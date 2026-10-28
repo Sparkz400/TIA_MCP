@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "2a79bc6afa82c2b09334ae76bb0e4a29d51448db5b5e0516e10ae9c455cc566f",
-      "bytes": 1341223
+      "sha256": "69da56c1fe74cf13e1a646b3fcfcac2ba9665eb391e393ee7d0da16cb31f860c",
+      "bytes": 1349421
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -93359,13 +93359,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93391,6 +93384,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -93491,13 +93491,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93509,6 +93502,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -93564,13 +93564,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93596,6 +93589,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -93652,13 +93652,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93698,6 +93691,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -93755,13 +93755,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93801,6 +93794,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -93855,13 +93855,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93873,6 +93866,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -93931,13 +93931,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -93949,6 +93942,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94009,13 +94009,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94041,6 +94034,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94147,13 +94147,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94189,13 +94182,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261025",
-          "profileSha256": "da262b01a6a4cbb8035d7e25abb5b1c8e521fa861221bef06f52dc4534d23985",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261025.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -94217,17 +94203,24 @@
           ]
         },
         {
-          "id": "local.library_compatibility.20261027",
-          "profileSha256": "75a8766a693d0404644eb44fb38534c6d0eccf02e774541400725070bb29d5e2",
-          "artifacts": [
-            "evidence/local.library_compatibility.20261027.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_compatibility.rerun.20261028",
+          "profileSha256": "05d3940ff80c9ab34599cf9c367c272bd45f4a47bfe424480fb9edc9f501e00a",
+          "artifacts": [
+            "evidence/local.library_compatibility.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94333,13 +94326,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94351,6 +94337,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94407,13 +94400,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94446,6 +94432,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94506,13 +94499,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94552,6 +94538,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94659,13 +94652,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94691,6 +94677,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94751,13 +94744,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94769,6 +94755,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94826,13 +94819,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_lifecycle.20261024",
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
@@ -94861,13 +94847,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261025",
-          "profileSha256": "da262b01a6a4cbb8035d7e25abb5b1c8e521fa861221bef06f52dc4534d23985",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261025.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -94886,6 +94865,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -94944,24 +94930,24 @@
           ]
         },
         {
-          "id": "local.library_formats.20261025",
-          "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df",
-          "artifacts": [
-            "evidence/local.library_formats.20261025.json"
-          ]
-        },
-        {
-          "id": "local.library_compatibility.20261027",
-          "profileSha256": "75a8766a693d0404644eb44fb38534c6d0eccf02e774541400725070bb29d5e2",
-          "artifacts": [
-            "evidence/local.library_compatibility.20261027.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_compatibility.rerun.20261028",
+          "profileSha256": "05d3940ff80c9ab34599cf9c367c272bd45f4a47bfe424480fb9edc9f501e00a",
+          "artifacts": [
+            "evidence/local.library_compatibility.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.rerun.20261028",
+          "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
+          "artifacts": [
+            "evidence/local.library_formats.rerun.20261028.json"
           ]
         }
       ],
@@ -102058,13 +102044,6 @@
           ]
         },
         {
-          "id": "local.library_dependencies.20261024",
-          "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5",
-          "artifacts": [
-            "evidence/local.library_dependencies.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -102083,6 +102062,13 @@
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
             "evidence/local.library_preservation.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_dependencies.rerun.20261028",
+          "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
+          "artifacts": [
+            "evidence/local.library_dependencies.rerun.20261028.json"
           ]
         }
       ],
@@ -102141,13 +102127,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_formats.20261024",
-          "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb",
-          "artifacts": [
-            "evidence/local.library_formats.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
@@ -102180,6 +102159,13 @@
           "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
             "evidence/local.read_contracts.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.rerun.20261028",
+          "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
+          "artifacts": [
+            "evidence/local.library_formats.rerun.20261028.json"
           ]
         }
       ],
@@ -102292,13 +102278,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_formats.20261024",
-          "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb",
-          "artifacts": [
-            "evidence/local.library_formats.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
@@ -102338,6 +102317,13 @@
           "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
             "evidence/local.read_contracts.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.rerun.20261028",
+          "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
+          "artifacts": [
+            "evidence/local.library_formats.rerun.20261028.json"
           ]
         }
       ],
@@ -102395,13 +102381,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_formats.20261025",
-          "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df",
-          "artifacts": [
-            "evidence/local.library_formats.20261025.json"
-          ]
-        },
-        {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
@@ -102441,6 +102420,13 @@
           "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
             "evidence/local.read_contracts.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.rerun.20261028",
+          "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
+          "artifacts": [
+            "evidence/local.library_formats.rerun.20261028.json"
           ]
         }
       ],
@@ -102794,13 +102780,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_formats.20261024",
-          "profileSha256": "1e60fb2ad69f77d99d5b680b269cf5b4fd4bd4a73d8711819fe7a9d9beec29eb",
-          "artifacts": [
-            "evidence/local.library_formats.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
@@ -102847,6 +102826,13 @@
           "profileSha256": "5ddf4156c9dae19b18c506fa88e74d5a843a92477f4fd66377655a25b97a2b7f",
           "artifacts": [
             "evidence/local.read_contracts.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_formats.rerun.20261028",
+          "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
+          "artifacts": [
+            "evidence/local.library_formats.rerun.20261028.json"
           ]
         }
       ],
@@ -116113,6 +116099,11 @@
       "sha256": "8e0d1e9c2289a5db277316934a9a6c1f811e03a317efc56876768edf012e1551"
     },
     {
+      "path": "evidence/local.library_compatibility.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "3630ac3504703fde35c12723a153bbab699bef8c7d57c09263c4ddc5c0507fc8"
+    },
+    {
       "path": "evidence/local.library_dependencies.20261024.json",
       "state": "observed",
       "sha256": "e083d70b8b7a6cc94638d7699383904fbcc82d80fc9d91e5940c9f22befc9c3a"
@@ -116121,6 +116112,11 @@
       "path": "evidence/local.library_dependencies.20261025.json",
       "state": "observed",
       "sha256": "d88ddbe890ccc86172ef692268073d7abbc4a7b0cf6cf3405e0ff1ed8254fa8a"
+    },
+    {
+      "path": "evidence/local.library_dependencies.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "adb1ed731b4b068690e18c210be14cca19df9982482af51f62e378b2bc5f730e"
     },
     {
       "path": "evidence/local.library_dmc_prerequisites.20261025.json",
@@ -116136,6 +116132,11 @@
       "path": "evidence/local.library_formats.20261025.json",
       "state": "observed",
       "sha256": "a30428a82d8cd2c36b26f48ac58bee26a3de94a3d42b2363720acc3784989e21"
+    },
+    {
+      "path": "evidence/local.library_formats.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "c75685791394c95eedf4c9ccea19433e03e3b846a6788cfc9e09154cc0cf33ec"
     },
     {
       "path": "evidence/local.library_import_scale.20261027.json",
@@ -116181,6 +116182,11 @@
       "path": "evidence/local.library_project_state.20261024.json",
       "state": "observed",
       "sha256": "38d55c13d4e1d7761edfcddc6c75dc1bccc3297e29f0b4e41926955e68534a83"
+    },
+    {
+      "path": "evidence/local.library_project_state.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "b6a7c0d5dc089087a50039222f5b43e0e8553f75aaeada232f655d29ad002539"
     },
     {
       "path": "evidence/local.library_protected.20261027.json",
@@ -116969,12 +116975,20 @@
       "profileSha256": "75a8766a693d0404644eb44fb38534c6d0eccf02e774541400725070bb29d5e2"
     },
     {
+      "id": "local.library_compatibility.rerun.20261028",
+      "profileSha256": "05d3940ff80c9ab34599cf9c367c272bd45f4a47bfe424480fb9edc9f501e00a"
+    },
+    {
       "id": "local.library_dependencies.20261024",
       "profileSha256": "1ceed0a2ca6d1867b8d2bc0270af8218c17396976e15a8ce2d0673f2a7da0bd5"
     },
     {
       "id": "local.library_dependencies.20261025",
       "profileSha256": "da262b01a6a4cbb8035d7e25abb5b1c8e521fa861221bef06f52dc4534d23985"
+    },
+    {
+      "id": "local.library_dependencies.rerun.20261028",
+      "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac"
     },
     {
       "id": "local.library_dmc_prerequisites.20261025",
@@ -116987,6 +117001,10 @@
     {
       "id": "local.library_formats.20261025",
       "profileSha256": "a89435a9359cd682c7d0d7b0b85caa332e2010f9b2006ccdb6edcf3b4afed2df"
+    },
+    {
+      "id": "local.library_formats.rerun.20261028",
+      "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb"
     },
     {
       "id": "local.library_import_scale.20261027",
@@ -117023,6 +117041,10 @@
     {
       "id": "local.library_project_state.20261024",
       "profileSha256": "ef3539e1ac03b5f6123898cae2a7efc8c85db0e65c82b3f55ef9f8c78bcf0e14"
+    },
+    {
+      "id": "local.library_project_state.rerun.20261028",
+      "profileSha256": "3c2cef6799d4bb505fba591529e0d1da14041baf7f75adca4ccf5cc941956d3d"
     },
     {
       "id": "local.library_protected.20261027",

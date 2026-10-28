@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.68",
-    "catalogSha256": "2a79bc6afa82c2b09334ae76bb0e4a29d51448db5b5e0516e10ae9c455cc566f",
+    "catalogSha256": "69da56c1fe74cf13e1a646b3fcfcac2ba9665eb391e393ee7d0da16cb31f860c",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "d9cb98b2b4df28af0241526a8e0da8e364d0624f4fab9fd14eccd00536ae9ea7"
   },
@@ -4708,10 +4708,10 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -4720,10 +4720,10 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -4732,10 +4732,10 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -4744,10 +4744,10 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -6417,52 +6417,52 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_formats.20261025",
         "local.library_releases.20261024",
         "local.library_releases.20261026",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_import_scale.20261027",
-        "local.read_contracts.20261028"
+        "local.read_contracts.20261028",
+        "local.library_formats.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261025",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261025",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261025",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         }
       ]
@@ -6480,52 +6480,52 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_formats.20261024",
         "local.library_releases.20261024",
         "local.library_releases.20261026",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library.native-traversal.20261027",
-        "local.read_contracts.20261028"
+        "local.read_contracts.20261028",
+        "local.library_formats.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library.native-traversal.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library.native-traversal.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library.native-traversal.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         }
       ]
@@ -6543,56 +6543,56 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_formats.20261024",
         "local.library_releases.20261024",
         "local.library_releases.20261026",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library.native-traversal.20261027",
         "local.library.native-chain.20261028",
-        "local.read_contracts.20261028"
+        "local.read_contracts.20261028",
+        "local.library_formats.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library.native-traversal.20261027",
             "local.library.native-chain.20261028",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library.native-traversal.20261027",
             "local.library.native-chain.20261028",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library.native-traversal.20261027",
             "local.library.native-chain.20261028",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         }
       ]
@@ -6688,48 +6688,48 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_formats.20261024",
         "local.library_releases.20261024",
         "local.library_releases.20261026",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.read_contracts.20261028"
+        "local.read_contracts.20261028",
+        "local.library_formats.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_formats.20261024",
             "local.library_releases.20261024",
             "local.library_releases.20261026",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.read_contracts.20261028"
+            "local.read_contracts.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         }
       ]
@@ -7237,11 +7237,11 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -7250,11 +7250,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7263,11 +7263,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7276,11 +7276,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7289,11 +7289,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7302,11 +7302,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7315,11 +7315,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -7342,9 +7342,9 @@
       "evidenceIds": [
         "local.library_upgrades.20261024",
         "local.library_vendor.20261025",
-        "local.library_formats.20261025",
-        "local.library_compatibility.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_compatibility.rerun.20261028",
+        "local.library_formats.rerun.20261028"
       ],
       "cells": [
         {
@@ -7353,9 +7353,9 @@
           "evidenceIds": [
             "local.library_upgrades.20261024",
             "local.library_vendor.20261025",
-            "local.library_formats.20261025",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
@@ -7364,9 +7364,9 @@
           "evidenceIds": [
             "local.library_upgrades.20261024",
             "local.library_vendor.20261025",
-            "local.library_formats.20261025",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
@@ -7375,9 +7375,9 @@
           "evidenceIds": [
             "local.library_upgrades.20261024",
             "local.library_vendor.20261025",
-            "local.library_formats.20261025",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
@@ -7386,9 +7386,9 @@
           "evidenceIds": [
             "local.library_upgrades.20261024",
             "local.library_vendor.20261025",
-            "local.library_formats.20261025",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
@@ -7397,9 +7397,9 @@
           "evidenceIds": [
             "local.library_upgrades.20261024",
             "local.library_vendor.20261025",
-            "local.library_formats.20261025",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         },
         {
@@ -7408,9 +7408,9 @@
           "evidenceIds": [
             "local.library_upgrades.20261024",
             "local.library_vendor.20261025",
-            "local.library_formats.20261025",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_formats.rerun.20261028"
           ]
         }
       ]
@@ -7433,9 +7433,9 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -7444,9 +7444,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7455,9 +7455,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7466,9 +7466,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7477,9 +7477,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7488,9 +7488,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7499,9 +7499,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -7524,18 +7524,17 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_scopes.20261025",
         "local.library_interruption.20261025",
         "local.library_dmc_prerequisites.20261025",
         "local.library_units.20261025",
-        "local.library_dependencies.20261025",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_import_scale.20261027",
-        "local.library_compatibility.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_compatibility.rerun.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -7544,18 +7543,17 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7564,18 +7562,17 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7584,18 +7581,17 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7604,18 +7600,17 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7624,18 +7619,17 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7644,18 +7638,17 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_compatibility.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_compatibility.rerun.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -7678,15 +7671,14 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_scopes.20261025",
         "local.library_interruption.20261025",
         "local.library_units.20261025",
-        "local.library_dependencies.20261025",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -7695,15 +7687,14 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7712,15 +7703,14 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7729,15 +7719,14 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7746,15 +7735,14 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7763,15 +7751,14 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7780,15 +7767,14 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_units.20261025",
-            "local.library_dependencies.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -7937,13 +7923,13 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_interruption.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_import_scale.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -7952,13 +7938,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7967,13 +7953,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7982,13 +7968,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -7997,13 +7983,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8012,13 +7998,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8027,13 +8013,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8056,13 +8042,13 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_interruption.20261024",
         "local.library_scopes.20261025",
         "local.library_interruption.20261025",
         "local.library_protected.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8071,13 +8057,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_protected.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8086,13 +8072,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_protected.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8101,13 +8087,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_protected.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8116,13 +8102,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_protected.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8131,13 +8117,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_protected.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8146,13 +8132,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_interruption.20261024",
             "local.library_scopes.20261025",
             "local.library_interruption.20261025",
             "local.library_protected.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8175,11 +8161,11 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8188,11 +8174,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8201,11 +8187,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8214,11 +8200,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8227,11 +8213,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8240,11 +8226,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8253,11 +8239,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8280,13 +8266,13 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_import_scale.20261027",
         "local.library.native-chain.20261028",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8295,13 +8281,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library.native-chain.20261028",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8310,13 +8296,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library.native-chain.20261028",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8325,13 +8311,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library.native-chain.20261028",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8340,13 +8326,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library.native-chain.20261028",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8355,13 +8341,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library.native-chain.20261028",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8370,13 +8356,13 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library.native-chain.20261028",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8399,9 +8385,9 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8410,9 +8396,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8421,9 +8407,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8432,9 +8418,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8443,9 +8429,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8454,9 +8440,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8465,9 +8451,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8490,11 +8476,11 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8503,11 +8489,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8516,11 +8502,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8529,11 +8515,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8542,11 +8528,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8555,11 +8541,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8568,11 +8554,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8595,9 +8581,9 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8606,9 +8592,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8617,9 +8603,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8628,9 +8614,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8639,9 +8625,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8650,9 +8636,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8661,9 +8647,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8686,9 +8672,9 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8697,9 +8683,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8708,9 +8694,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8719,9 +8705,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8730,9 +8716,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8741,9 +8727,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8752,9 +8738,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8777,9 +8763,9 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -8788,9 +8774,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8799,9 +8785,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8810,9 +8796,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8821,9 +8807,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8832,9 +8818,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -8843,9 +8829,9 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -8994,12 +8980,12 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_import_scale.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -9008,12 +8994,12 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9022,12 +9008,12 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9036,12 +9022,12 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9050,12 +9036,12 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9064,12 +9050,12 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9078,12 +9064,12 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -9169,11 +9155,11 @@
       "evidenceIds": [
         "local.library_releases.20261024",
         "local.library_releases.20261026",
-        "local.library_dependencies.20261024",
         "local.library_lifecycle.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
-        "local.library_preservation.20261028"
+        "local.library_preservation.20261028",
+        "local.library_dependencies.rerun.20261028"
       ],
       "cells": [
         {
@@ -9182,11 +9168,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9195,11 +9181,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9208,11 +9194,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9221,11 +9207,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9234,11 +9220,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         },
         {
@@ -9247,11 +9233,11 @@
           "evidenceIds": [
             "local.library_releases.20261024",
             "local.library_releases.20261026",
-            "local.library_dependencies.20261024",
             "local.library_lifecycle.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
-            "local.library_preservation.20261028"
+            "local.library_preservation.20261028",
+            "local.library_dependencies.rerun.20261028"
           ]
         }
       ]
@@ -23565,46 +23551,31 @@
       "notRetained": []
     },
     {
-      "id": "local.library_compatibility.20261027",
+      "id": "local.library_compatibility.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "4b69ad2c379e42b797ba533900124b7478916f7c",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.library_compatibility.20261027.json",
-          "sha256": "8e0d1e9c2289a5db277316934a9a6c1f811e03a317efc56876768edf012e1551"
+          "path": "evidence/local.library_compatibility.rerun.20261028.json",
+          "sha256": "3630ac3504703fde35c12723a153bbab699bef8c7d57c09263c4ddc5c0507fc8"
         }
       ],
       "notRetained": []
     },
     {
-      "id": "local.library_dependencies.20261024",
+      "id": "local.library_dependencies.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.library_dependencies.20261024.json",
-          "sha256": "e083d70b8b7a6cc94638d7699383904fbcc82d80fc9d91e5940c9f22befc9c3a"
-        }
-      ],
-      "notRetained": []
-    },
-    {
-      "id": "local.library_dependencies.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21
-      },
-      "sourceCommit": "b90742e04be053597e91b41e680d8870d942fc70",
-      "retained": [
-        {
-          "path": "evidence/local.library_dependencies.20261025.json",
-          "sha256": "d88ddbe890ccc86172ef692268073d7abbc4a7b0cf6cf3405e0ff1ed8254fa8a"
+          "path": "evidence/local.library_dependencies.rerun.20261028.json",
+          "sha256": "adb1ed731b4b068690e18c210be14cca19df9982482af51f62e378b2bc5f730e"
         }
       ],
       "notRetained": []
@@ -23625,31 +23596,16 @@
       "notRetained": []
     },
     {
-      "id": "local.library_formats.20261024",
+      "id": "local.library_formats.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.library_formats.20261024.json",
-          "sha256": "163f066ec2c6f20b940a144dfdd7e63eeceeac1d40f95ffb14bac67ff42ee0c8"
-        }
-      ],
-      "notRetained": []
-    },
-    {
-      "id": "local.library_formats.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21
-      },
-      "sourceCommit": "3ab2c78cbc2b14a98abc6054ec992a98556c10a6",
-      "retained": [
-        {
-          "path": "evidence/local.library_formats.20261025.json",
-          "sha256": "a30428a82d8cd2c36b26f48ac58bee26a3de94a3d42b2363720acc3784989e21"
+          "path": "evidence/local.library_formats.rerun.20261028.json",
+          "sha256": "c75685791394c95eedf4c9ccea19433e03e3b846a6788cfc9e09154cc0cf33ec"
         }
       ],
       "notRetained": []
