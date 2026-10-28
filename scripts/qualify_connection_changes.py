@@ -65,6 +65,8 @@ def create(run, kind, restore=False):
     run.apply("create a %s" % kind, "connection_create", payload,
               {"effects": [{"createConnection": kind, "localInterfacePath": local, "localNodeName": "X1", "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": "X1"}]},
               added=lambda applied, state: [key for key in state if key.startswith("conn:") and key not in before], restore=restore)
+    if restore:
+        return None  # The restored copy no longer holds the connection.
     added = sorted(key for key in run.current["view"] if key.startswith("conn:") and key not in before)
     require(added, "connection_inspect shows no new %s" % kind)
     return [run.current["view"][key] for key in added]

@@ -120,6 +120,19 @@ class Run(StateRun):
         self.mark("graph_edit", "applied", label)
         return result["document"]["recordRef"]
 
+    def prepare(self, label, kind, payload, preview=None, shown=None, exact=None):
+        if kind != "graph_import":
+            return super().prepare(label, kind, payload, preview, shown, exact)
+        # The Host replaces graphRef's document by its validated XML and source hash before the worker sees the payload.
+        prepared = self.h.stage("prepare " + label, lambda: self.h.tool("change_prepare", self.args(kind, payload)))
+        actual = prepared["preview"]
+        echoed = actual["payload"]
+        require(prepared["state"] == "prepared" and actual["changeId"] == prepared["changeId"] and actual["kind"] == kind and actual["project"]["path"] == self.project
+                and echoed.get("graphRef") == payload["graphRef"] and echoed.get("expectedBlockNames") == payload["expectedBlockNames"]
+                and len(echoed.get("sourceSha256") or "") == 64 and "<SW.Blocks.FB" in echoed.get("xml", ""),
+                "Preview of %s differs: %s" % (label, {k: actual.get(k) for k in ("kind", "project")}))
+        return prepared
+
     def apply(self, label, kind, payload, preview=None, **expected):
         prepared = self.prepare(label, kind, payload, preview or {})
         self.finish(label, kind, prepared, **expected)
