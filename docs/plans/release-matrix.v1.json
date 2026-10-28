@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.68",
-    "catalogSha256": "ac553913c7ea885e5a66cbe18a086e1e4ffb26962b6a810f3b28ffadf2acc877",
+    "catalogSha256": "75d6114f7d03b94042584024a02dcd7c70cabaa710d75a669afc034ae2c858db",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "d9cb98b2b4df28af0241526a8e0da8e364d0624f4fab9fd14eccd00536ae9ea7"
   },
@@ -7489,7 +7489,6 @@
       ],
       "evidenceIds": [
         "local.library_scopes.20261025",
-        "local.library_interruption.20261025",
         "local.library_dmc_prerequisites.20261025",
         "local.library_units.20261025",
         "local.library_protected.20261027",
@@ -7499,7 +7498,8 @@
         "local.library_compatibility.rerun.20261028",
         "local.library_dependencies.rerun.20261028",
         "local.library_lifecycle.rerun.20261028",
-        "local.library_releases.rerun.20261028"
+        "local.library_releases.rerun.20261028",
+        "local.library_interruption.rerun.20261028"
       ],
       "cells": [
         {
@@ -7507,7 +7507,6 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
@@ -7517,7 +7516,8 @@
             "local.library_compatibility.rerun.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7525,7 +7525,6 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
@@ -7535,7 +7534,8 @@
             "local.library_compatibility.rerun.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7543,7 +7543,6 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
@@ -7553,7 +7552,8 @@
             "local.library_compatibility.rerun.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7561,7 +7561,6 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
@@ -7571,7 +7570,8 @@
             "local.library_compatibility.rerun.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7579,7 +7579,6 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
@@ -7589,7 +7588,8 @@
             "local.library_compatibility.rerun.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7597,7 +7597,6 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_dmc_prerequisites.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
@@ -7607,7 +7606,8 @@
             "local.library_compatibility.rerun.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         }
       ]
@@ -7629,14 +7629,14 @@
       ],
       "evidenceIds": [
         "local.library_scopes.20261025",
-        "local.library_interruption.20261025",
         "local.library_units.20261025",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_preservation.20261028",
         "local.library_dependencies.rerun.20261028",
         "local.library_lifecycle.rerun.20261028",
-        "local.library_releases.rerun.20261028"
+        "local.library_releases.rerun.20261028",
+        "local.library_interruption.rerun.20261028"
       ],
       "cells": [
         {
@@ -7644,14 +7644,14 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7659,14 +7659,14 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7674,14 +7674,14 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7689,14 +7689,14 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7704,14 +7704,14 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
@@ -7719,14 +7719,14 @@
           "status": "bound",
           "evidenceIds": [
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_units.20261025",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         }
       ]
@@ -7873,98 +7873,98 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_interruption.20261024",
         "local.library_protected.20261027",
         "local.library_unit_relations.20261027",
         "local.library_import_scale.20261027",
         "local.library_preservation.20261028",
         "local.library_dependencies.rerun.20261028",
         "local.library_lifecycle.rerun.20261028",
-        "local.library_releases.rerun.20261028"
+        "local.library_releases.rerun.20261028",
+        "local.library_interruption.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_protected.20261027",
             "local.library_unit_relations.20261027",
             "local.library_import_scale.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         }
       ]
@@ -7985,98 +7985,91 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_interruption.20261024",
         "local.library_scopes.20261025",
-        "local.library_interruption.20261025",
         "local.library_protected.20261027",
         "local.library_preservation.20261028",
         "local.library_dependencies.rerun.20261028",
         "local.library_lifecycle.rerun.20261028",
-        "local.library_releases.rerun.20261028"
+        "local.library_releases.rerun.20261028",
+        "local.library_interruption.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_protected.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_protected.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_protected.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_protected.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_protected.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_interruption.20261024",
             "local.library_scopes.20261025",
-            "local.library_interruption.20261025",
             "local.library_protected.20261027",
             "local.library_preservation.20261028",
             "local.library_dependencies.rerun.20261028",
             "local.library_lifecycle.rerun.20261028",
-            "local.library_releases.rerun.20261028"
+            "local.library_releases.rerun.20261028",
+            "local.library_interruption.rerun.20261028"
           ]
         }
       ]
@@ -23531,31 +23524,16 @@
       "notRetained": []
     },
     {
-      "id": "local.library_interruption.20261024",
+      "id": "local.library_interruption.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "861e7f9916ff3d591e8e534ce08b06c028d055d1",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.library_interruption.20261024.json",
-          "sha256": "295087b4c48bb3044f00a8c284bdde24a37dded9c6f2b6ea399999e34adbaf17"
-        }
-      ],
-      "notRetained": []
-    },
-    {
-      "id": "local.library_interruption.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21
-      },
-      "sourceCommit": "824b0ba9a0c6bb43e369f3d2f3e3bdf3394ac2ab",
-      "retained": [
-        {
-          "path": "evidence/local.library_interruption.20261025.json",
-          "sha256": "7998131a28895c7f2c6f97504743f4ab2c8f2e0f7947ae3c9c583b8bf80d51f6"
+          "path": "evidence/local.library_interruption.rerun.20261028.json",
+          "sha256": "31ba34f79e5c58cdb861eec193247216146aff2d3f79357a9e0b5ad810c2dd60"
         }
       ],
       "notRetained": []

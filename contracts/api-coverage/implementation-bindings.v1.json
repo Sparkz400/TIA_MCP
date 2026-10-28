@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "ac553913c7ea885e5a66cbe18a086e1e4ffb26962b6a810f3b28ffadf2acc877",
-      "bytes": 1353381
+      "sha256": "75d6114f7d03b94042584024a02dcd7c70cabaa710d75a669afc034ae2c858db",
+      "bytes": 1355864
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -93617,24 +93617,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_interruption.20261024",
-          "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618",
-          "artifacts": [
-            "evidence/local.library_interruption.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_scopes.20261025",
           "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3",
           "artifacts": [
             "evidence/local.library_scopes.20261025.json"
-          ]
-        },
-        {
-          "id": "local.library_interruption.20261025",
-          "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071",
-          "artifacts": [
-            "evidence/local.library_interruption.20261025.json"
           ]
         },
         {
@@ -93670,6 +93656,13 @@
           "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
           "artifacts": [
             "evidence/local.library_releases.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.rerun.20261028",
+          "profileSha256": "40aac3015f3409b67c242536a371428cfcf3efc5432a29c259d44d206372ac39",
+          "artifacts": [
+            "evidence/local.library_interruption.rerun.20261028.json"
           ]
         }
       ],
@@ -93712,13 +93705,6 @@
       "schemaBindings": [],
       "schemaReview": "unresolved",
       "evidenceRefs": [
-        {
-          "id": "local.library_interruption.20261024",
-          "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618",
-          "artifacts": [
-            "evidence/local.library_interruption.20261024.json"
-          ]
-        },
         {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
@@ -93766,6 +93752,13 @@
           "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
           "artifacts": [
             "evidence/local.library_releases.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.rerun.20261028",
+          "profileSha256": "40aac3015f3409b67c242536a371428cfcf3efc5432a29c259d44d206372ac39",
+          "artifacts": [
+            "evidence/local.library_interruption.rerun.20261028.json"
           ]
         }
       ],
@@ -94084,13 +94077,6 @@
           ]
         },
         {
-          "id": "local.library_interruption.20261025",
-          "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071",
-          "artifacts": [
-            "evidence/local.library_interruption.20261025.json"
-          ]
-        },
-        {
           "id": "local.library_dmc_prerequisites.20261025",
           "profileSha256": "06ed522c979c39ff447c2f8b46dc37b7be620cda412f7357248834bdd4c4f01c",
           "artifacts": [
@@ -94158,6 +94144,13 @@
           "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
           "artifacts": [
             "evidence/local.library_releases.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.rerun.20261028",
+          "profileSha256": "40aac3015f3409b67c242536a371428cfcf3efc5432a29c259d44d206372ac39",
+          "artifacts": [
+            "evidence/local.library_interruption.rerun.20261028.json"
           ]
         }
       ],
@@ -94714,13 +94707,6 @@
           ]
         },
         {
-          "id": "local.library_interruption.20261025",
-          "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071",
-          "artifacts": [
-            "evidence/local.library_interruption.20261025.json"
-          ]
-        },
-        {
           "id": "local.library_units.20261025",
           "profileSha256": "91fe84eebe4ca4e2800646be60f38a5617d9eb8380011be62b58bb8d434503b2",
           "artifacts": [
@@ -94767,6 +94753,13 @@
           "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
           "artifacts": [
             "evidence/local.library_releases.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_interruption.rerun.20261028",
+          "profileSha256": "40aac3015f3409b67c242536a371428cfcf3efc5432a29c259d44d206372ac39",
+          "artifacts": [
+            "evidence/local.library_interruption.rerun.20261028.json"
           ]
         }
       ],
@@ -116029,6 +116022,11 @@
       "sha256": "7998131a28895c7f2c6f97504743f4ab2c8f2e0f7947ae3c9c583b8bf80d51f6"
     },
     {
+      "path": "evidence/local.library_interruption.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "31ba34f79e5c58cdb861eec193247216146aff2d3f79357a9e0b5ad810c2dd60"
+    },
+    {
       "path": "evidence/local.library_lifecycle.20261024.json",
       "state": "observed",
       "sha256": "24024e999a51c83d9f26a841acf2aee68638172a5ea5d2d9fb5fe82f2f31c61d"
@@ -116899,6 +116897,10 @@
     {
       "id": "local.library_interruption.20261025",
       "profileSha256": "53c257d61e046a642472d796552955146139b7fa31fb5709235cf9952f7c7071"
+    },
+    {
+      "id": "local.library_interruption.rerun.20261028",
+      "profileSha256": "40aac3015f3409b67c242536a371428cfcf3efc5432a29c259d44d206372ac39"
     },
     {
       "id": "local.library_lifecycle.20261024",
