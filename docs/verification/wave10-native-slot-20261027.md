@@ -91,9 +91,38 @@ Fixed: the runner now makes each scratch exactly de-DE, like the qualification H
 `project_languages_set` removes every other active language. The content binding is unchanged.
 Rerun pending.
 
-## Next slot
+## Second slot — 28 October
 
-1. `scripts/qualify_library_integrate_apply.py` on a fresh frozen build (with fixtures and AllowList).
-2. `scripts/probe_wave_kinds.py` for the web activation path.
-3. `scripts/probe_safety_kinds.py` (F-CPU, ET 200SP F-DI, `safety_fparameter_set`, `safety_printout`).
-4. Typed wave 9 engineering qualification (runbook step 6) without the two existing-global edge cases.
+Frozen build `D:\wp\b6` (commit 9ff587c, AllowList entry, `fixtures/typed-graphical` beside the
+worker), owned scratch CPU 1511-1 PN projects only.
+
+| Run | Outcome | Evidence |
+| --- | --- | --- |
+| `scripts/qualify_plc_object_mutations.py` | 369/369 steps; 22 X11 kinds verified (applied with exact preview and complete-export diff, refused per family, reopened in a fresh Portal, restored from their own checkpoint) | `local.plc_object_mutations.20261028` |
+| `scripts/validate_milestones.py --skip-simulation` | 11 changes with `change_status`, exact readback, fresh-Portal reopen; 8 restores with recovered reopen; `graphical_operand_set` verified, STL added to `source_upsert` | `local.milestones.reopen.20261028` |
+| `scripts/qualify_library_integrate_apply.py` | passed after the de-DE-only scratch fix: new and existing FBD FC callers installed, OB/LAD refused, Host without the flag refused | `local.library_integrate.combined_apply.20261028` |
+| `scripts/probe_wave_kinds.py` | `webServerActive` together with system pages applied; switching web serving off failed readback because TIA also clears `EnableSystemWebPages` (now previewed) | retained `D:\wp\a\wp_c236a724` |
+| `scripts/prepare_crossunit_capture_archive.py` | first native `software_unit_relation_set` and `software_unit_publication_set`, each with readback; archive `artifacts/crossunit-prep/838e0c54….zap21` | receipt next to the archive |
+| `capture_typed_routes_owned.py` crossUnit / crossNamespace | both passed with persistence (2 and 3 sources) | `artifacts/cap-crossunit`, `artifacts/cap-crossns` |
+
+Matrix: bound cells 441 → 585, open 1,658 → 1,514.
+
+Findings:
+
+- **`change_restore` after a failed compile.** A change whose compile fails leaves an inconsistent
+  user block; the recovery guard cannot fingerprint it and refuses (`FingerprintUnavailable`) by
+  design. The checkpoint stays retained. The X11 runner records this refusal.
+- **R_TRIG/F_TRIG instance DBs.** TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile,
+  whether created from SCL or with `CreateInstanceDB`, even after an R_TRIG use (`D:\wp\w9e`, a
+  scratch experiment). `instance_db_create` now refuses them; global edge storage needs its call in
+  the same compile.
+- **Safety probe blocked.** An F-CPU added to a scratch fails compile: "At least one local user must
+  have the following runtime right: Full access including fail-safe". Scratch provisioning
+  deliberately never grants that right, so `safety_fparameter_set`/`safety_printout` were not run.
+- **Combined apply content.** A scratch that keeps en-US next to de-DE adds empty en-US text items to
+  every export, which fails the captured-storage content binding; the runner now makes its scratches
+  de-DE only.
+
+Still open natively: the safety kinds (blocked as above), web deactivation after the preview fix,
+typed wave 9 builder qualification (66 cases), cross-scope call profiles (extraction pending) and
+`webserver_user_pages_generate`, `certificate_import`, `graph_edit` → `graph_import`.
