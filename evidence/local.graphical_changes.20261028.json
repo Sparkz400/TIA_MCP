@@ -2,10 +2,10 @@
   "schema": "tia-mcp.evidence-summary.v1",
   "evidenceId": "local.graphical_changes.20261028",
   "outcome": "passed",
-  "recordedAtUtc": "2026-10-28T16:45:31+00:00",
+  "recordedAtUtc": "2026-10-28T16:48:50+00:00",
   "source": {
     "commit": "6f82e7037ae976523f229d546642e4ba95d69285",
-    "dirty": true
+    "dirty": false
   },
   "environment": {
     "machine": "PCNico",
@@ -14,10 +14,10 @@
   },
   "scope": "scripts/qualify_graphical_changes.py (gr3) on a frozen Debug build of 6f82e70 (D:\\wp\\b56, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: the genuine V21 exports Tgp_FC_LAD and Tgp_FC_FBD (an FB calling the scratch's FC TiaMcp_IsEnabled) imported with the project culture and an extra Bool input; per language call_parameter_set moved the Enable argument to EnableAlternate, graphical_network_patch replaced one Access in place and graphical_network_insert added a copy of the network with fresh object IDs, each with checkpoint, compile, native preservation readback and save, change_status equal to the apply result and a complete snapshot differing only in the edited block; on LAD each kind first refused a wrong previewHash (PreviewMismatch) without stages or checkpoint; a fresh owned Portal reopen showed the identical state; from there one change per kind was applied again and restored from its checkpoint into a new directory equal to the reopened state; nine typed prepare refusals (NetworkNotFound, CallNotFound, ParameterNotFound, UnresolvedNetworkReference, InvalidNetworkPatch, UnsupportedLanguage, LanguageConversionNotSupported, InvalidSimaticML and AccessWiringUnsupported for call_connection_set) left the PLC software unchanged.",
   "limitations": [
-    "Two genuine V21 FlgNet/v5 fixtures (one LAD and one FBD network, each an FB calling an FC) in one owned scratch CPU 1511-1 PN V4.1.",
-    "graphical_network_patch is qualified for in-place Access replacement only: TIA renumbers UIds and orders Access parts first on import, so patches that add or remove fragments fail closed with NativePreservationMismatch (exploratory probe, same day) and need their checkpoint.",
-    "call_connection_set is refused before any change: TIA V21 import rejects an Access without a wire and an Access on several wires (exploratory probe, same day).",
-    "Engineering only; nothing is downloaded or simulated. Trials gr1 (build b54, stopped on the runner's own assertion in its restore phase) and gr2 (build b55, passed without change_status calls) are retained and not cited."
+    "Two genuine V21 FlgNet/v5 fixtures (one LAD and one FBD network, each an FB calling an FC) in one owned scratch CPU 1511-1 PN V4.1.\r",
+    "graphical_network_patch is qualified for in-place Access replacement only: TIA renumbers UIds and orders Access parts first on import, so patches that add or remove fragments fail closed with NativePreservationMismatch (exploratory probe, same day) and need their checkpoint.\r",
+    "call_connection_set is refused before any change: TIA V21 import rejects an Access without a wire and an Access on several wires (exploratory probe, same day).\r",
+    "Engineering only; nothing is downloaded or simulated. Trials gr1 (build b54, stopped on the runner's own assertion in its restore phase) and gr2 (build b55, passed without change_status calls) are retained and not cited.\r"
   ],
   "binaries": [
     {
