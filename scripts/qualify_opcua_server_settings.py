@@ -13,13 +13,14 @@ import argparse
 from pathlib import Path
 import re
 
+from compilation_evidence import require_clean_compile
 from library_native_harness import Harness, require
+from qualify_plc_object_mutations import STAGES, in_order
 
 KIND = "opcua_server_settings_set"
 PINNED = {"serverEnabled": ("opcua", "OpcUaServer"), "runtimeLicense": ("cpu", "OpcUaPurchasedLicense")}
 UNPINNED = ("port", "guestAccess", "autoAcceptClientCertificates")
 LICENSES = {0: "NoLicense", 1: "SimaticOpcUaS71500Small"}
-STAGES = ("checkpoint", "apply", "compile", "save")
 
 
 def body(h):
@@ -83,8 +84,9 @@ def body(h):
     require(preview["opcUaServerSettingsBefore"]["serverEnabled"]["value"] is False and preview["opcUaServerSettingsAfter"]["runtimeLicense"]["value"] == LICENSES[1]
             and {e["setting"] for e in preview["effects"]} == {"OpcUaServer", "OpcUaPurchasedLicense"}, "Preview differs: %s" % preview)
     applied = h.apply_prepared(KIND, prepared)
-    require([s for s in applied["stages"] if s in STAGES] == list(STAGES) and applied.get("recoveryArchiveSha256"), "Stages differ: %s" % applied["stages"])
-    require(applied["compile"].get("errorCount") == 0, "Device compile failed: %s" % applied["compile"])
+    require(in_order(applied["stages"], STAGES) and applied.get("recoveryArchiveSha256"), "Stages differ: %s" % applied["stages"])
+    require(applied["compile"].get("targetIdentityPolicy") == "device-path-v1", "Expected the all-devices compile receipt")
+    require_clean_compile(applied["compile"])
     readback = next(r for r in applied["readbacks"] if r.get("role") == "opcua-server-settings-readback")
     require(readback["serverEnabled"] is True and readback["runtimeLicense"] == LICENSES[1], "Readback differs: %s" % readback)
 
