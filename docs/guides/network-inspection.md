@@ -185,7 +185,10 @@ set the mode with `hardware_attributes` and `compile: false`, then create the ar
 checkpoint saves the mode. TIA adds the system constant `Local~PROFINET_interface_1~IODevice`
 (`Hw_Device`) with the I-device mode and one `Hw_SubModule` constant per area
 (`Local~PROFINET_interface_1~<area name>`). A new CD area gets direction `LocalToPartner`, one
-byte in each direction, the next free output byte as local address and position numbers from 1000.
+byte in each direction, the next free output byte as local address and position numbers from 1000. Switching the
+interface back to `IoController` with `hardware_attributes` removes its transfer areas and these
+constants; that kind has no transfer-area preservation check. The interface's
+`CalculatedBandwidthForCyclicIoData` is computed at the device compile and not saved.
 
 ## Preservation manifest identity checks
 
