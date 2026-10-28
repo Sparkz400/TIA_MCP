@@ -47,6 +47,10 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 - [x] **Step 5:** Record the outcome in `docs/verification/runtime-real-server-gate-<date>.md`. If either endpoint is unreachable or refused, stop here and record why. The plan below assumes both answer. Recorded in [the gate record](../verification/runtime-real-server-gate-20261028.md): OPC UA and the Web API both pass; the web login was Anonymous (web authentication disabled).
 - [ ] **Step 6 (operator):** Delete the throwaway instance and switch *Online Access* back to Softbus.
 
+**Gate follow-up, endpoint form:**
+
+- [x] The gate found that `runtime_ua_connect` refused the URL as the server advertises it (`opc.tcp://192.168.0.1:4840`) with `UaEndpointSelectionInvalid`. The SDK's `GetEndpoints` reports every advertised URL in `System.Uri` form with the root slash, so only that form can match. `OpcUaRuntimeSessionStore` now canonicalizes the caller's endpoint once in `Connect` and `Binding` (`Canonical`); `Validate`, the stored record, the credential binding and the `GetEndpoints` match stay exact. Test: an endpoint without the slash connects against the fixture server, names the same attempt and the same credential binding, and a query is still refused (`tests/TiaMcp.OpcUa.Runtime.Tests`). [OPC UA runtime](../reference/opcua-runtime.md).
+
 ### Task 1: TCP/IP admission in the simulator worker
 
 **Files:**
@@ -57,18 +61,19 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 **Interfaces:**
 - Produces: `public static string Refusal(string networkMode, string instanceInterface, string requiredInterface)`. It returns `null` when admitted, otherwise `"SoftbusRequired"` or `"TcpIpModeRequired"`. Inputs are the V8 enum names (`Softbus`, `TCPIPSingleAdapter`, `TCPIPMultipleAdapter`, `TCPIP`). `requiredInterface` is the interface recorded at creation.
 - Produces: the `create` request accepts `communicationInterface`: `"Softbus"` (default) or `"TCPIP"`. `"TCPIP"` is admitted only when `NetworkMode` is already `TCPIPSingleAdapter`. The instance's `CommunicationInterface` is set before power-on and stored in the creation receipt. `Info` already reports `communicationInterface`.
+- As built: `IInstance.CommunicationInterface` is read-only in V8 and follows the machine-wide mode (an Off instance in Softbus mode reports `Softbus`). So `sim_create` records the requested interface in the receipt and never assigns it, and every admission compares the live interface with it. Admission covers power-on, RUN, `sim_write`, `sim_write_owned`, `sim_test` and `sim_identity`; reads, tags and captures stay ungated. Selections without a receipt stay Softbus-only.
 
-- [ ] **Step 1: Write the failing tests** in `SimulationNetworkAdmissionTests`:
+- [x] **Step 1: Write the failing tests** in `SimulationNetworkAdmissionTests`:
   - `Refusal("Softbus","Softbus","Softbus") == null`
   - `Refusal("TCPIPSingleAdapter","TCPIP","TCPIP") == null`
   - `Refusal("TCPIPSingleAdapter","TCPIP","Softbus") == "SoftbusRequired"`
   - `Refusal("Softbus","Softbus","TCPIP") == "TcpIpModeRequired"` (the operator switched back mid-window)
   - `Refusal("TCPIPMultipleAdapter","TCPIP","TCPIP") == "TcpIpModeRequired"` (only single-adapter mode is admitted)
   - an unknown mode string is refused rather than admitted
-- [ ] **Step 2:** Run `dotnet run --project tests/TiaMcp.Tests -c Release`. Expected: the build fails because `SimulationNetworkAdmission` is not defined.
-- [ ] **Step 3:** Implement `Refusal`. Replace the inline Softbus checks and `EnsureSoftbus` with calls to it, passing the receipt's interface, and map a non-null result to `SimulatorException(code, …)` with the existing Softbus message for `SoftbusRequired`. In `Create`, validate `communicationInterface` and set `instance.CommunicationInterface` from it. `NetworkMode` is never assigned.
-- [ ] **Step 4:** Run the tests: all pass. Build `src/TiaMcp.Simulator.V8` against the V8 API with zero errors.
-- [ ] **Step 5:** Commit: `Simulator worker admits owned instances in existing TCP/IP single-adapter mode`.
+- [x] **Step 2:** Run `dotnet run --project tests/TiaMcp.Tests -c Release`. Expected: the build fails because `SimulationNetworkAdmission` is not defined.
+- [x] **Step 3:** Implement `Refusal`. Replace the inline Softbus checks and `EnsureSoftbus` with calls to it, passing the receipt's interface, and map a non-null result to `SimulatorException(code, …)` with the existing Softbus message for `SoftbusRequired`. In `Create`, validate `communicationInterface` and set `instance.CommunicationInterface` from it. `NetworkMode` is never assigned.
+- [x] **Step 4:** Run the tests: all pass. Build `src/TiaMcp.Simulator.V8` against the V8 API with zero errors. A source check also pins that the worker never assigns `NetworkMode`, adapter bindings or IP suites.
+- [x] **Step 5:** Commit: `Simulator worker admits owned instances in existing TCP/IP single-adapter mode`.
 
 ### Task 2: Bindings for TCP/IP endpoints
 
@@ -80,12 +85,13 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 **Interfaces:**
 - Consumes: Task 1's `communicationInterface` in the creation receipt.
 - Produces: refusal code `PlcsimEndpointUnreachable` when a Softbus binding backs a `runtime_ua_*` or `runtime_web_*` endpoint. The existing `RuntimeTargetNotOwnedPlcsim` covers an endpoint address outside the binding.
+- As built: `sim_identity` reports the admitted interface, so a mode switch mid-window fails every gated write with `TcpIpModeRequired` before the binding is compared. `Covers` also requires `TCPIP`, so the runtime handoff review never calls a Softbus binding `boundOwnedPlcsim`. A changed interface makes the binding stale. Only writes and RUN/STOP take a binding; `runtime_ua_connect` and `runtime_web_connect` do not, so the connect-time half of Review Focus 2 (and any host-subnet check) is still open for Task 4.
 
-- [ ] **Step 1: Write the failing tests:** a Softbus binding with endpoint `192.168.0.1` gives `PlcsimEndpointUnreachable`; a TCP/IP binding with addresses `["192.168.0.1"]` and endpoint `192.168.0.2` gives `RuntimeTargetNotOwnedPlcsim`; a TCP/IP binding with a matching address is admitted.
-- [ ] **Step 2:** Run `dotnet run --project tests/TiaMcp.PhysicalRuntime.Tests -c Release`. Expected: the new checks fail.
-- [ ] **Step 3:** Implement. The binding's content hash now includes `communicationInterface`, so older bindings stay readable but cannot authorize a network endpoint.
-- [ ] **Step 4:** Run the tests: all pass.
-- [ ] **Step 5:** Commit: `PLCSIM bindings record the communication interface; Softbus bindings never back network endpoints`.
+- [x] **Step 1: Write the failing tests:** a Softbus binding with endpoint `192.168.0.1` gives `PlcsimEndpointUnreachable`; a TCP/IP binding with addresses `["192.168.0.1"]` and endpoint `192.168.0.2` gives `RuntimeTargetNotOwnedPlcsim`; a TCP/IP binding with a matching address is admitted.
+- [x] **Step 2:** Run `dotnet run --project tests/TiaMcp.PhysicalRuntime.Tests -c Release`. Expected: the new checks fail.
+- [x] **Step 3:** Implement. The binding's content hash now includes `communicationInterface`, so older bindings stay readable but cannot authorize a network endpoint.
+- [x] **Step 4:** Run the tests: all pass.
+- [x] **Step 5:** Commit: `PLCSIM bindings record the communication interface; Softbus bindings never back network endpoints`.
 
 ### Task 3: `opcua_server_settings_set` change kind
 
@@ -98,14 +104,21 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 
 **Interfaces:**
 - Produces: change kind `opcua_server_settings_set`. Payload: `serverEnabled` (bool), `port` (1..65535), `guestAccess` (bool), `autoAcceptClientCertificates` (bool), `runtimeLicense` (one of the native enum names found in Step 1). Each field is optional and carries `{ expected, value }` like `webServerActive`. Preview lists each native attribute's before and after values. Apply uses the shared `change_apply` route (checkpoint, compile, save, readback).
+- As built ([fixture](../../fixtures/opcua/server-settings-v21-1511-v41.json)): `serverEnabled` is `OpcUaServer` on the CPU's `OPC UA` sub-item; `port` and `autoAcceptClientCertificates` are `OpcUaPort` and `OpcUaAutoAcceptAllClientCertificates` there, which exist only while the server is on; `runtimeLicense` is the CPU's UInt64 `OpcUaPurchasedLicense` (0..3 `NoLicense`, `SimaticOpcUaS71500Small`/`Medium`/`Large`, named by the V21 hardware parameter PDF). `guestAccess` has no attribute: V21 models guest access as the UMAC anonymous user holding the `OPCUAServerAccess` device right, so it is refused with `UnsupportedCapability`. V21 refuses to compile an active server unless some user holds that right; `umac_role_set` grants it, and a refused grant now lists the CPU's available device rights. The payload rules are a Core helper (`OpcUaServerSettings`) with offline tests. The kind has its own prepare and apply instead of joining `OpcUaPayloadFields`, because it writes hardware attributes, not the server interface group.
 
-- [ ] **Step 1: Capture names.** On a fresh owned scratch CPU 1511-1 PN V4.1, run `opcua_engineering_inspect` and save its `serverSettings` (attributes whose names contain `OpcUa`) to the fixture. Pin the exact attribute names; V21 documents no fixed list.
-- [ ] **Step 2: Write the failing checks:** `test_contracts` sees the new kind; payload validation refuses unknown fields, a port of 0 and an `expected` that differs from the read value (`ExpectedValueMismatch`).
-- [ ] **Step 3: Implement.** Write only the pinned attribute names. A missing attribute is `UnsupportedCapability`; nothing is written.
-- [ ] **Step 4: Native check.** Apply the kind on a scratch, then verify: readback, compile, save, fresh reopen and `change_restore` to the exact before state.
-- [ ] **Step 5:** Commit: `Add opcua_server_settings_set for the CPU OPC UA server`.
+- [x] **Step 1: Capture names.** On a fresh owned scratch CPU 1511-1 PN V4.1, run `opcua_engineering_inspect` and save its `serverSettings` (attributes whose names contain `OpcUa`) to the fixture. Pin the exact attribute names; V21 documents no fixed list.
+- [x] **Step 2: Write the failing checks:** `test_contracts` sees the new kind; payload validation refuses unknown fields, a port of 0 and an `expected` that differs from the read value (`ExpectedValueMismatch`).
+- [x] **Step 3: Implement.** Write only the pinned attribute names. A missing attribute is `UnsupportedCapability`; nothing is written.
+- [x] **Step 4: Native check.** Apply the kind on a scratch, then verify: readback, compile, save, fresh reopen and `change_restore` to the exact before state. `scripts/qualify_opcua_server_settings.py`; [verification record](../verification/opcua-server-settings-20261028.md).
+- [x] **Step 5:** Commit: `Add opcua_server_settings_set for the CPU OPC UA server`.
 
 ### Task 4: Real-server runner, normal path
+
+**Found while building Tasks 1-3 (resolve before Step 5):**
+
+- The engineering worker still requires Softbus for memory-card generation (`VerifySimulationInstance`), the discovery baseline and credential provisioning. Provisioning a TCP/IP instance needs the same receipt-based admission there; until then step 3 below refuses with `SoftbusRequired`.
+- Guest access cannot be set through V21 Openness (see Task 3). Either log in as the scratch's own runtime user (`TiaMcpTest_*`, generated DPAPI password; its role needs `OPCUAServerAccess`, as the Task 3 runner grants), which puts a generated credential into the Host vault, or use an operator-made seed with guest access. This is the user's call.
+- `autoAcceptClientCertificates` is settable, so the CPU can accept the Host's client certificate without `certificate_assign`.
 
 **Files:**
 - Create: `scripts/qualify_runtime_plcsim_tcpip.py`: reuses `smoke_mcp.Client` and the checks in `scripts/opcua_runtime_checks.py`; writes `verification.json` with `toolCalls` after the whole run passed

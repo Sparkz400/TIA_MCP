@@ -62,9 +62,14 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         DateTime.UtcNow < certificate.NotBefore.ToUniversalTime() ? "notYetValid" :
         DateTime.UtcNow >= certificate.NotAfter.ToUniversalTime() ? "expired" : "current";
 
+    /// <summary>The SDK reports every advertised endpoint in System.Uri form (opc.tcp://host:port/), while Siemens servers
+    /// advertise and TIA shows it without the root slash. Callers' endpoints are canonicalized once here; Validate stays exact.</summary>
+    public static OpcUaRuntimeSelection Canonical(OpcUaRuntimeSelection selection) =>
+        Uri.TryCreate(selection?.Endpoint, UriKind.Absolute, out var endpoint) ? selection with { Endpoint = endpoint.AbsoluteUri } : selection;
+
     public static CredentialBinding Binding(OpcUaRuntimeSelection selection)
     {
-        Validate(selection);
+        selection = Canonical(selection); Validate(selection);
         if (selection.Authentication != "username") throw Error("UaCredentialBindingInvalid");
         return new(new("opcUaRuntime", selection.Endpoint, selection.CertificateSha256, "applicationUri", selection.ApplicationUri),
             "opcUaRuntimeLogin", selection.User!);
@@ -94,7 +99,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
 
     public async Task<OpcUaRuntimeStatus> Connect(string attemptId, OpcUaRuntimeSelection selection, CancellationToken ct = default)
     {
-        Id(attemptId); Validate(selection);
+        Id(attemptId); selection = Canonical(selection); Validate(selection);
         if (selection.Authentication == "username")
         {
             ProtectedCredentialGuard.ValidateReference(selection.Credential!);

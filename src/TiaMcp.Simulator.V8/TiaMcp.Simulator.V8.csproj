@@ -15,6 +15,7 @@
   <ItemGroup>
     <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="WorkerPipeWriter.cs" />
     <Compile Include="../TiaMcp.Core/JournalFileReplacement.cs" Link="JournalFileReplacement.cs" />
+    <Compile Include="../TiaMcp.Core/SimulationNetworkAdmission.cs" Link="SimulationNetworkAdmission.cs" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <Reference Include="System.Security" />
     <Reference Include="Siemens.Simatic.Simulation.Runtime.Api.x64">

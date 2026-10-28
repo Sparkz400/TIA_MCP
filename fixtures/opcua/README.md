@@ -19,3 +19,7 @@ The next native fixture must capture independent PLC declarations and the real S
 `dependencies/device.xml` uses namespace index 2 for `urn:example:types`; `dependencies/types-v1.xml` uses index 1 for that URI. Together they resolve `Sensor → Telemetry → Reading` through a variable DataType and a structure field DataType. They are minimal authored NodeSet envelopes, not complete standard/companion models.
 
 `types-v2.xml` changes only Reading's BrowseName plus model version metadata. The v2 consumer manifest binds the exact device and v1 type file bytes. Independent expectations: one breaking node-field change, SensorClient indirectly affected through two edges, TypeClient directly affected, UnrelatedClient with no known impact. Omitting the type file reports a missing node and required model; supplying v1 and v2 together reports ambiguity. See [offline dependency analysis](../../docs/reference/opc-ua-dependencies.md) for commands and limits.
+
+## Native server settings
+
+`server-settings-v21-1511-v41.json` pins the CPU OPC UA server attribute names that `opcua_server_settings_set` writes: `OpcUaServer`, and while the server is on `OpcUaPort` and `OpcUaAutoAcceptAllClientCertificates`, on the CPU's `OPC UA` sub-item, and `OpcUaPurchasedLicense` on the CPU. It holds native captures of owned scratch CPUs 1511-1 PN V4.1 (TIA V21 Update 3) with the server off and on, plus the license value names from the V21 hardware parameter description. Guest access has no attribute: V21 models it as the UMAC anonymous user's `OPCUAServerAccess` right.

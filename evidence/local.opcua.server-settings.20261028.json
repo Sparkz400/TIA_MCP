@@ -1,0 +1,100 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.opcua.server-settings.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T17:33:51+00:00",
+  "source": {
+    "commit": "a2f3b3d34d148647ed48d9e9ffd97fc6ad9b4fe2",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts\\qualify_opcua_server_settings.py on build a2f3b3d (frozen D;C:\\Program Files\\Git\\wp\\rs05) in one owned scratch CPU 1511-1 PN V4.1 (V21 Update 3), 36\\36 steps; eleven typed refusals (unknown field, empty payload, bare value, stale expected, unknown license, scopePath, guest access, port and certificate acceptance while the server is off, port 0 and 65536, stale port) changed no CPU or OPC UA attribute; umac_role_set granted OPCUAServerAccess to the scratch runtime role; opcua_server_settings_set enabled the server with the Small license (checkpoint, device compile, save, native readback; only OpcUaServerCertificate changed besides the request), change_restore in the applying Portal returned every CPU and OPC UA sub-item attribute to the pre-change state, a second activation and a port 4840->4841 plus automatic certificate acceptance change applied with exactly those attribute changes, and a fresh owned Portal reopened the project with identical attributes and both journals applied.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN V4.1; other CPUs and firmware are not exercised.",
+    "guestAccess is refused: V21 models guest access as the UMAC anonymous user holding OPCUAServerAccess, which neither this kind nor umac_role_set changes.",
+    "Offline project settings only: nothing is downloaded, no OPC UA client connects, and the server certificate TIA assigns at compile is not inspected.",
+    "runtimeLicense records the purchased license; no entitlement is verified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3dfd38097710feab14b7c26a0985ba629120647a32653e5c6832d04367aac535"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "954e76dc8acc71cab201b02f60fedd91234e095a73394fdae383390b72a731df"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "6a310a15c266bca3d3d4c9ce6b48c35d9a992df8913cc6de3a2cfbb176bd2ddb",
+      "bytes": 307019,
+      "completed": true,
+      "steps": [
+        "start owned TIA opcua server settings",
+        "create owned scratch opcua server settings",
+        "inspect before",
+        "refuse an unknown field",
+        "refuse an empty payload",
+        "refuse a bare value",
+        "refuse a stale expected",
+        "refuse an unknown license",
+        "refuse a scopePath",
+        "refuse guest access",
+        "refuse port while the server is off",
+        "refuse certificate acceptance while the server is off",
+        "list the CPU's device rights",
+        "prepare umac_role_set",
+        "apply umac_role_set",
+        "inspect after the UMAC grant",
+        "prepare enable the server",
+        "apply opcua_server_settings_set",
+        "inspect after enabling",
+        "restore in the applying Portal",
+        "inspect after restore",
+        "prepare enable the server again",
+        "apply opcua_server_settings_set",
+        "inspect after enabling again",
+        "refuse port 0",
+        "refuse port 65536",
+        "refuse a stale port",
+        "prepare set port and certificate acceptance",
+        "apply opcua_server_settings_set",
+        "inspect after tuning",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "inspect after reopen",
+        "change_status after reopen: enable again",
+        "change_status after reopen: tune"
+      ],
+      "toolsPassed": [
+        "access_inspect",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hardware_inspect",
+        "opcua_engineering_inspect",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_open"
+      ]
+    }
+  ]
+}

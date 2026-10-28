@@ -8,6 +8,7 @@ using Siemens.Engineering.HW;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.OpcUa;
 using Siemens.Engineering.SW.OpcUa.AccessControl;
+using OpcUaServerSettings = TiaMcp.Core.OpcUaServerSettings;
 
 namespace TiaMcp.Openness.V21
 {
@@ -216,6 +217,95 @@ namespace TiaMcp.Openness.V21
             }
             readback["role"] = "opcua-readback";
             change.Readbacks.Add(readback);
+        }
+
+        // [0] is the CPU device item owning the PLC software, [1] its single sub-item exposing OpcUaServer (natively "OPC UA_1").
+        private static DeviceItem[] OpcUaServerOwners(PlcSoftware software)
+        {
+            for (IEngineeringInstance owner = software.Parent; owner != null && !(owner is Device); owner = owner.Parent)
+                if (owner is DeviceItem cpu)
+                {
+                    var servers = cpu.DeviceItems.Where(item => item.GetAttributeInfos().Any(info => info.Name == "OpcUaServer")).Take(2).ToArray();
+                    if (servers.Length == 1) return new[] { cpu, servers[0] };
+                }
+            throw new BridgeException("UnsupportedCapability", "The selected PLC's CPU exposes no single OPC UA sub-item with an OpcUaServer attribute.");
+        }
+
+        private static object OpcUaPayloadValue(JToken token) => (token as JValue)?.Value;
+
+        private void PrepareOpcUaServerSettings(EngineeringChange change, JObject preview)
+        {
+            var payload = change.Payload;
+            var unsupported = payload.Properties().Select(p => p.Name).Where(name => OpcUaServerSettings.Find(name) == null).ToArray();
+            if (unsupported.Length != 0) throw new BridgeException("InvalidRequest", "Unsupported OPC UA server settings fields: " + string.Join(", ", unsupported) + ". Passwords, certificates and user credentials are never accepted.");
+            if (payload.Count == 0) throw new BridgeException("InvalidRequest", "Name at least one of " + string.Join(", ", OpcUaServerSettings.Settings.Select(s => s.Field)) + ".");
+            if (change.Selector["scopePath"]?.Type == JTokenType.String) throw new BridgeException("InvalidRequest", "OPC UA changes target one PLC; scopePath is not supported.");
+            var plc = SelectPlc(change.Selector);
+            var owners = OpcUaServerOwners(plc.Software);
+            JObject before = new JObject(), after = new JObject();
+            var effects = (JArray)preview["effects"];
+            foreach (var setting in OpcUaServerSettings.Settings.Where(s => payload[s.Field] != null))
+            {
+                var requested = WebSetting(payload, setting.Field);
+                var item = owners[setting.OnCpu ? 0 : 1];
+                if (setting.Attribute == null || !item.GetAttributeInfos().Any(i => i.Name == setting.Attribute && (i.AccessMode & EngineeringAttributeAccessMode.Write) != 0))
+                    throw new BridgeException("UnsupportedCapability", setting.Field == "guestAccess"
+                        ? "V21 models OPC UA guest access as the UMAC anonymous user holding the OPCUAServerAccess device right, which this kind and umac_role_set never change; nothing was written."
+                        : setting.Field + " has no writable native " + (setting.Attribute ?? "attribute") + " on this CPU; port and automatic certificate acceptance exist only while the server is on. Nothing was written.");
+                object current = item.GetAttribute(setting.Attribute);
+                string refusal = OpcUaServerSettings.Refusal(setting.Field, OpcUaPayloadValue(requested["expected"]), OpcUaPayloadValue(requested["value"]), current);
+                if (refusal == "InvalidRequest") throw new BridgeException(refusal, setting.Field + " needs { expected, value }: booleans, a port 1..65535, or a license name of " + string.Join(", ", OpcUaServerSettings.Licenses) + ".");
+                if (refusal != null) throw new BridgeException(refusal, setting.Field + ".expected differs from the current " + setting.Attribute + " value; nothing was written.",
+                    new JObject { ["current"] = JToken.FromObject(OpcUaServerSettings.PayloadValue(setting.Field, current) ?? "unrecognized") });
+                before[setting.Field] = new JObject { ["item"] = item.Name, ["attribute"] = setting.Attribute, ["value"] = requested["expected"].DeepClone() };
+                after[setting.Field] = new JObject { ["item"] = item.Name, ["attribute"] = setting.Attribute, ["value"] = requested["value"].DeepClone() };
+                effects.Add(new JObject { ["plcPath"] = plc.Path, ["item"] = item.Name, ["setting"] = setting.Attribute, ["before"] = requested["expected"].DeepClone(), ["after"] = requested["value"].DeepClone() });
+            }
+            preview["opcUaServerSettingsBefore"] = before;
+            preview["opcUaServerSettingsAfter"] = after;
+            var warnings = (JArray)preview["warnings"];
+            warnings.Add("Offline project settings only: the CPU's OPC UA server changes once this configuration is downloaded. Clients, certificates and endpoint reachability are not checked.");
+            if (payload["runtimeLicense"] != null) warnings.Add("runtimeLicense records the purchased OPC UA runtime license in the project; it does not verify or activate an entitlement.");
+        }
+
+        private void ApplyOpcUaServerSettings(EngineeringChange change)
+        {
+            var payload = change.Payload;
+            var owners = OpcUaServerOwners(SelectPlc(change.Selector).Software);
+            var settings = OpcUaServerSettings.Settings.Where(s => payload[s.Field] != null).ToList();
+            // Enabling the server first and disabling it last keeps settings that depend on it writable.
+            var server = settings.FirstOrDefault(s => s.Field == "serverEnabled");
+            if (server != null && !payload["serverEnabled"].Value<bool>("value")) { settings.Remove(server); settings.Add(server); }
+            foreach (var setting in settings)
+            {
+                var item = owners[setting.OnCpu ? 0 : 1];
+                item.SetAttribute(setting.Attribute, OpcUaServerSettings.NativeValue(setting.Field, OpcUaPayloadValue(payload[setting.Field]["value"]), item.GetAttribute(setting.Attribute).GetType()));
+            }
+            var readback = new JObject { ["role"] = "opcua-server-settings-readback" };
+            foreach (var setting in OpcUaServerSettings.Settings.Where(s => payload[s.Field] != null))
+            {
+                object value = OpcUaServerSettings.PayloadValue(setting.Field, owners[setting.OnCpu ? 0 : 1].GetAttribute(setting.Attribute));
+                readback[setting.Field] = value == null ? JValue.CreateNull() : JToken.FromObject(value);
+            }
+            change.Readbacks.Add(readback);
+            if (OpcUaServerSettings.Settings.Any(s => payload[s.Field] != null && !JToken.DeepEquals(readback[s.Field], payload[s.Field]["value"])))
+                throw new BridgeException("MutationVerificationFailed", "OPC UA server settings read-back differs from the requested values.");
+        }
+
+        // Every device item's pinned OPC UA server attribute values; prepare and apply refuse if they changed in between.
+        private static JArray OpcUaServerSettingsFingerprint(Project project)
+        {
+            var names = OpcUaServerSettings.Settings.Where(s => s.Attribute != null).Select(s => s.Attribute).ToArray();
+            var budget = new ScanBudget(50000); var result = new JArray();
+            foreach (var entry in DeviceItems(project, budget))
+            {
+                var values = new JObject();
+                foreach (var info in entry.Item.GetAttributeInfos().Where(i => names.Contains(i.Name) && (i.AccessMode & EngineeringAttributeAccessMode.Read) != 0))
+                    values[info.Name] = ChangeScalar(entry.Item.GetAttribute(info.Name));
+                if (values.Count > 0) result.Add(new JObject { ["path"] = entry.Path, ["values"] = values });
+            }
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "OPC UA server settings fingerprint is incomplete.");
+            return result;
         }
 
         // Native export is the only public content readback; equality with the input is evidence, not a requirement.

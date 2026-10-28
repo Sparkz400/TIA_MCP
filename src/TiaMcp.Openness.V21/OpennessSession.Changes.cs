@@ -82,6 +82,7 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
+                if (change.Kind == "opcua_server_settings_set") change.Preview["fingerprintScope"] += " OPC UA server settings additionally cover every device item's pinned OPC UA server attribute values (server, port, automatic certificate acceptance, purchased license).";
                 if (change.Kind == "webserver_page_set") change.Preview["fingerprintScope"] += " Web page settings additionally cover every web-capable CPU's WebserverActivate value, system web page flag and web application names, types and default flags.";
                 if (change.Kind == "umac_role_set") change.Preview["fingerprintScope"] += " UMAC role changes additionally cover all custom and system roles with engineering and device function rights, and the role assignments and activation state of project, anonymous and UMC principals.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
@@ -509,6 +510,9 @@ namespace TiaMcp.Openness.V21
                 case "opcua_role_mapping_set":
                     PrepareOpcUaChange(change, preview);
                     break;
+                case "opcua_server_settings_set":
+                    PrepareOpcUaServerSettings(change, preview);
+                    break;
                 case "webserver_page_set":
                     PrepareWebServerPageSet(change, preview);
                     break;
@@ -903,6 +907,9 @@ namespace TiaMcp.Openness.V21
                 case "opcua_role_mapping_set":
                     ApplyOpcUaChange(change);
                     break;
+                case "opcua_server_settings_set":
+                    ApplyOpcUaServerSettings(change);
+                    break;
                 case "webserver_page_set":
                     ApplyWebServerPageSet(change);
                     break;
@@ -1122,7 +1129,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1291,6 +1298,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);
             if (change.Kind == "webserver_page_set") snapshot["webServer"] = WebServerFingerprint(project);
+            if (change.Kind == "opcua_server_settings_set") snapshot["opcUaServerSettings"] = OpcUaServerSettingsFingerprint(project);
             if (change.Kind == "umac_role_set") snapshot["umac"] = UmacFingerprint(project);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {

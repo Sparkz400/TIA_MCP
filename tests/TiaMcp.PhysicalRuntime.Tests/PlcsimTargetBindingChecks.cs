@@ -14,8 +14,8 @@ public static class PlcsimTargetBindingChecks
         { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code); }
         JsonElement Json(string text) { using var doc = JsonDocument.Parse(text); return doc.RootElement.Clone(); }
         string creation = new('a', 32), marker = new('b', 64);
-        string Identity(string name = "Sim1", bool owned = true, string addresses = "\"192.168.0.10\",\"0.0.0.0\",\"10.0.0.1\"") =>
-            $$$"""{"instanceId":3,"instanceName":"{{{name}}}","creationId":"{{{creation}}}","markerSha256":"{{{marker}}}","controllerAddresses":[{{{addresses}}}],"instance":{"id":3,"name":"{{{name}}}","owned":{{{(owned ? "true" : "false")}}},"storagePath":"C:\\sim\\Sim1"}}""";
+        string Identity(string name = "Sim1", bool owned = true, string addresses = "\"192.168.0.10\",\"0.0.0.0\",\"10.0.0.1\"", string communication = "TCPIP") =>
+            $$$"""{"instanceId":3,"instanceName":"{{{name}}}","creationId":"{{{creation}}}","markerSha256":"{{{marker}}}","controllerAddresses":[{{{addresses}}}],"communicationInterface":"{{{communication}}}","instance":{"id":3,"name":"{{{name}}}","owned":{{{(owned ? "true" : "false")}}},"storagePath":"C:\\sim\\Sim1"}}""";
         var observed = DateTimeOffset.Parse("2026-10-27T12:00:00Z");
         var binding = PlcsimTargetBindings.Observed(Json(Identity()), 3, "Sim1", creation, observed);
         Check(binding.ControllerAddresses.SequenceEqual(["10.0.0.1", "192.168.0.10"]), "Placeholder address dropped and addresses ordered");
@@ -23,6 +23,19 @@ public static class PlcsimTargetBindingChecks
         Fails(() => PlcsimTargetBindings.Observed(Json(Identity(owned: false)), 3, "Sim1", creation, observed), "PlcsimTargetBindingInvalid");
         Fails(() => PlcsimTargetBindings.Observed(Json(Identity(addresses: "\"0.0.0.0\"")), 3, "Sim1", creation, observed), "PlcsimTargetBindingInvalid");
         Fails(() => PlcsimTargetBindings.Observed(Json(Identity()), 3, "Sim1", new('c', 32), observed), "PlcsimTargetBindingInvalid");
+        Fails(() => PlcsimTargetBindings.Observed(Json(Identity(communication: "None")), 3, "Sim1", creation, observed), "PlcsimTargetBindingInvalid");
+        Fails(() => PlcsimTargetBindings.Observed(Json(Identity().Replace(",\"communicationInterface\":\"TCPIP\"", "")), 3, "Sim1", creation, observed), "PlcsimTargetBindingInvalid");
+        Check(binding.CommunicationInterface == "TCPIP", "The observed interface is recorded");
+
+        // Softbus is local to this PC: it never backs a network endpoint, whatever its addresses.
+        var softbus = PlcsimTargetBindings.Observed(Json(Identity(addresses: "\"192.168.0.1\"", communication: "Softbus")), 3, "Sim1", creation, observed);
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(softbus, "opc.tcp://192.168.0.1:4840/"), "PlcsimEndpointUnreachable");
+        Check(!PlcsimTargetBindings.Covers(softbus, "https://192.168.0.1"), "A Softbus binding covers no endpoint");
+        var tcpip = PlcsimTargetBindings.Observed(Json(Identity(addresses: "\"192.168.0.1\"")), 3, "Sim1", creation, observed);
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "opc.tcp://192.168.0.2:4840/"), "RuntimeTargetNotOwnedPlcsim");
+        PlcsimTargetBindings.RequireEndpoint(tcpip, "opc.tcp://192.168.0.1:4840/");
+        PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1");
+        Fails(() => PlcsimTargetBindings.RequireSameInstance(tcpip, tcpip with { CommunicationInterface = "Softbus" }), "PlcsimTargetBindingStale");
 
         Check(PlcsimTargetBindings.Covers(binding, "https://192.168.0.10") && PlcsimTargetBindings.Covers(binding, "opc.tcp://10.0.0.1:4840/"), "Owned controller addresses bind Web and UA endpoints");
         Check(!PlcsimTargetBindings.Covers(binding, "https://192.168.0.11") && !PlcsimTargetBindings.Covers(binding, "https://plc.example"), "Other addresses and host names stay unbound");
@@ -38,6 +51,14 @@ public static class PlcsimTargetBindingChecks
         Check(reopened.MarkerSha256 == marker && reopened.ControllerAddresses.SequenceEqual(binding.ControllerAddresses) && reopened.ProgramFingerprintSha256 is null, "Binding reopens exactly");
         File.AppendAllText(Path.Combine(root, "runtime-plcsim-bindings", sha256 + ".json"), " ");
         Fails(() => PlcsimTargetBindings.Read(root, sha256), "ArtifactChanged");
+
+        // A binding retained before the interface was recorded stays readable but cannot back a network endpoint.
+        string legacySha256 = (string)PlcsimTargetBindings.Retain(root, binding with { CommunicationInterface = null })["sha256"]!;
+        Check(!File.ReadAllText(Path.Combine(root, "runtime-plcsim-bindings", legacySha256 + ".json")).Contains("communicationInterface", StringComparison.Ordinal) &&
+            legacySha256 != sha256, "Legacy bytes omit the interface and hash differently");
+        var legacy = PlcsimTargetBindings.Read(root, legacySha256);
+        Check(legacy.CommunicationInterface is null, "Legacy binding reopens without an interface");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(legacy, "https://192.168.0.10"), "PlcsimEndpointUnreachable");
 
         string fingerprint = new('d', 64);
         string Compare(string name, string address, bool available = true) =>
