@@ -1863,6 +1863,18 @@
       ]
     },
     {
+      "featureId": "change.hardware_transfer_area_create",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_delete",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "obligations": [
         "X10"

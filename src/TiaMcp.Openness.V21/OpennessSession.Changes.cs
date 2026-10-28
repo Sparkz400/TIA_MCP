@@ -653,6 +653,10 @@ namespace TiaMcp.Openness.V21
                 case "hardware_replace":
                     PrepareHardwareReplace(change, project, preview);
                     break;
+                case "hardware_transfer_area_create":
+                case "hardware_transfer_area_delete":
+                    PrepareTransferArea(change, project, preview);
+                    break;
                 case "cax_import":
                     PrepareCaxImport(change, project, preview);
                     break;
@@ -1000,6 +1004,10 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "hardware_replace":
                     ApplyHardwareReplace(change, project);
+                    break;
+                case "hardware_transfer_area_create":
+                case "hardware_transfer_area_delete":
+                    ApplyTransferArea(change, project);
                     break;
                 case "cax_import":
                     ApplyCaxImport(change, project);
