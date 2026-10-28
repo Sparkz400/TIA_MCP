@@ -2947,8 +2947,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
-      "sha256": "52898542989c1269897c630d4ae2730af3afe389b0f79d6a7867679bd004da8b",
-      "bytes": 52984
+      "sha256": "2124614ba8293d798edefacbd4d3c9d9920ab7889a57c964358093d64464abef",
+      "bytes": 53338
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs",
