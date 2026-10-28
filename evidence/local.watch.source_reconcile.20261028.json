@@ -1,0 +1,55 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.watch.source_reconcile.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T17:17:16+00:00",
+  "source": {
+    "commit": "87da75562c26f17dc3cf6be6fef78dedbe180955",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_watch_source_reconcile.py (src3) on a frozen Debug build of 87da755 (D:\\wp\\b58, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: watch_table_generate captured the root EnableGate source binding; qualification_watch_authoring_source_negative ran under a qualification Host started with --watch-qualification host.watch_authoring_source_negative, so the worker completed the saved HeaderAuthor drift, the StaleSource refusal by VerifyWatchSource and the restoration (retained in the Host's interruption marker), and the Host exited 74 after the admitted native dispatch returned and before it recorded the outcome, leaving the shared admission in dispatchIntent; a second Host opened the original in a fresh owned Portal, a replay was refused with ResourceBusy before any native effect, qualification_watch_authoring_source_reconcile compared the retained pre-effect baseline with the fresh snapshot (absent table, identical content and peers, new session and process) and reconciled the project as unchanged without native mutation, a second reconcile was refused with InvalidOperationState, engineering_operation_status read the admission reconciled and a fresh capture reproduced the original FB and instance DB hashes; every owned Host, worker and Portal lifetime closed with exit proofs (Host 74 then 0, workers and Portals 0).",
+  "limitations": [
+    "One Host-loss point after the admitted native dispatch returned; a worker loss inside the helper leaves a changed project, which the reconciler refuses by design (ReconciliationIncomplete) and which needs checkpoint recovery instead.",
+    "Isolated qualification Host (--component-qualification --watch-qualification); production watch authoring stays disabled.",
+    "Trial src1 (D:\\wp\\wt\\src1, build b57) passed the Host loss and the worker-response checks but got an untyped McpToolError for the replay refusal; the Host tools now return typed errors. Trial src2 stopped before starting a Host on a wrong path. Neither is cited."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c10d8d6de67c59bbff4fd4ca2dd4330694fc584e318da23c7b04f500aa0c610b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6ccb75be03ab31fa04f218909be5f3af11b910680d0d9312fc519935af9dd325"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "8750e4ae290b6398827133754ece127d8ea7cd2c6124548a62d17224f3843d14",
+      "bytes": 1000,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_authoring_source_reconcile",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_generate"
+      ],
+      "toolsRejected": [
+        "qualification_watch_authoring_source_negative",
+        "qualification_watch_authoring_source_reconcile"
+      ]
+    }
+  ]
+}
