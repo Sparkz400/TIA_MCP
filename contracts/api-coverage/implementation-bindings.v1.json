@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b5d9d37da9c6daee33c0834bfacdd05430a82e0f9af3322ad776682b29a19585",
-      "bytes": 1239780
+      "sha256": "bc742db58d4cf81cbc2211810c268bb715f309a05946dbaae58bdb9047985c3c",
+      "bytes": 1244875
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -113379,7 +113379,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.lifecycle.20261028",
+          "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251",
+          "artifacts": [
+            "evidence/local.watch.lifecycle.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -113401,7 +113409,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.lifecycle.20261028",
+          "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251",
+          "artifacts": [
+            "evidence/local.watch.lifecycle.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -113423,7 +113439,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.lifecycle.20261028",
+          "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251",
+          "artifacts": [
+            "evidence/local.watch.lifecycle.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -113505,7 +113529,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.lifecycle.20261028",
+          "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251",
+          "artifacts": [
+            "evidence/local.watch.lifecycle.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -113527,7 +113559,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.lifecycle.20261028",
+          "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251",
+          "artifacts": [
+            "evidence/local.watch.lifecycle.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -113549,7 +113589,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.lifecycle.20261028",
+          "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251",
+          "artifacts": [
+            "evidence/local.watch.lifecycle.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115125,6 +115173,11 @@
       "sha256": "3538b8b3b20fae95e137ca58dc8598c626c85fd418e7ea8c98675da8cf08dab6"
     },
     {
+      "path": "evidence/local.watch.lifecycle.20261028.json",
+      "state": "observed",
+      "sha256": "38c0a2015cd771a2cb73872e4e7d4bf3eccb8a6e9b6015c7e5d992e9c70ef260"
+    },
+    {
       "path": "evidence/local.watch.native.20261028.json",
       "state": "observed",
       "sha256": "5cf94421eec475147273983d700a64224cb52577d2552be3961609de3bb1fee5"
@@ -115815,6 +115868,10 @@
     {
       "id": "local.watch.authoring.20261028",
       "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a"
+    },
+    {
+      "id": "local.watch.lifecycle.20261028",
+      "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251"
     },
     {
       "id": "local.watch.native.20261028",
