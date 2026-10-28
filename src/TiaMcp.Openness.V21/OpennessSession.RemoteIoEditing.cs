@@ -13,7 +13,8 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private static readonly HashSet<string> ChannelWriteAttributes = new HashSet<string>(new[]
-        { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay", "Smoothing" }, StringComparer.Ordinal);
+        // OperatingMode MotionControl lets a technology object use a TM PosInput/TM Count channel.
+        { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay", "Smoothing", "OperatingMode" }, StringComparer.Ordinal);
 
         private static JArray InspectChannelEngineeringAttributes(Channel channel, ScanBudget budget, JArray warnings, string path)
         {
