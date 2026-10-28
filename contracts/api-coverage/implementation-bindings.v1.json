@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "92de50559bf19b4999ab7fd4bcd9c3bd1a0bc5d4317f172aec12183ece3a74e3",
-      "bytes": 1190477
+      "sha256": "590d488eb94c276a7ea009a32cbf6a25a436750df957ccfeb3d864be13653ee1",
+      "bytes": 1201335
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -397,8 +397,8 @@
     },
     {
       "path": "contracts/library-plan.v1.schema.json",
-      "sha256": "610d3777a8337cf1b6e0c470759c4022b506e416fe896558759e6c4155f66e04",
-      "bytes": 8133
+      "sha256": "6ec68988fc8f85fa11eba4525a9b47448ebce0d7b6100738ac7a89a19c1b6455",
+      "bytes": 11909
     },
     {
       "path": "contracts/library-preview-effects.v1.schema.json",
@@ -93609,13 +93609,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_plc_master.20261008",
-          "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
-          "artifacts": [
-            "artifacts/lq/nl_1d1cda41/qualification.json"
-          ]
-        },
-        {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
@@ -93656,6 +93649,13 @@
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -93694,7 +93694,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -93761,6 +93769,13 @@
           "artifacts": [
             "evidence/local.library_lifecycle.20261024.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -93802,13 +93817,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_plc_master.20261008",
-          "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
-          "artifacts": [
-            "artifacts/lq/nl_1d1cda41/qualification.json"
-          ]
-        },
-        {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
           "artifacts": [
@@ -93848,6 +93856,13 @@
           "profileSha256": "e4f494896ecd62aa7819cc4dbebd87886ce706de9ea2627b5e56a6b658f8a684",
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -93890,13 +93905,6 @@
       "schemaBindings": [],
       "schemaReview": "unresolved",
       "evidenceRefs": [
-        {
-          "id": "local.library_plc_master.20261008",
-          "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
-          "artifacts": [
-            "artifacts/lq/nl_1d1cda41/qualification.json"
-          ]
-        },
         {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
@@ -93951,6 +93959,13 @@
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
             "evidence/local.library_protected.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -94049,6 +94064,13 @@
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94114,6 +94136,13 @@
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
             "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -94183,6 +94212,13 @@
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
             "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -94269,6 +94305,13 @@
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94307,7 +94350,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -94353,13 +94404,6 @@
       "schemaBindings": [],
       "schemaReview": "unresolved",
       "evidenceRefs": [
-        {
-          "id": "local.library_plc_master.20261008",
-          "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4",
-          "artifacts": [
-            "artifacts/lq/nl_1d1cda41/qualification.json"
-          ]
-        },
         {
           "id": "local.library_releases.20261024",
           "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
@@ -94450,6 +94494,13 @@
           "artifacts": [
             "evidence/local.library_compatibility.20261027.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94496,7 +94547,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_integrate.combined_apply.20261028",
+          "profileSha256": "98ae0b916ecfa6e91e8c5add62d4ca8aa2b37e5641657eecb1234e04b4490877",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -94559,6 +94618,13 @@
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
             "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -94648,6 +94714,13 @@
           "profileSha256": "b449479f6e5be2bb959cc2520287565a1c9152d9f4edc1b96b9339c5e41c51f0",
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -94748,6 +94821,13 @@
           "artifacts": [
             "evidence/local.library.native-chain.20261028.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94788,7 +94868,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -94872,6 +94960,13 @@
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94942,6 +95037,13 @@
           "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
           "artifacts": [
             "evidence/local.library_lifecycle.20261024.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -95053,6 +95155,13 @@
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
           ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -95121,6 +95230,13 @@
           "profileSha256": "75a8766a693d0404644eb44fb38534c6d0eccf02e774541400725070bb29d5e2",
           "artifacts": [
             "evidence/local.library_compatibility.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -102040,6 +102156,13 @@
           "profileSha256": "e4f494896ecd62aa7819cc4dbebd87886ce706de9ea2627b5e56a6b658f8a684",
           "artifacts": [
             "evidence/local.library_unit_relations.20261027.json"
+          ]
+        },
+        {
+          "id": "local.library_preservation.20261028",
+          "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
+          "artifacts": [
+            "evidence/local.library_preservation.20261028.json"
           ]
         }
       ],
@@ -116321,6 +116444,11 @@
       "sha256": "24024e999a51c83d9f26a841acf2aee68638172a5ea5d2d9fb5fe82f2f31c61d"
     },
     {
+      "path": "evidence/local.library_preservation.20261028.json",
+      "state": "observed",
+      "sha256": "e2b2f2caa67848a49556e5573cdfb58c4ae064ad7061dace039b455ed73eb752"
+    },
+    {
       "path": "evidence/local.library_project_state.20261024.json",
       "state": "observed",
       "sha256": "38d55c13d4e1d7761edfcddc6c75dc1bccc3297e29f0b4e41926955e68534a83"
@@ -116984,6 +117112,10 @@
     {
       "id": "local.library_plc_master.20261008",
       "profileSha256": "648467a74ebea161b88c51a7129c50e9a2a9372a83748226dfcfdd3e47b9bea4"
+    },
+    {
+      "id": "local.library_preservation.20261028",
+      "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc"
     },
     {
       "id": "local.library_project_state.20261024",
