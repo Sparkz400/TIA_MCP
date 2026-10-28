@@ -258,4 +258,15 @@ foreach (var kind in new[] { "hmi_engineering", "hardware_attributes", "tag_set"
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
 foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
     if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Covered kind treated as target-dependent: " + kind); else count++;
+// A failed apply journals what TIA said in MessageData/DetailMessageData, not only the generic Message.
+var native = new Siemens.Engineering.EngineeringException("Error when calling method 'ImportFromXlsx'.", new InvalidOperationException("inner"))
+{
+    MessageData = new Siemens.Engineering.ExceptionMessageData { Text = "Import failed.", DetailText = new string('x', 3000) },
+    DetailMessageData = Enumerable.Range(0, 20).Select(i => new Siemens.Engineering.ExceptionMessageData { Text = "The required worksheet 'TextList' is missing." }).ToList()
+};
+var chain = NativeFailureText.Chain(native);
+if (chain.Count != 2 || (string)chain[0]["text"] != "Import failed." || ((string)chain[0]["detail"]).Length != 2048 || ((JArray)chain[0]["details"]).Count != 16
+    || (string)chain[0]["details"][0]["text"] != "The required worksheet 'TextList' is missing." || (string)chain[1]["message"] != "inner" || chain[1]["details"] != null)
+    throw new Exception("Native failure chain differs: " + chain);
+count++; Console.WriteLine("PASS native failure chain keeps Siemens message data, bounded");
 Console.WriteLine($"{count} hardware preservation checks passed.");

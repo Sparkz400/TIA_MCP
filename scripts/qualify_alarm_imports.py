@@ -2,11 +2,12 @@
 
 Phase A adds an FB with a Program_Alarm and its instance DB, then applies plc_alarm_class_import (an edited display name in
 the project's alarm-class DAT), plc_alarm_instance_text_import (an edited instance alarm text), plc_supervision_import (the
-PLC's supervision workbook, unchanged) and plc_supervision_settings_import (an edited ProDiag category name) with checkpoint,
-compile and save. The first supervision import initializes ProDiag's global settings, which makes their export available. Each import file is a native export edited
+PLC's supervision workbook, unchanged), plc_supervision_settings_import (an edited ProDiag category name) and
+plc_alarm_text_list_import (a new user text list from an authored workbook with None, then one entry text edited in TIA's
+own export of it with Override) with checkpoint, compile and save. The first supervision import initializes ProDiag's global settings, which makes their export available. Each import file is a native export edited
 only in the named cell or element. Each preview is asserted against the request, and a complete state (every block, type and
 tag-table export, every member and group path, and plc_alarm_inspect's alarm classes, instance texts, supervisions and text
-lists) must differ from the previous one in exactly the intended keys. A fresh Portal then reopens the saved project, which
+lists and the user text-list export) must differ from the previous one in exactly the intended keys. A fresh Portal then reopens the saved project, which
 must show the identical state. Phase B applies one more import per kind from that state and restores its checkpoint in the
 applying Portal; the recovered copy must equal the pre-change state. Typed refusals must change nothing.
 """
@@ -18,6 +19,7 @@ import io
 import json
 from pathlib import Path
 import re
+from xml.sax.saxutils import escape
 import zipfile
 
 from library_native_harness import Harness, require
@@ -26,7 +28,10 @@ from qualify_access_changes import Run as StateRun
 from qualify_plc_object_mutations import coverage_gaps, diff, view
 from typed_graphical_transport import artifact_bytes
 
-KINDS = ("plc_alarm_class_import", "plc_alarm_instance_text_import", "plc_supervision_import", "plc_supervision_settings_import")
+KINDS = ("plc_alarm_class_import", "plc_alarm_instance_text_import", "plc_supervision_import", "plc_supervision_settings_import", "plc_alarm_text_list_import")
+TEXT_LIST = "TiaMcpStates"
+ENTRIES = (("0", "0", "Stopped"), ("1", "1", "Running"), ("2", "5", "Fault"))
+SPREADSHEET = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 FB = '''FUNCTION_BLOCK "AlFb"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -43,9 +48,9 @@ END_FUNCTION_BLOCK
 
 '''
 CRITERIA = {
-    "AC-identity": "refused: typed refusals of changed hashes, relative or wrongly typed files, import options a provider lacks or does not know and missing text-list names, each leaving the complete state unchanged.",
+    "AC-identity": "refused: typed refusals of changed hashes, relative or wrongly typed files, import options a provider lacks or does not know, missing text-list names and None for an existing text list, each leaving the complete state unchanged.",
     "AC-preview": "Every preview is asserted against the request before apply; a wrong previewHash refuses at apply.",
-    "AC-preserve": "applied: every program export and member and plc_alarm_inspect's alarm classes, instance texts, supervisions and text lists differ in exactly the intended keys.",
+    "AC-preserve": "applied: every program export and member and plc_alarm_inspect's alarm classes, instance texts, supervisions, text lists and user text-list export differ in exactly the intended keys.",
     "AC-native": "applied + persisted: checkpoint, compile and save stages, change_status, a fresh native export showing the edit and a fresh owned Portal reopen with identical state.",
     "AC-recovery": "restored: change_restore in the applying Portal into a new directory equals the pre-change state.",
     "AC-evidence": "This report: binaries, tool calls, step results, snapshots with state.json, the edited import files and limitations.",
@@ -55,7 +60,9 @@ LIMITATIONS = [
     "plc_supervision_import re-imports the PLC's own supervision workbook unchanged: a scratch project has no ProDiag supervisions to edit.",
     "TIA initializes ProDiag's global settings on the first supervision import (recorded under sideEffects); before that their export fails with "
     "'Global settings are not initialized'. plc_supervision_settings_import edits one category display name.",
-    "plc_alarm_text_list_import is not run: a scratch project has no user text list to export, so it has no native file to start from.",
+    "A fresh CPU has no user text list to export, so the first text-list workbook is authored in the layout TIA V21's importer reads (sheets TextList with "
+    "Name/ListRange/Comment [culture] and TextListEntry with Parent/From/To/Text [culture], custom properties FileVersion 1 and FileContent 'Alarm text lists'); "
+    "the Override imports edit one entry text in TIA's own export. One Decimal list with three entries; Binary and Bit lists, list comments and HMI consumers are not exercised.",
     "Engineering only; nothing is downloaded and no alarm is raised.",
 ]
 
@@ -119,6 +126,71 @@ def edit_xlsx(raw, sheet_name, cell, text):
     return out.getvalue()
 
 
+def text_list_workbook(cultures, styles):
+    """One user text list in the layout TIA V21's text-list importer reads. Like TIA's own exports it keeps every cell in a
+    shared-string table and has a styles part (styles: xl/styles.xml of a native export); without them the import throws."""
+    strings = []
+    def index(value):
+        if value not in strings:
+            strings.append(value)
+        return strings.index(value)
+    def sheet(rows):
+        cells = lambda r, row: "".join('<c r="%s%d" s="0" t="s"><v>%d</v></c>' % (chr(65 + i), r, index(v)) for i, v in enumerate(row))
+        body = "".join('<row r="%d">%s</row>' % (r, cells(r, row)) for r, row in enumerate(rows, 1))
+        return '<?xml version="1.0" encoding="utf-8"?><worksheet xmlns="%s"><sheetData>%s</sheetData></worksheet>' % (SPREADSHEET, body)
+    lists = [["Name", "ListRange", *("Comment [%s]" % c for c in cultures)], [TEXT_LIST, "Decimal", *("TIA MCP qualification" for _ in cultures)]]
+    entries = [["Parent", "From", "To", *("Text [%s]" % c for c in cultures)], *([TEXT_LIST, low, high, *(text for _ in cultures)] for low, high, text in ENTRIES)]
+    rel = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+    prop = '<property fmtid="{D5CDD505-2E9C-101B-9397-08002B2CF9AE}" pid="%d" name="%s"><vt:lpwstr>%s</vt:lpwstr></property>'
+    parts = {
+        "[Content_Types].xml": '<?xml version="1.0" encoding="utf-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+            '<Default Extension="xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" />'
+            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />'
+            '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml" />'
+            '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml" />'
+            '<Override PartName="/docProps/custom.xml" ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml" />'
+            '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" />'
+            '<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" /></Types>',
+        "_rels/.rels": '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Type="%s/officeDocument" Target="/xl/workbook.xml" Id="R1" /><Relationship Type="%s/custom-properties" Target="/docProps/custom.xml" Id="R2" /></Relationships>' % (rel, rel),
+        "docProps/custom.xml": '<?xml version="1.0" encoding="utf-8"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" '
+            'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">%s%s</Properties>' % (prop % (2, "FileVersion", "1"), prop % (3, "FileContent", "Alarm text lists")),
+        "xl/workbook.xml": '<?xml version="1.0" encoding="utf-8"?><workbook xmlns="%s"><sheets><sheet name="TextList" sheetId="1" r:id="R1" xmlns:r="%s" />'
+            '<sheet name="TextListEntry" sheetId="2" r:id="R2" xmlns:r="%s" /></sheets></workbook>' % (SPREADSHEET, rel, rel),
+        "xl/_rels/workbook.xml.rels": '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Type="%s/worksheet" Target="/xl/worksheets/sheet1.xml" Id="R1" /><Relationship Type="%s/worksheet" Target="/xl/worksheets/sheet2.xml" Id="R2" />'
+            '<Relationship Type="%s/styles" Target="/xl/styles.xml" Id="R3" /><Relationship Type="%s/sharedStrings" Target="/xl/sharedStrings.xml" Id="R4" /></Relationships>' % (rel, rel, rel, rel),
+        "xl/worksheets/sheet1.xml": sheet(lists),
+        "xl/worksheets/sheet2.xml": sheet(entries),
+    }
+    parts["xl/sharedStrings.xml"] = '<?xml version="1.0" encoding="utf-8"?><sst xmlns="%s" count="%d" uniqueCount="%d">%s</sst>' % (
+        SPREADSHEET, len(strings), len(strings), "".join("<si><t>%s</t></si>" % escape(v) for v in strings))
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as package:
+        for name, xml in parts.items():
+            package.writestr(name, xml.encode("utf-8"))
+        package.writestr("xl/styles.xml", styles)
+    return out.getvalue()
+
+
+def text_columns(sheet):
+    return sorted(c for c, title in sheet["rows"][0]["cells"].items() if title.startswith("Text ["))
+
+
+def entry_cell(sheets, text):
+    """The cell of the first-culture Text column whose value is text, in the TextListEntry worksheet of a text-list export."""
+    sheet = next(s for s in sheets if s["name"] == "TextListEntry")
+    column = text_columns(sheet)[0]
+    rows = [r["row"] for r in sheet["rows"][1:] if r["cells"].get(column) == text]
+    require(len(rows) == 1, "Expected one %r entry in the text-list export: %s" % (text, sheet["rows"]))
+    return "%s%d" % (column, rows[0])
+
+
+def entry_texts(state):
+    sheets = [s for s in state["alarm:userTextLists"].get("sheets") or [] if s["name"] == "TextListEntry"]
+    return sorted(r["cells"].get(c) for s in sheets for c in text_columns(s)[:1] for r in s["rows"][1:])
+
+
 def text_column(sheet):
     """The en-US alarm-text column of the instance-text worksheet, and the first data row."""
     header = sheet["rows"][0]["cells"]
@@ -128,7 +200,7 @@ def text_column(sheet):
 
 
 class Run(StateRun):
-    plc_compiled = ("plc_alarm_instance_text_import", "plc_supervision_import", "source_upsert", "instance_db_create")
+    plc_compiled = ("plc_alarm_instance_text_import", "plc_supervision_import", "plc_alarm_text_list_import", "source_upsert", "instance_db_create")
 
     def __init__(self, h):
         super().__init__(h)
@@ -144,7 +216,13 @@ class Run(StateRun):
         """plc_alarm_inspect's alarm configuration; the export files are kept for the next import."""
         result = self.h.tool("plc_alarm_inspect", {"plcPath": self.plc, "maxItems": 2000})
         scope = result["scopes"][0]
+        self.cultures = result["activeCultures"]
         state = {"alarm:textLists": scope["textLists"]}
+        lists = scope["userTextListExport"]
+        # Without a user text list V21 refuses the export; only its status is state then.
+        state["alarm:userTextLists"] = {"status": lists["status"], "sheets": [{"name": s["name"], "rows": s["rows"]} for s in lists.get("sheets", [])]}
+        if lists.get("artifact"):
+            self.exports["userTextLists"] = (lists["artifact"], artifact_bytes(self.h.tool, lists["artifact"]))
         for key, part in (("instanceTexts", scope["alarmInstanceTextExport"]), ("supervisions", scope["supervisionExport"])):
             state["alarm:" + key] = {"status": part["status"], "sheets": [{"name": s["name"], "rows": s["rows"]} for s in part.get("sheets", [])]}
             if part.get("artifact"):
@@ -226,6 +304,45 @@ def settings(run, old, new, restore=False):
               restore=restore)
 
 
+def native_styles(run):
+    with zipfile.ZipFile(io.BytesIO(run.exports["instanceTexts"][1])) as package:
+        return package.read("xl/styles.xml")
+
+
+def text_list_create(run):
+    payload = {**run.file("text-list.xlsx", text_list_workbook(run.cultures, native_styles(run))), "importOption": "None", "expectedTextListNames": [TEXT_LIST]}
+    def created(applied, state):
+        row = next((i for i in state["alarm:textLists"]["items"] if i["name"] == TEXT_LIST), None)
+        require(row and row["textListKind"] == "user" and row["listRange"] == "Decimal", "The new user text list is missing: %s" % state["alarm:textLists"])
+        require(state["alarm:userTextLists"]["status"] == "observed" and {"Stopped", "Running", "Fault"} <= set(entry_texts(state)),
+                "The fresh text-list export lacks the imported entries: %s" % state["alarm:userTextLists"])
+    run.apply("create user text list %s" % TEXT_LIST, "plc_alarm_text_list_import", payload,
+              {"effects": [{"action": "plc_alarm_text_list_import", "importOption": "None", "createTextLists": [TEXT_LIST], "replaceTextLists": []}]},
+              changed=["alarm:textLists", "alarm:userTextLists"], check=created)
+
+
+def text_list_override(run, old, new, restore=False):
+    raw = run.exports["userTextLists"][1]
+    payload = {**run.file("text-list-%s.xlsx" % new.replace(" ", "-"), edit_xlsx(raw, "TextListEntry", entry_cell(run.current["view"]["alarm:userTextLists"]["sheets"], old), new)),
+               "importOption": "Override", "expectedTextListNames": [TEXT_LIST]}
+    def shown(applied, state):
+        texts = entry_texts(state)
+        require(new in texts and old not in texts and {"Stopped", "Running"} <= set(texts), "The fresh text-list export does not show %r: %s" % (new, texts))
+    run.apply("replace text-list entry %s with %s" % (old, new), "plc_alarm_text_list_import", payload,
+              {"effects": [{"action": "plc_alarm_text_list_import", "importOption": "Override", "createTextLists": [], "replaceTextLists": [TEXT_LIST]}]},
+              changed=["alarm:userTextLists"], tolerated=lambda category, key: category == "changed" and key == "alarm:textLists", check=shown, restore=restore)
+
+
+def text_lists(run):
+    lists = run.file("text-list-refused.xlsx", text_list_workbook(run.cultures, native_styles(run)))
+    run.refuse("plc_alarm_text_list_import", "an unknown import option", {**lists, "importOption": "Merge", "expectedTextListNames": [TEXT_LIST]}, "InvalidRequest")
+    run.refuse("plc_alarm_text_list_import", "a changed hash", {**lists, "expectedSha256": "0" * 64, "importOption": "None", "expectedTextListNames": [TEXT_LIST]}, "ArtifactChanged")
+    run.refuse("plc_alarm_text_list_import", "a DAT instead of a workbook", {**run.file("lists.dat", run.exports["classes"][1]), "importOption": "None", "expectedTextListNames": [TEXT_LIST]}, "InvalidArtifact")
+    text_list_create(run)
+    run.refuse("plc_alarm_text_list_import", "None for an existing text list", {**lists, "importOption": "None", "expectedTextListNames": [TEXT_LIST]}, "ObjectExists")
+    text_list_override(run, "Fault", "Fault active")
+
+
 def phase_a(run):
     run.apply("create AlFb with a Program_Alarm", "source_upsert", {"language": "SCL", "source": FB, "expectedBlockNames": ["AlFb"]},
               {"effects": [{"action": "create", "blockName": "AlFb"}]}, added=["block:" + run.plc + "/blocks/AlFb"])
@@ -250,6 +367,7 @@ def phase_a(run):
     require("settings" in run.exports, "The supervision import did not make the ProDiag settings exportable")
     run.refuse("plc_supervision_settings_import", "an import option the provider lacks", {**run.file("settings.dat", run.exports["settings"][1]), "importOption": "Override"}, "InvalidRequest")
     settings(run, "Category 4", "TiaMcp Category")
+    text_lists(run)
 
 
 def reopen(run):
@@ -270,6 +388,7 @@ def phase_b(run):
     instance_text(run, "TiaMcpAgain", restore=True)
     supervisions(run, restore=True)
     settings(run, "TiaMcp Category", "TiaMcp Again", restore=True)
+    text_list_override(run, "Fault active", "Fault again", restore=True)
 
 
 def body(h):
