@@ -29,6 +29,7 @@ LIMITATIONS = [
     "Two CPU 1511-1 PN V4.1 on one subnet; S7 and TCP connections between their X1 nodes only. ISO, ISO-on-TCP, UDP, FDL, PtP and HMI connections, "
     "unspecified partners and program instructions or HMI tags that use a connection are not exercised.",
     "connection_set writes one allowlisted attribute per change; resource and capacity rules are left to the device compile.",
+    "Every device item of these CPUs, the rail and the ports included, exposes CommunicationManagement natively, so no owner-capability refusal exists here.",
     "Engineering only; nothing is downloaded and no communication is observed.",
 ]
 
@@ -94,8 +95,6 @@ def phase_a(run):
     base = {"hardwarePath": cpu, "localInterfacePath": local, "localNodeName": "X1", "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": "X1"}
     run.refuse("connection_create", "an unknown connection type", {**base, "connectionType": "ModbusConnection"}, "InvalidRequest")
     run.refuse("connection_create", "a missing owner", {**base, "hardwarePath": cpu + "X", "connectionType": "S7Connection"}, "HardwareNotFound")
-    # The rail exposes no CommunicationManagement (a port item does, natively).
-    run.refuse("connection_create", "an owner without CommunicationManagement", {**base, "hardwarePath": run.path("ScratchStation", "items", "Rail_0"), "connectionType": "S7Connection"}, "UnsupportedCapability")
     s7 = own(run, create(run, "S7Connection"))
     tcp = own(run, create(run, "TcpConnection"))
     name = tcp["properties"]["LocalConnectionName"]
