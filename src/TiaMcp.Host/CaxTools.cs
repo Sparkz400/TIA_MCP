@@ -51,8 +51,7 @@ public sealed partial class TiaTools
                 args["path"] = Path.Combine(Path.GetFullPath(options.ArtifactsDirectory), read.GetProperty("relativePath").GetString()!);
             }
         }
-        catch (Exception error) when (error is BridgeException or InvalidOperationException)
-        { throw new McpException(error is BridgeException bridge ? bridge.Code + ": " + bridge.Message : "amlRef and path must be strings."); }
+        catch (InvalidOperationException) { throw new BridgeException("InvalidRequest", "amlRef and path must be strings."); }
         return JsonSerializer.SerializeToElement(args, BridgeProtocol.Json);
     }
 }
