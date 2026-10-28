@@ -7667,12 +7667,14 @@
         "limitations": [
           "type_rename and type_delete address one exact existing UDT. Cross-scope moves and implicit namespace changes remain unsupported.",
           "Deletion requires dependencyPolicy=rejectReferenced. Conservative exported-XML dependency scans reject references and incomplete evidence; compile and recovery are mandatory.",
-          "No live native qualification is recorded for these new mutation routes."
+          "type_rename and type_delete are natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028), each with preview, exact snapshot diff, fresh-Portal reopen and checkpoint restore; software units, namespaces and know-how protected types are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7717,12 +7719,14 @@
         "limitations": [
           "tag_set and constant_set edit an exact existing member using a bounded native attribute allowlist; tag_delete and constant_delete require dependencyPolicy=rejectReferenced.",
           "System constants and safety/generated targets are excluded. Incomplete dependency evidence is rejected; compilation is mandatory.",
-          "Individual creation is not implemented by these routes; native tag-table import remains the existing creation route. New member mutation routes are unqualified."
+          "tag_create, tag_set, tag_delete, constant_create, constant_set and constant_delete are natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028), each with preview, exact snapshot diff, fresh-Portal reopen and checkpoint restore; software units, namespaces and safety are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
