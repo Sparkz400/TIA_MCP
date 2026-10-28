@@ -1,0 +1,76 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.testsuite.scope-probe.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T16:14:17+00:00",
+  "source": {
+    "commit": "8398c50cd0f9c1dac53e6841a2f2c012fe05ce0e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_testsuite_definitions.py --scope-probe on a frozen Debug build of 8398c50 (D:\\wp\\ts02), 16/16 steps, with a --testsuite-scope-probe Host and a visible owned TIA Portal V21 Update 3 with Test Suite Advanced V21, in an owned scratch CPU 1511-1 PN V4.1: qualification_testsuite_scope_probe refuses read before prepare (InvalidRequest) and a foreign project path (ProjectIsolationRequired); prepare imports the packaged style rule and sets its scope on Program blocks once, saved, with a flushed intent and SetScope return and no executor; every program export and member and both empty Test Suite inventories are unchanged; a second prepare is refused with RecoveryRequired and not replayed; read returns the rule with an identical native export; after a fresh owned Portal reopens the identical state, the probe refuses to adopt the reopened project (ProjectIsolationRequired). The live rule set exposes only the Name attribute and CopyScope, Delete, SaveToFile, SetScope and ShowInEditor: no scope read route.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN V4.1 and the packaged single-rule style fixture; SetScope's return is retained but is not complete effective-scope proof.",
+    "No style executor runs and no license is checked; the probe Host flag enables no production profile."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1c66e4a4e6ff2d698b4e0353bf92d9c63e1939e08a7b2864114568a6508cfb02"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "26df8c80b76201017554e9e5f9a1f1a6d306e1dba140fd82ec38ab8653fb15ef"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "2ba151ae9707c9050eaa24b6f18d563b9c235f1c4fa51e8e45dad9c5ec81ec63",
+      "bytes": 79483,
+      "completed": true,
+      "steps": [
+        "start owned TIA scope probe",
+        "create owned scratch scope probe",
+        "snapshot baseline",
+        "refuse scope probe: read before prepare",
+        "refuse scope probe: a foreign project path",
+        "prepare the packaged style rule",
+        "snapshot after prepare",
+        "prepare left every program export and both inventories unchanged",
+        "refuse scope probe: a second prepare",
+        "read the rule back",
+        "close the probed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "snapshot reopened",
+        "reopened state equals the baseline",
+        "refuse scope probe: the reopened project"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "project_inventory",
+        "project_open",
+        "qualification_testsuite_scope_probe",
+        "software_inspect",
+        "tag_table_read",
+        "testsuite_application_inventory",
+        "testsuite_system_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_scope_probe"
+      ]
+    }
+  ]
+}

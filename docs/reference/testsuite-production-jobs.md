@@ -66,7 +66,7 @@ Application/system execution, scope authoring/import, native list/group profiles
 
 ## TS-05 application tests
 
-Compiled against the V21 PublicAPI only; nothing below has run natively. Ledger D06; qualification is TS-Q02.
+The inventory and the `.tat` import are natively qualified (`local.testsuite.definitions.20261028`); `.ttst` imports and execution have not run natively ([record](../verification/testsuite-native-20261028.md)). Ledger D06; qualification is TS-Q02.
 
 | Entry | What it does |
 | --- | --- |
@@ -84,7 +84,7 @@ Open gaps: production `RequireQualification` refuses on both Host and worker. Sy
 
 ## TS-06 system tests
 
-Compiled against the V21 PublicAPI only; nothing below has run natively. Ledger D06.
+The inventory and the `.tst` import are natively qualified (`local.testsuite.definitions.20261028`); execution has not run natively ([record](../verification/testsuite-native-20261028.md)). Ledger D06.
 
 | Entry | What it does |
 | --- | --- |
