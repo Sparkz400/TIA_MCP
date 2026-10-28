@@ -1,6 +1,8 @@
 """Native check of opcua_server_settings_set on one owned scratch CPU 1511-1 PN V4.1.
 
-Refusals change nothing; then the CPU's OPC UA server is turned on with the Small runtime license through
+Refusals change nothing. V21 refuses to compile an active OPC UA server unless a user holds the
+"OPC UA server access" device right, so umac_role_set first grants it to the scratch's own runtime role
+(its identifier comes from a refused grant, which lists the CPU's available rights). Then the server is turned on with the Small runtime license through
 change_apply (checkpoint, device compile, save), read back natively, kept across a fresh Portal reopen and
 restored by change_restore to the exact before state. Attribute names the CPU exposes only after
 activation are recorded for pinning. Observations of this scratch only.
@@ -9,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import re
 
 from library_native_harness import Harness, require
 
@@ -59,6 +62,20 @@ def body(h):
     refuse("a scopePath", {"serverEnabled": {"expected": False, "value": True}}, "InvalidRequest", scopePath=plc)
     for field in UNPINNED:
         refuse("unpinned " + field, {field: {"expected": 4840 if field == "port" else False, "value": 4841 if field == "port" else True}}, "UnsupportedCapability")
+
+    umac = h.tool("access_inspect", {"maxItems": 2000})["projectUmac"]
+    roles, scopes = [n for n in umac["roleNames"].values() if n.startswith("TiaMcpRuntime_")], umac["deviceRightScopes"]
+    require(len(roles) == 1 and len(scopes) == 1, "Expected one scratch runtime role and one UMAC device: %s %s" % (roles, scopes))
+    grant = {"action": "grant", "roleName": roles[0], "deviceRights": [{"device": scopes[0], "identifier": "TiaMcpUnknownRight"}]}
+    listed = h.stage("list the CPU's device rights", lambda: h.call_error("change_prepare", {"kind": "umac_role_set", "payload": grant}))
+    require(listed.get("code") == "ObjectNotFound", "Expected ObjectNotFound: %s" % listed)
+    h.report["availableDeviceRights"] = listed["details"]["availableRights"]
+    rights = [r for r in h.report["availableDeviceRights"] if re.search(r"opc ?ua", r["name"] or "", re.I) and re.search(r"server", r["name"] or "", re.I)]
+    require(len(rights) == 1, "Expected one OPC UA server access right: %s" % h.report["availableDeviceRights"])
+    h.report["opcUaServerAccessRight"] = rights[0]
+    h.apply("umac_role_set", {**grant, "deviceRights": [{"device": scopes[0], "identifier": rights[0]["identifier"]}]})
+    before = h.stage("inspect after the UMAC grant", items)
+    require(pinned(before) == {"serverEnabled": False, "runtimeLicense": 0}, "The UMAC grant changed OPC UA settings: %s" % pinned(before))
 
     payload = {"serverEnabled": {"expected": False, "value": True}, "runtimeLicense": {"expected": "NoLicense", "value": LICENSES[1]}}
     prepared = h.stage("prepare " + KIND, lambda: h.tool("change_prepare", {"kind": KIND, "plcPath": plc, "payload": payload}))
