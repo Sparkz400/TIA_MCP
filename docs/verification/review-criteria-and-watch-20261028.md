@@ -38,6 +38,22 @@ from 2,099 to 2,019 non-deferred cells.
 | Composite engineering | `composite_engineering_review`, `_reopen`, `_page`, `_artifact_read`, `_list` |
 | Runtime handoff | `runtime_handoff_observation`, `_review`, `_reopen`, `_page`, `_artifact_read`, `_list` |
 
+### Host-only qualification
+
+`scripts/Test-Offline.ps1 -Configuration Release` ran from a clean detached worktree of
+`7aee9ef` (`D:\wp\off7a`) and passed: "Offline validation (All)", with every managed suite,
+Python test and actual-Host MCP workflow. Its review-runner reports were curated into one
+record per family, `local.hostonly.<family>.20261028`, each binding the Release Host tree
+hash. A feature was verified only when its family's runs exercised every one of its tools
+without error; all 40 qualified. The Test Suite style runner reran on a fresh fixture from
+the same build, because its first fixture root already held the job; its report now states
+completion and names its 46 checks. `scripts/curate_evidence.py` now reads the `shutdowns`
+receipts these runners write.
+
+Every record says Host-only: no TIA, Openness, PLCSIM or device is involved, and the
+reviews compare supplied or synthetic observations, so no native compatibility,
+communication, safety or runtime claim follows.
+
 Kept as they were: `db_snapshot_capture` and `composite_engineering_capture` (they call the
 bridge), `hmi_text_list_author` and `hmi_text_list_generate_set` (their output is meant for a
 native import), and the `runtime_*_page` features, which wait on the UA runtime scope
