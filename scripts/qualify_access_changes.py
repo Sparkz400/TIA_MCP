@@ -497,6 +497,7 @@ def import_(run, der, reference, restore=False):
     def check(applied, state):
         run.identity("certificate_import", label, {"sha256": sha}, applied["readbacks"][0]["certificate"], state[run.cert(created["certificateId"])])
     run.finish(label, "certificate_import", prepared, added=added, check=check, restore=restore)
+    return created["certificateId"]
 
 
 def certificates(run):
