@@ -104,6 +104,8 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("UnsupportedCapability", "The CPU exposes no writable Boolean WebserverActivate attribute.");
                 if (before.Value<bool>("webserverActivate") != expected) throw new BridgeException("StaleRevision", "webServerActive.expected differs from the current WebserverActivate value.");
                 after["webserverActivate"] = value;
+                // Natively, switching web serving off also clears EnableSystemWebPages (probe wp_c236a724).
+                if (!value && after["systemWebPagesEnabled"]?.Type == JTokenType.Boolean) after["systemWebPagesEnabled"] = false;
                 effects.Add(new JObject { ["plcPath"] = plc.Path, ["setting"] = "WebserverActivate", ["before"] = expected, ["after"] = value });
                 ((JArray)preview["warnings"]).Add("WebserverActivate changes whether the CPU serves web pages once this configuration is downloaded; web users, rights and certificates are not changed.");
             }

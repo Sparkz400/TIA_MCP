@@ -219,6 +219,8 @@ namespace TiaMcp.Openness.V21
 
         // IEC edge FBs that TIA copies know-how protected into System blocks/Program resources on first use (wave 10 native slot).
         // Timers and counters stay out: their single-instance DBs are typed by the data types IEC_TIMER/IEC_COUNTER, not by an FB.
+        // TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile (native 28 October, created after an R_TRIG use), so
+        // system FBs are refused: their global storage has to be created together with its call.
         private static readonly string[] SystemInstanceFbs = { "R_TRIG", "F_TRIG" };
 
         private void PrepareInstanceDbCreate(EngineeringChange change, JObject preview)
@@ -239,14 +241,14 @@ namespace TiaMcp.Openness.V21
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "instanceOfName lookup is incomplete.");
             if (fbs.Length > 1) throw new BridgeException("AmbiguousTarget", "instanceOfName matches more than one FB.");
             var fb = fbs.FirstOrDefault();
-            string system = SystemInstanceFbs.FirstOrDefault(item => string.Equals(item, requested, StringComparison.OrdinalIgnoreCase));
-            if (fb == null && system == null) throw new BridgeException("BlockNotFound", "instanceOfName must name one FB of the selected scope, or R_TRIG/F_TRIG.");
-            if (fb != null && fb.NativeSystemGroup && system == null) throw new BridgeException("GeneratedObject", "Only R_TRIG and F_TRIG may be instantiated from a generated system group.");
-            if (fb != null && !fb.NativeSystemGroup) EnsureEditableBlock(fb.Item, false);
-            change.Payload["instanceOfName"] = fb?.Item.Name ?? system;
+            if (SystemInstanceFbs.Any(item => string.Equals(item, requested, StringComparison.OrdinalIgnoreCase)))
+                throw new BridgeException("UnsupportedCapability", "TIA deletes an unreferenced " + requested.ToUpperInvariant() + " instance DB when it compiles; create such storage together with its call.");
+            if (fb == null) throw new BridgeException("BlockNotFound", "instanceOfName must name one FB of the selected scope.");
+            if (fb.NativeSystemGroup) throw new BridgeException("GeneratedObject", "FBs in generated system groups cannot be instantiated here.");
+            EnsureEditableBlock(fb.Item, false);
+            change.Payload["instanceOfName"] = fb.Item.Name;
             ((JArray)preview["effects"]).Add(new JObject { ["action"] = "create", ["blockType"] = "InstanceDB", ["blockName"] = name, ["groupPath"] = change.GroupPath,
-                ["number"] = number == 0 ? (JToken)"auto" : number, ["instanceOfName"] = change.Payload["instanceOfName"], ["instanceOfPath"] = fb?.Path, ["systemFb"] = system != null });
-            if (fb == null) ((JArray)preview["warnings"]).Add(system + " is not yet in System blocks; whether CreateInstanceDB supplies it without an earlier use is not natively verified.");
+                ["number"] = number == 0 ? (JToken)"auto" : number, ["instanceOfName"] = change.Payload["instanceOfName"], ["instanceOfPath"] = fb.Path });
         }
 
         private void ApplyInstanceDbCreate(EngineeringChange change)

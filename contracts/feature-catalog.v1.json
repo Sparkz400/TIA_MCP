@@ -5793,11 +5793,10 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
-          "Qualified for an instance DB of a user FB; R_TRIG/F_TRIG instance DBs are not covered by that run.",
+          "Qualified for an instance DB of a user FB.",
           "Payload name, instanceOfName and optional number (1-65535, else auto-numbered) in the standard PLC program scope and an exact user block group; software-unit, namespace, safety and generated targets refuse. CreateInstanceDB has no namespace parameter.",
-          "instanceOfName must name exactly one unprotected standard FB of that scope, or the IEC edge system FBs R_TRIG/F_TRIG (TIA's know-how protected System blocks copy, present or not). UDT/system-data-type DBs such as IEC_TIMER/IEC_COUNTER and timer/counter FB names are not accepted; they keep the SCL source route.",
-          "A block name used anywhere in the PLC or a number used by another DB refuses at prepare; the fingerprint pins both until apply. Apply requires compile=true and reads back name, number and InstanceOfName after creation and again after compile and save.",
-          "Whether CreateInstanceDB supplies R_TRIG/F_TRIG in a PLC that has not used them yet is not natively verified."
+          "instanceOfName must name exactly one unprotected standard FB of that scope. R_TRIG/F_TRIG are refused: natively, TIA deletes an unreferenced R_TRIG instance DB when it compiles (28 October), so such storage has to be created together with its call. UDT/system-data-type DBs such as IEC_TIMER/IEC_COUNTER are not instance DBs here.",
+          "A block name used anywhere in the PLC or a number used by another DB refuses at prepare; the fingerprint pins both until apply. Apply requires compile=true and reads back name, number and InstanceOfName after creation and again after compile and save."
         ]
       },
       "qualification": {
