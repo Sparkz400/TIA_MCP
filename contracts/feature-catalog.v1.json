@@ -3393,6 +3393,25 @@
         "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
         "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
       ]
+    },
+    {
+      "id": "local.plc_object_mutations.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_object_mutations.20261028, whose raw report was lost: scripts/qualify_plc_object_mutations.py on a frozen Debug build of 2d5aa7c (D:/wp/b65) in one owned scratch CPU 1511-1 PN (V21), 369/369 steps: tag_set, tag_create, tag_delete, constant_set, constant_create, constant_delete, tag_table_import_xml, type_source_upsert, type_rename, type_delete, plc_type_import_xml, source_upsert (SCL), block_import_xml, block_rename, block_delete, block_number_set, block_attributes_set (HeaderAuthor/HeaderFamily on an FB), group_create, group_rename, group_delete, plc_compile and instance_db_create each applied with exact preview assertions, checkpoint, compile and save; a complete export of every block, type and table plus every tag, constant and group differed from the previous one in exactly the intended keys; unchanged type and DB reimports showed no difference; typed prepare-time refusals per kind left the inventory unchanged and PreviewMismatch, StaleRevision and compile=false were refused at apply; a fresh owned Portal reopened the saved project with the identical verified state; from the reopened state one more change per kind was applied and restored by change_restore into a new directory equal to the pre-change state; a deliberately failing tag address (%M20000.0) ended CompileFailed/recovery_required with its checkpoint retained and change_restore refused FingerprintUnavailable on the inconsistent block."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects.",
+        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes, HeaderName and HeaderVersion are not written. Renamed and deleted groups were empty or held only a subgroup.",
+        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
+        "Engineering only; runtime behavior is not observed."
+      ]
     }
   ],
   "features": [
@@ -6134,8 +6153,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6186,8 +6205,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6238,8 +6257,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6344,7 +6363,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6394,7 +6413,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6444,8 +6463,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6495,7 +6514,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6548,7 +6567,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6602,7 +6621,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -6656,8 +6675,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028",
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -7901,7 +7920,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -7953,7 +7972,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8763,7 +8782,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8816,7 +8835,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8871,7 +8890,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8926,7 +8945,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -8979,7 +8998,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9032,7 +9051,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9085,7 +9104,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9137,7 +9156,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9190,7 +9209,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9244,7 +9263,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -9298,7 +9317,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
@@ -20791,7 +20810,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.rerun.20261028"
         ]
       },
       "availability": {
