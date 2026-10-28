@@ -34,9 +34,12 @@ namespace TiaMcp.Openness.V21
             if (node.Kind == "move" && !ScalarTypes.Contains(node.DataType ?? ""))
                 Fail("GraphicalMoveUnsupported", "MOVE requires one explicit scalar type for its input and output; no implicit conversion is performed.");
             if (node.Negated && node.Kind != "contact") Fail("InvalidTypedGraphicalModel", "Negated is only valid for normally closed LAD contacts; use an explicit FBD not node.");
+            // A cross-unit call has its own profile slot; it never reuses the in-unit call profile.
+            bool crossUnit = node.Kind == "call" && IsCrossUnit(context, ResolveCallee(context, node.CalleePath));
             var matches = (context.Profiles ?? new TypedGraphicalProfile[0]).Where(p => p != null && !p.ReaderOnly && p.Language == language && p.Kind == node.Kind
                 && (p.Instruction ?? "") == (node.Kind == "compare" ? node.Comparison : (node.Instruction ?? ""))
-                && (p.DataType ?? "") == (node.DataType ?? "") && p.TiaVersion == context.TiaVersion && p.CpuFamily == context.CpuFamily && p.Route == context.Route).ToArray();
+                && (p.DataType ?? "") == (node.DataType ?? "") && p.TiaVersion == context.TiaVersion && p.CpuFamily == context.CpuFamily && p.Route == context.Route
+                && (p.CalleeNameEncoding == "crossUnitQualified") == crossUnit).ToArray();
             if (matches.Length == 0 && (node.Kind == "powerrail" || node.Kind == "contact" || node.Kind == "coil" || node.Kind == "assign"))
             {
                 if (context.Route != "standard" || context.CpuFamily != "OrderNumber:6ES7 511-1AL03-0AB0/V4.1") Fail("GraphicalProfileUnavailable", "This basic profile is bounded to the observed CPU 1511 firmware V4.1 standard route. Other targets require separately validated instruction profiles.");
@@ -232,7 +235,17 @@ namespace TiaMcp.Openness.V21
             if (path == null || !context.Callees.TryGetValue(path, out callee) || callee == null || callee.Path != path || string.IsNullOrWhiteSpace(callee.InterfaceHash) || string.IsNullOrWhiteSpace(callee.Name)
                 || callee.BlockType != "FC" && callee.BlockType != "FB" || callee.Parameters == null)
             { Fail("GraphicalCalleeUnresolved", "Calls require an exact FC/FB identity and fresh interface declarations."); return null; }
+            RequireCalleeAccess(context, callee);
             return callee;
+        }
+        private static bool IsCrossUnit(TypedGraphicalContext context, TypedGraphicalCallee callee) => !string.Equals(callee.ScopePath, context.TargetScopePath, StringComparison.Ordinal);
+        /// <summary>V21 unit visibility: another unit's block is callable only through a direct SoftwareUnit relation of the caller's unit and when Published.</summary>
+        internal static void RequireCalleeAccess(TypedGraphicalContext context, TypedGraphicalCallee callee)
+        {
+            if (!IsCrossUnit(context, callee)) return;
+            if (string.IsNullOrEmpty(callee.ScopePath) || !(context.RelatedScopePaths ?? new string[0]).Contains(callee.ScopePath, StringComparer.Ordinal))
+                Fail("GraphicalUnitRelationMissing", "The callee " + callee.Path + " belongs to software unit " + callee.ScopePath + ", to which the caller's unit " + context.TargetScopePath + " declares no SoftwareUnit relation.");
+            if (callee.UnitAccess != "Published") Fail("GraphicalCalleeUnpublished", "The cross-unit callee " + callee.Path + " is " + (callee.UnitAccess ?? "of unknown access") + "; only Published blocks are visible to related units.");
         }
         private static TypedGraphicalInstance ResolveInstance(TypedGraphicalContext context, TypedGraphicalNode node, TypedGraphicalProfile profile)
         {

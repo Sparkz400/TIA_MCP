@@ -34,7 +34,11 @@ string html = before.ToHtml();
 GraphComparison comparison = before.CompareTo(GraphDocument.Load("after.xml"));
 string changes = comparison.ToJson();
 byte[] retained = before.GetOriginalBytes(); // Defensive copy; WriteOriginal(Stream) also available.
+// Typed edits splice the source text; refused results throw GraphException. GraphEditor.Parse(json) reads the same operations.
+byte[] edited = GraphEditor.Apply(before, [new GraphEdit("renameStep", Number: 1, Name: "Wait")]);
 ```
+
+`GraphEditor` supports the operations and refusals described in the [typed edits](../../docs/reference/graph-host-workflow.md#typed-edits) reference. It only produces bytes; it imports nothing.
 
 `GraphInspection` contains ordered graphs/sequences, steps, transitions, branches, connections, actions, interlocks, supervisions, pre/post operations, alarm XML, diagnostics and unsupported fragments. Every node and fragment has a location containing expanded XML names and sibling ordinals. Locations are diagnostic strings, not XPath expressions. XML snippets are inspection serializations, not byte-exact extracts.
 
@@ -55,7 +59,7 @@ This is **not full XSD validation** of arbitrary input. In particular, embedded 
 
 ## Preservation and comparison contract
 
-The reader retains the complete input byte array independently of its projection. Inspection JSON (`tia-graph-inspection.v1`) includes `originalSourceBase64`, input byte count and SHA-256. HTML offers a byte-identical original-source download. Encoding/BOM, declarations, comments, processing instructions, whitespace, ordering and all unknown content therefore survive extraction without reserialization. The model has no native XML edit/import API.
+The reader retains the complete input byte array independently of its projection. Inspection JSON (`tia-graph-inspection.v1`) includes `originalSourceBase64`, input byte count and SHA-256. HTML offers a byte-identical original-source download. Encoding/BOM, declarations, comments, processing instructions, whitespace, ordering and all unknown content therefore survive extraction without reserialization. The model has no native import API; `GraphEditor` changes only the edited spans of a copy.
 
 Comparison JSON (`tia-graph-comparison.v1`) includes both source hashes, diagnostics from both inputs, `sourceBytesChanged`, `matchingReliable` and individual before/after changes:
 

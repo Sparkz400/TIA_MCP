@@ -10,7 +10,7 @@ namespace TiaMcp.Openness.V21
     internal static class HardwareEngineeringRules
     {
         internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
-            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import" }.Contains(kind);
+            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set" }.Contains(kind);
 
         // Port interconnections join the manifest only for kinds that change or can lose them.
         internal static bool CapturesPorts(string kind) => kind == "hardware_port_connect" || kind == "hardware_port_disconnect" || kind == "hardware_replace";
@@ -80,7 +80,7 @@ namespace TiaMcp.Openness.V21
             string path = payload.Value<string>("hardwarePath");
             JObject Target(JArray rows, string target) => rows.Cast<JObject>().SingleOrDefault(row => row.Value<string>("path") == target)
                 ?? throw new BridgeException("MutationVerificationFailed", "The exact selected hardware path is absent from the preservation manifest.");
-            var selected = kind == "cax_import" ? null : Target(expected, path);
+            var selected = kind == "cax_import" || kind == "safety_fparameter_set" ? null : Target(expected, path);
             if (kind == "cax_import")
             {
                 // Siemens keeps every name-conflicting device for MoveToParkingLot and RetainTiaDevice, so existing rows
@@ -109,6 +109,11 @@ namespace TiaMcp.Openness.V21
             {
                 var channel = ((JArray)selected["channels"]).OfType<JObject>().Single(row => row.Value<int>("number") == payload.Value<int>("channelNumber") && row.Value<string>("type") == payload.Value<string>("channelType") && row.Value<string>("ioType") == payload.Value<string>("channelIoType"));
                 foreach (var property in ((JObject)payload["attributes"]).Properties()) channel["attributes"][property.Name] = property.Value.DeepClone();
+            }
+            else if (kind == "safety_fparameter_set")
+            {
+                foreach (var row in ((JArray)payload["parameters"]).OfType<JObject>())
+                    Target(expected, row.Value<string>("hardwarePath"))["attributes"][row.Value<string>("name")] = row["value"].DeepClone();
             }
             else if (kind == "hardware_cpu_memory_bytes")
             {

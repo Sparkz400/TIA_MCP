@@ -1,0 +1,24 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_TONR_LAD"
+VAR_INPUT
+  Enable : Bool;
+  Reset : Bool;
+  Preset : Time;
+END_VAR
+VAR_OUTPUT
+  Done : Bool;
+  Elapsed : Time;
+END_VAR
+VAR
+  Storage : TONR_TIME;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Contact( #Enable )
+  { S7_Templates := "time_type := Time" }
+  #Storage.TONR( r := #Reset, pt := #Preset, et => #Elapsed )
+  Coil( #Done )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

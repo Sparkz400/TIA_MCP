@@ -11,8 +11,8 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
-        // Only the explicitly launched qualification route reaches this factory.
-        // Production library_integrate remains plan-only.
+        // The explicitly launched qualification route reaches this factory; production
+        // library_integrate uses CreatePlcComponentProductionCoordinator behind its own Host flag.
         private PlcComponentCoordinator CreatePlcComponentQualificationCoordinator(string planChangeId, string previewHash, string root)
         {
             EnsureAttached();
@@ -23,16 +23,22 @@ namespace TiaMcp.Openness.V21
             if (_componentWindowManifest == null || !_componentWindowInstallAllowed || _componentWindowDispatchStep != "start" || !_sharedMutationDispatched)
                 throw new BridgeException("MutationScopeIncomplete", "The complete durable component window must be bound before preparation.");
             string workspace = _componentWindowManifest.Value<string>("workspace");
-            var operations = new NativePlcComponentOperations(this, plan, Path.Combine(workspace, "changes"));
+            var operations = new NativePlcComponentOperations(this, plan, workspace, false);
             return PlcComponentCoordinator.Create(root, LibraryChangeView(plan), operations, _componentWindowManifest.Value<string>("componentId"), workspace);
         }
+
+        // Host-gated production route: the same coordinator and adapters on the plan's own (not owned-scratch) project.
+        private PlcComponentCoordinator CreatePlcComponentProductionCoordinator(LibraryChange plan, string workspace) =>
+            PlcComponentCoordinator.Create(workspace, LibraryChangeView(plan), new NativePlcComponentOperations(this, plan, workspace, true));
 
         private sealed class NativePlcComponentOperations : IPlcComponentOperations
         {
             private readonly OpennessSession _session;
             private readonly LibraryChange _plan;
-            private readonly string _changes;
-            internal NativePlcComponentOperations(OpennessSession session, LibraryChange plan, string changes) { _session = session; _plan = plan; _changes = changes; }
+            private readonly string _changes, _workspace;
+            private readonly bool _production;
+            internal NativePlcComponentOperations(OpennessSession session, LibraryChange plan, string workspace, bool production)
+            { _session = session; _plan = plan; _workspace = workspace; _changes = Path.Combine(workspace, "changes"); _production = production; }
             public string SessionToken => _session._libraryGeneration;
 
             public JObject Prepare(JObject arguments)
@@ -45,7 +51,8 @@ namespace TiaMcp.Openness.V21
                     if (_session.LibraryChangeFingerprint(_plan) != _plan.Preview.Value<string>("fingerprint")) throw new BridgeException("PreviewStale", "Source or target changed after the component plan; no native mutation was dispatched.");
                     return _session.LibraryChangePrepare(arguments, (JArray)_plan.Preview["integrationPlan"]["versions"]);
                 }
-                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _session.CapturedStorageContext(_plan));
+                // The natively captured storage profile applies only to a plan whose installed FB/UDT content equals the captured one.
+                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _session.CapturedStorageContext(_plan, _production));
                 throw new BridgeException("UnsupportedComponentStep", "Coordinator can prepare only library_instantiate and graphical_typed_edit.");
             }
 
@@ -81,7 +88,7 @@ namespace TiaMcp.Openness.V21
             private void CheckProject()
             {
                 _session.EnsureAttached();
-                if (!_session._ownsPortal || _session._scratchProject == null || !_session._scratchProject.Equals(_plan.Project) || _session._portal.Projects.Count != 1)
+                if (!_production && (!_session._ownsPortal || _session._scratchProject == null || !_session._scratchProject.Equals(_plan.Project) || _session._portal.Projects.Count != 1))
                     throw new BridgeException("OwnedScratchRequired", "The exact qualification scratch project is no longer exclusively selected.");
                 _session.EnsureProjectOffline(_plan.Project);
             }
@@ -93,7 +100,7 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("ComponentReceiptMismatch", "Readback contract differs from the exact native plan.");
                 var scope = _session.LibraryPlcScope(_plan, out var plc); var budget = new ScanBudget(50000);
                 if (scope.Unit != null) throw new BridgeException("UnsupportedIntegrationScope", "Component readback requires the standard PLC scope.");
-                string directory = Path.Combine(_session._componentWindowManifest.Value<string>("workspace"), "captures", "component-read-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(directory);
+                string directory = Path.Combine(_workspace, "captures", "component-read-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(directory);
                 var result = new JObject { ["projectPath"] = _plan.Project.Path.FullName, ["plcPath"] = plc.Path };
                 using (_session.SharedMutationExclusive("TIA MCP component qualification readback"))
                 {

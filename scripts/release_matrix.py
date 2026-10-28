@@ -20,8 +20,8 @@ PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simul
 
 # Obligation owners for features newer than the 15 October ledger, by feature-name prefix.
 PREFIX_OWNERS = {
-    "access_inspect": ["X03", "D12"], "access_review": ["X03"], "certificate_inspect": ["X03"], "change.graph_import": ["X06"], "plc_alarm_inspect": ["D11", "L04"], "web_inspect": ["D12"], "addin_": ["X04"], "automationml_": ["D05"], "cax_export": ["D05"], "change.cax_import": ["D05"],
-    "change.block_attributes_set": ["X11"], "change.block_number_set": ["X11"], "change.connection_": ["D08"], "change.constant_create": ["X11"],
+    "access_inspect": ["X03", "D12"], "access_review": ["X03"], "certificate_inspect": ["X03"], "change.certificate_create": ["D12", "X03"], "change.certificate_import": ["D12", "X03"], "change.certificate_assign": ["D12", "X03"], "change.certificate_delete": ["D12", "X03"], "change.graph_import": ["X06"], "plc_alarm_inspect": ["D11", "L04"], "web_inspect": ["D12"], "addin_": ["X04"], "automationml_": ["D05"], "cax_export": ["D05"], "change.cax_import": ["D05"], "change.webserver_page_set": ["D12"], "change.webserver_user_pages_generate": ["D12"], "change.umac_role_set": ["X03", "D12"],
+    "change.block_attributes_set": ["X11"], "change.block_number_set": ["X11"], "change.instance_db_create": ["X11"],"change.connection_": ["D08"], "change.constant_create": ["X11"],
     "change.project_attributes_set": ["X01"], "change.project_languages_set": ["X01", "D03"], "change.software_unit_": ["D07"], "change.block_protect": ["X11"], "change.block_unprotect": ["X11"], "change.block_write_protection_set": ["X11"], "change.opcua_": ["D04"], "change.plc_alarm_": ["D11"], "change.plc_supervision_": ["D11"], "change.tag_create": ["X11"], "change.testsuite_application_import": ["D06"], "change.testsuite_system_import": ["D06"],"change.to_child_create": ["D13"], "change.to_connect": ["D13", "C02"], "change.to_disconnect": ["D13"],
     "change.hardware_cpu_memory_bytes": ["X10"], "change.hardware_port_": ["X10"], "change.hardware_replace": ["X10"], "change.plc_compile": ["X11"], "composite_engineering": ["C02"], "connection_inspect": ["D08"], "connection_review": ["D08"],
     "db_snapshot": ["D09"], "change.db_snapshot_": ["D09"], "device_": ["X10"], "diagnostic_": ["D17"], "diagnostic_plcsim_write": ["D02", "D16", "D17", "L03"], "diagnostic_runtime_acquisition_compare": ["D02", "D16", "D17", "C04"], "instance_lookup": ["D17", "L04", "X11"], "drive_observe": ["D10"], "drive_profile": ["D10"], "change.drive_parameter_set": ["D10"], "change.drive_telegram_set": ["D10"],
@@ -31,8 +31,7 @@ PREFIX_OWNERS = {
     "qualification_translation": ["D03"], "qualification_watch": ["D02"],
     "runtime.physical_plc": ["D16"], "runtime_capture": ["D16"], "runtime_handoff": ["C03"],
     "runtime_plcsim_bind": ["D16", "C03", "L03"], "runtime_web_write": ["D16", "L03"], "runtime_web_operating_mode": ["D16", "L03"], "runtime_ua_write": ["D16", "C03", "L03"],
-    "library_update_check": ["X02", "L02"], "change.library_cleanup": ["X02", "L02"], "change.library_harmonize": ["X02", "L02"],
-    "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"],
+    "library_update_check": ["X02", "L02"], "change.library_cleanup": ["X02", "L02"], "change.library_harmonize": ["X02", "L02"], "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"], "safety_printout": ["D14"], "change.safety_fparameter_set": ["D14"], "library.integrate_combined_apply": ["X02", "L02"],
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
     "technology_profile": ["D13"], "testsuite_": ["D06"], "translation_": ["D03"],
     "vci_": ["D01"], "watch_table": ["D02"], "web_application": ["D12"],

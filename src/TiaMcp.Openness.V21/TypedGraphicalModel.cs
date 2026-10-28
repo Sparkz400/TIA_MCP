@@ -84,6 +84,10 @@ namespace TiaMcp.Openness.V21
         public string Namespace { get; set; }
         public string InterfaceHash { get; set; }
         public TypedGraphicalParameter[] Parameters { get; set; } = new TypedGraphicalParameter[0];
+        // Software scope that owns the callee; a callee outside TargetScopePath is a cross-unit call.
+        public string ScopePath { get; set; }
+        // Native UnitAccessType of a cross-unit callee ("Published"/"Unpublished"); null in the caller's own scope.
+        public string UnitAccess { get; set; }
     }
     internal sealed class TypedGraphicalParameter
     {
@@ -110,6 +114,9 @@ namespace TiaMcp.Openness.V21
         public string CpuFamily { get; set; }
         public string Route { get; set; } = "standard";
         public string TargetNamespace { get; set; }
+        public string TargetScopePath { get; set; }
+        // Units the caller's unit declares a direct SoftwareUnit relation to, as exact scope paths.
+        public string[] RelatedScopePaths { get; set; } = new string[0];
         public string NetworkTemplateXml { get; set; }
         // An independently observed, validated native template is required for advanced profiles.
         // The resolver loads these from the deployed profile catalog, never the user payload.

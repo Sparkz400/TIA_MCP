@@ -1,6 +1,7 @@
 """Evidence-preserving local qualification lifetime; no attach or process kill API."""
 import copy
 import hashlib
+import json
 import pathlib
 import traceback
 
@@ -206,6 +207,12 @@ def snapshot(call, destination):
         for row in sorted(inventory[collection], key=lambda item: item["path"]):
             key = kind + ":" + row["path"]
             require(key not in result["objects"], "Duplicate exact identity in native inventory.")
+            if kind == "block" and row.get("isKnowHowProtected") is True and "/systemGroups/" in row["path"]:
+                # TIA copies protected system FBs such as R_TRIG into System blocks; they cannot be exported, so their identity is kept.
+                identity = json.dumps({k: row.get(k) for k in ("path", "name", "number", "kind", "programmingLanguage", "isConsistent")}, sort_keys=True).encode()
+                result["objects"][key] = {"kind": "protectedSystemBlock", "path": row["path"], "name": row["name"],
+                    "sha256": hashlib.sha256(identity).hexdigest(), "payloadSha256": hashlib.sha256(identity).hexdigest()}
+                continue
             exported = call(tool, {selector: row["path"]})
             raw = artifact_bytes(call, exported["artifact"])
             xml = raw.decode("utf-8-sig")
@@ -213,7 +220,6 @@ def snapshot(call, destination):
             file.write_bytes(raw)
             result["objects"][key] = {"kind": kind, "path": row["path"], "name": row["name"],
                 "file": str(file), "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(), "payloadSha256": native_hash(xml)}
-    import json
     (destination / "manifest.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     return result
 

@@ -448,6 +448,11 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         throw new Exception("Native-disabled CLI accepted " + flag);
     }
 });
+Test("CLI combined library_integrate apply is opt-in", work =>
+{
+    Equal(false, HostOptions.Parse([]).LibraryIntegrateApply);
+    Equal(true, HostOptions.Parse(["--enable-library-integrate-apply"]).LibraryIntegrateApply);
+});
 Test("CLI Add-In receiver is explicit and does not imply native admission", work =>
 {
     Equal(false, HostOptions.Parse([]).AddInHandoff);

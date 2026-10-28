@@ -49,7 +49,12 @@ namespace TiaMcp.Openness.V21
             result["hmi"] = LibraryHmiCapabilities();
             result["limits"] = new JObject { ["libraries"] = 32, ["metadataEntries"] = 10000, ["pageSize"] = 200, ["dependencyNodes"] = 1000, ["selectedComponents"] = 100 };
             result["plcIntegration"] = new JObject { ["action"] = "plc_component_plan", ["planOnly"] = true, ["applySupported"] = false, ["applyError"] = PlcLibraryIntegrationPlanner.ApplyError, ["schema"] = "contracts/plc-library-integration-recipe.v1.schema.json", ["scope"] = "One exact FB with pinned PLC dependencies in the PLC or a software unit; a new or exactly reused global instance DB, or a new multi-instance in an existing FB caller; an existing LAD/FBD FC, FB or OB caller or a new FC; scalar tags, UDT-tag members or DB members. Exact installed versions are reused with native proofs. Returns concrete separate preparation steps, planOnly reasons for steps the component route cannot apply, and a recovery/qualification packet." };
-            result["limitations"] = new JArray("Type authoring uses documented CreateFromDocuments; direct block-to-type creation is not exposed by the installed public API.", "PLC library_integrate prepares an explicit plan-only recipe. Combined apply is unavailable; proposed existing engineering operations require fresh preparation and are not atomic.", "Library copy/publication can initialize a default or promote a newer source default, with exact effects pinned in preview. Arbitrary default changes and project updates require separate prepared actions.", "Full document/preservation/runtime qualification must be retained for each target profile.");
+            if (_libraryIntegrateApplyEnabled)
+            {
+                result["plcIntegration"]["applySupported"] = true;
+                result["plcIntegration"]["combinedApply"] = "Enabled by --enable-library-integrate-apply for a fresh FB/dependency import with a new global instance DB and a new FBD FC caller or an existing one after its last network in the standard PLC scope; preview.combinedApply states eligibility. OB insertion, LAD/FB callers, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only. Not natively qualified as a production route.";
+            }
+            result["limitations"] = new JArray("Type authoring uses documented CreateFromDocuments; direct block-to-type creation is not exposed by the installed public API.", "PLC library_integrate prepares an explicit recipe. Combined apply runs only on a Host started with --enable-library-integrate-apply and only for the verified shapes in plcIntegration; otherwise the proposed steps require separate fresh preparation. Steps are never atomic.", "Library copy/publication can initialize a default or promote a newer source default, with exact effects pinned in preview. Arbitrary default changes and project updates require separate prepared actions.", "Full document/preservation/runtime qualification must be retained for each target profile.");
             return result;
         }
 
@@ -235,7 +240,7 @@ namespace TiaMcp.Openness.V21
                         change.Preview["targetPreview"] = PrepareLibraryHmiAction(change.Project, payload, change.Versions.FirstOrDefault(), change.Masters.FirstOrDefault());
                         break;
                     }
-                    if (change.Kind == "library_integrate") { if (PlcHmiIntegrationPlanner.IsRecipe(payload)) PreparePlcHmiIntegrationPlan(change); else PreparePlcLibraryIntegrationPlan(change); break; }
+                    if (change.Kind == "library_integrate") { if (PlcHmiIntegrationPlanner.IsRecipe(payload)) PreparePlcHmiIntegrationPlan(change); else { PreparePlcLibraryIntegrationPlan(change); PreparePlcCombinedApply(change); } break; }
                     PreparePlcLibraryInstantiation(change);
                     break;
                 case "library_update_project":
@@ -854,8 +859,11 @@ namespace TiaMcp.Openness.V21
             if (PlcComponentQualificationGate.IsId(args.Value<string>("changeId"))) return ComponentQualificationApply(args);
             string id = ChangeText(args, "changeId", 64);
             if (!_libraryChanges.TryGetValue(id, out var change)) throw new BridgeException("OutcomeUnknown", "Prepared native handles do not survive restart. Read durable change_status; never replay a dispatched operation.");
-            if (change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload))
+            bool component = change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload);
+            if (component && !_libraryIntegrateApplyEnabled)
                 throw new BridgeException(PlcLibraryIntegrationPlanner.ApplyError, "This PLC integration is a plan only. No idempotency claim, checkpoint, save, compile or native mutation was dispatched. Review the explicit separate steps and native qualification gates.", LibraryChangeView(change));
+            if (component && PlcCombinedApplyRefusal(change) is string refusal)
+                throw new BridgeException(PlcLibraryIntegrationPlanner.ApplyError, "Combined apply refused: " + refusal + " No idempotency claim, checkpoint or native mutation was dispatched.", LibraryChangeView(change));
             string key = ChangeText(args, "idempotencyKey", 128);
             if (ChangeText(args, "previewHash", 64) != change.PreviewHash) throw new BridgeException("PreviewMismatch", "previewHash does not match.");
             if (change.IdempotencyKey != null)
@@ -874,10 +882,12 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind == "library_create" || change.Kind == "library_upgrade") RequireLibraryHandleCapacity(1);
                 if (LibraryChangeFingerprint(change) != change.Preview.Value<string>("fingerprint")) throw new BridgeException("PreviewStale", "An affected library or target changed after preview.");
                 VerifyLibrarySources(change);
+                var coordinator = component ? PlcComponentApplyCoordinator(change) : null;
                 // A file claim survives worker termination. CreateNew is atomic across processes.
                 try { LibraryJournalStore.Claim(Path.GetDirectoryName(change.Directory), key, change.Id); }
                 catch (IOException) { throw new BridgeException("IdempotencyConflict", "This durable idempotency key was already claimed. Inspect its previous operation; no native call was dispatched."); }
                 change.IdempotencyKey = key; change.Journal["idempotencyKeyHash"] = ChangeHash(key);
+                if (coordinator != null) return ApplyPlcComponentIntegration(change, coordinator);
                 try
                 {
                     change.State = "checkpointing"; LibraryJournal(change, "claim", "completed");

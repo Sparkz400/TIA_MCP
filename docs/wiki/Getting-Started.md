@@ -35,6 +35,8 @@ From the repository root:
 
 If the probe reports missing prerequisites, follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md).
 
+Optional combined library install: start the Host with `--enable-library-integrate-apply` to let `change_apply` install a prepared PLC `library_integrate` plan in one step. It is off by default, covers only the natively verified shapes and refuses OB insertion. The route itself is not natively qualified. See [combined apply](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply-opt-in).
+
 Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll). It is not natively qualified.
 
 Vendor libraries can have additional CPU, tag-table and product requirements.

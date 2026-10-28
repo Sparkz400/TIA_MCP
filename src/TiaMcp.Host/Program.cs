@@ -17,6 +17,7 @@ try
     if (options.ComponentQualification) workerArguments.Add("--component-qualification");
     if (options.TestSuiteScopeProbe) workerArguments.Add("--testsuite-scope-probe");
     if (options.TranslationQualification) workerArguments.Add("--translation-qualification");
+    if (options.LibraryIntegrateApply) workerArguments.Add("--enable-library-integrate-apply");
 #if TESTSUITE_QUALIFICATION
     if (options.TestSuiteQualification) workerArguments.Add("--testsuite-qualification");
 #endif

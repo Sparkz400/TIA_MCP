@@ -1,0 +1,15 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "LAD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_MoveDInt_LAD"
+VAR_INPUT
+  Source : DInt;
+END_VAR
+VAR_OUTPUT
+  Target : DInt;
+END_VAR
+{ S7_Language := "LAD" }
+NETWORK
+RUNG wire#powerrail
+  Move( in := #Source, out1 => #Target )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

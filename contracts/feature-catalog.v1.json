@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.44",
+  "catalogVersion": "0.4.45",
   "targetTiaVersions": [
     21
   ],
@@ -2602,6 +2602,79 @@
         "One representative kind per reconciliation route qualifies the route's reconciliation, not every kind's native mutation; library transactions are covered by the library interruption records.",
         "The save-time rule trusts the checkpoint archive's file write time; the archive hash is verified, its timestamp is not."
       ]
+    },
+    {
+      "id": "local.wave-kinds.probe.20261027",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "559501c2b662f6d3fde8773133d445cc3b69ac31",
+        "passedScope": "Exploratory native probe on one owned scratch CPU 1511-1 PN (V21): certificate_create/assign (PlcCommunicationCertificate, there and back)/delete applied with exact readback; umac_role_set create/grant/assign/unassign/revoke applied; vci_workspace_create/delete applied; instance_lookup found the single-instance DB and both call-site sources; webserver_page_set refused WebServerNotActivated on a CPU with web serving off."
+      },
+      "artifacts": [
+        "evidence/local.wave-kinds.probe.20261027.json"
+      ],
+      "limitations": [
+        "Exploratory probe of one scratch project and one CPU: not feature qualification, no reopen/recovery/interruption gates beyond each apply's own readback.",
+        "Web page settings were only probed for their refusal; no change kind activates web serving.",
+        "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
+      ]
+    },
+    {
+      "id": "local.plc_object_mutations.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "adad6b0b0683b42051db4dbe1ef24f1ccbab321e",
+        "passedScope": "scripts/qualify_plc_object_mutations.py on build 9ff587c (frozen D:\\wp\\b6) in one owned scratch CPU 1511-1 PN (V21), 369/369 steps: tag_set, tag_create, tag_delete, constant_set, constant_create, constant_delete, tag_table_import_xml, type_source_upsert, type_rename, type_delete, plc_type_import_xml, source_upsert (SCL), block_import_xml, block_rename, block_delete, block_number_set, block_attributes_set (HeaderAuthor/HeaderFamily on an FB), group_create, group_rename, group_delete, plc_compile and instance_db_create each applied with exact preview assertions, checkpoint, compile and save; a complete export of every block, type and table plus every tag, constant and group differed from the previous one in exactly the intended keys; unchanged type and DB reimports showed no difference; typed prepare-time refusals per kind left the inventory unchanged and PreviewMismatch, StaleRevision and compile=false were refused at apply; a fresh owned Portal reopened the saved project with the identical verified state; from the reopened state one more change per kind was applied and restored by change_restore into a new directory equal to the pre-change state; a deliberately failing tag address (%M20000.0) ended CompileFailed/recovery_required with its checkpoint retained and change_restore refused FingerprintUnavailable on the inconsistent block."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects.",
+        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes, HeaderName and HeaderVersion are not written. Renamed and deleted groups were empty or held only a subgroup.",
+        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
+        "Engineering only; runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.milestones.reopen.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9f80075ba59d8ef8b4e5884f801512b4f8853f27",
+        "passedScope": "scripts/validate_milestones.py (--skip-simulation) on build 9ff587c (frozen D:\\wp\\b6) in owned scratch projects, 11 changes: graphical_operand_set on a LAD and an FBD block, block_rename, block_delete (after a DependencyExists refusal for the called TiaMcp_IsEnabled), type_source_upsert (UDT), source_upsert (SCL and STL), block_import_xml (LAD and FBD) and network_configure. Each change: preview, apply with checkpoint, compile and save; change_status equals the apply result with its retained checkpoint; a complete timestamp-free readback of every block, type, tag table and network node attribute differs only in the change's own objects; a fresh owned Portal reopens the saved changed project with an identical readback and change_status. Eight changes (both operand edits, rename, delete, UDT, STL source, LAD import, network address) are restored from their own checkpoint in the applying Portal with an exact pre-change readback, and the recovered project is reopened in another fresh Portal."
+      },
+      "artifacts": [
+        "evidence/local.milestones.reopen.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN; no software units, namespaces or safety. Simulation steps were skipped.",
+        "network_configure preservation is checked by the runner over program exports and network node attributes only; the worker's configured-hardware preservation stage does not run for that kind.",
+        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bc020684767dd1907a44a7aad35710d1317dd99e",
+        "passedScope": "scripts/qualify_library_integrate_apply.py on build 9ff587c (frozen D:\\wp\\b6, Host --enable-library-integrate-apply) in owned de-DE-only scratch projects: an authored global library with an FB and its UDT; for a new standalone FBD FC caller and for an existing FBD FC caller, change_apply of the prepared PLC library_integrate plan ran library_instantiate and graphical_typed_edit through the coordinator with readback after each step, reached installation_verified with one initial checkpoint, and an independent export/inventory diff showed exactly the planned FB, UDT, instance DB (first free number, captured storage profile) and caller network with everything else unchanged; compile 0 errors; fresh reopen identical; change_restore in an empty owned Portal retrieved the pre-change inventory and an empty project library. With the flag, an FBD OB caller and a new LAD FC were refused (PlcIntegrationNotQualified) with no change; without the flag library_capabilities reports apply unsupported and change_apply refuses with no change."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.20261028.json"
+      ],
+      "limitations": [
+        "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
+        "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
+        "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
+      ]
     }
   ],
   "features": [
@@ -3801,7 +3874,7 @@
           "Read-only superset of safety_inspect for safety_evidence_review: the safety_inspect fields keep their names and new sections (plcFParameters, fIoModules, safetyValidation, safetyPrintout) compare as other reported content.",
           "F-I/O are device items exposing Failsafe_FDestinationAddress anywhere in the project; modules whose Failsafe_FSourceAddress definitely differs from the PLC Failsafe_CentralFSourceAddress are only counted, unreadable addresses are kept with fSourceAddressMatchesPlc null. I-device/shared-device ownership is not resolved.",
           "Activation tests are project-level; evaluationDeviceNameMatchesPlc compares the native EvaluationDeviceName with the PLC DeviceItem name only, not an exact identity.",
-          "Validity uses the native TestValidity.CheckValidity query; side effects are not natively verified. Activation-test execution, ResetTestResult, F-parameter writes and safety login are not implemented.",
+          "Validity uses the native TestValidity.CheckValidity query; side effects are not natively verified. Activation-test execution, ResetTestResult and safety login are not implemented; F-parameter writes use change.safety_fparameter_set and printouts with explicit options use safety_printout.",
           "Optional exports require the Windows Microsoft Print to PDF driver for the safety printout; XLSX/PDF/SimaticML files are retained opaquely with SHA-256 and not parsed. Missing services or failed exports are warnings and mark the scope incomplete."
         ]
       },
@@ -3813,6 +3886,51 @@
         "status": "conditional",
         "reasons": [
           "Requires SafetyAdministration on the PLC; the Safety Validation Assistant service is reported as UnsupportedCapability when absent."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "safety_printout",
+      "domain": "safety",
+      "title": "Print the safety printout and activation-test reports to files",
+      "mcpTools": [
+        "safety_printout"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 DeviceItem.GetService<SafetyPrintout>().Print(SafetyPrintoutFilePrinter MicrosoftPrintToPdf or MicrosoftXpsDocumentWriter, FileInfo, documentLayout, SafetyPrintoutOption All or Compact) on the PLC DeviceItem owning SafetyAdministration.",
+          "V21 ActivationTest.GetService<ActivationTestPrintout>().Generate(FileInfo) and ActivationTest.Export(FileInfo, ExportOptions) through the safety_validation_inspect inventory when activationTestReports is set."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Only the two Windows file printers the API offers; the Print to PDF or XPS Document Writer queue must be installed (System.Drawing PrinterSettings.InstalledPrinters), otherwise PrinterUnavailable and nothing is printed. XPS output keeps whatever XPS/OpenXPS format the driver writes.",
+          "documentLayout is passed through as a plain layout name (letters, digits, underscore); TIA decides whether it exists.",
+          "PDF/XPS/XLSX/SimaticML files are written to the Host export directory and retained opaquely with SHA-256; content is not parsed or certified. A printout or report does not validate, accept or approve the safety program.",
+          "Activation tests are project-level; correlation to the PLC is by EvaluationDeviceName only, as in safety_validation_inspect."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires SafetyAdministration and the SafetyPrintout service on the PLC and an installed Windows file printer."
         ]
       },
       "prerequisites": [
@@ -4011,7 +4129,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN found a single-instance DB and call sites from xref and SimaticML (local.wave-kinds.probe.20261027); not natively qualified.",
           "One exact FB or FC in one PLC. Instance DBs resolve through the shared native InstanceType/TypeInstance or unnamespaced InstanceOfName resolver; multi-instance owners are FBs the native xref reports as users, confirmed by an exact same-scope Static declaration (including arrays with literal bounds) in their exported interface, up to maxDepth 8.",
           "Call sites list native xref call locations plus exported SCL/LAD/FBD CallInfo with compile-unit ordinal, instance components and simple symbolic actual operands; expressions, wired logic and indirect operands stay unresolved.",
           "STL and GRAPH are an unqualified symbolic scan of exported Access/CallInfo per the V21 schemas with no binding reader; native xref Open/Actions/Transition/Interlock/Supervision rows are retained. Other languages are reported unsupported and skipped.",
@@ -4020,7 +4138,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5263,6 +5383,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Qualified routes: SCL (local.plc_object_mutations.20261028) and STL (local.milestones.reopen.20261028). The SIMATIC_SD route is not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
@@ -5270,12 +5392,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.conformance.v03",
-          "local.units.v03",
-          "local.engineering.interruption-matrix.20261027"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5317,17 +5437,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.conformance.v03",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5369,17 +5489,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.conformance.v03",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5422,7 +5542,7 @@
         "status": "partial",
         "limitations": [
           "Payload is graphRef (retained GRAPH document) or path (inside the Host artifact directory) plus expectedBlockNames. The Host validates it with the net10 TiaMcp.Graph reader, which the net48 worker cannot load; structural errors, unsupported grammar outside the opaque envelope/embedded-logic boundaries, more than one chart and empty Interlock/Supervision modules without FlgNet (EmptyNativeCondition, rejected by TIA V21) are refused before native preparation.",
-          "Exactly one GRAPH block per document; language conversion, safety blocks and protected or generated targets are refused. No typed GRAPH edit is synthesized; the document is imported as supplied.",
+          "Exactly one GRAPH block per document; language conversion, safety blocks and protected or generated targets are refused. The worker synthesizes no GRAPH edit; typed edits are made beforehand with graph_edit and the document is imported as supplied.",
           "Apply requires compile=true. After compilation the block is re-exported and must equal the imported document beyond DocumentInfo and formatting (the existing native preservation comparer) before saving; otherwise the change is recovery_required. Documents exported without defaults can fail this check.",
           "The GraphComparer does not run inside the worker; review the declared change beforehand with graph_export and graph_compare.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
@@ -5473,16 +5593,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5524,15 +5644,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.units-expanded.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5574,16 +5694,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.units.v03",
-          "local.unit-recovery.v03"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5625,14 +5745,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "One standard, unprotected, non-generated block; sets AutoNumber=false then Number and reads both back. Native attribute infos must report both as readable and writable; AutoNumber is read-only for protected blocks and several OBs.",
-          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5675,14 +5797,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Qualified attributes: HeaderAuthor and HeaderFamily on an FB; HeaderName, HeaderVersion and the OB attributes are not written by that run.",
           "One standard, unprotected, non-generated block; allowlist HeaderAuthor, HeaderFamily, HeaderName, HeaderVersion, plus PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Each attribute must also be declared readable and writable by the native attribute infos; ProcessImagePartNumber is documented read-only on export and is rejected unless the native target reports write access.",
-          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5695,6 +5820,60 @@
         "Applicable native services and project protection state",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.instance_db_create",
+      "domain": "language",
+      "title": "Create one instance DB of an exact FB or IEC edge system FB",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "instance_db_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.Step7 PlcBlockComposition.CreateInstanceDB(String name, Boolean isAutoNumbered, Int32 number, String instanceOfName) and InstanceDB.InstanceOfName (documented father types FB/SFB/UDT/SDT); PlcBlock.Number readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Qualified for an instance DB of a user FB.",
+          "Payload name, instanceOfName and optional number (1-65535, else auto-numbered) in the standard PLC program scope and an exact user block group; software-unit, namespace, safety and generated targets refuse. CreateInstanceDB has no namespace parameter.",
+          "instanceOfName must name exactly one unprotected standard FB of that scope. R_TRIG/F_TRIG are refused: natively, TIA deletes an unreferenced R_TRIG instance DB when it compiles (28 October), so such storage has to be created together with its call. UDT/system-data-type DBs such as IEC_TIMER/IEC_COUNTER are not instance DBs here.",
+          "A block name used anywhere in the PLC or a number used by another DB refuses at prepare; the fingerprint pins both until apply. Apply requires compile=true and reads back name, number and InstanceOfName after creation and again after compile and save."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Standard PLC program scope; software units, safety and generated objects are excluded"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -5725,17 +5904,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact standard unprotected block only. dependencyPolicy defaults to rejectReferenced; other deletion policies are not accepted.",
           "The conservative exported-XML dependency scan runs at prepare and immediately before deletion. It excludes only the exact selected declaration and rejects references or incomplete evidence; no cascade deletion or automatic reference rewriting.",
-          "Historical deletion evidence qualifies its recorded fixtures; the new dependency guard requires separate native qualification.",
+          "The dependency guard refused deleting a referenced FB natively (DependencyExists) in local.plc_object_mutations.20261028.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5933,17 +6113,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) for one LAD and one FBD operand edit (local.milestones.reopen.20261028); software units, namespaces and safety blocks are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.conformance.v03",
-          "local.layers.units-expanded.20261008",
-          "local.typed.resolution.20261025"
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -6598,6 +6776,60 @@
       ]
     },
     {
+      "featureId": "change.safety_fparameter_set",
+      "domain": "safety",
+      "title": "Set allowlisted F-parameters of F-I/O owned by one safety PLC",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "safety_fparameter_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 HardwareObject.GetAttributeInfos/GetAttribute/SetAttribute (EngineeringAttributeInfo.Name/AccessMode Read and Write) on F-I/O DeviceItems for Failsafe_FDestinationAddress and Failsafe_FMonitoringtime; Failsafe_FSourceAddress, the PLC's Failsafe_CentralFSourceAddress and every readable Failsafe_*Signature* attribute are only read.",
+          "V21 SafetyAdministration.IsSafetyOfflineProgramPasswordSet/IsLoggedOnToSafetyOfflineProgram/ProgramSignatures on the PLC DeviceItem, DeviceItem.Addresses with Address.AddressControllers for ownership, and Device.GetService<ICompilable>().Compile() for the whole-project device compile. V21 exposes no separate safety-program compile; the device compile covers hardware and software including the F-program.",
+          "The Failsafe_* attribute names come from the V21 Openness F-I/O documentation, not from the installed PublicAPI XML (which lists only Failsafe_* enum types); each name's presence and Read/Write access is probed natively before preview."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
+          "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
+          "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
+          "A new F-destination address must differ from the current and planned address of every other F-I/O whose F-source is this PLC's or unreadable, so swaps and chained moves are refused; an unreadable F-destination address refuses as DependencyCoverageIncomplete.",
+          "A password-protected safety program must already be logged in through the authorized TIA workflow; no password is accepted, stored or passed to a login API.",
+          "Apply requires compile=true (whole-project device compile) and checkpointSave; configured-hardware preservation covers the two attributes on every device item plus the existing hardware manifest. Readback reports the written values and the F-I/O Failsafe_*Signature* attributes right after the write; safetyAfter reports PLC program signatures after compile."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 with STEP 7 Safety and an authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.project_simulation_enable",
       "domain": "simulation",
       "title": "Change project simulation compilation settings",
@@ -7222,7 +7454,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "Backlog beyond change.safety_fparameter_set (Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only); no other typed F-I/O parameter operation is exposed."
         ]
       },
       "qualification": {
@@ -7741,15 +7973,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Same scope and namespace, explicit collision checks, native dependency validation and mandatory compilation.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7793,15 +8026,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory. Conservative exported-XML scans reject references and incomplete evidence.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7845,6 +8079,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact table/member selector and explicit Name, DataTypeName or LogicalAddress allowlist; native address/type validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -7853,9 +8088,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7899,6 +8134,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact table/member selector and explicit Name, DataTypeName or Value allowlist. System constants are excluded; native validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -7907,9 +8143,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7953,15 +8189,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. Safety/system members remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8005,15 +8242,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. System constants remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8057,15 +8295,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
           "Safety units are rejected; a created tag that native TIA reports as IsSafety fails verification and requires checkpoint recovery.",
-          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8108,14 +8348,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and value; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
-          "Safety units are rejected. Readback is exact: dataTypeName and value must use the native normalized spelling.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Safety units are rejected. Readback is exact: dataTypeName and value must use the native normalized spelling."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8158,15 +8400,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "groupKind blocks/types/tags and exact parent group path; generated/root and safety groups are excluded. Native validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8210,15 +8453,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Renamed groups were empty or held only a subgroup.",
           "groupKind blocks/types/tags, exact group path and collision checks; generated/root and safety groups are excluded. Moves remain unsupported.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8262,15 +8507,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Deleted groups were empty or held only a subgroup.",
           "Only empty user groups; generated/root and safety groups are excluded. Moves and recursive deletion are unsupported.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -9680,7 +9927,7 @@
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
-          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply remains unavailable; emitted separate steps require fresh preparation and native qualification.",
+          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs only on a Host started with --enable-library-integrate-apply and only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
           "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentRecoveryAnchorUnavailable, ComponentMultiInstanceUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -9701,6 +9948,60 @@
       "prerequisites": [
         "TIA V21, matching optional HMI modules when applicable, and an authorized engineering session.",
         "Review exact identities and prepare preview before any mutation."
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "library.integrate_combined_apply",
+      "domain": "libraries",
+      "title": "Apply a PLC library integration plan as one change",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Reuses the existing library_instantiate and graphical_typed_edit routes (PlcBlockComposition.CreateFrom, PlcBlockComposition.Import, Project.Save/Archive, ICompilable.Compile, LibraryTypeVersion.FindInstances/Export); no new Siemens API."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.20261028).",
+          "Off by default. Only a Host started with --enable-library-integrate-apply executes a prepared PLC library_integrate plan in change_apply; other Hosts refuse it with PlcIntegrationNotQualified exactly as before. With the flag, the preview states eligibility in combinedApply.",
+          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
+          "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
+          "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
+          "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.library_integrate.combined_apply.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires --enable-library-integrate-apply. Normal Hosts keep PLC library_integrate plan-only."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21, an authorized engineering session and a Host started with --enable-library-integrate-apply",
+        "A prepared PLC library_integrate plan with preview.combinedApply.eligible=true",
+        "checkpointSave, compile and save set to true"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -11208,6 +11509,7 @@
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
+          "Cross-scope calls (27 October, offline tests only, not natively qualified): a call to a block in another namespace of the caller's own software unit emits the absolute namespace-qualified CallInfo Name through the route's captured namespaceQualified profile and is refused without it. A call into another software unit requires a direct SoftwareUnit relation of the caller's unit, a Published callee (native attribute Access, UnitAccessType) and its own crossUnitQualified profile, which no capture binds yet, so it returns GraphicalProfileUnavailable. Relation, publication, callee namespace and interface are part of the preview and rechecked at apply. Storage creation for another unit's FB and instance DBs outside the caller's scope are refused; existing storage in the caller's scope follows the usual instance rules. Capture inputs: fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json (authored, not executed).",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
@@ -16386,6 +16688,53 @@
       ]
     },
     {
+      "featureId": "graph_edit",
+      "domain": "language",
+      "title": "Typed GRAPH sequence edits into a new retained document",
+      "mcpTools": [
+        "graph_edit"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Pure managed GRAPH v6 editor in TiaMcp.Graph over the offline reader; no Siemens service. The result is applied natively only through the graph_import change kind."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Ops: addStep after an existing transition, addTransition from a step without successor to a step (direct or jump), removeStep/removeTransition of a linear-chain element (predecessor spliced to successor), renameStep/renameTransition, setStepComment, setSequenceTitle and setTransitionCondition; 1..32 operations per call, applied in order. Branches are never created or removed.",
+          "Edits splice the source text, so unedited bytes stay identical; only UTF-8/UTF-16 sources whose GRAPH namespace is the default namespace at the edit position are edited. The result is retained as a new document whose only input is the source, plus a comparison record.",
+          "Refused unless source and result read without errors, step/transition numbers are unique, names are unique (case-insensitive, also against declared block-interface members), connections alternate steps and transitions through branches, every transition has exactly one incoming and one outgoing connection and every step is reachable from an initial step.",
+          "Transition conditions are only series LAD contacts (normally open or closed) on exact top-level Bool members of the block interface in the same document; global tags, comparisons, FBD and other logic are not synthesized, and documents without a block interface cannot receive a condition.",
+          "Generated FB step/transition structures (G7_StepPlus_V6/G7_TransitionPlus_V6) are renamed or removed with their element; none is synthesized for added elements, whose empty LAD supervision/interlock modules use the recorded seed shape. TIA V21 generates such members and re-exports empty modules without FlgNet, so graph_import's exact readback can report NativePreservationMismatch (recovery_required) for added elements.",
+          "Uses no Siemens API and is not natively qualified. An edited native fixture validates against the installed V21 SW.PlcBlocks.Graph_v6.xsd in the offline tests; results are not schema-validated at run time, and import, compile and runtime behavior are unqualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a retained GRAPH document with exactly one chart and no reader errors, and available bounded Host storage."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET Host runtime",
+        "Retained GRAPH document record (graph_export or graph_inspect)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-preview",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "graph_reopen",
       "domain": "language",
       "title": "GRAPH REOPEN",
@@ -16714,7 +17063,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN created a workspace (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: groupPath, name (unused in that group), rootPath (absolute, absent or an empty directory, not overlapping another workspace root), language (exact active project culture). The root directory is created if absent.",
           "Workspace.WorkspaceLanguage has no public setter, so the language is fixed at creation. Rename, root relocation, library policy (GlobalLibraryPath, DeleteUnusedTypeVersionFromLibrary) and user group create/delete are not implemented.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
@@ -16724,7 +17073,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16767,7 +17118,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN deleted that workspace (local.wave-kinds.probe.20261027); not natively qualified.",
           "Payload: workspacePath. The preview lists every mapping (with GetStatus/GetChildStatus) removed with the workspace; the mapped engineering objects stay.",
           "Whether TIA deletes files below the root is not established: every root file is backed up first and the observed file effect is reported, not required.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
@@ -16777,7 +17128,9 @@
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18384,6 +18737,60 @@
       ]
     },
     {
+      "featureId": "change.umac_role_set",
+      "domain": "security-access",
+      "title": "Create a custom UMAC role, change its function rights or its project-user assignment",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "umac_role_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: Umac.UmacConfigurator (Project service) CustomRoles.Create(String,String), SystemRoles, ProjectUsers, AnonymousUser, UmcUsers, UmcUserGroups, EngineeringFunctionRights; CustomRole.AssignedEngineeringRights.Add/Remove, AssignDeviceFunctionRight/UnAssignDeviceFunctionRight(UmacDevice, DeviceFunctionRight), GetAssignedDeviceFunctionRights; User.Roles.Add/Remove; UmacDevice.AvailableDeviceFunctionRights (Device service)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "action=create takes roleName (the role gets an empty comment); grant/revoke take roleName with up to 64 engineeringRights identifiers and/or deviceRights {device, identifier}, device being a deviceRightScopes path from access_inspect; assign/unassign take roleName and userName. Any other field is refused.",
+          "Custom roles only: a name matching a system role is refused for every action. The anonymous user, UMC users and groups, passwords, aliases, activation, authentication type, session timeouts and role rename/delete are never changed.",
+          "Administrator preservation: V21 does not mark which rights are administrative, so every engineering function right an active non-anonymous project user holds before the change must still be held by one after it (AdministratorLockout). Device function rights can be revoked.",
+          "Preview carries umacBefore/umacAfter (all roles with engineering and device rights, all principals with activation and role assignments); apply read-back must equal umacAfter exactly. Effective runtime rights, UMC server membership and CPU download are not evaluated.",
+          "compile=true is mandatory and compiles all project devices. The change fingerprint adds the UMAC state; interruption reconciliation holds the outcome for review.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN applied create, grant (device right), assign, unassign and revoke (local.wave-kinds.probe.20261027); not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a project exposing UmacConfigurator; device rights also need a UmacDevice whose access control is activated. Native eligibility is checked at prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project exposing UmacConfigurator (no scopePath)",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "certificate_inspect",
       "domain": "public-certificates",
       "title": "Read native CPU certificate stores and syslog servers as public data",
@@ -18429,6 +18836,215 @@
       ]
     },
     {
+      "featureId": "change.certificate_create",
+      "domain": "public-certificates",
+      "title": "Create a device certificate in a CPU local certificate store from a usage template",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Siemens.Engineering.Security.LocalCertificateManager (DeviceItem service): LocalCertificateStore, EnableGlobalCertificatesStore; LocalCertificateStore.GetCertificateTemplate(CertificateUsage) and Certificates.Create(CertificateTemplate).",
+          "V21 CertificateTemplate SubjectCommonName/ValidFrom/ValidUntil setters, SubjectAlternativeNames.Create(SubjectAlternativeNameType, string) and SubjectAlternativeName.Delete(); Certificate Id/SubjectCommonName/HasPrivateKey/Export(FileInfo) for readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN applied with exact public readback (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Payload: hardwarePath (CPU), usage (Tls, OpcUaClient, OpcUaClientServer, OpcUaServer or WebServer), subjectCommonName (max 64), subjectAlternativeNames [{type: Dns|Email|Uri|IP, value}] that replace the template defaults, validFromUtc and validUntilUtc. The signature algorithm stays the template default.",
+          "V21 exposes no issuer or CA selection: TIA decides between self-signed and CA-signed; the readback reports the actual issuer. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Readback requires a public export of the new certificate with exactly the requested subject, UTC validity and alternative names. How TIA interprets template times and whether it adds names is unverified; a mismatch fails after the write and needs checkpoint recovery.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.certificate_import",
+      "domain": "public-certificates",
+      "title": "Import one public certificate into a CPU local certificate store",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 LocalCertificateStore.Certificates.Import(FileInfo); the Import(FileInfo, SecureString) password overload is never called. Certificate Id/HasPrivateKey/Export(FileInfo) for readback."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Payload: hardwarePath, uploadRef (committed artifact upload) and format der or pem. The Host turns the upload into exact public DER (PublicCertificateReview.PublicDer): exactly one certificate; PKCS#12/PFX, PKCS#7, private or encrypted keys, surplus data and any other payload field, including a password, refuse. Generic uploads retain their bytes before this check.",
+          "The worker re-checks the DER, imports a hash-pinned change artifact and verifies exactly one new certificate without a private key whose exported public DER has the reviewed SHA-256.",
+          "Importing does not establish trust, usage or assignment. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.certificate_assign",
+      "domain": "public-certificates",
+      "title": "Assign or unassign a local certificate through a native certificate attribute",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_assign",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 IEngineeringObject GetAttributeInfos/GetAttribute/SetAttribute on the target DeviceItem with a Siemens.Engineering.Security.Certificate from LocalCertificateStore.Certificates. The assignment attribute is dynamic and not named in the V21 PublicAPI metadata; it is discovered at runtime (name ending in Certificate, native ReadWrite, value null or Certificate)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN assigned PlcCommunicationCertificate and back (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Payload: hardwarePath (store owner CPU), targetPath (that CPU or one of its subitems), attributeName, certificateId (null unassigns) and expectedCertificateId (the current Id or null). Drift from the expected current assignment refuses at prepare and apply; readback compares the attribute's certificate Id.",
+          "Web server and OPC UA server assignments are separate attributes. Their exact V21 names, whether null unassigns, and per-service usage, key and SAN suitability are unverified. HW.CertificateSupportedService (runtime certificate management) is not used as an assignment route. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.certificate_delete",
+      "domain": "public-certificates",
+      "title": "Delete an unreferenced certificate from a CPU local certificate store",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "certificate_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 Certificate.Delete() on LocalCertificateStore.Certificates. References are read through DeviceItem GetAttributeInfos/GetAttribute, HW.Features.CertificateManagementConfiguration.CertificateSupportedServices (Id) and PlcAccessControlConfigurationProvider.UmcTrustedCertificateIds."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN deleted an unassigned certificate (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Payload: hardwarePath and certificateId. Refused when a certificate-named attribute on the owning device holds the certificate, a runtime-managed supported service or UMC trusted id names its Id, or any such reference cannot be read (fail closed).",
+          "Program, connection-DB and online references to the certificate Id are not scanned, and the device compile does not prove their absence. A deleted key pair is recoverable only through the project checkpoint. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "CPU exposing LocalCertificateManager with the global certificate store disabled",
+        "Verified recovery checkpoint; saving requires compile=true (device compile)"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "web_inspect",
       "domain": "web-applications",
       "title": "Read native CPU web server and web application configuration",
@@ -18469,6 +19085,116 @@
       "acceptanceCriteria": [
         "AC-identity",
         "AC-completeness",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.webserver_page_set",
+      "domain": "web-applications",
+      "title": "Set the CPU system web page flag and default web application from exact expected values",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "webserver_page_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: HW.Features.SystemWebPagesFeature.EnableSystemWebPages (settable), DefaultWebPagesFeature.WebApplicationConfigurations, WebApplicationConfiguration.IsDefault (settable), Name, ApplicationType; DeviceItem.GetAttribute(\"WebserverActivate\")."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload: webServerActive {expected, value} (the CPU's Boolean WebserverActivate attribute, only where it is writable), systemWebPages {expected, value} and/or defaultApplication {expected, value} with an application name or null for none. expected must equal the current value at prepare (StaleRevision otherwise); any other field is refused.",
+          "Page settings are refused unless the CPU owning plcPath has its Boolean WebserverActivate attribute true, now or through webServerActive in the same change; the native probe local.wave-kinds.probe.20261027 observed the attribute false on a scratch CPU 1511-1 PN. Web users, rights and certificates are never changed here.",
+          "Apply sets the requested application's IsDefault, then clears any other default. Read-back must equal preview.webServerAfter exactly: the flag and every application's name, type and default flag. V21 exposes no web application create, delete or rename.",
+          "Watch-table and display assignments, legacy and UMAC web user rights, certificates and online deployment are not covered; nothing is downloaded.",
+          "compile=true is mandatory and compiles all project devices. The change fingerprint adds every web-capable CPU's WebserverActivate value and page settings; interruption reconciliation holds the outcome for review.",
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN refused WebServerNotActivated (refusal only) (local.wave-kinds.probe.20261027); not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": [
+          "local.wave-kinds.probe.20261027"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a CPU with activated web serving that exposes SystemWebPagesFeature or DefaultWebPagesFeature; native eligibility is checked at prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "CPU with web serving activated",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.webserver_user_pages_generate",
+      "domain": "web-applications",
+      "title": "Generate user-defined web page data blocks from an explicit page directory",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "webserver_user_pages_generate",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: HW.Features.WebserverUserDefinedPages.GenerateBlocks(DirectoryInfo, FileInfo, String, WebDBGenerateOptions) returning IList<PlcBlock>; WebDBGenerateOptions.None/Override; PlcBlock.Export for override backups."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload: htmlDirectory (absolute), defaultPage (path relative to it), applicationName and explicit override; overrideBlocks (1-100 existing data block names) only with override=true. The explicit overload does not update the CPU's user-defined page attributes.",
+          "The directory is copied into the change directory at prepare (links refused, 20000 files / 4 GiB bound) and generation runs from that copy; its manifest hash is rechecked before the checkpoint.",
+          "Generated DB names and numbers are known only after generation. override=false relies on the native None option to refuse an existing DB; with override=true the overwritten pre-existing blocks must equal overrideBlocks exactly. A mismatch, an empty result or a missing pre-existing block fails after the checkpoint and requires recovery.",
+          "The affected set is the returned block identities (name, number, type) in the readback. Generated block internals are never edited; V21 exposes no delete for generated blocks, so none is offered.",
+          "Refused unless the CPU's Boolean WebserverActivate attribute is true. Nothing is downloaded or deployed; page content, browser behavior and Siemens package compatibility are not validated.",
+          "compile=true is mandatory and compiles the PLC software; generated blocks are covered by the standard block fingerprint.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a CPU with activated web serving that exposes WebserverUserDefinedPages; native eligibility is checked at prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "CPU with web serving activated",
+        "Absolute local page directory containing the default HTML page",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
@@ -18932,14 +19658,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Explicit PLC software only, empty payload and compile=true. Saves the current project and creates a checkpoint before compiler dispatch; compilation may change generated state.",
-          "Linked synthetic API tests exercise admission, diagnostics and single dispatch. Full worker/SDK build, native baseline compilation, safety signatures, persistence and recovery remain unqualified.",
+          "Native compile dispatch, persistence and checkpoint recovery are qualified on the scratch profile; safety signatures are not.",
           "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

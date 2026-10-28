@@ -68,7 +68,65 @@ against the V21 PublicAPI only and are **not natively qualified**.
   `graph_export` output, because missing default attributes fail that comparison.
 - Review the declared change before applying: `graph_export` the current block, then
   `graph_compare` it with the document to import. The GRAPH comparer runs in the
-  Host and is not part of the worker's apply gate. Typed GRAPH edits are not provided.
+  Host and is not part of the worker's apply gate. To change the sequence first, use
+  `graph_edit` (below) and import its result.
+
+## Typed edits
+
+`graph_edit` takes a retained document handle (`sourceRef`) and 1–32 `operations`,
+applied in order. It runs in the Host only and changes no project. Steps and
+transitions are addressed by their exact chart-wide `number`, sequences by their
+1-based ordinal. A later operation can address an element added by an earlier one.
+
+| Operation | Fields | Effect |
+| --- | --- | --- |
+| `addStep` | `number`, `name`, `afterTransition` | New step after that transition. The transition's outgoing connection now leads to the new step; its previous target is disconnected. |
+| `addTransition` | `number`, `name`, `fromStep`, `toStep`, `jump?`, `condition` | New LAD transition from a step that has no successor yet, to a step (`jump: true` for a jump). |
+| `removeStep`, `removeTransition` | `number` | Removes an element with exactly one incoming and at most one outgoing connection. Its predecessor is connected to its successor; a jump on either side stays a jump. |
+| `renameStep`, `renameTransition` | `number`, `name` | Changes the `Name` attribute. |
+| `setStepComment` | `number`, `lang`, `text` | Sets the step comment text for one culture, such as `en-US`. |
+| `setSequenceTitle` | `sequence`, `lang`, `text` | Sets the sequence title text for one culture. |
+| `setTransitionCondition` | `number`, `condition` | Replaces a LAD transition's network. |
+
+`condition` is 1–16 contacts in series, each `{ "operand": "StartCommand", "negated": false }`.
+`negated: true` is a normally closed contact. Each operand must be exactly one
+top-level `Bool` member of the block interface (Input, Output, InOut, Static or Temp)
+in the same document. Global tags, comparisons, FBD and other logic are not built.
+A document without a block interface cannot get a condition.
+
+To insert a step between transition 1 and step 2, add the step after transition 1
+and a transition from the new step to step 2:
+
+```json
+[{ "op": "addStep", "number": 5, "name": "Wait", "afterTransition": 1 },
+ { "op": "addTransition", "number": 6, "name": "Ready", "fromStep": 5, "toStep": 2,
+   "condition": [{ "operand": "StartCommand" }, { "operand": "GuardOpen", "negated": true }] }]
+```
+
+To take a step out of a chain, remove the step and its following transition together.
+
+Edits splice the source text, so every unedited byte stays identical. Only UTF-8 and
+UTF-16 sources are edited, and the GRAPH namespace must be the default namespace at
+the edit position. Renaming or removing a step or transition also renames or removes
+its generated FB structure (`G7_StepPlus_V6`/`G7_TransitionPlus_V6`) in the interface.
+Added elements get no such member. Added steps get empty LAD supervision and interlock
+modules in the shape the native seeds imported.
+
+The source and the result must both pass the reader without errors. The result is
+also refused (`GraphEdit*` codes) when numbers or names repeat (names are compared
+ignoring case, also against declared interface members), connections do not alternate
+steps and transitions through branches, a transition lacks exactly one incoming and
+one outgoing connection, a step has two successors or two direct predecessors, or a
+step is unreachable from an initial step. Branches are never created or removed.
+
+The result is retained as a new document whose only input is the source, together
+with a comparison record of the two. The response carries both summaries. Page the
+comparison's `/changes`, then import the new document's handle with `graph_import`.
+In the offline tests an edited native chart validates against the installed V21
+`SW.PlcBlocks.Graph_v6.xsd`; results are not schema-validated at run time.
+Native import is not qualified. TIA V21 generates the FB members of added elements
+and re-exports empty modules without `FlgNet`, so `graph_import`'s exact readback can
+report `NativePreservationMismatch` (`recovery_required`) for added elements.
 
 ## Explorer
 
@@ -111,8 +169,10 @@ while a file import is pending rejects the import instead of remapping by name.
 - Transfers recheck retained inputs on each call. This favors integrity; maximum
   size transfer throughput and memory are not performance-qualified.
 - `graph_export` and `graph_import` are implemented but not natively qualified.
-  Typed GRAPH editing, schema acceptance, native layout and runtime remain
-  separate unexecuted gates on this workstation.
+  `graph_edit` is Host-only and offline-tested; native import of its results,
+  schema acceptance, native layout and runtime remain separate unexecuted gates on
+  this workstation. Typed edits: 1–32 operations, 1–16 contacts, names up to 128 and
+  texts up to 4,096 characters, 256 KiB of operation JSON.
   CFC, DCC and other language products are separate X06 work, not GRAPH support.
 
 See [validation evidence](../verification/graph-host-workflow-20261016.md).

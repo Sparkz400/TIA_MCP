@@ -17,6 +17,7 @@ from qualify_typed_resolution import unqualified_outer_fixture, verify_untouched
 from run_conformance import native_document, structural_xml
 from qualify_typed_tag_ambiguity import verify_native_setup
 from capture_typed_routes_owned import declare_changes, authored_reference, verify_reference_additions, require_clean_compile
+from prepare_crossunit_capture_archive import block_access, capture_command
 from qualify_typed_multi_dependency import verify_append
 from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRuntimeBackend, file_inventory, inventory_difference
 
@@ -636,6 +637,38 @@ class RouteCapturePacketTests(unittest.TestCase):
                 if label:  # the after phase declares a Child of the route's own template FB
                     self.assertLess(order.index("Tgp" + label + "_TemplateFB_LAD.xml"), order.index(stem + "after.scl"))
 
+    def test_crossscope_call_packet_parses_exactly_and_names_the_callee_absolutely(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json").read_bytes())
+        self.assertEqual("authored-not-executed", packet["status"])
+        self.assertFalse(packet["nativeReferenceQualification"] or packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        for capture in packet["captures"]:
+            self.assertEqual(capture["unit"], capture["command"][capture["command"].index("--unit") + 1])
+            for entry in capture["sources"]:
+                observed, _, _ = authored_reference(root / entry["path"], capture["unit"])
+                for key in ("names", "namespace", "route", "authoredFormat"):
+                    self.assertEqual(entry[key], observed[key], entry["path"])
+                self.assertEqual(entry["sha256"], observed["fileSha256"], entry["path"])
+                if "-numeric-fc-" in entry["path"]:
+                    self.assertIn('"TiaMcp_UnitA.TgpUnit_NumericFC"(', (root / entry["path"]).read_text(encoding="utf-8-sig"))
+        self.assertEqual(["crossNamespace", "crossUnit"], [capture["id"] for capture in packet["captures"]])
+
+    def test_crossunit_preparation_binds_the_capture_command_and_reads_publication(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json").read_bytes())
+        capture = packet["captures"][1]
+        self.assertEqual("scripts/prepare_crossunit_capture_archive.py", capture["preparation"][2])
+        command = capture_command(capture, "artifacts/crossunit-prep/a.zap21", "a" * 64, "h.exe", "w.exe", "D:/wp/cap")
+        option = lambda name: command[command.index(name) + 1]
+        self.assertEqual(("artifacts/crossunit-prep/a.zap21", "a" * 64, "h.exe", "w.exe", "D:/wp/cap", "TiaMcp_UnitB"),
+                         tuple(map(option, ("--archive", "--sha256", "--host", "--worker", "--output", "--unit"))))
+        self.assertEqual([entry["path"] for entry in capture["sources"]], command[3:3 + len(capture["sources"])])
+        with self.assertRaises(RuntimeError):
+            capture_command({**capture, "command": [t for t in capture["command"] if t != "--worker"]}, "a", "b", "h", "w", "o")
+        xml = (root / "fixtures/typed-graphical/native/instance-effects-iec-softwareUnit/after-caller.xml").read_text(encoding="utf-8-sig")
+        self.assertEqual("Unpublished", block_access(xml))
+        self.assertEqual("Published", block_access(xml.replace("<Access>Unpublished</Access>", "<Access>Published</Access>", 1)))
+
     def test_transitive_route_cases_embed_the_caller_in_its_own_namespace(self):
         root = pathlib.Path(__file__).resolve().parents[1]
         cases = [c for c in json.loads((root / "fixtures/typed-graphical/route-advanced-cases.v1.json").read_bytes())["cases"]
@@ -719,6 +752,26 @@ class RouteCapturePacketTests(unittest.TestCase):
             if fault == "dependent-scope": faulty["inventory"]["blocks"][1]["scopePath"] = "/other"
             with self.subTest(fault=fault), self.assertRaises(RuntimeError):
                 verify_reference_additions(before, faulty, ["Effect"], "/unit", "Unit", modifies, observes)
+
+    def test_instance_db_spec_is_a_standard_route_addition(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = pathlib.Path(directory) / "storage.instancedb.json"
+            source.write_text('{"name": "Tgp_GlobalRTrig", "instanceOfName": "R_TRIG"}\n', encoding="utf-8")
+            entry, kind, payload = authored_reference(source, "")
+            self.assertEqual(("instance_db_create", {"name": "Tgp_GlobalRTrig", "instanceOfName": "R_TRIG"}, ["Tgp_GlobalRTrig"], "", "standard", "instance_db_spec"),
+                             (kind, payload, entry["names"], entry["namespace"], entry["route"], entry["authoredFormat"]))
+            with self.assertRaises(RuntimeError): authored_reference(source, "TiaMcp_UnitA")
+            for text in ('{"name": "X"}', '{"name": "X", "instanceOfName": "R_TRIG", "number": 1}', '{"name": "", "instanceOfName": "R_TRIG"}', '["X"]'):
+                source.write_text(text, encoding="utf-8")
+                with self.subTest(text=text), self.assertRaises(RuntimeError): authored_reference(source, "")
+        with self.assertRaises(RuntimeError):
+            declare_changes([({"sourcePath": "/x/s.instancedb.json", "names": ["Db"]}, "instance_db_create", {})], ["s.instancedb.json:Db"], [])
+        # CreateInstanceDB may also copy the protected system FB into System blocks; that copy is generated, not authored.
+        row = {"kind": "block", "name": "Tgp_GlobalRTrig", "path": "/plc/blocks/Tgp_GlobalRTrig", "payloadSha256": "db"}
+        system = {"kind": "protectedSystemBlock", "name": "R_TRIG", "path": "/plc/blocks/systemGroups/x/R_TRIG", "payloadSha256": "fb"}
+        after = {"objects": {"block:" + row["path"]: row, "block:" + system["path"]: system},
+                 "inventory": {"blocks": [{"path": row["path"], "name": row["name"], "scopePath": "/plc", "identity": {"namespace": ""}}]}}
+        self.assertEqual(["Tgp_GlobalRTrig"], [r["name"] for r in verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig"], "/plc", "")[0]])
 
     def test_unit_tag_table_is_an_unnamespaced_scope_addition(self):
         with tempfile.TemporaryDirectory() as directory:

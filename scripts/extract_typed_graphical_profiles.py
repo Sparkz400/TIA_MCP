@@ -2,7 +2,8 @@
 
 This copies the actual native export bytes and preserves observed native Part,
 CompileUnit and Static Member payloads. Pin direction/type contracts below are
-independently reviewed against each source program and the exported wires.
+independently reviewed against each source program and the exported wires;
+a wired pin outside its contract, or an unwired required pin, stops extraction.
 Compilation of reference fixtures is not qualification of the typed builder.
 """
 import argparse
@@ -11,10 +12,14 @@ import json
 import pathlib
 from xml.dom import minidom
 
+from engineering_preservation import native_payload_hash
 from smoke_mcp import ROOT
 
 NET = "http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5"
 INTERFACE = "http://www.siemens.com/automation/Openness/SW/Interface/v5"
+# Global IEC storage reference DB and its system type, by instruction (else kind).
+GLOBAL_STORAGE = {"timer": ("Tgp_GlobalTimer", "IEC_TIMER"), "counter": ("Tgp_GlobalCounter", "IEC_COUNTER"),
+                  "TONR": ("Tgp_GlobalTonr", "IEC_TIMER"), "R_TRIG": ("Tgp_GlobalRTrig", "R_TRIG"), "F_TRIG": ("Tgp_GlobalFTrig", "F_TRIG")}
 
 
 def fragment(node, namespace=None):
@@ -78,7 +83,15 @@ def extract(reports, route="standard", *, stage_output=None):
                         or target.parent.resolve() != native.resolve()):
                     raise ValueError("Candidate native filename must remain directly inside staging/native.")
                 if stage_output is not None and target.exists():
-                    raise ValueError("Candidate native filename collision; select exact source/route identities: " + str(target))
+                    # A source admitted again in a later capture run only confirms the first capture: same authored
+                    # source and the same native payload. Anything else is a real collision.
+                    first = next((s for s in sources if s["path"] == target.relative_to(ROOT).as_posix()), None)
+                    if (first is None or first["transportSourceSha256"] != entry["sha256"] or first["changeId"] == entry["changeId"]
+                            or native_payload_hash(target.read_text(encoding="utf-8-sig")) != native_payload_hash(raw.decode("utf-8-sig"))):
+                        raise ValueError("Candidate native filename collision; select exact source/route identities: " + str(target))
+                    first.setdefault("confirmingCaptures", []).append({"captureReport": report_path.relative_to(ROOT).as_posix(),
+                        "changeId": entry["changeId"], "sha256": hashlib.sha256(raw).hexdigest()})
+                    continue
                 target.write_bytes(raw)
                 source_hash = hashlib.sha256(raw).hexdigest()
                 source_bytes = source_path.read_bytes()
@@ -95,6 +108,9 @@ def extract(reports, route="standard", *, stage_output=None):
                     derivation_path = source_path.with_suffix(".provenance.json")
                     record["derivationPath"] = derivation_path.relative_to(ROOT).as_posix()
                     record["derivationSha256"] = hashlib.sha256(derivation_path.read_bytes()).hexdigest()
+                if entry.get("authoredFormat") == "instance_db_spec":
+                    record["authoredFormat"] = entry["authoredFormat"]
+                    record["transportNormalization"] = "UTF-8 JSON spec; name and instanceOfName submitted through instance_db_create (PlcBlockComposition.CreateInstanceDB)"
                 sources.append(record)
                 observed_name = exported["name"]
                 if route != "standard":
@@ -105,7 +121,10 @@ def extract(reports, route="standard", *, stage_output=None):
         if block not in observed:
             return
         document, target, source_hash, cpu = observed[block]
-        candidates = [part for part in document.getElementsByTagName("Part") if part.getAttribute("Name") == native_name]
+        # MOVE/arithmetic/edge casing comes from the capture; the worker matches those families case-insensitively too.
+        folded = kind in ("move", "math", "edge")
+        candidates = [part for part in document.getElementsByTagName("Part")
+                      if (part.getAttribute("Name").lower() == native_name.lower() if folded else part.getAttribute("Name") == native_name)]
         if kind == "call":
             candidates = list(document.getElementsByTagName("Call"))
         if kind == "powerrail":
@@ -123,6 +142,10 @@ def extract(reports, route="standard", *, stage_output=None):
         if len(candidates) == 0:
             raise ValueError("Native reference is not the requested profile variant: " + block + "/" + kind)
         part = candidates[0]
+        native_name = part.getAttribute("Name") or native_name
+        wired = {con.getAttribute("Name") for con in document.getElementsByTagName("NameCon") if con.getAttribute("UId") == part.getAttribute("UId")}
+        if pins and kind != "call" and not {item["name"] for item in pins if item["required"]} <= wired <= {item["name"] for item in pins}:
+            raise ValueError("Reviewed pin contract differs from the pins wired in " + block + ": " + ", ".join(sorted(wired)))
         profile = {"id": "v21.fw41." + (route + "." if route != "standard" else "") + language.lower() + "." + kind + ("." + instruction if instruction else "") +
                    ("." + data_type.lower() if data_type else "") + ".v1", "version": 1,
             "language": language, "kind": kind, "instruction": instruction, "dataType": data_type,
@@ -142,15 +165,17 @@ def extract(reports, route="standard", *, stage_output=None):
             assert call_info.getAttribute("Name").startswith(namespace + ".")
             assert not call_info.hasAttribute("Namespace")
             profile["calleeNameEncoding"] = "namespaceQualified"
-        if kind in ("timer", "counter"):
+        if kind in ("timer", "counter", "edge"):
             member = next(m for m in document.getElementsByTagName("Member") if m.getAttribute("Name") == "Storage")
             profile["instanceType"] = member.getAttribute("Datatype")
             profile["instanceDeclarationXml"] = fragment(member, INTERFACE)
-            global_name = "Tgp_GlobalTimer" if kind == "timer" else "Tgp_GlobalCounter"
+            global_name, global_type = GLOBAL_STORAGE.get(instruction) or GLOBAL_STORAGE[kind]
             global_call = "Tgp_" + instruction + "_Global_" + language
             if global_name in observed and global_call in observed:
                 global_document, _, global_hash, _ = observed[global_name]
-                profile["globalInstanceType"] = "IEC_TIMER" if kind == "timer" else "IEC_COUNTER"
+                if [node.firstChild.data for node in global_document.getElementsByTagName("InstanceOfName")] != [global_type]:
+                    raise ValueError("Global storage reference is not one " + global_type + " instance: " + global_name)
+                profile["globalInstanceType"] = global_type
                 profile["globalInstanceTemplateXml"] = global_document.toxml()
                 profile["globalInstanceSourceSha256"] = global_hash
         if kind == "call" and "Tgp_FB_multi_" + language in observed:
@@ -173,14 +198,29 @@ def extract(reports, route="standard", *, stage_output=None):
             add("Tgp_Not_FBD", language, "assign", "Coil", reader_only=True)
             if "Tgp_NotOne_FBD" in observed:
                 add("Tgp_NotOne_FBD", language, "not", "A")
-        for instruction in ("Eq", "Ne", "Lt", "Le", "Gt", "Ge"):
-            pins = [pin("in1", "input", "Int"), pin("in2", "input", "Int"), pin("out", "output", "Bool")]
-            if language == "LAD":
-                pins.insert(0, pin("pre", "input", "Bool"))
-            add("Tgp_" + instruction + "_" + language, language, "compare", instruction, instruction.lower(), "Int", pins)
-        for instruction in ("TON", "TOF", "TP"):
-            add("Tgp_" + instruction + "_" + language, language, "timer", instruction, instruction, "Time",
-                [pin("IN", "input", "Bool"), pin("PT", "input", "Time"), pin("ET", "output", "Time", False), pin("Q", "output", "Bool", False)])
+        # The Int references keep their original block names; DInt/Real references carry the type.
+        for data_type, suffix in (("Int", ""), ("DInt", "DInt"), ("Real", "Real")):
+            for instruction in ("Eq", "Ne", "Lt", "Le", "Gt", "Ge"):
+                pins = [pin("in1", "input", data_type), pin("in2", "input", data_type), pin("out", "output", "Bool")]
+                if language == "LAD":
+                    pins.insert(0, pin("pre", "input", "Bool"))
+                add("Tgp_" + instruction + suffix + "_" + language, language, "compare", instruction, instruction.lower(), data_type, pins)
+        for instruction in ("TON", "TOF", "TP", "TONR"):
+            pins = [pin("IN", "input", "Bool"), pin("PT", "input", "Time"), pin("ET", "output", "Time", False), pin("Q", "output", "Bool", False)]
+            if instruction == "TONR":
+                pins.insert(1, pin("R", "input", "Bool"))
+            add("Tgp_" + instruction + "_" + language, language, "timer", instruction, instruction, "Time", pins)
+        # MOVE, arithmetic and edge boxes have EN/ENO in LAD and FBD, like calls.
+        enable = [pin("en", "input", "Bool"), pin("eno", "output", "Bool", False)]
+        for data_type in ("Int", "DInt", "Real"):
+            add("Tgp_Move" + data_type + "_" + language, language, "move", "Move", None, data_type,
+                enable + [pin("in", "input", data_type), pin("out1", "output", data_type, False)])
+            for instruction in ("ADD", "SUB", "MUL", "DIV"):
+                add("Tgp_" + instruction.title() + data_type + "_" + language, language, "math", instruction.title(), instruction, data_type,
+                    enable + [pin("in1", "input", data_type), pin("in2", "input", data_type), pin("out", "output", data_type, False)])
+        for instruction in ("R_TRIG", "F_TRIG"):
+            add("Tgp_" + instruction + "_" + language, language, "edge", instruction, instruction, None,
+                enable + [pin("CLK", "input", "Bool"), pin("Q", "output", "Bool", False)])
         for instruction in ("CTU", "CTD", "CTUD"):
             inputs = {"CTU": ("CU", "R"), "CTD": ("CD", "LD"), "CTUD": ("CU", "CD", "R", "LD")}[instruction]
             outputs = ("QU", "QD") if instruction == "CTUD" else ("Q",)

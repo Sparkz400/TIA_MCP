@@ -6,6 +6,28 @@ not establish exact PLC scan timing.
 """
 import itertools
 
+COMPARE = {"eq": lambda x, y: x == y, "ne": lambda x, y: x != y,
+           "lt": lambda x, y: x < y, "le": lambda x, y: x <= y,
+           "gt": lambda x, y: x > y, "ge": lambda x, y: x >= y}
+# DInt at its signed limits; Real values are exactly representable in 32 bits.
+BOUNDARIES = {"dint": (-2147483648, -1, 0, 1, 2147483647), "real": (-1.5, 0.0, 0.25, 1.5, 16777216.0)}
+MOVES = {"int": (-32768, 0, 32767), "dint": (-2147483648, 0, 2147483647), "real": (-1.5, 0.25, 16777216.0)}
+# Hand-computed exact results inside each type's range. Overflow, division by zero and inexact
+# quotients are left out: their OUT/ENO results are not documented in this repository.
+ARITHMETIC = {
+    "int": {"add": ((32766, 1, 32767), (-32767, -1, -32768), (-5, 3, -2)),
+            "sub": ((-32767, 1, -32768), (32766, -1, 32767), (5, 8, -3)),
+            "mul": ((181, 181, 32761), (-128, 256, -32768), (-7, -6, 42)),
+            "div": ((-32768, 2, -16384), (32767, 1, 32767), (-84, 7, -12), (0, -5, 0))},
+    "dint": {"add": ((2147483646, 1, 2147483647), (-2147483647, -1, -2147483648), (-5, 3, -2)),
+             "sub": ((-2147483647, 1, -2147483648), (2147483646, -1, 2147483647), (5, 8, -3)),
+             "mul": ((46340, 46340, 2147395600), (-65536, 32768, -2147483648), (-7, -6, 42)),
+             "div": ((-2147483648, 2, -1073741824), (2147483647, 1, 2147483647), (-84, 7, -12), (0, -5, 0))},
+    "real": {"add": ((1.5, -2.25, -0.75), (16777215.0, 1.0, 16777216.0), (0.25, 0.25, 0.5)),
+             "sub": ((1.5, 2.25, -0.75), (-0.5, 0.25, -0.75), (16777216.0, 1.0, 16777215.0)),
+             "mul": ((1.5, -2.25, -3.375), (0.5, 0.5, 0.25), (-4.0, -4.0, 16.0)),
+             "div": ((6.0, -1.5, -4.0), (0.75, 0.5, 1.5), (-7.0, 2.0, -3.5))}}
+
 
 def step(identifier, writes, expected, calls=1, wait_ms=0):
     return {"id": identifier, "target": "dut", "set": {"dut." + k: v for k, v in writes.items()},
@@ -35,12 +57,9 @@ def cases(family):
         return [{"id": "all-eight-input-combinations", "initial": {}, "steps": [
             step("vector-" + str(i), dict(zip(("A", "B", "Inhibit"), row[:3])), {"Active": row[3]})
             for i, row in enumerate(rows)]}]
-    if family in ("eq", "ne", "lt", "le", "gt", "ge"):
-        operators = {"eq": lambda x, y: x == y, "ne": lambda x, y: x != y,
-                     "lt": lambda x, y: x < y, "le": lambda x, y: x <= y,
-                     "gt": lambda x, y: x > y, "ge": lambda x, y: x >= y}
+    if family in COMPARE:
         return [{"id": "signed-int-boundaries", "initial": {}, "steps": [
-            step("pair-" + str(i), {"Left": x, "Right": y}, {"Result": operators[family](x, y)})
+            step("pair-" + str(i), {"Left": x, "Right": y}, {"Result": COMPARE[family](x, y)})
             for i, (x, y) in enumerate(itertools.product((-32768, -1, 0, 1, 32767), repeat=2))]}]
     if family in ("fc", "fb-global", "fb-multi"):
         return [{"id": "parameter-flow", "initial": {}, "steps": [
@@ -111,5 +130,52 @@ def cases(family):
                  {"Count": -32768, "Done": True, "Lower": True}),
             step("release-minimum-load", {"Load": False}, {"Count": -32768}),
             step("minimum-does-not-wrap", {"Down": True}, {"Count": -32768, "Done": True, "Lower": True})]}]
+    operation, _, numeric = family.partition("-")
+    if operation in COMPARE and numeric in BOUNDARIES:
+        return [{"id": numeric + "-boundaries", "initial": {}, "steps": [
+            step("pair-" + str(i), {"Left": x, "Right": y}, {"Result": COMPARE[operation](x, y)})
+            for i, (x, y) in enumerate(itertools.product(BOUNDARIES[numeric], repeat=2))]}]
+    if operation == "move" and numeric in MOVES:
+        return [{"id": numeric + "-copies", "initial": {}, "steps": [
+            step("copy-" + str(i), {"Source": value}, {"Target": value}) for i, value in enumerate(MOVES[numeric])]}]
+    if numeric in ARITHMETIC and operation in ARITHMETIC[numeric]:
+        return [{"id": numeric + "-exact-results", "initial": {}, "steps": [
+            step("vector-" + str(i), {"Left": x, "Right": y}, {"Result": result})
+            for i, (x, y, result) in enumerate(ARITHMETIC[numeric][operation])]}]
+    if family == "tonr":
+        # Two segments shorter than PT reach it together: paused time is not counted, Q holds until R.
+        return [{"id": "accumulate-pause-resume-hold-reset", "initial": {}, "steps": [
+            step("reset", {"Enable": False, "Reset": True, "Preset": 3000}, {"Done": False, "Elapsed": 0}),
+            step("release-reset", {"Reset": False}, {"Done": False, "Elapsed": 0}),
+            step("start", {"Enable": True}, {"Done": False}),
+            step("accumulate", {}, {"Done": False}, wait_ms=2000),
+            step("pause", {"Enable": False}, {"Done": False}),
+            step("paused-time-not-counted", {}, {"Done": False}, wait_ms=2000),
+            step("resume", {"Enable": True}, {"Done": False}),
+            step("complete-from-both-segments", {}, {"Done": True, "Elapsed": 3000}, wait_ms=1500),
+            step("output-held-without-input", {"Enable": False}, {"Done": True, "Elapsed": 3000}),
+            step("reset-clears", {"Reset": True}, {"Done": False, "Elapsed": 0})]}]
+    if family == "rtrig":
+        # CLK low makes Q low whatever the initial edge memory; the pulse lasts exactly one call.
+        return [{"id": "one-call-pulse-per-rising-edge", "initial": {}, "steps": [
+            step("low", {"Signal": False}, {"Pulse": False}),
+            step("rising", {"Signal": True}, {"Pulse": True}),
+            step("held-high", {}, {"Pulse": False}),
+            step("still-high", {}, {"Pulse": False}, calls=3),
+            step("falling", {"Signal": False}, {"Pulse": False}),
+            step("held-low", {}, {"Pulse": False}, calls=3),
+            step("rising-again", {"Signal": True}, {"Pulse": True}),
+            step("after-second-pulse", {}, {"Pulse": False})]}]
+    if family == "ftrig":
+        # CLK high makes Q low whatever the initial edge memory; the pulse lasts exactly one call.
+        return [{"id": "one-call-pulse-per-falling-edge", "initial": {}, "steps": [
+            step("high", {"Signal": True}, {"Pulse": False}),
+            step("held-high", {}, {"Pulse": False}, calls=3),
+            step("falling", {"Signal": False}, {"Pulse": True}),
+            step("held-low", {}, {"Pulse": False}),
+            step("still-low", {}, {"Pulse": False}, calls=3),
+            step("rising", {"Signal": True}, {"Pulse": False}),
+            step("falling-again", {"Signal": False}, {"Pulse": True}),
+            step("after-second-pulse", {}, {"Pulse": False})]}]
     raise ValueError("No independent expected behavior for " + family)
 

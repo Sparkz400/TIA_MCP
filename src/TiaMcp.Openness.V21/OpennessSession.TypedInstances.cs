@@ -37,7 +37,10 @@ namespace TiaMcp.Openness.V21
                 if (!system)
                 {
                     if (!context.Callees.TryGetValue(calleePath, out var callee) || callee.BlockType != "FB") throw new BridgeException("InstanceTypeMismatch", "Only an exact FB call accepts instance storage.");
-                    dataType = "\"" + QualifiedName(capture.Block(calleePath).Item) + "\"";
+                    // Creation templates are route-captured for an FB in the caller's own scope; none covers another unit's FB.
+                    if (callee.ScopePath != context.TargetScopePath && (kind == "createMulti" || kind == "createGlobal"))
+                        throw new BridgeException("InstanceCreationRouteUnsupported", "Storage for an FB of another software unit has no captured creation template; use existing storage declared in the caller's scope.");
+                    dataType = "\"" + QualifiedName(capture.Block(calleePath, call: true).Item) + "\"";
                 }
                 else
                 {
@@ -203,7 +206,9 @@ namespace TiaMcp.Openness.V21
         }
         private static void RequireUniqueDeclaredFb(TypedResolutionCapture capture, string type, string path)
         {
-            var matches = capture.Blocks.Where(b => b.Item is FB && QualifiedName(b.Item) == type.Trim('"') && ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == capture.Change.ScopePath).ToArray();
+            // The caller's scope plus, for a cross-unit FB, the related unit that owns it.
+            string calleeScope = ObjectIdentity.ScopePath(capture.Plc.Path, path);
+            var matches = capture.Blocks.Where(b => b.Item is FB && QualifiedName(b.Item) == type.Trim('"') && (ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == capture.Change.ScopePath || ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == calleeScope)).ToArray();
             if (matches.Length != 1 || matches[0].Path != path) throw new BridgeException("AmbiguousInstanceType", "The native declaration cannot uniquely identify the selected FB across the complete PLC index.");
         }
         private void CaptureTypedDependents(TypedResolutionCapture capture, XElement declaration, JObject preview)
@@ -309,6 +314,15 @@ namespace TiaMcp.Openness.V21
                     if (!(db.Item is DataBlock) || ObjectIdentity.ScopePath(plc.Path, db.Path) != change.ScopePath || QualifiedName(db.Item) != dependency.Value<string>("name"))
                         throw new BridgeException("StaleDeclaration", "The selected DB symbol changed after preparation.");
                     TypedGraphicalResolution.RequireUniqueSymbol(blocks.Where(b => b.Item is DataBlock).Select(b => QualifiedName(b.Item)), QualifiedName(db.Item), "StaleDeclaration");
+                }
+                else if (dependency.Value<string>("kind") == "calleeUnitAccess")
+                {
+                    var callee = TypedGraphicalResolution.Exact(blocks, b => b.Path == dependency.Value<string>("path"),
+                        "StaleDeclaration", "The exact cross-unit callee is unavailable or ambiguous.");
+                    var caller = ResolveSoftwareScope(plc, change.ScopePath); var owner = ResolveSoftwareScope(plc, dependency.Value<string>("calleeScopePath"));
+                    if (caller.Path != dependency.Value<string>("callerScopePath") || ObjectIdentity.ScopePath(plc.Path, callee.Path) != owner.Path || owner.Name != dependency.Value<string>("relatedObject")
+                        || TypedUnitAccess(callee.Item) != "Published" || !TypedUnitRelated(caller, owner))
+                        throw new BridgeException("StaleDeclaration", "The cross-unit callee is no longer Published in a unit the caller's unit relates to.");
                 }
             }
             foreach (JObject creation in change.TypedInstanceCreations)

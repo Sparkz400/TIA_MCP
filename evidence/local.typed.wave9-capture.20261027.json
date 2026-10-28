@@ -1,0 +1,62 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.wave9-capture.20261027",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-10-27T23:14:44+00:00",
+  "source": {
+    "commit": "1809b1ba4f0134d5f3f4d2b3c8a2e866a0434cba",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Owned captures of independently authored wave 9 typed references on the standard route of CPU 1511-1 PN V4.1 (SHA-bound baseline 39cea56a, --unit ''), in three runs from the same baseline: 63 native references for DInt/Real compare (eq..ge), MOVE Int/DInt/Real, ADD/SUB/MUL/DIV Int/DInt/Real, TONR (multi-instance and Tgp_GlobalTonr) and R_TRIG/F_TRIG multi-instance, LAD and FBD, each admitted with exact added-block and unchanged-XML checks; the TONR storage DB was captured twice with an identical native payload. 60 profiles staged, audited (fixtures/typed-graphical/wave9-candidates-20261027.audit.json) and promoted.",
+  "limitations": [
+    "Each run stopped at one source (run 1: export of TIA's protected R_TRIG system FB, since fixed in the harness; run 2: TONR global caller without its storage DB in a fresh baseline; run 3: R_TRIG global DB). No complete-run persistence/reopen check, so the summary outcome is failed; only per-source engineering checks passed.",
+    "R_TRIG/F_TRIG global instance DBs authored in SCL never persist natively; their 6 global-storage sources and global profiles are not captured.",
+    "The three runs used successive Debug builds of this branch; the binary hashes are those of the last. Native reference capture only; builder engineering and runtime qualification are separate."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9f00cd4664bf8f3cc955a1bfc9ab0c9a0ab5ae005da45a00cc9f33595f343a5c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "ad26ac913206b1ca71d06b7adecb1f84b82d038d39450cfafec9dabcedbf6c6f"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "9815fed16c5682b0812edbed42b0e46c1de0d9503652f7bbc651cb56ca43b83e",
+      "bytes": 76439117,
+      "completed": false,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "87ecf04c8ca969f73f5c70164ee72fec7a946a4175c1d21a4f37b9997b0d25e6",
+      "bytes": 71955096,
+      "completed": false,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "b5f0817af0a1bba27d4c342760a5700748331f9acbaac74ddfe3f4fcf2624d06",
+      "bytes": 6613283,
+      "completed": false,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

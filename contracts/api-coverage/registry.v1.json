@@ -784,6 +784,12 @@
       ]
     },
     {
+      "featureId": "safety_printout",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
       "featureId": "xref_query",
       "obligations": [
         "L04"
@@ -1033,6 +1039,12 @@
       ]
     },
     {
+      "featureId": "change.instance_db_create",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
       "featureId": "change.block_delete",
       "obligations": [
         "L01",
@@ -1133,6 +1145,12 @@
     },
     {
       "featureId": "change.safety_import_xml",
+      "obligations": [
+        "D14"
+      ]
+    },
+    {
+      "featureId": "change.safety_fparameter_set",
       "obligations": [
         "D14"
       ]
@@ -1559,6 +1577,13 @@
     },
     {
       "featureId": "change.library_integrate",
+      "obligations": [
+        "X02",
+        "L02"
+      ]
+    },
+    {
+      "featureId": "library.integrate_combined_apply",
       "obligations": [
         "X02",
         "L02"
@@ -2457,6 +2482,12 @@
       ]
     },
     {
+      "featureId": "graph_edit",
+      "obligations": [
+        "X06"
+      ]
+    },
+    {
       "featureId": "graph_reopen",
       "obligations": [
         "X06"
@@ -2763,6 +2794,34 @@
     {
       "featureId": "certificate_inspect",
       "obligations": [
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_create",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_import",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_assign",
+      "obligations": [
+        "D12",
+        "X03"
+      ]
+    },
+    {
+      "featureId": "change.certificate_delete",
+      "obligations": [
+        "D12",
         "X03"
       ]
     },
@@ -3535,6 +3594,25 @@
       "featureId": "change.opcua_role_mapping_set",
       "obligations": [
         "D04"
+      ]
+    },
+    {
+      "featureId": "change.webserver_page_set",
+      "obligations": [
+        "D12"
+      ]
+    },
+    {
+      "featureId": "change.webserver_user_pages_generate",
+      "obligations": [
+        "D12"
+      ]
+    },
+    {
+      "featureId": "change.umac_role_set",
+      "obligations": [
+        "X03",
+        "D12"
       ]
     }
   ],

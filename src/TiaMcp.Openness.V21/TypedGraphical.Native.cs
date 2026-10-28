@@ -22,15 +22,18 @@ namespace TiaMcp.Openness.V21
             if (node.Kind == "call")
             {
                 var callee = ResolveCallee(context, node.CalleePath);
-                if (profile.CalleeNameEncoding != null && profile.CalleeNameEncoding != "simple" && profile.CalleeNameEncoding != "namespaceQualified")
+                if (profile.CalleeNameEncoding != null && profile.CalleeNameEncoding != "simple" && profile.CalleeNameEncoding != "namespaceQualified" && profile.CalleeNameEncoding != "crossUnitQualified")
                     Fail("GraphicalProfileUnavailable", "The native callee name encoding is not supported.");
                 string nativeName = callee.Name;
+                bool crossUnit = IsCrossUnit(context, callee);
+                if (crossUnit && string.IsNullOrEmpty(callee.Namespace)) Fail("GraphicalCalleeUnsupported", "A cross-unit callee without a namespace has no captured CallInfo encoding.");
                 if (!string.IsNullOrEmpty(callee.Namespace))
                 {
-                    if (profile.CalleeNameEncoding != "namespaceQualified" || string.IsNullOrEmpty(profile.NativeTemplateXml))
-                        Fail("GraphicalCalleeUnsupported", "A namespaced call requires an independently captured namespace-qualified CallInfo profile.");
-                    if (!string.Equals(context.TargetNamespace, callee.Namespace, StringComparison.Ordinal))
-                        Fail("GraphicalCalleeUnsupported", "Only calls within the freshly observed target namespace are qualified; cross-namespace calls require a separate native profile.");
+                    // The qualified CallInfo Name is absolute, so one in-unit profile covers any callee namespace of the
+                    // caller's own scope (or the standard route); a call into another unit needs its own capture.
+                    if (profile.CalleeNameEncoding != (crossUnit ? "crossUnitQualified" : "namespaceQualified") || string.IsNullOrEmpty(profile.NativeTemplateXml))
+                        Fail("GraphicalCalleeUnsupported", crossUnit ? "A call into another software unit requires an independently captured cross-unit CallInfo profile."
+                            : "A namespaced call requires an independently captured namespace-qualified CallInfo profile.");
                     var observed = EngineeringSources.ReadXml(profile.NativeTemplateXml).Root;
                     string observedName = (string)observed?.Element(Net + "CallInfo")?.Attribute("Name");
                     if (observed?.Name != Net + "Call" || string.IsNullOrEmpty(observedName) || observedName.IndexOf('.') <= 0 || observedName.EndsWith(".", StringComparison.Ordinal))

@@ -1,0 +1,72 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.combined_apply.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T01:36:45+00:00",
+  "source": {
+    "commit": "bc020684767dd1907a44a7aad35710d1317dd99e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py on build 9ff587c (frozen D:\\wp\\b6, Host --enable-library-integrate-apply) in owned de-DE-only scratch projects: an authored global library with an FB and its UDT; for a new standalone FBD FC caller and for an existing FBD FC caller, change_apply of the prepared PLC library_integrate plan ran library_instantiate and graphical_typed_edit through the coordinator with readback after each step, reached installation_verified with one initial checkpoint, and an independent export/inventory diff showed exactly the planned FB, UDT, instance DB (first free number, captured storage profile) and caller network with everything else unchanged; compile 0 errors; fresh reopen identical; change_restore in an empty owned Portal retrieved the pre-change inventory and an empty project library. With the flag, an FBD OB caller and a new LAD FC were refused (PlcIntegrationNotQualified) with no change; without the flag library_capabilities reports apply unsupported and change_apply refuses with no change.",
+  "limitations": [
+    "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
+    "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
+    "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
+  ],
+  "binaries": [
+    {
+      "name": "host",
+      "files": 26,
+      "sha256": "055dc55370c849bedee4df96354d01c041f829ce7408ba852d5001b7313d11a9"
+    },
+    {
+      "name": "worker",
+      "files": 795,
+      "sha256": "be42d34b4fffb9484ea1ac7c9751d9e343706dc1b7eed93af6b58d46aafcbbc4"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "0335f3e75dfa9a5fe4747b3389f1626e8ec671556a321f6253aba47b19ee2655",
+      "bytes": 6839986,
+      "completed": true,
+      "steps": [
+        "author",
+        "install:createStandaloneFc",
+        "install:existing",
+        "refusals",
+        "noFlag"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

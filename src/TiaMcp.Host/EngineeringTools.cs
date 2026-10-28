@@ -178,6 +178,11 @@ public sealed partial class TiaTools
             try { request = new DbSnapshotWorkflowStore(options.ArtifactsDirectory).LoadPayload(payload); }
             catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidDbSnapshot", error.Message)); }
+        // The worker cannot read the upload store; only exact public DER of the committed upload is handed over.
+        if (kind == "certificate_import")
+            try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }
+            catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException)
+            { return Failure(error as BridgeException ?? new BridgeException("InvalidCertificateImport", "The certificate upload could not be read.")); }
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
     }
 
@@ -228,5 +233,10 @@ public sealed partial class TiaTools
     [Description("Inspect one safety PLC like safety_inspect, plus Failsafe_* F-parameters of the CPU and its F-I/O modules (F-source/F-destination address, F-monitoring time, F-parameter signature) and Safety Validation Assistant activation tests, groups, safety functions, conditions, validity checks and recorded test states. exportArtifacts writes activation-test SimaticML and XLSX reports and the safety printout PDF to the export directory with SHA-256. The result is accepted by safety_evidence_review. Does not log in, execute activation tests, reset results, change F-parameters or approve the safety program.")]
     public Task<CallToolResult> SafetyValidationInspect(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? blockName = null, string? blockPath = null, int maxItems = 2000, string? scopePath = null, bool exportArtifacts = false)
         => Call("safety_validation_inspect", new { projectName, plcPath, blockName, blockPath, scopePath, maxItems = Limit(maxItems), exportArtifacts, artifactDirectory = ExportDirectory }, cancellationToken);
+
+    [McpServerTool(Name = "safety_printout", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Print the native safety printout of one safety PLC to a file in the export directory with SHA-256. printer is MicrosoftPrintToPdf or MicrosoftXpsDocumentWriter (Windows file printers only; refuses when that driver is not installed and never prints to a physical printer), documentLayout a TIA layout such as DocuInfo_ISO_A4_Portrait or DocuInfo_Simple_A4_Portrait_Small_Footer, option All or Compact. activationTestReports also writes each Safety Validation Assistant activation test's XLSX report and SimaticML export. Does not log in, change, compile, validate or approve the safety program.")]
+    public Task<CallToolResult> SafetyPrintout(CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string printer = "MicrosoftPrintToPdf", string documentLayout = "DocuInfo_ISO_A4_Portrait", string option = "All", bool activationTestReports = false, int maxItems = 2000)
+        => Call("safety_printout", new { projectName, plcPath, printer, documentLayout, option, activationTestReports, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
     private static JsonElement ObjectArguments(JsonElement value) => value.ValueKind == JsonValueKind.Object ? value : throw new McpException("An object is required.");
 }

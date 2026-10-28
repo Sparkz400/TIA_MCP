@@ -39,8 +39,8 @@ namespace TiaMcp.Openness.V21
 #endif
         }
 
-        internal OpennessSession(string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification) : this(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification)
-        { _translationQualification = translationQualification; }
+        internal OpennessSession(string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply = false) : this(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification)
+        { _translationQualification = translationQualification; _libraryIntegrateApplyEnabled = libraryIntegrateApply; }
 
         internal JObject Execute(string operation, JObject arguments)
         {
@@ -141,6 +141,7 @@ namespace TiaMcp.Openness.V21
                 case "web_inspect": return WebInspect(arguments);
                 case "vci_workspace_inspect": return VciWorkspaceInspect(arguments);
                 case "safety_validation_inspect": return SafetyInspect(arguments, validation: true);
+                case "safety_printout": return SafetyPrintoutCapture(arguments);
                 case "call_graph": return CallGraph(arguments);
                 case "instance_lookup": return InstanceLookup(arguments);
                 case "symbol_trace": return SymbolTrace(arguments);

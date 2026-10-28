@@ -49,12 +49,13 @@ def capture(args):
         report["scratch"] = scratch
         for source_path in args.sources:
             source = source_path.read_text(encoding="utf-8-sig")
-            names = re.findall(r'\b(?:FUNCTION_BLOCK|FUNCTION|DATA_BLOCK)\s+"([^"]+)"', source)
+            spec = json.loads(source) if source_path.name.lower().endswith(".instancedb.json") else None
+            names = [spec["name"]] if spec else re.findall(r'\b(?:FUNCTION_BLOCK|FUNCTION|DATA_BLOCK)\s+"([^"]+)"', source)
             entry = {"sourcePath": str(source_path.resolve()), "sha256": hashlib.sha256(source.encode()).hexdigest(),
                      "names": names, "engineeringVerified": False, "runtimeVerified": False}
             report["fixtures"].append(entry)
             print("PREPARE " + source_path.name, flush=True)
-            prepared = call("change_prepare", {"kind": "source_upsert", "payload": {
+            prepared = call("change_prepare", {"kind": "instance_db_create", "payload": spec} if spec else {"kind": "source_upsert", "payload": {
                 "language": "SCL" if source_path.suffix.lower() == ".scl" else "SIMATIC_SD", "source": source, "expectedBlockNames": names}})
             entry["changeId"] = prepared["changeId"]
             try:
@@ -70,12 +71,22 @@ def capture(args):
             assert applied["state"] == "applied" and applied["compile"]["errorCount"] == 0
             entry["compile"] = applied["compile"]
             entry["exports"] = []
+            missing = []
             for name in dict.fromkeys([*names, *args.observe_block]):
-                exported = call("block_read", {"blockName": name})
+                try:
+                    exported = call("block_read", {"blockName": name})
+                except Exception as error:  # An applied source whose block cannot be read back is recorded, not captured.
+                    missing.append({"name": name, "message": str(error)})
+                    continue
                 target = output / (name + ".xml")
                 target.write_text(exported["xml"], encoding="utf-8")
                 entry["exports"].append({"name": name, "path": str(target),
                     "sha256": hashlib.sha256(target.read_bytes()).hexdigest(), "block": exported["block"]})
+            if missing:
+                entry["exportFailures"] = missing
+                persist()
+                print("UNREADABLE " + source_path.name, flush=True)
+                continue
             entry["engineeringVerified"] = True
             persist()
             print("CAPTURED " + source_path.name, flush=True)

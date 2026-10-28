@@ -70,8 +70,8 @@ open native scope already has runners or is still unplanned:
 
 | Rank | Work | Open cells | What it needs |
 | --- | --- | --- | --- |
-| 1 | Per-kind review of committed native summaries: many X11/X10/L02 change kinds call the generic `change_*` tools in passed native runs, but none is cited | up to ~120 (X11 change kinds) | Offline review of each summary's steps against preview/native/recovery/preserve; promoting a native gate is the coordinator's call |
-| 2 | One native runner for X11 PLC object mutations (`tag_set`, `constant_set`, `tag_delete`, `constant_delete`, `group_*`, `type_rename/delete`, `block_rename/delete`, `plc_compile`), modeled on `qualify_cpu_memory_bytes.py` | ~90 | Offline runner plus unit tests, then one native slot |
+| 1 | Per-kind review of committed native summaries: many X11/X10/L02 change kinds call the generic `change_*` tools in passed native runs, but none is cited | 0 (reviewed 28 October) | [Review](native-summary-review-20261028.md): the kinds appear only as seeds, prerequisites or smoke steps; no row closes. It lists the next native run per kind |
+| 2 | ~~One native runner for X11 PLC object mutations~~ done 28 October: `scripts/qualify_plc_object_mutations.py` verified 22 kinds (`local.plc_object_mutations.20261028`, [native slot](wave10-native-slot-20261027.md)) | 0 (132 bound) | — |
 | 3 | `runtime_ua_*`, `runtime_web_*`, `runtime_capture_*` | 68 + 24 + 24 | Scope decision above; the runners exist |
 | 4 | Review-family criteria: 24 read-only `*_review`/`*_page` features carry AC-native/AC-recovery although they never touch TIA | 168 | Contract decision; if the criteria are corrected, the existing Host runners could close identity/completeness/preview/evidence |
 | 5 | `watch_table_*` / `qualification_watch_*` | 81 | Existing native runners; native slot |

@@ -1,0 +1,15 @@
+{ S7_Optimized := "TRUE"; S7_PreferredLanguage := "FBD"; S7_Version := "0.1" }
+FUNCTION_BLOCK "Tgp_MoveInt_FBD"
+VAR_INPUT
+  Source : Int;
+END_VAR
+VAR_OUTPUT
+  Target : Int;
+END_VAR
+{ S7_Language := "FBD" }
+NETWORK
+RUNG TRUE
+  Move( in := #Source, out1 => #Target )
+END_RUNG
+END_NETWORK
+END_FUNCTION_BLOCK

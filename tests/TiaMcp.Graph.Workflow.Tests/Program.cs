@@ -85,4 +85,18 @@ Check(store.ImportPayload(Payload(new { path = "exports/native-populated.xml" })
 Reject("GraphImportRefused", () => store.ImportPayload(Payload(new { path = emptyCondition })));
 Reject("GraphImportRefused", () => store.ImportPayload(Payload(new { graphRef = Text(large, "recordRef") })));
 Reject("InvalidRequest", () => store.ImportPayload(Payload(new { graphRef = Text(exported, "recordRef"), path = populated })));
+var editResult = Json(store.Edit(Text(exported, "recordRef"), Payload(new object[] {
+    new { op = "renameStep", number = 1, name = "Wait" }, new { op = "setStepComment", number = 1, lang = "en-US", text = "Waits for start" } })));
+var edited = editResult.GetProperty("document"); string editedRef = Text(edited, "recordRef");
+Check(edited.GetProperty("inputs")[0].GetString() == Text(exported, "recordRef") && Text(editResult.GetProperty("comparison"), "kind") == "comparison" &&
+    editResult.GetProperty("comparison").GetProperty("inputs")[1].GetString() == editedRef && editResult.GetProperty("comparison").GetProperty("counts").GetProperty("changes").GetInt32() > 0,
+    "typed edit retains a source-linked document and its comparison");
+Check(store.ImportPayload(Payload(new { graphRef = editedRef, expectedBlockNames = new[] { "GraphQualification" } }))["xml"]!.GetValue<string>().Contains("Name=\"Wait\""),
+    "edited document becomes a graph_import payload");
+var chained = Json(store.Edit(editedRef, Payload(new[] { new { op = "renameTransition", number = 1, name = "Go" } })));
+Check(Text(Json(store.Reopen(Text(chained.GetProperty("comparison"), "recordRef"))), "state") == "complete" &&
+    Text(Json(store.Reopen(Text(chained.GetProperty("document"), "recordRef"))), "state") == "complete", "chained edit lineage reopens");
+Reject("GraphEditIdentity", () => store.Edit(editedRef, Payload(new[] { new { op = "renameStep", number = 9, name = "Ghost" } })));
+Reject("GraphEditInput", () => store.Edit(editedRef, Payload(new { op = "renameStep" })));
+Reject("GraphInvalidReference", () => store.Edit(Text(editResult.GetProperty("comparison"), "recordRef"), Payload(new[] { new { op = "renameStep", number = 1, name = "Ghost" } })));
 Console.WriteLine($"{checks} GRAPH workflow checks passed; no native execution.");

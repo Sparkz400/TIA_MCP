@@ -78,7 +78,10 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
                 if (change.Kind == "hmi_engineering") change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
+                if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
+                if (change.Kind == "webserver_page_set") change.Preview["fingerprintScope"] += " Web page settings additionally cover every web-capable CPU's WebserverActivate value, system web page flag and web application names, types and default flags.";
+                if (change.Kind == "umac_role_set") change.Preview["fingerprintScope"] += " UMAC role changes additionally cover all custom and system roles with engineering and device function rights, and the role assignments and activation state of project, anonymous and UMC principals.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
                 change.Preview["targetGroupPath"] = change.GroupPath;
@@ -133,8 +136,8 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
             if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
-            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
-                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
+            if (!compile && (HardwareEngineeringRules.Applies(change.Kind) || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
+                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "webserver_page_set", "webserver_user_pages_generate", "umac_role_set" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
@@ -148,6 +151,7 @@ namespace TiaMcp.Openness.V21
                 ValidatePreparedFiles(change);
                 ValidateTypedDependencies(change);
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) VciRequireUnchangedFiles(change, project);
+                if (change.Kind == "webserver_user_pages_generate") WebSourceUnchanged(change);
                 // An unopenable credential must refuse before the checkpoint save, not after it.
                 if (BlockProtectionKinds.Contains(change.Kind)) OpenBlockProtectionCredential(change.Payload, "credential").Dispose();
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
@@ -201,7 +205,10 @@ namespace TiaMcp.Openness.V21
                     }
                     if (change.Kind == "graphical_typed_edit") VerifyTypedInstanceReadbacks(change);
                     if (save) { project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
-                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
+                    // A generated block can be present right after generation and gone after compile/save (R_TRIG/F_TRIG instance DBs, native probe w9p).
+                    if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
+                    if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
+                    if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = EngineeringFingerprint(change, project);
                     change.State = "applied";
                     WriteChangeJournal(change);
@@ -466,6 +473,9 @@ namespace TiaMcp.Openness.V21
                 case "block_attributes_set":
                     PrepareBlockEdit(change, preview);
                     break;
+                case "instance_db_create":
+                    PrepareInstanceDbCreate(change, preview);
+                    break;
                 case "group_create":
                 case "group_rename":
                 case "group_delete":
@@ -491,6 +501,15 @@ namespace TiaMcp.Openness.V21
                 case "opcua_reference_namespace_delete":
                 case "opcua_role_mapping_set":
                     PrepareOpcUaChange(change, preview);
+                    break;
+                case "webserver_page_set":
+                    PrepareWebServerPageSet(change, preview);
+                    break;
+                case "webserver_user_pages_generate":
+                    PrepareWebServerUserPages(change, preview);
+                    break;
+                case "umac_role_set":
+                    PrepareUmacRoleSet(change, project, preview);
                     break;
                 case "type_source_upsert":
                 {
@@ -603,6 +622,15 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_memory_bytes":
                     PrepareCpuMemoryBytes(change, project, preview);
                     break;
+                case "safety_fparameter_set":
+                {
+                    var plc = SelectPlc(change.Selector);
+                    preview["parameterChanges"] = FParameterSet(change, project, false);
+                    preview["safetyBefore"] = ReadSafety(plc.Software);
+                    effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
+                    ((JArray)preview["warnings"]).Add("Changing F-parameters changes the F-parameter signature of each F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns a PROFIsafe address to the physical F-I/O, or downloads anything; that stays with the authorized safety workflow.");
+                    break;
+                }
                 case "network_io_assign":
                     PrepareIoAssignment(change, project, preview, out _);
                     break;
@@ -731,6 +759,12 @@ namespace TiaMcp.Openness.V21
                         ["operation"] = payload["operation"].DeepClone(), ["telegramType"] = payload["telegramType"].DeepClone(), ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("The telegram change moves PLC-side I/O addresses. Apply reads back every telegram row of the drive object and reports the address shift; a collateral telegram change or an address overlap fails after the write and requires checkpoint recovery. Technology-object connections, PLC tags and program references to the telegram are not rebound; the mandatory device compile validates the configuration. Offline project only: no download.");
                     break;
+                case "certificate_create":
+                case "certificate_import":
+                case "certificate_assign":
+                case "certificate_delete":
+                    PrepareCertificateChange(change, project, preview);
+                    break;
                 default: throw new BridgeException("UnsupportedChange", "Unknown or unsupported change kind: " + change.Kind);
             }
             PrepareHardwarePreservation(change, project, preview);
@@ -824,6 +858,9 @@ namespace TiaMcp.Openness.V21
                 case "block_attributes_set":
                     ApplyBlockEdit(change);
                     break;
+                case "instance_db_create":
+                    ApplyInstanceDbCreate(change);
+                    break;
                 case "group_create":
                 case "group_rename":
                 case "group_delete":
@@ -849,6 +886,15 @@ namespace TiaMcp.Openness.V21
                 case "opcua_reference_namespace_delete":
                 case "opcua_role_mapping_set":
                     ApplyOpcUaChange(change);
+                    break;
+                case "webserver_page_set":
+                    ApplyWebServerPageSet(change);
+                    break;
+                case "webserver_user_pages_generate":
+                    ApplyWebServerUserPages(change);
+                    break;
+                case "umac_role_set":
+                    ApplyUmacRoleSet(change, project);
                     break;
                 case "type_source_upsert":
                 {
@@ -929,6 +975,9 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "hardware_cpu_memory_bytes":
                     ApplyCpuMemoryBytes(change, project);
+                    break;
+                case "safety_fparameter_set":
+                    change.Readbacks.Add(new JObject { ["role"] = "f-parameter-readback", ["parameters"] = FParameterSet(change, project, true) });
                     break;
                 case "network_io_assign":
                     ApplyIoAssignment(change, project);
@@ -1014,6 +1063,12 @@ namespace TiaMcp.Openness.V21
                 case "vci_synchronize":
                     ApplyVciChange(change, project);
                     break;
+                case "certificate_create":
+                case "certificate_import":
+                case "certificate_assign":
+                case "certificate_delete":
+                    ApplyCertificateChange(change, project);
+                    break;
             }
         }
 
@@ -1047,7 +1102,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || PlcAlarmProjectKinds.Contains(change.Kind))
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1214,6 +1269,9 @@ namespace TiaMcp.Openness.V21
             if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
             if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
+            if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);
+            if (change.Kind == "webserver_page_set") snapshot["webServer"] = WebServerFingerprint(project);
+            if (change.Kind == "umac_role_set") snapshot["umac"] = UmacFingerprint(project);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {
                 var attrs = change.Payload["attributes"] as JObject ?? new JObject();

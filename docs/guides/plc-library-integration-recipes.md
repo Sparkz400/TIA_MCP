@@ -5,7 +5,7 @@
 1. `library_instantiate` imports the exact FB and its native dependencies.
 2. After exact import readback, a freshly prepared `graphical_typed_edit` creates the named global instance DB and either inserts the explicitly wired call in the selected LAD/FBD caller or creates a new standalone FC containing that call.
 
-The recipe itself does **not** install the component. `change_apply` refuses it with `PlcIntegrationNotQualified` before idempotency claims, checkpoints, saves, compilation or native writes. The existing Unified HMI integration route keeps its separate behavior. A `prepared` journal state means that the plan was captured; check `preview.applySupported`, which is always false for PLC recipes.
+By default the recipe does **not** install the component. `change_apply` refuses it with `PlcIntegrationNotQualified` before idempotency claims, checkpoints, saves, compilation or native writes. A Host started with `--enable-library-integrate-apply` can install the verified shapes in one `change_apply`; see [combined apply](#combined-apply-opt-in). The existing Unified HMI integration route keeps its separate behavior. A `prepared` journal state means that the plan was captured; check `preview.applySupported`. It is false for PLC recipes unless that Host flag is set and the plan is an eligible shape.
 
 Restricted recipe names, native network IDs and pinned dependency hashes must
 match their complete grammar. Trailing line breaks are rejected without trimming;
@@ -99,13 +99,42 @@ The two step argument objects are proposals for **fresh** preparation, not appro
 
 Retain a complete initial project checkpoint before the first native mutation; it covers the project library, imported types, caller, instance DB and unrelated content. Each separately applied change has its own checkpoint/journal. A second-step failure does not roll back the first. For an uncertain result, read `change_status`; never replay. Recovery into a new owned location must use the initial checkpoint to restore the pre-installation state, followed by fresh-reopen and native-content comparisons. No checkpoint is created merely by planning.
 
+## Combined apply (opt-in)
+
+Start the Host with `--enable-library-integrate-apply` to let `change_apply` install a prepared PLC recipe. The flag is off by default; without it nothing above changes. The worker gets the flag from the Host. `library_capabilities` then reports `plcIntegration.applySupported: true`, and each PLC recipe preview carries `combinedApply` with `eligible` and, if refused, the `refusal` reason. Only an enabled Host changes the preview, so the reviewed `previewHash` always says whether apply installs.
+
+Only the natively verified shapes run ([fresh install](../verification/component-fresh-install-20261024.md), [existing caller](../verification/component-existing-caller-20261025.md)):
+
+- a fresh import of the FB and its dependencies from a read-only global library source with its retained snapshot;
+- a new global instance DB;
+- a new standalone FBD FC, or an existing FBD FC inserting after its last network, in the standard PLC scope;
+- root scalar tag bindings, no planner blockers and no `planOnly` steps.
+
+Everything else is refused with `PlcIntegrationNotQualified` before any claim, even with the flag: OB insertion (add the OB call as its own reviewed change), LAD and FB callers, placements before another network, reuse of installed versions or instance DBs, multi-instances, software units, DB or UDT-tag member bindings, HMI targets and PLC/HMI recipes.
+
+`change_apply` uses the same `previewHash`, `idempotencyKey` and `checkpointSave`/`compile`/`save=true` as any library change. It runs only under the Host's shared-mutation admission, which holds one exclusive lease for the whole sequence. Under that lease it rechecks the plan hash, the library fingerprint and the source hashes before the claim. It then drives the [internal component coordinator](#internal-component-coordinator) through every step: fresh `library_instantiate` preparation, apply and import readback, then fresh `graphical_typed_edit` preparation, apply and installation readback. Each freshly prepared step must match the reviewed plan. The instance DB uses the natively captured storage profile when the plan's installed FB/UDT content equals the captured component, and otherwise the shipped typed instance templates; a callee neither covers refuses with `InstanceCreationProfileUnavailable` (seen natively on 27 October before the captured profile was admitted on this route).
+
+The import step's complete-project archive is taken before the first mutation. It is the change's single recovery checkpoint and appears in the change's `journal.checkpoints`; the typed step's own archive is retained but never used for recovery. Any failure stops at that step and leaves `recovery_required`. `journal.failure.failedStep` and `journal.combinedApply` name the step, the step change IDs and the coordinator journal. `change_restore` on the same change retrieves the initial checkpoint into a new location in an empty owned Portal. Originals are never overwritten, no step is replayed, and there is no automatic in-place rollback. Steps are not atomic.
+
+This route is compiled against the V21 PublicAPI only and is not natively qualified as a production entry point. The qualification evidence covers the owned-scratch coordinator, not this Host-gated route.
+
+The native runner `scripts/qualify_library_integrate_apply.py` qualifies this route. **It is authored but unexecuted.** It starts the frozen Host with the flag, in owned TIA sessions and owned scratch projects only, and reuses the fixture and oracles of `qualify_plc_component.py`. For a new standalone FBD FC and for an existing FBD FC caller, it prepares the plan, requires `combinedApply.eligible` and applies once. It then checks by export and inventory that exactly the FB, the UDT, the instance DB (first free number) and the caller network were added and nothing else changed. It also checks the project library versions, a fresh reopen, a compile-only change with 0 errors, and `change_restore` of the initial checkpoint into a new location, which must show the pre-change inventory after retrieval and after reopen. With the flag, an FBD OB caller (built from the scratch `Main` and the peer FC's network) and a new LAD FC must be refused. A second Host without the flag must refuse the eligible plan. Each refusal must be `PlcIntegrationNotQualified`, with the plan still `prepared` and the project unchanged. Each new scratch is made exactly de-DE (de-DE becomes reference and editing language, then a second change removes every other active language), because the fixtures and the captured storage references are de-DE only; another active language adds text items to the installed FB/UDT exports and breaks their exact content binding. Use a Debug worker that is registered in the Openness allow-list.
+
+```powershell
+python -B scripts/qualify_library_integrate_apply.py `
+  --host <frozen-host.exe> --worker <frozen-worker.exe> `
+  --artifacts <short-artifacts-dir> --timeout 600 --run-native
+```
+
+Expected outcome: `<short-artifacts-dir>/i<6 hex>/result.json` with `status: "passed"`, all five `steps` passed, and `combinedApplyVerified`, `refusalsVerified` and `noFlagRefusalVerified` true. `runtimeVerified` stays false. A failed step stops the run with `status: "failed"`; nothing is restored or replayed automatically. Offline checks of its oracles: `python -B scripts/test_qualify_library_integrate_apply.py`.
+
 ## Verification and remaining qualification
 
 The dedicated offline suite is `dotnet run --project tests/TiaMcp.PlcLibraryIntegration.Tests`. It covers pins, interface/direction/type consistency, collisions, scope/protection/read-only inputs, strict payload fields, insertion blockers, nonmutation of inputs, actual LAD/FBD compiler acceptance against retained profiles, and the application guard's source boundary. The Openness worker is also compiled against the installed V21 references. These checks do not run TIA or establish native installation success.
 
 `scripts/qualify_plc_library_integration_plan.py` provides `qualify_plan(client, payload, artifacts, run_native=True)` for an initialized MCP client inside an explicitly owned `TiaMcpScratch_…` fixture. It captures native caller/inventory state, prepares the recipe, verifies retained version hashes, attempts the blocked apply once, then checks that no claim/checkpoint was created and that caller payload and block/type/tag inventories remain unchanged. It records failures and never retries, starts TIA, installs the proposed steps, closes a project or terminates a process. **This native harness is authored but unexecuted.** A native fixture must provide the selected released FB/dependency versions, existing scalar tags and eligible LAD/FBD caller.
 
-Production combined installation remains unavailable. An explicit qualification-only launch now exposes the internal coordinator for an owned scratch fixture; native qualification still must cover exact dependency links/content, DB/call/bindings, compiler diagnostics, unrelated-content preservation, save/fresh reopen, interruption/no-replay behavior, initial-checkpoint recovery and independent simulator assertions. The existing separate-operation evidence is not combined-operation evidence.
+Production combined installation is off by default; the opt-in [combined apply](#combined-apply-opt-in) is not natively qualified. An explicit qualification-only launch now exposes the internal coordinator for an owned scratch fixture; native qualification still must cover exact dependency links/content, DB/call/bindings, compiler diagnostics, unrelated-content preservation, save/fresh reopen, interruption/no-replay behavior, initial-checkpoint recovery and independent simulator assertions. The existing separate-operation evidence is not combined-operation evidence.
 
 ## Internal component coordinator
 
@@ -117,7 +146,7 @@ The exact internal native qualification factory is:
 CreatePlcComponentQualificationCoordinator(planChangeId, previewHash, absoluteArtifactRoot)
 ```
 
-It accepts only the exact current-session prepared PLC plan in the worker's sole, owned scratch project. The private factory is reachable only through the explicit `--component-qualification` launch and the qualification kind described below. Normal host/worker launches reject it with `ComponentQualificationDisabled`; it is not advertised as a production capability. The adapter is implemented and compiled. The earlier existing-caller attempt stopped before import at its native metadata-preservation boundary; standalone installation still requires its own complete native qualification. Applying the original production `library_integrate` change continues to return `PlcIntegrationNotQualified`.
+It accepts only the exact current-session prepared PLC plan in the worker's sole, owned scratch project. The private factory is reachable only through the explicit `--component-qualification` launch and the qualification kind described below. Normal host/worker launches reject it with `ComponentQualificationDisabled`; it is not advertised as a production capability. The adapter is implemented and compiled. The earlier existing-caller attempt stopped before import at its native metadata-preservation boundary; standalone installation still requires its own complete native qualification. On a Host without `--enable-library-integrate-apply`, applying the original production `library_integrate` change continues to return `PlcIntegrationNotQualified`.
 
 The Siemens-independent coordinator API is directly callable by offline test/qualification code:
 
