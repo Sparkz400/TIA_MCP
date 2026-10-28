@@ -18,6 +18,15 @@ class Loss(unittest.TestCase):
     def records(self):
         return [{'state':s,'checkpoints':[{}] if s!='prepared' else [],'evidence':[]} for s in ('prepared','dispatchIntent','recoveryIntent','reconciled')]
 
+    def test_lost_host_tree_passes_only_as_the_first_host(self):
+        proof=lambda code:{'completed':True,'sameOsHandleRetained':True,'birthAndImageVerified':True,'deadlineOrCancellationObserved':False,'forcedTermination':False,'exitCode':code}
+        tree={'completed':False,'startupOutcomeUnknown':False,'workerStartupCaptured':True,'nativeStartupInventoryComplete':True,'errors':[],'unknownReasons':[],
+              'finalizationErrors':[],'startupInventoryUnknownReasons':[],'exits':[{'role':'host','proof':proof(74)},{'role':'worker','proof':proof(0)},{'role':'native','proof':proof(0)}]}
+        close={'tree':tree,'closeInterrupted':None}
+        oracle.terminal(close,1)
+        with self.assertRaises(Exception): oracle.terminal(close,2)
+        with self.assertRaises(Exception): oracle.terminal({'tree':dict(tree,errors=['x']),'closeInterrupted':None},1)
+
     def test_saved_creation_unknown_reply(self):
         self.assertTrue(oracle.loss_boundary(self.records(),self.marker(),'owned.ap21')['target']['exists'])
 

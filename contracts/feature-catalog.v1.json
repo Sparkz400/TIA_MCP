@@ -3486,6 +3486,26 @@
       ]
     },
     {
+      "id": "local.watch.creation_loss.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "f721b6339e4f7509950fff72b83d094580fb391e",
+        "passedScope": "scripts/qualify_watch_authoring_loss.py (cl2) on a frozen Debug build of f721b63 (D:\\wp\\b59, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: watch_table_generate and watch_table_prepare_authoring for root WT05_BoolCreation with one Active Bool row (exact profile candidate matched), independent file-only review, then watch_table_apply under a Host started with --watch-qualification host.watch_apply_native: the native creation was applied and saved and the Host exited 74 before the reply; a second Host refused the replay (RecoveryRequired) and a competing owner (ResourceBusy) without native dispatch, recovered the checkpoint to a distinct destination whose fresh reopen shows the table absent, reconciled the restored project and the original as verifiedApplied without adopting the lost reply; the independent oracle verify_watch_authoring_loss passed (single dispatch, six preserved peer exports, exact Host/worker/Portal lifetimes: first Host 74, everything else 0)."
+      },
+      "artifacts": [
+        "evidence/local.watch.creation_loss.20261028.json"
+      ],
+      "limitations": [
+        "One Host-loss point (host.watch_apply_native) for one created root table with one Active Bool row; worker loss during creation and other authoring profiles are not exercised.",
+        "Isolated qualification Host; production watch authoring stays disabled.",
+        "Trial cl1 (D:\\wp\\wt\\cl1, build b58) passed the same native flow but its oracle required the lost Host's tree to report all-zero exits; the oracle now accepts exit 74 for that Host only. cl1 is retained and not cited."
+      ]
+    },
+    {
       "id": "local.opcua.server-settings.20261028",
       "status": "passed",
       "profile": {
@@ -14181,13 +14201,15 @@
         "limitations": [
           "Exact project/PLC/group/name destination, absent creation snapshot, collision and source freshness checks; bounded add/remove/reorder and multilingual comments using genuine captured row grammar.",
           "Full XML/row review uses the durable watch checkpoint, retained readback, saved reopen and explicit recovery path. Every new mutation profile remains production-gated pending native lifecycle evidence.",
-          "2026-10-28: a created table built from the packaged template takes DocumentInfo from a same-session export, since readback carries the installed products; the exact WT-05 profile is pinned under V21 Update 3."
+          "2026-10-28: a created table built from the packaged template takes DocumentInfo from a same-session export, since readback carries the installed products; the exact WT-05 profile is pinned under V21 Update 3.",
+          "2026-10-28: creation response loss passed under Update 3 (local.watch.creation_loss.20261028): the Host was lost after the saved native creation; a second Host refused the replay and a competing owner, recovered the checkpoint to absence and reconciled the original as verifiedApplied without adopting the lost reply."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.watch.authoring.20261028"
+          "local.watch.authoring.20261028",
+          "local.watch.creation_loss.20261028"
         ]
       },
       "availability": {
