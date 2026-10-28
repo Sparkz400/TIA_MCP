@@ -44,6 +44,8 @@ LIMITATIONS = [
     "Transfer areas are controller-device (CD) areas with the direction, lengths and local addresses TIA chooses; F-CD, PROFIsafe, shared-device and mapping-rule areas, "
     "direction and length edits are not exercised.",
     "The I-device mode change applies without compile or save, because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it.",
+    "The interface's CalculatedBandwidthForCyclicIoData (7040 after the device compile) is not saved: a fresh open reads 0 until the next compile, so the reopen comparison "
+    "excludes it and records both values under derivedAfterReopen.",
     "The GSDML content is Siemens output: the runner checks that it is well-formed XML naming the designation, not that another engineering tool imports it.",
     "Engineering only; nothing is downloaded and no PROFINET communication is observed.",
 ]
@@ -172,14 +174,28 @@ def phase_a(run, cpu, interface):
     return paths[0], export(run, "of the I-device", paths[0])
 
 
+# TIA computes an interface's cyclic IO bandwidth at the device compile and does not save it: a fresh open reads 0 until the next compile.
+DERIVED = ("CalculatedBandwidthForCyclicIoData",)
+
+
+def saved(view):
+    """The state without compile-derived attributes, for comparison across a fresh open."""
+    return {key: {**row, "attributes": {n: v for n, v in row["attributes"].items() if n not in DERIVED}} if key.startswith("hw:") else row for key, row in view.items()}
+
+
 def reopen(run, source, first):
     h, final = run.h, run.current
     h.stage("close the changed session", lambda: h.tool("tia_detach"))
     h.owned_portal("reopen")
     h.stage("reopen the saved project", lambda: h.reopen_project(run.project))
     run.current = run.b0 = run.snap("reopened")
-    h.stage("reopened state equals every verified change",
-            lambda: require(run.b0["view"] == final["view"], "Reopened state differs: %s" % diff(final["view"], run.b0["view"])) or len(final["view"]))
+    def equal():
+        before, after = saved(final["view"]), saved(run.b0["view"])
+        require(after == before, "Reopened state differs: %s" % diff(before, after))
+        h.report["derivedAfterReopen"] = {key: {name: {"applied": row["attributes"].get(name), "reopened": run.b0["view"][key]["attributes"].get(name)} for name in DERIVED}
+                                          for key, row in final["view"].items() if key.startswith("hw:") and any(row["attributes"].get(n) != run.b0["view"][key]["attributes"].get(n) for n in DERIVED)}
+        return len(before)
+    h.stage("reopened state equals every verified change", equal)
     for kind, rows in list(run.coverage.items()):
         if rows.get("applied"):
             run.mark(kind, "persisted", "fresh Portal reopen")

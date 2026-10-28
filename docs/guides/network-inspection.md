@@ -177,8 +177,15 @@ and children may follow the new type; everything outside it, port links included
 stay exact even with `acceptLoss`. The readback records the before/after inventory.
 
 `ConnectedPorts` is documented in V21 as "internal use only"; the bridge relies on it for
-readback. Which item exposes `GsdExportProvider` and whether Siemens requires a compiled
-I-device first are not observed yet.
+readback.
+
+Observed natively on a CPU 1511-1 PN V4.1 (28 October 2026): a new I-device fails the device
+compile ("There is no IO-controller/device address assignment") until it has a transfer area, so
+set the mode with `hardware_attributes` and `compile: false`, then create the area; that change's
+checkpoint saves the mode. TIA adds the system constant `Local~PROFINET_interface_1~IODevice`
+(`Hw_Device`) with the I-device mode and one `Hw_SubModule` constant per area
+(`Local~PROFINET_interface_1~<area name>`). A new CD area gets direction `LocalToPartner`, one
+byte in each direction, the next free output byte as local address and position numbers from 1000.
 
 ## Preservation manifest identity checks
 
