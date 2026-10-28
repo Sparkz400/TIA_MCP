@@ -106,7 +106,16 @@ def create_axis(run):
               added=["to:" + run.to("RbAxis")], tolerated=generated(run))
 
 
-def link(run, kind, payload):
+def coupled(run, item):
+    """TIA puts the connected item's addresses into the servo process image (ProcessImage) and keeps the sensor's PROFIdrive
+    interface tags RbAxis_Sensor<n>_Interface_AddressIn/Out (and so their tag table) in step, besides generated()."""
+    table = run.plc + "/tags/Default%20tag%20table"
+    system = generated(run)
+    return lambda category, key: system(category, key) or category == "changed" and key in ("hw:" + item, "tagTable:" + table) or (
+        category in ("added", "removed") and key.startswith("member:" + table + "/tags/RbAxis_Sensor"))
+
+
+def link(run, kind, payload, item):
     axis = run.to("RbAxis")
     def connected(applied, state):
         row = next(r for r in state["to:" + axis] if r["role"] == "sensor" and r["observationPath"].endswith("/0"))
@@ -118,7 +127,7 @@ def link(run, kind, payload):
                     "Sensor 0 is not on the requested channel: %s" % row)
     return run.apply("%s RbAxis sensor 0" % ("connect" if kind == "to_connect" else "disconnect"), kind, payload,
                      {"effects": [{"technologyObject": "RbAxis", "technologyPath": axis, "action": kind}]},
-                     shown={**payload, "name": "RbAxis"}, changed=["to:" + axis], check=connected, tolerated=generated(run))
+                     shown={**payload, "name": "RbAxis"}, changed=["to:" + axis], check=connected, tolerated=coupled(run, item))
 
 
 def sensor(run, phase):
@@ -182,7 +191,7 @@ def body(h):
     h.report["operatingMode"] = motion(run, old)
     create_axis(run)
     axis = run.to("RbAxis")
-    link(run, "to_connect", {"technologyPath": axis, "role": "sensor", "sensorIndex": 0, "hardwarePath": old, **CHANNEL})
+    link(run, "to_connect", {"technologyPath": axis, "role": "sensor", "sensorIndex": 0, "hardwarePath": old, **CHANNEL}, old)
     first = capture(run, "before the replacement", review(run, "before the replacement"))["phase"]
     record, declared = sensor(run, first)
     relation = declared["relationship"]
@@ -191,7 +200,7 @@ def body(h):
 
     new = plug(run, "RbEncB", 3)
     motion(run, new)
-    link(run, "to_disconnect", {"technologyPath": axis, "role": "sensor", "sensorIndex": 0})
+    link(run, "to_disconnect", {"technologyPath": axis, "role": "sensor", "sensorIndex": 0}, old)
     second = capture(run, "after the replacement", review(run, "after the replacement"))["phase"]
     require(sensor(run, second)[1]["relationship"]["state"] == "disconnected", "The after phase does not show sensor 0 disconnected")
 
@@ -215,7 +224,7 @@ def body(h):
     refuse_plan(run, "an altered receipt digest", replaced[:-1] + ("0" if replaced[-1] != "0" else "1"), "CompositeIntegrityFailure")
 
     planned = h.report["plans"]["with the declared replacement"]["entries"][0]["change"]
-    link(run, planned["kind"], planned["payload"])
+    link(run, planned["kind"], planned["payload"], new)
     third = capture(run, "after the rebind", review(run, "after the rebind"))["phase"]
     rebound = sensor(run, third)[1]
     require(rebound["relationship"]["state"] == "declared" and rebound["relationship"]["targetPath"] == new and rebound["targetResolution"] == "capturedObject",
