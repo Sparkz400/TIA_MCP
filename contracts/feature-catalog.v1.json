@@ -3602,6 +3602,42 @@
         "Inputs are libraries created in the run; V14-V20 upgrades are separate evidence.",
         "The locked source is simulated by an exclusive Windows handle, not a second TIA instance; its refusal surfaces as a generic EngineeringError."
       ]
+    },
+    {
+      "id": "local.library_lifecycle.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_lifecycle.20261024, whose raw reports were lost: scripts/qualify_library_lifecycle.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 82/82 steps; edit then discard restores the released link; discard of a committed version refused; malformed and mixed type-policy flags refused before mutation; DoNotUse blocks publication; read-only SetForUpdate on a PLC data type refused (AttributeNotWritable) instead of half-applying; type folders created, renamed and deleted with duplicate and root refusals; publication into an existing global library; master copy creation and duplicate refusal; deletion refused for default/used and non-default global versions, permitted for an unused non-default project version; fresh consumer instantiates the final generation without block-number collisions; the master-copy deletion checkpoint is restored into a new location. All 77 retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_lifecycle.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Releases 1.1.0 and 1.2.0 reuse the original FB document; they are lifecycle generations, not behavior changes.",
+        "Folder moves are not offered; folders are created, renamed and deleted empty.",
+        "Version deletion is qualified only in project libraries."
+      ]
+    },
+    {
+      "id": "local.library_releases.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_releases.20261024 and local.library_releases.20261026, whose raw reports were lost: scripts/qualify_library_release_changes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 105/105 steps; owned TIA V21 scratch projects: FB type 1.0.0, implementation-changing 1.1.0 (negated output) and breaking-interface 2.0.0 (output Active renamed Ready) created from documents in one native type identity with distinct version GUIDs; released exports match independently authored expectations; consumer updated 1.0.0 -> 1.1.0 compiles with unrelated native exports unchanged; 2.0.0 update fails compilation at the stale caller Main ('The formal parameter Active is invalid') without saving; its admission is reconciled in a fresh session; the checkpoint is restored into a new location and the unsaved original reopened, both linked to exactly 1.1.0. All 61 retained library observations (19 original-byte lock receipts) validate against the library schemas. local.library_releases.20261026 extended it, owned TIA V21 scratch projects and fresh owned PLCSIM Advanced V8 CPU1511 instances: FB type 1.0.0, implementation-changing 1.1.0 (negated output, same interface) and breaking 2.0.0 (output Active renamed Ready) in one native type identity with distinct version GUIDs, authored with simulation support; released exports and both instance DBs match independently authored expectations at every stage. Consumer at 1.0.0 runs the authored truth table on PLCSIM (probe output, probe instance output, Main's instance output and UDT field); updated to exactly 1.1.0 it compiles, keeps both instance DB interfaces and unrelated native exports, and runs the inverted truth table. The 2.0.0 update fails compilation at exactly the stale callers Main (OB1) and TiaMcpReleaseProbe_Cycle (OB123) ('The formal parameter Active is invalid'), reaches no unrelated block and is not saved; its admission is returned; the checkpoint restores to a new location and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged. A fresh consumer at exactly 2.0.0 with both callers adapted to Ready compiles clean, exposes no stale Active member and runs the 2.0.0 truth table. 105/105 steps; all 67 retained library observations (21 original-byte lock receipts) validate against the library schemas."
+      },
+      "artifacts": [
+        "evidence/local.library_releases.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Behavior is asserted from native exports (body and interface), not executed on a CPU or PLCSIM.",
+        "Caller migration together with a breaking update is not offered; the breaking case is qualified as an expected compile failure plus recovery.",
+        "One PLC, standard groups; no software units, protected/F types or runtime."
+      ]
     }
   ],
   "features": [
@@ -8208,12 +8244,11 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -9877,13 +9912,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.read_contracts.20261028",
-          "local.library_formats.rerun.20261028"
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -9927,13 +9961,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
           "local.read_contracts.20261028",
-          "local.library_formats.rerun.20261028"
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -9977,14 +10010,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
           "local.library.native-chain.20261028",
           "local.read_contracts.20261028",
-          "local.library_formats.rerun.20261028"
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10116,12 +10148,11 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.read_contracts.20261028",
-          "local.library_formats.rerun.20261028"
+          "local.library_formats.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10642,13 +10673,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10762,11 +10792,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10824,9 +10853,6 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
           "local.library_dmc_prerequisites.20261025",
@@ -10836,7 +10862,9 @@
           "local.library_import_scale.20261027",
           "local.library_preservation.20261028",
           "local.library_compatibility.rerun.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -10892,16 +10920,15 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
           "local.library_units.20261025",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11067,15 +11094,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11131,15 +11157,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_interruption.20261024",
           "local.library_scopes.20261025",
           "local.library_interruption.20261025",
           "local.library_protected.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11193,13 +11218,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11253,15 +11277,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library.native-chain.20261028",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11315,11 +11338,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11373,13 +11395,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11433,11 +11454,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11491,11 +11511,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11549,11 +11568,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11710,14 +11728,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {
@@ -11826,13 +11843,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_releases.20261024",
-          "local.library_releases.20261026",
-          "local.library_lifecycle.20261024",
           "local.library_protected.20261027",
           "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
-          "local.library_dependencies.rerun.20261028"
+          "local.library_dependencies.rerun.20261028",
+          "local.library_lifecycle.rerun.20261028",
+          "local.library_releases.rerun.20261028"
         ]
       },
       "availability": {

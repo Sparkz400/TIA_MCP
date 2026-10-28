@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "69da56c1fe74cf13e1a646b3fcfcac2ba9665eb391e393ee7d0da16cb31f860c",
-      "bytes": 1349421
+      "sha256": "ac553913c7ea885e5a66cbe18a086e1e4ffb26962b6a810f3b28ffadf2acc877",
+      "bytes": 1353381
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -93345,27 +93345,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -93391,6 +93370,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -93477,27 +93470,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
@@ -93509,6 +93481,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -93550,27 +93536,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -93596,6 +93561,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -93638,27 +93617,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_interruption.20261024",
           "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618",
           "artifacts": [
@@ -93698,6 +93656,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -93741,27 +93713,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_interruption.20261024",
           "profileSha256": "72dc579b94d4b6fdb72735d6dd0f3595f598527440f4cd33d153140558eba618",
           "artifacts": [
@@ -93802,6 +93753,20 @@
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -93841,27 +93806,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
@@ -93873,6 +93817,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -93917,27 +93875,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
@@ -93949,6 +93886,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -93995,27 +93946,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -94041,6 +93971,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94133,27 +94077,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_scopes.20261025",
           "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3",
           "artifacts": [
@@ -94221,6 +94144,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94312,27 +94249,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
@@ -94344,6 +94260,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94386,27 +94316,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -94439,6 +94348,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94485,27 +94408,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -94545,6 +94447,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94638,27 +94554,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -94684,6 +94579,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94730,27 +94639,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.library_preservation.20261028",
           "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc",
           "artifacts": [
@@ -94762,6 +94650,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -94804,27 +94706,6 @@
       "schemaBindings": [],
       "schemaReview": "unresolved",
       "evidenceRefs": [
-        {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
-          "id": "local.library_lifecycle.20261024",
-          "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b",
-          "artifacts": [
-            "evidence/local.library_lifecycle.20261024.json"
-          ]
-        },
         {
           "id": "local.library_scopes.20261025",
           "profileSha256": "5eaaca66e1848c07c249ea8d20c78a189af37be2e0e87ecc1dd8771ed51725f3",
@@ -94872,6 +94753,20 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_lifecycle.rerun.20261028",
+          "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b",
+          "artifacts": [
+            "evidence/local.library_lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -102030,20 +101925,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -102069,6 +101950,13 @@
           "profileSha256": "a2932f6c88fe3398e572604a1ea057ba70741d7d4229514c221bddd2f918e1ac",
           "artifacts": [
             "evidence/local.library_dependencies.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -102127,20 +102015,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -102166,6 +102040,13 @@
           "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
           "artifacts": [
             "evidence/local.library_formats.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -102278,20 +102159,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -102324,6 +102191,13 @@
           "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
           "artifacts": [
             "evidence/local.library_formats.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -102381,20 +102255,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -102427,6 +102287,13 @@
           "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
           "artifacts": [
             "evidence/local.library_formats.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -102780,20 +102647,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_releases.20261024",
-          "profileSha256": "493a870943258c2a5dc3e04a2f2195f1c76c593f9e0a20146a66c5976c949dfa",
-          "artifacts": [
-            "evidence/local.library_releases.20261024.json"
-          ]
-        },
-        {
-          "id": "local.library_releases.20261026",
-          "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211",
-          "artifacts": [
-            "evidence/local.library_releases.20261026.json"
-          ]
-        },
-        {
           "id": "local.library_protected.20261027",
           "profileSha256": "bd891ab4bf0a7620a516c9440276159f4ac7696c6e29b1fe7f2747a217b31e98",
           "artifacts": [
@@ -102833,6 +102686,13 @@
           "profileSha256": "027f84a515554870f071eef8d6cbc85654a29bc95aad3a39b51259bf14a28cbb",
           "artifacts": [
             "evidence/local.library_formats.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_releases.rerun.20261028",
+          "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d",
+          "artifacts": [
+            "evidence/local.library_releases.rerun.20261028.json"
           ]
         }
       ],
@@ -116174,6 +116034,11 @@
       "sha256": "24024e999a51c83d9f26a841acf2aee68638172a5ea5d2d9fb5fe82f2f31c61d"
     },
     {
+      "path": "evidence/local.library_lifecycle.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "62e5dc35cdc2f13b2d53d66843181b015db6b0d6f7c2cb5bf785534dd7130473"
+    },
+    {
       "path": "evidence/local.library_preservation.20261028.json",
       "state": "observed",
       "sha256": "e2b2f2caa67848a49556e5573cdfb58c4ae064ad7061dace039b455ed73eb752"
@@ -116202,6 +116067,11 @@
       "path": "evidence/local.library_releases.20261026.json",
       "state": "observed",
       "sha256": "e02e8f11fe5fc5be482960485df120d01451247be7aae743d9251f6255d345ca"
+    },
+    {
+      "path": "evidence/local.library_releases.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "cea1efe8fd86eec91cbfba5d28a91409277184b9ad1fbf257e0558e5ef1a5e69"
     },
     {
       "path": "evidence/local.library_scopes.20261025.json",
@@ -117035,6 +116905,10 @@
       "profileSha256": "aae85d578dc61c858589bd950599df14392689bb5e679676091b052d8d09691b"
     },
     {
+      "id": "local.library_lifecycle.rerun.20261028",
+      "profileSha256": "a04b7f080ea57592a23de23483a2105e55461db83f9c75910a25a4fd916d696b"
+    },
+    {
       "id": "local.library_preservation.20261028",
       "profileSha256": "bd1ce9856d7eb6f6552e0e7e499e72959a841e583c9a6f389a574fe5cd4e0bcc"
     },
@@ -117057,6 +116931,10 @@
     {
       "id": "local.library_releases.20261026",
       "profileSha256": "cdc701123ebdb2afd47acb90d56a6fff5a8ad6e3e3c0e9c9087ac075bb339211"
+    },
+    {
+      "id": "local.library_releases.rerun.20261028",
+      "profileSha256": "018086c6bfd8bb1c5abd15d2d50891a9de3120de4b54bf27057dda535844344d"
     },
     {
       "id": "local.library_scopes.20261025",
