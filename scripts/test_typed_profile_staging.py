@@ -19,6 +19,13 @@ def network(language, part, pins, storage=None):
             '</ObjectList></SW.Blocks.FB></Document>') % (extractor.INTERFACE, member, extractor.NET, part, wires, language)
 
 
+def caller(namespace, callee):
+    """A captured LAD caller in a namespace with one FC call naming its callee as given."""
+    return ('<Document><SW.Blocks.FB ID="0"><AttributeList><Namespace>%s</Namespace></AttributeList><ObjectList><SW.Blocks.CompileUnit ID="3">'
+            '<AttributeList><NetworkSource><FlgNet xmlns="%s"><Parts><Call UId="25"><CallInfo Name="%s" BlockType="FC" /></Call></Parts></FlgNet>'
+            '</NetworkSource><ProgrammingLanguage>LAD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FB></Document>') % (namespace, extractor.NET, callee)
+
+
 def storage(system):
     return '<Document><SW.Blocks.InstanceDB ID="0"><AttributeList><InstanceOfName>%s</InstanceOfName></AttributeList></SW.Blocks.InstanceDB></Document>' % system
 
@@ -159,6 +166,49 @@ class CandidateTests(unittest.TestCase):
         self.assertEqual(("R_TRIG", "R_TRIG", export["sha256"]), (edge["instanceType"], edge["globalInstanceType"], edge["globalInstanceSourceSha256"]))
         record = next(s for s in result["sources"] if s["path"].endswith("/Tgp_GlobalRTrig.xml"))
         self.assertEqual(("instance_db_spec", "spec"), (record["authoredFormat"], record["changeId"]))
+        self.unchanged()
+
+    def test_cross_scope_callers_bind_only_the_cross_unit_slot(self):
+        absolute = extractor.CROSS_SCOPE_CALLEE
+        for ordinal, (route, block, namespace, name, expected) in enumerate((
+                ("softwareUnit", "TgpCrossUnit_NumericFC_LAD", "TiaMcp_UnitB", absolute, ["v21.fw41.softwareUnit.lad.call.crossUnit.v1"]),
+                # The route's in-unit namespaceQualified profile serves it; the capture only confirms its absolute Name.
+                ("namespace", "TgpCrossNamespace_NumericFC_LAD", "TiaMcp_UnitA.Alternate", absolute, []),
+                ("softwareUnit", "TgpCrossUnit_NumericFC_LAD", "TiaMcp_UnitB", "TiaMcp_UnitB.TgpUnit_NumericFC", None),
+                ("namespace", "TgpCrossNamespace_NumericFC_LAD", "TiaMcp_UnitA", absolute, None))):
+            with self.subTest(route=route, namespace=namespace, name=name):
+                self.capture({block: caller(namespace, name)})
+                self.report["fixtures"][0]["route"] = route
+                self.write_report()
+                stage = self.stage / str(ordinal)
+                if expected is None:
+                    with self.assertRaisesRegex(ValueError, "name its callee absolutely"):
+                        extractor.extract_catalog([], [self.report_path], stage_output=stage)
+                    continue
+                result, _ = extractor.extract_catalog([], [self.report_path], stage_output=stage)
+                self.assertEqual(expected, [p["id"] for p in result["profiles"]])
+                self.assertEqual([block + ".xml"], [pathlib.Path(s["path"]).name for s in result["sources"]])
+                for profile in result["profiles"]:
+                    self.assertEqual(("crossUnitQualified", "softwareUnit"), (profile["calleeNameEncoding"], profile["route"]))
+                    self.assertIn('Name="' + absolute + '"', profile["nativeTemplateXml"])
+        self.unchanged()
+
+    def test_a_source_captured_in_another_checkout_binds_only_its_identical_copy(self):
+        other = tempfile.TemporaryDirectory()
+        self.addCleanup(other.cleanup)
+        entry = self.report["fixtures"][0]
+        entry.update(sourcePath=str(pathlib.Path(other.name) / "fixtures/typed-graphical/reference.s7dcl"),
+                     fileSha256=hashlib.sha256(self.source.read_bytes()).hexdigest())
+        self.write_report()
+        result, _ = extractor.extract_catalog([self.report_path], stage_output=self.stage / "same")
+        self.assertEqual("fixtures/typed-graphical/reference.s7dcl", result["sources"][0]["authoredSourcePath"])
+        for message, change in (("differs from the one captured", {"fileSha256": "0" * 64}),
+                                ("outside any repository fixtures", {"sourcePath": str(pathlib.Path(other.name) / "reference.s7dcl")})):
+            with self.subTest(message=message):
+                entry.update(change)
+                self.write_report()
+                with self.assertRaisesRegex(ValueError, message):
+                    extractor.extract_catalog([self.report_path], stage_output=self.stage / message.split()[0])
         self.unchanged()
 
     def test_candidates_copy_native_bytes_without_enabling_profile_or_overwriting_deployment(self):

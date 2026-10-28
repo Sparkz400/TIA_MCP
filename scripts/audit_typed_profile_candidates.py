@@ -33,6 +33,16 @@ def shape(element, ignore=()):
             (element.text or "").strip(), children)
 
 
+def captured_source(entry):
+    """A capture run from another checkout of this repository names its own copy; only identical bytes here stand in."""
+    path = pathlib.Path(entry["sourcePath"]).resolve()
+    parts = path.parts
+    if path.is_relative_to(ROOT) or "fixtures" not in parts:
+        return path
+    local = ROOT.joinpath(*parts[len(parts) - 1 - parts[::-1].index("fixtures"):])
+    return local.resolve() if local.is_file() and sha(local) == entry.get("fileSha256") else path
+
+
 def parse(path):
     return safe_xml(pathlib.Path(path).read_text(encoding="utf-8-sig"))
 
@@ -63,7 +73,7 @@ def audit(catalog_path, capture_path, prerequisites=()):
     fixtures, receipts, cpus = {}, set(), set()
     for capture in captures:
         for entry in capture["fixtures"]:
-            fixtures.setdefault(pathlib.Path(entry["sourcePath"]).resolve(), []).append(entry)
+            fixtures.setdefault(captured_source(entry), []).append(entry)
         receipts |= {call["result"]["artifact"]["sha256"] for call in capture["calls"]
                      if call["tool"] == "block_read" and call.get("status") == "passed"}
         cpus |= {a["value"] for item in capture["hardware"]["items"] if item.get("classification") == "CPU"
@@ -93,7 +103,7 @@ def audit(catalog_path, capture_path, prerequisites=()):
         check(shape(safe_xml(profile["nativeTemplateXml"])) in native, "instruction fragment: " + name)
         unit = next(node for node in document.iter() if local(node.tag) == "SW.Blocks.CompileUnit")
         check(shape(safe_xml(profile["networkTemplateXml"])) == shape(unit), "network envelope: " + name)
-        check(profile["route"] == entry["route"] and profile["cpuFamily"] == cpu, "route/cpu: " + name)
+        check(entry is not None and profile["route"] == entry["route"] and profile["cpuFamily"] == cpu, "route/cpu: " + name)
         languages = {node.text for node in document.iter() if local(node.tag) == "ProgrammingLanguage"}
         check(profile["language"] in languages, "language: " + name)
         check(all(profile[gate] is False for gate in GATES) and profile["nativeFormatValidated"] is True, "qualification flags: " + name)

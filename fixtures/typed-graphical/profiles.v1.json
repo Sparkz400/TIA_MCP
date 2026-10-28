@@ -3580,6 +3580,84 @@
       "nativeImportCompileVerified": true,
       "builderUsed": false,
       "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/crossscope-20261028/TgpUnit_NumericFB.xml",
+      "sha256": "a9d0381adbde9e833ea0d3733e226421e34a1cac6f9d0e64cd1362376938f870",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Unit-advanced-callees.scl",
+      "authoredSourceSha256": "e1dd93b65d87712f2a0fea6d563e78bd2ad0320e965fae760fc9feddc0a296ea",
+      "transportSourceSha256": "53b5c22c1ca4219d736250bc237c2c83cc2697d1c3f06698bcfd4dc7944d9f35",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/cap-crossns/capture.json",
+      "changeId": "e10744f24cde4bca8b645a1477d29761",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/crossscope-20261028/TgpUnit_NumericFC.xml",
+      "sha256": "6be0dcfa3450ea3b7d1eb1ad88a0535e1e4d50931890a32443a442ebce3dc53f",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-Unit-advanced-callees.scl",
+      "authoredSourceSha256": "e1dd93b65d87712f2a0fea6d563e78bd2ad0320e965fae760fc9feddc0a296ea",
+      "transportSourceSha256": "53b5c22c1ca4219d736250bc237c2c83cc2697d1c3f06698bcfd4dc7944d9f35",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/cap-crossns/capture.json",
+      "changeId": "e10744f24cde4bca8b645a1477d29761",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpCrossUnit_NumericFC_LAD.xml",
+      "sha256": "ff9cf4a29f15e6cdc228239a35d1f3422e30aeb09ab1a92b5e73ffe2c1b3a5fc",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-CrossUnit-numeric-fc-lad.s7dcl",
+      "authoredSourceSha256": "545c7a9fc79953477073c6ea4c8493c8fb6ce96b547f834c5084f43fdb6dc21a",
+      "transportSourceSha256": "2da8bab8b046aa843823dfe018480ea47c58bd2dd7a80e7368a63517a28192d3",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/cap-crossunit/capture.json",
+      "changeId": "046dd0a0fcb449cdaf9ae55933aa5fb9",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpCrossUnit_NumericFC_FBD.xml",
+      "sha256": "31afb093615c8f6d05b30cfde4fccd741aa7570b82d30f6af346a6b06b2d5899",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-CrossUnit-numeric-fc-fbd.s7dcl",
+      "authoredSourceSha256": "a038598e4bd727a576733a5f5c1989a26f077a29e85542156972c7252d0e5bd8",
+      "transportSourceSha256": "7308e7a75fe28f607df8777fb105fa1e4ad445d38906e876117bf5c91161bc7c",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/cap-crossunit/capture.json",
+      "changeId": "cc3b76ec609043909be1dc83401a1644",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpCrossNamespace_NumericFC_LAD.xml",
+      "sha256": "aa8bae4ec9c30a6c0f0d8c8a420fec1a71a5f4c544e10dc319f57b592376aa1e",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-CrossNamespace-numeric-fc-lad.s7dcl",
+      "authoredSourceSha256": "f754319c6d43fb6b9e06bc97df212da6fe092b73e65bba661329543b84799cc2",
+      "transportSourceSha256": "cd8f3b69f17ab57482b59a59958856a960a150f2f07516100d6ee09d0c13e5a7",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/cap-crossns/capture.json",
+      "changeId": "05ac5bf9482d4a62aacb2d4d4d4ca951",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TgpCrossNamespace_NumericFC_FBD.xml",
+      "sha256": "e40e8f90c131f4b7eebfb7ef53343816c34a97340f674a8661b2d3f745a5559e",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/route-CrossNamespace-numeric-fc-fbd.s7dcl",
+      "authoredSourceSha256": "0ecfa1b97c0d04b16d8b3e6d8950334ede6ee9ad7a7f0309bb0c224cd7e16dc6",
+      "transportSourceSha256": "53b97e9e14dd1fa9d7f82d8603d2f5f672499cd48bd80aec4dd34bf79e368273",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/cap-crossns/capture.json",
+      "changeId": "09654d0d42914744a431a4263c82d1fa",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
     }
   ],
   "profiles": [
@@ -11178,6 +11256,80 @@
       ],
       "instanceType": "F_TRIG",
       "instanceDeclarationXml": "<Member Name=\"Storage\" Datatype=\"F_TRIG\" Version=\"1.0\" Accessibility=\"Public\" xmlns=\"http://www.siemens.com/automation/Openness/SW/Interface/v5\">\n              <AttributeList>\n                <BooleanAttribute Name=\"ExternalAccessible\" SystemDefined=\"true\">true</BooleanAttribute>\n                <BooleanAttribute Name=\"ExternalVisible\" SystemDefined=\"true\">true</BooleanAttribute>\n                <BooleanAttribute Name=\"ExternalWritable\" SystemDefined=\"true\">true</BooleanAttribute>\n                <BooleanAttribute Name=\"SetPoint\" SystemDefined=\"true\">true</BooleanAttribute>\n              </AttributeList>\n              <Sections>\n                <Section Name=\"Input\">\n                  <Member Name=\"CLK\" Datatype=\"Bool\"/>\n                </Section>\n                <Section Name=\"Output\">\n                  <Member Name=\"Q\" Datatype=\"Bool\"/>\n                </Section>\n                <Section Name=\"InOut\"/>\n                <Section Name=\"Static\">\n                  <Member Name=\"Stat_Bit\" Datatype=\"Bool\"/>\n                </Section>\n              </Sections>\n            </Member>"
+    },
+    {
+      "id": "v21.fw41.softwareUnit.lad.call.crossUnit.v1",
+      "version": 1,
+      "language": "LAD",
+      "kind": "call",
+      "instruction": null,
+      "dataType": null,
+      "tiaVersion": "V21",
+      "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "route": "softwareUnit",
+      "nativeName": "Call",
+      "nativeTemplateXml": "<Call UId=\"25\" xmlns=\"http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5\">\n                  <CallInfo Name=\"TiaMcp_UnitA.TgpUnit_NumericFC\" BlockType=\"FC\">\n                    <Parameter Name=\"Value\" Section=\"Input\" Type=\"Int\"/>\n                    <Parameter Name=\"Ret_Val\" Section=\"Return\" Type=\"Int\"/>\n                    <Parameter Name=\"Result\" Section=\"Output\" Type=\"Int\"/>\n                    <Parameter Name=\"Accumulator\" Section=\"InOut\" Type=\"Int\"/>\n                  </CallInfo>\n                </Call>",
+      "sourceSha256": "ff9cf4a29f15e6cdc228239a35d1f3422e30aeb09ab1a92b5e73ffe2c1b3a5fc",
+      "provenance": "fixtures/typed-graphical/native/TgpCrossUnit_NumericFC_LAD.xml",
+      "nativeFormatValidated": true,
+      "engineeringVerified": false,
+      "preservationVerified": false,
+      "persistenceVerified": false,
+      "recoveryVerified": false,
+      "runtimeVerified": false,
+      "networkTemplateXml": "<SW.Blocks.CompileUnit ID=\"3\" CompositionName=\"CompileUnits\">\n        <AttributeList>\n          <NetworkSource>\n            <FlgNet xmlns=\"http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5\">\n              <Parts>\n                <Access Scope=\"LocalVariable\" UId=\"21\">\n                  <Symbol>\n                    <Component Name=\"Value\"/>\n                  </Symbol>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"22\">\n                  <Symbol>\n                    <Component Name=\"Accumulator\"/>\n                  </Symbol>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"23\">\n                  <Symbol>\n                    <Component Name=\"Result\"/>\n                  </Symbol>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"24\">\n                  <Symbol>\n                    <Component Name=\"Returned\"/>\n                  </Symbol>\n                </Access>\n                <Call UId=\"25\">\n                  <CallInfo Name=\"TiaMcp_UnitA.TgpUnit_NumericFC\" BlockType=\"FC\">\n                    <Parameter Name=\"Value\" Section=\"Input\" Type=\"Int\"/>\n                    <Parameter Name=\"Ret_Val\" Section=\"Return\" Type=\"Int\"/>\n                    <Parameter Name=\"Result\" Section=\"Output\" Type=\"Int\"/>\n                    <Parameter Name=\"Accumulator\" Section=\"InOut\" Type=\"Int\"/>\n                  </CallInfo>\n                </Call>\n              </Parts>\n              <Wires>\n                <Wire UId=\"26\">\n                  <Powerrail/>\n                  <NameCon UId=\"25\" Name=\"en\"/>\n                </Wire>\n                <Wire UId=\"27\">\n                  <IdentCon UId=\"21\"/>\n                  <NameCon UId=\"25\" Name=\"Value\"/>\n                </Wire>\n                <Wire UId=\"28\">\n                  <IdentCon UId=\"22\"/>\n                  <NameCon UId=\"25\" Name=\"Accumulator\"/>\n                </Wire>\n                <Wire UId=\"29\">\n                  <NameCon UId=\"25\" Name=\"Result\"/>\n                  <IdentCon UId=\"23\"/>\n                </Wire>\n                <Wire UId=\"30\">\n                  <NameCon UId=\"25\" Name=\"Ret_Val\"/>\n                  <IdentCon UId=\"24\"/>\n                </Wire>\n              </Wires>\n            </FlgNet>\n          </NetworkSource>\n          <ProgrammingLanguage>LAD</ProgrammingLanguage>\n        </AttributeList>\n        <ObjectList>\n          <MultilingualText ID=\"4\" CompositionName=\"Comment\">\n            <ObjectList>\n              <MultilingualTextItem ID=\"5\" CompositionName=\"Items\">\n                <AttributeList>\n                  <Culture>en-US</Culture>\n                  <Text/>\n                </AttributeList>\n              </MultilingualTextItem>\n            </ObjectList>\n          </MultilingualText>\n          <MultilingualText ID=\"6\" CompositionName=\"Title\">\n            <ObjectList>\n              <MultilingualTextItem ID=\"7\" CompositionName=\"Items\">\n                <AttributeList>\n                  <Culture>en-US</Culture>\n                  <Text/>\n                </AttributeList>\n              </MultilingualTextItem>\n            </ObjectList>\n          </MultilingualText>\n        </ObjectList>\n      </SW.Blocks.CompileUnit>",
+      "pins": [
+        {
+          "name": "en",
+          "direction": "input",
+          "dataType": "Bool",
+          "required": true
+        },
+        {
+          "name": "eno",
+          "direction": "output",
+          "dataType": "Bool",
+          "required": false
+        }
+      ],
+      "calleeNameEncoding": "crossUnitQualified"
+    },
+    {
+      "id": "v21.fw41.softwareUnit.fbd.call.crossUnit.v1",
+      "version": 1,
+      "language": "FBD",
+      "kind": "call",
+      "instruction": null,
+      "dataType": null,
+      "tiaVersion": "V21",
+      "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "route": "softwareUnit",
+      "nativeName": "Call",
+      "nativeTemplateXml": "<Call UId=\"26\" xmlns=\"http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5\">\n                  <CallInfo Name=\"TiaMcp_UnitA.TgpUnit_NumericFC\" BlockType=\"FC\">\n                    <Parameter Name=\"Value\" Section=\"Input\" Type=\"Int\"/>\n                    <Parameter Name=\"Ret_Val\" Section=\"Return\" Type=\"Int\"/>\n                    <Parameter Name=\"Result\" Section=\"Output\" Type=\"Int\"/>\n                    <Parameter Name=\"Accumulator\" Section=\"InOut\" Type=\"Int\"/>\n                  </CallInfo>\n                </Call>",
+      "sourceSha256": "31afb093615c8f6d05b30cfde4fccd741aa7570b82d30f6af346a6b06b2d5899",
+      "provenance": "fixtures/typed-graphical/native/TgpCrossUnit_NumericFC_FBD.xml",
+      "nativeFormatValidated": true,
+      "engineeringVerified": false,
+      "preservationVerified": false,
+      "persistenceVerified": false,
+      "recoveryVerified": false,
+      "runtimeVerified": false,
+      "networkTemplateXml": "<SW.Blocks.CompileUnit ID=\"3\" CompositionName=\"CompileUnits\">\n        <AttributeList>\n          <NetworkSource>\n            <FlgNet xmlns=\"http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5\">\n              <Parts>\n                <Access Scope=\"LiteralConstant\" UId=\"21\">\n                  <Constant>\n                    <ConstantType>Bool</ConstantType>\n                    <ConstantValue>TRUE</ConstantValue>\n                  </Constant>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"22\">\n                  <Symbol>\n                    <Component Name=\"Value\"/>\n                  </Symbol>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"23\">\n                  <Symbol>\n                    <Component Name=\"Accumulator\"/>\n                  </Symbol>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"24\">\n                  <Symbol>\n                    <Component Name=\"Result\"/>\n                  </Symbol>\n                </Access>\n                <Access Scope=\"LocalVariable\" UId=\"25\">\n                  <Symbol>\n                    <Component Name=\"Returned\"/>\n                  </Symbol>\n                </Access>\n                <Call UId=\"26\">\n                  <CallInfo Name=\"TiaMcp_UnitA.TgpUnit_NumericFC\" BlockType=\"FC\">\n                    <Parameter Name=\"Value\" Section=\"Input\" Type=\"Int\"/>\n                    <Parameter Name=\"Ret_Val\" Section=\"Return\" Type=\"Int\"/>\n                    <Parameter Name=\"Result\" Section=\"Output\" Type=\"Int\"/>\n                    <Parameter Name=\"Accumulator\" Section=\"InOut\" Type=\"Int\"/>\n                  </CallInfo>\n                </Call>\n              </Parts>\n              <Wires>\n                <Wire UId=\"27\">\n                  <IdentCon UId=\"21\"/>\n                  <NameCon UId=\"26\" Name=\"en\"/>\n                </Wire>\n                <Wire UId=\"28\">\n                  <IdentCon UId=\"22\"/>\n                  <NameCon UId=\"26\" Name=\"Value\"/>\n                </Wire>\n                <Wire UId=\"29\">\n                  <IdentCon UId=\"23\"/>\n                  <NameCon UId=\"26\" Name=\"Accumulator\"/>\n                </Wire>\n                <Wire UId=\"30\">\n                  <NameCon UId=\"26\" Name=\"Result\"/>\n                  <IdentCon UId=\"24\"/>\n                </Wire>\n                <Wire UId=\"31\">\n                  <NameCon UId=\"26\" Name=\"Ret_Val\"/>\n                  <IdentCon UId=\"25\"/>\n                </Wire>\n              </Wires>\n            </FlgNet>\n          </NetworkSource>\n          <ProgrammingLanguage>FBD</ProgrammingLanguage>\n        </AttributeList>\n        <ObjectList>\n          <MultilingualText ID=\"4\" CompositionName=\"Comment\">\n            <ObjectList>\n              <MultilingualTextItem ID=\"5\" CompositionName=\"Items\">\n                <AttributeList>\n                  <Culture>en-US</Culture>\n                  <Text/>\n                </AttributeList>\n              </MultilingualTextItem>\n            </ObjectList>\n          </MultilingualText>\n          <MultilingualText ID=\"6\" CompositionName=\"Title\">\n            <ObjectList>\n              <MultilingualTextItem ID=\"7\" CompositionName=\"Items\">\n                <AttributeList>\n                  <Culture>en-US</Culture>\n                  <Text/>\n                </AttributeList>\n              </MultilingualTextItem>\n            </ObjectList>\n          </MultilingualText>\n        </ObjectList>\n      </SW.Blocks.CompileUnit>",
+      "pins": [
+        {
+          "name": "en",
+          "direction": "input",
+          "dataType": "Bool",
+          "required": true
+        },
+        {
+          "name": "eno",
+          "direction": "output",
+          "dataType": "Bool",
+          "required": false
+        }
+      ],
+      "calleeNameEncoding": "crossUnitQualified"
     }
   ],
   "creationTemplates": [

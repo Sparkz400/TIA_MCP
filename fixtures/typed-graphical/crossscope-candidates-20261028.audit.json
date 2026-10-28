@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "catalog": "artifacts/xs/profiles.candidate.v1.json",
+  "catalogSha256": "7134a9cc201ef092a7511df5e2f6febe0502403cb4f0bbfed3db993f026638cb",
+  "captures": [
+    {
+      "capture": "artifacts/cap-crossns/capture.json",
+      "captureSha256": "3fb7d2c0afa9e4086911f6fd57eefb72dff97097e66bf9f0db26e367c13c9bd9"
+    },
+    {
+      "capture": "artifacts/cap-crossunit/capture.json",
+      "captureSha256": "9b8fefd54a6679c9f9614fd56c7f2a77c7649b89d96fa9cfea2633ef553d160d"
+    }
+  ],
+  "counts": {
+    "sources": 6,
+    "profiles": 2,
+    "templates": 0
+  },
+  "prerequisiteEquivalence": [
+    {
+      "committed": "fixtures/typed-graphical/native/TgpUnit_NumericFC.xml",
+      "committedSha256": "a091e27999c084dea1d36218b7b3be34c7539845a5aa0ca4882017106a31d09c",
+      "reexport": "artifacts/xs/native/TgpUnit_NumericFC.xml",
+      "reexportSha256": "6be0dcfa3450ea3b7d1eb1ad88a0535e1e4d50931890a32443a442ebce3dc53f",
+      "equivalent": true
+    },
+    {
+      "committed": "fixtures/typed-graphical/native/TgpUnit_NumericFB.xml",
+      "committedSha256": "60d5cafdade0b7a417a022761628cd220ee0298145ea88474fc396df0b5444ec",
+      "reexport": "artifacts/xs/native/TgpUnit_NumericFB.xml",
+      "reexportSha256": "a9d0381adbde9e833ea0d3733e226421e34a1cac6f9d0e64cd1362376938f870",
+      "equivalent": true
+    }
+  ],
+  "findings": [],
+  "passed": true
+}

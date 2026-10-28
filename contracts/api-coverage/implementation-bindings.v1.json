@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b3e85736af86401246b6b817645eb7b52c5cf7435e33e8a973220f7bfa44349e",
-      "bytes": 1131542
+      "sha256": "772822eeb31fbe1b091d10d8430c1a63929598ba3901aa2032abab32e3b956fa",
+      "bytes": 1131916
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -115872,7 +115872,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "3f12f0717e8e4d98468a3b1d649969927b56c30ead98153682df4e6bb61078f6"
+      "sha256": "7133bbe6e97260cda7932a35cf1db82a5584d972518bc2de4f0520a17b86c8fb"
     },
     {
       "path": "docs/verification/simulator-startup-20261024.md",

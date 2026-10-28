@@ -16,6 +16,10 @@ from author_route_cases import ARCHIVE, ARCHIVE_SHA256
 ROOT = Path(__file__).resolve().parent
 IEC_FAMILIES = ("ton", "tof", "tp", "ctu", "ctd", "ctud")
 REPO = ROOT.parent.parent
+# The crossUnit capture's prepared archive (scripts/prepare_crossunit_capture_archive.py, receipt beside it): TiaMcp_UnitA's
+# callees, the SoftwareUnit relation TiaMcp_UnitB -> TiaMcp_UnitA and the Published numeric FC.
+CROSSUNIT_ARCHIVE = "artifacts/crossunit-prep/838e0c54a1b825944749dfe51703c39929b7df4768dbc44f5bda1919315470c5.zap21"
+CROSSUNIT_ARCHIVE_SHA256 = "838e0c54a1b825944749dfe51703c39929b7df4768dbc44f5bda1919315470c5"
 
 
 def replace_names(value, prefix):
@@ -89,6 +93,33 @@ def main():
     (ROOT / "route-pending-references.v1.json").write_text(json.dumps({"schemaVersion": 1, "unqualifiedCases": missing}, indent=2) + "\n", encoding="utf-8")
     print(str(len(cases)) + " executable route cases; " + str(len(missing)) + " explicitly pending independent native references.")
     (ROOT / "route-operand-cases.v1.json").write_text(json.dumps({"schemaVersion": 1, "cases": operand_cases()}, indent=2) + "\n", encoding="utf-8")
+    (ROOT / "crossscope-cases.v1.json").write_text(json.dumps({"schemaVersion": 1, "cases": crossscope_cases()}, indent=2) + "\n", encoding="utf-8")
+
+
+def crossscope_cases():
+    """Calls of TiaMcp_UnitA's numeric FC from its alternate namespace and from the related unit TiaMcp_UnitB.
+
+    Mirrors route-capture-crossscope-call-packet.v1.json: the cross-namespace case admits the callees as that capture
+    did; the cross-unit case starts from the capture's prepared archive. The callee lies outside the case route.
+    """
+    callees = (ROOT / "sources/route-Unit-advanced-callees.scl").read_text(encoding="utf-8")
+    result = []
+    for label, unit, namespace, archive, archive_sha256 in (
+            ("CrossNamespace", "TiaMcp_UnitA", "TiaMcp_UnitA.Alternate", ARCHIVE, ARCHIVE_SHA256),
+            ("CrossUnit", "TiaMcp_UnitB", "TiaMcp_UnitB", CROSSUNIT_ARCHIVE, CROSSUNIT_ARCHIVE_SHA256)):
+        for original in [c for c in numeric_cases() if c["family"] == "numeric-fc"]:
+            case = copy.deepcopy(original)
+            name = "Tgp" + label + "_NumericFC_" + case["language"]
+            case.update(fixtureId="typed-" + label.lower() + "-numeric-fc-" + case["language"].lower(), blockName=name,
+                        referenceXml="fixtures/typed-graphical/native/" + name + ".xml", dependencyXmls=[],
+                        engineeringOnly=True, archivePath=archive, archiveSha256=archive_sha256, unitName=unit, namespace=namespace)
+            if label == "CrossNamespace":
+                case["dependencySources"] = [{"language": "SCL", "source": callees, "namespace": "TiaMcp_UnitA",
+                                              "expectedBlockNames": ["TgpUnit_NumericFC", "TgpUnit_NumericFB"]}]
+            [call] = [node for node in case["payload"]["model"]["nodes"] if node["kind"] == "call"]
+            call["calleePath"] = "$block:TiaMcp_UnitA/TgpUnit_NumericFC"
+            result.append(case)
+    return result
 
 
 def operand_cases():

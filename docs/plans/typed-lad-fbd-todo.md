@@ -35,10 +35,15 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   `SoftwareUnit` relation, a `Published` callee and a separate `crossUnitQualified` profile.
   Callee scope, access, namespace and interface are in the preview and rechecked at apply.
   Offline tests only.
-- [ ] Capture `route-capture-crossscope-call-packet.v1.json` (the cross-unit part needs the
-  archive `scripts/prepare_crossunit_capture_archive.py` prepares: callees, relation B->A and
-  publication; runner written, not run natively), bind the cross-unit
-  profile in `extract_typed_graphical_profiles.py`, then add and run route cases for both.
+- [x] Capture `route-capture-crossscope-call-packet.v1.json`: both parts passed on 28 October
+  (`artifacts/cap-crossns`, `artifacts/cap-crossunit` from the prepared archive
+  `artifacts/crossunit-prep/838e0c54….zap21`). The cross-namespace callers name the callee
+  absolutely, as the deployed namespace-route call profiles emit. The extractor binds the
+  cross-unit slot; `v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1` are audited
+  (`crossscope-candidates-20261028.audit.json`) and promoted, every qualification flag false.
+- [ ] Run the authored cases `fixtures/typed-graphical/crossscope-cases.v1.json` (cross-namespace
+  and cross-unit, LAD and FBD; engineering only) to qualify the builder for both calls; the
+  command is in the packet's `afterCapture`.
 
 ## Lane A — 25 October 2026
 
