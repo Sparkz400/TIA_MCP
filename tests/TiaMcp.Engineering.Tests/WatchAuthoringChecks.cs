@@ -92,6 +92,9 @@ internal static class WatchAuthoringChecks
                 "First-table creation and empty-table update use the packaged hash-pinned native grammar.");
             Check(resultRows.All(r => r!["comments"]!.AsObject().Count == 1 && r["comments"]!["fr-FR"] is not null),
                 "New rows use active project languages without carrying inactive template cultures.");
+            string candidate = File.ReadAllText(Path.Combine(packaged.Native.Root, preview["review"]!["input"]!["relativePath"]!.GetValue<string>()));
+            Check(candidate.Contains("V21 Update 3") != emptyUpdate && (preview["review"]!["template"]!["documentInfoSource"] is null) == emptyUpdate,
+                "Creation takes export metadata from the same-session export; an update keeps the existing table's.");
         }
         var mixed = await Fixture(true); mixed.Native.MakeMixed();
         mixed.Request["steps"] = new JsonArray(new JsonObject { ["kind"] = "reorder", ["order"] = new JsonArray(1, 0) });
@@ -191,10 +194,14 @@ internal static class WatchAuthoringChecks
             string file = Path.Combine(Root, Guid.NewGuid().ToString("N") + ".capture"); File.WriteAllBytes(file, bytes);
             string hash = data is null ? WatchTableDocument.Hash(bytes) : WatchTableDocument.SemanticHash(bytes);
             var document = data is null ? null : new WatchTableDocument(data);
+            // A peer exported by the current installation, newer than the packaged template.
+            string export = Path.Combine(Root, "session-export.xml");
+            if (!File.Exists(export)) File.WriteAllText(export, System.Text.Encoding.UTF8.GetString(Template).Replace("V21 Update 2", "V21 Update 3"));
             var observation = new NativeTargetObservation(new(new(project, "/PLC", "/PLC", "/PLC/watch/root/" + name, "watchTable"), new("capture-" + epoch, new((char)('b' + SourceVersion), 64)), hash),
                 project, "epoch-" + epoch, new('c', 64), new('d', 64), "hardware", null, true, [new("offline", "observed", new('e', 64)), new("watchImport", "observed", new('f', 64))]);
             var result = JsonSerializer.SerializeToNode(new { observation, processId = epoch, projectModified = false, peerSha256 = new string('9', 64),
                 peers = new { languages = new { active = ActiveCultures } },
+                tables = new[] { new { kind = "watch", group = "root", name = "SessionPeer", artifact = new { path = export, sha256 = WatchTableDocument.Hash(File.ReadAllBytes(export)) } } },
                 target = new { name, group = "root", exists = data is not null, artifact = new { path = file, sha256 = WatchTableDocument.Hash(bytes) }, semanticSha256 = hash, isConsistent = true,
                     rows = document is null ? [] : Enumerable.Range(0, document.Count).Select(i => new { kind = document.RowKind(i), name = document.Field(i, "Name"), address = document.Field(i, "Address"),
                         displayFormat = document.Field(i, "DisplayFormat"), modifyValue = document.Field(i, "ModifyValue"), modifyIntention = false }).ToArray() } }, BridgeProtocol.Json)!.AsObject();

@@ -1,0 +1,283 @@
+{
+  "observation": {
+    "reference": {
+      "object": {
+        "projectPath": "D:\\wp\\wt\\author2\\scratch\\TiaMcpScratch_20261028_082824_33d0c5ca\\TiaMcpScratch_20261028_082824_33d0c5ca\\TiaMcpScratch_20261028_082824_33d0c5ca.ap21",
+        "plcPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "scopePath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC",
+        "objectPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/watch/root/WT05_BoolCreation",
+        "kind": "watchTable"
+      },
+      "snapshot": {
+        "observationId": "4689586b72224b348d76bc0fa52885d6",
+        "sourceSha256": "aa9303ec18400c37ddeb0c236dc6a973479afbc24419a3cbb3fc456dc52224ff",
+        "tiaVersion": 21
+      },
+      "contentSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59"
+    },
+    "projectFilePath": "D:\\wp\\wt\\author2\\scratch\\TiaMcpScratch_20261028_082824_33d0c5ca\\TiaMcpScratch_20261028_082824_33d0c5ca\\TiaMcpScratch_20261028_082824_33d0c5ca.ap21",
+    "sessionEpoch": "a9973bb7a05841bb82a73339f31abe85",
+    "adapterSha256": "a12e1d4f0682ba15362d9d0871a418b1a61722753bfc8312b39f134d7a7b7d92",
+    "profileSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f",
+    "hardwareIdentity": "OrderNumber:6ES7 590-1***0-0AA0|OrderNumber:6ES7 511-1AL03-0AB0/V4.1||||||",
+    "nativeIdentity": null,
+    "offline": true,
+    "probes": [
+      {
+        "name": "offline",
+        "state": "observed",
+        "evidenceSha256": "aa9303ec18400c37ddeb0c236dc6a973479afbc24419a3cbb3fc456dc52224ff"
+      },
+      {
+        "name": "watchImport",
+        "state": "observed",
+        "evidenceSha256": "f41301a47cadd7b1c72a23bfbb16bf55df4581c5f03d22e3d903785a270a2d8f"
+      }
+    ]
+  },
+  "target": {
+    "kind": "watch",
+    "exists": false,
+    "group": "root",
+    "name": "WT05_BoolCreation",
+    "artifact": {
+      "path": "D:\\wp\\wt\\author2\\watch-observations\\w_82444718129e\\absent.txt",
+      "bytes": 44,
+      "sha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+      "mediaType": "application/xml"
+    },
+    "semanticSha256": "de6f003dbcdf15afebc60fa8ab04401d20bb81a4abb6cd4c9064f7e3d19a4e59",
+    "isConsistent": true,
+    "rows": []
+  },
+  "tables": [
+    {
+      "kind": "force",
+      "exists": true,
+      "group": "root",
+      "name": "Force table",
+      "artifact": {
+        "path": "D:\\wp\\wt\\author2\\watch-observations\\w_82444718129e\\force-0.xml",
+        "bytes": 2266,
+        "sha256": "c85a43d1686930faa50f7ee09f244aed3371a9059a1a67b36d4c6116873891a4",
+        "mediaType": "application/xml"
+      },
+      "semanticSha256": "c7b378c7f45d04ecfb47dcaaa2bc047e97fb5cb474b514c86a0156acb81a309a",
+      "isConsistent": true,
+      "rows": []
+    }
+  ],
+  "peers": {
+    "force:root/Force table": "c7b378c7f45d04ecfb47dcaaa2bc047e97fb5cb474b514c86a0156acb81a309a",
+    "group:root": "Watch and force tables",
+    "block:/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_IsEnabled": "aa7c8f2dfc2751978d646128a3dec487df14db0b50b16a3d4b32da649241cfad",
+    "block:/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate": "326bc4096d5faf7491ea1f920bb273a58dba6b426cad743cd07c95631344674d",
+    "block:/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/TiaMcp_EnableGate_DB": "fff585da83be4a2e777d7a9b6057352268cd18534106592c090854e234d3c16a",
+    "block:/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/blocks/Main": "42c5e4032bc789b2a595de39e777562bf5420e69424146f63540e91e5af98945",
+    "tags:/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC/tags/Default%20tag%20table": "9bae5f7ef6029faf49203abcec845237a35ed892b6bfcf51610ad5872b600dd1",
+    "hardware": [
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/Rail_0",
+        "name": "Rail_0",
+        "typeIdentifier": "OrderNumber:6ES7 590-1***0-0AA0",
+        "positionNumber": 0,
+        "containerPath": null,
+        "attributes": {
+          "Author": "nicos",
+          "Comment": "",
+          "Name": "Rail_0"
+        },
+        "channels": [],
+        "addresses": []
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC",
+        "name": "ScratchPLC",
+        "typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "positionNumber": 1,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/Rail_0",
+        "attributes": {
+          "AdditionalInformation": "",
+          "Author": "nicos",
+          "Comment": "",
+          "LocationIdentifier": "",
+          "Name": "ScratchPLC",
+          "PlantDesignation": ""
+        },
+        "channels": [],
+        "addresses": []
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/CPU%20display_1",
+        "name": "CPU display_1",
+        "typeIdentifier": null,
+        "positionNumber": 3,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC",
+        "attributes": {
+          "Name": "CPU display_1"
+        },
+        "channels": [],
+        "addresses": []
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/Card%20reader%2Fwriter_1",
+        "name": "Card reader/writer_1",
+        "typeIdentifier": null,
+        "positionNumber": 4,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC",
+        "attributes": {
+          "Name": "Card reader/writer_1"
+        },
+        "channels": [],
+        "addresses": []
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1",
+        "name": "OPC UA_1",
+        "typeIdentifier": null,
+        "positionNumber": 254,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC",
+        "attributes": {
+          "Name": "OPC UA_1"
+        },
+        "channels": [],
+        "addresses": []
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1",
+        "name": "PROFINET interface_1",
+        "typeIdentifier": null,
+        "positionNumber": 32768,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC",
+        "attributes": {
+          "Author": "nicos",
+          "Comment": "",
+          "Name": "PROFINET interface_1"
+        },
+        "channels": [],
+        "addresses": [],
+        "network": {
+          "nodes": [
+            {
+              "name": "X1",
+              "type": "Ethernet",
+              "subnet": null,
+              "attributes": {
+                "Address": "192.168.0.1",
+                "IpProtocolSelection": "Project",
+                "PnDeviceName": "scratchplc.profinet interface_1",
+                "PnDeviceNameAutoGeneration": true,
+                "PnDeviceNameSetDirectly": false,
+                "SubnetMask": "255.255.255.0",
+                "UseIpProtocol": true,
+                "UseRouter": false
+              }
+            }
+          ],
+          "controllers": [
+            {
+              "index": 0,
+              "system": {
+                "state": "notAssigned"
+              }
+            }
+          ],
+          "connectors": []
+        }
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1/items/Port_1",
+        "name": "Port_1",
+        "typeIdentifier": null,
+        "positionNumber": 32769,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1",
+        "attributes": {
+          "Author": "nicos",
+          "Comment": "",
+          "Name": "Port_1"
+        },
+        "channels": [],
+        "addresses": []
+      },
+      {
+        "path": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1/items/Port_2",
+        "name": "Port_2",
+        "typeIdentifier": null,
+        "positionNumber": 32770,
+        "containerPath": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1",
+        "attributes": {
+          "Author": "nicos",
+          "Comment": "",
+          "Name": "Port_2"
+        },
+        "channels": [],
+        "addresses": []
+      }
+    ],
+    "languages": {
+      "active": [
+        "de-DE"
+      ],
+      "reference": "de-DE",
+      "editing": "de-DE"
+    },
+    "access": [
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/Rail_0",
+        "available": false,
+        "watch": null,
+        "force": null
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC",
+        "available": true,
+        "watch": [],
+        "force": []
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/Card%20reader%2Fwriter_1",
+        "available": false,
+        "watch": null,
+        "force": null
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/CPU%20display_1",
+        "available": true,
+        "watch": [],
+        "force": []
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/OPC%20UA_1",
+        "available": false,
+        "watch": null,
+        "force": null
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1",
+        "available": false,
+        "watch": null,
+        "force": null
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1/items/Port_1",
+        "available": false,
+        "watch": null,
+        "force": null
+      },
+      {
+        "owner": "/projects/TiaMcpScratch_20261028_082824_33d0c5ca/devices/ScratchStation/items/ScratchPLC/items/PROFINET%20interface_1/items/Port_2",
+        "available": false,
+        "watch": null,
+        "force": null
+      }
+    ]
+  },
+  "peerSha256": "ef8277e2699a774ee2654f600e8375104b11eb409f20736fa96e625255e77493",
+  "projectModified": false,
+  "project": {
+    "name": "TiaMcpScratch_20261028_082824_33d0c5ca",
+    "path": "D:\\wp\\wt\\author2\\scratch\\TiaMcpScratch_20261028_082824_33d0c5ca\\TiaMcpScratch_20261028_082824_33d0c5ca\\TiaMcpScratch_20261028_082824_33d0c5ca.ap21"
+  },
+  "processId": 32264,
+  "coverage": "All watch/force documents, exported blocks/types/tag tables, configured hardware, languages and exposed watch/force access assignments for this bounded fixture. Unexposed vendor data is not claimed."
+}

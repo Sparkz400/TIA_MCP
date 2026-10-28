@@ -9,13 +9,19 @@ internal static class WatchAuthoringProfileChecks
     {
         int passed = 0;
         void Check(bool value, string message) { if (!value) throw new Exception(message); passed++; }
-        string fixture = Path.Combine(repo, "fixtures/watch-tables/native-authoring-v21");
+        string fixture = Path.Combine(repo, "fixtures/watch-tables/native-authoring-v21-update3");
         byte[] bytes = File.ReadAllBytes(Path.Combine(fixture, "creation.reviewed.xml"));
-        Check(WatchTableDocument.Hash(bytes) == "1b052ec8af495a2397abb347654ff478d105059312d3a6d11357a67716dc1cba", "Original reviewed XML fixture changed.");
+        Check(WatchTableDocument.Hash(bytes) == "55048d4003d6edfd6f6d80130a01ae1c9ede4a3d2fdf022e90377733efe0e733", "Original reviewed XML fixture changed.");
         var original = JsonNode.Parse(File.ReadAllBytes(Path.Combine(fixture, "profile-candidate-review.json")))!.AsObject();
         var matched = WatchAuthoringProfile.Assess(original, bytes);
         Check(matched["scopeMatched"]!.GetValue<bool>() && matched["profile"]!.GetValue<string>() == WatchAuthoringProfile.Key,
             "Retained exact native creation must match the bounded candidate: " + matched.ToJsonString());
+        // The Update 2 review differs only in the installation-bound export hashes.
+        string historical = Path.Combine(repo, "fixtures/watch-tables/native-authoring-v21");
+        var update2 = WatchAuthoringProfile.Assess(JsonNode.Parse(File.ReadAllBytes(Path.Combine(historical, "profile-candidate-review.json")))!.AsObject(),
+            File.ReadAllBytes(Path.Combine(historical, "creation.reviewed.xml")));
+        Check(JsonNode.DeepEquals(update2["mismatches"], JsonNode.Parse("[\"exactDirectInstanceDeclarations\",\"emptyForceAndSixPeerExports\",\"completePeerAndHardwareProfile\",\"completeCandidateXmlIncludingIdsAndMetadata\"]")),
+            "Update 2 evidence must stay historical: " + update2.ToJsonString());
         Check(!matched["nativeVerified"]!.GetValue<bool>() && !matched["productionApplyEnabled"]!.GetValue<bool>(), "Historical native evidence cannot activate this build.");
         var mutations = new Dictionary<string, Action<JsonObject>> {
             ["CPU firmware"] = r => r["before"]!["observation"]!["hardwareIdentity"] = WatchAuthoringProfile.Hardware.Replace("V4.1", "V4.0"),

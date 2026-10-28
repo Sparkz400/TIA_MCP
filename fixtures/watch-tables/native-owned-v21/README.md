@@ -9,3 +9,5 @@ These seven XML files are byte-identical native `WithDefaults` exports from the 
 The local complete lifecycle receipt is `artifacts/production-watch-20261015/document-review/wt04-workflow-verification-02.json`; the raw run label and operation ID in the manifest locate the retained journal, archive and snapshots. Absolute workstation paths are excluded from these tracked fixture documents. The independent file-only oracle is `scripts/verify_watch_workflow.py`, with regression tests in `scripts/test_verify_watch_workflow.py`.
 
 These fixtures qualify this bounded existing-row Bool literal workflow. They do not qualify native clone/delete/reorder/comment imports, populated force edits, other CPU/product profiles, access rules, compilation, HMI or runtime behavior. The separate failed `wt02` trial remains failed: a wholly blank peer comment row disappeared after reopen. It is not included here or normalized into a passing result.
+
+`MilestoneWatch.before.xml` is also the packaged authoring template (`WatchTableNativeTemplate`). It keeps its Update 2 `DocumentInfo`; a created table takes the current installation's `DocumentInfo` from a same-session export instead.
