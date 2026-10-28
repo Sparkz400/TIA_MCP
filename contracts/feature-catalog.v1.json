@@ -2753,6 +2753,26 @@
         "Engineering only; nothing is downloaded and runtime behavior is not observed.",
         "webserver_user_pages_generate is not qualified by this run: generation also added a system constant to the default tag table, which its preview does not declare."
       ]
+    },
+    {
+      "id": "local.watch.native.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "18964f20fab516cfe0d7ddf5f66d455adfadf3a9",
+        "passedScope": "scripts/qualify_watch_production_host.py (bool, host.watch_apply_native) and scripts/qualify_watch_mcp.py (host.watch_checkpoint) on a frozen Debug build of 18964f2 (D:\\wp\\b11, git-archived sources with source-manifest.json; src/ equals 7aee9ef) in fresh owned scratch CPU 1511-1 PN V4.1 projects under TIA Portal V21 Update 3: seeded MilestoneWatch fixture, saved fresh-reopen baseline, prepare with independent file-only review of the exact candidate, apply with native readback and peer preservation, fresh-reopen verification, checkpoint recovery to a distinct destination with restored and original reconciliation; Host loss at the checkpoint and at native apply with replay and competing-owner refusals, exact reconciliation (interrupted or recovered) and no replay; every owned Portal/worker lifetime closed with exit proofs; independent oracle verify_watch_expansion passed each run."
+      },
+      "artifacts": [
+        "evidence/local.watch.native.20261028.json"
+      ],
+      "limitations": [
+        "One existing-row Bool ModifyValue edit (FALSE to TRUE) in an owned scratch table; clone/delete/reorder/comment edits, force tables, authoring, other CPUs, firmware and languages are not qualified.",
+        "Interruption covers the Host points host.watch_checkpoint and host.watch_apply_native only. host.watch_restore_native and the native worker-loss points (checkpoint, import, save, retrieve) need the registered OwnedPortalCleanup helper and did not run.",
+        "Offline stored configuration only: no online modify, forcing, download or runtime behavior. Trial bool2 (D:\\wp\\wt\\bool2) stopped after watch_table_recover because the runner's controller sources were edited mid-run; it is retained as failed and not cited."
+      ]
     }
   ],
   "features": [
@@ -12700,8 +12720,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12747,8 +12769,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12852,8 +12876,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12898,8 +12924,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12944,8 +12972,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12990,8 +13020,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13036,8 +13068,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13128,8 +13162,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13171,8 +13207,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
