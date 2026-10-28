@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.46",
-    "catalogSha256": "c971a81401c4dd1eee897059bf06cde415142df5d3ed9f6e4021fdc725c0960e",
+    "catalogSha256": "35136b5b8eac5f52d426a4fe8210997206c1bbd5e1ced3547c82efdcefaa37f9",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -15,15 +15,15 @@
     "features": 447,
     "support": {
       "deferred": 10,
-      "limited": 61,
+      "limited": 69,
       "shipped": 85,
       "unavailable_target": 4,
-      "unqualified": 287
+      "unqualified": 279
     },
     "cells": {
-      "bound": 591,
+      "bound": 639,
       "deferred": 30,
-      "open": 1508
+      "open": 1460
     },
     "openCellsByOwner": {
       "C02": {
@@ -40,7 +40,7 @@
       },
       "D01": {
         "role": "VCI",
-        "open": 33
+        "open": 21
       },
       "D02": {
         "role": "Diagnostics and watch tables",
@@ -84,7 +84,7 @@
       },
       "D12": {
         "role": "Security and web",
-        "open": 90
+        "open": 54
       },
       "D13": {
         "role": "Technology and drives",
@@ -148,7 +148,7 @@
       },
       "X03": {
         "role": "Security",
-        "open": 64
+        "open": 34
       },
       "X04": {
         "role": "Add In",
@@ -13871,43 +13871,55 @@
         "change_restore"
       ],
       "changeKind": "vci_workspace_create",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D01"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -13921,43 +13933,55 @@
         "change_restore"
       ],
       "changeKind": "vci_workspace_delete",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D01"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -15535,44 +15559,56 @@
         "change_restore"
       ],
       "changeKind": "umac_role_set",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X03",
         "D12"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -15616,44 +15652,56 @@
         "change_restore"
       ],
       "changeKind": "certificate_create",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D12",
         "X03"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -15667,42 +15715,56 @@
         "change_restore"
       ],
       "changeKind": "certificate_import",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D12",
         "X03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.access.qualify.20261028"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -15716,44 +15778,56 @@
         "change_restore"
       ],
       "changeKind": "certificate_assign",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D12",
         "X03"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -15767,44 +15841,56 @@
         "change_restore"
       ],
       "changeKind": "certificate_delete",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D12",
         "X03"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -15848,43 +15934,55 @@
         "change_restore"
       ],
       "changeKind": "webserver_page_set",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D12"
       ],
       "evidenceIds": [
-        "local.wave-kinds.probe.20261027"
+        "local.access.qualify.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.access.qualify.20261028"
+          ]
         }
       ]
     },
@@ -20045,6 +20143,21 @@
         "artifacts/p16h/bridge04-strict-compile-reassessment.json",
         "artifacts/p16h/derived-positive-02-strict-compile-assessment.json"
       ]
+    },
+    {
+      "id": "local.access.qualify.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "a30465aa2122c35a6eef8cd3b27f54a5cb10ee9f",
+      "retained": [
+        {
+          "path": "evidence/local.access.qualify.20261028.json",
+          "sha256": "e05fd4c72a431b2cb83831961bbd6ed1b4b8e37b33906a2cafe580672cabaf2f"
+        }
+      ],
+      "notRetained": []
     },
     {
       "id": "local.capabilities.v03",

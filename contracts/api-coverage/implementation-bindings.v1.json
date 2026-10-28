@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c971a81401c4dd1eee897059bf06cde415142df5d3ed9f6e4021fdc725c0960e",
-      "bytes": 1139830
+      "sha256": "35136b5b8eac5f52d426a4fe8210997206c1bbd5e1ced3547c82efdcefaa37f9",
+      "bytes": 1143944
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2377,8 +2377,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
-      "sha256": "9a2c4421229e52aa01780de1f3cc9300b17d96c76aaf7749877b469720ecb537",
-      "bytes": 25069
+      "sha256": "0692402be6e0df05aef3269c1a1615c5714784d2804237ba646fa9d53f22ffcf",
+      "bytes": 26330
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
@@ -81098,8 +81098,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "PrepareCertificateChange",
               "line": 31,
-              "endLine": 81,
-              "sha256": "4ab73fd826b2498cbcbbb1f3242f81777d5795c60917d7d46b083f83ff04f5e4"
+              "endLine": 83,
+              "sha256": "d2851d1b9c2462c4fc7d8ead6bc676a80ed119e9e85dbd0aa4c48fc3f3575671"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
@@ -81124,8 +81124,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
-              "line": 83,
-              "endLine": 144,
+              "line": 85,
+              "endLine": 146,
               "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
@@ -81156,8 +81156,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "PrepareCertificateChange",
               "line": 31,
-              "endLine": 81,
-              "sha256": "4ab73fd826b2498cbcbbb1f3242f81777d5795c60917d7d46b083f83ff04f5e4"
+              "endLine": 83,
+              "sha256": "d2851d1b9c2462c4fc7d8ead6bc676a80ed119e9e85dbd0aa4c48fc3f3575671"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
@@ -81182,8 +81182,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
-              "line": 83,
-              "endLine": 144,
+              "line": 85,
+              "endLine": 146,
               "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
@@ -81214,8 +81214,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "PrepareCertificateChange",
               "line": 31,
-              "endLine": 81,
-              "sha256": "4ab73fd826b2498cbcbbb1f3242f81777d5795c60917d7d46b083f83ff04f5e4"
+              "endLine": 83,
+              "sha256": "d2851d1b9c2462c4fc7d8ead6bc676a80ed119e9e85dbd0aa4c48fc3f3575671"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
@@ -81240,8 +81240,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
-              "line": 83,
-              "endLine": 144,
+              "line": 85,
+              "endLine": 146,
               "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
@@ -81272,8 +81272,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "PrepareCertificateChange",
               "line": 31,
-              "endLine": 81,
-              "sha256": "4ab73fd826b2498cbcbbb1f3242f81777d5795c60917d7d46b083f83ff04f5e4"
+              "endLine": 83,
+              "sha256": "d2851d1b9c2462c4fc7d8ead6bc676a80ed119e9e85dbd0aa4c48fc3f3575671"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
@@ -81298,8 +81298,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
-              "line": 83,
-              "endLine": 144,
+              "line": 85,
+              "endLine": 146,
               "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             }
           ]
@@ -83633,8 +83633,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "PrepareCertificateChange",
               "line": 31,
-              "endLine": 81,
-              "sha256": "4ab73fd826b2498cbcbbb1f3242f81777d5795c60917d7d46b083f83ff04f5e4"
+              "endLine": 83,
+              "sha256": "d2851d1b9c2462c4fc7d8ead6bc676a80ed119e9e85dbd0aa4c48fc3f3575671"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuMemoryBytes.cs",
@@ -83960,8 +83960,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
               "name": "ApplyCertificateChange",
-              "line": 83,
-              "endLine": 144,
+              "line": 85,
+              "endLine": 146,
               "sha256": "87cb06fff0185a112769176d7b4e132d979e4a9415e04c3cc3798051b0f9941a"
             },
             {
@@ -91784,10 +91784,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -91830,10 +91830,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -91876,10 +91876,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -91920,7 +91920,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
+          "artifacts": [
+            "evidence/local.access.qualify.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96845,10 +96853,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -97001,10 +97009,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -97046,10 +97054,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -97091,10 +97099,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.wave-kinds.probe.20261027",
-          "profileSha256": "dd2ad822fb4b625772d008fff4ed392ac9de538916f012dc74f26d3f30f468aa",
+          "id": "local.access.qualify.20261028",
+          "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93",
           "artifacts": [
-            "evidence/local.wave-kinds.probe.20261027.json"
+            "evidence/local.access.qualify.20261028.json"
           ]
         }
       ],
@@ -115954,6 +115962,11 @@
       "sha256": "be7e6990feda1ca32a5bb1e9db34c272cc00b259cffa8ab60746af4665753886"
     },
     {
+      "path": "evidence/local.access.qualify.20261028.json",
+      "state": "observed",
+      "sha256": "e05fd4c72a431b2cb83831961bbd6ed1b4b8e37b33906a2cafe580672cabaf2f"
+    },
+    {
       "path": "evidence/local.catalog.20261024.json",
       "state": "observed",
       "sha256": "a9fda326ba917fe5ba9f2acf6db952fec9cfb0dda5bbaf0618f492379e1bfdf6"
@@ -116456,6 +116469,10 @@
     {
       "id": "hmi.readonly.unified-comfort.20261012",
       "profileSha256": "3a223f735da6c9795fdafa4e70fc4da924b9598af2a9ddc6f1dfe62e9019babb"
+    },
+    {
+      "id": "local.access.qualify.20261028",
+      "profileSha256": "06d7eb15510d8889ba00e334ee8562f54e9836e64fa0b40053c463c12a2b9b93"
     },
     {
       "id": "local.analysis.v03",
