@@ -66,7 +66,7 @@ class Run(StateRun):
         for key in ("certificateIdentity", "notQualified"):
             h.report.pop(key)
         h.report.update(criteria=CRITERIA, excluded={}, online={})
-        self.ticket = self.instance = None
+        self.ticket = self.instance = self.symbol = None
 
     def args(self, kind, payload, **top):
         return {"kind": kind, "payload": payload, "plcPath": self.plc, **top}
@@ -93,11 +93,12 @@ class Run(StateRun):
         return self.plc + "/blocks/" + DB
 
     def read_count(self):
-        result = self.h.tool("sim_read", {"instanceId": self.instance["id"], "signals": [{"symbol": SYMBOL, "type": "int16"}]})
-        return result["values"][0]["value"] if "values" in result else result
+        row = self.h.tool("sim_read", {"instanceId": self.instance["id"], "signals": [{"symbol": self.symbol, "type": "int16"}]})["values"][0]
+        require(row.get("quality") == "good", "The simulator cannot read %s: %s" % (self.symbol, row))
+        return row["value"]
 
     def write_count(self, value):
-        self.h.tool("sim_write", {"instanceId": self.instance["id"], "writes": [{"symbol": SYMBOL, "type": "int16", "value": value}]})
+        self.h.tool("sim_write", {"instanceId": self.instance["id"], "writes": [{"symbol": self.symbol, "type": "int16", "value": value}]})
         require(self.read_count() == value, "The simulator does not read back %s = %d" % (SYMBOL, value))
 
 
@@ -122,7 +123,12 @@ def simulate(run):
         h.tool("sim_state", {"instanceId": run.instance["id"], "action": "powerOn", "timeoutMs": 60000})
         running = h.tool("sim_state", {"instanceId": run.instance["id"], "action": "run", "timeoutMs": 30000})
         require(running.get("instance", {}).get("operatingState") == "Run", "Simulator did not enter RUN")
-        return {"instance": run.instance["id"], "count": run.read_count()}
+        # sim_tags loads the instance tag list; the symbol must resolve to exactly one native tag.
+        tags = [t["symbol"] for t in h.tool("sim_tags", {"instanceId": run.instance["id"], "maxItems": 2000})["tags"]]
+        found = [t for t in tags if t.replace('"', "") == SYMBOL.replace('"', "")]
+        require(len(found) == 1, "%s is missing or ambiguous in the simulator: %s" % (SYMBOL, [t for t in tags if "OnDb" in t]))
+        run.symbol = found[0]
+        return {"instance": run.instance["id"], "symbol": run.symbol, "count": run.read_count()}
     return h.stage("download into an owned PLCSIM Advanced instance", start)
 
 
