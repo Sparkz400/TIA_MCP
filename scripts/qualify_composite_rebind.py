@@ -93,7 +93,9 @@ def motion(run, item):
     attribute = next(a for a in channel["attributes"] if a["name"] == "OperatingMode")
     value = next(v["value"] for v in attribute["nativeEnumValues"] if v["name"] == "MotionControl")
     run.apply("set %s channel 0 to MotionControl" % item.rsplit("/", 1)[1], "hardware_channel_attributes", {"hardwarePath": item, **CHANNEL, "attributes": {"OperatingMode": value}},
-              {"attributeChanges": [{"name": "OperatingMode", "after": value}]}, changed=["hw:" + item])
+              {"attributeChanges": [{"name": "OperatingMode", "after": value}]}, changed=["hw:" + item], check=lambda applied, state: require(
+                  [a["value"] for c in state["hw:" + item]["channels"] for a in c["attributes"] if a["name"] == "OperatingMode"] == [value] * len(state["hw:" + item]["channels"]),
+                  "TIA does not report MotionControl on every channel of %s" % item))
     return {"before": attribute.get("value"), "after": value}
 
 

@@ -109,6 +109,15 @@ namespace TiaMcp.Openness.V21
             {
                 var channel = ((JArray)selected["channels"]).OfType<JObject>().Single(row => row.Value<int>("number") == payload.Value<int>("channelNumber") && row.Value<string>("type") == payload.Value<string>("channelType") && row.Value<string>("ioType") == payload.Value<string>("channelIoType"));
                 foreach (var property in ((JObject)payload["attributes"]).Properties()) channel["attributes"][property.Name] = property.Value.DeepClone();
+                // TIA applies a technology module's OperatingMode to all its channels and resizes that item's own address ranges in place.
+                if (payload["attributes"]["OperatingMode"] != null)
+                {
+                    foreach (var peer in ((JArray)selected["channels"]).OfType<JObject>().Where(row => row["attributes"]?["OperatingMode"] != null))
+                        peer["attributes"]["OperatingMode"] = payload["attributes"]["OperatingMode"].DeepClone();
+                    var addresses = (JArray)selected["addresses"]; var observed = Target(after, path)["addresses"] as JArray;
+                    if (observed?.Count == addresses.Count)
+                        for (int index = 0; index < addresses.Count; index++) addresses[index]["lengthBits"] = observed[index]?["lengthBits"]?.DeepClone();
+                }
             }
             else if (kind == "safety_fparameter_set")
             {
