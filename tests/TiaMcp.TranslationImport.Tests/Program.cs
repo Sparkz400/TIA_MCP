@@ -64,6 +64,15 @@ byte[] ClosedProof(string worker) => Fixture.Json(new { tree = new { completed =
             proof = new { completed = true, processExitVerified = true, birthAndImageVerified = true, sameOsHandleRetained = true,
                 handleClosed = true, exitCode = 0, deadlineOrCancellationObserved = false } }).ToArray() } });
 
+Test("Main comment view accepts the German and English TIA UI labels only", () => {
+    string project = Path.Combine(output, "Fixture.ap21");
+    True(TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Programmbausteine\\Main\\Bausteinkommentar", project) &&
+        TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Program blocks\\Main\\Block comment", project) &&
+        !TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Program blocks\\Main\\Initial_Call", project) &&
+        !TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Program blocks\\TiaMcp_IsEnabled\\Block comment", project) &&
+        !TranslationNativeComparison.MainCommentView("Other\\PLC\\Program blocks\\Main\\Block comment", project));
+    return Task.CompletedTask;
+});
 Test("completed owned fixture resumes by observation without repeating import or recovery", async () => {
     string root = Path.Combine(output, Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
     string worker = Path.Combine(root, "synthetic-worker"); File.WriteAllText(worker, "Synthetic test worker, never executable");

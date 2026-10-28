@@ -9,7 +9,7 @@ import sys
 
 from qualify_translation_category_probe import require, scan_store, WindowsFiles
 from qualify_translation_import import FAILURE_CASES
-from verify_translation_import import workbook, peer
+from verify_translation_import import MAIN_COMMENT_VIEWS, workbook, peer
 
 
 def verify(root):
@@ -42,7 +42,7 @@ def verify(root):
     require(changed == [oracle['nativeKey']], 'Exactly one reviewed Main edit required')
     key = changed[0]; old, new = before[key][-1], candidate[key][-1]
     require(before[key][:-1] == candidate[key][:-1] and old and new == oracle['replacement'] and
-            before[key][1] == '<BlockCommentCategoryData>' and before[key][2].split('\\')[2:] == ['Programmbausteine', 'Main', 'Bausteinkommentar'], 'Candidate exceeds exact Main target scope')
+            before[key][1] == '<BlockCommentCategoryData>' and before[key][2].split('\\')[2:] in MAIN_COMMENT_VIEWS, 'Candidate exceeds exact Main target scope')
 
     def observation(value, expected, restored=False):
         require(workbook(artifact(value['workbook'])) == expected and value['scope'] == baseline['scope'], 'Complete native texts/cultures differ')

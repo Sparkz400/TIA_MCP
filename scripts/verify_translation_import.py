@@ -11,6 +11,8 @@ from qualify_translation_category_probe import scan_store, require, WindowsFiles
 from verify_watch_workflow import canonical_sha
 
 S = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+# ExportProjectTexts labels view paths in the TIA UI language; German and English were observed natively.
+MAIN_COMMENT_VIEWS = (['Programmbausteine', 'Main', 'Bausteinkommentar'], ['Program blocks', 'Main', 'Block comment'])
 
 
 def workbook(data):
@@ -114,7 +116,7 @@ def verify(root):
         if changes:
             key = changes[0]; require(before[key][:-1] == candidate[key][:-1] and candidate[key][-1] == edit_oracle['replacement'], 'Non-target edit')
             view = before[key][2].split('\\')
-            require(len(view) == 5 and view[2:] == ['Programmbausteine','Main','Bausteinkommentar'] and before[key][1] == '<BlockCommentCategoryData>', 'Edit does not bind exact Main comment')
+            require(len(view) == 5 and view[2:] in MAIN_COMMENT_VIEWS and before[key][1] == '<BlockCommentCategoryData>', 'Edit does not bind exact Main comment')
             old, new = before[key][-1], candidate[key][-1]
         else: old = new = ''
         evidence = {e['gate']: e['artifact'] for e in applied['evidence']}

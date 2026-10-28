@@ -11,7 +11,7 @@ import sys
 
 from qualify_translation_category_probe import require, scan_store, WindowsFiles
 from qualify_translation_import import FAILURE_CASES
-from verify_translation_import import workbook, peer
+from verify_translation_import import MAIN_COMMENT_VIEWS, workbook, peer
 from verify_watch_workflow import canonical_sha
 
 
@@ -95,8 +95,8 @@ class Oracle:
         expected = (self.oracle['requested']['replacement'], self.oracle['original']['target']['text']) if reverse else (
             self.oracle['original']['target']['text'], self.oracle['requested']['replacement'])
         require((old, new) == expected and before[key][:-1] == candidate[key][:-1] and
-                before[key][1] == '<BlockCommentCategoryData>' and before[key][2].split('\\')[2:] ==
-                ['Programmbausteine', 'Main', 'Bausteinkommentar'], 'Edit exceeds exact reviewed Main target transition')
+                before[key][1] == '<BlockCommentCategoryData>' and before[key][2].split('\\')[2:] in
+                MAIN_COMMENT_VIEWS, 'Edit exceeds exact reviewed Main target transition')
 
         def observation(value, expected, restored=False, fresh=True):
             require(workbook(self.artifact(value['workbook'])) == expected and value['scope'] == baseline['scope'], 'Complete native texts/cultures differ')

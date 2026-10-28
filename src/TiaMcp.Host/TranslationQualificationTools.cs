@@ -82,8 +82,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         string folder = Path.Combine(Root, "translation-qualification"); Directory.CreateDirectory(folder);
         using (var file = new FileStream(Path.Combine(folder, operation.Id + ".json"), FileMode.CreateNew, FileAccess.Write, FileShare.Read))
         { file.Write(TranslationWorkerAdapter.JsonBytes(new { plcPath, operation.PlanSha256, sourceCulture, targetCulture, plcPaths })); file.Flush(true); }
-        var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath,
-            options.ApiDirectory ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48").Binaries();
+        var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath, TranslationNativeTools.ApiDirectory(options)).Binaries();
         var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(operation.Plan.Inputs[0]);
         TranslationAdmissionKey? admissionKey = null; string? admissionRefusal = null;
         // Generalized cultures, owners and source mode are qualification evidence only; no production key exists for them.
