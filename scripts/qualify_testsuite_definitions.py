@@ -65,7 +65,7 @@ def inventories(h, **extra):
 
 
 class Run(StateRun):
-    plc_compiled = ()  # Test Suite imports compile all devices.
+    plc_compiled = KINDS  # Test Suite imports compile the sole PLC's software.
 
     def __init__(self, h):
         super().__init__(h)
