@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.62",
+  "catalogVersion": "0.4.63",
   "targetTiaVersions": [
     21
   ],
@@ -3625,6 +3625,27 @@
         "The I-device mode change applies without compile or save because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it. Switching back to IoController with hardware_attributes removes the areas and their system constants.",
         "The GSDML is Siemens output: checked as well-formed XML naming the designation, not imported into another tool. Engineering only; nothing is downloaded and no PROFINET communication is observed."
       ]
+    },
+    {
+      "id": "local.safety_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "bb82136f645da83584aea72093c12c9d04b23347",
+        "passedScope": "scripts/qualify_safety_changes.py (sf3) on a frozen Debug build of 0355098 (D:\\wp\\b63, git-archived sources with source-manifest.json) in a fresh owned scratch under TIA Portal V21 Update 3: a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess, whose generated scratch user holds ProtectionLevelFailsafeAccess (Full access including fail-safe; owned scratch only, user-approved), plus an ET 200SP station with two F-DI 8x24VDC HF on its IO system. safety_inspect and safety_validation_inspect named the exact F-PLC, its runtime group Main_Safety_RTG1, program signatures and both F-DI F-parameters, reported explicit gaps and truncation at maxItems 1, and refused the standard scratch PLC (UnsupportedCapability); safety_printout wrote a PDF whose bytes match the reported size and SHA-256 and refused the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest); safety_fparameter_set moved one F-DI's Failsafe_FDestinationAddress to a free address with checkpoint, device compile, configured-hardware preservation and save, change_status and an exact state diff limited to that F-DI, was refused for a non-allowlisted attribute, a wrong expected value, a missing acknowledgement, the other F-DI's address, the non-writable Failsafe_FMonitoringtime and a wrong previewHash, persisted across a fresh Portal reopen (the compile-derived CalculatedBandwidthForCyclicIoData reads 0 after reopen and is recorded, not compared) and was restored from its checkpoint into a new directory equal to the reopened state; safety_import_xml was refused at prepare for a missing acknowledgement, a scope mismatch and a standard block."
+      },
+      "artifacts": [
+        "evidence/local.safety_changes.20261028.json"
+      ],
+      "limitations": [
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI 8x24VDC HF in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only.",
+        "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
+        "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
+        "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
+      ]
     }
   ],
   "features": [
@@ -4792,15 +4813,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Exact F-PLC, runtime group Main_Safety_RTG1 and program signatures, explicit gaps, truncation at maxItems 1; a standard PLC is refused (UnsupportedCapability).",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.safety.v02",
-          "local.layers.safety-requalified.20261008"
+          "local.safety_changes.20261028"
         ]
       },
       "availability": {
@@ -4838,7 +4859,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Both F-DI listed with their F-parameters, explicit gaps; a standard PLC is refused (UnsupportedCapability).",
           "Read-only superset of safety_inspect for safety_evidence_review: the safety_inspect fields keep their names and new sections (plcFParameters, fIoModules, safetyValidation, safetyPrintout) compare as other reported content.",
           "F-I/O are device items exposing Failsafe_FDestinationAddress anywhere in the project; modules whose Failsafe_FSourceAddress definitely differs from the PLC Failsafe_CentralFSourceAddress are only counted, unreadable addresses are kept with fSourceAddressMatchesPlc null. I-device/shared-device ownership is not resolved.",
           "Activation tests are project-level; evaluationDeviceNameMatchesPlc compares the native EvaluationDeviceName with the PLC DeviceItem name only, not an exact identity.",
@@ -4847,8 +4868,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4884,7 +4907,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). A Microsoft Print to PDF printout whose bytes match the reported size and SHA-256; the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest) are refused.",
           "Only the two Windows file printers the API offers; the Print to PDF or XPS Document Writer queue must be installed (System.Drawing PrinterSettings.InstalledPrinters), otherwise PrinterUnavailable and nothing is printed. XPS output keeps whatever XPS/OpenXPS format the driver writes.",
           "documentLayout is passed through as a plain layout name (letters, digits, underscore); TIA decides whether it exists.",
           "PDF/XPS/XLSX/SimaticML files are written to the Host export directory and retained opaquely with SHA-256; content is not parsed or certified. A printout or report does not validate, accept or approve the safety program.",
@@ -4892,8 +4915,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7142,7 +7167,8 @@
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "failsafeRuntimeAccess (with configureScratchSecurity, new scratch devices only) gives the generated runtime role the F-CPU right Full access including fail-safe (ProtectionLevelFailsafeAccess) instead of Full access, which an F-CPU compile requires (local.safety_changes.20261028)."
         ]
       },
       "qualification": {
@@ -7739,7 +7765,8 @@
           "The recorded CPU1511F firmware4.1 F_FBD comment fixture passed post-compile fingerprint/signature readback, guarded recovery, recovered unchanged compile and both saved-copy reopens. Earlier failed comment and blocked startup records remain historical evidence.",
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Native observation (28 October 2026, local.safety_changes.20261028): on this machine TIA refuses the F-block import with 'No safety license available', so the apply is not qualified; its prepare refusals (missing acknowledgement, scope mismatch, standard block) passed. Qualifying the apply needs an activated STEP 7 Safety license."
         ]
       },
       "qualification": {
@@ -7752,7 +7779,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Requires an activated STEP 7 Safety license for the native F-block import."
         ]
       },
       "prerequisites": [
@@ -7790,7 +7818,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
           "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
           "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
@@ -7800,8 +7828,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

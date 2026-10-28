@@ -3,8 +3,8 @@
 `composite_engineering_rebind_plan` (C02: `AC-identity`, `AC-completeness`, `AC-preview`,
 `AC-evidence`) is verified with `local.composite_rebind.20261028`. Runner:
 [`scripts/qualify_composite_rebind.py`](../../scripts/qualify_composite_rebind.py), frozen Debug
-build of `a5fdadc` (`D:\wp\rb06`), 57/57 steps, host exit 0. Matrix: 523 of 2,031 cells open
-(catalog `0.4.62`).
+build of `a5fdadc` (`D:\wp\rb06`), 57/57 steps, host exit 0. Matrix: 508 of 2,031 cells open
+(catalog `0.4.63`).
 
 ## Why it was open
 
