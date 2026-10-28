@@ -221,6 +221,8 @@ namespace TiaMcp.Openness.V21
                     change.State = "recovery_required";
                     change.Failure = ex.Message;
                     change.PrimaryFailure = ex.Message;
+                    // The failure's own evidence (for example the rows a preservation check found changed) is journaled with the change.
+                    if ((ex as BridgeException)?.Details is JObject details) change.Readbacks.Add(new JObject { ["role"] = "failure-details", ["details"] = details.DeepClone() });
                     CaptureTechnologyEvidence(change);
                     try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
                     WriteChangeJournal(change);

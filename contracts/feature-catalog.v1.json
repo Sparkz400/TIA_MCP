@@ -3221,6 +3221,68 @@
         "SoftwareUnit relations between standard units only; NonUnitDB and TODB relations are refused by design.",
         "Engineering only; nothing is downloaded and runtime behavior is not observed."
       ]
+    },
+    {
+      "id": "local.project_settings.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "d98a186e3eddfd2822ffa1526be0ef3baa4f6dd1",
+        "passedScope": "scripts/qualify_project_settings.py on a frozen Debug build of 2b0fc80 (D:\\wp\\b24), 50/50 steps, in one owned scratch CPU 1511-1 PN V4.1 project: V21 native attribute info declares Author, Copyright, Family and Version read-only and project_attributes_set refuses each with AttributeNotWritable (Comment: UnsupportedAttribute). project_languages_set adds de-DE as active and editing language, switches editing back and removes de-DE, each with checkpoint, PLC compile and save, asserted previews, project_properties readback and exact snapshot diffs; TIA's added or dropped de-DE text items in the project comment and every program export are checked and recorded; a fresh owned Portal reopen shows the identical state and a removal restored from its checkpoint equals the reopened state. project_copy copies the saved project into a new directory, leaves the source unchanged and refuses a missing project (ProjectNotFound); the copy opened with project_open readOnly is the only, secondary project, equals its source through software_inspect and project_properties, reports TIA's export refusal as ReadOnlyProject and refuses changes with ReadOnlyProject. Typed refusals (LanguageInUse, InvalidRequest, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.project_settings.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch project; multiuser, protected (UMAC) and upgraded projects are not exercised.",
+        "project_attributes_set cannot apply on V21: every allowlisted attribute is natively read-only.",
+        "project_languages_set: one supported language added and removed; texts in a removed language are not seeded, so their loss is not observed.",
+        "project_copy: the UnsavedProject refusal is not exercised. project_open readOnly: TIA refuses exports in the secondary project, so the copy is compared without program exports."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "692e8422b57bdcad26e839a2cb8a4cda7362335f",
+        "passedScope": "scripts/qualify_hardware_changes.py on a frozen Debug build of 16cca44 (D:\\wp\\b27), 127/127 steps, in an owned scratch CPU 1511-1 PN V4.1 with an added CPU 1511-1 PN V4.1 on one subnet and two DI 16x24VDC HF modules in the CPU rack: hardware_add, hardware_attributes (Comment, Author), hardware_replace (firmware V1.0 and V2.0), hardware_port_connect and hardware_port_disconnect (X1 ports of the two CPUs) and hardware_delete (the rack's last module), each applied with checkpoint, device compile and save, asserted previews and change_status; hardware_inspect items with complete attribute values, addresses, channels, ports and subnet membership, device_inventory rows and every PLC's program exports differ in exactly the intended keys, with TIA's mirrored module comment and port cable defaults recorded as side effects; a fresh owned Portal reopen shows the identical state; one change per kind restored from its checkpoint equals its pre-change state (hardware_add and a port connection before the reopen, because generated CPU security is scratch-only and a second link would form a ring). Typed refusals (ObjectExists, CatalogItemNotFound, UnsupportedAttribute, HardwareNotFound, InvalidRequest, SoftwareBearingHardware, UnsupportedCapability, BuiltInHardware, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.20261028.json"
+      ],
+      "limitations": [
+        "Two CPU 1511-1 PN V4.1 and DI 16x24VDC HF modules only; ET 200SP/MP, HMI, drive and GSD devices are not added, because an unassigned IO device does not compile on its own.",
+        "hardware_replace only between firmware versions that keep the addresses; acceptLoss and address-changing replacements are not exercised.",
+        "A module deletion that leaves a gap in an S7-1500 rack and a second link between the same two CPUs (a ring without media redundancy) fail the device compile.",
+        "Engineering only; nothing is downloaded and no physical topology is observed."
+      ]
+    },
+    {
+      "id": "local.technology_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "cb8a6614d42fd4b0509599f6f2a0c207eb7b571a",
+        "passedScope": "scripts/qualify_technology_changes.py on a frozen Debug build of cb4d4f0 (D:\\wp\\b31), 132/132 steps, in one owned scratch CPU 1511-1 PN V4.1: to_create (PID_Compact 3.0, TO_PositioningAxis 10.0 with initial VirtualAxis.Mode = 1), to_child_create (TO_OutputCam 10.0 under the axis), to_parameters (PID_Compact Config.OutputUpperLimit), to_connect and to_disconnect (an output cam to a PLC output tag) and to_delete, each applied with checkpoint, PLC compile and save, asserted previews, change_status and technology_read readback; every program export and member and each technology object's identity, connections and native XML export differ in exactly the intended keys, with TIA's system-group instructions and generated protected motion OBs recorded as side effects; a fresh owned Portal reopen shows the identical state; one change per kind restored from its checkpoint equals the reopened state. technology_read selects by exact path with XML export, refuses a missing path (ObjectNotFound), reports truncation for a one-item inventory and returns only prefixed parameters. Typed refusals (ObjectExists, InvalidRequest, UnsupportedCapability, TechnologyObjectNotFound, TagNotFound, NotConnected, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.technology_changes.20261028.json"
+      ],
+      "limitations": [
+        "PID_Compact 3.0, a virtual TO_PositioningAxis 10.0 and TO_OutputCam 10.0 only; other TO types and versions, measuring inputs and real drives or encoders are not exercised; an unconnected TO_ExternalEncoder fails compile.",
+        "Connections use the output-cam role with a PLC output tag; actor, sensor, torque, encoder and measuring-input roles and hardware or channel targets are only refused.",
+        "Engineering only; nothing is downloaded and no motion or control behavior is observed."
+      ]
     }
   ],
   "features": [
@@ -3581,15 +3643,16 @@
         "status": "partial",
         "limitations": [
           "readOnly=true opens the project as a secondary project; if TIA reports it as primary the worker closes it unsaved and fails with ReadOnlyOpenUnverified.",
-          "The worker refuses mutations on any non-primary project through its shared offline-engineering precondition (ReadOnlyProject): change_prepare/apply/restore, library changes, simulation, translation, watch and component routes. Read tools, including watch reads, remain available.",
-          "That Siemens itself write-protects secondary projects is not established; the refusal is the worker's own guard. tia_session_status reports readOnly per open project.",
-          "No UMAC delegate is passed; protected projects that require login are not opened read-only.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "The worker refuses mutations on any non-primary project through its shared offline-engineering precondition (ReadOnlyProject): change_prepare/apply/restore, library changes, simulation, translation, watch and component routes. Export-based reads (block, type and tag-table reads and other exports) are refused by TIA there and reported as ReadOnlyProject; inventory and inspection reads remain available.",
+          "Natively qualified (local.project_settings.20261028): readOnly opens the copy as the only, secondary project; inventory and inspection reads work, TIA itself refuses exports there (reported as ReadOnlyProject) and the worker refuses changes with ReadOnlyProject.",
+          "No UMAC delegate is passed; protected projects that require login are not opened read-only."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.project_settings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -3671,12 +3734,14 @@
           "Runs through shared mutation admission: the source project path, the new archive and the new destination are reserved; an unknown outcome is reconciled by engineering_admission_reconcile (source not saved since admission, archive and destination absent or fingerprint-equal to the source).",
           "The copy is verified by project name and new location only; its content is not compared to the source in the success path. The copy is closed after retrieval; open it with project_open in a fresh instance.",
           "Retrieving a secondary copy while the source is open, archiving a read-only source and protected (UMAC) projects are unprobed.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified (local.project_settings.20261028): the copy of a saved scratch project lands in a new directory, leaves the source unchanged and, opened read-only, equals the source through software_inspect and project_properties; a missing project is refused (ProjectNotFound). The UnsavedProject refusal is not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.project_settings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4288,6 +4353,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): exact selection by technologyPath with native XML export, ObjectNotFound for a missing path, a one-item inventory reporting truncation and prefixed parameter reads returning only that prefix.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Changed technology parameter reads exclude sensitive names before metadata/value getters, require unique readable Value metadata and expose captured versus incomplete/display-only states. Object/parameter scans are bounded; current SDK/native qualification is absent. Historical evidence references remain retained and do not qualify this changed technology detail path.",
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
@@ -4298,10 +4364,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.encoder-connected.20261008"
+          "local.technology_changes.20261028"
         ]
       },
       "availability": {
@@ -6723,14 +6788,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hardware_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6825,15 +6893,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): the last DI module of the CPU rack removed with its system constant; CPUs and built-in ports refused; reopen and checkpoint restore. A deletion that leaves a gap in an S7-1500 rack fails the device compile.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02"
+          "local.hardware_changes.20261028"
         ]
       },
       "availability": {
@@ -6875,6 +6944,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): Comment and Author of a DI 16x24VDC HF module, with TIA mirroring Comment to its built-in submodule; attributes outside the allowlist and invented paths refused; reopen and checkpoint restore. Channel attributes are qualified by the remote-I/O run.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -6882,9 +6952,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02"
+          "local.hardware_changes.20261028"
         ]
       },
       "availability": {
@@ -6980,6 +7050,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact 3.0 and a virtual TO_PositioningAxis 10.0 (initial VirtualAxis.Mode = 1) created, with TIA's system-group instructions and generated protected motion OBs recorded; case-insensitive duplicates, non-numeric versions and technologyPath refused; fresh-Portal reopen and checkpoint restore. Real drives and encoders are not exercised; an unconnected TO_ExternalEncoder fails compile.",
           "Siemens validates the explicitly requested native technology type/version on the selected CPU; a complete CPU-specific type/version catalog is not exposed.",
           "Optional parameters supplies up to 500 non-null scalar initial values. Sensitive names are rejected at prepare. Native parameter names, current value types and exposed write-access metadata can be checked only after creation.",
           "Initial values are applied and read back inside the creation checkpoint before the first compile. Configuration, dependency or readback failure may leave a partial object and requires checkpoint recovery.",
@@ -6993,11 +7064,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.axis.20261008",
-          "local.engineering.interruption-matrix.20261027"
+          "local.engineering.interruption-matrix.20261027",
+          "local.technology_changes.20261028"
         ]
       },
       "availability": {
@@ -7039,6 +7109,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact Config.OutputUpperLimit written and read back through technology_read; missing objects refused; a stale preview refuses at apply; reopen and checkpoint restore.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "A seeded connected TO_ExternalEncoder10.0 fixture passed exact Boolean parameter edit, native compilation, guarded recovery and fresh saved-copy reopen on CPU1511 firmware4.1 with TM PosInput2 firmware2.0/channel0/telegram83. Native fixture seeding is separate from MCP connection-write support.",
           "The 17 October scalar-access repair requires exact parameter names, one explicit readable/writable Value declaration, and a concrete current type or one supported metadata type for null values. Every batch is preflighted before its first setter, then access/type and typed readback are checked again. Current source has only synthetic linked-routine tests; the Siemens worker SDK build and native qualification must be repeated. Historical evidence references are retained without qualifying this changed source.",
@@ -7052,10 +7123,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.encoder-connected.20261008"
+          "local.technology_changes.20261028"
         ]
       },
       "availability": {
@@ -7097,6 +7167,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact objects deleted; missing objects refused; reopen and checkpoint restore.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "A virtual TO_PositioningAxis10.0 initial-parameter fixture passed on CPU1511 firmware4.1; external encoder compilation failed without telegram connections and recovered. This does not qualify connected motion hardware.",
           "The 17 October selection repair bounds technology identity scans to 50,000 objects/groups and 64 group levels. Existing-object previews bind an exact technologyPath; legacy names must be unique, path/name contradictions refuse, and apply never falls back to a name. Creation remains root-group-only with a repeated collision check; deletion verifies selected-path absence without replay. Path/type/version metadata fingerprints are revision evidence, not durable native identity or whole-object preservation. Linked-routine synthetic checks do not qualify the Siemens SDK or native lifecycle.",
@@ -7105,9 +7176,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02"
+          "local.technology_changes.20261028"
         ]
       },
       "availability": {
@@ -7149,7 +7220,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): an output cam connected to a PLC output tag, read back through technology_read; roles a target lacks, missing tags and ambiguous targets refused; reopen and checkpoint restore. Actor, sensor, torque, encoder and measuring-input roles and hardware or channel targets are only refused.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "One role slot per change: actor, sensor (with sensorIndex), torque, encoder, measuringInput or outputCam, named as in technology_read hardwareConnections rows. A null service or slot refuses the preview.",
           "Targets: hardwarePath (module, submodule or PROFIdrive telegram DeviceItem), hardwarePath with channelType/channelIoType/channelNumber (one native channel), hardwarePath with channelIndex (measuring input only) or tagName (one PLC tag). Unsupported role/target pairs refuse at prepare; native Siemens validation decides compatibility. ConnectOption.AllowAllModules, separate input/output modules, bit addresses and DB-member overloads are not exposed.",
@@ -7158,8 +7229,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.technology_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7202,7 +7275,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): the output-cam tag connection removed and read back; unconnected slots refused; reopen and checkpoint restore.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "Uses the same role/sensorIndex slot selection as to_connect; a slot that is not connected refuses the preview.",
           "Apply verifies IsConnected=false; a remaining connection requires checkpoint recovery. A TO that is invalid without a connection fails the mandatory compilation and requires recovery.",
@@ -7210,8 +7283,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.technology_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7254,15 +7329,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): TO_OutputCam 10.0 children created under the virtual axis; unknown compositions, owners without a cam container and existing names refused; reopen and checkpoint restore. Measuring inputs are not exercised.",
           "Requires an exact ownerPath, composition OutputCams or MeasuringInputs, a PLC-wide unused name, typeIdentifier and version. Name collision and owner service are checked at prepare and again before creation; Siemens validates the type/version pair.",
           "Apply verifies the child at <ownerPath>/children/<composition>/<name>; the technology identity fingerprint covers owner children. Initial parameters, hardware connections and cam content are separate changes.",
           "compile is optional as for to_create; saving still requires compile=true."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.technology_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7461,7 +7538,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively observed (local.project_settings.20261028): V21 declares all four allowlisted attributes read-only, so prepare refuses each with AttributeNotWritable before any write.",
           "Allowlist Author, Copyright, Family and Version; each must be reported readable and writable by native attribute info. Comment is a MultilingualText without a scalar attribute route and is not writable here.",
           "Preview shows before/requested values; apply verifies native type/value readback and records it. Project-scoped: no PLC is selected and compile is not required; save still requires compile=true."
         ]
@@ -7471,9 +7548,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "V21 native attribute info declares Author, Copyright, Family and Version read-only on a project, so every allowlisted attribute is refused with AttributeNotWritable (local.project_settings.20261028); the kind cannot apply on V21."
         ]
       },
       "prerequisites": [
@@ -7510,14 +7587,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified on one owned scratch project (local.project_settings.20261028): de-DE added as active and editing language, editing switched back and de-DE removed, with previews, project_properties readback, fresh-Portal reopen and checkpoint restore. TIA adds or drops that culture's empty text item in the project comment and in every program export; removed-language texts are not seeded.",
           "Languages must be supported by the project; removing the current or requested reference/editing language is refused, and both must be active after the change. Apply adds, then sets reference/editing, then removes, and verifies the complete active/reference/editing readback.",
           "Removing an active language may discard project texts in that language; only the recovery archive restores them. Project-scoped: no PLC is selected and compile is not required; save still requires compile=true."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.project_settings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12602,12 +12681,14 @@
           "hardwarePath and partnerHardwarePath each select one exact port device item exposing the native NetworkPort service; hardware_inspect lists them under network.ports.",
           "Configured-hardware preservation adds every port's ConnectedPorts owner paths to the manifest; only the two selected link entries may change. Compilation and the whole-project checkpoint are required.",
           "Configured offline topology only: no cable data, port options, alternative partners (tool changers), physical wiring or live topology.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): X1 ports of the two CPUs connected, with TIA setting both ports' cable defaults (SignalDelaySelection, CableLength); self links, non-port items and connected ports refused; reopen and checkpoint restore. A second link between the same two CPUs forms a ring, which fails compile without media redundancy."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hardware_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12652,12 +12733,14 @@
           "hardwarePath and partnerHardwarePath each select one exact port device item exposing the native NetworkPort service; hardware_inspect lists them under network.ports.",
           "Configured-hardware preservation adds every port's ConnectedPorts owner paths to the manifest; only the two selected link entries may change. Compilation and the whole-project checkpoint are required.",
           "Configured offline topology only: no cable data, port options, alternative partners (tool changers), physical wiring or live topology.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): the link removed, with TIA clearing the cable defaults; unconnected pairs refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hardware_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12702,12 +12785,14 @@
           "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
           "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
           "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): DI 16x24VDC HF between firmware V1.0 and V2.0 with configured_hardware_preservation_verified and unchanged addresses; unchanged identifiers, CPUs and identifiers missing from the catalog refused; reopen and checkpoint restore. acceptLoss and address-changing replacements are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hardware_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -24094,7 +24179,8 @@
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Native observation (28 October 2026): importing the authored minimal NodeSet fixtures/opcua/machine-v1.xml as a reference namespace crashed the owned TIA instance (\"Unexpected exception\", Portal disposed); the change's checkpoint was taken first. A Siemens-compatible companion NodeSet is still needed to qualify the import."
         ]
       },
       "qualification": {
