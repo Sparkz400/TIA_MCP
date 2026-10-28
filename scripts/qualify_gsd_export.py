@@ -91,15 +91,15 @@ def mode(run, interface, value, restore=False):
 def phase_a(run, cpu, interface):
     refuse_export(run, "an invented hardware path", {"hardwarePath": interface + "X", "designation": DESIGNATION}, ["HardwareNotFound"])
     refuse_export(run, "the CPU display, which has no GsdExportProvider", {"hardwarePath": cpu + "/items/CPU%20display_1", "designation": DESIGNATION}, ["UnsupportedCapability"])
-    run.h.report["exportableBefore"] = exportable(run)
-    refuse_export(run, "the interface before it is an I-device", {"hardwarePath": interface, "designation": DESIGNATION}, ["UnsupportedCapability", "ExportFailed", "EngineeringError"])
+    run.h.stage("no item reports gsdExportAvailable before the I-device", lambda: require(exportable(run) == [], "Exportable before the I-device: %s" % exportable(run)) or [])
+    refuse_export(run, "the interface before it is an I-device", {"hardwarePath": interface, "designation": DESIGNATION}, ["UnsupportedCapability"])
     run.apply("put ScratchPLC on GsdNet", "network_configure", {"hardwarePath": interface, "nodeName": "X1", "subnetName": "GsdNet"}, changed=["hw:" + interface])
     run.refuse("hardware_attributes", "two operating modes in one value", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "IoController, IoDevice"}}, "InvalidRequest")
     run.refuse("hardware_attributes", "an unknown operating mode", {"hardwarePath": interface, "attributes": {"InterfaceOperatingMode": "SharedDevice"}}, "InvalidRequest")
     mode(run, interface, "IoDevice")
     paths = exportable(run)
     run.h.report["exportableAfter"] = paths
-    require(len(paths) == 1, "Expected one item with GsdExportProvider on the I-device: %s" % paths)
+    require(paths == [interface], "Expected only the I-device interface to report gsdExportAvailable: %s" % paths)
     refuse_export(run, "a missing designation", {"hardwarePath": paths[0]}, ["InvalidRequest"])
     return paths[0], export(run, "of the I-device", paths[0])
 
@@ -126,7 +126,7 @@ def phase_b(run, interface, source, first):
     coupled = lambda category, key: key.startswith("hw:" + cpu) or key.startswith("inv:" + cpu.rsplit("/items/", 1)[0])
     run.finish("switch the interface back to IoController", "hardware_attributes", prepared, changed=["hw:" + interface], tolerated=coupled,
                rows={"hw:" + interface: {"attributes": {"InterfaceOperatingMode": "IoController"}}})
-    refuse_export(run, "the interface switched back to IoController", {"hardwarePath": source, "designation": DESIGNATION}, ["UnsupportedCapability", "ExportFailed", "EngineeringError"])
+    refuse_export(run, "the interface switched back to IoController", {"hardwarePath": source, "designation": DESIGNATION}, ["UnsupportedCapability"])
     run.restore("switch the interface back to IoController", "hardware_attributes", prepared)
     again = export(run, "from the restored copy", source)
     run.h.stage("the restored copy exports a GSDML of the same name", lambda: require(again["gsdml"] == first["gsdml"], "GSDML names differ") or again["gsdml"])
