@@ -161,9 +161,10 @@ def plug(run, name, slot):
 def network(run):
     for device, cpu, extra in (("HwPeer", "HwPeerCpu", {"attributes": {"Address": "192.168.0.2"}}), ("ScratchStation", "ScratchPLC", {})):
         interface = run.path(device, "items", cpu, "items", "PROFINET%20interface_1")
-        # device_inventory reports the node address, so only the readdressed peer interface changes there.
+        # device_inventory reports the node address on the device, CPU and interface rows, so only the readdressed peer changes there.
+        rows = [run.path(device), run.path(device, "items", cpu), interface] if extra else []
         run.apply("put %s on HwNet" % cpu, "network_configure", {"hardwarePath": interface, "nodeName": "X1", "subnetName": "HwNet", **extra},
-                  changed=["hw:" + interface] + (["inv:" + interface] if extra else []))
+                  changed=["hw:" + interface] + ["inv:" + row for row in rows])
 
 
 def attributes(run, name, values, restore=False):

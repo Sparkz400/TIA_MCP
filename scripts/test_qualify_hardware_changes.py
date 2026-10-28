@@ -1,7 +1,8 @@
-"""Offline checks of the pure helpers in qualify_hardware_changes.py and qualify_software_unit_changes.py; nothing here starts TIA."""
+"""Offline checks of the pure helpers in qualify_hardware_changes.py, qualify_software_unit_changes.py and qualify_project_settings.py; nothing here starts TIA."""
 import unittest
 
 import qualify_hardware_changes as q
+import qualify_project_settings as ps
 import qualify_software_unit_changes as u
 
 D = "/projects/S/devices/St/items/"
@@ -40,6 +41,13 @@ class HardwareChangeTests(unittest.TestCase):
     def test_unit_scopes_keep_preset_and_relations(self):
         rows = u.scopes({"softwareScopes": [{"path": "/p/units/A", "name": "A", "kind": "softwareUnit", "namespacePreset": "N", "relations": [], "groups": ["g"], "identity": {}}]})
         self.assertEqual({"scope:/p/units/A": {"name": "A", "kind": "softwareUnit", "namespacePreset": "N", "relations": []}}, rows)
+
+    def test_project_state_drops_point_in_time_values(self):
+        state = ps.project({"completeness": {"complete": True}, "properties": {"author": "a", "lastModified": "t", "sizeKb": 1, "isModified": False, "isPrimary": True},
+                            "languageSettings": {"active": ["en-US"]}, "attributeAccess": {}, "textCategories": [], "usedProducts": []})
+        self.assertEqual({"author": "a", "isPrimary": True}, state["project:properties"])
+        with self.assertRaises(AssertionError):
+            ps.project({"completeness": {"complete": False}})
 
 
 if __name__ == "__main__":
