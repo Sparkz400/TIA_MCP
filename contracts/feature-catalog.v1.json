@@ -3502,6 +3502,26 @@
         "composite_engineering_rebind_plan is not qualified by this run: over the fixture and recovered phases it reports no broken connection, because no verified flow creates a declared TO hardware relationship to break.",
         "Engineering only; nothing is downloaded."
       ]
+    },
+    {
+      "id": "local.plcsim_diagnostics.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "13b52905e739441fbd1ce1b3b4fa07eaab2aa536",
+        "passedScope": "scripts/qualify_plcsim_diagnostics.py on a frozen Debug build of 13b5290 (D:\\wp\\sr07), 49/49 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus. Fixture: an owned scratch CPU 1511-1 PN V4.1 with simulation support and an FB DiagGate (input Enable, output Active := Enable) whose instance DB Main calls without assigning Enable, each added with checkpoint, compile and save; a saved review is the source of a diagnostic case on that instance (two Bool hypotheses: Active follows Enable true, Active is released with Enable false) and of its experiment. simulation_provision_scratch_credential: after download and the generated-state save, provisioning with first-use trust for the owned empty CPU leaves the complete project state (hardware, device inventory, every program export) equal to the state just before it, the original card is restored and the instance goes through power-on, RUN, stop, power-off and owned release; a malformed ticket refuses as InvalidSimulationTicket. Two captures associated with the case (60 rows before, 80 rows after the write) are acquired into the experiment; an independent decoder of the original plan and segments reproduces every row and the per-hypothesis counts (releases 30 matched before, follows 40 matched after, no contradictions); JSON, Markdown and HTML exports of both are schema-valid and hash-exact, and the JSON export is the complete acquisition. diagnostic_plcsim_write: a wrong expected value returns preconditionMismatch and dispatches nothing; the write of Enable false to true and the restoring write each read back, and sim_read shows Active following. The comparison reports follows notApplicable to matchedOnly and releases matchedOnly to notApplicable, verdicts unresolved. Refusals: ArtifactUnavailable (unknown experiment, unknown acquisition), RuntimeCaptureReferenceInvalid, InvalidRequest (missing units, unknown export format, comparison fields beyond reason), RuntimeAcknowledgementRequired, RuntimeCaptureAssociationMismatch (signal outside the case), PlcsimCaptureInvalid (datatype differing from the declaration), RuntimeCaptureSessionBusy (write while a capture holds the instance), MeasurementLineageMismatch (an acquisition compared with itself)."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_diagnostics.20261028.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus with the owned scratch's generated credential (first-use TLS trust under the owned-empty-CPU policy); one FB instance with two Bool signals and two Bool hypotheses. Numeric, cycle-synchronous and multi-instance captures are not exercised.",
+        "Sequential polling: Enable and Active of one cycle are separate reads, and the counts depend on capture duration. Verdicts stay unresolved by design; no causation, scan atomicity or running-program identity is claimed.",
+        "The provisioning comparison covers the offline project state the read tools expose; online state other than the card restore is not compared."
+      ]
     }
   ],
   "features": [
@@ -5383,12 +5403,15 @@
           "Requires the ticket-bound instance to be the only registered local simulator, isolated through Softbus and explicit PLCSIM access.",
           "One-use native attempt; unknown online authentication challenges are rejected. No raw credentials or physical PLC route.",
           "TLS trust is rejected by default. Explicitly user-authorized first-use trust can be enabled only for the fresh owned empty local CPU, with a certificate pin for that attempt; this path still requires native qualification.",
-          "Provisioning is separate from proof of RUN, typed I/O and program assertions."
+          "Provisioning is separate from proof of RUN, typed I/O and program assertions.",
+          "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028): after download and the generated-state save, provisioning with explicit first-use trust for the owned empty CPU leaves the complete offline project state (hardware, device inventory, every program export) equal to the state just before it; the original card is restored, the instance runs, stops, switches off and is released; a malformed ticket refuses as InvalidSimulationTicket."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22678,12 +22701,15 @@
         "limitations": [
           "Revalidates one exact diagnostic experiment and its associated immutable runtime capture snapshot, retaining original plan/segment references, raw read JSON, per-read timing, errors, skipped polls, terminal state and explicit units.",
           "Produces a distinct bounded runtime-acquisition record rather than converting sequential polls into atomic trace samples. Observation counts remain descriptive and all hypothesis verdicts remain unresolved.",
-          "No new network acquisition, address/program authentication, synchronized clocks, scan atomicity, causal diagnosis or verified fix. Changed or unavailable original sources refuse; incomplete observations remain explicit."
+          "No new network acquisition, address/program authentication, synchronized clocks, scan atomicity, causal diagnosis or verified fix. Changed or unavailable original sources refuse; incomplete observations remain explicit.",
+          "Qualified with genuine runtime input on an owned PLCSIM Advanced V8 instance (local.plcsim_diagnostics.20261028): two genuine PLCSIM captures acquired into one experiment; an independent decoder of the original plan and segments reproduces every row and the per-hypothesis counts; unknown, malformed and self-referencing inputs refuse with typed codes."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22720,12 +22746,15 @@
         "limitations": [
           "Exports a retained diagnostic runtime-acquisition record as JSON, Markdown or escaped self-contained HTML after rederiving the exact original experiment, capture snapshot and sequential analysis.",
           "Readable previews retain explicit limits and include complete original acquisition JSON. Raw values, separate read times, gaps/errors, terminal state and uncertainty are not interpolated or silently truncated.",
-          "Hash consistency is not source authentication or live program identity. No target access, native qualification, causal inference or fixed-fault verdict."
+          "Hash consistency is not source authentication or live program identity. No target access, native qualification, causal inference or fixed-fault verdict.",
+          "Qualified with genuine runtime input on an owned PLCSIM Advanced V8 instance (local.plcsim_diagnostics.20261028): JSON, Markdown and HTML exports of two acquisitions of genuine PLCSIM captures are schema-valid and hash-exact, and the JSON export is the complete acquisition; unknown, malformed and self-referencing inputs refuse with typed codes."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22760,12 +22789,15 @@
         "status": "partial",
         "limitations": [
           "Rederives two retained runtime acquisitions of the same exact experiment from distinct original capture chains, then reports per hypothesis the matched, contradicted and unknown cycles on each side, an observed pattern and whether it changed, beside both capture contexts, signal sets, progress and quality.",
-          "Counts depend on capture duration and coverage; no rates, statistics, resampling or clock synchronization. Stimuli between the captures, such as diagnostic_plcsim_write, are not linked or verified. All verdicts remain unresolved; no causation or fix proof."
+          "Counts depend on capture duration and coverage; no rates, statistics, resampling or clock synchronization. Stimuli between the captures, such as diagnostic_plcsim_write, are not linked or verified. All verdicts remain unresolved; no causation or fix proof.",
+          "Qualified with genuine runtime input on an owned PLCSIM Advanced V8 instance (local.plcsim_diagnostics.20261028): the before/after comparison of two acquisitions around a diagnostic_plcsim_write reports the independently decoded counts and the expected pattern change, with verdicts unresolved; unknown, malformed and self-referencing inputs refuse with typed codes."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22801,12 +22833,14 @@
         "limitations": [
           "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
           "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
-          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8."
+          "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028) with one FB instance's Bool Enable: a wrong expected value returns preconditionMismatch without dispatching; a write and its restoring write each read back and the program reacts; refusals without acknowledgeWrite, for a signal outside the case, a datatype differing from the declaration and while a capture holds the instance."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

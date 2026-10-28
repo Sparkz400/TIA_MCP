@@ -1,14 +1,14 @@
-# Scattered single rows: text-list import, operation status, composite capture — 28 October 2026
+# Scattered single rows: text-list import, operation status, composite capture, PLCSIM diagnostics — 28 October 2026
 
 This lane took the open rows no other lane owned: `change.plc_alarm_text_list_import` (D11),
 `engineering_operation_status` (F03), `hardware_gsd_export` (X10), `simulation_provision_scratch_credential`
 (L03), the Softbus PLCSIM diagnostic rows (D02, D17), `composite_engineering_capture` and
 `composite_engineering_rebind_plan` (C02), and `hmi_text_list_author` and `hmi_text_list_generate_set` (X07).
-Three rows are verified (17 cells), four carry a recorded blocker, and five wait for PLCSIM to return to Softbus.
+Eight rows are verified (34 cells) and four carry a recorded blocker.
 
 Native runs used owned TIA Portal V21 Update 3 instances and owned scratch projects (CPU 1511-1 PN V4.1),
 built and run from frozen `git archive` copies under `D:\wp\sr<NN>` with a `source-manifest.json`. Nothing
-touched a user project, a PLC or PLCSIM.
+touched a user project or a PLC. The PLCSIM run used one owned PLCSIM Advanced V8 instance on Softbus, released at the end.
 
 ## Verified
 
@@ -17,6 +17,7 @@ touched a user project, a PLC or PLCSIM.
 | `change.plc_alarm_text_list_import` | [`qualify_alarm_imports.py`](../../scripts/qualify_alarm_imports.py) | `sr04` (`99a3709`) | Passed, 104/104 steps | `local.alarm_text_list.20261028` |
 | `engineering_operation_status` | [`qualify_operation_status.py`](../../scripts/qualify_operation_status.py) | `sr04` Host | Passed, 136 steps, 51 Host lifetimes | `local.operation_status.20261028` with `local.watch.native.20261028` |
 | `composite_engineering_capture` | [`qualify_composite_capture.py`](../../scripts/qualify_composite_capture.py) | `sr04` (`99a3709`) | Passed, 57/57 steps | `local.composite_capture.20261028` |
+| `simulation_provision_scratch_credential`, `diagnostic_plcsim_write`, `diagnostic_runtime_acquisition_compare`, `diagnostic_experiment_acquire_runtime`, `diagnostic_runtime_acquisition_export` | [`qualify_plcsim_diagnostics.py`](../../scripts/qualify_plcsim_diagnostics.py) | `sr07` (`13b5290`) | Passed, 49/49 steps | `local.plcsim_diagnostics.20261028` |
 
 **Text-list import.** The alarm runner now covers all five D11 kinds. A fresh CPU has no user text list to
 export, so the runner authors the first workbook in the layout V21's importer reads. The layout comes from
@@ -51,6 +52,32 @@ rows equal `technology_read`'s exposed slots. The capture changes nothing. A fre
 content. After a connection delete is restored from its checkpoint, the recovered copy refuses the original
 review as `ProjectMismatch` and captures the same content from its own review.
 
+**PLCSIM provisioning and diagnostics.** PLCSIM Advanced was on TCP/IP for the
+[runtime real-server gate](../plans/runtime-real-server-plan.md) for part of this lane; these rows ran after it
+returned to Softbus. The fixture is an FB `DiagGate` (input `Enable`, output `Active := Enable`) whose instance DB
+`Main` calls without assigning `Enable`. A saved review is the source of a diagnostic case on that instance, with
+two Bool hypotheses (`follows`: Active is true with Enable true; `releases`: Active is false with Enable false),
+and of its experiment.
+
+- **Provisioning (L03).** After the download and the generated-state save, provisioning leaves the complete
+  offline project state (hardware, device inventory, every program export) equal to the state just before it.
+  This was the missing `AC-preserve` gate. The original card is restored, and the instance runs, stops, switches
+  off and is released. A malformed ticket refuses as `InvalidSimulationTicket`.
+- **Acquisition and export (D17).** Two captures associated with the case (60 rows before the write, 80 after)
+  are acquired into the experiment. An independent decoder of the original plan and segments reproduces every
+  row and the per-hypothesis counts: `releases` matches 30 cycles before, `follows` 40 after, with no
+  contradictions. JSON, Markdown and HTML exports are schema-valid and hash-exact; the JSON export is the
+  acquisition itself.
+- **Write and compare (D02).** A wrong expected value returns `preconditionMismatch` and dispatches nothing. The
+  write of `Enable` (false → true) and the restoring write each read back, and `sim_read` shows `Active`
+  following. The comparison reports `follows` going from `notApplicable` to `matchedOnly` and `releases` the
+  reverse, with verdicts unresolved.
+- **Refusals:** `ArtifactUnavailable` (unknown experiment or acquisition), `RuntimeCaptureReferenceInvalid`,
+  `InvalidRequest` (missing units, unknown format, comparison fields beyond `reason`),
+  `RuntimeAcknowledgementRequired`, `RuntimeCaptureAssociationMismatch` (signal outside the case),
+  `PlcsimCaptureInvalid` (datatype differing from the declaration), `RuntimeCaptureSessionBusy` (write while a
+  capture holds the instance) and `MeasurementLineageMismatch` (an acquisition compared with itself).
+
 ## Defects fixed
 
 - **A failed apply hid TIA's reason.** `change_apply` journaled only the exception's `Message`, which for an
@@ -83,18 +110,6 @@ because the device compile then fails (below).
   meant for a native import. No worker route imports Unified text-list YAML: V21 offers
   `HmiTextListComposition.Import`, but the worker only exports Unified text lists and imports Classic XML.
 
-## Waiting for PLCSIM on Softbus
-
-PLCSIM Advanced was switched to TCP/IP for the [runtime real-server gate](../plans/runtime-real-server-plan.md)
-during this lane. These rows need an owned Softbus instance and were not started:
-
-- `simulation_provision_scratch_credential` (L03): held only on `AC-preserve`. It needs a provisioning run
-  that compares the project state before and after provisioning; earlier runs (`local.sim.provision.20261024`)
-  provisioned successfully but did not compare.
-- `diagnostic_plcsim_write`, `diagnostic_runtime_acquisition_compare` (D02) and
-  `diagnostic_experiment_acquire_runtime`, `diagnostic_runtime_acquisition_export` (D17): they need a genuine
-  PLCSIM capture of a downloaded case: case → experiment → capture → acquire → write → capture → acquire → compare.
-
 ## Runs not cited
 
 - `sr01/al`: the text-list import threw on the inline-string workbook (49 steps passed first); it led to the
@@ -102,3 +117,5 @@ during this lane. These rows need an owned Softbus instance and were not started
 - `sr01/gs`, `sr04/gs`: the GSD runner found the export and enum defects above.
 - `sr05/gs`: the I-device compile failure behind the `hardware_gsd_export` blocker.
 - `sr01/os`: the operation-status runner on the earlier `sr01` Host, superseded by the `sr04` run.
+- `sr06/ps`: the PLCSIM runner's first attempts: a relative simulator-worker path, then a wrong assumption about the
+  JSON export's shape (the run had already passed provisioning, the first capture and its acquisition).
