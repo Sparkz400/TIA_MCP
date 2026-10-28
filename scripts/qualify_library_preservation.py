@@ -118,7 +118,8 @@ def own(name, prefix="P|"):
 def library_row(prefix, row):
     """A logical library key that survives archive, retrieval and working copies, and the row it compares."""
     kind = row.get("kind")
-    require(not row.get("unavailable"), "Library element unavailable: %s" % row)
+    if row.get("unavailable"):  # Elements of absent products (DMC's SiVArc master copies) stay explicit rows.
+        return prefix + kind + ":" + (row.get("path") or row.get("masterCopyPath")), {"unavailable": True, "name": row.get("name")}
     if kind == "type":
         return prefix + "type:" + row["name"], {k: row.get(k) for k in ("path", "typeGuid", "engineeringType", "doNotUse", "setForUpdate", "status")}
     if kind == "version":

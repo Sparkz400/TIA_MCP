@@ -31,8 +31,8 @@ class LibraryPreservationTests(unittest.TestCase):
         self.assertEqual(("G|version:A@1.0.0", {k: v for k, v in version.items() if k != "kind"}), q.library_row("G|", version))
         self.assertEqual(("P|typeFolder:/types/F", True), q.library_row("P|", {"kind": "typeFolder", "path": "/types/F", "name": "F"}))
         self.assertEqual("P|masterCopy:/masterCopies/M", q.library_row("P|", {"kind": "masterCopy", "masterCopyPath": "/masterCopies/M", "name": "M"})[0])
-        with self.assertRaises(AssertionError):
-            q.library_row("P|", {"kind": "type", "name": "X", "unavailable": True})
+        self.assertEqual(("U|masterCopy:/masterCopies/S/A", {"unavailable": True, "name": "A"}),
+                         q.library_row("U|", {"kind": "masterCopy", "masterCopyPath": "/masterCopies/S/A", "name": "A", "unavailable": True, "reason": "Dummy"}))
 
     def test_parent_releases_change_only_the_sum_statement(self):
         original = (q.FIXTURES / (q.PARENT + ".scl")).read_text(encoding="utf-8")
