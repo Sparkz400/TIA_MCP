@@ -2621,6 +2621,24 @@
         "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
         "Engineering only; runtime behavior is not observed."
       ]
+    },
+    {
+      "id": "local.milestones.reopen.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9f80075ba59d8ef8b4e5884f801512b4f8853f27",
+        "passedScope": "scripts/validate_milestones.py (--skip-simulation) on build 9ff587c (frozen D:\\wp\\b6) in owned scratch projects, 11 changes: graphical_operand_set on a LAD and an FBD block, block_rename, block_delete (after a DependencyExists refusal for the called TiaMcp_IsEnabled), type_source_upsert (UDT), source_upsert (SCL and STL), block_import_xml (LAD and FBD) and network_configure. Each change: preview, apply with checkpoint, compile and save; change_status equals the apply result with its retained checkpoint; a complete timestamp-free readback of every block, type, tag table and network node attribute differs only in the change's own objects; a fresh owned Portal reopens the saved changed project with an identical readback and change_status. Eight changes (both operand edits, rename, delete, UDT, STL source, LAD import, network address) are restored from their own checkpoint in the applying Portal with an exact pre-change readback, and the recovered project is reopened in another fresh Portal."
+      },
+      "artifacts": [
+        "evidence/local.milestones.reopen.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN; no software units, namespaces or safety. Simulation steps were skipped.",
+        "network_configure preservation is checked by the runner over program exports and network node attributes only; the worker's configured-hardware preservation stage does not run for that kind.",
+        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
+      ]
     }
   ],
   "features": [
@@ -5330,7 +5348,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
-          "Qualified route: SCL. The STL/AWL and SIMATIC_SD routes are not covered by that run.",
+          "Qualified routes: SCL (local.plc_object_mutations.20261028) and STL (local.milestones.reopen.20261028). The SIMATIC_SD route is not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
@@ -5340,7 +5358,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5391,7 +5410,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5442,7 +5462,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5645,7 +5666,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -5856,7 +5878,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.20261028"
+          "local.plc_object_mutations.20261028",
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {
@@ -6054,16 +6077,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) for one LAD and one FBD operand edit (local.milestones.reopen.20261028); software units, namespaces and safety blocks are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.conformance.v03",
-          "local.layers.units-expanded.20261008"
+          "local.milestones.reopen.20261028"
         ]
       },
       "availability": {

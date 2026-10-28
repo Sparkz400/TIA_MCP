@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "fd6f9a6a8cc136381ddd79d01e8b784464d0e3d93239bf5a38f8ba8bdf544c84",
-      "bytes": 1127010
+      "sha256": "c724a8190345871b34b03ac1ac93a97c6e42e46e981e9d09fca264262dc1af47",
+      "bytes": 1129259
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -91317,6 +91317,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.20261028.json"
           ]
+        },
+        {
+          "id": "local.milestones.reopen.20261028",
+          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "artifacts": [
+            "evidence/local.milestones.reopen.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -91362,6 +91369,13 @@
           "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
             "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.reopen.20261028",
+          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "artifacts": [
+            "evidence/local.milestones.reopen.20261028.json"
           ]
         }
       ],
@@ -91493,6 +91507,13 @@
           "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
             "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.reopen.20261028",
+          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "artifacts": [
+            "evidence/local.milestones.reopen.20261028.json"
           ]
         }
       ],
@@ -92452,26 +92473,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.milestones.reopen.20261028",
+          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.conformance.v03",
-          "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19",
-          "artifacts": [
-            "artifacts/conformance/live-first/index.json"
-          ]
-        },
-        {
-          "id": "local.layers.units-expanded.20261008",
-          "profileSha256": "c875ccbae6d69db70bb5b6479b0c22e82d18aee4e99d388e9726e1f0eb3c2233",
-          "artifacts": [
-            "artifacts/object-model-expanded.json",
-            "artifacts/object-model-expanded-tag-name-collision.json"
+            "evidence/local.milestones.reopen.20261028.json"
           ]
         }
       ],
@@ -96031,6 +96036,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.20261028.json"
           ]
+        },
+        {
+          "id": "local.milestones.reopen.20261028",
+          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "artifacts": [
+            "evidence/local.milestones.reopen.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -96723,6 +96735,13 @@
           "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
             "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        },
+        {
+          "id": "local.milestones.reopen.20261028",
+          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "artifacts": [
+            "evidence/local.milestones.reopen.20261028.json"
           ]
         }
       ],
@@ -116078,6 +116097,11 @@
       "sha256": "16cdd557fbd90bc4eea5ddea5931961daa238e42047c7cc8845abd4a34690d34"
     },
     {
+      "path": "evidence/local.milestones.reopen.20261028.json",
+      "state": "observed",
+      "sha256": "af314cd5d2757d95cb7fff90aab441e9f090e2f6a986b9542f350a3ae44546dd"
+    },
+    {
       "path": "evidence/local.plc_component.existing_caller.20261025.json",
       "state": "observed",
       "sha256": "be39d685b9d99185e66aa0b0bef6982c7efd933e52dbbebd7d03878d56d26ac3"
@@ -116602,6 +116626,10 @@
     {
       "id": "local.milestones.20261024",
       "profileSha256": "b1b80295fcd905263658b5923350aa96f621a1fd63a5c64d357bd37babf1f3a1"
+    },
+    {
+      "id": "local.milestones.reopen.20261028",
+      "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e"
     },
     {
       "id": "local.offline.v02",

@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.44",
-    "catalogSha256": "fd6f9a6a8cc136381ddd79d01e8b784464d0e3d93239bf5a38f8ba8bdf544c84",
+    "catalogSha256": "c724a8190345871b34b03ac1ac93a97c6e42e46e981e9d09fca264262dc1af47",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -15,15 +15,15 @@
     "features": 447,
     "support": {
       "deferred": 10,
-      "limited": 58,
+      "limited": 59,
       "shipped": 85,
       "unavailable_target": 4,
-      "unqualified": 290
+      "unqualified": 289
     },
     "cells": {
-      "bound": 573,
+      "bound": 579,
       "deferred": 30,
-      "open": 1526
+      "open": 1520
     },
     "openCellsByOwner": {
       "C02": {
@@ -116,7 +116,7 @@
       },
       "L01": {
         "role": "Typed",
-        "open": 44
+        "open": 38
       },
       "L02": {
         "role": "Libraries and components",
@@ -180,7 +180,7 @@
       },
       "X11": {
         "role": "PLC and typed",
-        "open": 125
+        "open": 119
       }
     }
   },
@@ -2445,49 +2445,56 @@
         "X11"
       ],
       "evidenceIds": [
-        "local.plc_object_mutations.20261028"
+        "local.plc_object_mutations.20261028",
+        "local.milestones.reopen.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         }
       ]
@@ -2507,49 +2514,56 @@
         "X11"
       ],
       "evidenceIds": [
-        "local.plc_object_mutations.20261028"
+        "local.plc_object_mutations.20261028",
+        "local.milestones.reopen.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         }
       ]
@@ -2570,49 +2584,56 @@
         "X11"
       ],
       "evidenceIds": [
-        "local.plc_object_mutations.20261028"
+        "local.plc_object_mutations.20261028",
+        "local.milestones.reopen.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         }
       ]
@@ -2805,49 +2826,56 @@
         "X11"
       ],
       "evidenceIds": [
-        "local.plc_object_mutations.20261028"
+        "local.plc_object_mutations.20261028",
+        "local.milestones.reopen.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         }
       ]
@@ -3054,49 +3082,56 @@
         "X11"
       ],
       "evidenceIds": [
-        "local.plc_object_mutations.20261028"
+        "local.plc_object_mutations.20261028",
+        "local.milestones.reopen.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.plc_object_mutations.20261028"
+            "local.plc_object_mutations.20261028",
+            "local.milestones.reopen.20261028"
           ]
         }
       ]
@@ -3255,46 +3290,56 @@
         "change_restore"
       ],
       "changeKind": "graphical_operand_set",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "L01",
         "X11"
       ],
       "evidenceIds": [
-        "local.offline.v02",
-        "local.conformance.v03",
-        "local.layers.units-expanded.20261008"
+        "local.milestones.reopen.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.milestones.reopen.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.milestones.reopen.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.milestones.reopen.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.milestones.reopen.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.milestones.reopen.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.milestones.reopen.20261028"
+          ]
         }
       ]
     },
@@ -20445,21 +20490,6 @@
       ]
     },
     {
-      "id": "local.layers.units-expanded.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1"
-      },
-      "sourceCommit": null,
-      "retained": [],
-      "notRetained": [
-        "artifacts/object-model-expanded.json",
-        "artifacts/object-model-expanded-tag-name-collision.json"
-      ]
-    },
-    {
       "id": "local.library.native-traversal.20261027",
       "status": "passed",
       "profile": {
@@ -20782,6 +20812,21 @@
         {
           "path": "evidence/local.milestones.20261024.json",
           "sha256": "16cdd557fbd90bc4eea5ddea5931961daa238e42047c7cc8845abd4a34690d34"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.milestones.reopen.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "9f80075ba59d8ef8b4e5884f801512b4f8853f27",
+      "retained": [
+        {
+          "path": "evidence/local.milestones.reopen.20261028.json",
+          "sha256": "af314cd5d2757d95cb7fff90aab441e9f090e2f6a986b9542f350a3ae44546dd"
         }
       ],
       "notRetained": []
