@@ -45,7 +45,7 @@ public sealed partial class TiaTools
         => Call("plc_station_upload", new { downloadTicket, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "uploads") }, cancellationToken);
 
     [McpServerTool(Name = "project_open", Destructive = false, OpenWorld = false)]
-    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: reads work, every mutation is refused with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
+    [Description("Open an exact existing .ap21 project on the TIA host in an empty worker-owned instance started with tia_start. Does not upgrade, save or download it. Use a copied/test project for validation edits. readOnly=true opens it as a secondary (read-only) project: inventory and inspection reads work, TIA refuses exports (block/type/tag-table reads and other export-based tools) and every mutation is refused, both with ReadOnlyProject. If project login is required, prompt for the target's local username and password through TIA authentication; this tool accepts no raw credentials. Follow the server authentication instructions.")]
     public Task<CallToolResult> ProjectOpen(string path, CancellationToken cancellationToken, bool readOnly = false)
         => Call("project_open", new { path, readOnly }, cancellationToken);
 

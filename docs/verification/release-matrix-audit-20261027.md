@@ -70,7 +70,8 @@ native qualification.
   gates that compile, preserve, reopen and recover them.
   `change.hardware_delete` and `change.hardware_attributes` need the same gates.
   `hardware_inspect` is used as the oracle in those runs and still needs an
-  independent comparison of its own.
+  independent comparison of its own. Closed on 28 October for the six hardware kinds by
+  [their own runner](engineering-kinds-20261028.md).
 - **L03 Runtime.** `simulation_provision_scratch_credential` is held on
   AC-preserve: project preservation after provisioning is not independently
   verified. It needs a provisioning run that compares project fingerprints
@@ -106,4 +107,5 @@ native qualification.
 - **D13 Technology and D14 Safety.** `technology_read`, `change.to_*`,
   `safety_inspect` and `change.safety_import_xml` cite only unretained
   8 October records. They need fresh fixture runs with technology objects and a
-  safety CPU.
+  safety CPU. `technology_read` and the six `change.to_*` kinds closed on 28 October
+  ([record](engineering-kinds-20261028.md)); safety stays open.

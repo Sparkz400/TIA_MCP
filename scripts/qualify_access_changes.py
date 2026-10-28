@@ -148,6 +148,7 @@ def utc(moment):
 
 class Run:
     """The owned scratch's current state, the reopened pre-change state and per-kind criterion coverage."""
+    plc_compiled = PLC_COMPILED  # Kinds whose apply compiles the PLC software; the others compile all devices.
 
     def __init__(self, h):
         self.h, self.count, self.coverage, self.applied, self.skipped = h, 0, {}, [], {}
@@ -230,7 +231,7 @@ class Run:
         applied = h.apply_prepared(kind, prepared)
         require(applied["recoveryArchiveSha256"] and applied["preview"] == prepared["preview"], "Applied change lost its checkpoint or preview")
         require(in_order(applied["stages"], STAGES), "Checkpoint, apply, compile and save stages differ: %s" % applied["stages"])
-        if kind in PLC_COMPILED:
+        if kind in self.plc_compiled:
             require_plc_compile(applied["compile"], self.plc)
         else:
             require(applied["compile"].get("targetIdentityPolicy") == "device-path-v1", "Expected the all-devices compile receipt")

@@ -214,8 +214,10 @@ namespace TiaMcp.Openness.V21
         private static void RequireConnectionsPreserved(IEnumerable<Tuple<Connection, JObject>> expected, IEnumerable<Tuple<Connection, JObject>> actual)
         {
             Func<IEnumerable<Tuple<Connection, JObject>>, string[]> text = rows => rows.Select(row => row.Item2.ToString(Formatting.None)).OrderBy(row => row, StringComparer.Ordinal).ToArray();
-            if (!text(expected).SequenceEqual(text(actual)))
-                throw new BridgeException("MutationVerificationFailed", "Other connections of this owner changed or the target is still present; the checkpoint is retained for recovery.");
+            string[] before = text(expected), after = text(actual);
+            if (!before.SequenceEqual(after))
+                throw new BridgeException("MutationVerificationFailed", "Other connections of this owner changed or the target is still present; the checkpoint is retained for recovery.",
+                    new JObject { ["onlyBefore"] = new JArray(before.Except(after).Select(JObject.Parse)), ["onlyAfter"] = new JArray(after.Except(before).Select(JObject.Parse)) });
         }
 
         private static JObject ConnectionReadback(List<Tuple<Connection, JObject>> rows, Connection target)

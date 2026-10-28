@@ -1,0 +1,118 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.project_settings.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T14:28:51+00:00",
+  "source": {
+    "commit": "d98a186e3eddfd2822ffa1526be0ef3baa4f6dd1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_project_settings.py on a frozen Debug build of 2b0fc80 (D:\\wp\\b24), 50/50 steps, in one owned scratch CPU 1511-1 PN V4.1 project: V21 native attribute info declares Author, Copyright, Family and Version read-only and project_attributes_set refuses each with AttributeNotWritable (Comment: UnsupportedAttribute). project_languages_set adds de-DE as active and editing language, switches editing back and removes de-DE, each with checkpoint, PLC compile and save, asserted previews, project_properties readback and exact snapshot diffs; TIA's added or dropped de-DE text items in the project comment and every program export are checked and recorded; a fresh owned Portal reopen shows the identical state and a removal restored from its checkpoint equals the reopened state. project_copy copies the saved project into a new directory, leaves the source unchanged and refuses a missing project (ProjectNotFound); the copy opened with project_open readOnly is the only, secondary project, equals its source through software_inspect and project_properties, reports TIA's export refusal as ReadOnlyProject and refuses changes with ReadOnlyProject. Typed refusals (LanguageInUse, InvalidRequest, PreviewMismatch, StaleRevision) change nothing.",
+  "limitations": [
+    "One owned scratch project; multiuser, protected (UMAC) and upgraded projects are not exercised.",
+    "project_attributes_set cannot apply on V21: every allowlisted attribute is natively read-only.",
+    "project_languages_set: one supported language added and removed; texts in a removed language are not seeded, so their loss is not observed.",
+    "project_copy: the UnsavedProject refusal is not exercised. project_open readOnly: TIA refuses exports in the secondary project, so the copy is compared without program exports."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f76daf20d362252da468594fdcf2e9252ab70b7abbd617ceccb0ee717b4f0ef1"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "a56d98619f93ce028b636bf3b387ab2a674d2d354d430817d5b7c9d9a3b4978b"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "84d0062b117ec24c7fd8e8e2ceef9d15da8e20154c5fc33c39e77d811a8c2b4e",
+      "bytes": 282250,
+      "completed": true,
+      "steps": [
+        "start owned TIA project settings",
+        "create owned scratch project settings",
+        "snapshot baseline",
+        "refuse project_attributes_set: Author, which V21 declares read-only",
+        "refuse project_attributes_set: Copyright, which V21 declares read-only",
+        "refuse project_attributes_set: Family, which V21 declares read-only",
+        "refuse project_attributes_set: Version, which V21 declares read-only",
+        "refuse project_attributes_set: the multilingual Comment",
+        "prepare add de-DE (made stale below)",
+        "refuse apply project_languages_set: a wrong previewHash",
+        "refuse project_languages_set: an unknown culture",
+        "refuse project_languages_set: removing the reference language",
+        "refuse project_languages_set: an editing language that is not active",
+        "refuse project_languages_set: an empty request",
+        "prepare add de-DE as editing language",
+        "apply project_languages_set",
+        "change_status add de-DE as editing language",
+        "snapshot add de-DE as editing language",
+        "verify add de-DE as editing language",
+        "refuse apply project_languages_set: a preview made stale by a later change",
+        "prepare edit in en-US again",
+        "apply project_languages_set",
+        "change_status edit in en-US again",
+        "snapshot edit in en-US again",
+        "verify edit in en-US again",
+        "close the session the saved project",
+        "start owned TIA the saved project",
+        "open the saved project",
+        "snapshot reopened",
+        "reopened state equals every verified change",
+        "prepare remove de-DE",
+        "apply project_languages_set",
+        "change_status remove de-DE",
+        "snapshot remove de-DE",
+        "verify remove de-DE",
+        "restore remove de-DE",
+        "snapshot restored remove de-DE",
+        "restored remove de-DE equals the pre-change state",
+        "refuse project_copy of a missing project",
+        "project_copy",
+        "snapshot source after project_copy",
+        "project_copy left the source unchanged",
+        "source state without exports",
+        "close the session before the read-only open",
+        "start owned TIA read-only copy",
+        "open the copy read-only",
+        "the read-only copy equals its source",
+        "block_read in the read-only copy is refused",
+        "refuse project_languages_set: a read-only project",
+        "refuse tag_create: a read-only project"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_copy",
+        "project_inventory",
+        "project_open",
+        "project_properties",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_copy"
+      ]
+    }
+  ]
+}
