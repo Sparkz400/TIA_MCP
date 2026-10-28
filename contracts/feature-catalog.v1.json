@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.55",
+  "catalogVersion": "0.4.56",
   "targetTiaVersions": [
     21
   ],
@@ -3421,6 +3421,27 @@
         "One S7-300 CPU 315-2 PN/DP with RetainTiaDevice; an imported S7-1500 CPU fails the device compile because the AML carries no confidential-data password.",
         "MoveToParkingLot, OverwriteTiaDevice and devices that already exist in the target are not exercised.",
         "Engineering only; nothing is downloaded."
+      ]
+    },
+    {
+      "id": "local.watch.lifecycle.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "365085a745d192e9ea45c28076ab6333c6a80ac6",
+        "passedScope": "scripts/qualify_watch_lifecycle.py (lc2) on a frozen Debug build of 74bac9b (D:\\wp\\b53, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3, seeded with the MilestoneWatch fixture (root peers MilestoneWatch, UnchangedPeer and the scratch's force table): six chained lifecycle operations on the saved original project (create group WTL_Group, create table WTL_Table in it, rename the group to WTL_Renamed with the table inside, rename the table to WTL_Moved, delete it, delete the group), each prepared through its watch_table_prepare_* or watch_table_group_prepare_* tool, reviewed independently from the retained files (plan digest, inputs, an independently computed expected group subtree and profile gate), applied once through watch_table_apply with subtree readback and unchanged peers, verified by watch_table_verify_reopen after a fresh Portal reopen, recovered from its checkpoint into a new location whose fresh reopen equals the pre-operation subtree, and reconciled for restored and original; each next baseline equals the previous verified subtree; seven typed prepare refusals (WatchGroupCollision, WatchTableCollision, WatchGroupNotEmpty, WatchGroupNotFound twice, WatchTableNotFound twice); every owned Portal and worker lifetime closed with exit proofs."
+      },
+      "artifacts": [
+        "evidence/local.watch.lifecycle.20261028.json"
+      ],
+      "limitations": [
+        "Isolated qualification Host (--component-qualification --watch-qualification none); production apply of the lifecycle profiles stays disabled.",
+        "One user group level below root, ASCII names, one empty table; force tables, nested groups deeper than one level, escaped names and web/display access rules are not exercised.",
+        "No Host or worker loss during lifecycle operations; offline stored configuration only, no monitoring, modify or forcing.",
+        "Trial lc1 (D:\\wp\\wt\\lc1) stopped at the second apply with ProjectIsolationRequired because the unseeded scratch was no longer owned after a reopen; it is retained as failed and not cited."
       ]
     }
   ],
@@ -14142,13 +14163,15 @@
         "limitations": [
           "Creates one empty table in an exact existing group; refuses PLC-wide watch/force name collisions (case-insensitive). The new table's export hash is only known from readback, so verification requires exactly one added zero-row table and nothing else changed.",
           "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
-          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Review is production-available; apply stays refused outside the isolated qualification harness. Native lifecycle evidence exists (local.watch.lifecycle.20261028), but no lifecycle profile is promoted to production apply.",
+          "2026-10-28: natively qualified in an owned seeded scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.lifecycle.20261028): prepare, independent review of the plan digest and the independently computed subtree, apply with readback and unchanged peers, fresh-reopen verification and checkpoint recovery to the pre-operation subtree for a table inside a user group; the same name in root is refused PLC-wide (WatchTableCollision)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.lifecycle.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14190,13 +14213,15 @@
         "limitations": [
           "Expected readback is the captured export with only the table name changed; the manual's read-only note on Name stays a native residual. Refuses PLC-wide collisions, case-only renames and tables with web/display access rules.",
           "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
-          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Review is production-available; apply stays refused outside the isolated qualification harness. Native lifecycle evidence exists (local.watch.lifecycle.20261028), but no lifecycle profile is promoted to production apply.",
+          "2026-10-28: natively qualified in an owned seeded scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.lifecycle.20261028): prepare, independent review of the plan digest and the independently computed subtree, apply with readback and unchanged peers, fresh-reopen verification and checkpoint recovery to the pre-operation subtree for a table in a renamed group; the old name is refused afterwards (WatchTableNotFound)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.lifecycle.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14238,13 +14263,15 @@
         "limitations": [
           "Deletes one exact table from its group; refuses tables with web/display access rules. References from other products are not inventoried.",
           "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
-          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Review is production-available; apply stays refused outside the isolated qualification harness. Native lifecycle evidence exists (local.watch.lifecycle.20261028), but no lifecycle profile is promoted to production apply.",
+          "2026-10-28: natively qualified in an owned seeded scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.lifecycle.20261028): prepare, independent review of the plan digest and the independently computed subtree, apply with readback and unchanged peers, fresh-reopen verification and checkpoint recovery to the pre-operation subtree; a repeated delete is refused (WatchTableNotFound)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.lifecycle.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14286,13 +14313,15 @@
         "limitations": [
           "Creates one empty direct child group; refuses sibling group name collisions (case-insensitive). Master-copy creation (CreateFrom) is not implemented.",
           "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
-          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Review is production-available; apply stays refused outside the isolated qualification harness. Native lifecycle evidence exists (local.watch.lifecycle.20261028), but no lifecycle profile is promoted to production apply.",
+          "2026-10-28: natively qualified in an owned seeded scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.lifecycle.20261028): prepare, independent review of the plan digest and the independently computed subtree, apply with readback and unchanged peers, fresh-reopen verification and checkpoint recovery to the pre-operation subtree; a second create of the same group name is refused (WatchGroupCollision)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.lifecycle.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14334,13 +14363,15 @@
         "limitations": [
           "Renames one direct child user group; every contained table and subgroup must keep its exact content under the new path. Refuses sibling collisions and case-only renames.",
           "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
-          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Review is production-available; apply stays refused outside the isolated qualification harness. Native lifecycle evidence exists (local.watch.lifecycle.20261028), but no lifecycle profile is promoted to production apply.",
+          "2026-10-28: natively qualified in an owned seeded scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.lifecycle.20261028): prepare, independent review of the plan digest and the independently computed subtree, apply with readback and unchanged peers, fresh-reopen verification and checkpoint recovery to the pre-operation subtree for a group holding a table, which keeps its exact content under the new path; the old name is refused afterwards (WatchGroupNotFound)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.lifecycle.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -14382,13 +14413,15 @@
         "limitations": [
           "Empty groups only: any contained watch table, force table or subgroup is refused before and again at the native boundary. No recursive delete or move.",
           "Worker-owned saved offline scratch only; the parent group's whole subtree and every peer manifest are frozen, checkpointed, verified after the native effect and after save, and on fresh reopen/recovery.",
-          "Review is production-available; apply is refused outside the isolated qualification harness until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Review is production-available; apply stays refused outside the isolated qualification harness. Native lifecycle evidence exists (local.watch.lifecycle.20261028), but no lifecycle profile is promoted to production apply.",
+          "2026-10-28: natively qualified in an owned seeded scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.lifecycle.20261028): prepare, independent review of the plan digest and the independently computed subtree, apply with readback and unchanged peers, fresh-reopen verification and checkpoint recovery to the pre-operation subtree; deleting the group while it held a table was refused (WatchGroupNotEmpty), a repeated delete is refused (WatchGroupNotFound)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.lifecycle.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
