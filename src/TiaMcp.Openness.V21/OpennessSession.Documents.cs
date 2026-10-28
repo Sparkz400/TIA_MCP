@@ -27,7 +27,8 @@ namespace TiaMcp.Openness.V21
             var block = target.Target as PlcBlock; var type = target.Target as PlcType;
             if (block?.IsKnowHowProtected ?? type.IsKnowHowProtected) throw new BridgeException("ProtectedObject", "The selected " + kind + " is know-how protected.");
             string name = SafeFileName(target.Identity.Value<string>("name"));
-            var directory = Directory.CreateDirectory(Path.Combine(ArtifactDirectory(args), kind + "-" + format + "-" + Guid.NewGuid().ToString("N")));
+            // .NET Framework's CreateDirectory result keeps only the leaf name as its original path, which Openness rejects as relative.
+            var directory = new DirectoryInfo(Directory.CreateDirectory(Path.Combine(ArtifactDirectory(args), kind + "-" + format + "-" + Guid.NewGuid().ToString("N"))).FullName);
             var result = Envelope();
             result["project"] = ProjectInfo(target.Plc.Project);
             result["identity"] = target.Identity.DeepClone();
@@ -63,8 +64,9 @@ namespace TiaMcp.Openness.V21
             int max = Limit(args, 500);
             var lookup = new ScanBudget(50000);
             string scopePath = args.Value<string>("scopePath");
-            var documents = SoftwareScopes(plc, lookup).Where(scope => string.IsNullOrWhiteSpace(scopePath) || scope.Path == scopePath)
-                .SelectMany(scope => Documents(scope.Types, scope.Path + "/types", lookup, 0)).ToList();
+            var scopes = SoftwareScopes(plc, lookup).Where(scope => string.IsNullOrWhiteSpace(scopePath) || scope.Path == scopePath).ToList();
+            if (!string.IsNullOrWhiteSpace(scopePath)) RequireOne(scopes.Count, lookup, "PLC or software-unit scope");
+            var documents = scopes.SelectMany(scope => Documents(scope.Types, scope.Path + "/types", lookup, 0)).ToList();
             var selected = RequestPaths(args, "exportPaths").Select(path =>
             {
                 var matches = documents.Where(entry => entry.Path == path).ToList();
@@ -74,7 +76,7 @@ namespace TiaMcp.Openness.V21
             var exports = new JArray();
             foreach (var entry in selected)
             {
-                var directory = Directory.CreateDirectory(Path.Combine(ArtifactDirectory(args), "document-simaticSd-" + Guid.NewGuid().ToString("N")));
+                var directory = new DirectoryInfo(Directory.CreateDirectory(Path.Combine(ArtifactDirectory(args), "document-simaticSd-" + Guid.NewGuid().ToString("N"))).FullName);
                 var row = DocumentExport(entry.Item.ExportAsDocuments(directory, SafeFileName(entry.Item.Name)), directory);
                 row["path"] = entry.Path;
                 exports.Add(row);
@@ -112,7 +114,7 @@ namespace TiaMcp.Openness.V21
             if (units.Count != unitPaths.Count) throw new BridgeException("ObjectNotFound", "Every unitPath must name an exact software unit; safety units are excluded.");
             if (inconsistent.Count != 0) throw new BridgeException("CompileRequired", "Loadable generation requires consistent compiled objects. Compile first (change_prepare kind plc_compile); this tool never compiles.",
                 new JObject { ["inconsistent"] = new JArray(inconsistent.Take(100)), ["inconsistentCount"] = inconsistent.Count });
-            var provider = plc.Software.GetService<LoadableProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected PLC software exposes no LoadableProvider service.");
+            var provider = plc.Software.GetService<LoadableProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected PLC software exposes no LoadableProvider service; Siemens documents loadables only for CPU 1518 and its subtypes from firmware V2.8.");
             var directory = Directory.CreateDirectory(Path.Combine(ArtifactDirectory(args), "loadable-" + targetName + "-" + Guid.NewGuid().ToString("N")));
             var file = new FileInfo(Path.Combine(directory.FullName, "loadable"));
             if (blocks.Count != 0) provider.GenerateLoadable(file, blocks.Select(entry => entry.Item), option);
