@@ -163,7 +163,7 @@ def edit_package(root, block, old, new):
 def edit_in_project(run, workspace, block, family):
     """An in-place header edit; a source_upsert would replace the block and TIA would drop its mapping."""
     run.apply("set %s's family to %s" % (block, family), "block_attributes_set", {"blockName": block, "attributes": {"HeaderFamily": family}},
-              {"effects": [{"action": "block_attributes_set"}]}, changed=["block:%s/blocks/%s" % (run.plc, block)])
+              {"effects": [{"action": "block_attributes_set"}, {"attributes": [{"name": "HeaderFamily", "after": family}]}]}, changed=["block:%s/blocks/%s" % (run.plc, block)])
     require(run.mapping(workspace, block)["compareState"] != "Equal", "The project edit of %s is not visible to its mapping" % block)
 
 
