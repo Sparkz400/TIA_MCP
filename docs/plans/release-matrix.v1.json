@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.58",
-    "catalogSha256": "9566ef382efe36e3e994e9a4203ab68206e958f9fd914383d16c10c0f195365b",
+    "catalogSha256": "f990e693f2554d1a79b1b0f08ea980ca96d327520e04fd4963663fe271729085",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -12,18 +12,18 @@
     21
   ],
   "summary": {
-    "features": 447,
+    "features": 449,
     "support": {
       "deferred": 10,
       "limited": 217,
       "shipped": 110,
       "unavailable_target": 6,
-      "unqualified": 104
+      "unqualified": 106
     },
     "cells": {
       "bound": 1484,
       "deferred": 30,
-      "open": 535
+      "open": 547
     },
     "openCellsByOwner": {
       "C02": {
@@ -104,7 +104,7 @@
       },
       "X10": {
         "role": "Hardware and remote IO",
-        "open": 9
+        "open": 21
       },
       "X11": {
         "role": "PLC and typed",
@@ -10490,6 +10490,102 @@
           "evidenceIds": [
             "local.hardware_changes.20261028"
           ]
+        }
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_create",
+      "domain": "hardware",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_create",
+      "support": "unqualified",
+      "owners": [
+        "X10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_delete",
+      "domain": "hardware",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_delete",
+      "support": "unqualified",
+      "owners": [
+        "X10"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },

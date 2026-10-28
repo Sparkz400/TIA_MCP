@@ -13089,6 +13089,106 @@
       ]
     },
     {
+      "featureId": "change.hardware_transfer_area_create",
+      "domain": "hardware",
+      "title": "Create a controller-device transfer area on an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one controller-device (CD) transfer area with an exact name; a name already used on the interface (ignoring case) is refused as ObjectExists. TIA chooses its direction, lengths and local addresses, which the readback reports.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Other transfer-area types (F-CD, PROFIsafe, shared device, mapping rules), direction and length edits, and an assigned higher-level IO controller are not reviewed.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_delete",
+      "domain": "hardware",
+      "title": "Delete a transfer area of an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Deletes one transfer area by exact name; an absent name is refused as ObjectNotFound. Program references to its local addresses are checked only by the mandatory device compile.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Transfer areas with mapping rules or partner addresses from an assigned higher-level IO controller are not reviewed.",
+          "Compiled against the V21 PublicAPI only; not natively qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "domain": "hardware",
       "title": "Assign or disconnect one native remote-I/O connector",
