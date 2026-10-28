@@ -110,7 +110,8 @@ class Run(StateRun):
             before = self.state()
             result = self.h.tool("graph_edit", {"sourceRef": source, "operations": operations})
             original, edited = self.document(source), self.document(result["document"]["recordRef"])
-            require(original.count(old.encode("utf-8")) == 1 and edited == original.replace(old.encode("utf-8"), new.encode("utf-8")),
+            # A step rename also renames the step's G7_StepPlus member in the block interface, so every occurrence changes.
+            require(old.encode("utf-8") in original and edited == original.replace(old.encode("utf-8"), new.encode("utf-8")),
                     "graph_edit changed more than %r -> %r" % (old, new))
             require(self.state() == before, "graph_edit changed the project")
             return {"document": result["document"], "comparison": result["comparison"], "bytes": [len(original), len(edited)]}
