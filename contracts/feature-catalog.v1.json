@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.60",
+  "catalogVersion": "0.4.63",
   "targetTiaVersions": [
     21
   ],
@@ -3506,6 +3506,127 @@
       ]
     },
     {
+      "id": "local.alarm_text_list.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "99a37095e93c253ccafbdf709b69b24cf27c3b3c",
+        "passedScope": "scripts/qualify_alarm_imports.py on a frozen Debug build of 99a3709 (D:\\wp\\sr04), 104/104 steps, in one owned scratch CPU 1511-1 PN V4.1: the four alarm import kinds as in local.alarm_imports.20261028, plus plc_alarm_text_list_import: a user text list TiaMcpStates (Decimal, entries 0, 1 and 2-5) created from a workbook authored in the layout TIA V21's importer reads (importOption None), then one entry text replaced in TIA's own export with Override; each applied with checkpoint, PLC compile and save, asserted previews and change_status; every program export and member and plc_alarm_inspect's alarm classes, instance texts, supervisions, text lists and user text-list export differ in exactly the intended keys; a fresh owned Portal reopen shows the identical state; one Override from that state restored from its checkpoint equals the reopened state. Typed refusals (InvalidRequest, ArtifactChanged, InvalidArtifact, ObjectExists, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.alarm_text_list.20261028.json"
+      ],
+      "limitations": [
+        "One Decimal user text list with three entries in one culture; Binary and Bit lists, list comments, several lists per workbook, software units and HMI consumers are not exercised.",
+        "A fresh CPU has no text list to export, so the first workbook is authored (sheets TextList and TextListEntry, custom properties FileVersion 1 and FileContent 'Alarm text lists', shared strings and the styles part of a native export); the Override imports edit TIA's own export.",
+        "Engineering only; nothing is downloaded and no alarm is raised."
+      ]
+    },
+    {
+      "id": "local.operation_status.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "99a37095e93c253ccafbdf709b69b24cf27c3b3c",
+        "passedScope": "scripts/qualify_operation_status.py with the Host of a frozen Debug build of 99a3709 (D:\\wp\\sr04), 136 steps and 51 clean Host lifetimes, over copies of the durable operation and admission stores retained by 18 curated native runs: the twelve watch runs of local.watch.native.20261028 (eight worker-loss points, three Host-loss points, one uninterrupted), author3 and exact1 of local.watch.authoring.20261028, and the alarm and hardware runs local.alarm_imports.20261028, local.hardware_changes.20261028 and local.alarm_text_list.20261028. For each copy: engineering_operation_status returns every operation (prepared, reconciled, stopped) and admission (change_apply, change_restore, scratch_create, watch_fixture_seed, watch_authoring_source_negative) exactly as its newest on-disk revision; the 14 status reads the native runs recorded live, including outcomeUnknown reads right after worker loss, equal the on-disk revision of the same number; retained admission responses match their SHA-256 and none is unresolved; an unknown ID refuses as OperationNotFound and uppercase or traversal IDs as InvalidRequest; the reads change no store file; a second Host on the same store returns the same records. Hosts on tampered copies refuse an edited earlier revision and a missing revision as JournalInvalid and an altered admission response as ArtifactChanged."
+      },
+      "artifacts": [
+        "evidence/local.operation_status.20261028.json"
+      ],
+      "limitations": [
+        "The records come from native runs curated separately; this run reads them through the Host on copies and starts no TIA, worker or PLCSIM. Live reads during a native workflow are the 14 the watch runs recorded.",
+        "Watch operations cover one existing-row Bool ModifyValue and watch authoring; other native families keep only dispatch admissions (change_apply, change_restore, scratch_create).",
+        "Cooperating Hosts share one local artifact store; a remote or network store is not exercised."
+      ]
+    },
+    {
+      "id": "local.composite_capture.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "d32ab1c97ebb1e6d512320127f5f2643b13205ac",
+        "passedScope": "scripts/qualify_composite_capture.py on a frozen Debug build of 99a3709 (D:\\wp\\sr04), 57/57 steps, in one owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet, an S7 connection, PID_Compact 3.0 and a virtual TO_PositioningAxis 10.0 (each added with checkpoint, compile and save). A project review saved with project_snapshot_capture is captured into one composite phase: AutomationML (cax_export, retained and reopened through automationml_inspect/automationml_reopen), connections (one connection review whose observation rows equal connection_inspect), drives (drive_observe returns no drives: native, no records) and technology (one technology-profile record per saved technology object whose relationship rows equal technology_read's exposed slots), all native, composable, untruncated and changing nothing in the project. A malformed reviewId refuses as InvalidRequest and an unknown one as ArtifactUnavailable. A fresh owned Portal reopen captures the same content; after the S7 connection is deleted and its checkpoint restored, the recovered copy at another path refuses the original review as ProjectMismatch and captures the same content from its own new review."
+      },
+      "artifacts": [
+        "evidence/local.composite_capture.20261028.json"
+      ],
+      "limitations": [
+        "No drives (drive capture is drive_observe's empty result; Startdrive cannot read a new drive's drive objects), no TO hardware-module or channel connection and fewer than 32 records, so truncation is not reached.",
+        "The capture is not an atomic project revision; freshness and source authenticity stay unverified, as the result states.",
+        "composite_engineering_rebind_plan is not qualified by this run: over the fixture and recovered phases it reports no broken connection, because no verified flow creates a declared TO hardware relationship to break.",
+        "Engineering only; nothing is downloaded."
+      ]
+    },
+    {
+      "id": "local.plcsim_diagnostics.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "13b52905e739441fbd1ce1b3b4fa07eaab2aa536",
+        "passedScope": "scripts/qualify_plcsim_diagnostics.py on a frozen Debug build of 13b5290 (D:\\wp\\sr07), 49/49 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus. Fixture: an owned scratch CPU 1511-1 PN V4.1 with simulation support and an FB DiagGate (input Enable, output Active := Enable) whose instance DB Main calls without assigning Enable, each added with checkpoint, compile and save; a saved review is the source of a diagnostic case on that instance (two Bool hypotheses: Active follows Enable true, Active is released with Enable false) and of its experiment. simulation_provision_scratch_credential: after download and the generated-state save, provisioning with first-use trust for the owned empty CPU leaves the complete project state (hardware, device inventory, every program export) equal to the state just before it, the original card is restored and the instance goes through power-on, RUN, stop, power-off and owned release; a malformed ticket refuses as InvalidSimulationTicket. Two captures associated with the case (60 rows before, 80 rows after the write) are acquired into the experiment; an independent decoder of the original plan and segments reproduces every row and the per-hypothesis counts (releases 30 matched before, follows 40 matched after, no contradictions); JSON, Markdown and HTML exports of both are schema-valid and hash-exact, and the JSON export is the complete acquisition. diagnostic_plcsim_write: a wrong expected value returns preconditionMismatch and dispatches nothing; the write of Enable false to true and the restoring write each read back, and sim_read shows Active following. The comparison reports follows notApplicable to matchedOnly and releases matchedOnly to notApplicable, verdicts unresolved. Refusals: ArtifactUnavailable (unknown experiment, unknown acquisition), RuntimeCaptureReferenceInvalid, InvalidRequest (missing units, unknown export format, comparison fields beyond reason), RuntimeAcknowledgementRequired, RuntimeCaptureAssociationMismatch (signal outside the case), PlcsimCaptureInvalid (datatype differing from the declaration), RuntimeCaptureSessionBusy (write while a capture holds the instance), MeasurementLineageMismatch (an acquisition compared with itself)."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_diagnostics.20261028.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus with the owned scratch's generated credential (first-use TLS trust under the owned-empty-CPU policy); one FB instance with two Bool signals and two Bool hypotheses. Numeric, cycle-synchronous and multi-instance captures are not exercised.",
+        "Sequential polling: Enable and Active of one cycle are separate reads, and the counts depend on capture duration. Verdicts stay unresolved by design; no causation, scan atomicity or running-program identity is claimed.",
+        "The provisioning comparison covers the offline project state the read tools expose; online state other than the card restore is not compared."
+      ]
+    },
+    {
+      "id": "local.gsd_transfer_areas.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "f0ca4850509c2cecc2d3de1c61d3ca7be5f4acfa",
+        "passedScope": "scripts/qualify_gsd_export.py on a frozen Debug build of f0ca485 (D:\\wp\\ta04, git-archived sources with source-manifest.json), 80/80 steps, in one owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: X1 put on subnet GsdNet; the PROFINET interface made an I-device with hardware_attributes (InterfaceOperatingMode 'IoController, IoDevice') without compile or save; hardware_transfer_area_create added the controller-device areas TiaMcpArea, TiaMcpSpare and TiaMcpTemp and hardware_transfer_area_delete removed TiaMcpTemp, each with asserted preview, checkpoint (which saved the mode), device compile, configured-hardware preservation including every I-device interface's transfer areas, save and change_status; hardware_inspect, device_inventory and the PLC's program state differ in exactly the intended keys, with the CPU's hardware-identifier system constants recorded as sideEffects. hardware_gsd_export then wrote GSDML.xml (7823 bytes, SHA-256 a1adccde...) from the only item reporting gsdExportAvailable and changed nothing. A fresh owned Portal reopen shows the identical state (except the compile-derived CalculatedBandwidthForCyclicIoData) and exports the byte-identical GSDML; from that state a create, a delete and the switch back to IoController are each restored from their checkpoints into copies equal to the reopened state, and the last copy exports the same GSDML. Typed refusals (HardwareNotFound, UnsupportedCapability, InvalidRequest, ObjectExists, ObjectNotFound) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.gsd_transfer_areas.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is IO controller and I-device on a subnet without a higher-level IO controller; no shared device or controller assignment.",
+        "Controller-device (CD) transfer areas only, with the direction (LocalToPartner), lengths (1 byte each way) and local output addresses TIA chooses; F-CD, PROFIsafe, shared-device and mapping-rule areas and direction or length edits are not exercised.",
+        "The I-device mode change applies without compile or save because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it. Switching back to IoController with hardware_attributes removes the areas and their system constants.",
+        "The GSDML is Siemens output: checked as well-formed XML naming the designation, not imported into another tool. Engineering only; nothing is downloaded and no PROFINET communication is observed."
+      ]
+    },
+    {
+      "id": "local.safety_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "bb82136f645da83584aea72093c12c9d04b23347",
+        "passedScope": "scripts/qualify_safety_changes.py (sf3) on a frozen Debug build of 0355098 (D:\\wp\\b63, git-archived sources with source-manifest.json) in a fresh owned scratch under TIA Portal V21 Update 3: a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess, whose generated scratch user holds ProtectionLevelFailsafeAccess (Full access including fail-safe; owned scratch only, user-approved), plus an ET 200SP station with two F-DI 8x24VDC HF on its IO system. safety_inspect and safety_validation_inspect named the exact F-PLC, its runtime group Main_Safety_RTG1, program signatures and both F-DI F-parameters, reported explicit gaps and truncation at maxItems 1, and refused the standard scratch PLC (UnsupportedCapability); safety_printout wrote a PDF whose bytes match the reported size and SHA-256 and refused the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest); safety_fparameter_set moved one F-DI's Failsafe_FDestinationAddress to a free address with checkpoint, device compile, configured-hardware preservation and save, change_status and an exact state diff limited to that F-DI, was refused for a non-allowlisted attribute, a wrong expected value, a missing acknowledgement, the other F-DI's address, the non-writable Failsafe_FMonitoringtime and a wrong previewHash, persisted across a fresh Portal reopen (the compile-derived CalculatedBandwidthForCyclicIoData reads 0 after reopen and is recorded, not compared) and was restored from its checkpoint into a new directory equal to the reopened state; safety_import_xml was refused at prepare for a missing acknowledgement, a scope mismatch and a standard block."
+      },
+      "artifacts": [
+        "evidence/local.safety_changes.20261028.json"
+      ],
+      "limitations": [
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI 8x24VDC HF in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only.",
+        "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
+        "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
+        "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
+      ]
+    },
+    {
       "id": "local.translation.qualification.20261028",
       "status": "passed",
       "profile": {
@@ -4580,13 +4701,15 @@
         "limitations": [
           "Exact hardwarePath whose item exposes GsdExportProvider (hardware_inspect reports gsdExportAvailable); other items are refused as UnsupportedCapability.",
           "Siemens writes into a fresh artifact directory; up to 32 produced files are returned with SHA-256 and further files are reported as truncated. The GSD content is not validated by the bridge.",
-          "Which item exposes the service and whether Siemens requires a compiled I-device configuration are not observed yet.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Native observation (28 October 2026): V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode; other items are refused as UnsupportedCapability and only I-device interfaces report gsdExportAvailable. On a CPU 1511-1 PN interface InterfaceOperatingMode \"IoController, IoDevice\" applies (IoDevice alone is refused by TIA); the device compile then fails with 'Error in I-device: There is no IO-controller/device address assignment' until change.hardware_transfer_area_create adds a transfer area.",
+          "Natively qualified (local.gsd_transfer_areas.20261028) on an I-device CPU 1511-1 PN V4.1 with two CD transfer areas and no higher-level IO controller: Siemens wrote one file, GSDML.xml (7823 bytes), byte-identical after a fresh reopen and in a checkpoint-restored copy; the export changes nothing and is withdrawn when the interface is switched back to IoController. The Host requires designation; a blank one is InvalidRequest."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4716,15 +4839,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Exact F-PLC, runtime group Main_Safety_RTG1 and program signatures, explicit gaps, truncation at maxItems 1; a standard PLC is refused (UnsupportedCapability).",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.safety.v02",
-          "local.layers.safety-requalified.20261008"
+          "local.safety_changes.20261028"
         ]
       },
       "availability": {
@@ -4762,7 +4885,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Both F-DI listed with their F-parameters, explicit gaps; a standard PLC is refused (UnsupportedCapability).",
           "Read-only superset of safety_inspect for safety_evidence_review: the safety_inspect fields keep their names and new sections (plcFParameters, fIoModules, safetyValidation, safetyPrintout) compare as other reported content.",
           "F-I/O are device items exposing Failsafe_FDestinationAddress anywhere in the project; modules whose Failsafe_FSourceAddress definitely differs from the PLC Failsafe_CentralFSourceAddress are only counted, unreadable addresses are kept with fSourceAddressMatchesPlc null. I-device/shared-device ownership is not resolved.",
           "Activation tests are project-level; evaluationDeviceNameMatchesPlc compares the native EvaluationDeviceName with the PLC DeviceItem name only, not an exact identity.",
@@ -4771,8 +4894,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -4808,7 +4933,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). A Microsoft Print to PDF printout whose bytes match the reported size and SHA-256; the absent XPS printer (PrinterUnavailable) and a bad layout name (InvalidRequest) are refused.",
           "Only the two Windows file printers the API offers; the Print to PDF or XPS Document Writer queue must be installed (System.Drawing PrinterSettings.InstalledPrinters), otherwise PrinterUnavailable and nothing is printed. XPS output keeps whatever XPS/OpenXPS format the driver writes.",
           "documentLayout is passed through as a plain layout name (letters, digits, underscore); TIA decides whether it exists.",
           "PDF/XPS/XLSX/SimaticML files are written to the Host export directory and retained opaquely with SHA-256; content is not parsed or certified. A printout or report does not validate, accept or approve the safety program.",
@@ -4816,8 +4941,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5432,12 +5559,15 @@
           "Requires the ticket-bound instance to be the only registered local simulator, isolated through Softbus and explicit PLCSIM access.",
           "One-use native attempt; unknown online authentication challenges are rejected. No raw credentials or physical PLC route.",
           "TLS trust is rejected by default. Explicitly user-authorized first-use trust can be enabled only for the fresh owned empty local CPU, with a certificate pin for that attempt; this path still requires native qualification.",
-          "Provisioning is separate from proof of RUN, typed I/O and program assertions."
+          "Provisioning is separate from proof of RUN, typed I/O and program assertions.",
+          "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028): after download and the generated-state save, provisioning with explicit first-use trust for the owned empty CPU leaves the complete offline project state (hardware, device inventory, every program export) equal to the state just before it; the original card is restored, the instance runs, stops, switches off and is released; a malformed ticket refuses as InvalidSimulationTicket."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7063,7 +7193,8 @@
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "failsafeRuntimeAccess (with configureScratchSecurity, new scratch devices only) gives the generated runtime role the F-CPU right Full access including fail-safe (ProtectionLevelFailsafeAccess) instead of Full access, which an F-CPU compile requires (local.safety_changes.20261028)."
         ]
       },
       "qualification": {
@@ -7220,7 +7351,8 @@
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "InterfaceOperatingMode (added 28 October) is allowlisted as a set of InterfaceOperatingModes names ([Flags] enums take Enum.ToString's form, for example \"IoController, IoDevice\") but not natively qualified: on a CPU 1511-1 PN interface it applies, and the device compile then requires a transfer area that no change kind creates."
         ]
       },
       "qualification": {
@@ -7657,7 +7789,8 @@
           "The recorded CPU1511F firmware4.1 F_FBD comment fixture passed post-compile fingerprint/signature readback, guarded recovery, recovered unchanged compile and both saved-copy reopens. Earlier failed comment and blocked startup records remain historical evidence.",
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Native observation (28 October 2026, local.safety_changes.20261028): on this machine TIA refuses the F-block import with 'No safety license available', so the apply is not qualified; its prepare refusals (missing acknowledgement, scope mismatch, standard block) passed. Qualifying the apply needs an activated STEP 7 Safety license."
         ]
       },
       "qualification": {
@@ -7670,7 +7803,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Catalog entry is not a current-target authorization or availability result."
+          "Catalog entry is not a current-target authorization or availability result.",
+          "Requires an activated STEP 7 Safety license for the native F-block import."
         ]
       },
       "prerequisites": [
@@ -7708,7 +7842,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
           "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
           "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
@@ -7718,8 +7852,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13093,6 +13229,110 @@
       ]
     },
     {
+      "featureId": "change.hardware_transfer_area_create",
+      "domain": "hardware",
+      "title": "Create a controller-device transfer area on an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one controller-device (CD) transfer area with an exact name; a name already used on the interface (ignoring case) is refused as ObjectExists. TIA chooses its direction, lengths and local addresses, which the readback reports.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Other transfer-area types (F-CD, PROFIsafe, shared device, mapping rules), direction and length edits, and an assigned higher-level IO controller are not reviewed.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.gsd_transfer_areas.20261028): the interface made an I-device with hardware_attributes without compile, then TiaMcpArea, TiaMcpSpare and TiaMcpTemp created and TiaMcpTemp deleted, each with device compile (0 errors), preservation, save, fresh reopen and checkpoint restore. TIA gives a new CD area direction LocalToPartner, 1 byte each way, the next free output byte and position numbers from 1000, and adds a Hw_SubModule system constant Local~<interface>~<area> per area (Local~<interface>~IODevice with the I-device mode). Switching the interface back to IoController removes the areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_delete",
+      "domain": "hardware",
+      "title": "Delete a transfer area of an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Deletes one transfer area by exact name; an absent name is refused as ObjectNotFound. Program references to its local addresses are checked only by the mandatory device compile.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Transfer areas with mapping rules or partner addresses from an assigned higher-level IO controller are not reviewed.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.gsd_transfer_areas.20261028): the interface made an I-device with hardware_attributes without compile, then TiaMcpArea, TiaMcpSpare and TiaMcpTemp created and TiaMcpTemp deleted, each with device compile (0 errors), preservation, save, fresh reopen and checkpoint restore. TIA gives a new CD area direction LocalToPartner, 1 byte each way, the next free output byte and position numbers from 1000, and adds a Hw_SubModule system constant Local~<interface>~<area> per area (Local~<interface>~IODevice with the I-device mode). Switching the interface back to IoController removes the areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.network_io_assign",
       "domain": "hardware",
       "title": "Assign or disconnect one native remote-I/O connector",
@@ -13998,12 +14238,16 @@
         "status": "partial",
         "limitations": [
           "First mutation profile is one existing Bool ModifyValue in a worker-owned scratch. Host/worker native rechecks and shared durable ownership are wired for this workflow.",
-          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required."
+          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required.",
+          "Qualified on the durable stores of 18 curated native runs read through fresh Hosts (local.operation_status.20261028): every operation and admission equals its newest on-disk revision, the 14 live reads local.watch.native.20261028 recorded after worker and Host loss equal their revisions, unknown, malformed and tampered journals refuse with typed codes, reads change no store file and a cooperating Host returns the same records."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.operation_status.20261028",
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22158,12 +22402,14 @@
           "Each native capture is retained through its existing workflow (AutomationML document, connection-review-request.v1, drive-profile-review-request.v2, technology-profile-review-request.v1) as one observed state with identical before/after; the result is one composite phase plus per-capture native/unavailable/failed status and per-record refusals.",
           "Technology objects come from the saved review; technology_read connection slots become hardware relationships whose target is the single resolved hardware or channel-owner reference, otherwise disconnected or unknown with a reason. CPU order number, firmware and encoder routes (technology v4) are not captured.",
           "At most 32 component records per phase with explicit truncation; drive_observe is bounded by maxItems 2000 and reports parametersComplete false when paged. Captures are sequential, not an atomic project revision, and a response for a different project path refuses the whole capture.",
-          "Host logic tested offline against fake worker responses only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU, an S7 connection, PID_Compact and a virtual axis (local.composite_capture.20261028): AML, connection and technology captures checked against independent reads, unchanged project, the same content after a fresh reopen and in a checkpoint-recovered copy, which refuses the original review as ProjectMismatch. Drives only as drive_observe's empty result: Startdrive cannot read a new drive's drive objects."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.composite_capture.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22203,7 +22449,8 @@
           "Output only: lists before-phase declared TO hardware relationships that are missing, disconnected, unknown or unresolved after, with the replacement from declared model correspondences or AML correspondences through declared hardware mappings in both phases. Missing, conflicting or role-less replacements stay explicit without a payload.",
           "to_connect payloads (technologyPath, role, sensorIndex, hardwarePath, carried-over channel selector or channel index) are emitted only when the bundled catalog has the to_connect change kind; a carried-over selector is not verified on the replacement module.",
           "Role and slot metadata exist only in relationships produced by composite_engineering_capture; supplied records without them report connectionRoleUnknown. At most 200 entries with explicit truncation.",
-          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified."
+          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified.",
+          "Native observation (28 October 2026): over two native phases (local.composite_capture.20261028) the plan reports no broken connection, because no verified flow creates a declared TO hardware-module or channel connection: to_connect is qualified only for output cams to PLC tags. Qualification needs a fixture TO connected to a module or channel, for example TO_ExternalEncoder on a TM Count or an output cam on a TM Timer DIDQ channel."
         ]
       },
       "qualification": {
@@ -22519,7 +22766,8 @@
           "No existing-content merge, system/formatted lists, native numeric-range or installed-language certification, native import/compile/runtime, complete consumer mapping or preservation claim.",
           "4 MiB request, 128 lists, 4096 total entries/texts, 32 languages, conservative 8 MiB per candidate and shared 512 MiB retention. Nonoverlapping ranges and unambiguous ASCII text identifiers only.",
           "Explicit v2 Bool binding generation uses exact v7 saved component/output evidence, declared translations and a retained previous candidate pair. Manual drift or relevant conflicts suppress candidates; selected retained peers stay unchanged. Original reviews and predecessor chains are revalidated; 16 predecessor and 128 MiB lineage-input limits. This does not establish native preservation or complete C01 generation.",
-          "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification."
+          "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification.",
+          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
         ]
       },
       "qualification": {
@@ -22739,7 +22987,8 @@
           "V1 coordinates fixed-membership Bool/integer text-list sets; v2 explicitly evolves retained sets through output additions, removals, renames and same-type member rebinding. Every prior/current declared output and binding must be accounted for.",
           "Exact predecessor/current/proposed comparisons, captured lineage, manual edits and cross-output collisions are checked before candidate publication. Conflicts suppress the whole proposed set; old records retain their semantics.",
           "Established plain TextLists/TextLibrary YAML only. Removal/rename effects are previews, not source deletion or native writes. No implicit type conversion, general SiVArc template engine, complete project coverage or native preservation qualification.",
-          "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified."
+          "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified.",
+          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
         ]
       },
       "qualification": {
@@ -22783,12 +23032,15 @@
         "limitations": [
           "Revalidates one exact diagnostic experiment and its associated immutable runtime capture snapshot, retaining original plan/segment references, raw read JSON, per-read timing, errors, skipped polls, terminal state and explicit units.",
           "Produces a distinct bounded runtime-acquisition record rather than converting sequential polls into atomic trace samples. Observation counts remain descriptive and all hypothesis verdicts remain unresolved.",
-          "No new network acquisition, address/program authentication, synchronized clocks, scan atomicity, causal diagnosis or verified fix. Changed or unavailable original sources refuse; incomplete observations remain explicit."
+          "No new network acquisition, address/program authentication, synchronized clocks, scan atomicity, causal diagnosis or verified fix. Changed or unavailable original sources refuse; incomplete observations remain explicit.",
+          "Qualified with genuine runtime input on an owned PLCSIM Advanced V8 instance (local.plcsim_diagnostics.20261028): two genuine PLCSIM captures acquired into one experiment; an independent decoder of the original plan and segments reproduces every row and the per-hypothesis counts; unknown, malformed and self-referencing inputs refuse with typed codes."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22825,12 +23077,15 @@
         "limitations": [
           "Exports a retained diagnostic runtime-acquisition record as JSON, Markdown or escaped self-contained HTML after rederiving the exact original experiment, capture snapshot and sequential analysis.",
           "Readable previews retain explicit limits and include complete original acquisition JSON. Raw values, separate read times, gaps/errors, terminal state and uncertainty are not interpolated or silently truncated.",
-          "Hash consistency is not source authentication or live program identity. No target access, native qualification, causal inference or fixed-fault verdict."
+          "Hash consistency is not source authentication or live program identity. No target access, native qualification, causal inference or fixed-fault verdict.",
+          "Qualified with genuine runtime input on an owned PLCSIM Advanced V8 instance (local.plcsim_diagnostics.20261028): JSON, Markdown and HTML exports of two acquisitions of genuine PLCSIM captures are schema-valid and hash-exact, and the JSON export is the complete acquisition; unknown, malformed and self-referencing inputs refuse with typed codes."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22865,12 +23120,15 @@
         "status": "partial",
         "limitations": [
           "Rederives two retained runtime acquisitions of the same exact experiment from distinct original capture chains, then reports per hypothesis the matched, contradicted and unknown cycles on each side, an observed pattern and whether it changed, beside both capture contexts, signal sets, progress and quality.",
-          "Counts depend on capture duration and coverage; no rates, statistics, resampling or clock synchronization. Stimuli between the captures, such as diagnostic_plcsim_write, are not linked or verified. All verdicts remain unresolved; no causation or fix proof."
+          "Counts depend on capture duration and coverage; no rates, statistics, resampling or clock synchronization. Stimuli between the captures, such as diagnostic_plcsim_write, are not linked or verified. All verdicts remain unresolved; no causation or fix proof.",
+          "Qualified with genuine runtime input on an owned PLCSIM Advanced V8 instance (local.plcsim_diagnostics.20261028): the before/after comparison of two acquisitions around a diagnostic_plcsim_write reports the independently decoded counts and the expected pattern change, with verdicts unresolved; unknown, malformed and self-referencing inputs refuse with typed codes."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22906,12 +23164,14 @@
         "limitations": [
           "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
           "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
-          "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8."
+          "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028) with one FB instance's Bool Enable: a wrong expected value returns preconditionMismatch without dispatching; a write and its restoring write each read back and the program reacts; refusals without acknowledgeWrite, for a signal outside the case, a datatype differing from the declaration and while a capture holds the instance."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_diagnostics.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -24139,12 +24399,14 @@
           "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
           "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
           "Safety units, system text lists and the text-list library lifecycle (CreateFrom, delete, rename, master copies) are not covered.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.alarm_text_list.20261028): a Decimal user text list created from a workbook in the layout V21's importer reads (sheets TextList with Name/ListRange/Comment [culture] and TextListEntry with Parent/From/To/Text [culture], custom properties FileVersion 1 and FileContent 'Alarm text lists', a shared-string table and a styles part; without those two parts ImportFromXlsx throws instead of returning a result), then one entry replaced with Override in TIA's own export; unknown options, changed hashes, DAT files and None for an existing list refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.alarm_text_list.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

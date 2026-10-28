@@ -22,7 +22,9 @@ namespace TiaMcp.Openness.V21
             if (type.IsEnum)
             {
                 string text = token.Value<string>();
-                if (!Enum.GetNames(type).Contains(text, StringComparer.Ordinal)) throw new BridgeException("InvalidRequest", "Unknown enum value for " + type.Name + ": " + text);
+                // A [Flags] enum takes a set of its names in Enum.ToString's form, for example "IoController, IoDevice".
+                var names = type.IsDefined(typeof(FlagsAttribute), false) ? (text ?? "").Split(',').Select(name => name.Trim()) : new[] { text };
+                if (names.Any(name => !Enum.GetNames(type).Contains(name, StringComparer.Ordinal))) throw new BridgeException("InvalidRequest", "Unknown enum value for " + type.Name + ": " + text);
                 return Enum.Parse(type, text, false);
             }
             if (type == typeof(string)) { if (token.Type != JTokenType.String) throw new BridgeException("InvalidRequest", "String attribute requires a JSON string."); return token.Value<string>(); }

@@ -215,6 +215,19 @@ Check("port connect without captured port rejected", "hardware_port_connect", ne
 Check("self port link rejected", "hardware_port_connect", new JObject { ["hardwarePath"] = portA, ["partnerHardwarePath"] = portA }, _ => { }, false, FreePorts);
 Check("port disconnect unlinks both ends", "hardware_port_disconnect", portLink, rows => SetLinks(rows, false), true, LinkedPorts);
 Check("partial port disconnect rejected", "hardware_port_disconnect", portLink, rows => rows[4]["port"]["connectedPorts"] = new JArray(), false, LinkedPorts);
+JObject Area(string name, int start) => new JObject { ["name"] = name, ["type"] = "CD", ["direction"] = "PartnerToLocal", ["positionNumber"] = start, ["localToPartnerLength"] = 0, ["partnerToLocalLength"] = 1,
+    ["localAddresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = start, ["lengthBits"] = 8 }), ["partnerAddresses"] = new JArray() };
+void Areas(JArray rows, params JObject[] areas) => rows[2]["network"]["transferAreas"] = new JArray(areas);
+var areaCreate = new JObject { ["hardwarePath"] = controller, ["name"] = "Ta" };
+Check("transfer area create adds exactly the named area", "hardware_transfer_area_create", areaCreate, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)), true, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create without the area rejected", "hardware_transfer_area_create", areaCreate, _ => { }, false, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create of an existing area rejected", "hardware_transfer_area_create", areaCreate, _ => { }, false, rows => Areas(rows, Area("Ta", 4)));
+Check("transfer area create changing another area rejected", "hardware_transfer_area_create", areaCreate, rows => Areas(rows, Area("Keep", 3), Area("Ta", 4)), false, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create with collateral address rejected", "hardware_transfer_area_create", areaCreate, rows => { Areas(rows, Area("Keep", 2), Area("Ta", 4)); rows[1]["addresses"][0]["startAddress"] = 4; }, false, rows => Areas(rows, Area("Keep", 2)));
+Check("transfer area create on an uncaptured interface rejected", "hardware_transfer_area_create", areaCreate, _ => { }, false);
+Check("transfer area delete removes exactly the named area", "hardware_transfer_area_delete", areaCreate, rows => Areas(rows, Area("Keep", 2)), true, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)));
+Check("transfer area delete keeping the area rejected", "hardware_transfer_area_delete", areaCreate, _ => { }, false, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)));
+Check("transfer area delete removing another area rejected", "hardware_transfer_area_delete", areaCreate, rows => Areas(rows), false, rows => Areas(rows, Area("Keep", 2), Area("Ta", 4)));
 const string child = module + "/items/Sub";
 var replace = new JObject { ["hardwarePath"] = module, ["typeIdentifier"] = "Catalog:DI32" };
 void WithChild(JArray rows) => rows.Add(Row(child, 1));
@@ -258,4 +271,15 @@ foreach (var kind in new[] { "hmi_engineering", "hardware_attributes", "tag_set"
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
 foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
     if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Covered kind treated as target-dependent: " + kind); else count++;
+// A failed apply journals what TIA said in MessageData/DetailMessageData, not only the generic Message.
+var native = new Siemens.Engineering.EngineeringException("Error when calling method 'ImportFromXlsx'.", new InvalidOperationException("inner"))
+{
+    MessageData = new Siemens.Engineering.ExceptionMessageData { Text = "Import failed.", DetailText = new string('x', 3000) },
+    DetailMessageData = Enumerable.Range(0, 20).Select(i => new Siemens.Engineering.ExceptionMessageData { Text = "The required worksheet 'TextList' is missing." }).ToList()
+};
+var chain = NativeFailureText.Chain(native);
+if (chain.Count != 2 || (string)chain[0]["text"] != "Import failed." || ((string)chain[0]["detail"]).Length != 2048 || ((JArray)chain[0]["details"]).Count != 16
+    || (string)chain[0]["details"][0]["text"] != "The required worksheet 'TextList' is missing." || (string)chain[1]["message"] != "inner" || chain[1]["details"] != null)
+    throw new Exception("Native failure chain differs: " + chain);
+count++; Console.WriteLine("PASS native failure chain keeps Siemens message data, bounded");
 Console.WriteLine($"{count} hardware preservation checks passed.");

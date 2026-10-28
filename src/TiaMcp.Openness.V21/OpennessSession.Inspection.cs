@@ -227,7 +227,7 @@ namespace TiaMcp.Openness.V21
                         row["network"] = InspectConfiguredNetwork(project, entry, network, hardware, budget, warnings);
                     row["gsd"] = GsdInfo(entry.Item.GetService<GsdDeviceItem>());
                     if (entry.Item.Parent is Device device && device.IsGsd) row["gsdDevice"] = GsdInfo(device.GetService<GsdDevice>());
-                    row["gsdExportAvailable"] = entry.Item.GetService<GsdExportProvider>() != null;
+                    row["gsdExportAvailable"] = entry.Item.GetService<GsdExportProvider>() != null && IsIDeviceInterface(entry.Item);
                     row["attributes"] = InspectionAttributes(entry.Item, budget, warnings, entry.Path);
                 }
                 catch (Exception exception) { warnings.Add(InspectionWarning(entry.Path, exception)); }

@@ -119,6 +119,7 @@ Findings:
 - **Safety probe blocked.** An F-CPU added to a scratch fails compile: "At least one local user must
   have the following runtime right: Full access including fail-safe". Scratch provisioning
   deliberately never grants that right, so `safety_fparameter_set`/`safety_printout` were not run.
+  Resolved on 28 October with the opt-in `failsafeRuntimeAccess` ([record](safety-changes-20261028.md)).
 - **Combined apply content.** A scratch that keeps en-US next to de-DE adds empty en-US text items to
   every export, which fails the captured-storage content binding; the runner now makes its scratches
   de-DE only.

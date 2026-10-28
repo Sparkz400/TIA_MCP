@@ -27,7 +27,8 @@ KINDS = ("hardware_add", "hardware_attributes", "hardware_replace", "hardware_po
 CPU = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"
 # Two firmware versions of DI 16x24VDC HF; the change between them keeps the module's addresses.
 MODULE, MODULE_V2 = "OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "OrderNumber:6ES7 521-1BH00-0AB0/V2.0"
-CONFIGURED = ("hardware_replace", "hardware_port_connect", "hardware_port_disconnect", "network_configure", "hardware_plug")
+CONFIGURED = ("hardware_replace", "hardware_port_connect", "hardware_port_disconnect", "network_configure", "hardware_plug",
+              "hardware_transfer_area_create", "hardware_transfer_area_delete")
 CRITERIA = {
     "AC-identity": "refused: typed refusals of duplicate, unknown, built-in, software-bearing, unchanged, unconnected or already connected targets, each leaving the complete state unchanged.",
     "AC-preview": "Every preview is asserted against the request before apply; a wrong previewHash refuses at apply.",
