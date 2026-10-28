@@ -2,9 +2,9 @@
   "schema": "tia-mcp.evidence-summary.v1",
   "evidenceId": "local.typed.wave9.engineering.20261028",
   "outcome": "passed",
-  "recordedAtUtc": "2026-10-28T03:23:12+00:00",
+  "recordedAtUtc": "2026-10-28T03:23:28+00:00",
   "source": {
-    "commit": "6dcbf7e9bd844cd236777791b5afc7160177fc3a",
+    "commit": "b425d0a2228609b048840b7fede7a4fe27e36f08",
     "dirty": false
   },
   "environment": {
@@ -12,7 +12,7 @@
     "os": "Windows-11-10.0.26300-SP0",
     "tiaVersion": 21
   },
-  "scope": "scripts/qualify_typed_graphical.py --engineering-only on the standard route of CPU 1511-1 PN V4.1 (V21), each case in a fresh owned scratch, one complete batch (w9q5): 40 wave 9 cases pass all four native engineering gates (engineering, preservation, persistence, recovery) — all 12 SUB/DIV Int/DInt/Real LAD/FBD, MUL/MOVE DInt/Real LAD, TONR and R_TRIG/F_TRIG multi-instance and TONR existing-global LAD/FBD, and the FBD compare/MOVE/ADD/MUL cases — against the natively captured profiles (local.typed.wave9-capture.20261027).",
+  "scope": "scripts/qualify_typed_graphical.py --engineering-only on the standard route of CPU 1511-1 PN V4.1 (V21), each case in a fresh owned scratch, one complete batch (w9q5): 40 wave 9 cases pass all four native engineering gates (engineering, preservation, persistence, recovery): SUB/DIV Int/DInt/Real in LAD and FBD; R_TRIG/F_TRIG multi-instance LAD and FBD; every FBD DInt/Real compare (eq..ge), MOVE/ADD/MUL Int/DInt/Real and TONR; and TONR on the existing global Tgp_GlobalTonr in LAD and FBD. Profiles: local.typed.wave9-capture.20261027.",
   "limitations": [
     "The 4 typed-existingglobal-rtrig/ftrig cases are not run: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile, so no global edge storage profile exists. The other 22 wave 9 cases passed in earlier stopped batches (local.typed.wave9.engineering-early.20261028).",
     "SUB/DIV references are imported without TIA's exported Card=2 template value, which TIA refuses on import (recorded per case as referenceImportAdaptation); the reader treats Card=2 as absent for SUB/DIV only.",
