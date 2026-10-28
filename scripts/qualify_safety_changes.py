@@ -25,8 +25,8 @@ from pathlib import Path
 
 from library_native_harness import Harness, require
 from probe_safety_kinds import DEST, FDI, FDI2, MONITORING, STATION, REMOTE, catalog, change, free_destination, topology, write
-from qualify_hardware_changes import Run as HardwareRun, reopen
-from qualify_plc_object_mutations import coverage_gaps
+from qualify_hardware_changes import Run as HardwareRun
+from qualify_plc_object_mutations import coverage_gaps, diff
 
 KINDS = ("safety_fparameter_set",)  # safety_import_xml: TIA refuses the F-block import without a STEP 7 Safety license.
 MAIN = "Main_Safety_RTG1"
@@ -55,6 +55,34 @@ class Run(HardwareRun):
 
     def args(self, kind, payload, **top):
         return {"kind": kind, "payload": payload, "plcPath": self.plc, **top}
+
+
+# Computed by the hardware compile and not saved: a freshly reopened project reads 0 until its next compile.
+DERIVED = ("CalculatedBandwidthForCyclicIoData",)
+
+
+def comparable(view):
+    return {k: {**v, "attributes": {a: x for a, x in v["attributes"].items() if a not in DERIVED}} if k.startswith("hw:") else v for k, v in view.items()}
+
+
+def reopen(run):
+    """qualify_hardware_changes.reopen, except that compile-derived attributes are recorded instead of compared."""
+    h, final = run.h, run.current
+    h.stage("close the changed session", lambda: h.tool("tia_detach"))
+    h.owned_portal("reopen")
+    h.stage("reopen the saved project", lambda: h.reopen_project(run.project))
+    run.current = run.b0 = run.snap("reopened")
+    def same():
+        require(comparable(run.b0["view"]) == comparable(final["view"]), "Reopened state differs: %s" % diff(comparable(final["view"]), comparable(run.b0["view"])))
+        derived = {k: {a: [final["view"][k]["attributes"].get(a), run.b0["view"][k]["attributes"].get(a)] for a in DERIVED
+                       if final["view"][k]["attributes"].get(a) != run.b0["view"][k]["attributes"].get(a)}
+                   for k in diff(final["view"], run.b0["view"])["changed"]}
+        h.report["reopenDerived"] = derived
+        return derived
+    h.stage("reopened state equals every verified change", same)
+    for kind, rows in list(run.coverage.items()):
+        if rows.get("applied"):
+            run.mark(kind, "persisted", "fresh Portal reopen")
 
 
 def side_effects(run):
