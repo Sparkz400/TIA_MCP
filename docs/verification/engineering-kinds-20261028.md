@@ -32,6 +32,7 @@ nothing touched a user project, a PLC or PLCSIM.
 | [`qualify_graph_changes.py`](../../scripts/qualify_graph_changes.py) | every program export (GRAPH documents checked byte for byte) | `b39` | Passed, 38/38 steps | `local.graph_changes.20261028` |
 | [`qualify_project_settings.py`](../../scripts/qualify_project_settings.py), with `project_simulation_enable` | as above | `b38` | Passed, 64/64 steps | `local.project_simulation.20261028` |
 | [`qualify_cax_export.py`](../../scripts/qualify_cax_export.py) | the hardware runner's state, unchanged by each export | `b40` | Passed, 12/12 steps | `local.cax_export.20261028` |
+| [`qualify_cax_import.py`](../../scripts/qualify_cax_import.py) | the hardware runner's state; the imported device's hardware rows compared with the exported device's | `b48` | Passed, 35/35 steps | `local.cax_import.20261028` |
 | [`qualify_vci_mappings.py`](../../scripts/qualify_vci_mappings.py) | every program export plus workspace and mapping identities; compare states and package files checked per change | `b45` | Passed, 89/89 steps | `local.vci_mappings.20261028` |
 
 ## Findings
@@ -72,7 +73,19 @@ nothing touched a user project, a PLC or PLCSIM.
   `G7_StepPlus` member in the block interface, and nothing else.
 - **An imported S7-1500 CPU needs its password again.** `cax_export` of a secured CPU, checkpoint restore and
   `cax_import` with `RetainTiaDevice` worked natively, but the imported CPU fails the device compile: the AML carries
-  no confidential-data password. `cax_import` stays open.
+  no confidential-data password. An S7-300 CPU 315-2 PN/DP compiles without it, and its import reproduces the exported
+  hardware rows exactly, so `cax_import` is qualified with that device. The Host also returned `cax_import`'s AML
+  refusals as an untyped error; they are now typed like every other preparation refusal.
+- **Drives cannot be compiled or observed yet.** A SINAMICS G120C PN exposes no device-level compile service, and the
+  worker's device compile requires one on every device, so no device-compiled change (including the drive kinds) can
+  run in a project that holds a drive. On the newly added drive, Startdrive Openness also cannot read the drive
+  object number, so `drive_observe` returns no drive objects (reported as incomplete). The drive rows need a reviewed
+  compile route and a Startdrive-configured fixture.
+- **Online routes cannot authenticate.** Against a downloaded, credential-provisioned owned PLCSIM Advanced instance,
+  going online asks for authentication, because the scratch CPU must be access-protected to compile. The online
+  routes (`plc_online_compare`, `plc_station_upload`, the DB-snapshot kinds) never log in by design and refuse with
+  `SimulationOnlineAuthenticationRequired`. They need a reviewed route that authenticates with the generated scratch
+  credential, as `simulation_download` does.
 - **VCI mappings.** `vci_mapping_add` exported the package and then failed with a `NullReferenceException`:
   `GetChildStatus` returns null for a mapped block. Mapping rows and `vci_workspace_inspect` now read it null-safe.
   Re-importing a mapped block from SCL source replaces the block, and TIA drops its mapping; in-place edits keep it.
@@ -105,7 +118,7 @@ nothing touched a user project, a PLC or PLCSIM.
 
 ## Verified
 
-Catalogs `0.4.53` and `0.4.54` verify:
+Catalogs `0.4.53` to `0.4.55` verify:
 
 - `change.software_unit_create`, `_publication_set`, `_relation_set` and `_delete` (`local.software_units.20261028`);
 - `change.project_languages_set`, `project_copy` and `project_open.read_only` (`local.project_settings.20261028`);
@@ -118,7 +131,7 @@ Catalogs `0.4.53` and `0.4.54` verify:
 - `change.connection_create`, `_set` and `_delete` (`local.connection_changes.20261028`);
 - `change.graph_import`, `graph_edit` and `graph_export` (`local.graph_changes.20261028`);
 - `change.project_simulation_enable` (`local.project_simulation.20261028`);
-- `cax_export` (`local.cax_export.20261028`);
+- `cax_export` (`local.cax_export.20261028`) and `change.cax_import` (`local.cax_import.20261028`);
 - `change.vci_mapping_add`, `change.vci_synchronize` and `change.vci_mapping_remove` (`local.vci_mappings.20261028`);
 - `tag.member.crud` and `type.rename_delete`, whose kinds the X11 run (`local.plc_object_mutations.20261028`)
   already covers.
@@ -137,6 +150,6 @@ Catalogs `0.4.53` and `0.4.54` verify:
   because a scratch project has no user text list to export.
 - Project settings: `project_attributes_set` cannot apply on V21; the copy is compared without program exports,
   which TIA refuses in a read-only project.
-- Still open from these owners: the six D04 OPC UA kinds (no Siemens-compatible NodeSet on this PC) and
-  `change.cax_import` (an imported S7-1500 CPU fails compile without its password).
+- Still open from these owners: the six D04 OPC UA kinds (TIA crashed on reference-namespace import with two
+  different NodeSets), the D10 drive rows and the D09 online rows (see the findings above).
 - Engineering only: nothing is downloaded, and no runtime, motion or alarm behavior is observed.

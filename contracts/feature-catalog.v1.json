@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.54",
+  "catalogVersion": "0.4.55",
   "targetTiaVersions": [
     21
   ],
@@ -3402,6 +3402,26 @@
         "change_restore never restores workspace files; restore equality covers the project state only.",
         "Mapped blocks are edited in place: an SCL re-import replaces the block and TIA drops its mapping."
       ]
+    },
+    {
+      "id": "local.cax_import.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "350c5147ddc785c38b0978bb62a192a40209c1ad",
+        "passedScope": "scripts/qualify_cax_import.py on a frozen Debug build of 2878f76 (D:\\wp\\b48), 35/35 steps, in an owned scratch CPU 1511-1 PN V4.1: an S7-300 CPU 315-2 PN/DP device is added, exported with cax_export and removed again by restoring its checkpoint; cax_import with RetainTiaDevice then brings it back from the retained AML with checkpoint, device compile and save, asserted preview (the Host-resolved AML path and hash) and change_status; the complete state differs from the device-free state only below the imported device, whose hardware rows equal the exported device's exactly; the first import restored from its checkpoint equals the device-free state; the second import persists through a fresh owned Portal reopen. Typed refusals (InvalidRequest for an AML given by record and path and for an unknown option, ArtifactChanged, PreviewMismatch) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.cax_import.20261028.json"
+      ],
+      "limitations": [
+        "One S7-300 CPU 315-2 PN/DP with RetainTiaDevice; an imported S7-1500 CPU fails the device compile because the AML carries no confidential-data password.",
+        "MoveToParkingLot, OverwriteTiaDevice and devices that already exist in the target are not exercised.",
+        "Engineering only; nothing is downloaded."
+      ]
     }
   ],
   "features": [
@@ -5330,7 +5350,8 @@
           "Endpoint identity uses the credential-provisioning observer Portal: exactly one addressable PLCSIM endpoint, equal to the instance's own controller address. Zero-address entries such as the Runtime Manager placeholder are recorded, not excluded by a baseline.",
           "TLS verification is answered NonTrusted and every login/password challenge is left unanswered (fail closed); a target that requires either cannot be compared.",
           "Applies the PLC's sole PLCSIM target interface like provisioning; whether TIA marks the in-memory project modified is reported (projectModifiedBefore/After), never saved.",
-          "Bounded tree (maxItems, depth 64) with explicit truncation. The FingerprintDataProvider owner (TiaPortal) and fingerprint coverage are unqualified; an unavailable or failing provider is reported and does not stop the compare."
+          "Bounded tree (maxItems, depth 64) with explicit truncation. The FingerprintDataProvider owner (TiaPortal) and fingerprint coverage are unqualified; an unavailable or failing provider is reported and does not stop the compare.",
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
         ]
       },
       "qualification": {
@@ -5377,7 +5398,8 @@
           "Requires an empty worker-owned Portal; creates a new project under the artifact root and never opens or changes an existing project. Goes through shared mutation admission; a structured failure is a returned outcome, while a lost worker leaves the admission unknown with no reconciliation adapter.",
           "Same owned-instance, observer-endpoint and fail-closed TLS/login rules as plc_online_compare. Missing products are answered NoAction and make the result partial; any other upload request (passwords included) fails the upload.",
           "Every upload message is kept (bounded at 10000 with explicit truncation) in the response and station-upload.json; the partial destination project is saved and retained on failure.",
-          "Uploaded hardware/software completeness, compile and reopen of the new project are not verified."
+          "Uploaded hardware/software completeness, compile and reopen of the new project are not verified.",
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
         ]
       },
       "qualification": {
@@ -19363,7 +19385,8 @@
           "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Exports the snapshot stored on the offline DB (taken in TIA or by change kind db_snapshot_create); it is not a current CPU read, never goes online and leaves the project unchanged. A DB without a stored snapshot refuses with DbSnapshotUnavailable.",
           "The record binds the export's project path, PLC path and DB path to the selected saved review DB. It proves neither CPU/program identity nor freshness, structural compatibility or XSD conformance; all verification flags stay false.",
-          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not."
+          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not.",
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
         ]
       },
       "qualification": {
@@ -19412,7 +19435,8 @@
           "Payload: exact blockPath of a standard GlobalDB/InstanceDB/ArrayDB and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
           "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS trust and logins rejected, always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
           "CreateSnapshot replaces the snapshot stored in the project. The previous snapshot export is kept as a backup; the readback export must differ from it. Recovery is the project checkpoint archive.",
-          "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established."
+          "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established.",
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
         ]
       },
       "qualification": {
@@ -19465,7 +19489,8 @@
           "Writes CPU values. Payload: snapshotRecordId of a db_snapshot_capture review, acknowledgeActualValueWrite=true and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
           "The Host reopens the review and binds blockPath, project path and snapshot SHA-256 from it; supplied-upload reviews refuse with DbSnapshotSourceRequired and another DB with DbSnapshotIdentityMismatch. Prepare and apply re-export the stored snapshot and refuse with DbSnapshotChanged unless its hash equals the reviewed capture.",
           "No public V21 API reads actual values back, so the write is reported, not verified. The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false, so the applied PLCSIM route is never saved.",
-          "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime."
+          "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime.",
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
         ]
       },
       "qualification": {
@@ -23646,18 +23671,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.cax_import.20261028): an exported S7-300 CPU 315-2 PN/DP device imported with RetainTiaDevice reproduces the exported hardware rows exactly and changes nothing else; ambiguous AML inputs, unknown options and changed hashes refused; fresh-Portal reopen and checkpoint restore. An imported S7-1500 CPU fails the device compile because the AML carries no confidential-data password; MoveToParkingLot and OverwriteTiaDevice are not exercised.",
           "Payload: importOption plus a retained automationml amlRef, or a path inside the Host artifact directory with expectedSha256. The file (at most 64 MiB) is copied and hash-pinned at prepare and verified again at apply.",
           "Siemens refuses CAx import inside exclusive access: apply releases the admitted shared-mutation lease only around the native call, so the kind is limited to a worker-owned TIA instance and the Host's admitted change_apply route.",
           "Whole-project checkpoint, compile=true device-project compilation, and configured-hardware manifests before and after with a path difference in the readbacks. MoveToParkingLot and RetainTiaDevice must leave every existing configured row exact (additions only); OverwriteTiaDevice replaces devices as the AML file dictates, so its hardware outcome is recorded for review but cannot be matched.",
           "The V19+ TransferResult overload writes no native log; the message tree is retained as cax-import.transfer-result.json. An error state fails into recovery_required.",
-          "Software, HMI and unexposed vendor data changed by the import are covered only by the generic engineering fingerprint; no AML-to-native identity mapping is established.",
-          "Native observation (28 October 2026, local.cax_export.20261028 fixture): exporting a secured CPU 1511-1 PN, restoring the checkpoint before it and importing the AML with RetainTiaDevice applied, but the imported CPU failed the device compile because the AML carries no confidential-data password. A device that compiles without generated security is still needed to qualify the import."
+          "Software, HMI and unexposed vendor data changed by the import are covered only by the generic engineering fingerprint; no AML-to-native identity mapping is established."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.cax_import.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23751,7 +23777,8 @@
           "One exact hardwarePath and driveObjectNumber; 1..200 exact parameter names, each with the expected current value exactly as drive_observe reports it. Prepare and apply refuse any difference before the first write; the requested values are also part of the change fingerprint.",
           "Scalar values only, converted to the current native CLR type; BICO interconnections, unavailable values, Safety Integrated parameters (p9300..p10999) and commissioning/reset/save/motor-identification parameters (p0009, p0010, p0970-p0972, p0976, p0977, p1900, p1910, p1960, p3900) are refused.",
           "Openness exposes no per-parameter write access: a read-only or rejected value fails at the native setter after earlier writes and requires checkpoint recovery. Startdrive may recalculate dependent parameters; readback covers only the listed parameters, so compare drive_observe snapshots with drive_profile_review.",
-          "compile=true compiles all project devices; no online write, download or RAM-to-ROM."
+          "compile=true compiles all project devices; no online write, download or RAM-to-ROM.",
+          "Native observation (28 October 2026): a SINAMICS G120C PN added to an owned scratch exposes no device-level ICompilable, and the worker's device compile requires one on every device, so every device-compiled change, including this kind, refuses with UnsupportedCapability (\"Device compiler unavailable\") in a project that holds a drive. Qualifying this kind needs a reviewed compile route for Startdrive drives."
         ]
       },
       "qualification": {
@@ -23804,7 +23831,8 @@
           "Operations: change the TelegramNumber of the only MainTelegram or SupplementaryTelegram; insert a SupplementaryTelegram (telegramNumber) or an AdditionalTelegram (inputSize/outputSize in native Telegram.GetSize units, read back through GetSize) when none of that type exists; erase the only SupplementaryTelegram or AdditionalTelegram. Startdrive's CanChangeTelegram/CanInsert* must agree; Openness has no erase check. Safety telegrams are refused as a safety boundary; torque/edge telegrams, main-telegram insert/erase, ChangeSize and PKW are not supported.",
           "Startdrive assigns addresses only during the write, so the preview shows the current rows and the request. Apply reads back every telegram row, reports the address shift, and fails after the write (checkpoint recovery) on a collateral telegram type/number change or an I/O overlap. Overlaps that already exist refuse at prepare.",
           "Overlap check: same-IoType byte ranges against every configured project address; ranges sharing an address controller, or with unresolved controllers, conflict. Matching a telegram range to its own device-item range uses native object equality or equal parent/type/start/length, which is unqualified.",
-          "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles all project devices). No online write, download or RAM-to-ROM."
+          "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles all project devices). No online write, download or RAM-to-ROM.",
+          "Native observation (28 October 2026): a SINAMICS G120C PN added to an owned scratch exposes no device-level ICompilable, and the worker's device compile requires one on every device, so every device-compiled change, including this kind, refuses with UnsupportedCapability (\"Device compiler unavailable\") in a project that holds a drive. Qualifying this kind needs a reviewed compile route for Startdrive drives."
         ]
       },
       "qualification": {
@@ -23855,7 +23883,8 @@
           "Parameter access is always unknown: Openness exposes no per-parameter write access and the CLR Value setter exists on every parameter. Bits sub-compositions and ReadParameters are not expanded; BICO sources resolve to DO<n> plus the exact parameter name or stay unresolved with a reason.",
           "Telegram addresses use the repository's hardware Address convention (start byte, length in bits); PLC ownership, PKW and hardware identifiers are not resolved.",
           "maxItems bounds all rows; parameters page per drive object with parameterOffset/nextParameterOffset and a 50,000-parameter scan bound. Motor/encoder configuration is read only for caller-supplied dataset/encoder numbers because their index ranges are undocumented; side-effect freedom of GetCurrent*Configuration is not natively verified.",
-          "No online values, upload, download, RAM-to-ROM, activation, safety or motion."
+          "No online values, upload, download, RAM-to-ROM, activation, safety or motion.",
+          "Native observation (28 October 2026): on a SINAMICS G120C PN newly added to an owned scratch (no compile, unsaved), Startdrive Openness cannot read DriveObject.DriveObjectNumber (\"could not be retrieved\"); drive_observe reports it as a warning with scopeComplete false and no drive objects. Qualifying it needs a Startdrive-configured drive fixture."
         ]
       },
       "qualification": {
@@ -24331,7 +24360,7 @@
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
           "Compiled against the V21 PublicAPI only; not natively qualified.",
-          "Native observation (28 October 2026): importing the authored minimal NodeSet fixtures/opcua/machine-v1.xml as a reference namespace crashed the owned TIA instance (\"Unexpected exception\", Portal disposed); the change's checkpoint was taken first. A Siemens-compatible companion NodeSet is still needed to qualify the import."
+          "Native observation (28 October 2026): importing the authored minimal NodeSet fixtures/opcua/machine-v1.xml as a reference namespace crashed the owned TIA instance (\"Unexpected exception\", Portal disposed); the change's checkpoint was taken first. A second, companion-style NodeSet (an ObjectType with a typed, modelled variable and a RequiredModel reference) crashed it the same way, so the crash is not specific to the file; the trigger (for example the CPU's OPC UA server or licence state) is not established."
         ]
       },
       "qualification": {

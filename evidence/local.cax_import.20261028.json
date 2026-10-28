@@ -1,0 +1,102 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.cax_import.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T15:40:48+00:00",
+  "source": {
+    "commit": "350c5147ddc785c38b0978bb62a192a40209c1ad",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_cax_import.py on a frozen Debug build of 2878f76 (D:\\wp\\b48), 35/35 steps, in an owned scratch CPU 1511-1 PN V4.1: an S7-300 CPU 315-2 PN/DP device is added, exported with cax_export and removed again by restoring its checkpoint; cax_import with RetainTiaDevice then brings it back from the retained AML with checkpoint, device compile and save, asserted preview (the Host-resolved AML path and hash) and change_status; the complete state differs from the device-free state only below the imported device, whose hardware rows equal the exported device's exactly; the first import restored from its checkpoint equals the device-free state; the second import persists through a fresh owned Portal reopen. Typed refusals (InvalidRequest for an AML given by record and path and for an unknown option, ArtifactChanged, PreviewMismatch) change nothing.",
+  "limitations": [
+    "One S7-300 CPU 315-2 PN/DP with RetainTiaDevice; an imported S7-1500 CPU fails the device compile because the AML carries no confidential-data password.",
+    "MoveToParkingLot, OverwriteTiaDevice and devices that already exist in the target are not exercised.",
+    "Engineering only; nothing is downloaded."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "ffbf44e2f20d3b06157ed62f7be9e0a4465976c79d6d26af8dede2547ae12d4b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "dc288870434c066584675d2024ca8f8fe8098032ed5bd19d0d56106d10e76cae"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "a8f5d8c9f383256547dc012dd017e5c30b3639505fd0441b0651748d22a81213",
+      "bytes": 250827,
+      "completed": true,
+      "steps": [
+        "start owned TIA cax import",
+        "create owned scratch cax import",
+        "snapshot baseline",
+        "prepare add CaxCpu315",
+        "apply hardware_add",
+        "change_status add CaxCpu315",
+        "snapshot add CaxCpu315",
+        "verify add CaxCpu315",
+        "cax_export CaxCpu315",
+        "restore remove CaxCpu315 through its checkpoint",
+        "snapshot restored remove CaxCpu315 through its checkpoint",
+        "restored remove CaxCpu315 through its checkpoint equals the pre-change state",
+        "refuse cax_import: an AML given by record and by path",
+        "refuse cax_import: an unknown import option",
+        "refuse cax_import: a changed hash",
+        "prepare import CaxCpu315 (previewHash checked below)",
+        "refuse apply cax_import: a wrong previewHash",
+        "prepare import CaxCpu315 from its AML",
+        "apply cax_import",
+        "change_status import CaxCpu315 from its AML",
+        "snapshot import CaxCpu315 from its AML",
+        "verify import CaxCpu315 from its AML",
+        "restore import CaxCpu315 from its AML",
+        "snapshot restored import CaxCpu315 from its AML",
+        "restored import CaxCpu315 from its AML equals the pre-change state",
+        "prepare import CaxCpu315 again",
+        "apply cax_import",
+        "change_status import CaxCpu315 again",
+        "snapshot import CaxCpu315 again",
+        "verify import CaxCpu315 again",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "snapshot reopened",
+        "reopened state equals the import"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "cax_export",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "device_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}
