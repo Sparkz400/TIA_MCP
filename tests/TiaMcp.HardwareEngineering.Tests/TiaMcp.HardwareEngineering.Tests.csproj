@@ -5,6 +5,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs" Link="HardwareEngineeringRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs" Link="RemoteIoCompanionContract.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/AdmissionReconcileRules.cs" Link="AdmissionReconcileRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/NativeFailureText.cs" Link="NativeFailureText.cs" />
     <Compile Include="../../tests/TiaMcp.PlcLibraryIntegration.Tests/BridgeException.cs" Link="BridgeException.cs" />
     <None Update="Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

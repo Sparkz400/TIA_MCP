@@ -33,7 +33,9 @@ namespace TiaMcp.Openness.V21
         private static readonly HashSet<string> HardwareWriteAttributes = new HashSet<string>(new[]
         {
             "Name", "Author", "Comment", "InformationText", "PlantDesignation", "LocationIdentifier", "AdditionalInformation",
-            "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay"
+            "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay",
+            // A PROFINET interface's InterfaceOperatingModes flags: "IoController, IoDevice" makes an S7-1500 CPU an I-device.
+            "InterfaceOperatingMode"
         }, StringComparer.Ordinal);
         private static readonly HashSet<string> NetworkWriteAttributes = new HashSet<string>(new[]
         {
@@ -224,6 +226,7 @@ namespace TiaMcp.Openness.V21
                     change.PrimaryFailure = ex.Message;
                     // The failure's own evidence (for example the rows a preservation check found changed) is journaled with the change.
                     if ((ex as BridgeException)?.Details is JObject details) change.Readbacks.Add(new JObject { ["role"] = "failure-details", ["details"] = details.DeepClone() });
+                    else change.Readbacks.Add(new JObject { ["role"] = "native-exception", ["chain"] = NativeFailureText.Chain(ex) });
                     CaptureTechnologyEvidence(change);
                     try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
                     WriteChangeJournal(change);
