@@ -86,10 +86,15 @@ namespace TiaMcp.Openness.V21
                 project.Archive(new DirectoryInfo(directory), "before-seed.zap21", ProjectArchivationMode.Compressed);
                 TranslationWrite(marker, new JObject { ["state"] = "dispatchIntent", ["projectPath"] = project.Path.FullName,
                     ["checkpoint"] = FileArtifact(new FileInfo(Path.Combine(directory, "before-seed.zap21"))), ["automaticReplay"] = false });
-                var de = project.LanguageSettings.Languages.Find(CultureInfo.GetCultureInfo("de-DE"));
-                var en = project.LanguageSettings.Languages.Find(CultureInfo.GetCultureInfo("en-GB"));
-                if (project.LanguageSettings.ReferenceLanguage.Culture.Name != "de-DE") throw new BridgeException("TranslationScopeUnqualified", "German reference language required.");
-                if (!project.LanguageSettings.ActiveLanguages.Contains(en)) project.LanguageSettings.ActiveLanguages.Add(en);
+                var settings = project.LanguageSettings;
+                var de = settings.Languages.Find(CultureInfo.GetCultureInfo("de-DE"));
+                var en = settings.Languages.Find(CultureInfo.GetCultureInfo("en-GB"));
+                if (de == null || en == null) throw new BridgeException("ProjectLanguageUnavailable", "TIA offers no de-DE or en-GB project language.");
+                // A new scratch takes its reference language from the TIA UI; the fixture is exactly de-DE (reference) and en-GB.
+                if (!settings.ActiveLanguages.Contains(de)) settings.ActiveLanguages.Add(de);
+                settings.ReferenceLanguage = de; settings.EditingLanguage = de;
+                if (!settings.ActiveLanguages.Contains(en)) settings.ActiveLanguages.Add(en);
+                foreach (var other in settings.ActiveLanguages.Where(language => language.Culture.Name != "de-DE" && language.Culture.Name != "en-GB").ToArray()) settings.ActiveLanguages.Remove(other);
                 var plc = SelectPlc(args).Software;
                 foreach (string name in new[] { "Main", "TiaMcp_IsEnabled", "TiaMcp_EnableGate" })
                 {
