@@ -37,6 +37,7 @@ LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1, one workspace in the root workspace group and SCL FCs mapped by export; connect mode, library types, "
     "nested directories and global library policies are not exercised.",
     "Workspace files are edited by this runner between changes; change_restore never restores them, so restore equality covers the project state only.",
+    "Mapped blocks are edited in place (block_attributes_set): re-importing a mapped block from SCL source replaces the object and TIA drops its mapping.",
     "Engineering only; no version-control system is used.",
 ]
 
@@ -53,7 +54,7 @@ def portable(value):
 
 
 class Run(StateRun):
-    plc_compiled = KINDS + ("vci_workspace_create", "source_upsert")
+    plc_compiled = KINDS + ("vci_workspace_create", "source_upsert", "block_attributes_set")
 
     def __init__(self, h):
         super().__init__(h)
@@ -159,6 +160,13 @@ def edit_package(root, block, old, new):
     raise AssertionError("No package file of %s holds %r: %s" % (block, old, files_under(root)))
 
 
+def edit_in_project(run, workspace, block, family):
+    """An in-place header edit; a source_upsert would replace the block and TIA would drop its mapping."""
+    run.apply("set %s's family to %s" % (block, family), "block_attributes_set", {"blockName": block, "attributes": {"HeaderFamily": family}},
+              {"effects": [{"action": "block_attributes_set"}]}, changed=["block:%s/blocks/%s" % (run.plc, block)])
+    require(run.mapping(workspace, block)["compareState"] != "Equal", "The project edit of %s is not visible to its mapping" % block)
+
+
 def phase_a(run):
     workspace = workspace_create(run, "TiaMcpVci", run.root(1))
     root = run.current["view"]["vciWorkspace:" + workspace]["rootPath"]
@@ -178,14 +186,11 @@ def phase_a(run):
     run.refuse("vci_mapping_add", "an object already mapped", {**base, "format": fmt, "fileName": "VciFcAgain"}, "VciMappingExists")
     run.refuse("vci_synchronize", "a project-ward synchronization of every mapping", {"workspacePath": workspace, "allMappedObjects": True, "direction": "WorkspaceToProject"}, "VciScopeTooBroad")
     block = "block:%s/blocks/VciFc" % run.plc
-    run.apply("edit VciFc in the project", "source_upsert", {"language": "SCL", "source": fc("VciFc", 2), "expectedBlockNames": ["VciFc"]},
-              {"effects": [{"action": "source_upsert"}]}, changed=[block])
-    compare_state(run, workspace, "VciFc", "ProjectObjectChanged" if run.mapping(workspace, "VciFc")["compareState"] != "Equal" else "Equal")
+    edit_in_project(run, workspace, "VciFc", "VciFam")
     synchronize(run, workspace, root, "VciFc", "ProjectToWorkspace", [])
-    run.h.report["files"]["edited"] = edit_package(root, "VciFc", ":= 2;", ":= 3;")
+    run.h.report["files"]["edited"] = edit_package(root, "VciFc", ":= 1;", ":= 3;")
+    require(run.mapping(workspace, "VciFc")["compareState"] != "Equal", "The workspace edit is not visible to the mapping")
     synchronize(run, workspace, root, "VciFc", "WorkspaceToProject", [block])
-    require(":= 3;" in Path(run.current["files"][block]).read_text(encoding="utf-8-sig") or "3" in run.current["view"][block].get("payloadSha256", ""),
-            "The project block does not carry the workspace edit")
     add(run, workspace, root, "VciKeep", fmt)
     remove(run, workspace, root, "VciFc")
 
@@ -205,8 +210,7 @@ def reopen(run):
 
 def phase_b(run):
     workspace, root, fmt = run.h.report["fixture"]["workspace"], run.h.report["fixture"]["root"], run.h.report["fixture"]["format"]
-    run.apply("edit VciKeep in the project", "source_upsert", {"language": "SCL", "source": fc("VciKeep", 5), "expectedBlockNames": ["VciKeep"]},
-              {"effects": [{"action": "source_upsert"}]}, changed=["block:%s/blocks/VciKeep" % run.plc])
+    edit_in_project(run, workspace, "VciKeep", "VciAgain")
     run.b0 = run.current
     synchronize(run, workspace, root, "VciKeep", "ProjectToWorkspace", [], restore=True)
     add(run, workspace, root, "VciFc", fmt, restore=True)
