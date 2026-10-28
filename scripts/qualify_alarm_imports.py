@@ -126,10 +126,16 @@ def edit_xlsx(raw, sheet_name, cell, text):
     return out.getvalue()
 
 
-def text_list_workbook(cultures):
-    """One user text list in the layout TIA V21's text-list importer reads; every cell is an inline string, as in edit_xlsx."""
+def text_list_workbook(cultures, styles):
+    """One user text list in the layout TIA V21's text-list importer reads. Like TIA's own exports it keeps every cell in a
+    shared-string table and has a styles part (styles: xl/styles.xml of a native export); without them the import throws."""
+    strings = []
+    def index(value):
+        if value not in strings:
+            strings.append(value)
+        return strings.index(value)
     def sheet(rows):
-        cells = lambda r, row: "".join('<c r="%s%d" t="inlineStr"><is><t>%s</t></is></c>' % (chr(65 + i), r, escape(v)) for i, v in enumerate(row))
+        cells = lambda r, row: "".join('<c r="%s%d" s="0" t="s"><v>%d</v></c>' % (chr(65 + i), r, index(v)) for i, v in enumerate(row))
         body = "".join('<row r="%d">%s</row>' % (r, cells(r, row)) for r, row in enumerate(rows, 1))
         return '<?xml version="1.0" encoding="utf-8"?><worksheet xmlns="%s"><sheetData>%s</sheetData></worksheet>' % (SPREADSHEET, body)
     lists = [["Name", "ListRange", *("Comment [%s]" % c for c in cultures)], [TEXT_LIST, "Decimal", *("TIA MCP qualification" for _ in cultures)]]
@@ -140,6 +146,8 @@ def text_list_workbook(cultures):
         "[Content_Types].xml": '<?xml version="1.0" encoding="utf-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
             '<Default Extension="xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml" />'
             '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />'
+            '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml" />'
+            '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml" />'
             '<Override PartName="/docProps/custom.xml" ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml" />'
             '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" />'
             '<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml" /></Types>',
@@ -150,14 +158,18 @@ def text_list_workbook(cultures):
         "xl/workbook.xml": '<?xml version="1.0" encoding="utf-8"?><workbook xmlns="%s"><sheets><sheet name="TextList" sheetId="1" r:id="R1" xmlns:r="%s" />'
             '<sheet name="TextListEntry" sheetId="2" r:id="R2" xmlns:r="%s" /></sheets></workbook>' % (SPREADSHEET, rel, rel),
         "xl/_rels/workbook.xml.rels": '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-            '<Relationship Type="%s/worksheet" Target="/xl/worksheets/sheet1.xml" Id="R1" /><Relationship Type="%s/worksheet" Target="/xl/worksheets/sheet2.xml" Id="R2" /></Relationships>' % (rel, rel),
+            '<Relationship Type="%s/worksheet" Target="/xl/worksheets/sheet1.xml" Id="R1" /><Relationship Type="%s/worksheet" Target="/xl/worksheets/sheet2.xml" Id="R2" />'
+            '<Relationship Type="%s/styles" Target="/xl/styles.xml" Id="R3" /><Relationship Type="%s/sharedStrings" Target="/xl/sharedStrings.xml" Id="R4" /></Relationships>' % (rel, rel, rel, rel),
         "xl/worksheets/sheet1.xml": sheet(lists),
         "xl/worksheets/sheet2.xml": sheet(entries),
     }
+    parts["xl/sharedStrings.xml"] = '<?xml version="1.0" encoding="utf-8"?><sst xmlns="%s" count="%d" uniqueCount="%d">%s</sst>' % (
+        SPREADSHEET, len(strings), len(strings), "".join("<si><t>%s</t></si>" % escape(v) for v in strings))
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as package:
         for name, xml in parts.items():
             package.writestr(name, xml.encode("utf-8"))
+        package.writestr("xl/styles.xml", styles)
     return out.getvalue()
 
 
@@ -292,8 +304,13 @@ def settings(run, old, new, restore=False):
               restore=restore)
 
 
+def native_styles(run):
+    with zipfile.ZipFile(io.BytesIO(run.exports["instanceTexts"][1])) as package:
+        return package.read("xl/styles.xml")
+
+
 def text_list_create(run):
-    payload = {**run.file("text-list.xlsx", text_list_workbook(run.cultures)), "importOption": "None", "expectedTextListNames": [TEXT_LIST]}
+    payload = {**run.file("text-list.xlsx", text_list_workbook(run.cultures, native_styles(run))), "importOption": "None", "expectedTextListNames": [TEXT_LIST]}
     def created(applied, state):
         row = next((i for i in state["alarm:textLists"]["items"] if i["name"] == TEXT_LIST), None)
         require(row and row["textListKind"] == "user" and row["listRange"] == "Decimal", "The new user text list is missing: %s" % state["alarm:textLists"])
@@ -317,7 +334,7 @@ def text_list_override(run, old, new, restore=False):
 
 
 def text_lists(run):
-    lists = run.file("text-list-refused.xlsx", text_list_workbook(run.cultures))
+    lists = run.file("text-list-refused.xlsx", text_list_workbook(run.cultures, native_styles(run)))
     run.refuse("plc_alarm_text_list_import", "an unknown import option", {**lists, "importOption": "Merge", "expectedTextListNames": [TEXT_LIST]}, "InvalidRequest")
     run.refuse("plc_alarm_text_list_import", "a changed hash", {**lists, "expectedSha256": "0" * 64, "importOption": "None", "expectedTextListNames": [TEXT_LIST]}, "ArtifactChanged")
     run.refuse("plc_alarm_text_list_import", "a DAT instead of a workbook", {**run.file("lists.dat", run.exports["classes"][1]), "importOption": "None", "expectedTextListNames": [TEXT_LIST]}, "InvalidArtifact")
