@@ -35,16 +35,16 @@
 
 This proves the premise before any code: a TCP/IP-mode PLCSIM Advanced instance serves a CPU's OPC UA and web endpoints that the existing Host runtime client can reach.
 
-- [ ] **Step 1 (operator):** In the PLCSIM Advanced control panel, set *Online Access* to *PLCSIM Virtual Eth. Adapter* (TCP/IP single adapter). The adapter is `Ethernet 2` ("Siemens PLCSIM Virtual Ethernet Adapter").
-- [ ] **Step 2 (operator, elevated PowerShell):** Give the adapter a static address in the CPU's subnet. Today it has only `169.254.140.84`.
+- [x] **Step 1 (operator):** In the PLCSIM Advanced control panel, set *Online Access* to *PLCSIM Virtual Eth. Adapter* (TCP/IP single adapter). The adapter is `Ethernet 2` ("Siemens PLCSIM Virtual Ethernet Adapter").
+- [x] **Step 2 (operator, elevated PowerShell):** Give the adapter a static address in the CPU's subnet. Today it has only `169.254.140.84`.
 
 ```powershell
 New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLength 24
 ```
 
-- [ ] **Step 3 (operator, TIA UI):** Build a throwaway CPU 1511-1 PN V4.1 project at `192.168.0.1`. Activate the OPC UA server (guest access, runtime license *SIMATIC OPC UA S7-1500 small*, *automatically accept client certificates*) and the web server. Download it to a manually created TCP/IP instance.
-- [ ] **Step 4 (agent):** From the Host, `runtime_ua_client_identity`, then `runtime_ua_connect` to `opc.tcp://192.168.0.1:4840`, pinning the server certificate shown in TIA's certificate manager. Then `runtime_ua_browse` and one `runtime_ua_read`. Also `runtime_web_connect` to `https://192.168.0.1`.
-- [ ] **Step 5:** Record the outcome in `docs/verification/runtime-real-server-gate-<date>.md`. If either endpoint is unreachable or refused, stop here and record why. The plan below assumes both answer.
+- [x] **Step 3 (operator, TIA UI):** Build a throwaway CPU 1511-1 PN V4.1 project at `192.168.0.1`. Activate the OPC UA server (guest access, runtime license *SIMATIC OPC UA S7-1500 small*, *automatically accept client certificates*) and the web server. Download it to a manually created TCP/IP instance.
+- [x] **Step 4 (agent):** From the Host, `runtime_ua_client_identity`, then `runtime_ua_connect` to `opc.tcp://192.168.0.1:4840/` (the trailing slash is required; see the gate record), pinning the server certificate shown in TIA's certificate manager. Then `runtime_ua_browse` and one `runtime_ua_read`. Also `runtime_web_connect` to `https://192.168.0.1`.
+- [x] **Step 5:** Record the outcome in `docs/verification/runtime-real-server-gate-<date>.md`. If either endpoint is unreachable or refused, stop here and record why. The plan below assumes both answer. Recorded in [the gate record](../verification/runtime-real-server-gate-20261028.md): OPC UA and the Web API both pass; the web login was Anonymous (web authentication disabled).
 - [ ] **Step 6 (operator):** Delete the throwaway instance and switch *Online Access* back to Softbus.
 
 ### Task 1: TCP/IP admission in the simulator worker

@@ -138,6 +138,11 @@ namespace TiaMcp.Openness.V21
                 }
             }
             catch (Exception error) { warnings.Add(InspectionWarning(owner.Path + "/network/ports", error)); }
+            if (IsIDeviceInterface(owner.Item))
+            {
+                try { result["transferAreas"] = TransferAreas(network); }
+                catch (Exception error) { warnings.Add(InspectionWarning(owner.Path + "/network/transferAreas", error)); }
+            }
             bool unresolved = result.Descendants().OfType<JProperty>().Any(property => property.Name == "resolution" && (string)property.Value != "resolved");
             result["scopeComplete"] = !budget.Truncated && warnings.Count == failuresBefore && !unresolved;
             result["associationBasis"] = "Native controller/connector associations and engineering-object equality; names and address overlap never establish ownership.";

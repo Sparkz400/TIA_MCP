@@ -233,6 +233,8 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "hardware_gsd_export", ProbeCapabilityService<GsdExportProvider>(hardware, "hardware", probes), "partial", "I-device GSD export through the native GsdExportProvider into the artifact directory with SHA-256; content is not validated.");
                 var network = ProbeCapabilityService<NetworkInterface>(hardware, "hardware", probes);
                 AddTargetFeature(features, "change.network_configure", network, "partial", "Offline node attributes and subnet links only; each field is checked against native access and the bridge allowlist.");
+                foreach (string feature in new[] { "change.hardware_transfer_area_create", "change.hardware_transfer_area_delete" })
+                    AddTargetFeature(features, feature, network, "partial", "One controller-device (CD) transfer area by exact name on a PROFINET interface in I-device mode; name readback, compiled preservation and checkpoint required.");
                 AddTargetFeature(features, "change.network_io_assign", network, "partial", "Exact native connector/controller indexes, selected-PLC ownership and common-subnet prerequisite; shared-device/multi-controller assignments are rejected.");
                 var communication = ProbeCapabilityService<CommunicationManagement>(hardware, "hardware", probes);
                 AddTargetFeature(features, "connection_inspect", communication, "partial", "Configured CommunicationManagement connections of this owner with typed properties and native endpoint owners; no consumers, resources or runtime communication.");

@@ -1,0 +1,134 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plcsim_diagnostics.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T17:01:34+00:00",
+  "source": {
+    "commit": "13b52905e739441fbd1ce1b3b4fa07eaab2aa536",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_plcsim_diagnostics.py on a frozen Debug build of 13b5290 (D:\\wp\\sr07), 49/49 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus. Fixture: an owned scratch CPU 1511-1 PN V4.1 with simulation support and an FB DiagGate (input Enable, output Active := Enable) whose instance DB Main calls without assigning Enable, each added with checkpoint, compile and save; a saved review is the source of a diagnostic case on that instance (two Bool hypotheses: Active follows Enable true, Active is released with Enable false) and of its experiment. simulation_provision_scratch_credential: after download and the generated-state save, provisioning with first-use trust for the owned empty CPU leaves the complete project state (hardware, device inventory, every program export) equal to the state just before it, the original card is restored and the instance goes through power-on, RUN, stop, power-off and owned release; a malformed ticket refuses as InvalidSimulationTicket. Two captures associated with the case (60 rows before, 80 rows after the write) are acquired into the experiment; an independent decoder of the original plan and segments reproduces every row and the per-hypothesis counts (releases 30 matched before, follows 40 matched after, no contradictions); JSON, Markdown and HTML exports of both are schema-valid and hash-exact, and the JSON export is the complete acquisition. diagnostic_plcsim_write: a wrong expected value returns preconditionMismatch and dispatches nothing; the write of Enable false to true and the restoring write each read back, and sim_read shows Active following. The comparison reports follows notApplicable to matchedOnly and releases matchedOnly to notApplicable, verdicts unresolved. Refusals: ArtifactUnavailable (unknown experiment, unknown acquisition), RuntimeCaptureReferenceInvalid, InvalidRequest (missing units, unknown export format, comparison fields beyond reason), RuntimeAcknowledgementRequired, RuntimeCaptureAssociationMismatch (signal outside the case), PlcsimCaptureInvalid (datatype differing from the declaration), RuntimeCaptureSessionBusy (write while a capture holds the instance), MeasurementLineageMismatch (an acquisition compared with itself).",
+  "limitations": [
+    "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus with the owned scratch's generated credential (first-use TLS trust under the owned-empty-CPU policy); one FB instance with two Bool signals and two Bool hypotheses. Numeric, cycle-synchronous and multi-instance captures are not exercised.",
+    "Sequential polling: Enable and Active of one cycle are separate reads, and the counts depend on capture duration. Verdicts stay unresolved by design; no causation, scan atomicity or running-program identity is claimed.",
+    "The provisioning comparison covers the offline project state the read tools expose; online state other than the card restore is not compared."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "6dc8a393316dac9210fc1f17da1fcdee3389389f1e23b27e2e0490c56d3fac03"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "cd6352571783dbd4880b6ef9b2a17fa2da33af818516a04aa66cc4ca413de458"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "c6d286abb1b1829487bcf807e262b0135c978c3545ae5522ebf705913e071c3a"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "4a7a22edd6799e4e3c7f65befc8abb64c455cc0f0c3a2af961845588ccd38955",
+      "bytes": 840926,
+      "completed": true,
+      "steps": [
+        "start owned TIA PLCSIM diagnostics",
+        "create owned scratch PLCSIM diagnostics",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare instance_db_create",
+        "apply instance_db_create",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "save project review",
+        "diagnostic_plan",
+        "diagnostic_experiment_plan",
+        "discovery baseline",
+        "sim_create",
+        "simulation_download",
+        "project state before provisioning",
+        "refuse simulation_provision_scratch_credential: a malformed download ticket",
+        "simulation_provision_scratch_credential",
+        "provisioning left the project state unchanged",
+        "power on",
+        "run",
+        "sim_read shows Enable and Active False",
+        "capture before the write",
+        "acquire and export before the write",
+        "refuse diagnostic_experiment_acquire_runtime: an unknown experiment",
+        "refuse diagnostic_experiment_acquire_runtime: a malformed snapshot reference",
+        "refuse diagnostic_experiment_acquire_runtime: missing units",
+        "refuse diagnostic_runtime_acquisition_export: an unknown acquisition",
+        "refuse diagnostic_runtime_acquisition_export: an unknown format",
+        "refuse diagnostic_plcsim_write: no acknowledgeWrite",
+        "refuse diagnostic_plcsim_write: a signal outside the case",
+        "refuse diagnostic_plcsim_write: a datatype that differs from the declaration",
+        "diagnostic_plcsim_write with a wrong expected value",
+        "diagnostic_plcsim_write set Enable",
+        "sim_read shows Enable and Active True",
+        "capture after the write",
+        "acquire and export after the write",
+        "diagnostic_runtime_acquisition_compare",
+        "refuse diagnostic_runtime_acquisition_compare: one acquisition with itself",
+        "refuse diagnostic_runtime_acquisition_compare: fields beyond reason",
+        "start a capture that holds the instance",
+        "refuse diagnostic_plcsim_write: while a capture holds the instance",
+        "stop the holding capture",
+        "diagnostic_plcsim_write restore Enable",
+        "sim_read shows Enable and Active False",
+        "stop",
+        "power off",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "device_inventory",
+        "diagnostic_experiment_acquire_runtime",
+        "diagnostic_experiment_plan",
+        "diagnostic_plan",
+        "diagnostic_plcsim_write",
+        "diagnostic_runtime_acquisition_compare",
+        "diagnostic_runtime_acquisition_export",
+        "hardware_inspect",
+        "project_inventory",
+        "project_snapshot_capture",
+        "runtime_capture_start",
+        "runtime_capture_status",
+        "runtime_capture_stop",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "diagnostic_experiment_acquire_runtime",
+        "diagnostic_plcsim_write",
+        "diagnostic_runtime_acquisition_compare",
+        "diagnostic_runtime_acquisition_export",
+        "simulation_provision_scratch_credential"
+      ]
+    }
+  ]
+}

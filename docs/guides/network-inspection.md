@@ -6,6 +6,7 @@
 - `network.ioControllers`: native I/O system name/number/subnet, resolved controller owner hardware path and assigned connector owners.
 - `network.ioConnectors`: native connected I/O-system reference and exposed connector attributes. `notAssigned` and `notConnected` are distinct from unavailable getters.
 - `network.ports`: each port of the interface (`portIndex`, the port's own hardware path) with the hardware paths of its configured partner ports (`NetworkPort.ConnectedPorts`).
+- `network.transferAreas`: on an interface in I-device mode only (`InterfaceOperatingMode` includes `IoDevice`), each transfer area by name with its type, direction, position number, both lengths and its local and partner addresses (`NetworkInterface.TransferAreas`).
 - `gsd` / `gsdDevice`: `GsdId`, `GsdName`, `GsdType` and the PROFINET/PROFIBUS flags of a GSD device item, and of its GSD device on root items. `gsdExportAvailable` tells whether the item exposes the I-device `GsdExportProvider`.
 
 Owner paths come from native engineering-object equality and bounded native ancestry. Names and address overlaps are never ownership proof. Individual getter failures retain earlier metadata and appear in warnings. `network.scopeComplete` becomes false on truncation, failed getters or unresolved association owners. Hardware lookup is capped at 50,000 items; global subnet resolution examines at most 5,000 subnets. The public `maxItems` budget still applies to emitted rows, attributes and associations.
@@ -149,19 +150,22 @@ needing its own scope and evidence:
 
 ## Port topology, module replacement and GSD export
 
-Three prepared kinds and one read-only tool extend the hardware routes (ledger X10). All
-are compiled against the V21 PublicAPI only and are not natively qualified.
+Five prepared kinds and one read-only tool extend the hardware routes (ledger X10). Their
+native qualification is recorded per feature in the catalog.
 
 | Kind / tool | Payload and boundary |
 |---|---|
 | `hardware_port_connect` | `hardwarePath`, `partnerHardwarePath`: two exact port device items from `network.ports`. Both ports must be free; `NetworkPort.ConnectToPort`, then forward and reverse `ConnectedPorts` must show the link. Alternative partners (tool changers) are not supported. |
 | `hardware_port_disconnect` | Same payload; the two ports must be linked. `NetworkPort.DisconnectFromPort`, then neither side may list the other. |
 | `hardware_replace` | `hardwarePath`, exact installed catalog `typeIdentifier`, optional `acceptLoss: true`. `DeviceItem.ChangeType` on one pluggable module in a rack; built-in and software-bearing items are refused. |
-| `hardware_gsd_export` | `hardwarePath`, `designation`, optional `description`. Calls `GsdExportProvider.Export` into a fresh directory under the export artifacts and returns every produced file (up to 32) with its SHA-256. The GSD content is not validated. |
+| `hardware_transfer_area_create` | `hardwarePath` (an I-device interface), `name`. `TransferAreaComposition.Create(name, TransferAreaType.CD)`: one controller-device transfer area; TIA chooses its direction, lengths and local addresses, which the readback and `network.transferAreas` report. A name already used on the interface (ignoring case) is refused as `ObjectExists`, a non-I-device item as `UnsupportedCapability`. |
+| `hardware_transfer_area_delete` | Same payload; `TransferArea.Delete` on the area with that exact name (`ObjectNotFound` otherwise). Program references to its addresses are checked only by the device compile. |
+| `hardware_gsd_export` | `hardwarePath`, `designation`, optional `description`. The item must be a PROFINET interface whose `InterfaceOperatingMode` includes `IoDevice` (set `"IoController, IoDevice"` with `hardware_attributes`); V21 offers `GsdExportProvider` on every device item but exports only from an I-device interface, so other items are refused as `UnsupportedCapability` and only I-device interfaces report `gsdExportAvailable`. Calls `GsdExportProvider.Export` into a fresh directory under the export artifacts and returns every produced file (up to 32) with its SHA-256. The GSD content is not validated. |
 
-The three kinds use the configured-hardware preservation described above, with
-the port links of every port added to the manifest. A port change may alter only the
-two selected link entries. Compilation and the whole-project checkpoint are mandatory.
+The five kinds use the configured-hardware preservation described above. Port kinds add
+the port links of every port to the manifest; a port change may alter only the two selected
+link entries. Every manifest also holds the transfer areas of each I-device interface; a
+transfer-area change may add or remove only the named area of the selected interface. Compilation and the whole-project checkpoint are mandatory.
 
 V21 offers no compatibility check before `ChangeType`. The `hardware_replace` preview
 records `inventoryBefore`: the addresses (with owners) and child items of the module's
@@ -173,8 +177,18 @@ and children may follow the new type; everything outside it, port links included
 stay exact even with `acceptLoss`. The readback records the before/after inventory.
 
 `ConnectedPorts` is documented in V21 as "internal use only"; the bridge relies on it for
-readback. Which item exposes `GsdExportProvider` and whether Siemens requires a compiled
-I-device first are not observed yet.
+readback.
+
+Observed natively on a CPU 1511-1 PN V4.1 (28 October 2026): a new I-device fails the device
+compile ("There is no IO-controller/device address assignment") until it has a transfer area, so
+set the mode with `hardware_attributes` and `compile: false`, then create the area; that change's
+checkpoint saves the mode. TIA adds the system constant `Local~PROFINET_interface_1~IODevice`
+(`Hw_Device`) with the I-device mode and one `Hw_SubModule` constant per area
+(`Local~PROFINET_interface_1~<area name>`). A new CD area gets direction `LocalToPartner`, one
+byte in each direction, the next free output byte as local address and position numbers from 1000. Switching the
+interface back to `IoController` with `hardware_attributes` removes its transfer areas and these
+constants; that kind has no transfer-area preservation check. The interface's
+`CalculatedBandwidthForCyclicIoData` is computed at the device compile and not saved.
 
 ## Preservation manifest identity checks
 
