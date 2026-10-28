@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "35136b5b8eac5f52d426a4fe8210997206c1bbd5e1ced3547c82efdcefaa37f9",
-      "bytes": 1143944
+      "sha256": "2e54010ffed676bc64955905e26f9c96fd96b8061341d56b1e8b07e17b29cc3a",
+      "bytes": 1144343
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2822,8 +2822,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
-      "sha256": "9f271d7b033dec4d149710f9f1011bf894e34eaaa627c2e268310c965516104a",
-      "bytes": 31108
+      "sha256": "4c875eed0f977db2f68c5789af08d09ff6dc07b3b15577ed0dcc1f5b4b85d9c6",
+      "bytes": 31300
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.cs",
@@ -83807,8 +83807,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareUmacRoleSet",
-              "line": 301,
-              "endLine": 326,
+              "line": 303,
+              "endLine": 328,
               "sha256": "cc28153dbdf7fcb153c3d1f6140f3176f36e19dedc5796b89c0bd40c30cc8626"
             },
             {
@@ -83829,8 +83829,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareWebServerUserPages",
               "line": 181,
-              "endLine": 210,
-              "sha256": "9f33913b5c3badd67596bd89db6dc73e54597905e5a6e7a8f90572b9ef76bc5f"
+              "endLine": 212,
+              "sha256": "54ecf758b620f51c9334e4be4ece78998ed26162c4310c4ec02d1f0970d0a3d7"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectProperties.cs",
@@ -84100,8 +84100,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyUmacRoleSet",
-              "line": 328,
-              "endLine": 357,
+              "line": 330,
+              "endLine": 359,
               "sha256": "d68eab244a36c8aaca8ceb6e91d867f0f54e21fcbff4126ebd4c8dd457fe11b3"
             },
             {
@@ -84121,8 +84121,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyWebServerUserPages",
-              "line": 212,
-              "endLine": 229,
+              "line": 214,
+              "endLine": 231,
               "sha256": "5c20f306604183f4bec28eb364b37fae75eb5d2d9b527d3b5e001ec94f2f78d9"
             },
             {
@@ -89256,8 +89256,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareUmacRoleSet",
-              "line": 301,
-              "endLine": 326,
+              "line": 303,
+              "endLine": 328,
               "sha256": "cc28153dbdf7fcb153c3d1f6140f3176f36e19dedc5796b89c0bd40c30cc8626"
             }
           ]
@@ -89276,8 +89276,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyUmacRoleSet",
-              "line": 328,
-              "endLine": 357,
+              "line": 330,
+              "endLine": 359,
               "sha256": "d68eab244a36c8aaca8ceb6e91d867f0f54e21fcbff4126ebd4c8dd457fe11b3"
             }
           ]
@@ -89614,8 +89614,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "PrepareWebServerUserPages",
               "line": 181,
-              "endLine": 210,
-              "sha256": "9f33913b5c3badd67596bd89db6dc73e54597905e5a6e7a8f90572b9ef76bc5f"
+              "endLine": 212,
+              "sha256": "54ecf758b620f51c9334e4be4ece78998ed26162c4310c4ec02d1f0970d0a3d7"
             }
           ]
         },
@@ -89633,8 +89633,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
               "name": "ApplyWebServerUserPages",
-              "line": 212,
-              "endLine": 229,
+              "line": 214,
+              "endLine": 231,
               "sha256": "5c20f306604183f4bec28eb364b37fae75eb5d2d9b527d3b5e001ec94f2f78d9"
             }
           ]

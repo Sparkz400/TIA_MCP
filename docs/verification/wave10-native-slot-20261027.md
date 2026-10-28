@@ -151,3 +151,21 @@ reconciliation). A milestones rerun on build ba861fc (`D:\wp\b7`) passed with no
 stage `configured_hardware_preservation_verified` on the offline address change, plus change_status,
 fresh-Portal reopen, restore and recovered reopen: `local.milestones.network.20261028`. The row is
 verified; bound cells 585 → 591.
+
+## Access and VCI qualification — 28 October
+
+`scripts/qualify_access_changes.py` on owned scratch CPU 1511-1 PN projects (frozen builds `D:\wp\b9`, `D:\wp\b10`).
+
+- **Found and fixed first:** natively, compile re-issues a created WebServer certificate (CN-only subject, the CPU's IP as
+  alternative names, new notBefore and serial; common name and validity end kept). `certificate_create` now checks the
+  saved certificate after compile, accepts exactly that documented re-issue for WebServer usage and warns in its preview.
+  Switching web serving on makes TIA create a web server certificate and assign it to `WebserverCertificate`; the preview
+  now says so.
+- **Run `ac_0165b47c` (209/210 steps):** `webserver_page_set`, `certificate_create`, `certificate_assign`,
+  `certificate_delete`, `certificate_import`, `umac_role_set`, `vci_workspace_create` and `vci_workspace_delete` qualified:
+  exact state diffs over blocks, types, tag tables, certificates, UMAC, web and VCI state, typed refusals, fresh-Portal
+  reopen and own-checkpoint restore. Evidence `local.access.qualify.20261028`; bound cells 591 → 639.
+- **`webserver_user_pages_generate`:** generation also adds a system constant named after the application (now previewed).
+  In the rerun `ac_8d290e2d` the same 8 kinds qualified again, but after a fresh-Portal reopen the CPU's
+  `WebserverApplicationName` and `WebserverHTMLDirectory` read differently than right after apply, so this kind stays
+  unqualified.

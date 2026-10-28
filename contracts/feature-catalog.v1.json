@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.46",
+  "catalogVersion": "0.4.47",
   "targetTiaVersions": [
     21
   ],
@@ -19261,7 +19261,8 @@
           "The affected set is the returned block identities (name, number, type) in the readback. Generated block internals are never edited; V21 exposes no delete for generated blocks, so none is offered.",
           "Refused unless the CPU's Boolean WebserverActivate attribute is true. Nothing is downloaded or deployed; page content, browser behavior and Siemens package compatibility are not validated.",
           "compile=true is mandatory and compiles the PLC software; generated blocks are covered by the standard block fingerprint.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Native qualification runs (28 October, ac_0165b47c and ac_8d290e2d): generation applied and adds a system constant named after the application to the default tag table (now previewed), but after a fresh-Portal reopen the CPU's WebserverApplicationName and WebserverHTMLDirectory read differently than right after apply, so persistence is not established and the kind stays unqualified."
         ]
       },
       "qualification": {
