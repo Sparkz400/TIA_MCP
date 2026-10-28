@@ -1,9 +1,10 @@
-"""Offline checks of the pure helpers in qualify_hardware_changes.py, qualify_software_unit_changes.py and qualify_project_settings.py; nothing here starts TIA."""
+"""Offline checks of the pure helpers in qualify_hardware_changes.py, qualify_software_unit_changes.py, qualify_project_settings.py and qualify_technology_changes.py; nothing here starts TIA."""
 import unittest
 
 import qualify_hardware_changes as q
 import qualify_project_settings as ps
 import qualify_software_unit_changes as u
+import qualify_technology_changes as tc
 
 D = "/projects/S/devices/St/items/"
 
@@ -48,6 +49,10 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual({"author": "a", "isPrimary": True}, state["project:properties"])
         with self.assertRaises(AssertionError):
             ps.project({"completeness": {"complete": False}})
+
+    def test_technology_selection_binds_path_and_name(self):
+        self.assertEqual({"role": "outputCam", "technologyPath": "/p/technology/A/children/OutputCams/C", "name": "C"},
+                         tc.selected(None, "/p/technology/A/children/OutputCams/C", {"role": "outputCam"}))
 
 
 if __name__ == "__main__":
