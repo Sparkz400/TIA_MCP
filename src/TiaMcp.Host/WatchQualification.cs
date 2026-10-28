@@ -11,9 +11,12 @@ namespace TiaMcp.Host;
 // nor inject faults or admit unqualified document edits.
 internal sealed class WatchQualificationBridge(IBridgeClient inner, HostOptions options) : IBridgeClient
 {
+    private string? admitted; // the operation of the last mutation_begin; mutation_dispatch carries only its lease
+
     public async Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
     {
         var point = options.WatchQualificationPoint!;
+        if (operation == "mutation_begin") admitted = JsonSerializer.SerializeToNode(arguments, BridgeProtocol.Json)?["operation"]?.GetValue<string>();
         var marker = Path.Combine(options.ArtifactsDirectory, "interruption-marker.json");
         if (operation is "watch_checkpoint" or "watch_apply_native" or "watch_restore_native")
         {
@@ -23,7 +26,8 @@ internal sealed class WatchQualificationBridge(IBridgeClient inner, HostOptions 
             arguments = input;
         }
         var result = await inner.CallAsync(operation, arguments, cancellationToken);
-        if (point == "host." + operation)
+        // An admitted mutation's Host point fires after its native dispatch returned, before the Host records the outcome.
+        if (point == "host." + (operation == "mutation_dispatch" ? admitted : operation))
         {
             using (var file = new FileStream(marker, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
             {

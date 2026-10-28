@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.58",
+  "catalogVersion": "0.4.59",
   "targetTiaVersions": [
     21
   ],
@@ -3442,6 +3442,47 @@
         "One user group level below root, ASCII names, one empty table; force tables, nested groups deeper than one level, escaped names and web/display access rules are not exercised.",
         "No Host or worker loss during lifecycle operations; offline stored configuration only, no monitoring, modify or forcing.",
         "Trial lc1 (D:\\wp\\wt\\lc1) stopped at the second apply with ProjectIsolationRequired because the unseeded scratch was no longer owned after a reopen; it is retained as failed and not cited."
+      ]
+    },
+    {
+      "id": "local.graphical_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "6f82e7037ae976523f229d546642e4ba95d69285",
+        "passedScope": "scripts/qualify_graphical_changes.py (gr3) on a frozen Debug build of 6f82e70 (D:\\wp\\b56, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: the genuine V21 exports Tgp_FC_LAD and Tgp_FC_FBD (an FB calling the scratch's FC TiaMcp_IsEnabled) imported with the project culture and an extra Bool input; per language call_parameter_set moved the Enable argument to EnableAlternate, graphical_network_patch replaced one Access in place and graphical_network_insert added a copy of the network with fresh object IDs, each with checkpoint, compile, native preservation readback and save, change_status equal to the apply result and a complete snapshot differing only in the edited block; on LAD each kind first refused a wrong previewHash (PreviewMismatch) without stages or checkpoint; a fresh owned Portal reopen showed the identical state; from there one change per kind was applied again and restored from its checkpoint into a new directory equal to the reopened state; nine typed prepare refusals (NetworkNotFound, CallNotFound, ParameterNotFound, UnresolvedNetworkReference, InvalidNetworkPatch, UnsupportedLanguage, LanguageConversionNotSupported, InvalidSimaticML and AccessWiringUnsupported for call_connection_set) left the PLC software unchanged."
+      },
+      "artifacts": [
+        "evidence/local.graphical_changes.20261028.json"
+      ],
+      "limitations": [
+        "Two genuine V21 FlgNet/v5 fixtures (one LAD and one FBD network, each an FB calling an FC) in one owned scratch CPU 1511-1 PN V4.1.",
+        "graphical_network_patch is qualified for in-place Access replacement only: TIA renumbers UIds and orders Access parts first on import, so patches that add or remove fragments fail closed with NativePreservationMismatch (exploratory probe, same day) and need their checkpoint.",
+        "call_connection_set is refused before any change: TIA V21 import rejects an Access without a wire and an Access on several wires (exploratory probe, same day).",
+        "Engineering only; nothing is downloaded or simulated. Trials gr1 (build b54, stopped on the runner's own assertion in its restore phase) and gr2 (build b55, passed without change_status calls) are retained and not cited."
+      ]
+    },
+    {
+      "id": "local.watch.source_reconcile.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "87da75562c26f17dc3cf6be6fef78dedbe180955",
+        "passedScope": "scripts/qualify_watch_source_reconcile.py (src3) on a frozen Debug build of 87da755 (D:\\wp\\b58, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: watch_table_generate captured the root EnableGate source binding; qualification_watch_authoring_source_negative ran under a qualification Host started with --watch-qualification host.watch_authoring_source_negative, so the worker completed the saved HeaderAuthor drift, the StaleSource refusal by VerifyWatchSource and the restoration (retained in the Host's interruption marker), and the Host exited 74 after the admitted native dispatch returned and before it recorded the outcome, leaving the shared admission in dispatchIntent; a second Host opened the original in a fresh owned Portal, a replay was refused with ResourceBusy before any native effect, qualification_watch_authoring_source_reconcile compared the retained pre-effect baseline with the fresh snapshot (absent table, identical content and peers, new session and process) and reconciled the project as unchanged without native mutation, a second reconcile was refused with InvalidOperationState, engineering_operation_status read the admission reconciled and a fresh capture reproduced the original FB and instance DB hashes; every owned Host, worker and Portal lifetime closed with exit proofs (Host 74 then 0, workers and Portals 0)."
+      },
+      "artifacts": [
+        "evidence/local.watch.source_reconcile.20261028.json"
+      ],
+      "limitations": [
+        "One Host-loss point after the admitted native dispatch returned; a worker loss inside the helper leaves a changed project, which the reconciler refuses by design (ReconciliationIncomplete) and which needs checkpoint recovery instead.",
+        "Isolated qualification Host (--component-qualification --watch-qualification); production watch authoring stays disabled.",
+        "Trial src1 (D:\\wp\\wt\\src1, build b57) passed the Host loss and the worker-response checks but got an untyped McpToolError for the replay refusal; the Host tools now return typed errors. Trial src2 stopped before starting a Host on a wrong path. Neither is cited."
       ]
     },
     {
@@ -7886,6 +7927,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified in an owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 on the genuine V21 exports Tgp_FC_LAD and Tgp_FC_FBD (local.graphical_changes.20261028): graphical_network_patch (in-place Access replacement) and graphical_network_insert passed with native preservation readback, fresh reopen and checkpoint restore in LAD and FBD.",
           "graphical_network_patch upserts/removes explicit native Part, Access, Call and Wire fragments with UId and reference validation; graphical_network_insert inserts one native compile unit with collision-free explicit object IDs.",
           "Only FlgNet/v5 LAD/FBD. Untouched interfaces, comments, native extensions and peer networks are preserved; no generic instruction synthesizer or implicit identifier remapping.",
           "Offline preservation fixtures exercise Boolean branches, comparisons, arithmetic, moves, edges, latches, timers, counters and calls; these are not native import/compile or runtime qualification.",
@@ -7893,8 +7935,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.graphical_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8661,6 +8705,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified in an owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 on the genuine V21 exports Tgp_FC_LAD and Tgp_FC_FBD (local.graphical_changes.20261028): an Access replaced in place (symbol to TRUE constant in LAD, constant to symbol in FBD) with native preservation readback, fresh reopen and checkpoint restore; unresolved references, empty patches and SCL blocks are refused. TIA renumbers UIds and orders Access parts first on every import, so a patch that adds or removes fragments fails closed with NativePreservationMismatch and must be restored; only in-place replacements are qualified.",
           "graphical_network_patch upserts/removes explicit native Part, Access, Call and Wire fragments with UId and reference validation; graphical_network_insert inserts one native compile unit with collision-free explicit object IDs.",
           "Only FlgNet/v5 LAD/FBD. Untouched interfaces, comments, native extensions and peer networks are preserved; no generic instruction synthesizer or implicit identifier remapping.",
           "Offline preservation fixtures exercise Boolean branches, comparisons, arithmetic, moves, edges, latches, timers, counters and calls; these are not native import/compile or runtime qualification.",
@@ -8670,10 +8715,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.graphical.20261008",
-          "local.layers.graphical-reopen.20261008"
+          "local.graphical_changes.20261028"
         ]
       },
       "availability": {
@@ -8717,14 +8761,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified in an owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 on the genuine V21 exports Tgp_FC_LAD and Tgp_FC_FBD (local.graphical_changes.20261028): a copy of the network inserted with fresh object IDs in LAD and FBD with native preservation readback, fresh reopen and checkpoint restore; a language-mismatched network and reused object IDs are refused. The readback check compares SimaticML object IDs positionally, because TIA renumbers them in document order on every export.",
           "One explicit FlgNet/v5 compile unit with unique object IDs and matching network language; existing native content remains unchanged. No implicit ID rewriting or instruction synthesis.",
           "This new route has no recorded native compile, save/reopen, recovery or runtime qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.graphical_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8767,6 +8814,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "2026-10-28: natively qualified in an owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 on the genuine V21 exports Tgp_FC_LAD and Tgp_FC_FBD (local.graphical_changes.20261028): the Enable argument of an FB's FC call moved to another input in LAD and FBD with checkpoint, compile, native preservation readback and save, an exact snapshot diff limited to the block, fresh reopen and checkpoint restore; unknown network, call and parameter are refused.",
           "Standard StructuredText/v4 SCL or FlgNet/v5 LAD/FBD; existing simple local/global symbolic components with unchanged component count only.",
           "Shared graphical Access nodes, expression/indirect operands and safety scopes are rejected. Instance/multi-instance XML remains unchanged; symbol names alone do not prove exact target identity.",
           "Native SCL FC, FB global-instance and FB multi-instance input-argument edits passed exact preservation, guarded checkpoint recovery and fresh applied/recovered save-reopen checks on the recorded PLC-root profile only.",
@@ -8774,10 +8822,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.calls-expanded.20261008",
-          "local.layers.calls-reopen.20261008"
+          "local.graphical_changes.20261028"
         ]
       },
       "availability": {
@@ -8822,7 +8869,7 @@
         "status": "partial",
         "limitations": [
           "One existing two-endpoint call-parameter-to-Access wire in FlgNet/v5. Branched, unresolved and native expression connections are rejected; shared Access definitions are never rewritten.",
-          "This new route has no recorded native compile, save/reopen, recovery or runtime qualification.",
+          "Prepare refuses every move that would leave an Access unwired or on two wires (AccessWiringUnsupported), which on V21 is every move between existing Accesses; no native apply route exists.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
@@ -8831,9 +8878,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "No native compile, save/reopen or recovery qualification has been recorded for these new routes."
+          "TIA Portal V21 import refuses a network with an Access that has no wire and one whose Access is used by several wires (native probes, 28 October 2026). Moving a call-parameter wire between existing Accesses always leaves the previous Access unwired and puts the target on a second wire, so the kind cannot apply on V21; prepare now refuses it with AccessWiringUnsupported (local.graphical_changes.20261028)."
         ]
       },
       "prerequisites": [
@@ -13679,7 +13726,8 @@
           "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
           "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
           "Worker-owned saved offline scratch only; prepare and apply are refused outside the isolated qualification harness, like the other expanded document edits, until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Native observation (28 October 2026): a fresh scratch holds only the PLC's default force table, with no rows, and V21 has no API that creates force rows; the field, comment, clone, delete and reorder edits all need an existing row. Qualifying this feature needs a force table with rows authored in the TIA Portal editor (the force-fixture capture route), which no unattended runner can do."
         ]
       },
       "qualification": {
@@ -16762,12 +16810,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "2026-10-28: natively qualified in an owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3 (local.watch.source_reconcile.20261028): an actual Host loss at host.watch_authoring_source_negative, after the admitted native dispatch returned, left the admission in dispatchIntent; a fresh Host and Portal reconciled it as unchanged from a fresh snapshot equal to the retained baseline, without native mutation. A replay was refused with ResourceBusy and a second reconcile with InvalidOperationState. A worker loss inside the helper leaves a changed project, which the reconciler refuses by design.",
           "Qualification-only read and durable reconciliation of exact retained intent, native receipt and fresh original snapshot. Never replays or implicitly restores a native mutation."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.source_reconcile.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
