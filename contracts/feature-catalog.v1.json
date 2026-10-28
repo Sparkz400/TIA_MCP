@@ -3474,6 +3474,63 @@
         "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
         "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
       ]
+    },
+    {
+      "id": "local.plc_component.install.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_component.install.20261024, whose raw report was lost, on a frozen Debug build of 2d5aa7c (D:/wp/b65): scripts/qualify_plc_component.py --run-native (author_new_source): fresh owned de-DE scratch authors TiaMcpComponentState UDT and TiaMcpComponentGate FB (simulation-capable), releases 1.0.0, publishes and archives; fresh owned consumer imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 (first available DB2, AutoNumber=false) and standalone FBD FC TiaMcpComponentCaller with call and Enable/Active tag bindings, full compile and save; complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.install.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Qualification-only route; production combined library_integrate apply stays disabled.",
+        "Standalone new FC caller only; existing-caller insertion remains rejected by V21 native ID renumbering (NativeIdPreservationUnsupported).",
+        "Storage is the captured component04 profile, bound by complete installed FB/UDT content equality for a freshly authored source; no other FB layouts.",
+        "native04/native05 artifacts are not on this machine; source reuse and the native05 recovery audit were not run."
+      ]
+    },
+    {
+      "id": "local.plc_component.runtime.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_component.runtime.20261024, whose raw report was lost, on a frozen Debug build of 2d5aa7c (D:/wp/b65): scripts/component_runtime.py --run-native on the re-run installation (local.plc_component.install.rerun.20261028): saved installed project proven equal to its fresh-reopen snapshot, simulation-capable compilation enabled as its own change, OB1 Main call to TiaMcpComponentCaller as a separate reviewed source_upsert changing only OB1, then fresh owned PLCSIM Advanced V8 instance with verified card, generated-state save, scratch credential provisioning (owned empty-CPU trust) and restored-card check; ComponentEnable true/false/true/false drives ComponentActive on every edge. r05 continues r04 and r03 by recorded hash from the exact post-OB snapshot."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.runtime.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Wall-clock polling, not scan-accurate; one component (Bool Enable/Active) on CPU1511.",
+        "OB insertion is a separate operation with its own acceptance; it is not part of component installation.",
+        "r03 stopped at the CPU configuration password and r04 at an unloaded simulator tag list; both harness gaps were fixed and r05 continued from the same saved post-OB project."
+      ]
+    },
+    {
+      "id": "local.plc_component.existing_caller.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.plc_component.existing_caller.20261025, whose raw report was lost, on a frozen Debug build of 2d5aa7c (D:/wp/b65): scripts/qualify_plc_component.py --run-native --caller-mode existing (author_new_source, run b07): fresh owned de-DE scratch authors and releases TiaMcpComponentState UDT and TiaMcpComponentGate FB 1.0.0; a fresh consumer first creates the existing FBD FC TiaMcpComponentCaller (one network, block title after it) and an unrelated peer FC, then imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 from the captured storage profile and inserts the component call network after caller network 3 (typed insertNetwork). V21 renumbering matched the prediction exactly: inserted network 8, following block-title IDs 8->D and 9->E (+5); the native callerInsertion proof and the qualifier both reverse that one shift and recover the original caller exactly. Full compile and save, complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, first-import-checkpoint retrieval to a new location equal to the baseline and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
+      },
+      "artifacts": [
+        "evidence/local.plc_component.existing_caller.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Qualification-only route; production combined library_integrate apply stays disabled.",
+        "Existing FBD FC caller only, inserting after its last network; LAD, FB and OB callers are not qualified (OB callers are refused).",
+        "Accepted ID change is exactly the following-ID shift of the 25 October 2026 scope decision; any other caller change fails closed.",
+        "Storage is the captured component04 profile; no other FB layouts.",
+        "Runtime not exercised: the caller is not called from an OB in this run."
+      ]
     }
   ],
   "features": [
@@ -14181,9 +14238,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_component.install.20261024",
-          "local.plc_component.runtime.20261024",
-          "local.plc_component.existing_caller.20261025"
+          "local.plc_component.install.rerun.20261028",
+          "local.plc_component.runtime.rerun.20261028",
+          "local.plc_component.existing_caller.rerun.20261028"
         ]
       },
       "availability": {

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "be791f6578b568044315171627a217af89f675d65068a344b12a6e42cb60f0cc",
-      "bytes": 1335691
+      "sha256": "2a79bc6afa82c2b09334ae76bb0e4a29d51448db5b5e0516e10ae9c455cc566f",
+      "bytes": 1341223
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -105422,24 +105422,24 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.plc_component.install.20261024",
-          "profileSha256": "d381c20eb0984dc0e69b6babde96c5c387b35e1ec9fc9fa81693d78fe94008a6",
+          "id": "local.plc_component.install.rerun.20261028",
+          "profileSha256": "16043ba9d12c73ab3b6d1af103b22d93c186fa106d957e65389641e688d16299",
           "artifacts": [
-            "evidence/local.plc_component.install.20261024.json"
+            "evidence/local.plc_component.install.rerun.20261028.json"
           ]
         },
         {
-          "id": "local.plc_component.runtime.20261024",
-          "profileSha256": "0c407f78a48be9a949ddf594c27603606eaa4584db929314c81c5773a0e6aabb",
+          "id": "local.plc_component.runtime.rerun.20261028",
+          "profileSha256": "b98a773b76a64a25463c645a22897e8a20b756d285dc66fc37e8f9f2443a8081",
           "artifacts": [
-            "evidence/local.plc_component.runtime.20261024.json"
+            "evidence/local.plc_component.runtime.rerun.20261028.json"
           ]
         },
         {
-          "id": "local.plc_component.existing_caller.20261025",
-          "profileSha256": "c0eeeae4d6dfb504c1b04b00134a64c607c786011dcfc82f9fa503d160286a5f",
+          "id": "local.plc_component.existing_caller.rerun.20261028",
+          "profileSha256": "40549ff7f3a90e29439cd13bc698b70f5153fe74acacb0daaaf498a286d0a3c7",
           "artifacts": [
-            "evidence/local.plc_component.existing_caller.20261025.json"
+            "evidence/local.plc_component.existing_caller.rerun.20261028.json"
           ]
         }
       ],
@@ -116263,14 +116263,29 @@
       "sha256": "be39d685b9d99185e66aa0b0bef6982c7efd933e52dbbebd7d03878d56d26ac3"
     },
     {
+      "path": "evidence/local.plc_component.existing_caller.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "7fad26c9903980850b37297b3df806edcdd44e35d3a6b26b0e1d17f81ad295e0"
+    },
+    {
       "path": "evidence/local.plc_component.install.20261024.json",
       "state": "observed",
       "sha256": "3654669852bab08a630e373de084b456f19657e66553d2c825fe2001fca40d2b"
     },
     {
+      "path": "evidence/local.plc_component.install.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "d5ed2a47e5e76513af1274dcce50d74ef4f7fc0e734638a938f4b72cbeb279d4"
+    },
+    {
       "path": "evidence/local.plc_component.runtime.20261024.json",
       "state": "observed",
       "sha256": "1cfae83a61d3ee9524b60d5e1fc43c213f8ac79c22181b7055827467ce2dd2ef"
+    },
+    {
+      "path": "evidence/local.plc_component.runtime.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "88ff7615198342532fca513be3c0f2c0937d23b972949a6885accb298f14318e"
     },
     {
       "path": "evidence/local.plc_object_mutations.20261028.json",
@@ -117074,12 +117089,24 @@
       "profileSha256": "c0eeeae4d6dfb504c1b04b00134a64c607c786011dcfc82f9fa503d160286a5f"
     },
     {
+      "id": "local.plc_component.existing_caller.rerun.20261028",
+      "profileSha256": "40549ff7f3a90e29439cd13bc698b70f5153fe74acacb0daaaf498a286d0a3c7"
+    },
+    {
       "id": "local.plc_component.install.20261024",
       "profileSha256": "d381c20eb0984dc0e69b6babde96c5c387b35e1ec9fc9fa81693d78fe94008a6"
     },
     {
+      "id": "local.plc_component.install.rerun.20261028",
+      "profileSha256": "16043ba9d12c73ab3b6d1af103b22d93c186fa106d957e65389641e688d16299"
+    },
+    {
       "id": "local.plc_component.runtime.20261024",
       "profileSha256": "0c407f78a48be9a949ddf594c27603606eaa4584db929314c81c5773a0e6aabb"
+    },
+    {
+      "id": "local.plc_component.runtime.rerun.20261028",
+      "profileSha256": "b98a773b76a64a25463c645a22897e8a20b756d285dc66fc37e8f9f2443a8081"
     },
     {
       "id": "local.plc_object_mutations.20261028",
