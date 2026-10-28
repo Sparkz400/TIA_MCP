@@ -47,6 +47,7 @@ LIMITATIONS = [
     "Renamed and deleted groups were empty or held only a subgroup; groups holding blocks, types or tables are not renamed or moved.",
     "Not covered here: " + ", ".join(sorted(EXCLUDED)) + ".",
     "Engineering only; runtime behavior is not observed.",
+    "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
 ]
 
 DATA = '''DATA_BLOCK "X11Data"
@@ -525,7 +526,16 @@ def recover_each_kind(run):
         return {"isError": failed, "error": (outcome.get("structuredContent") or {}).get("error"), "state": status["state"],
                 "stages": status["stages"], "compile": status["compile"], "failure": status["failure"]}
     h.report["nativeBound"] = h.stage("apply " + label, dispatch)
-    run.restore(label, "tag_set", prepared)
+    if not h.report["nativeBound"]["isError"]:
+        run.restore(label, "tag_set", prepared)
+        return
+    # A failed compile leaves an inconsistent user block, which the recovery guard deliberately cannot fingerprint;
+    # change_restore then refuses rather than accept a weaker guard. The checkpoint stays retained (checked above).
+    def refused():
+        error = h.call_error("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        require(error.get("code") == "FingerprintUnavailable", "Expected the inconsistent-block recovery refusal: %s" % error)
+        return error
+    h.report["nativeBound"]["restoreRefusal"] = h.stage("restore " + label + " is refused on the inconsistent block", refused)
 
 
 def body(h):
