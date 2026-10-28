@@ -104,9 +104,11 @@ class Run(StateRun):
         before = self.current["view"]
         def generated(category, key):
             """TIA adds a technology object's instructions and types to the system groups (PID_Compact) and generates
-            know-how protected motion OBs (MC_Interpolator, MC_Servo) for an axis."""
+            know-how protected motion OBs (MC_Interpolator, MC_Servo) with their system constants for an axis."""
             row = (self.current["view"] if category == "added" else before).get(key) or {}
-            return category in ("added", "removed") and key.split(":", 1)[0] in ("block", "type") and ("/systemGroups/" in key or row.get("isKnowHowProtected") is True)
+            family = key.split(":", 1)[0]
+            return category in ("added", "removed") and (family in ("block", "type") and ("/systemGroups/" in key or row.get("isKnowHowProtected") is True)
+                                                          or family == "member" and "/systemConstants/" in key)
         self.finish(label, kind, prepared, tolerated=generated, **expected)
         return prepared
 
