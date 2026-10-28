@@ -7,8 +7,8 @@ project-library version. The snapshot must differ from the previous one in exact
 each kind is refused once for a stale or unknown identity and once for a wrong previewHash, without any change. A fresh
 Portal then reopens the saved project and global library, which must show the identical state. Phase B applies one
 more change per kind from that state and restores its checkpoint into new locations; the recovered state must equal
-the pre-change state. Phase C persists a failed change's partial global-library state through library_save and
-restores the failed change's checkpoint.
+the pre-change state. Phase C, run first in its own scratch, persists a failed change's partial global-library state
+through library_save and restores the failed change's checkpoint.
 """
 from __future__ import annotations
 
@@ -623,16 +623,36 @@ def phase_b(run, a):
                then=close_created, restore=True)
 
 
-def phase_c(run, a):
-    """library_save of a global library left dirty by a failed same-session change, then restore of that save."""
-    h, p1 = run.h, a["p1"]
-    # A third CPU without its confidential-data password makes every later project compile fail. Without compile the
-    # change may not save; the failing change's checkpointSave saves it into that change's recovery baseline.
-    prepared = h.prepare("hardware_add", {"typeIdentifier": h.scratch["selectedCpu"]["typeIdentifier"], "deviceName": "ScratchStation3", "itemName": "ScratchPLC3"})
-    h.stage("apply hardware_add without compile", lambda: h.tool("change_apply", {**h.apply_args(prepared), "compile": False, "save": False}))
-    clean = run.library_view("G|", run.g, False)
-    failing = h.prepare("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": run.g, "target": {"plcPath": p1},
-                        "object": {"kind": "block", "objectPath": a["blocks"]["TiaMcp_EnableGate_DB"]}})
+def interface(h, plc):
+    """The first network interface node of the PLC's device, from hardware_inspect."""
+    device = plc.split("/items/")[0] + "/"
+    rows = sorted((r for r in h.tool("hardware_inspect", {"maxItems": 2000})["items"]
+                   if r["path"].startswith(device) and r.get("network", {}).get("nodes")), key=lambda r: r["path"])
+    require(rows, "No network interface under " + device)
+    return rows[0]["path"], rows[0]["network"]["nodes"][0]["name"]
+
+
+def phase_c(run):
+    """In its own owned scratch: library_save of a global library left dirty by a failed same-session change, then
+    restore of that save. Runs first, because its address conflict fails every later compile of that project."""
+    h = run.h
+    p1 = h.owned_scratch("failed change")
+    blocks = {b["name"]: b["path"] for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"] if b["plcPath"] == p1}
+    h.apply("hardware_add", {"typeIdentifier": h.scratch["selectedCpu"]["typeIdentifier"], "deviceName": "ScratchStation2", "itemName": "ScratchPLC2",
+            "configureScratchSecurity": True})
+    p2 = next(p["path"] for p in h.tool("project_inventory", {"maxItems": 1000})["plcs"] if p["path"] != p1)
+    g = h.apply("library_create", {"schemaVersion": 1, "name": "PreservationFailedChange"})["journal"]["result"]["library"]["libraryId"]
+    # Both CPUs on one subnet with the same IP address: every block stays consistent (an uncompiled block would refuse
+    # every change first), and the project compile fails. The second assignment applies without compile and save; the
+    # failing change's checkpointSave saves it into that change's recovery baseline.
+    for plc, compiled in ((p1, True), (p2, False)):
+        path, node = interface(h, plc)
+        prepared = h.prepare("network_configure", {"hardwarePath": path, "nodeName": node, "subnetName": "LibConflict",
+                                                   "attributes": {"Address": "192.0.2.10", "SubnetMask": "255.255.255.0"}})
+        h.stage("apply network_configure %s compile=%s" % (node, compiled), lambda: h.tool("change_apply", {**h.apply_args(prepared), "compile": compiled, "save": compiled}))
+    clean = run.library_view("G|", g, False)
+    failing = h.prepare("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": g, "target": {"plcPath": p1},
+                        "object": {"kind": "block", "objectPath": blocks["TiaMcp_EnableGate_DB"]}})
 
     def fail():
         result = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(failing)})
@@ -644,14 +664,19 @@ def phase_c(run, a):
     h.stage("master copy whose project compile fails leaves the global library dirty", fail)
     if h.unresolved_admissions():
         h.reconcile_admission("reconcile the failed change's admission")
-    run.refuse("an unrelated recoveryChangeId", "library_save", {"schemaVersion": 1, "source": h.source_ref(run.g), "recoveryChangeId": "lib-not-a-failed-change"},
-               "RecoveryRequired")
-    saved = h.apply("library_save", {"schemaVersion": 1, "source": h.source_ref(run.g), "recoveryChangeId": failing["changeId"]})
-    dirty = run.library_view("G|", run.g, False)
+
+    def refused():
+        error = h.call_error("change_prepare", {"kind": "library_save", "payload": {"schemaVersion": 1, "source": h.source_ref(g),
+                             "recoveryChangeId": "lib-not-a-failed-change"}})
+        require(error.get("code") == "RecoveryRequired", "Expected RecoveryRequired, observed %s" % error)
+        return error
+    h.stage("refuse library_save: an unrelated recoveryChangeId", refused)
+    saved = h.apply("library_save", {"schemaVersion": 1, "source": h.source_ref(g), "recoveryChangeId": failing["changeId"]})
+    dirty = run.library_view("G|", g, False)
     h.stage("saved global library holds the failed change's partial state", lambda: require(
         diff(clean, dirty) == {"added": ["G|masterCopy:" + MASTER + "TiaMcp_EnableGate_DB"], "removed": [], "changed": []},
         "Persisted partial state differs: %s" % diff(clean, dirty)) or diff(clean, dirty))
-    h.tool("library_close", {"libraryId": run.g})
+    h.tool("library_close", {"libraryId": g})
     restored = h.stage("restore the save", lambda: h.tool("change_restore", {"changeId": saved["changeId"], "previewHash": saved["previewHash"]}))
     rows = restored["resources"]
     require([r["kind"] for r in rows] == ["library"] and rows[0]["state"] == "completed", "Expected one recovered library")
@@ -659,6 +684,7 @@ def phase_c(run, a):
     h.stage("recovered global library equals its state before the failed change", lambda: require(
         recovered == clean, "Recovered library differs: %s" % diff(clean, recovered)) or len(clean))
     run.mark("library_save", "restored", "failed-change partial state")
+    h.stage("close failed-change session", lambda: h.tool("tia_detach"))
 
 
 def body(h, upgrade_input):
@@ -667,11 +693,11 @@ def body(h, upgrade_input):
     for path in FIXTURES.glob("*.*"):
         shutil.copy2(path, documents)
     run = Run(h, documents)
+    phase_c(run)
     a = phase_a(run, upgrade_input)
     a["upgraded"]["source"] = str(upgrade_input)
     reopen(run, a)
     phase_b(run, a)
-    phase_c(run, a)
     gaps = {kind: [n for n in NEEDS if n not in run.coverage.get(kind, {})] for kind in KINDS}
     h.stage("every kind meets every criterion", lambda: require(not any(gaps.values()), "Criterion gaps: %s" % gaps) or sorted(KINDS))
     h.stage("every snapshot diff was exact", lambda: require(not run.mismatches, "%d snapshot mismatches" % len(run.mismatches)) or 0)
