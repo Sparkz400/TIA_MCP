@@ -89,9 +89,9 @@ guard worked as intended; the trial is kept as failed.
 
 All three Host points and all eight native worker-loss points are covered; the user
 registered the `OwnedPortalCleanup` helper (`D:\wp\b11\cleanup`) for the latter. Still open
-for D02: `watch_table_force_document_edit`,
-the create/rename/delete table and group features and the authoring features have no passing
-native run.
+for D02: `watch_table_force_document_edit` has no passing native run. The authoring features
+passed later the same day ([record](watch-authoring-update3-20261028.md)), and so did the
+create/rename/delete table and group features ([record](watch-lifecycle-20261028.md)).
 
 ### TIA Portal V21 Update 3 breaks the pinned authoring profile
 

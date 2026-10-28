@@ -236,10 +236,9 @@ namespace TiaMcp.Tests
             var before = new XDocument(document);
             await SourceError("SharedCallOperand", () => EngineeringSources.SetCallParameterOperand(document, "1", "100", "Enable", new[] { "Unexpected" }));
             AssertSameXml(before, document);
-            var expected = new XDocument(document);
-            Network(expected).Descendants(Net + "Wire").Single(e => e.Attribute("UId")?.Value == "102").Element(Net + "IdentCon")!.SetAttributeValue("UId", "22");
-            EngineeringSources.SetGraphicalCallConnection(document, "1", "100", "Enable", "22");
-            AssertSameXml(expected, document);
+            // Access 21 would lose its only wire and Access 22 would gain a second one; TIA V21 refuses both on import.
+            await SourceError("AccessWiringUnsupported", () => EngineeringSources.SetGraphicalCallConnection(document, "1", "100", "Enable", "22"));
+            AssertSameXml(before, document);
             Network(document).Descendants(Net + "Wire").Single(e => e.Attribute("UId")?.Value == "102")
                 .Add(new XElement(Net + "NameCon", new XAttribute("UId", "23"), new XAttribute("Name", "in")));
             before = new XDocument(document);
@@ -267,12 +266,14 @@ namespace TiaMcp.Tests
                 .Replace("<n:FlgNet xmlns:n=\"urn:native\"><n:Part UId=\"21\" Name=\"Contact\" /></n:FlgNet>", "<FlgNet xmlns=\"urn:native\">\n  <Part Name=\"Contact\" UId=\"21\"/>\n</FlgNet>")
                 .Replace("<![CDATA[opaque <content>]]>", "opaque &lt;content&gt;"));
             EngineeringSources.RequireNativePreservation(expected, formatted);
+            // Object IDs are export-order serialization numbers; TIA renumbers them after an inserted network.
+            EngineeringSources.RequireNativePreservation(expected, EngineeringSources.ReadXml(original.Replace("ID=\"0\"", "ID=\"9\"")));
             foreach (string changed in new[]
             {
                 original.Replace("<!--outer comment-->", ""), original.Replace("<!--keep comment-->", ""),
                 original.Replace("Name=\"Enable\"", "Name=\"Changed\""), original.Replace("  Prüfung – 温度  ", "Prüfung – 温度"),
                 original.Replace("opaque <content>", "lost"), original.Replace("Version=\"7\"", "Version=\"8\""),
-                original.Replace("<Text>   </Text>", "<Text/>"), original.Replace("ID=\"0\"", "ID=\"9\""),
+                original.Replace("<Text>   </Text>", "<Text/>"),
                 original.Replace("<Child/> </Spacing>", "<Child/></Spacing>"), original.Replace("Name=\"Contact\"", "Name=\"Coil\"")
             })
                 await SourceError("NativePreservationMismatch", () => EngineeringSources.RequireNativePreservation(expected, EngineeringSources.ReadXml(changed)));

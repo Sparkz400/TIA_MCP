@@ -23,14 +23,14 @@ KINDS = ("tag_set", "tag_create", "tag_delete", "constant_set", "constant_create
          "source_upsert", "block_import_xml", "block_rename", "block_delete", "block_number_set", "block_attributes_set",
          "group_create", "group_rename", "group_delete", "plc_compile", "instance_db_create")
 _CREDENTIAL = "Apply refuses with CredentialRouteUnavailable before the checkpoint: no route hands a Host credential to the worker."
-_GRAPHICAL = "Needs LAD/FBD fixture blocks and exported network/UId selectors; a plain scratch holds SCL blocks only."
+_GRAPHICAL = "Qualified by scripts/qualify_graphical_changes.py on native LAD/FBD fixtures; a plain scratch holds SCL blocks only."
 # X11-owned change kinds a plain scratch cannot qualify; scripts/test_qualify_plc_object_mutations.py keeps
 # KINDS plus these equal to the catalog's X11-owned change kinds.
 EXCLUDED = {
     "block_protect": _CREDENTIAL, "block_unprotect": _CREDENTIAL, "block_write_protection_set": _CREDENTIAL,
     "graphical_operand_set": _GRAPHICAL, "graphical_network_patch": _GRAPHICAL, "graphical_network_insert": _GRAPHICAL,
-    "call_connection_set": _GRAPHICAL,
-    "call_parameter_set": "Needs exported network and call UIds of a symbolic call argument; belongs with the graphical/call fixtures.",
+    "call_connection_set": "Unavailable on V21: TIA refuses an Access without a wire or on two wires; prepare refuses it (qualify_graphical_changes.py).",
+    "call_parameter_set": _GRAPHICAL,
     "graphical_typed_edit": "Qualified by its own typed LAD/FBD program, which also carries AC-completeness and AC-runtime.",
 }
 NEEDS = ("applied", "persisted", "refused", "restored")
