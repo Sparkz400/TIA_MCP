@@ -16,6 +16,7 @@ from pathlib import Path
 from exact_qualification_client import ExactClient
 from qualify_exact_worker_startup import emit, package
 from qualify_translation_category_probe import ref, require
+from qualify_translation_import import preexisting_preserved
 
 PRODUCTION = {'translation_native_capture', 'translation_native_prepare', 'translation_native_apply',
               'translation_native_status', 'translation_native_recover', 'translation_native_reconcile'}
@@ -138,7 +139,7 @@ class Run:
             self.lifecycle(report)
             self.call('tia_detach')
             after = self.call('tia_discover')
-            require(sorted(before['processes'], key=lambda x: x['processId']) == sorted(after['processes'], key=lambda x: x['processId']), 'Preexisting Portal set changed')
+            require(preexisting_preserved(before, after, started['processId']), 'A preexisting Portal disappeared or the owned Portal remains')
             report['preexistingPreserved'] = report['completed'] = True
         except BaseException as error:
             report['failure'] = {'type': type(error).__name__, 'message': str(error)}

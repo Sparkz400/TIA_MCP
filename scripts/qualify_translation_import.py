@@ -22,6 +22,12 @@ REPO = Path(__file__).resolve().parents[1]
 FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')
 
 
+def preexisting_preserved(before, after, owned):
+    """Other lanes start their own Portals concurrently: every preexisting Portal must remain and the owned one must have exited."""
+    remaining = {p['processId'] for p in after['processes']}
+    return {p['processId'] for p in before['processes']} <= remaining and owned not in remaining
+
+
 def category_verdict(result):
     require(result['projectModified'] is False, 'Category probe modified the fixture')
     populated, matrix = result['populated'], result['matrix']
@@ -281,7 +287,7 @@ class Run:
                     if label == 'noop': self.call('project_open', {'path': project})
                 self.call('tia_detach')
                 after = self.call('tia_discover')
-                require(sorted(before['processes'], key=lambda x: x['processId']) == sorted(after['processes'], key=lambda x: x['processId']), 'Preexisting Portal set changed')
+                require(preexisting_preserved(before, after, started['processId']), 'A preexisting Portal disappeared or the owned Portal remains')
                 report['preexistingPreserved'] = True
                 report['completed'] = True
             except BaseException as error:
