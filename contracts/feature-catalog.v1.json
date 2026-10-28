@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.61",
+  "catalogVersion": "0.4.62",
   "targetTiaVersions": [
     21
   ],
@@ -3604,6 +3604,27 @@
         "Sequential polling: Enable and Active of one cycle are separate reads, and the counts depend on capture duration. Verdicts stay unresolved by design; no causation, scan atomicity or running-program identity is claimed.",
         "The provisioning comparison covers the offline project state the read tools expose; online state other than the card restore is not compared."
       ]
+    },
+    {
+      "id": "local.gsd_transfer_areas.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "f0ca4850509c2cecc2d3de1c61d3ca7be5f4acfa",
+        "passedScope": "scripts/qualify_gsd_export.py on a frozen Debug build of f0ca485 (D:\\wp\\ta04, git-archived sources with source-manifest.json), 80/80 steps, in one owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3: X1 put on subnet GsdNet; the PROFINET interface made an I-device with hardware_attributes (InterfaceOperatingMode 'IoController, IoDevice') without compile or save; hardware_transfer_area_create added the controller-device areas TiaMcpArea, TiaMcpSpare and TiaMcpTemp and hardware_transfer_area_delete removed TiaMcpTemp, each with asserted preview, checkpoint (which saved the mode), device compile, configured-hardware preservation including every I-device interface's transfer areas, save and change_status; hardware_inspect, device_inventory and the PLC's program state differ in exactly the intended keys, with the CPU's hardware-identifier system constants recorded as sideEffects. hardware_gsd_export then wrote GSDML.xml (7823 bytes, SHA-256 a1adccde...) from the only item reporting gsdExportAvailable and changed nothing. A fresh owned Portal reopen shows the identical state (except the compile-derived CalculatedBandwidthForCyclicIoData) and exports the byte-identical GSDML; from that state a create, a delete and the switch back to IoController are each restored from their checkpoints into copies equal to the reopened state, and the last copy exports the same GSDML. Typed refusals (HardwareNotFound, UnsupportedCapability, InvalidRequest, ObjectExists, ObjectNotFound) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.gsd_transfer_areas.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is IO controller and I-device on a subnet without a higher-level IO controller; no shared device or controller assignment.",
+        "Controller-device (CD) transfer areas only, with the direction (LocalToPartner), lengths (1 byte each way) and local output addresses TIA chooses; F-CD, PROFIsafe, shared-device and mapping-rule areas and direction or length edits are not exercised.",
+        "The I-device mode change applies without compile or save because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it. Switching back to IoController with hardware_attributes removes the areas and their system constants.",
+        "The GSDML is Siemens output: checked as well-formed XML naming the designation, not imported into another tool. Engineering only; nothing is downloaded and no PROFINET communication is observed."
+      ]
     }
   ],
   "features": [
@@ -4633,13 +4654,15 @@
         "limitations": [
           "Exact hardwarePath whose item exposes GsdExportProvider (hardware_inspect reports gsdExportAvailable); other items are refused as UnsupportedCapability.",
           "Siemens writes into a fresh artifact directory; up to 32 produced files are returned with SHA-256 and further files are reported as truncated. The GSD content is not validated by the bridge.",
-          "Native observation (28 October 2026): V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode; other items are now refused as UnsupportedCapability and only I-device interfaces report gsdExportAvailable. On a CPU 1511-1 PN interface InterfaceOperatingMode \"IoController, IoDevice\" applies (IoDevice alone is refused by TIA), but the device compile then fails with 'Error in I-device: There is no IO-controller/device address assignment': a new I-device needs a transfer area, and no change kind creates one (V21 offers TransferAreaComposition.Create). Native qualification waits for that kind.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Native observation (28 October 2026): V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode; other items are refused as UnsupportedCapability and only I-device interfaces report gsdExportAvailable. On a CPU 1511-1 PN interface InterfaceOperatingMode \"IoController, IoDevice\" applies (IoDevice alone is refused by TIA); the device compile then fails with 'Error in I-device: There is no IO-controller/device address assignment' until change.hardware_transfer_area_create adds a transfer area.",
+          "Natively qualified (local.gsd_transfer_areas.20261028) on an I-device CPU 1511-1 PN V4.1 with two CD transfer areas and no higher-level IO controller: Siemens wrote one file, GSDML.xml (7823 bytes), byte-identical after a fresh reopen and in a checkpoint-restored copy; the export changes nothing and is withdrawn when the interface is switched back to IoController. The Host requires designation; a blank one is InvalidRequest."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -13131,6 +13154,110 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_create",
+      "domain": "hardware",
+      "title": "Create a controller-device transfer area on an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Creates one controller-device (CD) transfer area with an exact name; a name already used on the interface (ignoring case) is refused as ObjectExists. TIA chooses its direction, lengths and local addresses, which the readback reports.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Other transfer-area types (F-CD, PROFIsafe, shared device, mapping rules), direction and length edits, and an assigned higher-level IO controller are not reviewed.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.gsd_transfer_areas.20261028): the interface made an I-device with hardware_attributes without compile, then TiaMcpArea, TiaMcpSpare and TiaMcpTemp created and TiaMcpTemp deleted, each with device compile (0 errors), preservation, save, fresh reopen and checkpoint restore. TIA gives a new CD area direction LocalToPartner, 1 byte each way, the next free output byte and position numbers from 1000, and adds a Hw_SubModule system constant Local~<interface>~<area> per area (Local~<interface>~IODevice with the I-device mode). Switching the interface back to IoController removes the areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_transfer_area_delete",
+      "domain": "hardware",
+      "title": "Delete a transfer area of an I-device interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_transfer_area_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: NetworkInterface.TransferAreas, TransferAreaComposition.Create(String, TransferAreaType) and TransferArea.Delete(), reached through DeviceItem.GetService<NetworkInterface>() on an interface whose InterfaceOperatingMode includes IoDevice."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Deletes one transfer area by exact name; an absent name is refused as ObjectNotFound. Program references to its local addresses are checked only by the mandatory device compile.",
+          "hardwarePath selects one exact PROFINET interface in I-device mode (InterfaceOperatingMode includes IoDevice, set with change.hardware_attributes); other items are refused as UnsupportedCapability. hardware_inspect lists its areas under network.transferAreas.",
+          "Configured-hardware preservation adds every I-device interface's transfer areas (name, type, direction, lengths, local and partner addresses) to the manifest; only the named area may appear or disappear. Device compile and the whole-project checkpoint are required.",
+          "Transfer areas with mapping rules or partner addresses from an assigned higher-level IO controller are not reviewed.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.gsd_transfer_areas.20261028): the interface made an I-device with hardware_attributes without compile, then TiaMcpArea, TiaMcpSpare and TiaMcpTemp created and TiaMcpTemp deleted, each with device compile (0 errors), preservation, save, fresh reopen and checkpoint restore. TIA gives a new CD area direction LocalToPartner, 1 byte each way, the next free output byte and position numbers from 1000, and adds a Hw_SubModule system constant Local~<interface>~<area> per area (Local~<interface>~IODevice with the I-device mode). Switching the interface back to IoController removes the areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.gsd_transfer_areas.20261028"
         ]
       },
       "availability": {

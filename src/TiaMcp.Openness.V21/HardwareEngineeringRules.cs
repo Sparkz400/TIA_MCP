@@ -10,7 +10,8 @@ namespace TiaMcp.Openness.V21
     internal static class HardwareEngineeringRules
     {
         internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
-            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure" }.Contains(kind);
+            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
+            "hardware_transfer_area_create", "hardware_transfer_area_delete" }.Contains(kind);
 
         // Port interconnections join the manifest only for kinds that change or can lose them.
         internal static bool CapturesPorts(string kind) => kind == "hardware_port_connect" || kind == "hardware_port_disconnect" || kind == "hardware_replace";
@@ -232,6 +233,18 @@ namespace TiaMcp.Openness.V21
                 // The new type may bring its own channels, attributes and children; everything outside the subtree stays exact.
                 foreach (var row in expected.Where(row => InTree(row, path)).ToArray()) row.Remove();
                 foreach (var row in after.Where(row => InTree(row, path))) expected.Add(row.DeepClone());
+            }
+            else if (kind == "hardware_transfer_area_create" || kind == "hardware_transfer_area_delete")
+            {
+                // Only the named area of the selected interface may appear or disappear; its other areas stay exact.
+                bool create = kind == "hardware_transfer_area_create";
+                string name = payload.Value<string>("name");
+                JArray Areas(JObject row) => row["network"]?["transferAreas"] as JArray ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured transfer-area list.");
+                JArray Others(JArray areas) => new JArray(areas.Where(area => area.Value<string>("name") != name).Select(area => area.DeepClone()));
+                var old = Areas(selected); var now = Areas(Target(after, path));
+                if (old.Count(area => area.Value<string>("name") == name) != (create ? 0 : 1) || now.Count(area => area.Value<string>("name") == name) != (create ? 1 : 0) || !JToken.DeepEquals(Others(old), Others(now)))
+                    Fail("The selected interface's transfer areas differ from exactly one " + (create ? "created" : "deleted") + " area named " + name + ".");
+                selected["network"]["transferAreas"] = now.DeepClone();
             }
             else Fail("Unknown hardware preservation policy.");
             JArray Sorted(JArray rows) => new JArray(rows.Cast<JObject>().OrderBy(row => row.Value<string>("path"), StringComparer.Ordinal));
