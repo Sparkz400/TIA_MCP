@@ -133,7 +133,7 @@ def link(run, kind, payload, item):
 def sensor(run, phase):
     """The axis record's sensor-0 relationship row of one composite phase."""
     require(len(phase["technology"]) == 1, "Expected one technology record: %s" % phase["technology"])
-    rows = run.h.tool("technology_profile_report", {"recordId": phase["technology"][0], "section": "relationships", "count": 200})["rows"]
+    rows = [r["value"] for r in run.h.tool("technology_profile_report", {"recordId": phase["technology"][0], "section": "relationships", "count": 200})["rows"]]
     rows = [r for r in rows if r["phase"] == "after" and r["relationship"]["metadata"].get("role") == "sensor" and r["relationship"]["metadata"].get("sensorIndex") == 0]
     require(len(rows) == 1, "Expected one sensor-0 relationship: %s" % rows)
     return phase["technology"][0], rows[0]
@@ -156,7 +156,7 @@ def compose(run, label, before, after, correspondences):
         run.h.tool("artifact_upload_chunk", {"uploadId": begun["uploadId"], "offset": 0, "data": base64.b64encode(data).decode("ascii")})
         upload = run.h.tool("artifact_upload_commit", {"uploadId": begun["uploadId"]})["artifactRef"]
         record = run.h.tool("composite_engineering_review", {"uploadRef": upload})["recordRef"]
-        claims = run.h.tool("composite_engineering_page", {"recordRef": record, "section": "correspondences", "count": 50})["rows"]
+        claims = [r["value"] for r in run.h.tool("composite_engineering_page", {"recordRef": record, "section": "correspondences", "count": 50})["rows"]]
         require([c["state"] for c in claims] == ["declaredCorrespondence"] * len(correspondences), "Correspondences are not declared: %s" % claims)
         return record
     return run.h.stage("composite review " + label, submit)
