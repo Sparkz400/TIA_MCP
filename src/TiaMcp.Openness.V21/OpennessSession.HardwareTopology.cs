@@ -60,12 +60,21 @@ namespace TiaMcp.Openness.V21
 
         private static JObject GsdInfo(IGsdObject gsd) => gsd == null ? null : new JObject { ["gsdId"] = gsd.GsdId, ["gsdName"] = gsd.GsdName, ["gsdType"] = gsd.GsdType, ["isProfinet"] = gsd.IsProfinet, ["isProfibus"] = gsd.IsProfibus };
 
+        // V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode.
+        private static bool IsIDeviceInterface(DeviceItem item)
+        {
+            var network = item.GetService<NetworkInterface>();
+            return network != null && (network.InterfaceOperatingMode & InterfaceOperatingModes.IoDevice) != 0;
+        }
+
         // Read-only for the project: Siemens writes the I-device GSD file(s) into a fresh artifact directory.
         private JObject HardwareGsdExport(JObject args)
         {
             var project = SelectProject(args);
             var item = ChangeHardware(project, args);
             var provider = item.Item.GetService<GsdExportProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected hardware item exposes no native GsdExportProvider (I-device GSD export).");
+            if (!IsIDeviceInterface(item.Item))
+                throw new BridgeException("UnsupportedCapability", "GSD export is available only on a PROFINET interface in I-device mode (InterfaceOperatingMode IoDevice).");
             string designation = ChangeText(args, "designation", 128);
             string description = args.Value<string>("description") ?? "";
             if (description.Length > 1024) throw new BridgeException("InvalidRequest", "description exceeds 1024 characters.");
