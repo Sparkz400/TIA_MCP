@@ -59,7 +59,7 @@ LIMITATIONS = [
 
 
 class Run(StateRun):
-    plc_compiled = KINDS + ("source_upsert",)
+    plc_compiled = KINDS + ("source_upsert", "project_simulation_enable")
 
     def __init__(self, h):
         super().__init__(h)
@@ -188,6 +188,9 @@ def body(h):
     run.current = run.snap("baseline")
     prepared = run.prepare("create " + DB, "source_upsert", {"language": "SCL", "source": SOURCE % 5, "expectedBlockNames": [DB]}, {})
     run.finish("create " + DB, "source_upsert", prepared, added=["block:" + run.block()])
+    # The memory-card download requires simulation support, which only an explicit reviewed change enables.
+    prepared = run.prepare("enable simulation support", "project_simulation_enable", {"enabled": True}, {})
+    run.finish("enable simulation support", "project_simulation_enable", prepared)
     review = h.stage("project_snapshot_capture", lambda: h.tool("project_snapshot_capture", {"request": {"plcPath": run.plc, "blockPaths": [run.block()]}}))
     review_id = review.get("reviewId") or review.get("review", {}).get("reviewId")
     require(review_id, "project_snapshot_capture returned no reviewId: %s" % list(review))
