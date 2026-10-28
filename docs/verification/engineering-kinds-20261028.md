@@ -28,6 +28,11 @@ nothing touched a user project, a PLC or PLCSIM.
 | [`qualify_hardware_changes.py`](../../scripts/qualify_hardware_changes.py) | `hardware_inspect` items (complete attribute values, addresses, channels, ports, subnets), `device_inventory` rows, every PLC's program | `b27` | Passed, 127/127 steps | `local.hardware_changes.20261028` |
 | [`qualify_technology_changes.py`](../../scripts/qualify_technology_changes.py) | per technology object: identity, `technology_read` connections, native XML export | `b31` | Passed, 132/132 steps | `local.technology_changes.20261028` |
 | [`qualify_alarm_imports.py`](../../scripts/qualify_alarm_imports.py) | `plc_alarm_inspect` alarm classes, instance texts, supervisions, ProDiag settings, text lists | `b34` | Passed, 82/82 steps | `local.alarm_imports.20261028` |
+| [`qualify_connection_changes.py`](../../scripts/qualify_connection_changes.py) | the hardware runner's state plus every `connection_inspect` row | `b39` | Passed, 76/76 steps | `local.connection_changes.20261028` |
+| [`qualify_graph_changes.py`](../../scripts/qualify_graph_changes.py) | every program export (GRAPH documents checked byte for byte) | `b39` | Passed, 38/38 steps | `local.graph_changes.20261028` |
+| [`qualify_project_settings.py`](../../scripts/qualify_project_settings.py), with `project_simulation_enable` | as above | `b38` | Passed, 64/64 steps | `local.project_simulation.20261028` |
+| [`qualify_cax_export.py`](../../scripts/qualify_cax_export.py) | the hardware runner's state, unchanged by each export | `b40` | Passed, 12/12 steps | `local.cax_export.20261028` |
+| [`qualify_vci_mappings.py`](../../scripts/qualify_vci_mappings.py) | every program export plus workspace and mapping identities; compare states and package files checked per change | `b45` | Passed, 89/89 steps | `local.vci_mappings.20261028` |
 
 ## Findings
 
@@ -56,6 +61,21 @@ nothing touched a user project, a PLC or PLCSIM.
   IDs renumbered by first use.
 - **ProDiag settings start uninitialized.** A scratch project's ProDiag settings export fails ("Global settings
   are not initialized") until the first supervision import initializes them.
+- **`Connection.Equals` is not reliable.** Every `connection_create` after an owner's first failed the worker's
+  own preservation check: V21 reported the existing S7 connection as equal to the new TCP connection, so both rows
+  dropped out of the comparison. Connections are now identified by their owner-scoped name and `LocalConnectionId`.
+  A failed apply's own failure details (here, the differing rows) are now journaled; before, the apply wrapper
+  replaced them with the change view.
+- **TIA keeps a connection's partner counterpart in step.** Creating, changing or deleting a connection on one CPU
+  does the same to the partner CPU's counterpart; the connection runner records it.
+- **A GRAPH step rename renames its interface member too.** `graph_edit` replaces the step's name and its
+  `G7_StepPlus` member in the block interface, and nothing else.
+- **An imported S7-1500 CPU needs its password again.** `cax_export` of a secured CPU, checkpoint restore and
+  `cax_import` with `RetainTiaDevice` worked natively, but the imported CPU fails the device compile: the AML carries
+  no confidential-data password. `cax_import` stays open.
+- **VCI mappings.** `vci_mapping_add` exported the package and then failed with a `NullReferenceException`:
+  `GetChildStatus` returns null for a mapped block. Mapping rows and `vci_workspace_inspect` now read it null-safe.
+  Re-importing a mapped block from SCL source replaces the block, and TIA drops its mapping; in-place edits keep it.
 - **An authored NodeSet crashed TIA.** Importing the minimal fixture `fixtures/opcua/machine-v1.xml` as a reference
   namespace crashed the owned TIA instance ("Unexpected exception"; the Portal was disposed). The OPC UA kinds stay
   open until a Siemens-compatible companion NodeSet is available.
@@ -75,6 +95,9 @@ nothing touched a user project, a PLC or PLCSIM.
   (`VirtualAxis.Mode = 1`) with TO_OutputCam 10.0 children, and two PLC output tags. The runner sets a PID limit,
   connects an output cam to a tag and disconnects it, and deletes PID objects. `technology_read` is checked for exact
   selection, a missing path, a one-item inventory and prefixed parameters.
+- **Connections:** the hardware runner's two CPUs on one subnet; S7 and TCP connections between their X1 nodes.
+- **GRAPH:** the authored native seed FB (`tests/TiaMcp.Graph.Tests/fixtures/native-v21/populated/seed.xml`, one step,
+  one transition), exported, edited (step rename) and imported twice.
 - **Alarm imports:** an SCL FB with a `Program_Alarm` and its instance DB. Each import file is a native export edited
   in one place: an alarm-class display name in the DAT, the en-US alarm text in the instance-text workbook and a
   ProDiag category name in the settings DAT. The supervision workbook is re-imported unchanged, because a scratch
@@ -82,7 +105,7 @@ nothing touched a user project, a PLC or PLCSIM.
 
 ## Verified
 
-Catalog `0.4.53` verifies:
+Catalogs `0.4.53` and `0.4.54` verify:
 
 - `change.software_unit_create`, `_publication_set`, `_relation_set` and `_delete` (`local.software_units.20261028`);
 - `change.project_languages_set`, `project_copy` and `project_open.read_only` (`local.project_settings.20261028`);
@@ -92,6 +115,11 @@ Catalog `0.4.53` verifies:
   (`local.technology_changes.20261028`);
 - `change.plc_alarm_class_import`, `_instance_text_import`, `change.plc_supervision_import` and
   `_settings_import` (`local.alarm_imports.20261028`);
+- `change.connection_create`, `_set` and `_delete` (`local.connection_changes.20261028`);
+- `change.graph_import`, `graph_edit` and `graph_export` (`local.graph_changes.20261028`);
+- `change.project_simulation_enable` (`local.project_simulation.20261028`);
+- `cax_export` (`local.cax_export.20261028`);
+- `change.vci_mapping_add`, `change.vci_synchronize` and `change.vci_mapping_remove` (`local.vci_mappings.20261028`);
 - `tag.member.crud` and `type.rename_delete`, whose kinds the X11 run (`local.plc_object_mutations.20261028`)
   already covers.
 
@@ -109,7 +137,6 @@ Catalog `0.4.53` verifies:
   because a scratch project has no user text list to export.
 - Project settings: `project_attributes_set` cannot apply on V21; the copy is compared without program exports,
   which TIA refuses in a read-only project.
-- Still open from these owners: the three D08 connection kinds (creating a second connection fails the worker's
-  preservation check; the cause is under investigation) and the six D04 OPC UA kinds (no Siemens-compatible
-  NodeSet on this PC).
+- Still open from these owners: the six D04 OPC UA kinds (no Siemens-compatible NodeSet on this PC) and
+  `change.cax_import` (an imported S7-1500 CPU fails compile without its password).
 - Engineering only: nothing is downloaded, and no runtime, motion or alarm behavior is observed.

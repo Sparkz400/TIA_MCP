@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.cax_export.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T15:11:51+00:00",
+  "source": {
+    "commit": "09b843c61acb2bd26de7e5a2895547756cf1f3b3",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_cax_export.py on a frozen Debug build of 65a3606 (D:\\wp\\b40), 12/12 steps, in an owned scratch CPU 1511-1 PN V4.1 with an added CPU 1511-1 PN V4.1: cax_export of each device and of the whole project through Siemens CaxProvider; each names the exact device (or none), reports a successful transfer without errors and no unsaved project change before or after, writes an AML whose SHA-256 the retained AutomationML record repeats and whose schema validates, names the device and its CPU, and leaves the hardware, device inventory and program state unchanged; an unknown device path is refused (DeviceNotFound) without a change.",
+  "limitations": [
+    "Two CPU 1511-1 PN V4.1; drives, HMI and device types Siemens excludes from CAx exchange are not exported.",
+    "The AML is checked for device and CPU names, hash and schema validity, not interpreted further.",
+    "cax_import is not qualified: an imported S7-1500 CPU lacks its confidential-data password and fails the device compile."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "107cb5c062964934a9624b810f33b9dd65454017417f1297509d2cc42ac18739"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "76444e8c97757cf6e8e60e84cebf3a70a568da6ad5e556842a0c965e2a8a5bcf"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "fcf664d767f6caeda33f02c1bf1ebc4bb4c2a9553e49f20dfae21e4013c3b487",
+      "bytes": 111159,
+      "completed": true,
+      "steps": [
+        "start owned TIA cax export",
+        "create owned scratch cax export",
+        "snapshot baseline",
+        "prepare add CPU HwPeer",
+        "apply hardware_add",
+        "change_status add CPU HwPeer",
+        "snapshot add CPU HwPeer",
+        "verify add CPU HwPeer",
+        "cax_export ScratchStation",
+        "cax_export HwPeer",
+        "cax_export the project",
+        "refuse cax_export: an unknown device"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "cax_export",
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "device_inventory",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "cax_export"
+      ]
+    }
+  ]
+}

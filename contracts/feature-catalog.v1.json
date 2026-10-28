@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.53",
+  "catalogVersion": "0.4.54",
   "targetTiaVersions": [
     21
   ],
@@ -3303,6 +3303,105 @@
         "plc_alarm_text_list_import is only refused: a scratch project has no user text list to export.",
         "Engineering only; nothing is downloaded and no alarm is raised."
       ]
+    },
+    {
+      "id": "local.project_simulation.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "c8de3eb221350acb2315dd55a7e869e8f39bdaf7",
+        "passedScope": "scripts/qualify_project_settings.py on a frozen Debug build of ec64259 (D:\\wp\\b38), 64/64 steps, in one owned scratch CPU 1511-1 PN V4.1 project: the run of local.project_settings.20261028 repeated, plus project_simulation_enable switching IsSimulationDuringBlockCompilationEnabled from false to true and back, each with checkpoint, PLC compile and save, asserted previews and change_status; a fresh preparation reads the new setting natively; the complete program and project_properties state stays unchanged; a fresh owned Portal reopen shows the identical state and the switch back restored from its checkpoint equals the reopened state. A payload without the explicit enabled flag is refused (InvalidRequest)."
+      },
+      "artifacts": [
+        "evidence/local.project_simulation.20261028.json"
+      ],
+      "limitations": [
+        "No read tool exposes IsSimulationDuringBlockCompilationEnabled; a fresh preparation's native before value is the readback.",
+        "The setting only affects later block compilation; no simulator is started and nothing is downloaded."
+      ]
+    },
+    {
+      "id": "local.graph_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "65a3606f6c8190f0ea5319c8ef4d018c32aa0406",
+        "passedScope": "scripts/qualify_graph_changes.py on a frozen Debug build of c8de3eb (D:\\wp\\b39), 38/38 steps, in one owned scratch CPU 1511-1 PN V4.1 with the authored native GRAPH seed FB (one step, one transition) imported through block_import_xml: graph_export returns the exact block software_inspect lists, retains the bytes of its native export (equal SHA-256) and leaves the project unchanged, refusing SCL and missing blocks; graph_edit renames step 1, and its result equals the source with every occurrence of the step name replaced (the step and its G7_StepPlus interface member) and nothing else, refusing a name an interface member uses (GraphEditDuplicate); graph_import applies the edited document with checkpoint, PLC compile and save, asserted preview and change_status, changing exactly the GRAPH block, whose native export carries the new name; a fresh owned Portal reopen shows the identical state and a second export, edit and import restored from its checkpoint equals the reopened state. Typed refusals (UnsupportedLanguage, BlockNotFound, XmlScopeMismatch, InvalidRequest, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.graph_changes.20261028.json"
+      ],
+      "limitations": [
+        "One GRAPH FB with one step and one transition; branches, jumps, actions, interlocks and supervisions are not edited natively.",
+        "graph_edit: renameStep only natively; the other typed operations are covered by the offline GRAPH tests.",
+        "Engineering only; no sequence is executed and behavioral equivalence is not certified."
+      ]
+    },
+    {
+      "id": "local.connection_changes.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "65a3606f6c8190f0ea5319c8ef4d018c32aa0406",
+        "passedScope": "scripts/qualify_connection_changes.py on a frozen Debug build of c8de3eb (D:\\wp\\b39), 76/76 steps, in an owned scratch CPU 1511-1 PN V4.1 with an added CPU 1511-1 PN V4.1 on one subnet: connection_create (an S7 and a TCP connection between the two X1 nodes), connection_set (the TCP connection's LocalPort) and connection_delete, each applied with checkpoint, device compile and save, asserted previews and change_status; every connection_inspect row, the configured hardware, device inventory and both PLCs' program exports differ in exactly the intended keys, with the partner CPU's counterpart that TIA keeps in step recorded as a side effect; a fresh owned Portal reopen shows the identical state; one change per kind restored from its checkpoint equals the reopened state. Typed refusals (InvalidRequest, HardwareNotFound, UnsupportedAttribute, ObjectNotFound, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.connection_changes.20261028.json"
+      ],
+      "limitations": [
+        "Two CPU 1511-1 PN V4.1; S7 and TCP connections only; ISO, ISO-on-TCP, UDP, FDL, PtP, HMI and unspecified partners are not exercised.",
+        "connection_set writes one allowlisted attribute per change; program instructions and HMI tags that use a connection are covered only by the device compile.",
+        "Engineering only; nothing is downloaded and no communication is observed."
+      ]
+    },
+    {
+      "id": "local.cax_export.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "09b843c61acb2bd26de7e5a2895547756cf1f3b3",
+        "passedScope": "scripts/qualify_cax_export.py on a frozen Debug build of 65a3606 (D:\\wp\\b40), 12/12 steps, in an owned scratch CPU 1511-1 PN V4.1 with an added CPU 1511-1 PN V4.1: cax_export of each device and of the whole project through Siemens CaxProvider; each names the exact device (or none), reports a successful transfer without errors and no unsaved project change before or after, writes an AML whose SHA-256 the retained AutomationML record repeats and whose schema validates, names the device and its CPU, and leaves the hardware, device inventory and program state unchanged; an unknown device path is refused (DeviceNotFound) without a change."
+      },
+      "artifacts": [
+        "evidence/local.cax_export.20261028.json"
+      ],
+      "limitations": [
+        "Two CPU 1511-1 PN V4.1; drives, HMI and device types Siemens excludes from CAx exchange are not exported.",
+        "The AML is checked for device and CPU names, hash and schema validity, not interpreted further.",
+        "cax_import is not qualified: an imported S7-1500 CPU lacks its confidential-data password and fails the device compile."
+      ]
+    },
+    {
+      "id": "local.vci_mappings.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "f9996a183d21a24302e2792cdf93f03a9e5581f1",
+        "passedScope": "scripts/qualify_vci_mappings.py on a frozen Debug build of f9996a1 (D:\\wp\\b45), 89/89 steps, in one owned scratch CPU 1511-1 PN V4.1 with one VCI workspace (root outside the project and the artifact store) and two SCL FCs: vci_mapping_add (export in SCL format), vci_synchronize (ProjectToWorkspace after an in-place header edit, WorkspaceToProject after a workspace-file edit) and vci_mapping_remove, each applied with checkpoint, PLC compile and save, asserted previews and change_status; every program export and member and every workspace and mapping identity differ in exactly the intended keys; each mapping reads back Equal after the change and package files change only where written; a fresh owned Portal reopen shows the identical state; one change per kind restored from its checkpoint equals the pre-change project state. Typed refusals (VciFormatUnsupported, VciWorkspaceNotFound, VciPackageMissing, VciMappingNotFound, VciMappingExists, VciScopeTooBroad, VciPackageCollision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.vci_mappings.20261028.json"
+      ],
+      "limitations": [
+        "One workspace in the root group and SCL FCs mapped by export; connect mode, library types, nested directories and global library policies are not exercised.",
+        "change_restore never restores workspace files; restore equality covers the project state only.",
+        "Mapped blocks are edited in place: an SCL re-import replaces the block and TIA drops its mapping."
+      ]
     }
   ],
   "features": [
@@ -6187,12 +6286,14 @@
           "Exactly one GRAPH block per document; language conversion, safety blocks and protected or generated targets are refused. The worker synthesizes no GRAPH edit; typed edits are made beforehand with graph_edit and the document is imported as supplied.",
           "Apply requires compile=true. After compilation the block is re-exported and must equal the imported document beyond DocumentInfo and formatting (the existing native preservation comparer) before saving; otherwise the change is recovery_required. Documents exported without defaults can fail this check.",
           "The GraphComparer does not run inside the worker; review the declared change beforehand with graph_export and graph_compare.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.graph_changes.20261028): an edited export of a one-step GRAPH FB imported with checkpoint, PLC compile and save, changing exactly that block and read back in its native export; documents outside expectedBlockNames and ambiguous inputs refused; fresh-Portal reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.graph_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -7508,14 +7609,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified in an owned scratch project (local.project_simulation.20261028): IsSimulationDuringBlockCompilationEnabled switched on and off with checkpoint, compile and save, read back through a fresh preparation (no read tool exposes it), fresh-Portal reopen and checkpoint restore; a payload without the explicit flag is refused.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02"
+          "local.project_simulation.20261028"
         ]
       },
       "availability": {
@@ -17473,6 +17575,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively exercised (local.graph_changes.20261028): renameStep on a native export changes every occurrence of the step name (the step and its G7_StepPlus interface member) and nothing else, and the result imports; a name an interface member uses is refused (GraphEditDuplicate). Other operations are covered offline only.",
           "Ops: addStep after an existing transition, addTransition from a step without successor to a step (direct or jump), removeStep/removeTransition of a linear-chain element (predecessor spliced to successor), renameStep/renameTransition, setStepComment, setSequenceTitle and setTransitionCondition; 1..32 operations per call, applied in order. Branches are never created or removed.",
           "Edits splice the source text, so unedited bytes stay identical; only UTF-8/UTF-16 sources whose GRAPH namespace is the default namespace at the edit position are edited. The result is retained as a new document whose only input is the source, plus a comparison record.",
           "Refused unless source and result read without errors, step/transition numbers are unique, names are unique (case-insensitive, also against declared block-interface members), connections alternate steps and transitions through branches, every transition has exactly one incoming and one outgoing connection and every step is reachable from an initial step.",
@@ -17482,8 +17585,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.graph_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17699,12 +17804,14 @@
           "Exports one exact block; non-GRAPH, know-how protected and natively rejected blocks are refused. The language check runs after the native export, so a refused block still leaves its export artifact.",
           "The retained record uses the offline graph-v6-structure.v2 reader; reports keep nativeQualified, fullSchemaValidated and behavioralEquivalenceCertified false.",
           "Each export adds one record to the bounded GRAPH store (128 records, 2 GiB, no automatic eviction).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified (local.graph_changes.20261028): exports the exact GRAPH block software_inspect lists, retains the bytes of its native export with equal SHA-256 and leaves the project unchanged; SCL and missing blocks are refused."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.graph_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17944,18 +18051,21 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.vci_mappings.20261028): SCL FCs mapped by export in SCL format, reading back Equal with only new package files; unsupported formats, unknown workspaces, missing packages, mapped objects and leftover packages refused; fresh-Portal reopen and checkpoint restore. Connect mode is only refused.",
           "Payload: workspacePath, objectPath, mode (export or connect), directory (relative to the root, empty for the root), fileName (without extension), format (exact native token from GetSupportedFileFormats).",
           "An object already mapped in any workspace and a package already owned by another mapping are refused. export refuses existing package files and must read back Equal; connect requires existing package files and only reports the native status.",
           "The directory is passed as the absolute path below the root: the 15 October V21 probe rejected a relative DirectoryInfo for this parameter. Package completeness (for example SIMATIC SD .s7res companions) is not checked.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
           "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
-          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first.",
+          "Native observation (28 October 2026): re-importing a mapped block from SCL source (source_upsert) replaces the block object and TIA drops its mapping; edit mapped blocks in place or remap them."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.vci_mappings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -17998,7 +18108,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified (local.vci_mappings.20261028): mappings removed with their package files kept; unmapped objects refused; reopen and checkpoint restore.",
           "Payload: workspacePath, objectPath. Removes only the mapping; the engineering object stays. Package files are backed up first; any native file effect within the package is reported.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
           "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
@@ -18006,8 +18116,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.vci_mappings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18050,7 +18162,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified (local.vci_mappings.20261028): one mapping synchronized ProjectToWorkspace after an in-place project edit and WorkspaceToProject after a workspace-file edit, each reading back Equal; a project-ward synchronization of every mapping refused; reopen and checkpoint restore.",
           "Payload: workspacePath, direction (ProjectToWorkspace or WorkspaceToProject), and either objectPath or allMappedObjects=true (1..200 mappings, ProjectToWorkspace only). Mappings with both ProjectObjectChanged and WorkspaceFileChanged are refused as VciConflict; WorkspaceToProject refuses WorkspaceFileMissing.",
           "Each synchronized mapping must read back CompareState Equal. A whole-workspace sync is a journaled sequence of per-mapping calls, not a transaction.",
           "ProjectToWorkspace overwrites the previewed package files (backed up first); every other workspace file must stay byte-identical. WorkspaceToProject keeps the workspace files byte-identical, applies the guards of direct mutations (safety-unit, F-block, know-how protected objects refused) and requires compile=true.",
@@ -18060,8 +18172,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.vci_mappings.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19005,14 +19119,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified between two owned scratch CPUs 1511-1 PN V4.1 on one subnet (local.connection_changes.20261028): S7 and TCP connections created with their partner counterparts, unknown types and owners refused; fresh-Portal reopen and checkpoint restore. Connections are identified by their owner-scoped name and LocalConnectionId, because V21 Connection.Equals reports different connections of one owner as equal.",
           "Explicit connectionType (S7Connection, TcpConnection, UdpConnection, IsoConnection, IsoOnTcpConnection, FdlConnection, PtpConnection or HmiConnection), exact owner hardwarePath, local interface node, partner target and partner interface node. Unspecified partners are not supported. Siemens decides type/endpoint compatibility; generated names, IDs and parameters are kept.",
           "Verifies native type and endpoint equality and that every other connection of the owner reads back unchanged. Partner-side counterparts, program instructions and HMI tags are covered only by the mandatory whole-project device compile; resource/capacity rules are not assessed."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.connection_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19055,14 +19171,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified (local.connection_changes.20261028): S7 and TCP connections deleted with their partner counterparts; missing connections refused; reopen and checkpoint restore.",
           "Exactly one connection of the exact owner by LocalConnectionName and optional LocalConnectionId; missing or ambiguous matches are rejected.",
           "No dependency scan of program instructions or HMI tags: the mandatory whole-project device compile is the only consumer check. Verifies the owner's remaining connections read back exactly as before; partner-side counterparts are not checked."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.connection_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19105,14 +19223,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified (local.connection_changes.20261028): the TCP connection's LocalPort written and read back through connection_inspect, with TIA keeping the partner counterpart in step; non-allowlisted attributes, empty requests and missing connections refused; a stale owner table refuses at apply; reopen and checkpoint restore.",
           "Allowlist LocalActiveEstablishment, PartnerActiveEstablishment, LocalPort, PartnerPort, PartnerAddress, LocalTsap, PartnerTsap, LocalLsap, PartnerLsap; each must also be declared native read/write on the selected connection. Names, IDs and resource IDs are excluded. Whether the typed properties are exposed through the attribute route is not natively observed.",
           "Native readback of each requested value and unchanged readback of every other connection of the owner. Dependent changes on the selected connection itself are reported, not restricted; partner-side counterparts are covered only by the mandatory device compile."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.connection_changes.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23531,7 +23651,8 @@
           "Siemens refuses CAx import inside exclusive access: apply releases the admitted shared-mutation lease only around the native call, so the kind is limited to a worker-owned TIA instance and the Host's admitted change_apply route.",
           "Whole-project checkpoint, compile=true device-project compilation, and configured-hardware manifests before and after with a path difference in the readbacks. MoveToParkingLot and RetainTiaDevice must leave every existing configured row exact (additions only); OverwriteTiaDevice replaces devices as the AML file dictates, so its hardware outcome is recorded for review but cannot be matched.",
           "The V19+ TransferResult overload writes no native log; the message tree is retained as cax-import.transfer-result.json. An error state fails into recovery_required.",
-          "Software, HMI and unexposed vendor data changed by the import are covered only by the generic engineering fingerprint; no AML-to-native identity mapping is established."
+          "Software, HMI and unexposed vendor data changed by the import are covered only by the generic engineering fingerprint; no AML-to-native identity mapping is established.",
+          "Native observation (28 October 2026, local.cax_export.20261028 fixture): exporting a secured CPU 1511-1 PN, restoring the checkpoint before it and importing the AML with RetainTiaDevice applied, but the imported CPU failed the device compile because the AML carries no confidential-data password. A device that compiles without generated security is still needed to qualify the import."
         ]
       },
       "qualification": {
@@ -23575,7 +23696,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified (local.cax_export.20261028): exports of two CPU 1511-1 PN devices and of the whole project report a successful transfer, write an AML whose hash the AutomationML record repeats and whose schema validates, and leave the project unchanged; an unknown device path is refused (DeviceNotFound).",
           "Uses the V19+ TransferResult overloads, which write no native log file; the message tree (up to 50000 messages, truncation explicit) is retained as <export>.transfer-result.json beside the AML and maxItems messages are returned. Both files are returned with SHA-256.",
           "Whole project or one exact device path from device_inventory. Siemens excludes drives, most HMI devices and listed Scalance/system device types from CAx exchange.",
           "Exports the in-memory project state without saving; projectModifiedBefore/After report unsaved edits. An error state or a missing AML file refuses with the retained transfer result.",
@@ -23583,8 +23704,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.cax_export.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
