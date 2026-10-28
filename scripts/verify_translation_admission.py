@@ -11,7 +11,7 @@ import sys
 
 from qualify_translation_category_probe import require, scan_store, WindowsFiles
 from qualify_translation_import import FAILURE_CASES
-from verify_translation_import import MAIN_COMMENT_VIEWS, workbook, peer
+from verify_translation_import import MAIN_COMMENT_VIEWS, accepted_return, workbook, peer
 from verify_watch_workflow import canonical_sha
 
 
@@ -37,7 +37,7 @@ def content_sha(rows):
 class Oracle:
     def __init__(self, root):
         self.root = Path(root).resolve()
-        self.imports = [load(p) for p in self.root.glob('translation-native/import-*/native-return.json')]
+        self.imports = [dict(load(p), log=(p.parent / 'complete-log').read_bytes()) for p in self.root.glob('translation-native/import-*/native-return.json')]
         self.restores = [load(p) for p in self.root.glob('translation-native/restore-*/restore-return.json')]
         self.oracle = load(self.root / 'edit-oracle.json')
 
@@ -147,7 +147,7 @@ class Oracle:
         require(len(imports) == expected_imports, 'Import count differs; replay forbidden')
         for imported in imports:
             require(imported['planSha256'] == final['planSha256'] and imported['candidateSha256'] == binding['candidate']['sha256'] and
-                    imported['state'] == 'Info' and imported['updateSourceLanguage'] is False, 'Native return differs')
+                    accepted_return(imported['state'], imported['log'], before, candidate) and imported['updateSourceLanguage'] is False, 'Native return differs')
         restores = [r for r in self.restores if r['projectPath'] == trial['recoveryPath']]
         require(len(restores) == 1 and restores[0]['oneRetrieve'], 'Exactly one distinct checkpoint restoration required')
         apply_calls = self.calls('qualification_translation_apply', trial['id'])
