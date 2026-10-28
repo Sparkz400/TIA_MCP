@@ -28,7 +28,8 @@ CRITERIA = {
 LIMITATIONS = [
     "Two CPU 1511-1 PN V4.1 on one subnet; S7 and TCP connections between their X1 nodes only. ISO, ISO-on-TCP, UDP, FDL, PtP and HMI connections, "
     "unspecified partners and program instructions or HMI tags that use a connection are not exercised.",
-    "connection_set writes one allowlisted attribute per change; resource and capacity rules are left to the device compile.",
+    "connection_set writes one allowlisted attribute per change; resource and capacity rules are left to the device compile. TIA keeps the partner "
+    "CPU's counterpart in step (changed on set, removed on delete); this is recorded under sideEffects.",
     "Every device item of these CPUs, the rail and the ports included, exposes CommunicationManagement natively, so no owner-capability refusal exists here.",
     "Engineering only; nothing is downloaded and no communication is observed.",
 ]
@@ -74,18 +75,25 @@ def own(run, rows):
     return next(row for row in rows if row["id"].startswith(cpu + "/connections/"))
 
 
+def counterpart(run, row):
+    """The partner CPU's side of an owner's connection, which TIA keeps in step with it."""
+    return "conn:" + ends(run)[1] + "/connections/" + row["id"].rsplit("/", 1)[1]
+
+
 def set_attribute(run, row, name, value, restore=False):
     cpu = ends(run)[0]
     payload = {"hardwarePath": cpu, "connectionName": row["properties"]["LocalConnectionName"], "attributes": {name: value}}
     run.apply("set %s's %s" % (row["properties"]["LocalConnectionName"], name), "connection_set", payload,
               {"effects": [{"connection": row["id"], "attributes": [{"name": name, "after": value}]}]},
-              changed=["conn:" + row["id"]], rows={"conn:" + row["id"]: {"properties": {name: value}}}, restore=restore)
+              changed=["conn:" + row["id"]], rows={"conn:" + row["id"]: {"properties": {name: value}}},
+              tolerated=lambda category, key: category == "changed" and key == counterpart(run, row), restore=restore)
 
 
 def delete(run, row, restore=False):
     cpu = ends(run)[0]
     run.apply("delete " + row["properties"]["LocalConnectionName"], "connection_delete", {"hardwarePath": cpu, "connectionName": row["properties"]["LocalConnectionName"]},
-              {"effects": [{"deleteConnection": row}]}, removed=["conn:" + row["id"]], restore=restore)
+              {"effects": [{"deleteConnection": row}]}, removed=["conn:" + row["id"]],
+              tolerated=lambda category, key: category == "removed" and key == counterpart(run, row), restore=restore)
 
 
 def phase_a(run):
