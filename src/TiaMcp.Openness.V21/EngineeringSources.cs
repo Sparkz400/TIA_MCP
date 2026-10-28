@@ -336,6 +336,9 @@ namespace TiaMcp.Openness.V21
                 {
                     var normalized = NormalizeNativeElement(element, false);
                     normalized.Elements("DocumentInfo").Remove();
+                    // SimaticML object IDs are serialization numbers that every export reassigns in document order.
+                    int id = 0;
+                    foreach (var attribute in normalized.DescendantsAndSelf().Attributes("ID")) attribute.Value = (id++).ToString(System.Globalization.CultureInfo.InvariantCulture);
                     result.Add(normalized);
                 }
                 else if (node is XComment comment) result.Add(new XComment(comment.Value));
@@ -463,6 +466,11 @@ namespace TiaMcp.Openness.V21
                 "AccessNotFound", "targetAccessUid must identify one existing Access in this network.");
             SimpleSymbolComponents(target);
             var wire = IsolatedCallWire(network, callUid, parameterName);
+            string previous = wire.Element(network.Name.Namespace + "IdentCon").Attribute("UId")?.Value;
+            var wired = network.Element(network.Name.Namespace + "Wires").Descendants(network.Name.Namespace + "IdentCon").Select(e => e.Attribute("UId")?.Value).ToArray();
+            // TIA V21 import refuses an Access without a wire and one on several wires, so the move must leave both on exactly one.
+            if (wired.Count(uid => uid == previous) != 2 || wired.Contains(targetAccessUid))
+                throw new BridgeException("AccessWiringUnsupported", "TIA Portal V21 imports a network only when every Access is wired exactly once; moving this wire would leave Access " + previous + " unwired or Access " + targetAccessUid + " on two wires.");
             wire.Element(network.Name.Namespace + "IdentCon").SetAttributeValue("UId", targetAccessUid);
         }
 

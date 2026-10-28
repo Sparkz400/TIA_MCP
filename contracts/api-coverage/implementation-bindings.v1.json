@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "dd4bf99ef6b22d5455ba55286f0a54649c8089db55178d86d17cb5b65e0ee6a9",
-      "bytes": 1255728
+      "sha256": "8e5e051eafc7b9662e66c3b84bff254eb7107a5351d545047d5ae7c682908f54",
+      "bytes": 1266799
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1852,8 +1852,8 @@
     },
     {
       "path": "src/TiaMcp.Host/HostOptions.cs",
-      "sha256": "6e8728bab25ccb01888a6d91153b6337977aebf41f32f2fc4a90a8e3c60068ea",
-      "bytes": 9613
+      "sha256": "b82592f6d5ce7778f2904b1ae26697baf9f8ef7817b1a8791ed29fe42d867b12",
+      "bytes": 9671
     },
     {
       "path": "src/TiaMcp.Host/LibraryPackageTools.cs",
@@ -2067,13 +2067,13 @@
     },
     {
       "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
-      "sha256": "2f2fb5c06c47817e1f8fb9552fd7cd57cfe3c2bf0099ef6e8eb307e54f92b4df",
-      "bytes": 2036
+      "sha256": "b3f5b8f7082a6d9d4d273daf10e72c8758385a27353957aa522862310ee991c6",
+      "bytes": 2912
     },
     {
       "path": "src/TiaMcp.Host/WatchQualification.cs",
-      "sha256": "f390649ce9d1ec47c888e861def3706544bf6d3ad6e736d45b129cb322d398e9",
-      "bytes": 3779
+      "sha256": "e5c23461d547df5ac52264cea7efd261a2c01bebcccb4aa21f1e4efd28ee810d",
+      "bytes": 4220
     },
     {
       "path": "src/TiaMcp.Host/WatchTableTools.cs",
@@ -2242,8 +2242,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/EngineeringSources.cs",
-      "sha256": "0f0b2f7f6cde097995cd82f1cf27cdf56e2b851164e8afeaad7b469f3ec37a19",
-      "bytes": 51242
+      "sha256": "25245a81d80590d815e91373959f1b840fae71821abe5796937954adc1b933dd",
+      "bytes": 52338
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
@@ -3274,6 +3274,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -9407,6 +9414,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -9506,6 +9520,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "RequireBlock",
           "line": 101,
@@ -9595,6 +9616,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -9711,6 +9739,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -9877,8 +9912,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/AddIns/AddInEnrollment.cs",
@@ -10168,6 +10203,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -10256,6 +10298,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -10340,6 +10389,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -10462,6 +10518,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/CaxTools.cs",
@@ -10610,6 +10673,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -10687,6 +10757,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -13112,6 +13189,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -14156,9 +14240,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
@@ -14374,8 +14458,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -16126,9 +16210,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
@@ -17462,8 +17546,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -19371,8 +19455,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -20295,8 +20379,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -21572,6 +21656,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -22620,6 +22711,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -22696,6 +22794,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -22783,6 +22888,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -22935,8 +23047,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -23096,6 +23208,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -24069,9 +24188,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/DiagnosticUaCaptureSource.cs",
@@ -25658,6 +25777,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -25746,6 +25872,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -25830,6 +25963,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -25928,6 +26068,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -26988,6 +27135,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Host/HmiTools.cs",
           "name": "HmiArguments",
           "line": 25,
@@ -27084,6 +27238,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/HmiTools.cs",
@@ -27689,6 +27850,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -27777,6 +27945,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -27853,6 +28028,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -27937,6 +28119,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -28032,6 +28221,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -28184,8 +28380,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -28262,6 +28458,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -28369,6 +28572,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
@@ -28535,8 +28745,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -30012,6 +30222,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
           "line": 244,
@@ -30162,8 +30379,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -30248,6 +30465,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -31299,6 +31523,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -32571,9 +32802,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
@@ -32719,8 +32950,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -32889,6 +33120,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -34286,6 +34524,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -34382,6 +34627,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -34482,6 +34734,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -34570,6 +34829,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -34655,6 +34921,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -34746,6 +35019,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -34823,6 +35103,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -35003,6 +35290,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
           "name": "ObjectArguments",
           "line": 244,
@@ -35092,6 +35386,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -35740,6 +36041,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -35824,6 +36132,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -35915,6 +36230,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -36121,9 +36443,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
@@ -36276,8 +36598,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/AutomationMlWorkflowStore.cs",
@@ -37072,9 +37394,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -38370,9 +38692,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -38437,9 +38759,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
@@ -38636,9 +38958,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/TracePlanning.cs",
@@ -39058,9 +39380,9 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "Reconcile",
-          "line": 27,
-          "endLine": 31,
-          "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+          "line": 28,
+          "endLine": 32,
+          "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -39127,9 +39449,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
@@ -39584,9 +39906,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -40227,9 +40549,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -40289,9 +40611,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -41280,9 +41602,9 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "Reconcile",
-          "line": 27,
-          "endLine": 31,
-          "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+          "line": 28,
+          "endLine": 32,
+          "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -41702,15 +42024,15 @@
       "host": {
         "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "name": "SourceNegative",
-        "line": 18,
-        "endLine": 23,
-        "sha256": "4e8238c7c1cec97c4e8e4fc3751c4730b63eab0a4e33bc28812adf86728af11b"
+        "line": 19,
+        "endLine": 24,
+        "sha256": "a15f9237b864f6aff369632388227e045e91eba58838fcee10526728594bffb9"
       },
       "bridgeOperations": [
         "qualification_watch_authoring_source_negative"
       ],
       "localCallNames": [
-        "CallAsync",
+        "Call",
         "Combine",
         "RequireQualification"
       ],
@@ -41718,16 +42040,23 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "SourceNegative",
-          "line": 18,
-          "endLine": 23,
-          "sha256": "4e8238c7c1cec97c4e8e4fc3751c4730b63eab0a4e33bc28812adf86728af11b"
+          "line": 19,
+          "endLine": 24,
+          "sha256": "a15f9237b864f6aff369632388227e045e91eba58838fcee10526728594bffb9"
         },
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "RequireQualification",
-          "line": 11,
-          "endLine": 15,
+          "line": 12,
+          "endLine": 16,
           "sha256": "5f7bbd168f1494ddae2af2ceddc7d78efc166fdcc33e41f255e22248ee856032"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "workerRoutes": [
@@ -41742,25 +42071,25 @@
       ],
       "localHandlers": [
         {
-          "path": "src/TiaMcp.Core/BridgeClient.cs",
-          "name": "CallAsync",
-          "line": 31,
-          "endLine": 71,
-          "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
+          "path": "src/TiaMcp.Host/SimulatorTools.cs",
+          "name": "Call",
+          "line": 69,
+          "endLine": 77,
+          "sha256": "c9c34b54560a042f4c5daca1d088cea5edcc8272c7db9e76f6c3384711cb6d8f"
         },
         {
-          "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
-          "name": "CallAsync",
-          "line": 14,
-          "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "path": "src/TiaMcp.Host/TiaTools.cs",
+          "name": "Call",
+          "line": 80,
+          "endLine": 88,
+          "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
-          "path": "src/TiaMcp.Host/WatchQualification.cs",
-          "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleAdapter.cs",
@@ -41779,15 +42108,15 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "RequireQualification",
-          "line": 11,
-          "endLine": 15,
+          "line": 12,
+          "endLine": 16,
           "sha256": "5f7bbd168f1494ddae2af2ceddc7d78efc166fdcc33e41f255e22248ee856032"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 44,
-          "endLine": 48,
+          "line": 48,
+          "endLine": 52,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -41801,31 +42130,38 @@
       "host": {
         "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "name": "Reconcile",
-        "line": 27,
-        "endLine": 31,
-        "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+        "line": 28,
+        "endLine": 32,
+        "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
       },
       "bridgeOperations": [
         "qualification_watch_authoring_source_reconcile"
       ],
       "localCallNames": [
-        "CallAsync",
+        "Call",
         "RequireQualification"
       ],
       "hostDelegationAnchors": [
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "Reconcile",
-          "line": 27,
-          "endLine": 31,
-          "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+          "line": 28,
+          "endLine": 32,
+          "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
         },
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "RequireQualification",
-          "line": 11,
-          "endLine": 15,
+          "line": 12,
+          "endLine": 16,
           "sha256": "5f7bbd168f1494ddae2af2ceddc7d78efc166fdcc33e41f255e22248ee856032"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "workerRoutes": [
@@ -41840,25 +42176,25 @@
       ],
       "localHandlers": [
         {
-          "path": "src/TiaMcp.Core/BridgeClient.cs",
-          "name": "CallAsync",
-          "line": 31,
-          "endLine": 71,
-          "sha256": "23b4c1e5648ffa4c3ad0d0543112b36dce333ee36034073946d6a047c5c1c7fa"
+          "path": "src/TiaMcp.Host/SimulatorTools.cs",
+          "name": "Call",
+          "line": 69,
+          "endLine": 77,
+          "sha256": "c9c34b54560a042f4c5daca1d088cea5edcc8272c7db9e76f6c3384711cb6d8f"
         },
         {
-          "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
-          "name": "CallAsync",
-          "line": 14,
-          "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "path": "src/TiaMcp.Host/TiaTools.cs",
+          "name": "Call",
+          "line": 80,
+          "endLine": 88,
+          "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
-          "path": "src/TiaMcp.Host/WatchQualification.cs",
-          "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleAdapter.cs",
@@ -41877,15 +42213,15 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "RequireQualification",
-          "line": 11,
-          "endLine": 15,
+          "line": 12,
+          "endLine": 16,
           "sha256": "5f7bbd168f1494ddae2af2ceddc7d78efc166fdcc33e41f255e22248ee856032"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 44,
-          "endLine": 48,
+          "line": 48,
+          "endLine": 52,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -41899,8 +42235,8 @@
       "host": {
         "path": "src/TiaMcp.Host/WatchQualification.cs",
         "name": "Compete",
-        "line": 61,
-        "endLine": 78,
+        "line": 65,
+        "endLine": 82,
         "sha256": "3460574674ad7d833f8df6ca3e43eb8c251d3f48a4594092bebd273b62619c24"
       },
       "bridgeOperations": [],
@@ -41918,15 +42254,15 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Compete",
-          "line": 61,
-          "endLine": 78,
+          "line": 65,
+          "endLine": 82,
           "sha256": "3460574674ad7d833f8df6ca3e43eb8c251d3f48a4594092bebd273b62619c24"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 44,
-          "endLine": 48,
+          "line": 48,
+          "endLine": 52,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -42243,15 +42579,15 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "RequireQualification",
-          "line": 11,
-          "endLine": 15,
+          "line": 12,
+          "endLine": 16,
           "sha256": "5f7bbd168f1494ddae2af2ceddc7d78efc166fdcc33e41f255e22248ee856032"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 44,
-          "endLine": 48,
+          "line": 48,
+          "endLine": 52,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         },
         {
@@ -42294,8 +42630,8 @@
       "host": {
         "path": "src/TiaMcp.Host/WatchQualification.cs",
         "name": "Seed",
-        "line": 52,
-        "endLine": 57,
+        "line": 56,
+        "endLine": 61,
         "sha256": "178f12d49bdc64aead43b3da15430338d35e69122548d01f8b4506d66b90dce6"
       },
       "bridgeOperations": [
@@ -42310,15 +42646,15 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Seed",
-          "line": 52,
-          "endLine": 57,
+          "line": 56,
+          "endLine": 61,
           "sha256": "178f12d49bdc64aead43b3da15430338d35e69122548d01f8b4506d66b90dce6"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 44,
-          "endLine": 48,
+          "line": 48,
+          "endLine": 52,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -42350,9 +42686,9 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "CallAsync",
-          "line": 14,
-          "endLine": 38,
-          "sha256": "2c02d88b94e9004f27f05fc724c6d6d0135c468de9018dc81d3a43ef5e2a7b93"
+          "line": 16,
+          "endLine": 42,
+          "sha256": "f5d10ebdf8289411d08e121c3cd82e3cbed35faf4c8554d5d562b4c504f922a2"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleAdapter.cs",
@@ -42371,15 +42707,15 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "RequireQualification",
-          "line": 11,
-          "endLine": 15,
+          "line": 12,
+          "endLine": 16,
           "sha256": "5f7bbd168f1494ddae2af2ceddc7d78efc166fdcc33e41f255e22248ee856032"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 44,
-          "endLine": 48,
+          "line": 48,
+          "endLine": 52,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -42596,8 +42932,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -57513,8 +57849,8 @@
           "path": "src/TiaMcp.Host/HostOptions.cs",
           "name": "Parse",
           "line": 25,
-          "endLine": 115,
-          "sha256": "99a98c17577cf690685f5d5fd05123cdfbf19ebb38d1e84f257c4de83c7c28c0"
+          "endLine": 116,
+          "sha256": "5b063d332a09ff72aa9257bb20f48ba6e108bf53fd9c9b97e9b4052e415e8872"
         },
         {
           "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -58029,6 +58365,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -58125,6 +58468,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -58225,6 +58575,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -58315,6 +58672,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58393,6 +58757,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58555,6 +58926,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58632,6 +59010,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58710,6 +59095,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58787,6 +59179,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58864,6 +59263,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -58941,6 +59347,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59104,6 +59517,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59266,6 +59686,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59342,6 +59769,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59418,6 +59852,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59494,6 +59935,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59570,6 +60018,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -59654,6 +60109,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -60714,6 +61176,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -60802,6 +61271,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -60886,6 +61362,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -62899,6 +63382,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -62995,6 +63485,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -64181,9 +64678,9 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "Reconcile",
-          "line": 27,
-          "endLine": 31,
-          "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+          "line": 28,
+          "endLine": 32,
+          "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteTools.cs",
@@ -65408,6 +65905,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -65815,6 +66319,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -65891,6 +66402,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -65968,6 +66486,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -66044,6 +66569,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -66120,6 +66652,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -66196,6 +66735,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -66272,6 +66818,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -70663,9 +71216,9 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "Reconcile",
-          "line": 27,
-          "endLine": 31,
-          "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+          "line": 28,
+          "endLine": 32,
+          "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -72063,9 +72616,9 @@
         {
           "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
           "name": "Reconcile",
-          "line": 27,
-          "endLine": 31,
-          "sha256": "cd7cc66e345b1f811180bf7ac3e419d9b44fef5ba19314a2a35968e157cfbd0d"
+          "line": 28,
+          "endLine": 32,
+          "sha256": "78622e8acd8b4842b49e4af1fae89579d13e22bace55cf4120e8ac70d371c8f4"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -72943,6 +73496,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -76366,6 +76926,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -76454,6 +77021,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76530,6 +77104,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76606,6 +77187,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76682,6 +77270,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76758,6 +77353,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76834,6 +77436,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76910,6 +77519,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -76986,6 +77602,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77062,6 +77685,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77138,6 +77768,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77214,6 +77851,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77290,6 +77934,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77366,6 +78017,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77442,6 +78100,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -77518,6 +78183,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -78566,6 +79238,13 @@
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
         },
         {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
+        },
+        {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
           "line": 134,
@@ -78670,6 +79349,13 @@
           "line": 80,
           "endLine": 88,
           "sha256": "28e4f96fa55304527193680fb082ada5aa6be9820f74f20d286b20f0a8b5cb06"
+        },
+        {
+          "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
+          "name": "Call",
+          "line": 35,
+          "endLine": 46,
+          "sha256": "f49312fa872e47f4aa76cafa3645fa705b875c23b45cd91a0347433141db4ea8"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
@@ -88288,7 +88974,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -89570,11 +90257,20 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
-        "src/TiaMcp.Host/TranslationNativeTools.cs"
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
+          "artifacts": [
+            "evidence/local.graphical_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -89625,7 +90321,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -89654,7 +90351,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -89692,7 +90390,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -89770,7 +90469,8 @@
         "src/TiaMcp.Host/ProjectExplorerResources.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [
         {
@@ -89885,7 +90585,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -89927,6 +90628,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -89970,6 +90672,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
@@ -90032,6 +90735,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -90091,6 +90795,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -90134,6 +90839,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs"
       ],
@@ -90169,6 +90875,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
@@ -90231,6 +90938,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs"
       ],
@@ -90266,6 +90974,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs"
       ],
@@ -90301,6 +91010,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -90340,6 +91050,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -90351,18 +91062,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.calls-expanded.20261008",
-          "profileSha256": "d79065d9811fd188c3bcf6511b53f5406007836475349f0476577a2633f2b5d3",
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
           "artifacts": [
-            "artifacts/engineering-layers-calls-expanded.json"
-          ]
-        },
-        {
-          "id": "local.layers.calls-reopen.20261008",
-          "profileSha256": "ba75c38dd8e94790b5659ae8c5405c0b8900248690c5546cec5a9a9e96447ef3",
-          "artifacts": [
-            "artifacts/engineering-gap-calls.json",
-            "artifacts/engineering-gap-preservation-audit.json"
+            "evidence/local.graphical_changes.20261028.json"
           ]
         }
       ],
@@ -90395,6 +91098,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Cax.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs"
       ],
@@ -90438,6 +91142,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
@@ -90482,6 +91187,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
@@ -90526,6 +91232,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
@@ -90570,6 +91277,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.CertificateChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
@@ -90614,6 +91322,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs"
       ],
@@ -90657,6 +91366,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs"
       ],
@@ -90700,6 +91410,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Connections.cs"
       ],
@@ -90743,6 +91454,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.cs"
@@ -90787,6 +91499,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -90830,6 +91543,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -90873,6 +91587,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs"
       ],
@@ -90908,6 +91623,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs"
       ],
@@ -90943,6 +91659,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -90980,6 +91697,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -91017,6 +91735,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -91062,6 +91781,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -91071,7 +91791,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
+          "artifacts": [
+            "evidence/local.graphical_changes.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91101,6 +91829,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -91112,18 +91841,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.graphical.20261008",
-          "profileSha256": "bb872dfbe8158c4b9de183eb28a1e860f18e7d8f86a1050d734e75cb7cc78cac",
+          "id": "local.graphical_changes.20261028",
+          "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
-          ]
-        },
-        {
-          "id": "local.layers.graphical-reopen.20261008",
-          "profileSha256": "7abc60227ec42ca6ab1d89c630b6797d7563599a1674f965c3bfc7f09cb35b7d",
-          "artifacts": [
-            "artifacts/engineering-gap-graphical.json",
-            "artifacts/engineering-gap-preservation-audit.json"
+            "evidence/local.graphical_changes.20261028.json"
           ]
         }
       ],
@@ -91156,6 +91877,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -91210,6 +91932,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs"
@@ -91478,6 +92201,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.cs"
@@ -91522,6 +92246,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.cs"
@@ -91566,6 +92291,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.cs"
@@ -91610,6 +92336,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -91657,6 +92384,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.HardwareEditing.cs"
       ],
@@ -91707,6 +92435,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -91752,6 +92481,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
@@ -91795,6 +92525,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.CpuMemoryBytes.cs"
       ],
@@ -91838,6 +92569,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SecurityInspection.cs"
@@ -91882,6 +92614,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
       ],
@@ -91932,6 +92665,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -91991,6 +92725,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs"
       ],
@@ -92034,6 +92769,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs"
       ],
@@ -92077,6 +92813,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs"
       ],
@@ -92173,6 +92910,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -92216,6 +92954,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -92305,6 +93044,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryMaintenance.cs"
       ],
@@ -92348,6 +93088,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -92421,6 +93162,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs"
@@ -92507,6 +93249,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryMaintenance.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -92608,6 +93351,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.HmiModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryVersionDocuments.cs",
@@ -92710,6 +93454,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs"
       ],
@@ -92781,6 +93526,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -92856,6 +93602,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -92947,6 +93694,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryMaintenance.cs"
       ],
@@ -92990,6 +93738,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Inspection.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -93132,6 +93881,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Inspection.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -93183,6 +93933,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs"
       ],
       "schemaBindings": [],
@@ -93253,6 +94004,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -93347,6 +94099,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -93452,6 +94205,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -93498,6 +94252,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -93589,6 +94344,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -93666,6 +94422,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -93782,6 +94539,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -93857,6 +94615,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -93903,6 +94662,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
       ],
@@ -93953,6 +94713,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs"
       ],
@@ -93988,6 +94749,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs"
       ],
@@ -94023,6 +94785,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs"
       ],
@@ -94058,6 +94821,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs"
       ],
@@ -94093,6 +94857,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs"
       ],
@@ -94128,6 +94893,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs"
       ],
@@ -94163,6 +94929,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.PlcAlarmImports.cs"
       ],
@@ -94206,6 +94973,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.PlcAlarmImports.cs"
       ],
@@ -94249,6 +95017,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.PlcAlarmImports.cs"
       ],
@@ -94284,6 +95053,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.PlcComponentCoordinator.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -94330,6 +95100,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.PlcAlarmImports.cs"
       ],
@@ -94373,6 +95144,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.PlcAlarmImports.cs"
       ],
@@ -94416,6 +95188,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -94464,6 +95237,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -94502,6 +95276,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectProperties.cs",
@@ -94547,6 +95322,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SecurityInspection.cs"
@@ -94591,6 +95367,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
@@ -94629,6 +95406,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -94682,6 +95460,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SoftwareUnits.cs"
       ],
@@ -94725,6 +95504,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SoftwareUnits.cs"
       ],
@@ -94768,6 +95548,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SoftwareUnits.cs"
       ],
@@ -94811,6 +95592,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SoftwareUnits.cs"
       ],
@@ -94854,6 +95636,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -94915,6 +95698,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.cs"
@@ -94959,6 +95743,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -95002,6 +95787,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -95045,6 +95831,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
@@ -95093,6 +95880,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteApplication.cs"
       ],
@@ -95128,6 +95916,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs"
       ],
@@ -95163,6 +95952,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.TechnologyEditing.cs"
       ],
@@ -95206,6 +95996,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SecurityInspection.cs",
@@ -95255,6 +96046,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -95310,6 +96102,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SecurityInspection.cs",
@@ -95359,6 +96152,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SecurityInspection.cs",
@@ -95408,6 +96202,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.SecurityInspection.cs",
@@ -95457,6 +96252,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -95500,6 +96296,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs"
       ],
@@ -95543,6 +96340,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ObjectModel.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.ScalarValues.cs",
@@ -95602,6 +96400,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs"
       ],
@@ -95645,6 +96444,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs"
       ],
@@ -95688,6 +96488,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs"
       ],
@@ -95731,6 +96532,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs"
       ],
@@ -95774,6 +96576,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs"
       ],
@@ -95817,6 +96620,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs"
       ],
@@ -95860,6 +96664,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs"
       ],
@@ -95903,6 +96708,7 @@
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs"
       ],
@@ -95926,7 +96732,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -95957,7 +96764,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -95995,7 +96803,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
-        "src/TiaMcp.Host/TranslationNativeTools.cs"
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -96025,7 +96834,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -96055,7 +96865,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -96498,7 +97309,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -99289,7 +100101,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -99475,7 +100288,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/AdmissionReconcileTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -99519,6 +100333,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -99562,7 +100377,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/HostOptions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -99625,7 +100441,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100182,7 +100999,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100212,7 +101030,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100235,7 +101054,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100282,7 +101102,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/HmiTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100461,7 +101282,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/HmiTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100492,7 +101314,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/HmiTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100621,7 +101444,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100669,7 +101493,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
-        "src/TiaMcp.Host/TranslationNativeTools.cs"
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100758,7 +101583,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100788,7 +101614,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100854,7 +101681,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100906,7 +101734,8 @@
         "src/TiaMcp.Host/HostOptions.cs",
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -100936,7 +101765,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -101037,7 +101867,8 @@
         "src/TiaMcp.Host/HostOptions.cs",
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -101435,7 +102266,8 @@
         "src/TiaMcp.Host/HostOptions.cs",
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -101515,7 +102347,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/LibraryTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -101694,7 +102527,8 @@
         "src/TiaMcp.Host/DiscoveryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102023,7 +102857,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/OpcUaEngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102300,7 +103135,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102331,7 +103167,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102362,7 +103199,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102393,7 +103231,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102423,7 +103262,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102454,7 +103294,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102476,7 +103317,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102499,7 +103341,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/ProjectIndexTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102529,7 +103372,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102590,7 +103434,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/ProjectIndexTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102620,7 +103465,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102953,7 +103799,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -102983,7 +103830,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -103013,7 +103861,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -103043,7 +103892,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -104861,10 +105711,10 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
-        "src/TiaMcp.Core/BridgeClient.cs",
         "src/TiaMcp.Core/TestSuite/TestSuiteStyleAdapter.cs",
         "src/TiaMcp.Core/TestSuite/TestSuiteWorkerAdapter.cs",
-        "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
+        "src/TiaMcp.Host/SimulatorTools.cs",
+        "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchQualification.cs"
       ],
@@ -104894,16 +105744,24 @@
       ],
       "changeKind": null,
       "sourceDependencies": [
-        "src/TiaMcp.Core/BridgeClient.cs",
         "src/TiaMcp.Core/TestSuite/TestSuiteStyleAdapter.cs",
         "src/TiaMcp.Core/TestSuite/TestSuiteWorkerAdapter.cs",
-        "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
+        "src/TiaMcp.Host/SimulatorTools.cs",
+        "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchQualification.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.source_reconcile.20261028",
+          "profileSha256": "a1441472d896044c722b0aee2eaea7dbf96ad0375020e3e30a6476c19a62aa49",
+          "artifacts": [
+            "evidence/local.watch.source_reconcile.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -109020,7 +109878,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109059,7 +109918,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109082,7 +109942,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109104,6 +109965,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109134,6 +109996,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109174,6 +110037,7 @@
         "src/TiaMcp.Core/WebApplications/WebApplicationReview.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109204,6 +110068,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109234,6 +110099,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109271,6 +110137,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109301,6 +110168,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109331,6 +110199,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109371,6 +110240,7 @@
         "src/TiaMcp.Core/WebApplications/WebApplicationReview.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109418,6 +110288,7 @@
         "src/TiaMcp.Core/WebApplications/WebApplicationReview.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Simulator.V8/SimulatorSession.cs"
       ],
       "schemaBindings": [],
@@ -109448,7 +110319,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109478,7 +110350,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109508,7 +110381,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109538,7 +110412,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109561,7 +110436,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109740,7 +110616,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109781,7 +110658,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
-        "src/TiaMcp.Host/TranslationNativeTools.cs"
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109811,7 +110689,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -109842,7 +110721,8 @@
         "src/TiaMcp.Host/DiscoveryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -110201,7 +111081,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -110232,7 +111113,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TestSuiteTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -110968,7 +111850,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TestSuiteTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111129,7 +112012,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111158,7 +112042,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111187,7 +112072,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111216,7 +112102,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111245,7 +112132,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111274,7 +112162,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -111303,7 +112192,8 @@
       "changeKind": null,
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -112623,7 +113513,8 @@
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
-        "src/TiaMcp.Host/TranslationNativeTools.cs"
+        "src/TiaMcp.Host/TranslationNativeTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -112654,7 +113545,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -113393,7 +114285,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -113423,6 +114316,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113459,6 +114353,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113481,6 +114376,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113511,6 +114407,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113541,6 +114438,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113571,6 +114469,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113601,6 +114500,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113631,6 +114531,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113641,6 +114542,13 @@
           "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a",
           "artifacts": [
             "evidence/local.watch.authoring.20261028.json"
+          ]
+        },
+        {
+          "id": "local.watch.creation_loss.20261028",
+          "profileSha256": "a2e753c055400d74b37ecd7890ed0151db1f46c2d51dc161ab30d36a42dc3ae6",
+          "artifacts": [
+            "evidence/local.watch.creation_loss.20261028.json"
           ]
         }
       ],
@@ -113661,6 +114569,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113691,6 +114600,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113721,6 +114631,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113751,6 +114662,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113781,6 +114693,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113811,6 +114724,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113841,6 +114755,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -113871,6 +114786,7 @@
       "sourceDependencies": [
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
         "src/TiaMcp.Host/WatchTableTools.cs"
       ],
       "schemaBindings": [],
@@ -114050,7 +114966,8 @@
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -114080,7 +114997,8 @@
       "sourceDependencies": [
         "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
-        "src/TiaMcp.Host/TiaTools.cs"
+        "src/TiaMcp.Host/TiaTools.cs",
+        "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs"
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
@@ -114754,6 +115672,11 @@
       "sha256": "caa0c90d571556fd6016186c3450f7569c7d31d2e39f83729d9e2474bb3f76b7"
     },
     {
+      "path": "evidence/local.graphical_changes.20261028.json",
+      "state": "observed",
+      "sha256": "90db501c13d8a86483f034eba925e6a3920d75f4f56b7d74af7ce305ba1ad325"
+    },
+    {
       "path": "evidence/local.hardware.20261024.json",
       "state": "observed",
       "sha256": "e0b51d539feaafddb8ccbdf0bb2ba9d8d590af0ce408d150cc72ea777209d02a"
@@ -115319,6 +116242,11 @@
       "sha256": "3538b8b3b20fae95e137ca58dc8598c626c85fd418e7ea8c98675da8cf08dab6"
     },
     {
+      "path": "evidence/local.watch.creation_loss.20261028.json",
+      "state": "observed",
+      "sha256": "57f57789ee55465421c50e41b7a92668aa717683081b037e72b648399759fc28"
+    },
+    {
       "path": "evidence/local.watch.lifecycle.20261028.json",
       "state": "observed",
       "sha256": "38c0a2015cd771a2cb73872e4e7d4bf3eccb8a6e9b6015c7e5d992e9c70ef260"
@@ -115327,6 +116255,11 @@
       "path": "evidence/local.watch.native.20261028.json",
       "state": "observed",
       "sha256": "5cf94421eec475147273983d700a64224cb52577d2552be3961609de3bb1fee5"
+    },
+    {
+      "path": "evidence/local.watch.source_reconcile.20261028.json",
+      "state": "observed",
+      "sha256": "b6e1a397fb6b6adfb42a4d5acb8ce80a7638d1143da7544f6179efee240097b7"
     },
     {
       "path": "evidence/local.wave-kinds.probe.20261027.json",
@@ -115454,6 +116387,10 @@
     {
       "id": "local.graph_changes.20261028",
       "profileSha256": "35369847e5ca9d4d4ea76df0f6560a16f36e637bdf5f6f804383ee2f6a7a75a6"
+    },
+    {
+      "id": "local.graphical_changes.20261028",
+      "profileSha256": "1708dfa6146fa46c4991fa3f7369cec213ef851c3179139200d0414da8f03ba3"
     },
     {
       "id": "local.guards.v02",
@@ -116024,12 +116961,20 @@
       "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a"
     },
     {
+      "id": "local.watch.creation_loss.20261028",
+      "profileSha256": "a2e753c055400d74b37ecd7890ed0151db1f46c2d51dc161ab30d36a42dc3ae6"
+    },
+    {
       "id": "local.watch.lifecycle.20261028",
       "profileSha256": "32014d57654a51baca1e0b17a144dfce25b2475d19cb6420d7627103cd330251"
     },
     {
       "id": "local.watch.native.20261028",
       "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a"
+    },
+    {
+      "id": "local.watch.source_reconcile.20261028",
+      "profileSha256": "a1441472d896044c722b0aee2eaea7dbf96ad0375020e3e30a6476c19a62aa49"
     },
     {
       "id": "local.wave-kinds.probe.20261027",
