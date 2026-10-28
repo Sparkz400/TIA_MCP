@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "eea4bdf8f5c34201aca5ce2976c356b8007daa1fc53678ef01f466729224ffd7",
-      "bytes": 1290123
+      "sha256": "c0ca3cd84ff82b418893e83a755d9df621ede90ea0388419fb01e3f894c17665",
+      "bytes": 1319076
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2377,8 +2377,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Capabilities.cs",
-      "sha256": "093f02f43cb55f17caba857b0d869d5932998328a9c0810019d8d11b9ae4473e",
-      "bytes": 57053
+      "sha256": "2f500db585e59d448091eb2098ef5a1c2d1ecd79bc4c940e5cb32efc56b00940",
+      "bytes": 57147
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CapturedStorage.cs",
@@ -2397,8 +2397,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "03c20438ac92d61cb99206c3db1983655d936cd8c41edb4b506dbda1fb83f228",
-      "bytes": 118167
+      "sha256": "dec843808dd8101ef38d72a52b79496834692477829a3ad8c6bbf630f17760b3",
+      "bytes": 118205
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ComponentScratchLanguage.cs",
@@ -89365,10 +89365,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.access-review.20261028",
-          "profileSha256": "c692b43eb00eaaa906766b3f99489581be737ea6a9926ec5ba1531b60b0c034d",
+          "id": "local.hostonly.access-review.rerun.20261028",
+          "profileSha256": "4cdad80ba503c744c6819eca8f8f46e6fc10f7aafebbf89b2a758c8bb585d575",
           "artifacts": [
-            "evidence/local.hostonly.access-review.20261028.json"
+            "evidence/local.hostonly.access-review.rerun.20261028.json"
           ]
         }
       ],
@@ -89440,10 +89440,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.access-review.20261028",
-          "profileSha256": "c692b43eb00eaaa906766b3f99489581be737ea6a9926ec5ba1531b60b0c034d",
+          "id": "local.hostonly.access-review.rerun.20261028",
+          "profileSha256": "4cdad80ba503c744c6819eca8f8f46e6fc10f7aafebbf89b2a758c8bb585d575",
           "artifacts": [
-            "evidence/local.hostonly.access-review.20261028.json"
+            "evidence/local.hostonly.access-review.rerun.20261028.json"
           ]
         }
       ],
@@ -89805,10 +89805,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -89869,17 +89869,17 @@
           ]
         },
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
-          "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
-          ]
-        },
-        {
           "id": "local.library_import_scale.20261027",
           "profileSha256": "b449479f6e5be2bb959cc2520287565a1c9152d9f4edc1b96b9339c5e41c51f0",
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
+          ]
+        },
+        {
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
+          "artifacts": [
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -89953,17 +89953,17 @@
           ]
         },
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
-          "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
-          ]
-        },
-        {
           "id": "local.library_import_scale.20261027",
           "profileSha256": "b449479f6e5be2bb959cc2520287565a1c9152d9f4edc1b96b9339c5e41c51f0",
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
+          ]
+        },
+        {
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
+          "artifacts": [
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -90025,17 +90025,17 @@
           ]
         },
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
-          "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
-          ]
-        },
-        {
           "id": "local.library_import_scale.20261027",
           "profileSha256": "b449479f6e5be2bb959cc2520287565a1c9152d9f4edc1b96b9339c5e41c51f0",
           "artifacts": [
             "evidence/local.library_import_scale.20261027.json"
+          ]
+        },
+        {
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
+          "artifacts": [
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -90220,10 +90220,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.automationml.20261027",
-          "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a",
+          "id": "local.hostonly.automationml.rerun.20261028",
+          "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6",
           "artifacts": [
-            "evidence/local.hostonly.automationml.20261027.json"
+            "evidence/local.hostonly.automationml.rerun.20261028.json"
           ]
         }
       ],
@@ -90288,10 +90288,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.automationml.20261027",
-          "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a",
+          "id": "local.hostonly.automationml.rerun.20261028",
+          "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6",
           "artifacts": [
-            "evidence/local.hostonly.automationml.20261027.json"
+            "evidence/local.hostonly.automationml.rerun.20261028.json"
           ]
         }
       ],
@@ -90352,10 +90352,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.automationml.20261027",
-          "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a",
+          "id": "local.hostonly.automationml.rerun.20261028",
+          "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6",
           "artifacts": [
-            "evidence/local.hostonly.automationml.20261027.json"
+            "evidence/local.hostonly.automationml.rerun.20261028.json"
           ]
         }
       ],
@@ -90414,10 +90414,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.automationml.20261027",
-          "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a",
+          "id": "local.hostonly.automationml.rerun.20261028",
+          "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6",
           "artifacts": [
-            "evidence/local.hostonly.automationml.20261027.json"
+            "evidence/local.hostonly.automationml.rerun.20261028.json"
           ]
         }
       ],
@@ -90475,10 +90475,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.automationml.20261027",
-          "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a",
+          "id": "local.hostonly.automationml.rerun.20261028",
+          "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6",
           "artifacts": [
-            "evidence/local.hostonly.automationml.20261027.json"
+            "evidence/local.hostonly.automationml.rerun.20261028.json"
           ]
         }
       ],
@@ -90533,10 +90533,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.automationml.20261027",
-          "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a",
+          "id": "local.hostonly.automationml.rerun.20261028",
+          "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6",
           "artifacts": [
-            "evidence/local.hostonly.automationml.20261027.json"
+            "evidence/local.hostonly.automationml.rerun.20261028.json"
           ]
         }
       ],
@@ -91004,17 +91004,10 @@
           ]
         },
         {
-          "id": "local.milestones.reopen.20261028",
-          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.reopen.20261028.json"
-          ]
-        },
-        {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
-          "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -91064,17 +91057,10 @@
           ]
         },
         {
-          "id": "local.milestones.reopen.20261028",
-          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.reopen.20261028.json"
-          ]
-        },
-        {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
-          "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -91207,17 +91193,10 @@
           ]
         },
         {
-          "id": "local.milestones.reopen.20261028",
-          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.reopen.20261028.json"
-          ]
-        },
-        {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
-          "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -92201,17 +92180,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.milestones.reopen.20261028",
-          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.reopen.20261028.json"
-          ]
-        },
-        {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
-          "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -95033,10 +95005,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -96114,17 +96086,10 @@
           ]
         },
         {
-          "id": "local.milestones.reopen.20261028",
-          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.reopen.20261028.json"
-          ]
-        },
-        {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
-          "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -96846,17 +96811,10 @@
           ]
         },
         {
-          "id": "local.milestones.reopen.20261028",
-          "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e",
+          "id": "local.milestones.rerun.20261028",
+          "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055",
           "artifacts": [
-            "evidence/local.milestones.reopen.20261028.json"
-          ]
-        },
-        {
-          "id": "local.milestones.network.20261028",
-          "profileSha256": "32a2495e8fd5a407d035368b29337c465c736bbf8d3dfa9f0359f23a79048bbc",
-          "artifacts": [
-            "evidence/local.milestones.network.20261028.json"
+            "evidence/local.milestones.rerun.20261028.json"
           ]
         }
       ],
@@ -97422,10 +97380,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.composite-engineering.20261028",
-          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "id": "local.hostonly.composite-engineering.rerun.20261028",
+          "profileSha256": "e075a5c4f00d3d287ef07496d1dba2b5ba2c9dabfdaca8f48e27187c300fe90c",
           "artifacts": [
-            "evidence/local.hostonly.composite-engineering.20261028.json"
+            "evidence/local.hostonly.composite-engineering.rerun.20261028.json"
           ]
         }
       ],
@@ -97524,10 +97482,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.composite-engineering.20261028",
-          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "id": "local.hostonly.composite-engineering.rerun.20261028",
+          "profileSha256": "e075a5c4f00d3d287ef07496d1dba2b5ba2c9dabfdaca8f48e27187c300fe90c",
           "artifacts": [
-            "evidence/local.hostonly.composite-engineering.20261028.json"
+            "evidence/local.hostonly.composite-engineering.rerun.20261028.json"
           ]
         }
       ],
@@ -97599,10 +97557,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.composite-engineering.20261028",
-          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "id": "local.hostonly.composite-engineering.rerun.20261028",
+          "profileSha256": "e075a5c4f00d3d287ef07496d1dba2b5ba2c9dabfdaca8f48e27187c300fe90c",
           "artifacts": [
-            "evidence/local.hostonly.composite-engineering.20261028.json"
+            "evidence/local.hostonly.composite-engineering.rerun.20261028.json"
           ]
         }
       ],
@@ -97717,10 +97675,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.composite-engineering.20261028",
-          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "id": "local.hostonly.composite-engineering.rerun.20261028",
+          "profileSha256": "e075a5c4f00d3d287ef07496d1dba2b5ba2c9dabfdaca8f48e27187c300fe90c",
           "artifacts": [
-            "evidence/local.hostonly.composite-engineering.20261028.json"
+            "evidence/local.hostonly.composite-engineering.rerun.20261028.json"
           ]
         }
       ],
@@ -97790,10 +97748,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.composite-engineering.20261028",
-          "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24",
+          "id": "local.hostonly.composite-engineering.rerun.20261028",
+          "profileSha256": "e075a5c4f00d3d287ef07496d1dba2b5ba2c9dabfdaca8f48e27187c300fe90c",
           "artifacts": [
-            "evidence/local.hostonly.composite-engineering.20261028.json"
+            "evidence/local.hostonly.composite-engineering.rerun.20261028.json"
           ]
         }
       ],
@@ -97895,10 +97853,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.connection-review.20261028",
-          "profileSha256": "e1acbfcb19497b6bfe9ecaea500418e82451bee83798c4db5858e56e552b5210",
+          "id": "local.hostonly.connection-review.rerun.20261028",
+          "profileSha256": "397dd3e040b2c7594f700dad7203a767c50113a65d2d386c36b8ed5846fc30d7",
           "artifacts": [
-            "evidence/local.hostonly.connection-review.20261028.json"
+            "evidence/local.hostonly.connection-review.rerun.20261028.json"
           ]
         }
       ],
@@ -97970,10 +97928,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.connection-review.20261028",
-          "profileSha256": "e1acbfcb19497b6bfe9ecaea500418e82451bee83798c4db5858e56e552b5210",
+          "id": "local.hostonly.connection-review.rerun.20261028",
+          "profileSha256": "397dd3e040b2c7594f700dad7203a767c50113a65d2d386c36b8ed5846fc30d7",
           "artifacts": [
-            "evidence/local.hostonly.connection-review.20261028.json"
+            "evidence/local.hostonly.connection-review.rerun.20261028.json"
           ]
         }
       ],
@@ -98121,10 +98079,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.db-snapshot-review.20261028",
-          "profileSha256": "d5c53ca02749819c5e65e5b5d9dd5d10d7eb99281ee306fe1fce0a73fde15a54",
+          "id": "local.hostonly.db-snapshot-review.rerun.20261028",
+          "profileSha256": "5ce8c960522606b877d061357739e0799dcf31df05d1afa4d24a63107f397829",
           "artifacts": [
-            "evidence/local.hostonly.db-snapshot-review.20261028.json"
+            "evidence/local.hostonly.db-snapshot-review.rerun.20261028.json"
           ]
         }
       ],
@@ -98196,10 +98154,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.db-snapshot-review.20261028",
-          "profileSha256": "d5c53ca02749819c5e65e5b5d9dd5d10d7eb99281ee306fe1fce0a73fde15a54",
+          "id": "local.hostonly.db-snapshot-review.rerun.20261028",
+          "profileSha256": "5ce8c960522606b877d061357739e0799dcf31df05d1afa4d24a63107f397829",
           "artifacts": [
-            "evidence/local.hostonly.db-snapshot-review.20261028.json"
+            "evidence/local.hostonly.db-snapshot-review.rerun.20261028.json"
           ]
         }
       ],
@@ -98723,10 +98681,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-experiments.20261027",
-          "profileSha256": "9d2fbf253c57a94aff76299687e1d1ceeba4095bb45029187de659d78337c343",
+          "id": "local.hostonly.diagnostic-experiments.rerun.20261028",
+          "profileSha256": "3ce1b9089eb91a122f6c1483cfd4093ae1b4f10eba4da75e37c9a4c7b086f10a",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-experiments.20261027.json"
+            "evidence/local.hostonly.diagnostic-experiments.rerun.20261028.json"
           ]
         }
       ],
@@ -98806,10 +98764,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-experiments.20261027",
-          "profileSha256": "9d2fbf253c57a94aff76299687e1d1ceeba4095bb45029187de659d78337c343",
+          "id": "local.hostonly.diagnostic-experiments.rerun.20261028",
+          "profileSha256": "3ce1b9089eb91a122f6c1483cfd4093ae1b4f10eba4da75e37c9a4c7b086f10a",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-experiments.20261027.json"
+            "evidence/local.hostonly.diagnostic-experiments.rerun.20261028.json"
           ]
         }
       ],
@@ -99129,10 +99087,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-experiments.20261027",
-          "profileSha256": "9d2fbf253c57a94aff76299687e1d1ceeba4095bb45029187de659d78337c343",
+          "id": "local.hostonly.diagnostic-experiments.rerun.20261028",
+          "profileSha256": "3ce1b9089eb91a122f6c1483cfd4093ae1b4f10eba4da75e37c9a4c7b086f10a",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-experiments.20261027.json"
+            "evidence/local.hostonly.diagnostic-experiments.rerun.20261028.json"
           ]
         }
       ],
@@ -99190,10 +99148,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-experiments.20261027",
-          "profileSha256": "9d2fbf253c57a94aff76299687e1d1ceeba4095bb45029187de659d78337c343",
+          "id": "local.hostonly.diagnostic-experiments.rerun.20261028",
+          "profileSha256": "3ce1b9089eb91a122f6c1483cfd4093ae1b4f10eba4da75e37c9a4c7b086f10a",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-experiments.20261027.json"
+            "evidence/local.hostonly.diagnostic-experiments.rerun.20261028.json"
           ]
         }
       ],
@@ -99273,10 +99231,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -99375,10 +99333,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -99698,10 +99656,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -99915,10 +99873,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-ua.20261027",
-          "profileSha256": "0a4d9e4c720f5799719839e98a279f0ba2bb5da07e8b8f5f172b5fc244f7ab41",
+          "id": "local.hostonly.diagnostic-ua.rerun.20261028",
+          "profileSha256": "be87f2514efa8732a29b530b72925fb94425402879ed00c6ae688f28b0068078",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-ua.20261027.json"
+            "evidence/local.hostonly.diagnostic-ua.rerun.20261028.json"
           ]
         }
       ],
@@ -100003,10 +99961,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-ua.20261027",
-          "profileSha256": "0a4d9e4c720f5799719839e98a279f0ba2bb5da07e8b8f5f172b5fc244f7ab41",
+          "id": "local.hostonly.diagnostic-ua.rerun.20261028",
+          "profileSha256": "be87f2514efa8732a29b530b72925fb94425402879ed00c6ae688f28b0068078",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-ua.20261027.json"
+            "evidence/local.hostonly.diagnostic-ua.rerun.20261028.json"
           ]
         }
       ],
@@ -100064,10 +100022,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-ua.20261027",
-          "profileSha256": "0a4d9e4c720f5799719839e98a279f0ba2bb5da07e8b8f5f172b5fc244f7ab41",
+          "id": "local.hostonly.diagnostic-ua.rerun.20261028",
+          "profileSha256": "be87f2514efa8732a29b530b72925fb94425402879ed00c6ae688f28b0068078",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-ua.20261027.json"
+            "evidence/local.hostonly.diagnostic-ua.rerun.20261028.json"
           ]
         }
       ],
@@ -100533,10 +100491,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostic-ua.20261027",
-          "profileSha256": "0a4d9e4c720f5799719839e98a279f0ba2bb5da07e8b8f5f172b5fc244f7ab41",
+          "id": "local.hostonly.diagnostic-ua.rerun.20261028",
+          "profileSha256": "be87f2514efa8732a29b530b72925fb94425402879ed00c6ae688f28b0068078",
           "artifacts": [
-            "evidence/local.hostonly.diagnostic-ua.20261027.json"
+            "evidence/local.hostonly.diagnostic-ua.rerun.20261028.json"
           ]
         }
       ],
@@ -100615,10 +100573,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -100711,10 +100669,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.drive-profile-review.20261028",
-          "profileSha256": "381f9e86552103270992c1d3bb292382d4bbf5b87cedb15d4d598db7b9e7f4fd",
+          "id": "local.hostonly.drive-profile-review.rerun.20261028",
+          "profileSha256": "1ffb7edf598d2e63473e2cb8fb01c2eb35027df23d0106cd843d19eb6a2f7a98",
           "artifacts": [
-            "evidence/local.hostonly.drive-profile-review.20261028.json"
+            "evidence/local.hostonly.drive-profile-review.rerun.20261028.json"
           ]
         }
       ],
@@ -100786,10 +100744,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.drive-profile-review.20261028",
-          "profileSha256": "381f9e86552103270992c1d3bb292382d4bbf5b87cedb15d4d598db7b9e7f4fd",
+          "id": "local.hostonly.drive-profile-review.rerun.20261028",
+          "profileSha256": "1ffb7edf598d2e63473e2cb8fb01c2eb35027df23d0106cd843d19eb6a2f7a98",
           "artifacts": [
-            "evidence/local.hostonly.drive-profile-review.20261028.json"
+            "evidence/local.hostonly.drive-profile-review.rerun.20261028.json"
           ]
         }
       ],
@@ -101063,10 +101021,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.graph.20261027",
-          "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854",
+          "id": "local.hostonly.graph.rerun.20261028",
+          "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3",
           "artifacts": [
-            "evidence/local.hostonly.graph.20261027.json"
+            "evidence/local.hostonly.graph.rerun.20261028.json"
           ]
         }
       ],
@@ -101131,10 +101089,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.graph.20261027",
-          "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854",
+          "id": "local.hostonly.graph.rerun.20261028",
+          "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3",
           "artifacts": [
-            "evidence/local.hostonly.graph.20261027.json"
+            "evidence/local.hostonly.graph.rerun.20261028.json"
           ]
         }
       ],
@@ -101316,10 +101274,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.graph.20261027",
-          "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854",
+          "id": "local.hostonly.graph.rerun.20261028",
+          "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3",
           "artifacts": [
-            "evidence/local.hostonly.graph.20261027.json"
+            "evidence/local.hostonly.graph.rerun.20261028.json"
           ]
         }
       ],
@@ -101378,10 +101336,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.graph.20261027",
-          "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854",
+          "id": "local.hostonly.graph.rerun.20261028",
+          "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3",
           "artifacts": [
-            "evidence/local.hostonly.graph.20261027.json"
+            "evidence/local.hostonly.graph.rerun.20261028.json"
           ]
         }
       ],
@@ -101439,10 +101397,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.graph.20261027",
-          "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854",
+          "id": "local.hostonly.graph.rerun.20261028",
+          "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3",
           "artifacts": [
-            "evidence/local.hostonly.graph.20261027.json"
+            "evidence/local.hostonly.graph.rerun.20261028.json"
           ]
         }
       ],
@@ -101497,10 +101455,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.graph.20261027",
-          "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854",
+          "id": "local.hostonly.graph.rerun.20261028",
+          "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3",
           "artifacts": [
-            "evidence/local.hostonly.graph.20261027.json"
+            "evidence/local.hostonly.graph.rerun.20261028.json"
           ]
         }
       ],
@@ -101744,10 +101702,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.hmi-component-review.20261028",
-          "profileSha256": "b80e29ddcd39dd4a09e727797b4e6713a2512b84fbe318d78bdb0dbc26ec9db5",
+          "id": "local.hostonly.hmi-component-review.rerun.20261028",
+          "profileSha256": "51fd6cccb7ed78d0c444fb7a56e6647800c379a500b9ca682e9b6f4d5a9a5ecc",
           "artifacts": [
-            "evidence/local.hostonly.hmi-component-review.20261028.json"
+            "evidence/local.hostonly.hmi-component-review.rerun.20261028.json"
           ]
         }
       ],
@@ -101819,10 +101777,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.hmi-component-review.20261028",
-          "profileSha256": "b80e29ddcd39dd4a09e727797b4e6713a2512b84fbe318d78bdb0dbc26ec9db5",
+          "id": "local.hostonly.hmi-component-review.rerun.20261028",
+          "profileSha256": "51fd6cccb7ed78d0c444fb7a56e6647800c379a500b9ca682e9b6f4d5a9a5ecc",
           "artifacts": [
-            "evidence/local.hostonly.hmi-component-review.20261028.json"
+            "evidence/local.hostonly.hmi-component-review.rerun.20261028.json"
           ]
         }
       ],
@@ -103158,10 +103116,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103226,10 +103184,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103284,10 +103242,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103340,10 +103298,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103492,10 +103450,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103554,10 +103512,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103615,10 +103573,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -103673,10 +103631,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.opcua.20261027",
-          "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869",
+          "id": "local.hostonly.opcua.rerun.20261028",
+          "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56",
           "artifacts": [
-            "evidence/local.hostonly.opcua.20261027.json"
+            "evidence/local.hostonly.opcua.rerun.20261028.json"
           ]
         }
       ],
@@ -104662,10 +104620,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -105358,10 +105316,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.public-certificate-review.20261028",
-          "profileSha256": "c53715b28a6dcad9a54cce4faf03d1e121676c0eba20c4d65d5eb7786b717a34",
+          "id": "local.hostonly.public-certificate-review.rerun.20261028",
+          "profileSha256": "cc1fa5b46a0e517732b1d94579c19ceb29e3add8334407f541bcf13623ecfc51",
           "artifacts": [
-            "evidence/local.hostonly.public-certificate-review.20261028.json"
+            "evidence/local.hostonly.public-certificate-review.rerun.20261028.json"
           ]
         }
       ],
@@ -105433,10 +105391,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.public-certificate-review.20261028",
-          "profileSha256": "c53715b28a6dcad9a54cce4faf03d1e121676c0eba20c4d65d5eb7786b717a34",
+          "id": "local.hostonly.public-certificate-review.rerun.20261028",
+          "profileSha256": "cc1fa5b46a0e517732b1d94579c19ceb29e3add8334407f541bcf13623ecfc51",
           "artifacts": [
-            "evidence/local.hostonly.public-certificate-review.20261028.json"
+            "evidence/local.hostonly.public-certificate-review.rerun.20261028.json"
           ]
         }
       ],
@@ -107710,10 +107668,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.runtime-handoff.20261028",
-          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "id": "local.hostonly.runtime-handoff.rerun.20261028",
+          "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b",
           "artifacts": [
-            "evidence/local.hostonly.runtime-handoff.20261028.json"
+            "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
           ]
         }
       ],
@@ -107772,10 +107730,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.runtime-handoff.20261028",
-          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "id": "local.hostonly.runtime-handoff.rerun.20261028",
+          "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b",
           "artifacts": [
-            "evidence/local.hostonly.runtime-handoff.20261028.json"
+            "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
           ]
         }
       ],
@@ -107829,10 +107787,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.runtime-handoff.20261028",
-          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "id": "local.hostonly.runtime-handoff.rerun.20261028",
+          "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b",
           "artifacts": [
-            "evidence/local.hostonly.runtime-handoff.20261028.json"
+            "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
           ]
         }
       ],
@@ -107904,10 +107862,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.runtime-handoff.20261028",
-          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "id": "local.hostonly.runtime-handoff.rerun.20261028",
+          "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b",
           "artifacts": [
-            "evidence/local.hostonly.runtime-handoff.20261028.json"
+            "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
           ]
         }
       ],
@@ -107965,10 +107923,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.runtime-handoff.20261028",
-          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "id": "local.hostonly.runtime-handoff.rerun.20261028",
+          "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b",
           "artifacts": [
-            "evidence/local.hostonly.runtime-handoff.20261028.json"
+            "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
           ]
         }
       ],
@@ -108038,10 +107996,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.runtime-handoff.20261028",
-          "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de",
+          "id": "local.hostonly.runtime-handoff.rerun.20261028",
+          "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b",
           "artifacts": [
-            "evidence/local.hostonly.runtime-handoff.20261028.json"
+            "evidence/local.hostonly.runtime-handoff.rerun.20261028.json"
           ]
         }
       ],
@@ -110337,10 +110295,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.safety-evidence-review.20261028",
-          "profileSha256": "119fc4a5e7eaa8c8443f3061734bf783579c2f3508a36be814e35aff600902a9",
+          "id": "local.hostonly.safety-evidence-review.rerun.20261028",
+          "profileSha256": "51bd3c8ebc956493704c3ec852450cde17bda537c0578aa835437a8b6d3b0e18",
           "artifacts": [
-            "evidence/local.hostonly.safety-evidence-review.20261028.json"
+            "evidence/local.hostonly.safety-evidence-review.rerun.20261028.json"
           ]
         }
       ],
@@ -110431,10 +110389,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.safety-evidence-review.20261028",
-          "profileSha256": "119fc4a5e7eaa8c8443f3061734bf783579c2f3508a36be814e35aff600902a9",
+          "id": "local.hostonly.safety-evidence-review.rerun.20261028",
+          "profileSha256": "51bd3c8ebc956493704c3ec852450cde17bda537c0578aa835437a8b6d3b0e18",
           "artifacts": [
-            "evidence/local.hostonly.safety-evidence-review.20261028.json"
+            "evidence/local.hostonly.safety-evidence-review.rerun.20261028.json"
           ]
         }
       ],
@@ -111110,10 +111068,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.software-unit-review.20261028",
-          "profileSha256": "a17e0c088e77e179414d9d2221f1885257f05d86edc7a100a0c24af323650545",
+          "id": "local.hostonly.software-unit-review.rerun.20261028",
+          "profileSha256": "3ca74c65263339b6bdbde929c84b52d4e52e6ad5342818cf4d3373803cc703ab",
           "artifacts": [
-            "evidence/local.hostonly.software-unit-review.20261028.json"
+            "evidence/local.hostonly.software-unit-review.rerun.20261028.json"
           ]
         }
       ],
@@ -111185,10 +111143,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.software-unit-review.20261028",
-          "profileSha256": "a17e0c088e77e179414d9d2221f1885257f05d86edc7a100a0c24af323650545",
+          "id": "local.hostonly.software-unit-review.rerun.20261028",
+          "profileSha256": "3ca74c65263339b6bdbde929c84b52d4e52e6ad5342818cf4d3373803cc703ab",
           "artifacts": [
-            "evidence/local.hostonly.software-unit-review.20261028.json"
+            "evidence/local.hostonly.software-unit-review.rerun.20261028.json"
           ]
         }
       ],
@@ -111577,10 +111535,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.technology-profile-review.20261028",
-          "profileSha256": "9ba1ff875b6bed1dffb3d0c3cc65169e1aa0f37e5689bfb70770cf1ec24ccbff",
+          "id": "local.hostonly.technology-profile-review.rerun.20261028",
+          "profileSha256": "2b6c9444b0b2322512bf59954d2e65bf70cfddd373a5801bd28227d07320e9c3",
           "artifacts": [
-            "evidence/local.hostonly.technology-profile-review.20261028.json"
+            "evidence/local.hostonly.technology-profile-review.rerun.20261028.json"
           ]
         }
       ],
@@ -111650,10 +111608,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.technology-profile-review.20261028",
-          "profileSha256": "9ba1ff875b6bed1dffb3d0c3cc65169e1aa0f37e5689bfb70770cf1ec24ccbff",
+          "id": "local.hostonly.technology-profile-review.rerun.20261028",
+          "profileSha256": "2b6c9444b0b2322512bf59954d2e65bf70cfddd373a5801bd28227d07320e9c3",
           "artifacts": [
-            "evidence/local.hostonly.technology-profile-review.20261028.json"
+            "evidence/local.hostonly.technology-profile-review.rerun.20261028.json"
           ]
         }
       ],
@@ -111869,10 +111827,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.testsuite-result.20261028",
-          "profileSha256": "8768eb570f2cc7a19f2cb3b79bc6076ecd29b710dd74042d4697979d96dc0d19",
+          "id": "local.hostonly.testsuite-result.rerun.20261028",
+          "profileSha256": "f5208153caf923382a457f81afa25bf133b3cf406add82b0e62d173a023100ac",
           "artifacts": [
-            "evidence/local.hostonly.testsuite-result.20261028.json"
+            "evidence/local.hostonly.testsuite-result.rerun.20261028.json"
           ]
         }
       ],
@@ -111900,10 +111858,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.testsuite-result.20261028",
-          "profileSha256": "8768eb570f2cc7a19f2cb3b79bc6076ecd29b710dd74042d4697979d96dc0d19",
+          "id": "local.hostonly.testsuite-result.rerun.20261028",
+          "profileSha256": "f5208153caf923382a457f81afa25bf133b3cf406add82b0e62d173a023100ac",
           "artifacts": [
-            "evidence/local.hostonly.testsuite-result.20261028.json"
+            "evidence/local.hostonly.testsuite-result.rerun.20261028.json"
           ]
         }
       ],
@@ -112845,10 +112803,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -112875,10 +112833,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -112950,10 +112908,10 @@
       "schemaReview": "partial",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -112994,10 +112952,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -113034,10 +112992,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -113066,10 +113024,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.diagnostics.20261027",
-          "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67",
+          "id": "local.hostonly.diagnostics.rerun.20261028",
+          "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e",
           "artifacts": [
-            "evidence/local.hostonly.diagnostics.20261027.json"
+            "evidence/local.hostonly.diagnostics.rerun.20261028.json"
           ]
         }
       ],
@@ -113122,10 +113080,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113183,10 +113141,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113239,10 +113197,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113301,10 +113259,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113365,10 +113323,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113427,10 +113385,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113910,10 +113868,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -113974,10 +113932,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -114035,10 +113993,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -114091,10 +114049,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.translation.20261027",
-          "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376",
+          "id": "local.hostonly.translation.rerun.20261028",
+          "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f",
           "artifacts": [
-            "evidence/local.hostonly.translation.20261027.json"
+            "evidence/local.hostonly.translation.rerun.20261028.json"
           ]
         }
       ],
@@ -114233,10 +114191,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114291,10 +114249,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114349,10 +114307,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114406,10 +114364,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114464,10 +114422,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114526,10 +114484,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114584,10 +114542,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114641,10 +114599,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114698,10 +114656,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114755,10 +114713,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114812,10 +114770,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -114873,10 +114831,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.vci.20261027",
-          "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9",
+          "id": "local.hostonly.vci.rerun.20261028",
+          "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf",
           "artifacts": [
-            "evidence/local.hostonly.vci.20261027.json"
+            "evidence/local.hostonly.vci.rerun.20261028.json"
           ]
         }
       ],
@@ -115479,10 +115437,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.web-application-review.20261028",
-          "profileSha256": "0e885e842a80d42f96cf4a3ebbf413592d1e491a37de3bf9bbdaad28d897cac1",
+          "id": "local.hostonly.web-application-review.rerun.20261028",
+          "profileSha256": "10001f391e54590bbb6ab46446d8c5ee58052f4bd315927bc17f7d3acff929bb",
           "artifacts": [
-            "evidence/local.hostonly.web-application-review.20261028.json"
+            "evidence/local.hostonly.web-application-review.rerun.20261028.json"
           ]
         }
       ],
@@ -115554,10 +115512,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hostonly.web-application-review.20261028",
-          "profileSha256": "0e885e842a80d42f96cf4a3ebbf413592d1e491a37de3bf9bbdaad28d897cac1",
+          "id": "local.hostonly.web-application-review.rerun.20261028",
+          "profileSha256": "10001f391e54590bbb6ab46446d8c5ee58052f4bd315927bc17f7d3acff929bb",
           "artifacts": [
-            "evidence/local.hostonly.web-application-review.20261028.json"
+            "evidence/local.hostonly.web-application-review.rerun.20261028.json"
           ]
         }
       ],
@@ -115905,6 +115863,11 @@
       "sha256": "a30ad77e39d4bb4e06af39a9086136033d853efa2d286946b39e9f196106495d"
     },
     {
+      "path": "evidence/local.hostonly.access-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "e4b0e34bc46b1f11aa18429146143e4ca1c911a8fcf7cde900c5c45276539212"
+    },
+    {
       "path": "evidence/local.hostonly.addin-selection.20261028.json",
       "state": "observed",
       "sha256": "cc85d4858b34b40dd3700f6888e22cc041320c8535204203ad2d0c2ad58d3f1f"
@@ -115915,9 +115878,19 @@
       "sha256": "97829e7e23ac8e1728579b0aab6b231064f6dc59d94470c447de9c22cc0a8300"
     },
     {
+      "path": "evidence/local.hostonly.automationml.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "3546056ffc37430bbb1c95b7b7a2deab58317649d9f8811733ccf651a538870e"
+    },
+    {
       "path": "evidence/local.hostonly.composite-engineering.20261028.json",
       "state": "observed",
       "sha256": "9211a0f1761a6dad549826e5be6453f9c8a19828322eb4744420ab28a29e34f7"
+    },
+    {
+      "path": "evidence/local.hostonly.composite-engineering.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "7398be738c51cc8dc86ece25935df7085850d44389c34077ccd36969df22cd40"
     },
     {
       "path": "evidence/local.hostonly.connection-review.20261028.json",
@@ -115925,9 +115898,19 @@
       "sha256": "f2052cbd0f605a843576f0e4c39ab1296e9863ae232a28dca218caab4f32d569"
     },
     {
+      "path": "evidence/local.hostonly.connection-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "bfc44aab2cd9cea3a4e3311bfa4ffbf2fce4f423d125614a4db02ba86531555b"
+    },
+    {
       "path": "evidence/local.hostonly.db-snapshot-review.20261028.json",
       "state": "observed",
       "sha256": "f2df23bf0b3b762e8c0248ad9a8d94af129bf1ad3e52e0f96949f29e0565c20b"
+    },
+    {
+      "path": "evidence/local.hostonly.db-snapshot-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "b72cce23a5ce79e110be6f579cc1756e529aba112c2a6499ef1ca21192ddb936"
     },
     {
       "path": "evidence/local.hostonly.diagnostic-experiments.20261027.json",
@@ -115935,9 +115918,19 @@
       "sha256": "91d5f1031ba6f3486be5dff8f173377dcf998be8fc54131cff2b3c1792ebfb43"
     },
     {
+      "path": "evidence/local.hostonly.diagnostic-experiments.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "9e6fde7b21283174f086aa7f97ce2d85fc465cc7e55ac23e63c4dfcb87e09d75"
+    },
+    {
       "path": "evidence/local.hostonly.diagnostic-ua.20261027.json",
       "state": "observed",
       "sha256": "b45e314fc44560ee104a3f4d089a7b78ed078a4bc0e7fbf3725ac11150bcb57a"
+    },
+    {
+      "path": "evidence/local.hostonly.diagnostic-ua.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "db52cc319cbbd2968d36c99898c39149e27c8180eb9196234aedb64f6a9e0327"
     },
     {
       "path": "evidence/local.hostonly.diagnostics.20261027.json",
@@ -115945,9 +115938,19 @@
       "sha256": "f88aad47f22dab221cb07867408392bc293e10fe75e8c094d7efef4d98738ab7"
     },
     {
+      "path": "evidence/local.hostonly.diagnostics.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "3024f86da4a259f1ab0d094516e687f61b85e767f852718192ea0c2d1c2cf5be"
+    },
+    {
       "path": "evidence/local.hostonly.drive-profile-review.20261028.json",
       "state": "observed",
       "sha256": "2e220f3d5f6d3564c5e19fa391d2cfe9b2c1b73d5bd1e444d6542566fc14dbe0"
+    },
+    {
+      "path": "evidence/local.hostonly.drive-profile-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "57e01336fe318e88552c548f0ab346da3b540a8eb7e9ebc5c6c1daf26081e5c6"
     },
     {
       "path": "evidence/local.hostonly.graph.20261027.json",
@@ -115955,9 +115958,19 @@
       "sha256": "084aed38041da4be21b439d65c3a19bf570daa8af11ecd3ebaeec7cebe1de0a6"
     },
     {
+      "path": "evidence/local.hostonly.graph.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "c564c342bdc1ab387e98ee1e89ffda7f5ea3ef1ce09c9119436ef659bc28d06d"
+    },
+    {
       "path": "evidence/local.hostonly.hmi-component-review.20261028.json",
       "state": "observed",
       "sha256": "2f10b51050dbcad49e0b048f6dcf7248ec95dbb61211557c51943b61ef46fb72"
+    },
+    {
+      "path": "evidence/local.hostonly.hmi-component-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "3a7507ab1be8428640585d9ca59ee04c95bad52c66f2f9565e1f4900e59ae94f"
     },
     {
       "path": "evidence/local.hostonly.multiuser-review.20261028.json",
@@ -115970,9 +115983,19 @@
       "sha256": "6ccee5b05988e9b5ef91fa3cf1713265486291fda670d92e3e731c1f7bf84544"
     },
     {
+      "path": "evidence/local.hostonly.opcua.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "182a99ce84cb82e5fe254db06e52dac987bbd776dc5518a0116d96ee2d9eebd9"
+    },
+    {
       "path": "evidence/local.hostonly.public-certificate-review.20261028.json",
       "state": "observed",
       "sha256": "31909399a9c3b30fd3a6f59b2d65c39df95602c2b7e8cdc4a6760645d06a5783"
+    },
+    {
+      "path": "evidence/local.hostonly.public-certificate-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "80ad95dc2314dc28dde89dfb795e4a197c0c0640eb9275bcb71a5b3fa0d2c769"
     },
     {
       "path": "evidence/local.hostonly.runtime-handoff.20261028.json",
@@ -115980,14 +116003,29 @@
       "sha256": "723231cd7215014a5572ab886371111e5ad90dc58cc50d330abf7790e5e96029"
     },
     {
+      "path": "evidence/local.hostonly.runtime-handoff.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "35fc1246168bfa2ca027cb49c16bcfeba9f9ab71f90c44bf39c9ce2ae48f1e5d"
+    },
+    {
       "path": "evidence/local.hostonly.safety-evidence-review.20261028.json",
       "state": "observed",
       "sha256": "a57ecd93744a403a7a2b6edc0b47034f1482a36a5edb278568f25dc540c714b4"
     },
     {
+      "path": "evidence/local.hostonly.safety-evidence-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "ac6532d80ed16c86080b840c28c5795342621ec8fd0fd8ab2a1ea85fedde0884"
+    },
+    {
       "path": "evidence/local.hostonly.software-unit-review.20261028.json",
       "state": "observed",
       "sha256": "cdabacfb8191b86944becdcb6bbfbb20919aba60e6328ca83ff1aecdbeb95c79"
+    },
+    {
+      "path": "evidence/local.hostonly.software-unit-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "c1a0fef7bf9e9b0dd2c1ecbcd22b52a88d3dd4ec844f775eb852146ff2a07071"
     },
     {
       "path": "evidence/local.hostonly.teamcenter-review.20261028.json",
@@ -116000,9 +116038,19 @@
       "sha256": "741834812571409f4b3a2c3fbb3faa03c3b22d599a8b1c52adb5f2ee0a304172"
     },
     {
+      "path": "evidence/local.hostonly.technology-profile-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "3f096310ced9f4774027cf33dc67cd4f9a406031c1e00283dec4fc92917ee284"
+    },
+    {
       "path": "evidence/local.hostonly.testsuite-result.20261028.json",
       "state": "observed",
       "sha256": "0f7851237244c7f3ed022e6fee4db4effce4260fdd21715896d86e3974faa303"
+    },
+    {
+      "path": "evidence/local.hostonly.testsuite-result.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "0bde86c9e6b08d40b4ea09eb644298818d8888809b8faec9282860b23225b318"
     },
     {
       "path": "evidence/local.hostonly.testsuite-style-review.20261028.json",
@@ -116015,14 +116063,29 @@
       "sha256": "f69df3b244c8f3f9a60694a27032a0b57cfffc1f3769b5a6f253d0c6256fb212"
     },
     {
+      "path": "evidence/local.hostonly.translation.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "90edfa145b6c93242f52de2a918ed54049f71cf0264294cecb182ffab5921c47"
+    },
+    {
       "path": "evidence/local.hostonly.vci.20261027.json",
       "state": "observed",
       "sha256": "6dcef7003d53fee8ff211a3a87c779435dccfe4045a4b59da0d645f176292746"
     },
     {
+      "path": "evidence/local.hostonly.vci.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "707f8919626b95a9e43069987854b540476336c6053ee7963a3a1270b7c64fbc"
+    },
+    {
       "path": "evidence/local.hostonly.web-application-review.20261028.json",
       "state": "observed",
       "sha256": "3fe52f1d7b1e71a519e288f22cda892eaf791a1d2f11669a61c9f9437ed37774"
+    },
+    {
+      "path": "evidence/local.hostonly.web-application-review.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "8389c93c3820396aaf92675ed6de8df818e93e70259ac48a68233df8ba8c6b1d"
     },
     {
       "path": "evidence/local.library.native-chain.20261028.json",
@@ -116163,6 +116226,11 @@
       "path": "evidence/local.milestones.reopen.20261028.json",
       "state": "observed",
       "sha256": "af314cd5d2757d95cb7fff90aab441e9f090e2f6a986b9542f350a3ae44546dd"
+    },
+    {
+      "path": "evidence/local.milestones.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "0c0c70e95e8a7d8b6c187be7f79eff50a36797c29128538d6ddbb6e905b90203"
     },
     {
       "path": "evidence/local.opcua.server-settings.20261028.json",
@@ -116642,6 +116710,10 @@
       "profileSha256": "c692b43eb00eaaa906766b3f99489581be737ea6a9926ec5ba1531b60b0c034d"
     },
     {
+      "id": "local.hostonly.access-review.rerun.20261028",
+      "profileSha256": "4cdad80ba503c744c6819eca8f8f46e6fc10f7aafebbf89b2a758c8bb585d575"
+    },
+    {
       "id": "local.hostonly.addin-selection.20261028",
       "profileSha256": "7bb8e77a0111abe01ff25769a25ab4d2c466652ed03fbb011ef6480b318f6664"
     },
@@ -116650,40 +116722,80 @@
       "profileSha256": "075d2e3370292d4b323880d16fdf6471b9bfe32f6addbcd6c54d8ce89374aa4a"
     },
     {
+      "id": "local.hostonly.automationml.rerun.20261028",
+      "profileSha256": "53ce3f8f3c3a9025a82542f7b1859cc4ae8418a97237a05bafc0a5e7ec357db6"
+    },
+    {
       "id": "local.hostonly.composite-engineering.20261028",
       "profileSha256": "c735a9c8801d14f68b5f15cb551b7e85a080652214cf07a5d83b86d397643c24"
+    },
+    {
+      "id": "local.hostonly.composite-engineering.rerun.20261028",
+      "profileSha256": "e075a5c4f00d3d287ef07496d1dba2b5ba2c9dabfdaca8f48e27187c300fe90c"
     },
     {
       "id": "local.hostonly.connection-review.20261028",
       "profileSha256": "e1acbfcb19497b6bfe9ecaea500418e82451bee83798c4db5858e56e552b5210"
     },
     {
+      "id": "local.hostonly.connection-review.rerun.20261028",
+      "profileSha256": "397dd3e040b2c7594f700dad7203a767c50113a65d2d386c36b8ed5846fc30d7"
+    },
+    {
       "id": "local.hostonly.db-snapshot-review.20261028",
       "profileSha256": "d5c53ca02749819c5e65e5b5d9dd5d10d7eb99281ee306fe1fce0a73fde15a54"
+    },
+    {
+      "id": "local.hostonly.db-snapshot-review.rerun.20261028",
+      "profileSha256": "5ce8c960522606b877d061357739e0799dcf31df05d1afa4d24a63107f397829"
     },
     {
       "id": "local.hostonly.diagnostic-experiments.20261027",
       "profileSha256": "9d2fbf253c57a94aff76299687e1d1ceeba4095bb45029187de659d78337c343"
     },
     {
+      "id": "local.hostonly.diagnostic-experiments.rerun.20261028",
+      "profileSha256": "3ce1b9089eb91a122f6c1483cfd4093ae1b4f10eba4da75e37c9a4c7b086f10a"
+    },
+    {
       "id": "local.hostonly.diagnostic-ua.20261027",
       "profileSha256": "0a4d9e4c720f5799719839e98a279f0ba2bb5da07e8b8f5f172b5fc244f7ab41"
+    },
+    {
+      "id": "local.hostonly.diagnostic-ua.rerun.20261028",
+      "profileSha256": "be87f2514efa8732a29b530b72925fb94425402879ed00c6ae688f28b0068078"
     },
     {
       "id": "local.hostonly.diagnostics.20261027",
       "profileSha256": "4192ee8b463121f6dc48daee1ee5eb5e9d5e41e211365e7e7c0b9883072a2d67"
     },
     {
+      "id": "local.hostonly.diagnostics.rerun.20261028",
+      "profileSha256": "3e4dc2cf53a557ccd4a6456fdc43db02c713c39f3b21a0af6849213ff43d859e"
+    },
+    {
       "id": "local.hostonly.drive-profile-review.20261028",
       "profileSha256": "381f9e86552103270992c1d3bb292382d4bbf5b87cedb15d4d598db7b9e7f4fd"
+    },
+    {
+      "id": "local.hostonly.drive-profile-review.rerun.20261028",
+      "profileSha256": "1ffb7edf598d2e63473e2cb8fb01c2eb35027df23d0106cd843d19eb6a2f7a98"
     },
     {
       "id": "local.hostonly.graph.20261027",
       "profileSha256": "6d0bdf8a00d2b2433ce982f341cbfabb684d5f5cf32c80b2672f53ed809a6854"
     },
     {
+      "id": "local.hostonly.graph.rerun.20261028",
+      "profileSha256": "791e920c9d08a58c20a0dbb01f265e9d6d34232e6c5d9eac6dd201049353feb3"
+    },
+    {
       "id": "local.hostonly.hmi-component-review.20261028",
       "profileSha256": "b80e29ddcd39dd4a09e727797b4e6713a2512b84fbe318d78bdb0dbc26ec9db5"
+    },
+    {
+      "id": "local.hostonly.hmi-component-review.rerun.20261028",
+      "profileSha256": "51fd6cccb7ed78d0c444fb7a56e6647800c379a500b9ca682e9b6f4d5a9a5ecc"
     },
     {
       "id": "local.hostonly.multiuser-review.20261028",
@@ -116694,20 +116806,40 @@
       "profileSha256": "ca5ea597e7dfae4bdb12eea1a1761064ddbace244e22b42cc7e671672a818869"
     },
     {
+      "id": "local.hostonly.opcua.rerun.20261028",
+      "profileSha256": "387d49dec1088e6991f20aa87738ad302a09857d009d60522b877f2d44f38c56"
+    },
+    {
       "id": "local.hostonly.public-certificate-review.20261028",
       "profileSha256": "c53715b28a6dcad9a54cce4faf03d1e121676c0eba20c4d65d5eb7786b717a34"
+    },
+    {
+      "id": "local.hostonly.public-certificate-review.rerun.20261028",
+      "profileSha256": "cc1fa5b46a0e517732b1d94579c19ceb29e3add8334407f541bcf13623ecfc51"
     },
     {
       "id": "local.hostonly.runtime-handoff.20261028",
       "profileSha256": "6485b43d2bdd71381c5bed749d4fa21dd2561f1317636db19172a135c81091de"
     },
     {
+      "id": "local.hostonly.runtime-handoff.rerun.20261028",
+      "profileSha256": "4ef459145c972bf6aa3d12476416dbf7f760ff43dd1ddce9368bb2563793cb8b"
+    },
+    {
       "id": "local.hostonly.safety-evidence-review.20261028",
       "profileSha256": "119fc4a5e7eaa8c8443f3061734bf783579c2f3508a36be814e35aff600902a9"
     },
     {
+      "id": "local.hostonly.safety-evidence-review.rerun.20261028",
+      "profileSha256": "51bd3c8ebc956493704c3ec852450cde17bda537c0578aa835437a8b6d3b0e18"
+    },
+    {
       "id": "local.hostonly.software-unit-review.20261028",
       "profileSha256": "a17e0c088e77e179414d9d2221f1885257f05d86edc7a100a0c24af323650545"
+    },
+    {
+      "id": "local.hostonly.software-unit-review.rerun.20261028",
+      "profileSha256": "3ca74c65263339b6bdbde929c84b52d4e52e6ad5342818cf4d3373803cc703ab"
     },
     {
       "id": "local.hostonly.teamcenter-review.20261028",
@@ -116718,8 +116850,16 @@
       "profileSha256": "9ba1ff875b6bed1dffb3d0c3cc65169e1aa0f37e5689bfb70770cf1ec24ccbff"
     },
     {
+      "id": "local.hostonly.technology-profile-review.rerun.20261028",
+      "profileSha256": "2b6c9444b0b2322512bf59954d2e65bf70cfddd373a5801bd28227d07320e9c3"
+    },
+    {
       "id": "local.hostonly.testsuite-result.20261028",
       "profileSha256": "8768eb570f2cc7a19f2cb3b79bc6076ecd29b710dd74042d4697979d96dc0d19"
+    },
+    {
+      "id": "local.hostonly.testsuite-result.rerun.20261028",
+      "profileSha256": "f5208153caf923382a457f81afa25bf133b3cf406add82b0e62d173a023100ac"
     },
     {
       "id": "local.hostonly.testsuite-style-review.20261028",
@@ -116730,12 +116870,24 @@
       "profileSha256": "b6e5ff70a1c58113098ca047876f2fbf1d341141427719b65f40d0746a052376"
     },
     {
+      "id": "local.hostonly.translation.rerun.20261028",
+      "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f"
+    },
+    {
       "id": "local.hostonly.vci.20261027",
       "profileSha256": "182d83d8f4714bc52afc988094be0051e30fa79396d1866d1e42c50f2f5cfec9"
     },
     {
+      "id": "local.hostonly.vci.rerun.20261028",
+      "profileSha256": "ec12088c1a781b87f45a116cee86dae405e0df1d959926c0ae3ed9f91a7a21bf"
+    },
+    {
       "id": "local.hostonly.web-application-review.20261028",
       "profileSha256": "0e885e842a80d42f96cf4a3ebbf413592d1e491a37de3bf9bbdaad28d897cac1"
+    },
+    {
+      "id": "local.hostonly.web-application-review.rerun.20261028",
+      "profileSha256": "10001f391e54590bbb6ab46446d8c5ee58052f4bd315927bc17f7d3acff929bb"
     },
     {
       "id": "local.layers.encoder-connected.20261008",
@@ -116852,6 +117004,10 @@
     {
       "id": "local.milestones.reopen.20261028",
       "profileSha256": "5ad9b465eb03d9830c627df5feaa2a41f98fefffcdf107ea633ded3fdaf1ec1e"
+    },
+    {
+      "id": "local.milestones.rerun.20261028",
+      "profileSha256": "de4e6f8a9213a07f7f6e3081cf8b9e77682608e97b9bc6e33143d0189bf62055"
     },
     {
       "id": "local.opcua.server-settings.20261028",
