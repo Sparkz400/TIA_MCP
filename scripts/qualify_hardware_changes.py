@@ -41,7 +41,7 @@ LIMITATIONS = [
     "acceptLoss, address-changing replacements and replacements that lose child items are not exercised.",
     "hardware_attributes writes Comment and Author of a module; TIA mirrors Comment to the module's built-in submodule (recorded under sideEffects). Channel attributes are qualified by the remote-I/O run.",
     "Port interconnections between the two CPUs' X1 ports only; TIA sets the ports' cable defaults (SignalDelaySelection, CableLength) on connect and clears them on disconnect (recorded under sideEffects).",
-    "hardware_delete removes a pluggable module; CPUs, HMIs and built-in items are refused by design.",
+    "hardware_delete removes the last pluggable module of the CPU rack (an S7-1500 rack with a gap fails compile); CPUs, HMIs and built-in items are refused by design.",
     "Engineering only; nothing is downloaded and no physical topology is observed.",
 ]
 
@@ -247,7 +247,8 @@ def phase_a(run):
     run.refuse("hardware_port_connect", "an already connected port", {"hardwarePath": ports(run, 1)[0], "partnerHardwarePath": ports(run, 1)[1]}, "InvalidRequest")
     link(run, "hardware_port_disconnect", 1)
     link(run, "hardware_port_connect", 2)
-    delete(run, "HwDi")
+    # S7-1500 racks refuse gaps at compile, so only the last module is deleted.
+    delete(run, "HwDi2")
 
 
 def reopen(run):
@@ -265,11 +266,11 @@ def reopen(run):
 
 def phase_b(run):
     add_cpu(run, "add CPU HwOther", "HwOther", restore=True)
-    attributes(run, "HwDi2", {"Comment": "HwAgain"}, restore=True)
-    replace(run, "HwDi2", MODULE, MODULE_V2, restore=True)
+    attributes(run, "HwDi", {"Comment": "HwAgain"}, restore=True)
+    replace(run, "HwDi", MODULE_V2, MODULE, restore=True)
     link(run, "hardware_port_connect", 1, restore=True)
     link(run, "hardware_port_disconnect", 2, restore=True)
-    delete(run, "HwDi2", restore=True)
+    delete(run, "HwDi", restore=True)
 
 
 def body(h):
