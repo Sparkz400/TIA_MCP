@@ -41,6 +41,10 @@ LIMITATIONS = [
     "sensor 0 is the only connected slot; one model correspondence. AML correspondences through hardware mappings, actor, torque, encoder and measuring-input "
     "roles, conflicting replacements and truncation are not exercised natively.",
     "The replacement is declared, not inferred: the plan carries the before channel selector over to the replacement module, which this fixture shares by type.",
+    "TIA couples native effects that are recorded under sideEffects: OperatingMode applies to both channels and shrinks the module's output range (24 to 8 bytes); "
+    "a mode change may renumber the submodule's hardware identifier (Local~<module>); a sensor connection puts the item's addresses into the servo process image "
+    "and adds RbAxis_Sensor1_Interface_AddressIn/Out tags (PD_TEL83) with their system types; to_disconnect keeps those tags, so the next connection adds "
+    "copies suffixed (1).",
     "Engineering only; nothing is downloaded.",
 ]
 
@@ -131,7 +135,8 @@ def link(run, kind, payload, item):
             channels = [a["value"] for a in row.get("attributes") or [] if isinstance(a.get("value"), dict) and a["value"].get("kind") == "channel"]
             require([(c["parent"]["hardwarePath"], c["type"], c["ioType"], c["number"]) for c in channels] == [(payload["hardwarePath"], *CHANNEL.values())],
                     "Sensor 0 is not on the requested channel: %s" % row)
-    return run.apply("%s RbAxis sensor 0" % ("connect" if kind == "to_connect" else "disconnect"), kind, payload,
+    module = item.rsplit("/", 1)[1]
+    return run.apply("connect RbAxis sensor 0 to " + module if kind == "to_connect" else "disconnect RbAxis sensor 0 from " + module, kind, payload,
                      {"effects": [{"technologyObject": "RbAxis", "technologyPath": axis, "action": kind}]},
                      shown={**payload, "name": "RbAxis"}, changed=["to:" + axis], check=connected, tolerated=coupled(run, item))
 
