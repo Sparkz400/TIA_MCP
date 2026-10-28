@@ -35,7 +35,7 @@ class Run:
     def __init__(self, args):
         self.args, self.root = args, args.root.resolve()
         self.root.mkdir(parents=True, exist_ok=False)
-        self.clients, self.lifetimes, self.client = [], [], None
+        self.clients, self.lifetimes, self.client, self.tool_calls = [], [], None, []
         self.comment_edit, comment_ref = None, None
         if getattr(args, "comment_input", None):
             self.comment_edit = read_comment_input(args.comment_input, args.mode)
@@ -115,6 +115,7 @@ class Run:
         # Retain the exact reply before decoding; a malformed/error body must
         # not erase the only response or bypass owned failure reconciliation.
         self.save("call-" + str(time.time_ns()) + "-" + name, response)
+        self.tool_calls.append({"name": name, "isError": bool(response.get("isError"))})
         packet = response.get("structuredContent")
         if packet is None:
             content = "\n".join(c["text"] for c in response.get("content", []) if c["type"] == "text")
@@ -310,6 +311,8 @@ class Run:
         assert verdict["completed"], verdict["issues"]
         intervention = (self.root / "coordinator-native-close.json").exists()
         self.save("exact-cleanup", {"completed": True, "lifetimes": self.lifetimes, "hostCount": len(self.clients), "explicitNativeTermination": intervention, "coordinatorInterventionRequired": intervention, "normalLifecyclePassed": self.args.mode not in oracle.NATIVE_POINTS | oracle.HOST_POINTS})
+        # scripts/curate_evidence.py reads this report; expected refusals stay listed as rejected calls.
+        self.save("verification", {"completed": verdict["completed"], "mode": self.args.mode, "toolCalls": self.tool_calls})
         return verdict
 
 

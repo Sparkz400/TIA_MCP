@@ -37,6 +37,14 @@ class CurateEvidenceTests(unittest.TestCase):
         self.assertEqual(["inspect", "reopen"], summary["steps"])
         self.assertEqual((["vci_prepare"], ["vci_commit"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_reads_shutdown_receipts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "verification.json")
+            path.write_text(json.dumps({"completed": True, "checks": ["review"], "shutdowns": [
+                {"hostExitCode": 0, "toolCalls": [{"name": "connection_review", "isError": False}]}]}), encoding="utf-8")
+            summary = run(path)
+        self.assertEqual(["connection_review"], summary["toolsPassed"])
+
     def test_run_accepts_passed_status_and_string_steps(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "result.json")

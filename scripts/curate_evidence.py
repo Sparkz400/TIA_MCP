@@ -34,7 +34,7 @@ def run(path):
     # Qualifiers that log each MCP call as a step (tool + isError) have no separate toolCalls list;
     # Host-only workflow runners keep each Host lifetime's calls in its close receipt instead.
     calls = (report.get("toolCalls")
-             or [c for receipt in report.get("hostExits", []) + report.get("cleanups", [])
+             or [c for receipt in report.get("hostExits", []) + report.get("cleanups", []) + report.get("shutdowns", [])
                  for c in receipt.get("toolCalls", [])]
              or [{"name": st["tool"], "isError": st["isError"]}
                  for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st]
