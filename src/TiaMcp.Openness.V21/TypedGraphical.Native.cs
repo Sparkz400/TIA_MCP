@@ -67,6 +67,9 @@ namespace TiaMcp.Openness.V21
                 Fail("GraphicalProfileUnavailable", "The MOVE/arithmetic template overload does not match the exact requested type.");
             foreach (var attribute in template.Descendants().Where(e => e.Name != Net + "Instance").Attributes("UId").ToArray()) attribute.Value = ids.Uid("template:" + node.Key + ":" + attribute.Value);
             template.SetAttributeValue("UId", uid);
+            // TIA exports SUB/DIV with Card=2 but refuses that Card on import (native w9q typed-sub-int-lad); only ADD/MUL are expandable.
+            if (node.Kind == "math" && (node.Instruction == "SUB" || node.Instruction == "DIV"))
+                template.Elements(Net + "TemplateValue").Where(e => (string)e.Attribute("Name") == "Card").Remove();
             if (node.Kind == "and" || node.Kind == "or" || node.Kind == "branch" || node.Kind == "not")
             {
                 var card = template.Elements(Net + "TemplateValue").SingleOrDefault(e => (string)e.Attribute("Name") == "Card");
@@ -446,7 +449,9 @@ namespace TiaMcp.Openness.V21
                 var template = EngineeringSources.ReadXml(profile.NativeTemplateXml).Root;
                 if (template == null || template.Name != part.Name) continue;
                 if (profile.Kind == "not" && part.Elements(Net + "TemplateValue").FirstOrDefault(e => (string)e.Attribute("Name") == "Card")?.Value != "1") continue;
-                if (XNode.DeepEquals(ProfileShape(template), ProfileShape(part))) return profile;
+                // TIA exports source-created SUB/DIV with Card=2 but imports and re-exports them without it (native w9q typed-sub-int-lad).
+                bool fixedCard = profile.Kind == "math" && (profile.Instruction == "SUB" || profile.Instruction == "DIV");
+                if (XNode.DeepEquals(ProfileShape(template, fixedCard), ProfileShape(part, fixedCard))) return profile;
             }
             return null;
         }
@@ -462,9 +467,10 @@ namespace TiaMcp.Openness.V21
                 && !e.HasElements && !HasPayloadText(e) && !string.IsNullOrWhiteSpace((string)e.Attribute("Name")) && ScalarTypes.Contains((string)e.Attribute("Type") ?? "")
                 && new[] { "Input", "Output", "InOut", "Return" }.Contains((string)e.Attribute("Section")) && (blockType == "FC" || (string)e.Attribute("Section") != "Return"));
         }
-        private static XElement ProfileShape(XElement element)
+        private static XElement ProfileShape(XElement element, bool dropFixedCard = false)
         {
             var copy = new XElement(element);
+            if (dropFixedCard) copy.Elements(Net + "TemplateValue").Where(e => (string)e.Attribute("Name") == "Card" && (string)e.Attribute("Type") == "Cardinality" && e.Value == "2").Remove();
             foreach (var instance in copy.Elements(Net + "Instance"))
                 if (IsPlainInstance(instance)) { instance.ReplaceAttributes(); instance.ReplaceNodes(); }
             foreach (var uid in copy.DescendantsAndSelf().Attributes("UId").ToArray()) uid.Remove();

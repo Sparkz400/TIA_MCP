@@ -217,6 +217,45 @@ internal static class TypedGraphicalCorpusTests
         Console.WriteLine("Typed corpus pure emission verified " + count + " captured profiles; native apply and runtime qualification are separate.");
         return Task.CompletedTask;
     }
+    // Native w9q typed-sub-int-lad: TIA refuses the Card=2 it exports on SUB/DIV, and its re-export of the
+    // Card-less import is the source-created export minus that value. Both forms read as the same profile.
+    internal static Task NonExpandableMathReadsWithoutExportedCard()
+    {
+        string root = RepositoryRoot();
+        var profiles = JObject.Parse(File.ReadAllText(Path.Combine(root, "fixtures", "typed-graphical", "profiles.v1.json")))["profiles"]!.ToObject<TypedGraphicalProfile[]>()!;
+        var cases = JObject.Parse(File.ReadAllText(Path.Combine(root, "fixtures", "typed-graphical", "wave9-cases.v1.json")))["cases"]!;
+        bool IsCard(XElement e) => e.Name == TypedGraphical.Net + "TemplateValue" && e.Attribute("Name")?.Value == "Card";
+        int count = 0;
+        foreach (var testCase in cases.Where(c => c.Value<string>("blockName")!.StartsWith("Tgp_Sub") || c.Value<string>("blockName")!.StartsWith("Tgp_Div")))
+        {
+            var exported = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root, testCase.Value<string>("referenceXml")!)));
+            var imported = new XDocument(exported);
+            var card = imported.Descendants().Where(IsCard).Single(); Check.Equal("2", card.Value); card.Remove();
+            foreach (var document in new[] { exported, imported })
+                Check.Equal("complete", TypedGraphical.Read(document, "/fixture", profiles).Networks.Single().Coverage);
+            var model = testCase["payload"]!["model"]!.ToObject<TypedGraphicalModel>()!;
+            model.NetworkId = imported.Descendants("SW.Blocks.CompileUnit").Single().Attribute("ID")!.Value;
+            string type = model.Nodes.Single(n => n.Kind == "math").DataType;
+            var context = new TypedGraphicalContext { CpuFamily = "OrderNumber:6ES7 511-1AL03-0AB0/V4.1", Profiles = profiles };
+            foreach (var operand in model.Operands)
+                context.Operands[operand.Key] = operand.Scope == "constant" ? new() { Identity = "literal:true", Scope = "LiteralConstant", DataType = "Bool", Value = "true", DeclarationHash = "captured" }
+                    : new() { Identity = "/fixture/" + operand.Key, Scope = "LocalVariable", Components = operand.Components, DataType = type, Writable = operand.Key == "Result", DeclarationHash = "captured" };
+            // Replacement of the imported network regenerates exactly TIA's import form, with no Card.
+            var built = TypedGraphical.Build(imported, model, context);
+            EngineeringSources.RequireNativePreservation(imported, built.Document);
+            Check.Equal(false, built.Document.Descendants().Any(IsCard));
+            count++;
+        }
+        Check.Equal(12, count);
+        // Only the fixed two-input value is ignorable: an expanded SUB and a Card-less expandable ADD stay unrecognized.
+        var sub = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root, "fixtures", "typed-graphical", "native", "Tgp_SubInt_LAD.xml")));
+        sub.Descendants().Where(IsCard).Single().Value = "3";
+        Check.Equal("partial", TypedGraphical.Read(sub, "/fixture", profiles).Networks.Single().Coverage);
+        var add = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root, "fixtures", "typed-graphical", "native", "Tgp_AddInt_LAD.xml")));
+        add.Descendants().Where(IsCard).Single().Remove();
+        Check.Equal("partial", TypedGraphical.Read(add, "/fixture", profiles).Networks.Single().Coverage);
+        return Task.CompletedTask;
+    }
     private static TypedGraphicalConnection Wire(string from, string fromPort, string to, string toPort) => new() { From = new() { Node = from, Port = fromPort }, To = new() { Node = to, Port = toPort } };
     private static string RepositoryRoot()
     {

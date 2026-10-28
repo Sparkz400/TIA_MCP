@@ -1,0 +1,111 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.wave9.engineering-early.20261028",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-10-28T03:23:28+00:00",
+  "source": {
+    "commit": "b425d0a2228609b048840b7fede7a4fe27e36f08",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Two earlier batches of the same runner that each stopped at one case. w9q passed 14 cases (all LAD DInt/Real compares eq..ge, MOVE Int and ADD Int LAD) before SUB Int LAD hit TIA's Card import refusal; w9q4 passed 8 (MUL Int LAD, MOVE/ADD/MUL DInt and Real LAD, TONR LAD) before R_TRIG LAD hit the protected R_TRIG system FB export. Both stopping cases passed later in local.typed.wave9.engineering.20261028.",
+  "limitations": [
+    "Each batch stopped before completing, so the summary outcome is failed; only the per-case gate results are evidence. Runs used earlier Debug builds of this branch; the binary hashes are those of the last."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "055dc55370c849bedee4df96354d01c041f829ce7408ba852d5001b7313d11a9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "cec523d9e3deb8c3e93b687556005fa3d4232f46f80efad6033074fcbf4d37be"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation.json",
+      "sha256": "6d82dd081691a0073936153f6f037a528c7335b6de4665040aad7eed40291c8f",
+      "bytes": 71120,
+      "completed": false,
+      "steps": [
+        "typed-add-int-lad: passed",
+        "typed-eq-dint-lad: passed",
+        "typed-eq-real-lad: passed",
+        "typed-ge-dint-lad: passed",
+        "typed-ge-real-lad: passed",
+        "typed-gt-dint-lad: passed",
+        "typed-gt-real-lad: passed",
+        "typed-le-dint-lad: passed",
+        "typed-le-real-lad: passed",
+        "typed-lt-dint-lad: passed",
+        "typed-lt-real-lad: passed",
+        "typed-move-int-lad: passed",
+        "typed-ne-dint-lad: passed",
+        "typed-ne-real-lad: passed",
+        "typed-sub-int-lad: failed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    },
+    {
+      "report": "curation.json",
+      "sha256": "036322ade27ff16df34d1c7194ffe47f4ae9f3126b96a993b67ee26438d9ca0c",
+      "bytes": 41204,
+      "completed": false,
+      "steps": [
+        "typed-add-dint-lad: passed",
+        "typed-add-real-lad: passed",
+        "typed-move-dint-lad: passed",
+        "typed-move-real-lad: passed",
+        "typed-mul-dint-lad: passed",
+        "typed-mul-int-lad: passed",
+        "typed-mul-real-lad: passed",
+        "typed-rtrig-lad: failed",
+        "typed-tonr-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "block_read"
+      ]
+    }
+  ]
+}

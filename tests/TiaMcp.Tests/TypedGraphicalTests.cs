@@ -277,6 +277,9 @@ internal static class TypedGraphicalTests
             var crossNamespace = TypedGraphical.Build(captured, authored, qualified);
             Check.Equal("TiaMcp_UnitA.TgpUnit_NumericFC", crossNamespace.Document.Descendants(Net + "CallInfo").Single().Attribute("Name")!.Value);
             Check.Equal(true, crossNamespace.Profiles.Contains("v21.fw41.namespace." + language.ToLowerInvariant() + ".call.v1"));
+            // Rebuilt on the cross-namespace caller captured on 28 October, it reproduces that native reference (offline only).
+            var crossNamespaceReference = CapturedUnitCall(language, "TgpCrossNamespace_NumericFC_").Captured;
+            EngineeringSources.RequireNativePreservation(crossNamespaceReference, TypedGraphical.Build(crossNamespaceReference, authored, qualified).Document);
             // Without a bound namespace-qualified profile the namespaced call stays refused.
             qualified.Profiles = qualified.Profiles.Select(p => { var copy = JObject.FromObject(p).ToObject<TypedGraphicalProfile>()!; if (copy.Kind == "call") copy.CalleeNameEncoding = null; return copy; }).ToArray();
             await Error("GraphicalCalleeUnsupported", () => TypedGraphical.Build(captured, authored, qualified));
@@ -290,16 +293,19 @@ internal static class TypedGraphicalTests
             var (captured, authored, context) = CapturedUnitCall(language);
             var catalog = context.Profiles;
             var callee = context.Callees.Values.Single();
-            // Caller in TiaMcp_UnitB calls TiaMcp_UnitA's block. The cross-unit profile is unit-test-only: none is captured.
+            // Caller in TiaMcp_UnitB calls TiaMcp_UnitA's block through the cross-unit profile captured on 28 October.
             context.TargetScopePath = "Devices/PLC/units/TiaMcp_UnitB"; context.TargetNamespace = "TiaMcp_UnitB";
             callee.ScopePath = "Devices/PLC/units/TiaMcp_UnitA"; callee.UnitAccess = "Published";
             context.RelatedScopePaths = [callee.ScopePath];
-            var crossUnit = JObject.FromObject(catalog.Single(p => p.Kind == "call" && p.Route == "softwareUnit" && p.Language == language)).ToObject<TypedGraphicalProfile>()!;
-            crossUnit.Id += ".crossunit-test"; crossUnit.CalleeNameEncoding = "crossUnitQualified";
-            context.Profiles = catalog.Concat([crossUnit]).ToArray();
+            var crossUnit = catalog.Single(p => p.Kind == "call" && p.Route == "softwareUnit" && p.Language == language && p.CalleeNameEncoding == "crossUnitQualified");
+            Check.Equal("v21.fw41.softwareUnit." + language.ToLowerInvariant() + ".call.crossUnit.v1", crossUnit.Id);
+            var inUnit = catalog.Where(p => p != crossUnit).ToArray();
             var accepted = TypedGraphical.Build(captured, authored, context);
             Check.Equal("TiaMcp_UnitA.TgpUnit_NumericFC", accepted.Document.Descendants(Net + "CallInfo").Single().Attribute("Name")!.Value);
             Check.Equal(true, accepted.Profiles.Contains(crossUnit.Id));
+            // Rebuilt on the captured cross-unit caller, the typed call reproduces that native reference (offline only).
+            var reference = CapturedUnitCall(language, "TgpCrossUnit_NumericFC_").Captured;
+            EngineeringSources.RequireNativePreservation(reference, TypedGraphical.Build(reference, authored, context).Document);
             context.RelatedScopePaths = [];
             await Error("GraphicalUnitRelationMissing", () => TypedGraphical.Build(captured, authored, context));
             context.RelatedScopePaths = [callee.ScopePath];
@@ -307,17 +313,17 @@ internal static class TypedGraphicalTests
             await Error("GraphicalCalleeUnpublished", () => TypedGraphical.Build(captured, authored, context));
             callee.UnitAccess = "Published";
             // The in-unit namespace-qualified profile never serves a cross-unit call.
-            context.Profiles = catalog;
+            context.Profiles = inUnit;
             await Error("GraphicalProfileUnavailable", () => TypedGraphical.Build(captured, authored, context));
             // A same-unit call ignores the cross-unit slot and keeps its captured profile.
-            context.Profiles = catalog.Concat([crossUnit]).ToArray();
+            context.Profiles = catalog;
             callee.ScopePath = context.TargetScopePath;
             Check.Equal(false, TypedGraphical.Build(captured, authored, context).Profiles.Contains(crossUnit.Id));
         }
     }
 
     // The captured software-unit numeric FC caller with its exact callee and the deployed catalog profiles.
-    private static (XDocument Captured, TypedGraphicalModel Model, TypedGraphicalContext Context) CapturedUnitCall(string language)
+    private static (XDocument Captured, TypedGraphicalModel Model, TypedGraphicalContext Context) CapturedUnitCall(string language, string caller = "TgpUnit_NumericFC_")
     {
         DirectoryInfo? root = new(AppContext.BaseDirectory);
         while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
@@ -325,7 +331,7 @@ internal static class TypedGraphicalTests
         string fixtures = Path.Combine(root.FullName, "fixtures", "typed-graphical");
         var profiles = JObject.Parse(File.ReadAllText(Path.Combine(fixtures, "profiles.v1.json")))["profiles"]!.ToObject<TypedGraphicalProfile[]>()!;
         var cases = JObject.Parse(File.ReadAllText(Path.Combine(fixtures, "numeric-cases.v1.json")))["cases"]!;
-        var captured = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(fixtures, "native", "TgpUnit_NumericFC_" + language + ".xml")));
+        var captured = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(fixtures, "native", caller + language + ".xml")));
         var authored = cases.Single(c => c.Value<string>("family") == "numeric-fc" && c.Value<string>("language") == language)["payload"]!["model"]!.ToObject<TypedGraphicalModel>()!;
         authored.NetworkId = "3";
         const string calleePath = "/captured/unit/TgpUnit_NumericFC";

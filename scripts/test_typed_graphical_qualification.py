@@ -8,8 +8,8 @@ import tempfile
 import unittest
 from xml.etree import ElementTree as ET
 
-from typed_graphical_native_expectations import topology, adapt_reference_bindings, adapt_reference_culture, project_culture
-from qualify_typed_graphical import selected_blocks, snapshot, read_graph, independent_behavior
+from typed_graphical_native_expectations import topology, adapt_reference_bindings, adapt_reference_culture, adapt_reference_import, project_culture
+from qualify_typed_graphical import block_path, selected_blocks, snapshot, read_graph, independent_behavior
 from block_test_program import generate_program, inspect_interface
 from block_test_executor import validate_suite
 
@@ -115,6 +115,33 @@ class IndependentTopologyTests(unittest.TestCase):
             validate_suite(suite, program)
             self.assertTrue(suite["cases"][0]["steps"][-1]["assertions"])
 
+    def test_crossscope_cases_bind_their_captured_callers_and_the_callee_outside_the_route(self):
+        cases = json.loads((ROOT / "fixtures/typed-graphical/crossscope-cases.v1.json").read_bytes())["cases"]
+        self.assertEqual(["typed-crossnamespace-numeric-fc-lad", "typed-crossnamespace-numeric-fc-fbd",
+                          "typed-crossunit-numeric-fc-lad", "typed-crossunit-numeric-fc-fbd"], [c["fixtureId"] for c in cases])
+        net = "{http://www.siemens.com/automation/Openness/SW/NetworkSource/FlgNet/v5}"
+        callee = "/plc/units/TiaMcp_UnitA/blocks/namespaces/TiaMcp_UnitA/TgpUnit_NumericFC"
+        callees = (ROOT / "fixtures/typed-graphical/sources/route-Unit-advanced-callees.scl").read_text(encoding="utf-8")
+        for case in cases:
+            with self.subTest(case=case["fixtureId"]):
+                document = ET.fromstring((ROOT / case["referenceXml"]).read_text(encoding="utf-8-sig"))
+                self.assertEqual(case["namespace"], next(document.iter("Namespace")).text)
+                self.assertEqual(["TiaMcp_UnitA.TgpUnit_NumericFC"], [info.get("Name") for info in document.iter(net + "CallInfo")])
+                self.assertTrue(case["engineeringOnly"] and (ROOT / case["referenceXml"]).name == case["blockName"] + ".xml")
+                cross_unit = case["unitName"] != "TiaMcp_UnitA"
+                # The cross-unit archive already holds the callees; the cross-namespace case admits them as its capture did.
+                self.assertEqual([] if cross_unit else [{"language": "SCL", "source": callees, "namespace": "TiaMcp_UnitA",
+                                                         "expectedBlockNames": ["TgpUnit_NumericFC", "TgpUnit_NumericFB"]}],
+                                 case.get("dependencySources", []))
+                [call] = [node for node in case["payload"]["model"]["nodes"] if node["kind"] == "call"]
+                before = {case["blockName"]: {"block": {"path": "/plc/units/" + case["unitName"] + "/blocks/" + case["blockName"]}},
+                          "@unselected:" + callee: {"block": {"path": callee}}}
+                self.assertEqual(callee, block_path(before, call["calleePath"]))
+                self.assertEqual(before[case["blockName"]]["block"]["path"], block_path(before, "$block:" + case["blockName"]))
+                for blocks in ({case["blockName"]: before[case["blockName"]]}, {**before, "@unselected:/other" + callee: {"block": {"path": "/other" + callee}}}):
+                    with self.assertRaises(AssertionError):
+                        block_path(blocks, call["calleePath"])
+
     def test_wave9_cases_preflight_against_their_authored_sources(self):
         packet = json.loads((ROOT / "fixtures/typed-graphical/wave9-capture-packet.v1.json").read_bytes())
         self.assertEqual("authored-not-executed", packet["status"])
@@ -171,6 +198,32 @@ class IndependentTopologyTests(unittest.TestCase):
                         count += 1
         self.assertGreater(count, 0)
 
+
+
+class ReferenceImportAdaptationTests(unittest.TestCase):
+    def test_only_sub_and_div_lose_their_card_value(self):
+        root = pathlib.Path(__file__).resolve().parents[1] / "fixtures/typed-graphical/native"
+        for name, expected in (("Tgp_SubInt_LAD.xml", 1), ("Tgp_DivReal_FBD.xml", 1), ("Tgp_AddInt_LAD.xml", 0), ("Tgp_MulDInt_FBD.xml", 0)):
+            xml = (root / name).read_text(encoding="utf-8-sig")
+            adapted, removed = adapt_reference_import(xml)
+            self.assertEqual(expected, removed, name)
+            self.assertEqual(xml.count('Name="Card"') - expected, adapted.count('Name="Card"'), name)
+            self.assertEqual(xml.count('Name="SrcType"'), adapted.count('Name="SrcType"'), name)
+
+    def test_wave9_sub_div_topology_oracle_is_the_card_less_import_form(self):
+        # Native w9q typed-sub-int-lad: TIA re-exports the adapted import without Card, and typed replacement emits none,
+        # so the topology oracle must be the adapted reference (no topologyXml bypasses it); the raw one would differ.
+        cases = json.loads((ROOT / "fixtures/typed-graphical/wave9-cases.v1.json").read_bytes())["cases"]
+        selected = [c for c in cases if any(n.get("instruction") in ("SUB", "DIV") for n in c["payload"]["model"]["nodes"])]
+        self.assertEqual(12, len(selected))
+        for case in selected:
+            with self.subTest(case=case["fixtureId"]):
+                self.assertNotIn("topologyXml", case)
+                xml = (ROOT / case["referenceXml"]).read_text(encoding="utf-8-sig")
+                adapted, removed = adapt_reference_import(xml)
+                self.assertEqual(1, removed)
+                self.assertEqual(re.sub(r'<TemplateValue Name="Card" Type="Cardinality">2</TemplateValue>\s*', "", xml), adapted)
+                self.assertNotEqual(topology(xml), topology(adapted))
 
 if __name__ == "__main__":
     unittest.main()

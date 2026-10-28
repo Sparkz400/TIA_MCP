@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "fixtureId": "typed-crossnamespace-numeric-fc-lad",
+      "family": "numeric-fc",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpCrossNamespace_NumericFC_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpCrossNamespace_NumericFC_LAD.xml",
+      "dependencyXmls": [],
+      "interfaceDependencies": [],
+      "runtimeInstances": [
+        "dut"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_UnitA/TgpUnit_NumericFC"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Value",
+              "scope": "local",
+              "components": [
+                "Value"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "Returned",
+              "scope": "local",
+              "components": [
+                "Returned"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Value",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Result"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Ret_Val"
+              },
+              "to": {
+                "node": "$Returned",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "dependencySources": [
+        {
+          "language": "SCL",
+          "source": "NAMESPACE TiaMcp_UnitA\nFUNCTION \"TgpUnit_NumericFC\" : Int\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Value : Int;\nEND_VAR\nVAR_IN_OUT\n Accumulator : Int;\nEND_VAR\nVAR_OUTPUT\n Result : Int;\nEND_VAR\nBEGIN\n #Accumulator := #Accumulator + #Value;\n #Result := #Accumulator * 2;\n #TgpUnit_NumericFC := #Accumulator + 1;\nEND_FUNCTION\n\nFUNCTION_BLOCK \"TgpUnit_NumericFB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\n Delta : Int;\n Reset : Bool;\nEND_VAR\nVAR_IN_OUT\n Accumulator : Int;\nEND_VAR\nVAR_OUTPUT\n Total : Int;\nEND_VAR\nVAR\n State : Int;\nEND_VAR\nBEGIN\n IF #Reset THEN\n  #State := 0;\n ELSIF #Enable THEN\n  #State := #State + #Delta;\n  #Accumulator := #Accumulator + #Delta;\n END_IF;\n #Total := #State + #Accumulator;\nEND_FUNCTION_BLOCK\n\nEND_NAMESPACE\n",
+          "namespace": "TiaMcp_UnitA",
+          "expectedBlockNames": [
+            "TgpUnit_NumericFC",
+            "TgpUnit_NumericFB"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-crossnamespace-numeric-fc-fbd",
+      "family": "numeric-fc",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpCrossNamespace_NumericFC_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpCrossNamespace_NumericFC_FBD.xml",
+      "dependencyXmls": [],
+      "interfaceDependencies": [],
+      "runtimeInstances": [
+        "dut"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_UnitA/TgpUnit_NumericFC"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Value",
+              "scope": "local",
+              "components": [
+                "Value"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "Returned",
+              "scope": "local",
+              "components": [
+                "Returned"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Value",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Result"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Ret_Val"
+              },
+              "to": {
+                "node": "$Returned",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21",
+      "archiveSha256": "39cea56a73b8e58263e256c2f27b2402e1d29989fb12cb471f66970e1cce74d6",
+      "unitName": "TiaMcp_UnitA",
+      "namespace": "TiaMcp_UnitA.Alternate",
+      "dependencySources": [
+        {
+          "language": "SCL",
+          "source": "NAMESPACE TiaMcp_UnitA\nFUNCTION \"TgpUnit_NumericFC\" : Int\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Value : Int;\nEND_VAR\nVAR_IN_OUT\n Accumulator : Int;\nEND_VAR\nVAR_OUTPUT\n Result : Int;\nEND_VAR\nBEGIN\n #Accumulator := #Accumulator + #Value;\n #Result := #Accumulator * 2;\n #TgpUnit_NumericFC := #Accumulator + 1;\nEND_FUNCTION\n\nFUNCTION_BLOCK \"TgpUnit_NumericFB\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR_INPUT\n Enable : Bool;\n Delta : Int;\n Reset : Bool;\nEND_VAR\nVAR_IN_OUT\n Accumulator : Int;\nEND_VAR\nVAR_OUTPUT\n Total : Int;\nEND_VAR\nVAR\n State : Int;\nEND_VAR\nBEGIN\n IF #Reset THEN\n  #State := 0;\n ELSIF #Enable THEN\n  #State := #State + #Delta;\n  #Accumulator := #Accumulator + #Delta;\n END_IF;\n #Total := #State + #Accumulator;\nEND_FUNCTION_BLOCK\n\nEND_NAMESPACE\n",
+          "namespace": "TiaMcp_UnitA",
+          "expectedBlockNames": [
+            "TgpUnit_NumericFC",
+            "TgpUnit_NumericFB"
+          ]
+        }
+      ]
+    },
+    {
+      "fixtureId": "typed-crossunit-numeric-fc-lad",
+      "family": "numeric-fc",
+      "language": "LAD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpCrossUnit_NumericFC_LAD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpCrossUnit_NumericFC_LAD.xml",
+      "dependencyXmls": [],
+      "interfaceDependencies": [],
+      "runtimeInstances": [
+        "dut"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "LAD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "rail",
+              "kind": "powerrail"
+            },
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_UnitA/TgpUnit_NumericFC"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Value",
+              "scope": "local",
+              "components": [
+                "Value"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "Returned",
+              "scope": "local",
+              "components": [
+                "Returned"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "rail",
+                "port": "out"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Value",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Result"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Ret_Val"
+              },
+              "to": {
+                "node": "$Returned",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/crossunit-prep/838e0c54a1b825944749dfe51703c39929b7df4768dbc44f5bda1919315470c5.zap21",
+      "archiveSha256": "838e0c54a1b825944749dfe51703c39929b7df4768dbc44f5bda1919315470c5",
+      "unitName": "TiaMcp_UnitB",
+      "namespace": "TiaMcp_UnitB"
+    },
+    {
+      "fixtureId": "typed-crossunit-numeric-fc-fbd",
+      "family": "numeric-fc",
+      "language": "FBD",
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "blockName": "TgpCrossUnit_NumericFC_FBD",
+      "referenceXml": "fixtures/typed-graphical/native/TgpCrossUnit_NumericFC_FBD.xml",
+      "dependencyXmls": [],
+      "interfaceDependencies": [],
+      "runtimeInstances": [
+        "dut"
+      ],
+      "payload": {
+        "model": {
+          "schemaVersion": 1,
+          "language": "FBD",
+          "operation": "replaceNetwork",
+          "networkId": "$first",
+          "nodes": [
+            {
+              "key": "call",
+              "kind": "call",
+              "calleePath": "$block:TiaMcp_UnitA/TgpUnit_NumericFC"
+            }
+          ],
+          "operands": [
+            {
+              "key": "Value",
+              "scope": "local",
+              "components": [
+                "Value"
+              ]
+            },
+            {
+              "key": "Result",
+              "scope": "local",
+              "components": [
+                "Result"
+              ]
+            },
+            {
+              "key": "Returned",
+              "scope": "local",
+              "components": [
+                "Returned"
+              ]
+            },
+            {
+              "key": "Accumulator",
+              "scope": "local",
+              "components": [
+                "Accumulator"
+              ]
+            },
+            {
+              "key": "True",
+              "scope": "constant",
+              "dataType": "Bool",
+              "value": "true"
+            }
+          ],
+          "connections": [
+            {
+              "from": {
+                "node": "$True",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "en"
+              }
+            },
+            {
+              "from": {
+                "node": "$Value",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Value"
+              }
+            },
+            {
+              "from": {
+                "node": "$Accumulator",
+                "port": "value"
+              },
+              "to": {
+                "node": "call",
+                "port": "Accumulator"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Result"
+              },
+              "to": {
+                "node": "$Result",
+                "port": "value"
+              }
+            },
+            {
+              "from": {
+                "node": "call",
+                "port": "Ret_Val"
+              },
+              "to": {
+                "node": "$Returned",
+                "port": "value"
+              }
+            }
+          ]
+        },
+        "instances": []
+      },
+      "engineeringOnly": true,
+      "archivePath": "artifacts/crossunit-prep/838e0c54a1b825944749dfe51703c39929b7df4768dbc44f5bda1919315470c5.zap21",
+      "archiveSha256": "838e0c54a1b825944749dfe51703c39929b7df4768dbc44f5bda1919315470c5",
+      "unitName": "TiaMcp_UnitB",
+      "namespace": "TiaMcp_UnitB"
+    }
+  ]
+}

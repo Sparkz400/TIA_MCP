@@ -45,6 +45,19 @@ def adapt_reference_culture(xml, culture):
     return adapted, count
 
 
+# TIA exports SUB/DIV with a Card template value it then refuses on import; only ADD/MUL are expandable.
+NON_EXPANDABLE_CARD = re.compile(r'(<Part Name="(?:Sub|Div)"[^>]*>\s*)<TemplateValue Name="Card" Type="Cardinality">\d+</TemplateValue>\s*', re.IGNORECASE)
+
+
+def adapt_reference_import(xml):
+    """Drop the Card template value of SUB/DIV parts so TIA re-imports its own export.
+
+    Returns the adapted XML and the number of removed values. TIA re-exports the import without them
+    (native w9q typed-sub-int-lad), so the adapted XML is also the qualification's topology oracle.
+    """
+    return NON_EXPANDABLE_CARD.subn(lambda m: m.group(1), xml)
+
+
 def adapt_reference_bindings(xml, bindings):
     """Apply explicit fixture author substitutions, independent of emitter output.
 

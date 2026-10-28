@@ -21,7 +21,7 @@ from block_test_runtime import NativeAudit, NativeToolError, canonical, digest, 
 from run_block_tests import apply_change, binary_manifest, save_json
 from run_conformance import native_document, structural_xml
 from smoke_mcp import Client, ROOT
-from typed_graphical_native_expectations import assert_independent_topology, adapt_reference_bindings, assert_existing_caller_insertion, adapt_reference_culture, project_culture
+from typed_graphical_native_expectations import assert_independent_topology, adapt_reference_bindings, assert_existing_caller_insertion, adapt_reference_culture, adapt_reference_import, project_culture
 from typed_graphical_transport import artifact_bytes
 from qualify_deployment import McpClient, load_configuration
 from typed_graphical_owned_session import TypedOwnedSession
@@ -106,6 +106,17 @@ def selected_blocks(call, case):
     return result, scope
 
 
+def block_path(blocks, reference):
+    """"$block:<name>" is a block of the case route; "$block:<namespace>/<name>" the one block of that namespace outside it."""
+    name = reference[len("$block:"):]
+    if "/" not in name:
+        return blocks[name]["block"]["path"]
+    matches = [value["block"]["path"] for key, value in blocks.items()
+               if key.startswith("@unselected:") and value["block"]["path"].endswith("/namespaces/" + name)]
+    assert len(matches) == 1, "Exactly one block outside the case route must be " + name
+    return matches[0]
+
+
 def snapshot(call, names, directory, case=None):
     directory.mkdir()
     exports = {}
@@ -114,6 +125,12 @@ def snapshot(call, names, directory, case=None):
     if include_peers:
         names = sorted(blocks)
     for ordinal, name in enumerate(dict.fromkeys(names)):
+        row = blocks.get(name) if blocks is not None else None
+        if row is not None and row.get("isKnowHowProtected") is True and "/systemGroups/" in row["path"]:
+            # TIA copies protected system FBs such as R_TRIG into System blocks; they cannot be exported, so their identity is kept.
+            identity = json.dumps({k: row.get(k) for k in ("path", "name", "number", "kind", "programmingLanguage", "isConsistent")}, sort_keys=True)
+            exports[name] = {"xml": "", "payloadSha256": hashlib.sha256(identity.encode()).hexdigest(), "block": row, "kind": "protectedSystemBlock"}
+            continue
         result = call("block_read", {"blockPath": blocks[name]["path"]} if blocks is not None else {"blockName": name})
         (directory / (str(ordinal).zfill(3) + ".xml")).write_bytes(result["xml"].encode("utf-8"))
         exports[name] = {"xml": result["xml"], "payloadSha256": native_hash(result["xml"]), "block": result["block"]}
@@ -222,6 +239,9 @@ def run_case(case, args, output):
         culture = project_culture(call("block_read", {"blockName": "Main"})["xml"])
         reference_xml, retargeted = adapt_reference_culture(reference_xml, culture)
         report["referenceCultureAdaptation"] = {"projectCulture": culture, "referenceItems": retargeted, "dependencyItems": 0}
+        reference_xml, removed = adapt_reference_import(reference_xml)
+        if removed:
+            report["referenceImportAdaptation"] = {"nonExpandableCardValuesRemoved": removed}
         for dependency in case.get("dependencySources", []):
             apply_change(call, "source_upsert", {**route, **dependency})
         for dependency in case.get("dependencyXmls", []):
@@ -278,17 +298,17 @@ def run_case(case, args, output):
         # Exact callee paths are observed from this scratch, never synthesized.
         for node in payload["model"].get("nodes", []):
             if node.get("calleePath", "").startswith("$block:"):
-                node["calleePath"] = before[node["calleePath"][7:]]["block"]["path"]
+                node["calleePath"] = block_path(before, node["calleePath"])
             if node.get("nativeUid", "").startswith("$part:"):
                 _, kind, ordinal = node["nativeUid"].split(":")
                 matches = [e for e in document.iter() if e.tag.rsplit("}", 1)[-1] == "Part" and e.get("Name") == kind]
                 node["nativeUid"] = matches[int(ordinal)].get("UId")
         for operand in payload["model"].get("operands", []):
             if operand.get("ownerPath", "").startswith("$block:"):
-                operand["ownerPath"] = before[operand["ownerPath"][7:]]["block"]["path"]
+                operand["ownerPath"] = block_path(before, operand["ownerPath"])
         for instance in payload.get("instances", []):
             if instance.get("blockPath", "").startswith("$block:"):
-                instance["blockPath"] = before[instance["blockPath"][7:]]["block"]["path"]
+                instance["blockPath"] = block_path(before, instance["blockPath"])
         for field in ("networkId", "insertAfterNetworkId"):
             if payload["model"].get(field) == "$first":
                 payload["model"][field] = next(e.attrib["ID"] for e in document.iter() if e.tag == "SW.Blocks.CompileUnit")

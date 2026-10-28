@@ -10,7 +10,7 @@ namespace TiaMcp.Openness.V21
     internal static class HardwareEngineeringRules
     {
         internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
-            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set" }.Contains(kind);
+            "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure" }.Contains(kind);
 
         // Port interconnections join the manifest only for kinds that change or can lose them.
         internal static bool CapturesPorts(string kind) => kind == "hardware_port_connect" || kind == "hardware_port_disconnect" || kind == "hardware_replace";
@@ -173,6 +173,24 @@ namespace TiaMcp.Openness.V21
                         if (owners.Count > 1 || (owners.Count == 1 && (disconnect || owners[0].Value<string>() != payload.Value<string>("addressControllerOwnerPath")))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
                         addresses[i]["owners"] = owners.DeepClone();
                     }
+                }
+            }
+            else if (kind == "network_configure")
+            {
+                // Only the selected node's requested attributes and subnet may change; a change TIA couples to them refuses.
+                string nodeName = payload.Value<string>("nodeName"), subnet = payload.Value<string>("subnetName");
+                JObject Node(JObject row)
+                {
+                    var nodes = (row["network"]?["nodes"] as JArray ?? new JArray()).OfType<JObject>().Where(node => nodeName == null || node.Value<string>("name") == nodeName).Take(2).ToArray();
+                    return nodes.Length == 1 ? nodes[0] : throw new BridgeException("MutationVerificationFailed", "The selected network node is not exactly one manifest node.");
+                }
+                var node = Node(selected); var observed = Node(Target(after, path));
+                foreach (var property in (payload["attributes"] as JObject ?? new JObject()).Properties()) node["attributes"][property.Name] = property.Value.DeepClone();
+                if (subnet != null || payload.Value<bool?>("disconnect") == true)
+                {
+                    // Apply connects to an existing subnet by case-insensitive name; disconnect leaves none.
+                    if (!string.Equals(observed.Value<string>("subnet"), subnet, StringComparison.OrdinalIgnoreCase)) Fail("The selected node's subnet differs from the request.");
+                    node["subnet"] = observed["subnet"]?.DeepClone();
                 }
             }
             else if (kind == "hardware_port_connect" || kind == "hardware_port_disconnect")

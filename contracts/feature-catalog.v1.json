@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.45",
+  "catalogVersion": "0.4.46",
   "targetTiaVersions": [
     21
   ],
@@ -2674,6 +2674,58 @@
         "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
         "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
         "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
+      ]
+    },
+    {
+      "id": "local.typed.wave9.engineering.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b425d0a2228609b048840b7fede7a4fe27e36f08",
+        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only on the standard route of CPU 1511-1 PN V4.1 (V21), each case in a fresh owned scratch, one complete batch (w9q5): 40 wave 9 cases pass all four native engineering gates (engineering, preservation, persistence, recovery): SUB/DIV Int/DInt/Real in LAD and FBD; R_TRIG/F_TRIG multi-instance LAD and FBD; every FBD DInt/Real compare (eq..ge), MOVE/ADD/MUL Int/DInt/Real and TONR; and TONR on the existing global Tgp_GlobalTonr in LAD and FBD. Profiles: local.typed.wave9-capture.20261027."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9.engineering.20261028.json"
+      ],
+      "limitations": [
+        "The 4 typed-existingglobal-rtrig/ftrig cases are not run: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile, so no global edge storage profile exists. The other 22 wave 9 cases passed in earlier stopped batches (local.typed.wave9.engineering-early.20261028).",
+        "SUB/DIV references are imported without TIA's exported Card=2 template value, which TIA refuses on import (recorded per case as referenceImportAdaptation); the reader treats Card=2 as absent for SUB/DIV only.",
+        "Engineering only: the runtime gate is not run."
+      ]
+    },
+    {
+      "id": "local.typed.crossscope.engineering.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "6dcbf7e9bd844cd236777791b5afc7160177fc3a",
+        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only: typed LAD and FBD calls from a caller in TiaMcp_UnitA's alternate namespace to TiaMcp_UnitA.TgpUnit_NumericFC (namespaceQualified profile) and from unit TiaMcp_UnitB to the published TiaMcp_UnitA FC through a SoftwareUnit relation (crossUnitQualified profiles v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1), each case in a fresh owned project retrieved from its SHA-bound archive; all 4 pass the four native engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.crossscope.engineering.20261028.json"
+      ],
+      "limitations": [
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Engineering only: the runtime gate is not run."
+      ]
+    },
+    {
+      "id": "local.milestones.network.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ba861fce777645490974e21be85c3e451b7fca59",
+        "passedScope": "scripts/validate_milestones.py (--skip-simulation) on build ba861fc (frozen D:\\wp\\b7) in owned scratch projects, the same 11 changes as local.milestones.reopen.20261028, now with network_configure as a hardware-rule kind: the offline PROFINET address/subnet-mask change of the scratch CPU's node applied with checkpoint, compile and save and reported configured_hardware_preservation_verified (only the requested node attributes changed in the configured-hardware manifest); change_status equals the apply result; the timestamp-free readback differs only in that node's address; a fresh owned Portal reopens the changed project identically; change_restore in the applying Portal returns the exact pre-change readback and the recovered project reopens identically in another fresh Portal. All other changes pass as in the earlier run."
+      },
+      "artifacts": [
+        "evidence/local.milestones.network.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN; one node's Address and SubnetMask only; subnet connect/disconnect and other attributes are not run natively. Simulation steps were skipped.",
+        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
       ]
     }
   ],
@@ -5395,7 +5447,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5447,7 +5500,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5499,7 +5553,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5703,7 +5758,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -5915,7 +5971,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.20261028",
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -6121,7 +6178,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.reopen.20261028"
+          "local.milestones.reopen.20261028",
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -6366,17 +6424,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) for one node's Address and SubnetMask (local.milestones.network.20261028); subnet connect/disconnect and other attributes are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "Attribute preflight precedes subnet changes, but subsequent metadata/type changes or native failures can leave partial effects requiring checkpoint recovery.",
+          "Apply runs the worker's configured-hardware preservation stage, also with compile=false: only the selected node's requested allowlisted attributes and requested subnet may change. Any other node, attribute, address, I/O-system or connector change refuses, including one TIA couples to the request (for example an address reassigned on a subnet connect), and change_restore compares the retrieved hardware with the prechange manifest. An interrupted apply reconciles on the configured-hardware route.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02"
+          "local.milestones.network.20261028"
         ]
       },
       "availability": {
@@ -11509,14 +11569,14 @@
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
-          "Cross-scope calls (27 October, offline tests only, not natively qualified): a call to a block in another namespace of the caller's own software unit emits the absolute namespace-qualified CallInfo Name through the route's captured namespaceQualified profile and is refused without it. A call into another software unit requires a direct SoftwareUnit relation of the caller's unit, a Published callee (native attribute Access, UnitAccessType) and its own crossUnitQualified profile, which no capture binds yet, so it returns GraphicalProfileUnavailable. Relation, publication, callee namespace and interface are part of the preview and rechecked at apply. Storage creation for another unit's FB and instance DBs outside the caller's scope are refused; existing storage in the caller's scope follows the usual instance rules. Capture inputs: fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json (authored, not executed).",
+          "Cross-scope calls (27 October, offline tests only, not natively qualified): a call to a block in another namespace of the caller's own software unit emits the absolute namespace-qualified CallInfo Name through the route's captured namespaceQualified profile and is refused without it. A call into another software unit requires a direct SoftwareUnit relation of the caller's unit, a Published callee (native attribute Access, UnitAccessType) and its own crossUnitQualified profile. Relation, publication, callee namespace and interface are part of the preview and rechecked at apply. Storage creation for another unit's FB and instance DBs outside the caller's scope are refused; existing storage in the caller's scope follows the usual instance rules. Profiles captured 28 October (fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json, audit crossscope-candidates-20261028.audit.json): the cross-namespace references confirm the absolute Name the deployed namespace-route call profiles emit, and the cross-unit references bind v21.fw41.softwareUnit.lad.call.crossUnit.v1 and v21.fw41.softwareUnit.fbd.call.crossUnit.v1 (CPU 1511 V4.1 only). Engineering (four gates) passed natively for a cross-namespace and a cross-unit numeric FC call in LAD and FBD (local.typed.crossscope.engineering.20261028); FB callees, cross-unit storage and runtime are not qualified.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026, all unqualified: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). No native reference for these families has been captured yet, so the deployed catalog has no profile for them and every request is refused with GraphicalProfileUnavailable until an independently authored source is captured, extracted and qualified on the target; created TONR/R_TRIG/F_TRIG storage additionally needs a captured IEC dependent-instance effect member. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. Created TONR/R_TRIG/F_TRIG storage additionally needs a captured IEC dependent-instance effect member. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
         ]
       },
       "qualification": {
@@ -11551,7 +11611,9 @@
           "local.typed.transitive-capture.20261026",
           "local.typed.transitive-effects.20261026",
           "local.typed.route-transitive-capture.20261027",
-          "local.typed.route-transitive-effects.20261027"
+          "local.typed.route-transitive-effects.20261027",
+          "local.typed.wave9.engineering.20261028",
+          "local.typed.crossscope.engineering.20261028"
         ]
       },
       "availability": {
