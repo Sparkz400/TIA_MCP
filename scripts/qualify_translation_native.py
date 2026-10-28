@@ -20,7 +20,7 @@ from exact_qualification_client import ExactClient
 from qualify_exact_worker_startup import emit, package
 from qualify_reliability import terminate_owned_test_worker
 from qualify_translation_category_probe import ref, require
-from qualify_translation_import import preexisting_preserved
+from qualify_translation_import import portal_check
 from smoke_mcp import Client
 
 PRODUCTION = {'translation_native_capture', 'translation_native_prepare', 'translation_native_apply',
@@ -233,7 +233,8 @@ class Run:
         require(status['state'] not in ('prepared', 'succeeded', 'reconciled'), 'Interrupted operation must stay unresolved')
         replay = self.call('translation_native_apply', {**request, 'revision': status['revision']}, '')
         destination = None
-        if status['checkpoints']:
+        # A lost Host leaves its intent state (checkpointIntent/dispatchIntent), which reconciles read-only without a restore.
+        if status['checkpoints'] and status['state'] in ('outcomeUnknown', 'recoveryRequired', 'ready'):
             project = Path(self.entry['projectPath'])
             destination = self.root / ('recovery-' + state + '-' + loss) / project.parent.name / project.name
             status = self.call('translation_native_recover', {**request, 'revision': status['revision'], 'newProjectPath': str(destination)})
@@ -269,8 +270,8 @@ class Run:
             self.lifecycle(report)
             self.call('tia_detach')
             after = self.call('tia_discover')
-            require(preexisting_preserved(before, after, started['processId']), 'A preexisting Portal disappeared or the owned Portal remains')
-            report['preexistingPreserved'] = report['completed'] = True
+            report.update(portal_check(before, after, started['processId']))
+            report['completed'] = True
         except BaseException as error:
             report['failure'] = {'type': type(error).__name__, 'message': str(error)}
         finally:

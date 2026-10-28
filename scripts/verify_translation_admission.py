@@ -198,7 +198,7 @@ def verify(root):
     same = admission.get('sameInstance', False)
     require(admission['kind'] == ('translation-same-instance-qualification' if same else 'translation-failure-qualification') and
             Path(admission['artifactRoot']).resolve() == root and admission['resumeOperation'] is None, 'Fresh exact packet required')
-    require(result['completed'] and result['productionEnabled'] is False and result['automaticReplay'] is False and result['preexistingPreserved'], 'Incomplete native packet')
+    require(result['completed'] and result['productionEnabled'] is False and result['automaticReplay'] is False and result.get('ownedPortalExited') is True, 'Incomplete native packet')
     cases = list(FAILURE_CASES) if same else [admission.get('failureCase')]
     require(all(c in FAILURE_CASES for c in cases) and [t['name'] for t in result['trials']] == cases, 'Exact bounded ordered case list required')
     oracle = Oracle(root); checks = [oracle.operation(t) for t in result['trials']]

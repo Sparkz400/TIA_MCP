@@ -24,10 +24,13 @@ STALE_CODES = ('StaleWorkbook', 'TranslationScopeMismatch')
 FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')
 
 
-def preexisting_preserved(before, after, owned):
-    """Other lanes start their own Portals concurrently: every preexisting Portal must remain and the owned one must have exited."""
+def portal_check(before, after, owned):
+    """The owned Portal must have exited. Other lanes start and end their own Portals on this machine; these runners
+    never terminate a process, so a foreign Portal that ended meanwhile is recorded, not treated as a failure."""
     remaining = {p['processId'] for p in after['processes']}
-    return {p['processId'] for p in before['processes']} <= remaining and owned not in remaining
+    require(owned not in remaining, 'The owned Portal remains after detach')
+    ended = sorted({p['processId'] for p in before['processes']} - remaining)
+    return {'ownedPortalExited': True, 'foreignPortalsEnded': ended, 'preexistingPreserved': not ended}
 
 
 def category_verdict(result):
@@ -289,8 +292,7 @@ class Run:
                     if label == 'noop': self.call('project_open', {'path': project})
                 self.call('tia_detach')
                 after = self.call('tia_discover')
-                require(preexisting_preserved(before, after, started['processId']), 'A preexisting Portal disappeared or the owned Portal remains')
-                report['preexistingPreserved'] = True
+                report.update(portal_check(before, after, started['processId']))
                 report['completed'] = True
             except BaseException as error:
                 report['failure'] = {'type': type(error).__name__, 'message': str(error)}
