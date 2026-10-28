@@ -115,7 +115,8 @@ class Run:
         # Retain the exact reply before decoding; a malformed/error body must
         # not erase the only response or bypass owned failure reconciliation.
         self.save("call-" + str(time.time_ns()) + "-" + name, response)
-        self.tool_calls.append({"name": name, "isError": bool(response.get("isError"))})
+        # Unit tests build runners with __new__, so the list may not exist yet.
+        self.__dict__.setdefault("tool_calls", []).append({"name": name, "isError": bool(response.get("isError"))})
         packet = response.get("structuredContent")
         if packet is None:
             content = "\n".join(c["text"] for c in response.get("content", []) if c["type"] == "text")
