@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.50",
+  "catalogVersion": "0.4.51",
   "targetTiaVersions": [
     21
   ],
@@ -3139,6 +3139,45 @@
       "limitations": [
         "Metadata only: no block-logic freshness, runtime, remote transport or whole-project completeness claim.",
         "One standard CPU fixture with generated SCL functions; software units, multiple PLCs and HMI are not part of this run."
+      ]
+    },
+    {
+      "id": "local.explorer.e1.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "fbf960f457ac161991323ac5b4063f0c3f9c0e36",
+        "passedScope": "scripts/qualify_project_explorer.py --two-plcs --second-cpu 'CPU 1214C DC/DC/DC' --seeder UnitSeeder --namespace-collision on a frozen Debug build of fbf960f (D:\\wp\\b16): owned scratch CPU 1511-1 PN V4.1 with nested and empty block groups, two software units with namespace presets, TiaMcp_IsEnabled in the PLC root, both units and a second namespace of unit A, plus a CPU 1214C DC/DC/DC V4.7 (163 nodes). Every PLC's captured blocks, types, tag tables and groups equal software_inspect, every device and device item equals device_inventory, every parent's paged children partition the tree without duplicates or omissions, the CPU 1214C's absent PlcUnitProvider is reported as unsupported coverage, identical names keep distinct exact identities, details agree with block_read and hardware_inspect, a 12-item capture reports partial coverage, and session-mismatched, released and disconnected selections are refused."
+      },
+      "artifacts": [
+        "evidence/local.explorer.e1.20261028.json"
+      ],
+      "limitations": [
+        "Offline engineering metadata only; no physical topology, online or runtime claim, and metadata verification does not certify content.",
+        "Relationship scope (exact authored edges, depth/edge bounds) is qualified by the default fixture run local.explorer.relationship-scope.20261024 and the provider run, not by this two-PLC fixture.",
+        "One machine and one small fixture; capture and query timings are observations, not latency guarantees."
+      ]
+    },
+    {
+      "id": "local.explorer.relationships.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "fbf960f457ac161991323ac5b4063f0c3f9c0e36",
+        "passedScope": "scripts/qualify_project_explorer_relationships.py on release tia-mcp-v21_20261028_113957_7850e07e packaged from the frozen tree of fbf960f (D:\\wp\\b16): fresh owned scratch CPU 1511-1 PN V4.1 with an IM 155-6AU02 V6.4 head, one subnet and one IO system (prepared hardware_add, network_configure, network_io_assign), a TM PosInput module (prepared hardware_plug), and via UnitSeeder explorer-relations two software units with one relation and an external-encoder TO connected to the module channel. Configured-network edges equal the independent hardware_inspect oracle; technology-connection and software-unit-relation edges equal technology_read and software_inspect; subnet, watch/force-table and external-source collections captured; portable export retains the network evidence. A second run reopened the saved fixture read-only and repeated all checks."
+      },
+      "artifacts": [
+        "evidence/local.explorer.relationships.20261028.json"
+      ],
+      "limitations": [
+        "Configured offline engineering relationships only; no cables, ports, physical topology, online or runtime claim.",
+        "One fixture per provider: one subnet/IO system, one external-encoder TO and one unit relation; other TO types and relation kinds (NonUnitDB, TODB) are not covered."
       ]
     }
   ],
@@ -11322,6 +11361,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11335,13 +11375,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012",
-          "local.explorer.relationship-scope.20261024"
+          "local.explorer.relationship-scope.20261024",
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11376,6 +11413,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11388,12 +11426,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012",
-          "local.explorer.native-providers.20261026"
+          "local.explorer.native-providers.20261026",
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11428,6 +11464,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11437,11 +11474,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11476,6 +11511,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11485,11 +11521,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11524,6 +11558,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11534,12 +11569,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11574,6 +11606,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "Configured-network, technology-connection and software-unit-relation providers natively qualified against hardware_inspect, technology_read and software_inspect on one fixture, including a read-only reopen (local.explorer.relationships.20261028); authored call/member edges and traversal bounds by local.explorer.relationship-scope.20261024.",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11586,14 +11619,13 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012",
+          "local.explorer.relationship-scope.20261024",
           "local.explorer.native-providers.20261026",
-          "local.explorer.native-providers.20261027"
+          "local.explorer.native-providers.20261027",
+          "local.explorer.e1.20261028",
+          "local.explorer.relationships.20261028"
         ]
       },
       "availability": {
@@ -11628,6 +11660,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11639,9 +11672,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
@@ -11720,6 +11753,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
+          "E1 hierarchy and query contract natively qualified on two PLCs (CPU 1511-1 PN with software units, nested and empty groups and a namespace collision; CPU 1214C without a unit service), against independent software_inspect and device_inventory reads (local.explorer.e1.20261028).",
           "Metadata freshness is separate from content; no complete-project revision claim.",
           "Read-only viewer and exact session/snapshot-bound object selection.",
           "HMI and typed graphical previews require their operation-specific provider and qualification.",
@@ -11731,12 +11765,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.explorer.native-browser.20261008",
-          "hmi.readonly.unified-comfort.20261012",
-          "explorer.hmi.browser.20261012",
-          "explorer.native.thousand-functions.20261012"
+          "local.explorer.e1.20261028"
         ]
       },
       "availability": {
