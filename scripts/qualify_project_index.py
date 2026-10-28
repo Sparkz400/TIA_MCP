@@ -87,6 +87,8 @@ def run(args):
     owned_pid = None
 
     def save():
+        # Curated evidence lists the tools that answered without error (scripts/curate_evidence.py).
+        report["toolCalls"] = [c for client in (owner, observer) if client is not None for c in client.tool_calls]
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
 
