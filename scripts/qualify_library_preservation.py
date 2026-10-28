@@ -93,13 +93,26 @@ def unmatched(patterns, keys):
 
 
 def compare(observed, expected):
-    """Mismatches between an observed diff and expected added/removed/changed patterns; empty when exact."""
+    """Mismatches between an observed diff and expected added/removed/changed patterns; empty when exact. Changed keys
+    matching an optional "may" pattern are allowed without being required (the targeted type's own derived rows)."""
     result = {}
     for part in ("added", "removed", "changed"):
-        miss = unmatched(expected.get(part, ()), observed[part])
+        keys = observed[part]
+        if part == "changed":
+            required = expected.get(part, ())
+            keys = [k for k in keys if any(fnmatch.fnmatchcase(k, p) for p in required)
+                    or not any(fnmatch.fnmatchcase(k, p) for p in expected.get("may", ()))]
+        miss = unmatched(expected.get(part, ()), keys)
         if miss["keys"] or miss["patterns"]:
             result[part] = miss
     return result
+
+
+def own(name, prefix="P|"):
+    """A type's own rows. Its native status follows instance/default relations (observed: Consistent, then
+    NonDefaultVersionInstantiation while a PLC uses a non-default version), and releasing a higher version makes it
+    the default, so these rows may change with any change of that type."""
+    return [prefix + "type:" + name, prefix + "version:%s@*" % name]
 
 
 def library_row(prefix, row):
@@ -144,9 +157,13 @@ class Run:
 
     def library_view(self, prefix, library, export):
         result = self.h.query(library)
-        require(result["completeness"]["scopeComplete"] and result.get("nextOffset") is None, "Library metadata incomplete")
+        items = list(result["items"])
+        while result.get("nextOffset") is not None:  # Later pages are pinned to the first page's revision.
+            result = self.h.query(library, offset=result["nextOffset"], revision=result["revision"])
+            items += result["items"]
+        require(result["completeness"]["scopeComplete"], "Library metadata incomplete")
         rows, formats = {}, {}
-        for row in result["items"]:
+        for row in items:
             key, value = library_row(prefix, row)
             require(key not in rows, "Duplicate library identity " + key)
             rows[key] = value
@@ -296,7 +313,9 @@ class Run:
             if "project" in checkpoints:  # Project retrieval needs an empty owned Portal.
                 h.stage("detach before restoring " + label, lambda: h.tool("tia_detach"))
                 h.owned_portal("restore " + label)
-                self.g = None
+            elif self.g:  # The retrieved copy carries the same library name; close the saved original first.
+                h.tool("library_close", {"libraryId": self.g})
+            self.g = None
             restored = h.stage("restore " + label, lambda: h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
             rows = restored["resources"]
             require(restored["state"] == "restored_to_new_locations" and sorted(r["kind"] for r in rows) == checkpoints
@@ -305,8 +324,6 @@ class Run:
                 if row["kind"] == "project":
                     self.pl = h.project_library()
                 else:
-                    if self.g:
-                        h.tool("library_close", {"libraryId": self.g})
                     self.g, self.g_path = row["library"]["libraryId"], row["library"]["path"]
             if self.g is None:
                 self.reopen_global("after restoring " + label)
@@ -339,14 +356,19 @@ def version(run, library, name, number):
 
 
 def release(run, work, number, changed=(), restore=False):
-    """Releasing changes the type's status row; observed on V21: a released block instance also exports without its
-    HeaderAuthor/Family/Name/Version, while a PLC data type instance exports unchanged. Callers name those PLC keys."""
+    """Observed on V21: a released block instance exports without its HeaderAuthor/Family/Name/Version, while a PLC
+    data type instance exports unchanged; callers name those PLC keys. Releasing a higher version made it the default."""
     name = work["typeName"]
     run.change("release %s %s" % (name, number), "library_release_version", run.h.selected(run.pl, [work], versionNumber=number,
                author="TIA MCP qualification", comment="Preservation release " + number),
                {"removed": ["P|version:%s@%s" % (name, work["version"])], "added": ["P|version:%s@%s" % (name, number)],
-                "changed": ["P|type:" + name, *changed]}, restore=restore)
-    return None if restore else version(run, run.pl, name, number)
+                "changed": list(changed), "may": own(name)}, restore=restore)
+    if restore:
+        return None
+    released = version(run, run.pl, name, number)
+    run.h.stage("released %s %s is committed" % (name, number), lambda: require(
+        released["state"] == "Committed", "Release readback differs: %s" % released) or {"isDefault": released["isDefault"]})
+    return released
 
 
 def edit_documents(run, previous, plc, source, composition, extension, changed):
@@ -354,9 +376,19 @@ def edit_documents(run, previous, plc, source, composition, extension, changed):
     before, name = run.current, previous["typeName"]
     created = run.h.edit_source(run.pl, plc, previous, name, source, composition, extension)
     run.current = run.snap("document edit " + name)
-    run.expect("document edit " + name, before, {"added": ["P|version:%s@*" % name], "changed": ["P|type:" + name, *changed]})
+    run.expect("document edit " + name, before, {"added": ["P|version:%s@*" % name], "changed": list(changed), "may": own(name)})
     run.mark("library_edit_version", "applied", "documents " + previous["typeName"])
     return created
+
+
+def set_default(run, target, current, restore=False):
+    """Make an older committed version the default again: exactly the two default rows change."""
+    name = target["typeName"]
+    run.change("default %s %s" % (name, target["version"]), "library_set_default", run.h.selected(run.pl, [target]),
+               {"changed": ["P|version:%s@%s" % (name, target["version"]), "P|version:%s@%s" % (name, current)], "may": own(name)}, restore=restore)
+    if not restore:
+        run.h.stage("%s %s is the default" % (name, target["version"]), lambda: require(
+            version(run, run.pl, name, target["version"])["isDefault"] is True, "Default readback differs") or target["version"])
 
 
 def phase_a(run, upgrade_input):
@@ -402,24 +434,27 @@ def phase_a(run, upgrade_input):
 
     # Edit through the PLC 1 test instance, then discard; refuse discarding a committed version.
     run.change("edit Parent test instance", "library_edit_version", h.selected(run.pl, [released[PARENT]], testInstanceName=PARENT, target={"plcPath": p1}),
-               {"added": ["P|version:%s@*" % PARENT], "changed": ["P|type:" + PARENT, blk(p1, PARENT)]})
+               {"added": ["P|version:%s@*" % PARENT], "changed": [blk(p1, PARENT)], "may": own(PARENT)})
     run.refuse("a committed version", "library_discard_version", h.selected(run.pl, [released[PARENT]]), "InvalidChangeState")
     edited = in_work(run, PARENT)
     run.change("discard Parent edit", "library_discard_version", h.selected(run.pl, [edited]),
-               {"removed": ["P|version:%s@%s" % (PARENT, edited["version"])], "changed": ["P|type:" + PARENT, blk(p1, PARENT)]})
+               {"removed": ["P|version:%s@%s" % (PARENT, edited["version"])], "changed": [blk(p1, PARENT)], "may": own(PARENT)})
 
-    # Implementation-only releases 1.1.0 and 1.2.0; the PLC 1 test instance follows each new version.
+    # Implementation-only releases 1.1.0 and 1.2.0; the PLC 1 test instance follows each new version, and each release
+    # becomes the default, so the explicit default change goes back to 1.0.0.
     parents = {}
     for increment, number in ((1, "1.1.0"), (2, "1.2.0")):
         work = edit_documents(run, parents.get("1.1.0", released[PARENT]), p1, parent_source(increment), "blocks", ".scl", [blk(p1, PARENT)])
         parents[number] = release(run, work, number, [blk(p1, PARENT)])
-        previous_default = "1.0.0" if number == "1.1.0" else "1.1.0"
-        run.change("default Parent " + number, "library_set_default", h.selected(run.pl, [parents[number]]),
-                   {"changed": ["P|version:%s@%s" % (PARENT, previous_default), "P|version:%s@%s" % (PARENT, number)]})
+        if number == "1.1.0":
+            set_default(run, released[PARENT], "1.1.0")
+        elif not version(run, run.pl, PARENT, number)["isDefault"]:  # Publication needs the default.
+            set_default(run, parents[number], "1.0.0")
     run.refuse("the default version", "library_delete", h.selected(run.pl, [parents["1.2.0"]]), "DependencyConflict")
-    run.change("delete unused Parent 1.1.0", "library_delete", h.selected(run.pl, [parents["1.1.0"]]), {"removed": ["P|version:%s@1.1.0" % PARENT]})
+    run.change("delete unused Parent 1.1.0", "library_delete", h.selected(run.pl, [parents["1.1.0"]]),
+               {"removed": ["P|version:%s@1.1.0" % PARENT], "may": own(PARENT)})
     run.change("publish Parent 1.2.0", "library_publish", h.selected(run.pl, [parents["1.2.0"]], destinationLibraryId=run.g),
-               {"added": ["G|version:%s@1.2.0" % PARENT], "changed": ["G|version:%s@1.0.0" % PARENT]})
+               {"added": ["G|version:%s@1.2.0" % PARENT], "changed": ["G|version:%s@1.0.0" % PARENT], "may": own(PARENT, "G|")})
     # A native project update can delete library objects that no OB reaches, so preparation must refuse until every
     # library-linked object in PLC 2 has an OB-rooted reference that does not pass through the updated Parent.
     update = lambda: h.selected(run.g, [version(run, run.g, PARENT, "1.2.0")], updateScope="entireSelectedPlc", target={"plcPath": p2})
@@ -430,11 +465,11 @@ def phase_a(run, upgrade_input):
         if not spare:
             run.refuse(("Child, Outer and Inner reachable only through the updated Parent" if not child else "the unrelated spare type unreferenced"),
                        "library_update_project", update(), "LibraryUpdateCleanupRisk")
-    run.change("update PLC 2 to Parent 1.2.0", "library_update_project", update(), {"changed": [blk(p2, PARENT)]})
+    run.change("update PLC 2 to Parent 1.2.0", "library_update_project", update(), {"changed": [blk(p2, PARENT)], "may": own(PARENT)})
     run.refuse("types with only used versions", "library_cleanup", {"schemaVersion": 1, "source": h.source_ref(run.pl), "types": [released[INNER]["typeGuid"]],
                "cleanUpMode": "PreserveDefaultVersionOfUnusedTypes"}, "NoEffect")
     run.change("clean up unused Parent versions", "library_cleanup", {"schemaVersion": 1, "source": h.source_ref(run.pl), "types": [released[PARENT]["typeGuid"]],
-               "cleanUpMode": "PreserveDefaultVersionOfUnusedTypes"}, {"removed": ["P|version:%s@1.0.0" % PARENT]})
+               "cleanUpMode": "PreserveDefaultVersionOfUnusedTypes"}, {"removed": ["P|version:%s@1.0.0" % PARENT], "may": own(PARENT)})
 
     # Type policy, including malformed and read-only flags refused before mutation.
     inner_rows = ["P|type:" + INNER, "P|version:%s@1.0.0" % INNER]
@@ -465,20 +500,18 @@ def phase_a(run, upgrade_input):
                {"added": ["P|masterCopy:" + MASTER + "TiaMcp_IsEnabled"]})
 
     # Renamed instances in PLC 2; harmonize restores Parent's library name (Child stays renamed for phase B). Exports that
-    # name a renamed FB change with it: an instance DB's InstanceOfName and Parent's Child multi-instance member.
+    # name a renamed FB change with it: an instance DB's InstanceOfName, the calling OB's CallInfo and Parent's Child member.
     for name in (PARENT, CHILD):
         run.helper("rename %s in PLC 2" % name, "block_rename", {"blockName": name, "newName": name + "Local"}, p2)
     harmonize = {"schemaVersion": 1, "source": h.source_ref(run.pl), "target": {"plcPath": p2}, "types": [released[PARENT]["typeGuid"]]}
     run.refuse("no harmonize flag", "library_harmonize", harmonize, "InvalidRequest")
     run.change("harmonize Parent in PLC 2", "library_harmonize", {**harmonize, "source": h.source_ref(run.pl), "harmonizeNames": True, "harmonizePaths": True},
-               {"added": [blk(p2, PARENT)], "removed": [blk(p2, PARENT + "Local")], "changed": [blk(p2, PARENT + "_DB")]})
+               {"added": [blk(p2, PARENT)], "removed": [blk(p2, PARENT + "Local")], "changed": [blk(p2, PARENT + "_DB"), blk(p2, CYCLE)]})
 
     # Parent 1.3.0 is the global default while PLC 2 stays at 1.2.0, for the restored update in phase B.
     parents["1.3.0"] = release(run, edit_documents(run, parents["1.2.0"], p1, parent_source(3), "blocks", ".scl", [blk(p1, PARENT)]), "1.3.0", [blk(p1, PARENT)])
-    run.change("default Parent 1.3.0", "library_set_default", h.selected(run.pl, [parents["1.3.0"]]),
-               {"changed": ["P|version:%s@1.2.0" % PARENT, "P|version:%s@1.3.0" % PARENT]})
     run.change("publish Parent 1.3.0", "library_publish", h.selected(run.pl, [parents["1.3.0"]], destinationLibraryId=run.g),
-               {"added": ["G|version:%s@1.3.0" % PARENT], "changed": ["G|version:%s@1.2.0" % PARENT]})
+               {"added": ["G|version:%s@1.3.0" % PARENT], "changed": ["G|version:%s@1.2.0" % PARENT], "may": own(PARENT, "G|")})
 
     archive = {}
     def archived(applied):
@@ -510,11 +543,8 @@ def reopen(run, a):
     h.owned_portal("reopen")
     h.stage("reopen the saved project", lambda: h.reopen_project(project))
     run.pl = h.project_library()
-    run.reopen_global("after reopen")
-    run.current = run.snap("reopened")
-    h.stage("reopened state equals every verified change", lambda: (run.current == final or run.mismatch("reopen", diff(final, run.current))) and len(final))
 
-    def persisted_outputs():
+    def persisted_outputs():  # Before the global library reopens: its archive holds a library of the same name.
         upgraded = a["upgraded"]
         opened = h.tool("library_open", {"request": {"path": upgraded["path"], "expectedSha256": sha256(upgraded["path"])}})
         rows = run.library_view("U|", opened["libraryId"], False)
@@ -526,6 +556,9 @@ def reopen(run, a):
         require(rows == a["archive"]["rows"], "Archived global library differs from its archived state")
         return {"upgradedRows": len(rows), "archiveRows": len(a["archive"]["rows"])}
     h.stage("reopened upgrade output and archive equal their recorded state", persisted_outputs)
+    run.reopen_global("after reopen")
+    run.current = run.snap("reopened")
+    h.stage("reopened state equals every verified change", lambda: (run.current == final or run.mismatch("reopen", diff(final, run.current))) and len(final))
     for kind in KINDS:
         if "applied" in run.coverage.get(kind, {}):
             run.mark(kind, "persisted", "fresh Portal reopen")
@@ -550,10 +583,10 @@ def phase_b(run, a):
                {"added": [blk(p2, "TiaMcp_IsEnabled")]}, restore=True)
     run.change("update PLC 2 to Parent 1.3.0", "library_update_project",
                h.selected(run.g, [version(run, run.g, PARENT, "1.3.0")], updateScope="entireSelectedPlc", target={"plcPath": p2}),
-               {"changed": [blk(p2, PARENT)]}, restore=True)
+               {"changed": [blk(p2, PARENT)], "may": own(PARENT)}, restore=True)
     run.change("harmonize Child in PLC 2", "library_harmonize", {"schemaVersion": 1, "source": h.source_ref(run.pl), "target": {"plcPath": p2},
                "types": [a["released"][CHILD]["typeGuid"]], "harmonizeNames": True, "harmonizePaths": True},
-               {"added": [blk(p2, CHILD)], "removed": [blk(p2, CHILD + "Local")], "changed": [blk(p2, PARENT), blk(p2, PARENT + "_DB"), blk(p2, CHILD + "_DB")]},
+               {"added": [blk(p2, CHILD)], "removed": [blk(p2, CHILD + "Local")], "changed": [blk(p2, PARENT), blk(p2, PARENT + "_DB"), blk(p2, CHILD + "_DB"), blk(p2, CYCLE)]},
                restore=True)
 
     # A fresh UDT type carries the authoring and version kinds.
@@ -565,18 +598,17 @@ def phase_b(run, a):
     typ = "type:%s/types/%s" % (p1, EXTRA)
     for restore in (True, False):
         run.change("edit %s test instance" % EXTRA, "library_edit_version", h.selected(run.pl, [first], testInstanceName=EXTRA, target={"plcPath": p1}),
-                   {"added": ["P|version:%s@*" % EXTRA], "changed": ["P|type:" + EXTRA]}, restore=restore)
+                   {"added": ["P|version:%s@*" % EXTRA], "may": own(EXTRA)}, restore=restore)
     edited = in_work(run, EXTRA)
     for restore in (True, False):
         run.change("discard %s edit" % EXTRA, "library_discard_version", h.selected(run.pl, [edited]),
-                   {"removed": ["P|version:%s@%s" % (EXTRA, edited["version"])], "changed": ["P|type:" + EXTRA]}, restore=restore)
+                   {"removed": ["P|version:%s@%s" % (EXTRA, edited["version"])], "may": own(EXTRA)}, restore=restore)
     second = release(run, edit_documents(run, first, p1, udt(EXTRA, "Value : Int;\n    Extra : Bool;"), "types", ".udt", [typ]), "1.1.0")
-    defaults = ["P|version:%s@1.0.0" % EXTRA, "P|version:%s@1.1.0" % EXTRA]
-    for restore in (True, False):
-        run.change("default %s 1.1.0" % EXTRA, "library_set_default", h.selected(run.pl, [second]), {"changed": defaults}, restore=restore)
-    run.change("delete unused %s 1.0.0" % EXTRA, "library_delete", h.selected(run.pl, [first]), {"removed": [defaults[0]]}, restore=True)
+    set_default(run, first, "1.1.0", restore=True)
+    older = "P|version:%s@1.0.0" % EXTRA
+    run.change("delete unused %s 1.0.0" % EXTRA, "library_delete", h.selected(run.pl, [first]), {"removed": [older], "may": own(EXTRA)}, restore=True)
     run.change("clean up unused %s versions" % EXTRA, "library_cleanup", {"schemaVersion": 1, "source": h.source_ref(run.pl), "types": [first["typeGuid"]],
-               "cleanUpMode": "PreserveDefaultVersionOfUnusedTypes"}, {"removed": [defaults[0]]}, restore=True)
+               "cleanUpMode": "PreserveDefaultVersionOfUnusedTypes"}, {"removed": [older], "may": own(EXTRA)}, restore=True)
     run.change("publish %s" % EXTRA, "library_publish", h.selected(run.pl, [second], destinationLibraryId=run.g),
                {"added": ["G|type:" + EXTRA, "G|version:%s@1.0.0" % EXTRA, "G|version:%s@1.1.0" % EXTRA]}, restore=True)
     run.change("archive global library", "library_archive", {"schemaVersion": 1, "source": h.source_ref(run.g)}, restore=True)
@@ -617,6 +649,7 @@ def phase_c(run, a):
     h.stage("saved global library holds the failed change's partial state", lambda: require(
         diff(clean, dirty) == {"added": ["G|masterCopy:" + MASTER + "TiaMcp_EnableGate_DB"], "removed": [], "changed": []},
         "Persisted partial state differs: %s" % diff(clean, dirty)) or diff(clean, dirty))
+    h.tool("library_close", {"libraryId": run.g})
     restored = h.stage("restore the save", lambda: h.tool("change_restore", {"changeId": saved["changeId"], "previewHash": saved["previewHash"]}))
     rows = restored["resources"]
     require([r["kind"] for r in rows] == ["library"] and rows[0]["state"] == "completed", "Expected one recovered library")

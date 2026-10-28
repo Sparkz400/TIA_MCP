@@ -17,6 +17,15 @@ class LibraryPreservationTests(unittest.TestCase):
         self.assertEqual({"removed": {"keys": [], "patterns": ["P|version:A@1.0.0"]}},
                          q.compare(observed, {"added": ["P|*"], "removed": ["P|version:A@1.0.0"], "changed": ["block:*"]}))
 
+    def test_may_patterns_allow_but_do_not_require_a_type_s_own_rows(self):
+        observed = {"added": [], "removed": [], "changed": ["P|type:A", "block:PLC/blocks/A"]}
+        self.assertEqual({}, q.compare(observed, {"changed": ["block:PLC/blocks/A"], "may": q.own("A")}))
+        self.assertEqual({}, q.compare({**observed, "changed": ["block:PLC/blocks/A"]}, {"changed": ["block:PLC/blocks/A"], "may": q.own("A")}))
+        self.assertEqual({"changed": {"keys": ["P|type:B"], "patterns": []}},
+                         q.compare({**observed, "changed": ["P|type:B", "block:PLC/blocks/A"]}, {"changed": ["block:*"], "may": q.own("A")}))
+        self.assertEqual({"added": {"keys": ["P|version:A@2.0.0"], "patterns": []}},
+                         q.compare({"added": ["P|version:A@2.0.0"], "removed": [], "changed": []}, {"may": q.own("A")}))
+
     def test_library_rows_key_on_names_and_versions_not_session_ids(self):
         version = {"kind": "version", "typeName": "A", "version": "1.0.0", "typeGuid": "t", "versionGuid": "v", "path": "/types/A/versions/v", "isDefault": True}
         self.assertEqual(("G|version:A@1.0.0", {k: v for k, v in version.items() if k != "kind"}), q.library_row("G|", version))
