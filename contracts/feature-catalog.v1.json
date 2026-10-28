@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.56",
+  "catalogVersion": "0.4.58",
   "targetTiaVersions": [
     21
   ],
@@ -3443,6 +3443,65 @@
         "No Host or worker loss during lifecycle operations; offline stored configuration only, no monitoring, modify or forcing.",
         "Trial lc1 (D:\\wp\\wt\\lc1) stopped at the second apply with ProjectIsolationRequired because the unseeded scratch was no longer owned after a reopen; it is retained as failed and not cited."
       ]
+    },
+    {
+      "id": "local.alarm_text_list.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "99a37095e93c253ccafbdf709b69b24cf27c3b3c",
+        "passedScope": "scripts/qualify_alarm_imports.py on a frozen Debug build of 99a3709 (D:\\wp\\sr04), 104/104 steps, in one owned scratch CPU 1511-1 PN V4.1: the four alarm import kinds as in local.alarm_imports.20261028, plus plc_alarm_text_list_import: a user text list TiaMcpStates (Decimal, entries 0, 1 and 2-5) created from a workbook authored in the layout TIA V21's importer reads (importOption None), then one entry text replaced in TIA's own export with Override; each applied with checkpoint, PLC compile and save, asserted previews and change_status; every program export and member and plc_alarm_inspect's alarm classes, instance texts, supervisions, text lists and user text-list export differ in exactly the intended keys; a fresh owned Portal reopen shows the identical state; one Override from that state restored from its checkpoint equals the reopened state. Typed refusals (InvalidRequest, ArtifactChanged, InvalidArtifact, ObjectExists, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.alarm_text_list.20261028.json"
+      ],
+      "limitations": [
+        "One Decimal user text list with three entries in one culture; Binary and Bit lists, list comments, several lists per workbook, software units and HMI consumers are not exercised.",
+        "A fresh CPU has no text list to export, so the first workbook is authored (sheets TextList and TextListEntry, custom properties FileVersion 1 and FileContent 'Alarm text lists', shared strings and the styles part of a native export); the Override imports edit TIA's own export.",
+        "Engineering only; nothing is downloaded and no alarm is raised."
+      ]
+    },
+    {
+      "id": "local.operation_status.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "99a37095e93c253ccafbdf709b69b24cf27c3b3c",
+        "passedScope": "scripts/qualify_operation_status.py with the Host of a frozen Debug build of 99a3709 (D:\\wp\\sr04), 136 steps and 51 clean Host lifetimes, over copies of the durable operation and admission stores retained by 18 curated native runs: the twelve watch runs of local.watch.native.20261028 (eight worker-loss points, three Host-loss points, one uninterrupted), author3 and exact1 of local.watch.authoring.20261028, and the alarm and hardware runs local.alarm_imports.20261028, local.hardware_changes.20261028 and local.alarm_text_list.20261028. For each copy: engineering_operation_status returns every operation (prepared, reconciled, stopped) and admission (change_apply, change_restore, scratch_create, watch_fixture_seed, watch_authoring_source_negative) exactly as its newest on-disk revision; the 14 status reads the native runs recorded live, including outcomeUnknown reads right after worker loss, equal the on-disk revision of the same number; retained admission responses match their SHA-256 and none is unresolved; an unknown ID refuses as OperationNotFound and uppercase or traversal IDs as InvalidRequest; the reads change no store file; a second Host on the same store returns the same records. Hosts on tampered copies refuse an edited earlier revision and a missing revision as JournalInvalid and an altered admission response as ArtifactChanged."
+      },
+      "artifacts": [
+        "evidence/local.operation_status.20261028.json"
+      ],
+      "limitations": [
+        "The records come from native runs curated separately; this run reads them through the Host on copies and starts no TIA, worker or PLCSIM. Live reads during a native workflow are the 14 the watch runs recorded.",
+        "Watch operations cover one existing-row Bool ModifyValue and watch authoring; other native families keep only dispatch admissions (change_apply, change_restore, scratch_create).",
+        "Cooperating Hosts share one local artifact store; a remote or network store is not exercised."
+      ]
+    },
+    {
+      "id": "local.composite_capture.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "d32ab1c97ebb1e6d512320127f5f2643b13205ac",
+        "passedScope": "scripts/qualify_composite_capture.py on a frozen Debug build of 99a3709 (D:\\wp\\sr04), 57/57 steps, in one owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet, an S7 connection, PID_Compact 3.0 and a virtual TO_PositioningAxis 10.0 (each added with checkpoint, compile and save). A project review saved with project_snapshot_capture is captured into one composite phase: AutomationML (cax_export, retained and reopened through automationml_inspect/automationml_reopen), connections (one connection review whose observation rows equal connection_inspect), drives (drive_observe returns no drives: native, no records) and technology (one technology-profile record per saved technology object whose relationship rows equal technology_read's exposed slots), all native, composable, untruncated and changing nothing in the project. A malformed reviewId refuses as InvalidRequest and an unknown one as ArtifactUnavailable. A fresh owned Portal reopen captures the same content; after the S7 connection is deleted and its checkpoint restored, the recovered copy at another path refuses the original review as ProjectMismatch and captures the same content from its own new review."
+      },
+      "artifacts": [
+        "evidence/local.composite_capture.20261028.json"
+      ],
+      "limitations": [
+        "No drives (drive capture is drive_observe's empty result; Startdrive cannot read a new drive's drive objects), no TO hardware-module or channel connection and fewer than 32 records, so truncation is not reached.",
+        "The capture is not an atomic project revision; freshness and source authenticity stay unverified, as the result states.",
+        "composite_engineering_rebind_plan is not qualified by this run: over the fixture and recovered phases it reports no broken connection, because no verified flow creates a declared TO hardware relationship to break.",
+        "Engineering only; nothing is downloaded."
+      ]
     }
   ],
   "features": [
@@ -4472,7 +4531,7 @@
         "limitations": [
           "Exact hardwarePath whose item exposes GsdExportProvider (hardware_inspect reports gsdExportAvailable); other items are refused as UnsupportedCapability.",
           "Siemens writes into a fresh artifact directory; up to 32 produced files are returned with SHA-256 and further files are reported as truncated. The GSD content is not validated by the bridge.",
-          "Which item exposes the service and whether Siemens requires a compiled I-device configuration are not observed yet.",
+          "Native observation (28 October 2026): V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode; other items are now refused as UnsupportedCapability and only I-device interfaces report gsdExportAvailable. On a CPU 1511-1 PN interface InterfaceOperatingMode \"IoController, IoDevice\" applies (IoDevice alone is refused by TIA), but the device compile then fails with 'Error in I-device: There is no IO-controller/device address assignment': a new I-device needs a transfer area, and no change kind creates one (V21 offers TransferAreaComposition.Create). Native qualification waits for that kind.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
@@ -7112,7 +7171,8 @@
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
+          "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
+          "InterfaceOperatingMode (added 28 October) is allowlisted as a set of InterfaceOperatingModes names ([Flags] enums take Enum.ToString's form, for example \"IoController, IoDevice\") but not natively qualified: on a CPU 1511-1 PN interface it applies, and the device compile then requires a transfer area that no change kind creates."
         ]
       },
       "qualification": {
@@ -13883,12 +13943,16 @@
         "status": "partial",
         "limitations": [
           "First mutation profile is one existing Bool ModifyValue in a worker-owned scratch. Host/worker native rechecks and shared durable ownership are wired for this workflow.",
-          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required."
+          "Full watch lifecycle, other native families/profiles, remote admission and legacy-dispatch migration remain required.",
+          "Qualified on the durable stores of 18 curated native runs read through fresh Hosts (local.operation_status.20261028): every operation and admission equals its newest on-disk revision, the 14 live reads local.watch.native.20261028 recorded after worker and Host loss equal their revisions, unknown, malformed and tampered journals refuse with typed codes, reads change no store file and a cooperating Host returns the same records."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.operation_status.20261028",
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -21984,12 +22048,14 @@
           "Each native capture is retained through its existing workflow (AutomationML document, connection-review-request.v1, drive-profile-review-request.v2, technology-profile-review-request.v1) as one observed state with identical before/after; the result is one composite phase plus per-capture native/unavailable/failed status and per-record refusals.",
           "Technology objects come from the saved review; technology_read connection slots become hardware relationships whose target is the single resolved hardware or channel-owner reference, otherwise disconnected or unknown with a reason. CPU order number, firmware and encoder routes (technology v4) are not captured.",
           "At most 32 component records per phase with explicit truncation; drive_observe is bounded by maxItems 2000 and reports parametersComplete false when paged. Captures are sequential, not an atomic project revision, and a response for a different project path refuses the whole capture.",
-          "Host logic tested offline against fake worker responses only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU, an S7 connection, PID_Compact and a virtual axis (local.composite_capture.20261028): AML, connection and technology captures checked against independent reads, unchanged project, the same content after a fresh reopen and in a checkpoint-recovered copy, which refuses the original review as ProjectMismatch. Drives only as drive_observe's empty result: Startdrive cannot read a new drive's drive objects."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.composite_capture.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22029,7 +22095,8 @@
           "Output only: lists before-phase declared TO hardware relationships that are missing, disconnected, unknown or unresolved after, with the replacement from declared model correspondences or AML correspondences through declared hardware mappings in both phases. Missing, conflicting or role-less replacements stay explicit without a payload.",
           "to_connect payloads (technologyPath, role, sensorIndex, hardwarePath, carried-over channel selector or channel index) are emitted only when the bundled catalog has the to_connect change kind; a carried-over selector is not verified on the replacement module.",
           "Role and slot metadata exist only in relationships produced by composite_engineering_capture; supplied records without them report connectionRoleUnknown. At most 200 entries with explicit truncation.",
-          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified."
+          "Tested offline against fake worker captures only; no plan has been prepared, applied or natively qualified.",
+          "Native observation (28 October 2026): over two native phases (local.composite_capture.20261028) the plan reports no broken connection, because no verified flow creates a declared TO hardware-module or channel connection: to_connect is qualified only for output cams to PLC tags. Qualification needs a fixture TO connected to a module or channel, for example TO_ExternalEncoder on a TM Count or an output cam on a TM Timer DIDQ channel."
         ]
       },
       "qualification": {
@@ -22345,7 +22412,8 @@
           "No existing-content merge, system/formatted lists, native numeric-range or installed-language certification, native import/compile/runtime, complete consumer mapping or preservation claim.",
           "4 MiB request, 128 lists, 4096 total entries/texts, 32 languages, conservative 8 MiB per candidate and shared 512 MiB retention. Nonoverlapping ranges and unambiguous ASCII text identifiers only.",
           "Explicit v2 Bool binding generation uses exact v7 saved component/output evidence, declared translations and a retained previous candidate pair. Manual drift or relevant conflicts suppress candidates; selected retained peers stay unchanged. Original reviews and predecessor chains are revalidated; 16 predecessor and 128 MiB lineage-input limits. This does not establish native preservation or complete C01 generation.",
-          "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification."
+          "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification.",
+          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
         ]
       },
       "qualification": {
@@ -22565,7 +22633,8 @@
           "V1 coordinates fixed-membership Bool/integer text-list sets; v2 explicitly evolves retained sets through output additions, removals, renames and same-type member rebinding. Every prior/current declared output and binding must be accounted for.",
           "Exact predecessor/current/proposed comparisons, captured lineage, manual edits and cross-output collisions are checked before candidate publication. Conflicts suppress the whole proposed set; old records retain their semantics.",
           "Established plain TextLists/TextLibrary YAML only. Removal/rename effects are previews, not source deletion or native writes. No implicit type conversion, general SiVArc template engine, complete project coverage or native preservation qualification.",
-          "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified."
+          "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified.",
+          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
         ]
       },
       "qualification": {
@@ -23965,12 +24034,14 @@
           "Native Warning results are accepted and retained with the log/messages; they can describe a partial import. Error/Failure/ErrorRollback fails apply and leaves recovery_required with the checkpoint.",
           "The change fingerprint adds a content hash of a fresh native export of this artifact type for every PLC/software-unit owner; XLSX document properties are excluded. Native exports are not byte-deterministic (random XLSX relationship IDs, a DAT entry named after its file, a DAT CreationDate stamp); since 28 October the fingerprint normalizes these, and unchanged re-imports pass (local.alarm_imports.20261028). Any other nondeterminism still fails closed as StaleRevision before any write.",
           "Safety units, system text lists and the text-list library lifecycle (CreateFrom, delete, rename, master copies) are not covered.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.alarm_text_list.20261028): a Decimal user text list created from a workbook in the layout V21's importer reads (sheets TextList with Name/ListRange/Comment [culture] and TextListEntry with Parent/From/To/Text [culture], custom properties FileVersion 1 and FileContent 'Alarm text lists', a shared-string table and a styles part; without those two parts ImportFromXlsx throws instead of returning a result), then one entry replaced with Override in TIA's own export; unknown options, changed hashes, DAT files and None for an existing list refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.alarm_text_list.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
