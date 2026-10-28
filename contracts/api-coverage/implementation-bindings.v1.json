@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6af6711acde686c593d3a165fbe3243734ce0f4d321f7ce4d8e390b23b9c778b",
-      "bytes": 1333535
+      "sha256": "be791f6578b568044315171627a217af89f675d65068a344b12a6e42cb60f0cc",
+      "bytes": 1335691
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -94276,10 +94276,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_integrate.combined_apply.20261028",
-          "profileSha256": "98ae0b916ecfa6e91e8c5add62d4ca8aa2b37e5641657eecb1234e04b4490877",
+          "id": "local.library_integrate.combined_apply.rerun.20261028",
+          "profileSha256": "c1a0cf27f9e08094899b449a8acd5df551c5767f797aa66162071b7156f77565",
           "artifacts": [
-            "evidence/local.library_integrate.combined_apply.20261028.json"
+            "evidence/local.library_integrate.combined_apply.rerun.20261028.json"
           ]
         }
       ],
@@ -102020,10 +102020,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.library_integrate.combined_apply.20261028",
-          "profileSha256": "98ae0b916ecfa6e91e8c5add62d4ca8aa2b37e5641657eecb1234e04b4490877",
+          "id": "local.library_integrate.combined_apply.rerun.20261028",
+          "profileSha256": "c1a0cf27f9e08094899b449a8acd5df551c5767f797aa66162071b7156f77565",
           "artifacts": [
-            "evidence/local.library_integrate.combined_apply.20261028.json"
+            "evidence/local.library_integrate.combined_apply.rerun.20261028.json"
           ]
         }
       ],
@@ -116153,6 +116153,11 @@
       "sha256": "820cf37a35bab35f2dab0cb9de533090b29e454812d6dec0bba4afb77a2bcedb"
     },
     {
+      "path": "evidence/local.library_integrate.combined_apply.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "76011c55724c7c5b0906c1af998a32728b728caf31d8367bdcae9632f5e7ce95"
+    },
+    {
       "path": "evidence/local.library_interruption.20261024.json",
       "state": "observed",
       "sha256": "295087b4c48bb3044f00a8c284bdde24a37dded9c6f2b6ea399999e34adbaf17"
@@ -116979,6 +116984,10 @@
     {
       "id": "local.library_integrate.combined_apply.20261028",
       "profileSha256": "98ae0b916ecfa6e91e8c5add62d4ca8aa2b37e5641657eecb1234e04b4490877"
+    },
+    {
+      "id": "local.library_integrate.combined_apply.rerun.20261028",
+      "profileSha256": "c1a0cf27f9e08094899b449a8acd5df551c5767f797aa66162071b7156f77565"
     },
     {
       "id": "local.library_interruption.20261024",

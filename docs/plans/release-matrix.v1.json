@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.68",
-    "catalogSha256": "6af6711acde686c593d3a165fbe3243734ce0f4d321f7ce4d8e390b23b9c778b",
+    "catalogSha256": "be791f6578b568044315171627a217af89f675d65068a344b12a6e42cb60f0cc",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "d9cb98b2b4df28af0241526a8e0da8e364d0624f4fab9fd14eccd00536ae9ea7"
   },
@@ -7809,49 +7809,49 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_integrate.combined_apply.20261028"
+        "local.library_integrate.combined_apply.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         }
       ]
@@ -7872,49 +7872,49 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_integrate.combined_apply.20261028"
+        "local.library_integrate.combined_apply.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028"
           ]
         }
       ]
@@ -23685,16 +23685,16 @@
       "notRetained": []
     },
     {
-      "id": "local.library_integrate.combined_apply.20261028",
+      "id": "local.library_integrate.combined_apply.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "bc020684767dd1907a44a7aad35710d1317dd99e",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.library_integrate.combined_apply.20261028.json",
-          "sha256": "820cf37a35bab35f2dab0cb9de533090b29e454812d6dec0bba4afb77a2bcedb"
+          "path": "evidence/local.library_integrate.combined_apply.rerun.20261028.json",
+          "sha256": "76011c55724c7c5b0906c1af998a32728b728caf31d8367bdcae9632f5e7ce95"
         }
       ],
       "notRetained": []

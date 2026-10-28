@@ -3456,6 +3456,24 @@
         "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
         "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
       ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.library_integrate.combined_apply.20261028, whose raw report was lost: scripts/qualify_library_integrate_apply.py on a frozen Debug build of 2d5aa7c (D:/wp/b65, Host --enable-library-integrate-apply) in owned de-DE-only scratch projects: an authored global library with an FB and its UDT; for a new standalone FBD FC caller and for an existing FBD FC caller, change_apply of the prepared PLC library_integrate plan ran library_instantiate and graphical_typed_edit through the coordinator with readback after each step, reached installation_verified with one initial checkpoint, and an independent export/inventory diff showed exactly the planned FB, UDT, instance DB (first free number, captured storage profile) and caller network with everything else unchanged; compile 0 errors; fresh reopen identical; change_restore in an empty owned Portal retrieved the pre-change inventory and an empty project library. With the flag, an FBD OB caller and a new LAD FC were refused (PlcIntegrationNotQualified) with no change; without the flag library_capabilities reports apply unsupported and change_apply refuses with no change."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.rerun.20261028.json"
+      ],
+      "limitations": [
+        "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
+        "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
+        "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
+      ]
     }
   ],
   "features": [
@@ -10815,7 +10833,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_integrate.combined_apply.20261028"
+          "local.library_integrate.combined_apply.rerun.20261028"
         ]
       },
       "availability": {
@@ -10868,7 +10886,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_integrate.combined_apply.20261028"
+          "local.library_integrate.combined_apply.rerun.20261028"
         ]
       },
       "availability": {
