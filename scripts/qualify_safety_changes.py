@@ -9,10 +9,10 @@ ET 200SP station with two F-DI modules on the F-CPU's IO system. Then:
 - safety_printout: a PDF whose bytes match the reported size and SHA-256; an absent printer and a bad layout are refused.
 - safety_fparameter_set: Failsafe_FDestinationAddress of one F-DI moved to a free address; typed refusals for a
   non-allowlisted attribute, a wrong expected value, a missing acknowledgement and a duplicate address.
-- safety_import_xml: Main_Safety_RTG1 re-imported with a block comment; refusals for a missing acknowledgement, a standard
-  block and a scope mismatch.
+- safety_import_xml: refusals before any change for a missing acknowledgement, a standard block and a scope mismatch. Its
+  apply is not run: TIA refuses the F-block import with "No safety license available" on this machine (run sf1).
 
-Each change runs with checkpoint, compile and save and an exact state diff over hardware, device inventory and every PLC's
+Each F-parameter change runs with checkpoint, compile and save and an exact state diff over hardware, device inventory and every PLC's
 program; F-generated blocks and the F-station's signature attributes that the safety compile rewrites are recorded as side
 effects. A fresh Portal reopen must show the identical state; from there each kind is applied again and restored from its
 checkpoint into a new directory equal to the reopened state. No safety login, password, acceptance or download.
@@ -28,7 +28,7 @@ from probe_safety_kinds import DEST, FDI, FDI2, MONITORING, STATION, REMOTE, cat
 from qualify_hardware_changes import Run as HardwareRun, reopen
 from qualify_plc_object_mutations import coverage_gaps
 
-KINDS = ("safety_fparameter_set", "safety_import_xml")
+KINDS = ("safety_fparameter_set",)  # safety_import_xml: TIA refuses the F-block import without a STEP 7 Safety license.
 MAIN = "Main_Safety_RTG1"
 CRITERIA = {
     "AC-identity": "Reads name the exact F-PLC and refuse a standard PLC; changes refuse a non-allowlisted attribute, a wrong expected value, a duplicate F-destination, missing acknowledgements, a standard block and a scope mismatch, each leaving the project unchanged.",
@@ -44,8 +44,8 @@ LIMITATIONS = [
     "Full access including fail-safe (failsafeRuntimeAccess, scratch only).",
     "safety_fparameter_set changes Failsafe_FDestinationAddress only: Failsafe_FMonitoringtime of this F-DI is not declared writable "
     "(AttributeNotWritable), as its F-monitoring time is not manually assigned.",
-    "safety_import_xml re-imports the generated main safety block with a changed block comment; no F-logic behavior, F-I/O "
-    "commissioning, acceptance, login, password or download is exercised.",
+    "safety_import_xml is refused at prepare only: its native import needs a STEP 7 Safety license this machine lacks. No F-logic "
+    "behavior, F-I/O commissioning, acceptance, login, password or download is exercised.",
     "A printout or signature read does not validate, accept or approve a safety program.",
 ]
 
@@ -101,31 +101,17 @@ def reads(run, standard):
     return {name: paths[0] for name, paths in owned.items()}, modules
 
 
-def fparameter(run, di, modules, label, restore=False):
+def fparameter(run, di, modules, label, restore=False, stale=False):
     current = run.h.tool("safety_validation_inspect", {"plcPath": run.plc, "maxItems": 2000})
     values = {m["path"]: {a["name"]: a.get("value") for a in m["fParameters"]} for m in current["fIoModules"]}
     before, value = values[di][DEST], free_destination(values[di][DEST], values)
     run.current_before = run.current["view"]
     prepared = run.prepare(label, "safety_fparameter_set", write(di, DEST, before, value))
+    if stale:
+        run.refuse_apply("safety_fparameter_set", "a wrong previewHash", {**prepared, "previewHash": "0" * 64}, "PreviewMismatch")
     applied = run.finish(label, "safety_fparameter_set", prepared, changed=["hw:" + di], tolerated=side_effects(run),
                          rows={"hw:" + di: {"attributes": {DEST: value}}}, restore=restore)
     require("configured_hardware_preservation_verified" in applied["stages"], "The F-parameter write lacks configured-hardware preservation")
-
-
-def import_main(run, text, label, restore=False, stale=False):
-    h = run.h
-    xml = h.tool("block_read", {"plcPath": run.plc, "blockName": MAIN})["xml"]
-    require("<Text />" in xml, "The main safety block has no empty comment text to fill")
-    edited = xml.replace("<Text />", "<Text>%s</Text>" % text, 1)
-    payload = {"xml": edited, "expectedBlockNames": [MAIN], "safetyAcknowledged": True}
-    key = "block:" + run.plc + "/blocks/" + MAIN
-    run.current_before = run.current["view"]
-    prepared = run.prepare(label, "safety_import_xml", payload)
-    if stale:
-        run.refuse_apply("safety_import_xml", "a wrong previewHash", {**prepared, "previewHash": "0" * 64}, "PreviewMismatch")
-    run.finish(label, "safety_import_xml", prepared, changed=[key], tolerated=side_effects(run), restore=restore,
-               check=lambda applied, state: require(text in h.tool("block_read", {"plcPath": run.plc, "blockName": MAIN})["xml"], "The comment is not in the export"))
-    return xml
 
 
 def refusals(run, di, di2, modules):
@@ -163,11 +149,9 @@ def body(h):
     owned, modules = reads(run, run.standard)
     di, di2 = owned[FDI], owned[FDI2]
     refusals(run, di, di2, modules)
-    fparameter(run, di, modules, "move %s's F-destination address" % FDI)
-    import_main(run, "TiaMcp safety import", "re-import %s with a block comment" % MAIN, stale=True)
+    fparameter(run, di, modules, "move %s's F-destination address" % FDI, stale=True)
     reopen(run)
     fparameter(run, di, modules, "move %s's F-destination address again" % FDI, restore=True)
-    import_main(run, "TiaMcp safety import again", "re-import %s with another comment" % MAIN, restore=True)
     gaps = coverage_gaps(run.coverage, KINDS)
     require(not gaps, "Kinds without applied, persisted, refused and restored evidence: %s" % gaps)
 

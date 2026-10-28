@@ -110,9 +110,8 @@ namespace TiaMcp.Openness.V21
 
         private static bool IsScratchFailsafeRight(DeviceFunctionRight right)
         {
-            string identifier = right.Identifier ?? "";
-            return string.Equals(identifier.Split('.', '/', ':').Last(), "FullAccessIncludingFailsafe", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(identifier, "ProtectionLevelFullAccessIncludingFailsafe", StringComparison.Ordinal) ||
+            // V21 Update 3 identifies it as ProtectionLevelFailsafeAccess (observed on a CPU 1511F-1 PN); the name is the localized fallback.
+            return string.Equals(right.Identifier, "ProtectionLevelFailsafeAccess", StringComparison.Ordinal) ||
                 string.Equals(right.Name, "Full access including fail-safe", StringComparison.OrdinalIgnoreCase);
         }
 
