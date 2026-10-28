@@ -1,0 +1,63 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.crossscope.engineering.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T03:22:55+00:00",
+  "source": {
+    "commit": "6dcbf7e9bd844cd236777791b5afc7160177fc3a",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py --engineering-only: typed LAD and FBD calls from a caller in TiaMcp_UnitA's alternate namespace to TiaMcp_UnitA.TgpUnit_NumericFC (namespaceQualified profile) and from unit TiaMcp_UnitB to the published TiaMcp_UnitA FC through a SoftwareUnit relation (crossUnitQualified profiles v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1), each case in a fresh owned project retrieved from its SHA-bound archive; all 4 pass the four native engineering gates.",
+  "limitations": [
+    "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+    "Engineering only: the runtime gate is not run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "055dc55370c849bedee4df96354d01c041f829ce7408ba852d5001b7313d11a9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "cec523d9e3deb8c3e93b687556005fa3d4232f46f80efad6033074fcbf4d37be"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation.json",
+      "sha256": "5af8b489d6dde542ff48d70312033ca17f383a153914f86bcf111767256dc8f1",
+      "bytes": 33716,
+      "completed": true,
+      "steps": [
+        "typed-crossnamespace-numeric-fc-fbd: passed",
+        "typed-crossnamespace-numeric-fc-lad: passed",
+        "typed-crossunit-numeric-fc-fbd: passed",
+        "typed-crossunit-numeric-fc-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

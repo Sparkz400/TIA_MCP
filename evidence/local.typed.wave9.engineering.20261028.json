@@ -1,0 +1,100 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.wave9.engineering.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T03:23:12+00:00",
+  "source": {
+    "commit": "6dcbf7e9bd844cd236777791b5afc7160177fc3a",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py --engineering-only on the standard route of CPU 1511-1 PN V4.1 (V21), each case in a fresh owned scratch, one complete batch (w9q5): 40 wave 9 cases pass all four native engineering gates (engineering, preservation, persistence, recovery) — all 12 SUB/DIV Int/DInt/Real LAD/FBD, MUL/MOVE DInt/Real LAD, TONR and R_TRIG/F_TRIG multi-instance and TONR existing-global LAD/FBD, and the FBD compare/MOVE/ADD/MUL cases — against the natively captured profiles (local.typed.wave9-capture.20261027).",
+  "limitations": [
+    "The 4 typed-existingglobal-rtrig/ftrig cases are not run: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile, so no global edge storage profile exists. The other 22 wave 9 cases passed in earlier stopped batches (local.typed.wave9.engineering-early.20261028).",
+    "SUB/DIV references are imported without TIA's exported Card=2 template value, which TIA refuses on import (recorded per case as referenceImportAdaptation); the reader treats Card=2 as absent for SUB/DIV only.",
+    "Engineering only: the runtime gate is not run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "055dc55370c849bedee4df96354d01c041f829ce7408ba852d5001b7313d11a9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "cec523d9e3deb8c3e93b687556005fa3d4232f46f80efad6033074fcbf4d37be"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation.json",
+      "sha256": "1b1706539ccf24831f5b9e5e8b3193ad3513197a8a659ef23ad98807d140bb4f",
+      "bytes": 201875,
+      "completed": true,
+      "steps": [
+        "typed-add-dint-fbd: passed",
+        "typed-add-int-fbd: passed",
+        "typed-add-real-fbd: passed",
+        "typed-div-dint-fbd: passed",
+        "typed-div-dint-lad: passed",
+        "typed-div-int-fbd: passed",
+        "typed-div-int-lad: passed",
+        "typed-div-real-fbd: passed",
+        "typed-div-real-lad: passed",
+        "typed-eq-dint-fbd: passed",
+        "typed-eq-real-fbd: passed",
+        "typed-existingglobal-tonr-fbd: passed",
+        "typed-existingglobal-tonr-lad: passed",
+        "typed-ftrig-fbd: passed",
+        "typed-ftrig-lad: passed",
+        "typed-ge-dint-fbd: passed",
+        "typed-ge-real-fbd: passed",
+        "typed-gt-dint-fbd: passed",
+        "typed-gt-real-fbd: passed",
+        "typed-le-dint-fbd: passed",
+        "typed-le-real-fbd: passed",
+        "typed-lt-dint-fbd: passed",
+        "typed-lt-real-fbd: passed",
+        "typed-move-dint-fbd: passed",
+        "typed-move-int-fbd: passed",
+        "typed-move-real-fbd: passed",
+        "typed-mul-dint-fbd: passed",
+        "typed-mul-int-fbd: passed",
+        "typed-mul-real-fbd: passed",
+        "typed-ne-dint-fbd: passed",
+        "typed-ne-real-fbd: passed",
+        "typed-rtrig-fbd: passed",
+        "typed-rtrig-lad: passed",
+        "typed-sub-dint-fbd: passed",
+        "typed-sub-dint-lad: passed",
+        "typed-sub-int-fbd: passed",
+        "typed-sub-int-lad: passed",
+        "typed-sub-real-fbd: passed",
+        "typed-sub-real-lad: passed",
+        "typed-tonr-fbd: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
