@@ -208,6 +208,7 @@ namespace TiaMcp.Openness.V21
                     if (save) { project.Save(); change.Stages.Add("changed_project_saved"); WriteChangeJournal(change); }
                     // A generated block can be present right after generation and gone after compile/save (R_TRIG/F_TRIG instance DBs, native probe w9p).
                     if (change.Kind == "source_upsert") { VerifyExpectedBlocksExist(change, SelectPlc(change.Selector)); change.Stages.Add("source_blocks_verified_after_save"); }
+                    if (change.Kind == "certificate_create") { VerifyCreatedCertificateAfterSave(change, project); change.Stages.Add("certificate_verified_after_save"); }
                     if (change.Kind == "instance_db_create") { VerifyInstanceDb(change, SelectPlc(change.Selector)); change.Stages.Add("instance_db_verified_after_save"); }
                     if (change.Kind == "safety_import_xml" || change.Kind == "plc_compile" || change.Kind == "safety_fparameter_set") change.SafetyAfter = ReadSafety(SelectPlc(change.Selector).Software);
                     change.AfterFingerprint = EngineeringFingerprint(change, project);

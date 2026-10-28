@@ -107,7 +107,7 @@ namespace TiaMcp.Openness.V21
                 // Natively, switching web serving off also clears EnableSystemWebPages (probe wp_c236a724).
                 if (!value && after["systemWebPagesEnabled"]?.Type == JTokenType.Boolean) after["systemWebPagesEnabled"] = false;
                 effects.Add(new JObject { ["plcPath"] = plc.Path, ["setting"] = "WebserverActivate", ["before"] = expected, ["after"] = value });
-                ((JArray)preview["warnings"]).Add("WebserverActivate changes whether the CPU serves web pages once this configuration is downloaded; web users, rights and certificates are not changed.");
+                ((JArray)preview["warnings"]).Add("WebserverActivate changes whether the CPU serves web pages once this configuration is downloaded. Natively, switching it on also makes TIA create a web server certificate in the CPU's local store and assign it to WebserverCertificate (probe wp_c236a724); web users and rights are not changed.");
             }
             if ((payload["systemWebPages"] != null || payload["defaultApplication"] != null) && after.Value<bool?>("webserverActivate") != true)
                 throw new BridgeException("WebServerNotActivated", "Page settings require web serving to be active on this CPU, now or through webServerActive in this change.");
@@ -205,7 +205,9 @@ namespace TiaMcp.Openness.V21
             change.ObjectNames = named;
             preview["webSource"] = new JObject { ["sha256"] = LibraryDirectoryHash(snapshot), ["defaultPage"] = page, ["applicationName"] = application };
             ((JArray)preview["effects"]).Add(new JObject { ["action"] = "generateUserPageBlocks", ["plcPath"] = plc.Path, ["option"] = overwrite ? "Override" : "None", ["overrideBlocks"] = new JArray(named),
-                ["affectedSet"] = "The block identities GenerateBlocks returns; apply lists them in its readback." });
+                ["affectedSet"] = "The block identities GenerateBlocks returns; apply lists them in its readback.",
+                // Natively (qualification ac_0165b47c) TIA also adds a system constant named after the application to the default tag table.
+                ["systemConstant"] = application });
             ((JArray)preview["warnings"]).Add("Generated DB names and numbers follow the CPU's web settings and are known only after generation. With override=false native generation refuses an existing target DB; with override=true the overwritten pre-existing blocks must equal overrideBlocks exactly, otherwise apply fails after the checkpoint and recovery is required. Generated block internals are never edited, no delete API exists and nothing is downloaded.");
         }
 

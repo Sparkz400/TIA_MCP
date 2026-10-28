@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.46",
+  "catalogVersion": "0.4.47",
   "targetTiaVersions": [
     21
   ],
@@ -2726,6 +2726,32 @@
       "limitations": [
         "One owned scratch CPU 1511-1 PN; one node's Address and SubnetMask only; subnet connect/disconnect and other attributes are not run natively. Simulation steps were skipped.",
         "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
+      ]
+    },
+    {
+      "id": "local.access.qualify.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a30465aa2122c35a6eef8cd3b27f54a5cb10ee9f",
+        "passedScope": "scripts/qualify_access_changes.py on build cfd431b+ (frozen D:\\wp\b9) in one owned scratch CPU 1511-1 PN (V21), 209/210 steps: webserver_page_set, certificate_create, certificate_assign, certificate_delete, certificate_import, umac_role_set, vci_workspace_create and vci_workspace_delete each applied with exact preview assertions, checkpoint, compile and save, change_status, and a complete before/after state (every block, type and tag-table export plus certificate_inspect, access_inspect, web_inspect and vci_workspace_inspect) that differs in exactly the intended keys, with recorded web activation side effects (TIA's web server certificate); typed refusals per kind changed nothing; a fresh owned Portal reopened the project with an identical state and every journal applied; one further change per kind was restored by change_restore to the exact pre-change state. Created WebServer certificates were re-issued by the compile with the requested common name and validity end kept."
+      },
+      "artifacts": [
+        "evidence/local.access.qualify.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN with its local certificate store; the global certificate store, other CPUs, HMI devices and UMC servers are not exercised.",
+        "certificate_assign writes only PlcCommunicationCertificate on the store-owning CPU; WebserverCertificate, OPC UA attributes and null unassignment are not written. certificate_inspect renders certificate attributes display-only, so the assigned Id is read back through typed refusals (AssignmentDrift currentCertificateId, CertificateInUse references).",
+        "Certificates are created with usage WebServer and one Dns alternative name. The persisted identity after the device compile is compared with the request and recorded under certificateIdentity; the wave 10 probe saw the compile re-issue a created certificate (CN-only subject, new serial and notBefore, the CPU address as alternative names), and a mismatch lists the kind under notQualified.",
+        "certificate_import imports the public DER of a certificate this run created and deleted; PEM, CA-issued and foreign certificates are not imported natively.",
+        "umac_role_set: one custom role, one device function right taken from the scratch's custom role and one active project user; engineering function rights are never granted or revoked (no read tool lists the available ones), so AdministratorLockout is not exercised; anonymous and UMC principals are untouched.",
+        "webserver_page_set writes webServerActive and systemWebPages; defaultApplication is only refused (stale or missing application), never written.",
+        "Switching web serving on or off is allowed to change the CPU's web- and certificate-named attributes and to add or remove certificates in its store; these side effects are recorded under sideEffects.",
+        "VCI workspaces are created in the root workspace group without mappings, with roots outside the artifact store and the project; change_restore never restores workspace files.",
+        "Not covered here: vci_mapping_add, vci_mapping_remove, vci_synchronize.",
+        "Engineering only; nothing is downloaded and runtime behavior is not observed.",
+        "webserver_user_pages_generate is not qualified by this run: generation also added a system constant to the default tag table, which its preview does not declare."
       ]
     }
   ],
@@ -17125,7 +17151,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN created a workspace (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): a root outside the project and artifact store with the project culture en-US.",
           "Payload: groupPath, name (unused in that group), rootPath (absolute, absent or an empty directory, not overlapping another workspace root), language (exact active project culture). The root directory is created if absent.",
           "Workspace.WorkspaceLanguage has no public setter, so the language is fixed at creation. Rename, root relocation, library policy (GlobalLibraryPath, DeleteUnusedTypeVersionFromLibrary) and user group create/delete are not implemented.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
@@ -17134,9 +17160,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -17180,7 +17206,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN deleted that workspace (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): a workspace without mappings.",
           "Payload: workspacePath. The preview lists every mapping (with GetStatus/GetChildStatus) removed with the workspace; the mapped engineering objects stay.",
           "Whether TIA deletes files below the root is not established: every root file is backed up first and the observed file effect is reported, not required.",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
@@ -17189,9 +17215,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -18818,18 +18844,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): one custom role, one device function right and one active project user; engineering function rights and AdministratorLockout are not exercised.",
           "action=create takes roleName (the role gets an empty comment); grant/revoke take roleName with up to 64 engineeringRights identifiers and/or deviceRights {device, identifier}, device being a deviceRightScopes path from access_inspect; assign/unassign take roleName and userName. Any other field is refused.",
           "Custom roles only: a name matching a system role is refused for every action. The anonymous user, UMC users and groups, passwords, aliases, activation, authentication type, session timeouts and role rename/delete are never changed.",
           "Administrator preservation: V21 does not mark which rights are administrative, so every engineering function right an active non-anonymous project user holds before the change must still be held by one after it (AdministratorLockout). Device function rights can be revoked.",
           "Preview carries umacBefore/umacAfter (all roles with engineering and device rights, all principals with activation and role assignments); apply read-back must equal umacAfter exactly. Effective runtime rights, UMC server membership and CPU download are not evaluated.",
-          "compile=true is mandatory and compiles all project devices. The change fingerprint adds the UMAC state; interruption reconciliation holds the outcome for review.",
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN applied create, grant (device right), assign, unassign and revoke (local.wave-kinds.probe.20261027); not natively qualified."
+          "compile=true is mandatory and compiles all project devices. The change fingerprint adds the UMAC state; interruption reconciliation holds the outcome for review."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -18918,17 +18944,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN applied with exact public readback (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): usage WebServer with one Dns alternative name; TIA re-issues it at compile with the requested common name and validity end kept.",
           "Payload: hardwarePath (CPU), usage (Tls, OpcUaClient, OpcUaClientServer, OpcUaServer or WebServer), subjectCommonName (max 64), subjectAlternativeNames [{type: Dns|Email|Uri|IP, value}] that replace the template defaults, validFromUtc and validUntilUtc. The signature algorithm stays the template default.",
           "V21 exposes no issuer or CA selection: TIA decides between self-signed and CA-signed; the readback reports the actual issuer. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Readback requires a public export of the new certificate with exactly the requested subject, UTC validity and alternative names. How TIA interprets template times and whether it adds names is unverified; a mismatch fails after the write and needs checkpoint recovery.",
-          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust.",
+          "Apply checks the created certificate again after compile and save, because compile can re-issue it (probe wp_2ec78aa9: subject, serial, validity and alternative names changed); a re-issued certificate fails with MutationVerificationFailed and needs checkpoint recovery."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -18971,7 +18998,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): the public DER of a certificate this run created and deleted; PEM, CA-issued and foreign certificates are not imported natively.",
           "Payload: hardwarePath, uploadRef (committed artifact upload) and format der or pem. The Host turns the upload into exact public DER (PublicCertificateReview.PublicDer): exactly one certificate; PKCS#12/PFX, PKCS#7, private or encrypted keys, surplus data and any other payload field, including a password, refuse. Generic uploads retain their bytes before this check.",
           "The worker re-checks the DER, imports a hash-pinned change artifact and verifies exactly one new certificate without a private key whose exported public DER has the reviewed SHA-256.",
           "Importing does not establish trust, usage or assignment. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
@@ -18979,8 +19006,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.access.qualify.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19022,16 +19051,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN assigned PlcCommunicationCertificate and back (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): PlcCommunicationCertificate on the store-owning CPU only; WebserverCertificate, OPC UA attributes and null unassignment are not written.",
           "Payload: hardwarePath (store owner CPU), targetPath (that CPU or one of its subitems), attributeName, certificateId (null unassigns) and expectedCertificateId (the current Id or null). Drift from the expected current assignment refuses at prepare and apply; readback compares the attribute's certificate Id.",
           "Web server and OPC UA server assignments are separate attributes. Their exact V21 names, whether null unassigns, and per-service usage, key and SAN suitability are unverified. HW.CertificateSupportedService (runtime certificate management) is not used as an assignment route. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -19074,16 +19103,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN deleted an unassigned certificate (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): unassigned certificates of the CPU's local store; CertificateInUse refused for an assigned one.",
           "Payload: hardwarePath and certificateId. Refused when a certificate-named attribute on the owning device holds the certificate, a runtime-managed supported service or UMC trusted id names its Id, or any such reference cannot be read (fail closed).",
           "Program, connection-DB and online references to the certificate Id are not scanned, and the device compile does not prove their absence. A deleted key pair is recoverable only through the project checkpoint. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -19170,18 +19199,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) (local.access.qualify.20261028): webServerActive on and off and systemWebPages on the scratch CPU; defaultApplication is only refused, never written.",
           "Payload: webServerActive {expected, value} (the CPU's Boolean WebserverActivate attribute, only where it is writable), systemWebPages {expected, value} and/or defaultApplication {expected, value} with an application name or null for none. expected must equal the current value at prepare (StaleRevision otherwise); any other field is refused.",
           "Page settings are refused unless the CPU owning plcPath has its Boolean WebserverActivate attribute true, now or through webServerActive in the same change; the native probe local.wave-kinds.probe.20261027 observed the attribute false on a scratch CPU 1511-1 PN. Web users, rights and certificates are never changed here.",
           "Apply sets the requested application's IsDefault, then clears any other default. Read-back must equal preview.webServerAfter exactly: the flag and every application's name, type and default flag. V21 exposes no web application create, delete or rename.",
           "Watch-table and display assignments, legacy and UMAC web user rights, certificates and online deployment are not covered; nothing is downloaded.",
           "compile=true is mandatory and compiles all project devices. The change fingerprint adds every web-capable CPU's WebserverActivate value and page settings; interruption reconciliation holds the outcome for review.",
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN refused WebServerNotActivated (refusal only) (local.wave-kinds.probe.20261027); not natively qualified."
+          "Switching web serving on also makes TIA create a web server certificate in the CPU's local store and assign it to WebserverCertificate (probe wp_c236a724); the preview warns about it, and the change's readback covers only the web settings."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027"
+          "local.access.qualify.20261028"
         ]
       },
       "availability": {
@@ -19231,7 +19261,8 @@
           "The affected set is the returned block identities (name, number, type) in the readback. Generated block internals are never edited; V21 exposes no delete for generated blocks, so none is offered.",
           "Refused unless the CPU's Boolean WebserverActivate attribute is true. Nothing is downloaded or deployed; page content, browser behavior and Siemens package compatibility are not validated.",
           "compile=true is mandatory and compiles the PLC software; generated blocks are covered by the standard block fingerprint.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Native qualification runs (28 October, ac_0165b47c and ac_8d290e2d): generation applied and adds a system constant named after the application to the default tag table (now previewed), but after a fresh-Portal reopen the CPU's WebserverApplicationName and WebserverHTMLDirectory read differently than right after apply, so persistence is not established and the kind stays unqualified."
         ]
       },
       "qualification": {
