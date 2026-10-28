@@ -6,8 +6,9 @@ preview is asserted against the request, and a complete state (hardware_inspect 
 values, ports and subnet membership, device_inventory rows, and the program exports of every PLC) must differ from the
 previous one in exactly the intended keys. TIA-coupled side effects are tolerated only where named, and are recorded. A fresh
 Portal then reopens the saved project, which must show the identical state. Phase B applies one more change per kind from
-that state and restores its checkpoint in the applying Portal; the recovered copy must equal the pre-change state. Typed
-refusals must change nothing.
+that state and restores its checkpoint in the applying Portal; the recovered copy must equal the pre-change state. A second
+CPU is added and restored already in phase A, because generated CPU security is restricted to the worker's own new scratch
+(a reopened project refuses it with ScratchIsolationRequired). Typed refusals must change nothing.
 """
 from __future__ import annotations
 
@@ -233,6 +234,9 @@ def refusals(run):
 
 def phase_a(run):
     add_cpu(run, "add CPU HwPeer", "HwPeer")
+    # Generated CPU security is restricted to the worker's own new scratch, so hardware_add's restore runs here, not after the reopen.
+    run.b0 = run.current
+    add_cpu(run, "add CPU HwOther", "HwOther", restore=True)
     network(run)
     plug(run, "HwDi", 2)
     module = run.hw("ScratchStation", "items", "HwDi")
@@ -265,7 +269,6 @@ def reopen(run):
 
 
 def phase_b(run):
-    add_cpu(run, "add CPU HwOther", "HwOther", restore=True)
     attributes(run, "HwDi", {"Comment": "HwAgain"}, restore=True)
     replace(run, "HwDi", MODULE_V2, MODULE, restore=True)
     link(run, "hardware_port_connect", 1, restore=True)

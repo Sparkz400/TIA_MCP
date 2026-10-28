@@ -3200,6 +3200,27 @@
         "library_cleanup ran PreserveDefaultVersionOfUnusedTypes on selected types; DeleteUnusedTypes and folder selections are not exercised. library_harmonize renamed instances; differing library folders and PLC groups are not constructible in V21.",
         "library_upgrade used DMC Open Library V19 PLC (MIT); a type's own status and default rows may change with any change of that type, every other key is exact."
       ]
+    },
+    {
+      "id": "local.software_units.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "584712e3bfc43a70a278a9e3772c18194ad86f3a",
+        "passedScope": "scripts/qualify_software_unit_changes.py on a frozen Debug build of 15b66ed (D:\\wp\\b17), 105/105 steps, in one owned scratch CPU 1511-1 PN V4.1: software_unit_create (with and without namespace preset), software_unit_publication_set (an SCL FB in a unit, Published and Unpublished, read back as <Access> in the native export), software_unit_relation_set (add and remove SoftwareUnit relations) and software_unit_delete (empty units, with their generated default tag table and outgoing relations), each applied with checkpoint, PLC compile and save; every preview asserted; every block, type and tag-table export, member and group path and each scope's name, kind, namespace preset and relations differ in exactly the intended keys; a fresh owned Portal reopen shows the identical state; one change per kind restored from its checkpoint equals the reopened state. Typed refusals (ObjectExists, RelationCycle incl. self, ObjectNotFound, UnsupportedRelationType, ScopeNotFound, DependencyExists, UnitNotEmpty, InvalidRequest, UnsupportedAttribute, PreviewMismatch, StaleRevision) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.software_units.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 without safety units; SafetyBoundary refusals, templates, CreateFrom, copy, move and rename of units are not exercised.",
+        "Publication is set on one SCL FB; PLC data types, other block kinds and consumers that unpublishing would break are not exercised.",
+        "SoftwareUnit relations between standard units only; NonUnitDB and TODB relations are refused by design.",
+        "Engineering only; nothing is downloaded and runtime behavior is not observed."
+      ]
     }
   ],
   "features": [
@@ -9114,12 +9135,14 @@
           "Creates one standard unit in the selected PLC; a case-insensitive name collision with any software or safety unit is refused. Without namespacePreset the native default preset is kept.",
           "Name and namespace preset are read back after creation. Templates, master-copy instantiation (CreateFrom), copy, move and rename are not part of this kind.",
           "Safety units are refused for every software-unit lifecycle kind.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.20261028): units created with and without namespace preset, the case-insensitive collision refused, exact snapshot diff, fresh-Portal reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9166,12 +9189,14 @@
           "Adding refuses an existing relation, a self-relation and any relation that closes a SoftwareUnit relation cycle (conservative; native cycle acceptance is not established). Removing requires exactly one matching relation.",
           "A relation grants access only to published members; consumer effects are reported by the mandatory compile, not modelled.",
           "Safety units are refused for every software-unit lifecycle kind.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.20261028): SoftwareUnit relations added and removed; cycles (including self-relations), duplicates, missing relations, NonUnitDB and missing units refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9218,12 +9243,14 @@
           "Only one exact unit block or PLC data type; OBs, know-how protected, safety, generated and PLC-root objects are refused. The value is read back after writing.",
           "Unpublishing can break consumers in related units; the mandatory compile reports them, the change does not rewrite consumers.",
           "Safety units are refused for every software-unit lifecycle kind.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.20261028): Access set to Published and Unpublished on an SCL FB in a unit and read back as <Access> in the native export; PLC-root targets and other attributes refused; reopen and checkpoint restore. PLC data types and broken consumers are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -9269,12 +9296,14 @@
           "dependencyPolicy=rejectReferenced (default) is mandatory; no cascade. The unit must hold no blocks, types, tags or constants, user groups, external sources or user text lists; empty tag tables and the unit's own outgoing relations are removed with it and listed in the preview.",
           "Refused while any software or safety unit of the PLC has a relation naming this unit. Name-based relation matching cannot see references outside the selected PLC.",
           "Safety units are refused for every software-unit lifecycle kind.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.20261028): empty units deleted with their generated default tag table and outgoing relations; non-empty, referenced and PLC-root targets refused; reopen and checkpoint restore."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
