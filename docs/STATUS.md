@@ -38,18 +38,21 @@ claim to raw report. In short: each verified feature cites curated summaries in
 [`evidence/`](../evidence/README.md); their raw reports are kept in the main checkout's
 ignored `artifacts/evidence/` store and checked by `scripts/audit_evidence_store.py`.
 84 raw reports of 74 evidence IDs were gone before that store existed
-([list](../evidence/raw-reports-lost.json)); 140 of the 359 verified features cite only
-those IDs, so their runs cannot be re-audited.
+([list](../evidence/raw-reports-lost.json)). Overnight re-runs replaced 44 of them with 40 new
+records ([re-runs](verification/evidence-reruns-20261028.md)), so only 3 of the 359 verified
+features (`hmi_inspect`, `hmi_references`, `hmi_capabilities`) still rest solely on a lost
+report; the [TODO](TODO.md#lost-evidence-still-to-re-run) lists the rest.
 
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
-[28 October](history/status-log.md#28-october-2026): catalog evidence retired and the release
-ledger refreshed; STATUS, TODO and the docs index restructured; raw evidence store and encoder
-test leak fix; Test Suite definitions and scope probe; runtime real-server Tasks 1–3; project translations under V21 Update 3; the
-safety F-block import with a STEP 7 Safety license; the composite rebind plan; I-device
-transfer areas and GSD export; watch-table lifecycle and Host-loss reconciliation;
-graphical network edits; connections, GRAPH, VCI mappings and CAx.
+[28 October](history/status-log.md#28-october-2026): lost evidence re-run (21 host-only and 18
+native records); `safety_import_xml` now compiles every device; catalog evidence retired and
+the release ledger refreshed; STATUS, TODO and the docs index restructured; raw evidence store
+and encoder test leak fix; Test Suite definitions and scope probe; runtime real-server Tasks
+1–3; project translations under V21 Update 3; the composite rebind plan; I-device transfer
+areas and GSD export; watch-table lifecycle and Host-loss reconciliation; graphical network
+edits; connections, GRAPH, VCI mappings and CAx.
 
 ## Updating this page
 

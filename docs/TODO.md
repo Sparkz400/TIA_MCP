@@ -72,6 +72,19 @@ Catalog `0.4.68`, 398 open cells, each row under its first owner (the matrix sum
 - **X04 Add-In (4 cells, 1 row):** `addin_companion`, not yet run inside TIA.
 - **L05 deployment (3 cells, 1 row):** `deployment.vm_qualification` needs the VMware guest.
 
+### Lost evidence still to re-run
+
+On 28 October 40 new records re-ran 44 of the 74 records whose raw reports were lost ([re-runs](verification/evidence-reruns-20261028.md)). Still cited and still on lost reports:
+
+- [ ] **HMI bridge (`local.hmi.bridge.20261025`):** the only record that `hmi_inspect`, `hmi_references` and `hmi_capabilities` rest on. Re-run with `HmiSeeder.exe qualify` fixtures per HMI profile, then `scripts/qualify_hmi.py`.
+- [ ] **Library units, unit relations and protected objects** (`local.library_units.20261025`, `local.library_unit_relations.20261027`, `local.library_protected.20261027`): `qualify_library_units.py` hung in its `LibraryUnitSeeder` step on 28 October; diagnose the seeder before re-running all three.
+- [ ] **Library scopes (`local.library_scopes.20261025`):** `qualify_library_scopes.py` reopens its project while TIA still holds the project lock; it failed twice on 28 October under Update 3.
+- [ ] **Typed LAD/FBD (11 records):** `local.typed.crossscope.engineering.20261028`, `.insertion.20261025`, `.native-boundaries.20261025`, `.resolution.20261025`, `.route-profiles.20261025`, `.route-transitive-capture.20261027`, `.route-transitive-effects.20261027`, `.routes.engineering.20261025`, `.runtime.20261024`, `.runtime.reruns.20261024`, `.wave9.engineering.20261028` (`qualify_typed_graphical.py`, `qualify_typed_resolution.py`, `extract_typed_transitive_effects.py`).
+- [ ] **Engineering, explorer and probe records:** `local.engineering.boundaries.20261024`, `local.engineering.interruption.rerun.20261024`, `local.explorer.native-providers.20261027`, `local.explorer.relationship-scope.20261024`, `local.wave-kinds.probe.20261027`.
+- Not re-runnable here: `local.library_upgrades.20261024`, `local.library_vendor.20261025` and `local.library_dmc_prerequisites.20261025` need vendor and DMC inputs that are no longer on this PC.
+
+Every feature citing these records except the three HMI features also cites retained evidence.
+
 ## Repository and hosted CI
 
 - [ ] Review subsequent dependency PRs, especially native NuGet changes, and perform applicable SDK/runtime qualification.

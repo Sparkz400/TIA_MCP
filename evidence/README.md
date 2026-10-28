@@ -20,7 +20,14 @@ cleaning `artifacts/`. `scripts/audit_evidence_store.py` (part of local
 `Test-Offline.ps1` runs) fails when a summarized report is missing from the store
 or changed. `raw-reports-lost.json` lists the reports that were already gone when
 the store was introduced on 28 October 2026; their summaries and hashes stand, but
-the runs can no longer be re-audited.
+the runs can no longer be re-audited. A re-run of such a record is curated as
+`<original stem>.rerun.<date>` and replaces it in the features that cite it
+([re-runs](../docs/verification/evidence-reruns-20261028.md)).
+
+Native runs keep their working artifacts under a short path such as `D:\wp\rr`,
+because TIA refuses scratch and checkpoint paths over 143 characters; curation still
+copies every report into the store. Curate from a checkout whose `HEAD` is the commit
+the frozen binaries were built from, so the summary names that commit.
 
 ```powershell
 python -B scripts/curate_evidence.py --id local.smoke.20261024 `

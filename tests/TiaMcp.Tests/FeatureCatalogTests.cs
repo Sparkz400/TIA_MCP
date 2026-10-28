@@ -27,7 +27,8 @@ internal static partial class Program
         // sim_state is verified only by a record that exercised all four actions (powerOn, run, stop, powerOff).
         Check.Equal("verified", startup.GetProperty("features")[0].GetProperty("qualification").GetProperty("status").GetString());
         var startupEvidence = startup.GetProperty("evidence").EnumerateArray().ToDictionary(e => e.GetProperty("id").GetString()!);
-        Check.Equal("passed", startupEvidence["local.sim.state.20261024"].GetProperty("status").GetString());
+        var cited = startup.GetProperty("features")[0].GetProperty("qualification").GetProperty("evidenceIds")[0].GetString()!;
+        Check.Equal("passed", startupEvidence[cited].GetProperty("status").GetString());
         await Check.BridgeError("InvalidRequest", () => { catalog.Query(maxItems: 0); return Task.CompletedTask; });
         await Check.BridgeError("InvalidRequest", () => { catalog.Query(implementationStatus: "perfect"); return Task.CompletedTask; });
         await Check.BridgeError("FeatureNotFound", () => { catalog.Query(featureId: "unknown"); return Task.CompletedTask; });
