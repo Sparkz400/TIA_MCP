@@ -143,6 +143,19 @@ namespace TiaMcp.Openness.V21
             if (assigned != null) readback["assignment"] = assigned;
         }
 
+        // Compile can re-issue a created device certificate (probe wp_2ec78aa9: subject, serial, validity and alternative
+        // names changed after compile), so the saved certificate is checked against the request again.
+        private void VerifyCreatedCertificateAfterSave(EngineeringChange change, Project project)
+        {
+            var created = change.Readbacks.OfType<JObject>().LastOrDefault(r => (string)r["role"] == "certificate-readback")?["certificate"];
+            uint id = created?.Value<uint?>("certificateId") ?? throw new BridgeException("MutationVerificationFailed", "The created certificate's identity was not recorded.");
+            var store = CertificateStore(ChangeHardware(project, change.Payload).Item);
+            var certificate = store.Certificates.FirstOrDefault(c => c.Id == id) ?? throw new BridgeException("MutationVerificationFailed", "The created certificate is gone after compile and save.");
+            var identity = PublicIdentity(ExportPublicDer(certificate, change.Directory)); identity["certificateId"] = id; identity["privateKeyPresent"] = certificate.HasPrivateKey;
+            change.Readbacks.Add(new JObject { ["role"] = "certificate-readback-after-save", ["certificate"] = identity });
+            RequireCreatedCertificate(CertificateCreateRequest(change.Payload), identity, certificate);
+        }
+
         private static void RequireCreatedCertificate(JObject request, JObject identity, Certificate created)
         {
             var names = identity["subjectAlternativeNames"] as JArray;

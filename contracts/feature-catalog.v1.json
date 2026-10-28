@@ -18922,7 +18922,8 @@
           "Payload: hardwarePath (CPU), usage (Tls, OpcUaClient, OpcUaClientServer, OpcUaServer or WebServer), subjectCommonName (max 64), subjectAlternativeNames [{type: Dns|Email|Uri|IP, value}] that replace the template defaults, validFromUtc and validUntilUtc. The signature algorithm stays the template default.",
           "V21 exposes no issuer or CA selection: TIA decides between self-signed and CA-signed; the readback reports the actual issuer. Refused while EnableGlobalCertificatesStore is true; V21 exposes neither the project-wide store nor a store migration.",
           "Readback requires a public export of the new certificate with exactly the requested subject, UTC validity and alternative names. How TIA interprets template times and whether it adds names is unverified; a mismatch fails after the write and needs checkpoint recovery.",
-          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust."
+          "Previews, readbacks and journals carry public identity only (SHA-256 of the exported DER, subject, issuer, validity, alternative names, store); private-key presence is a flag and private keys are never read, exported or accepted. Checkpoint restore recovers the project, not proven private-key recoverability, and changes no device or client trust.",
+          "Apply checks the created certificate again after compile and save, because compile can re-issue it (probe wp_2ec78aa9: subject, serial, validity and alternative names changed); a re-issued certificate fails with MutationVerificationFailed and needs checkpoint recovery."
         ]
       },
       "qualification": {
@@ -19175,7 +19176,8 @@
           "Apply sets the requested application's IsDefault, then clears any other default. Read-back must equal preview.webServerAfter exactly: the flag and every application's name, type and default flag. V21 exposes no web application create, delete or rename.",
           "Watch-table and display assignments, legacy and UMAC web user rights, certificates and online deployment are not covered; nothing is downloaded.",
           "compile=true is mandatory and compiles all project devices. The change fingerprint adds every web-capable CPU's WebserverActivate value and page settings; interruption reconciliation holds the outcome for review.",
-          "One exploratory native probe on an owned scratch CPU 1511-1 PN refused WebServerNotActivated (refusal only) (local.wave-kinds.probe.20261027); not natively qualified."
+          "One exploratory native probe on an owned scratch CPU 1511-1 PN refused WebServerNotActivated (refusal only) (local.wave-kinds.probe.20261027); not natively qualified.",
+          "Switching web serving on also makes TIA create a web server certificate in the CPU's local store and assign it to WebserverCertificate (probe wp_c236a724); the preview warns about it, and the change's readback covers only the web settings."
         ]
       },
       "qualification": {
