@@ -46,12 +46,12 @@ internal static partial class Program
             root => root["features"]![1]!["featureId"] = root["features"]![0]!["featureId"]!.GetValue<string>(),
             root => root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("invented-proof"),
             root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray(),
-            root => Verified(root)["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.sim.startup.v02"),
-            root => { root["features"]![0]!["qualification"]!["status"] = "failed";
-                root["features"]![0]!["qualification"]!["evidenceIds"] = new JsonArray("local.offline.v02"); },
+            root => Cited(Verified(root))["status"] = "failed",
+            // A failed qualification must cite a failed record; the bundled first feature cites a passed one.
+            root => root["features"]![0]!["qualification"]!["status"] = "failed",
             root => Cited(Verified(root))["status"] = "blocked",
             root => Cited(Verified(root))["status"] = "skipped",
-            root => root["evidence"]!.AsArray().Single(e => e!["id"]!.GetValue<string>() == "local.offline.v02")!["status"] = "perfect",
+            root => Cited(root)["status"] = "perfect",
             root => root["features"]![0]!["implementation"]!["status"] = "not_implemented",
             root => root["features"]![0]!["acceptanceCriteria"] = new JsonArray("unknown-criterion")
         })
