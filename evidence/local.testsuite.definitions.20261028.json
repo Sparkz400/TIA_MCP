@@ -1,0 +1,124 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.testsuite.definitions.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T16:13:44+00:00",
+  "source": {
+    "commit": "8398c50cd0f9c1dac53e6841a2f2c012fe05ce0e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_testsuite_definitions.py on a frozen Debug build of 8398c50 (D:\\wp\\ts02), 57/57 steps, in an owned scratch CPU 1511-1 PN V4.1 of TIA Portal V21 Update 3 with Test Suite Advanced V21: testsuite_application_inventory and testsuite_system_inventory observe the service and empty, untruncated groups and refuse an unknown projectName; testsuite_application_import (the packaged native .tat and two renamed copies) and testsuite_system_import (the packaged native .tst and a renamed copy) apply with asserted previews, checkpoint, PLC compile and save, and the complete state (every program export and member plus both inventories with each case's fresh native export hash) differs in exactly the new case and group count; maxItems=1 over two cases reports truncation; a fresh owned Portal reopens the identical state; one import per kind restores from its checkpoint, and an import whose reviewed name misses the file fails readback (MutationVerificationFailed) into recovery_required and restores; typed refusals (ProjectNotFound, InvalidRequest, PreviewMismatch, ObjectExists) change nothing.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN V4.1 and the packaged native .tat/.tst exports (one step each); application test sets (.ttst) are not imported because no native set export exists to start from.",
+    "Definitions only: no SetScope, no Test Suite execution and no simulator; the system case's OPC UA endpoint stays text.",
+    "The import file is not parsed: names are reviewed by the caller and checked by readback after the native import. A fresh export equals the imported file except two trailing empty lines TIA appends."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1c66e4a4e6ff2d698b4e0353bf92d9c63e1939e08a7b2864114568a6508cfb02"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "26df8c80b76201017554e9e5f9a1f1a6d306e1dba140fd82ec38ab8653fb15ef"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "78f1a328d82c503a1780a067e7de87a42ea946d4a141ce626ed34db99145a23f",
+      "bytes": 306234,
+      "completed": true,
+      "steps": [
+        "start owned TIA Test Suite definitions",
+        "create owned scratch Test Suite definitions",
+        "inventories: service present, empty groups, unknown project refused",
+        "snapshot baseline",
+        "refuse testsuite_application_import: a relative path",
+        "refuse testsuite_application_import: a system .tst",
+        "refuse testsuite_application_import: set names with a .tat",
+        "refuse testsuite_application_import: no expected case names",
+        "prepare application import (refused with a wrong previewHash)",
+        "refuse apply testsuite_application_import: a wrong previewHash",
+        "prepare import the packaged application case",
+        "apply testsuite_application_import",
+        "change_status import the packaged application case",
+        "snapshot import the packaged application case",
+        "verify import the packaged application case",
+        "refuse testsuite_application_import: an existing case",
+        "prepare import a second application case",
+        "apply testsuite_application_import",
+        "change_status import a second application case",
+        "snapshot import a second application case",
+        "verify import a second application case",
+        "application inventory truncates at maxItems=1",
+        "refuse testsuite_system_import: a relative path",
+        "refuse testsuite_system_import: an application .tat",
+        "refuse testsuite_system_import: no expected case names",
+        "prepare import the packaged system case",
+        "apply testsuite_system_import",
+        "change_status import the packaged system case",
+        "snapshot import the packaged system case",
+        "verify import the packaged system case",
+        "refuse testsuite_system_import: an existing case",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "snapshot reopened",
+        "reopened state equals every verified change",
+        "prepare import a third application case",
+        "apply testsuite_application_import",
+        "change_status import a third application case",
+        "snapshot import a third application case",
+        "verify import a third application case",
+        "restore import a third application case",
+        "snapshot restored import a third application case",
+        "restored import a third application case equals the pre-change state",
+        "prepare import a second system case",
+        "apply testsuite_system_import",
+        "change_status import a second system case",
+        "snapshot import a second system case",
+        "verify import a second system case",
+        "restore import a second system case",
+        "snapshot restored import a second system case",
+        "restored import a second system case equals the pre-change state",
+        "prepare application import whose reviewed name misses the file",
+        "readback mismatch fails into recovery_required",
+        "restore readback mismatch",
+        "snapshot restored readback mismatch",
+        "restored readback mismatch equals the pre-change state"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "testsuite_application_inventory",
+        "testsuite_system_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "testsuite_application_inventory",
+        "testsuite_system_inventory"
+      ]
+    }
+  ]
+}

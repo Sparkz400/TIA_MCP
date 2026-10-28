@@ -47,7 +47,8 @@ class Harness:
     def run(self, body):
         try:
             self.client = Client(self.args.host.resolve(), self.args.timeout, ["--worker", str(self.args.worker.resolve()),
-                                 "--artifacts", str(self.directory), "--sim-worker", str(getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe")])
+                                 "--artifacts", str(self.directory), "--sim-worker", str(getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe"),
+                                 *getattr(self.args, "host_args", ())])
             self.client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {},
                                 "clientInfo": {"name": "native-library-qualification", "version": "1"}})
             self.client.notify("notifications/initialized")
