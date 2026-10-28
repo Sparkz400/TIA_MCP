@@ -2602,6 +2602,25 @@
         "Web page settings were only probed for their refusal; no change kind activates web serving.",
         "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
       ]
+    },
+    {
+      "id": "local.plc_object_mutations.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "adad6b0b0683b42051db4dbe1ef24f1ccbab321e",
+        "passedScope": "scripts/qualify_plc_object_mutations.py on build 9ff587c (frozen D:\\wp\\b6) in one owned scratch CPU 1511-1 PN (V21), 369/369 steps: tag_set, tag_create, tag_delete, constant_set, constant_create, constant_delete, tag_table_import_xml, type_source_upsert, type_rename, type_delete, plc_type_import_xml, source_upsert (SCL), block_import_xml, block_rename, block_delete, block_number_set, block_attributes_set (HeaderAuthor/HeaderFamily on an FB), group_create, group_rename, group_delete, plc_compile and instance_db_create each applied with exact preview assertions, checkpoint, compile and save; a complete export of every block, type and table plus every tag, constant and group differed from the previous one in exactly the intended keys; unchanged type and DB reimports showed no difference; typed prepare-time refusals per kind left the inventory unchanged and PreviewMismatch, StaleRevision and compile=false were refused at apply; a fresh owned Portal reopened the saved project with the identical verified state; from the reopened state one more change per kind was applied and restored by change_restore into a new directory equal to the pre-change state; a deliberately failing tag address (%M20000.0) ended CompileFailed/recovery_required with its checkpoint retained and change_restore refused FingerprintUnavailable on the inconsistent block."
+      },
+      "artifacts": [
+        "evidence/local.plc_object_mutations.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects.",
+        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes, HeaderName and HeaderVersion are not written. Renamed and deleted groups were empty or held only a subgroup.",
+        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
+        "Engineering only; runtime behavior is not observed."
+      ]
     }
   ],
   "features": [
@@ -5310,6 +5329,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Qualified route: SCL. The STL/AWL and SIMATIC_SD routes are not covered by that run.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "SIMATIC_SD imports independently authored .s7dcl graphical reference documents through native ImportFromDocuments, mandatory compilation and checkpointing; only new exact declared names are permitted and existing blocks cannot be replaced by this route.",
@@ -5317,12 +5338,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.conformance.v03",
-          "local.units.v03",
-          "local.engineering.interruption-matrix.20261027"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5364,17 +5382,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.conformance.v03",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5416,17 +5433,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.conformance.v03",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5520,16 +5536,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "One exact native group and namespace per change; cross-scope relocation and implicit namespace changes are rejected.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5571,15 +5587,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hardware.v02",
-          "local.layers.units-expanded.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5621,16 +5637,15 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.units.v03",
-          "local.unit-recovery.v03"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -5672,14 +5687,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "One standard, unprotected, non-generated block; sets AutoNumber=false then Number and reads both back. Native attribute infos must report both as readable and writable; AutoNumber is read-only for protected blocks and several OBs.",
-          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Numbers are limited to 1-65535; a number already used by another block of the same kind (FB, FC, OB or any DB) anywhere in the PLC is rejected at prepare and apply. Native OB number/event-class rules remain authoritative."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5722,14 +5739,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Qualified attributes: HeaderAuthor and HeaderFamily on an FB; HeaderName, HeaderVersion and the OB attributes are not written by that run.",
           "One standard, unprotected, non-generated block; allowlist HeaderAuthor, HeaderFamily, HeaderName, HeaderVersion, plus PriorityNumber, CyclicTime, PhaseOffset and ProcessImagePartNumber for OBs only. Each attribute must also be declared readable and writable by the native attribute infos; ProcessImagePartNumber is documented read-only on export and is rejected unless the native target reports write access.",
-          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Scalar-write guards require unique access metadata, known scalar types, complete batch preflight and exact typed readback. Earlier setters can already have taken effect when a later one fails; recovery uses the checkpoint."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5772,16 +5792,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Qualified for an instance DB of a user FB; R_TRIG/F_TRIG instance DBs are not covered by that run.",
           "Payload name, instanceOfName and optional number (1-65535, else auto-numbered) in the standard PLC program scope and an exact user block group; software-unit, namespace, safety and generated targets refuse. CreateInstanceDB has no namespace parameter.",
           "instanceOfName must name exactly one unprotected standard FB of that scope, or the IEC edge system FBs R_TRIG/F_TRIG (TIA's know-how protected System blocks copy, present or not). UDT/system-data-type DBs such as IEC_TIMER/IEC_COUNTER and timer/counter FB names are not accepted; they keep the SCL source route.",
           "A block name used anywhere in the PLC or a number used by another DB refuses at prepare; the fingerprint pins both until apply. Apply requires compile=true and reads back name, number and InstanceOfName after creation and again after compile and save.",
-          "Whether CreateInstanceDB supplies R_TRIG/F_TRIG in a PLC that has not used them yet is not natively verified.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Whether CreateInstanceDB supplies R_TRIG/F_TRIG in a PLC that has not used them yet is not natively verified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5824,17 +5847,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact standard unprotected block only. dependencyPolicy defaults to rejectReferenced; other deletion policies are not accepted.",
           "The conservative exported-XML dependency scan runs at prepare and immediately before deletion. It excludes only the exact selected declaration and rejects references or incomplete evidence; no cascade deletion or automatic reference rewriting.",
-          "Historical deletion evidence qualifies its recorded fixtures; the new dependency guard requires separate native qualification.",
+          "The dependency guard refused deleting a referenced FB natively (DependencyExists) in local.plc_object_mutations.20261028.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.offline.v02",
-          "local.units.v03"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7893,15 +7916,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Same scope and namespace, explicit collision checks, native dependency validation and mandatory compilation.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7945,15 +7969,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory. Conservative exported-XML scans reject references and incomplete evidence.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -7997,6 +8022,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact table/member selector and explicit Name, DataTypeName or LogicalAddress allowlist; native address/type validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -8005,9 +8031,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8051,6 +8077,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact table/member selector and explicit Name, DataTypeName or Value allowlist. System constants are excluded; native validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -8059,9 +8086,9 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8105,15 +8132,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. Safety/system members remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8157,15 +8185,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "dependencyPolicy=rejectReferenced is mandatory; conservative scan rejects references and incomplete evidence. System constants remain excluded.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8209,15 +8238,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
           "Safety units are rejected; a created tag that native TIA reports as IsSafety fails verification and requires checkpoint recovery.",
-          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0).",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8260,14 +8291,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and value; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
-          "Safety units are rejected. Readback is exact: dataTypeName and value must use the native normalized spelling.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Safety units are rejected. Readback is exact: dataTypeName and value must use the native normalized spelling."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -8310,15 +8343,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "groupKind blocks/types/tags and exact parent group path; generated/root and safety groups are excluded. Native validation and compilation are mandatory.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8362,15 +8396,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Renamed groups were empty or held only a subgroup.",
           "groupKind blocks/types/tags, exact group path and collision checks; generated/root and safety groups are excluded. Moves remain unsupported.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -8414,15 +8450,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
+          "Deleted groups were empty or held only a subgroup.",
           "Only empty user groups; generated/root and safety groups are excluded. Moves and recursive deletion are unsupported.",
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.layers.objects.20261008"
+          "local.plc_object_mutations.20261028"
         ]
       },
       "availability": {
@@ -19559,14 +19597,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Explicit PLC software only, empty payload and compile=true. Saves the current project and creates a checkpoint before compiler dispatch; compilation may change generated state.",
-          "Linked synthetic API tests exercise admission, diagnostics and single dispatch. Full worker/SDK build, native baseline compilation, safety signatures, persistence and recovery remain unqualified.",
+          "Native compile dispatch, persistence and checkpoint recovery are qualified on the scratch profile; safety signatures are not.",
           "Existing engineering fingerprint coverage remains incomplete; this route does not establish whole-project preservation or PLC runtime correctness."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plc_object_mutations.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

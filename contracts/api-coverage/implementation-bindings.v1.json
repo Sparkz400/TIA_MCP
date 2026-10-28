@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "92737e3718cf3d06e7d27cb2e930329a7197d2e35ebe48cdf7cfab372d521f9c",
-      "bytes": 1120023
+      "sha256": "05459a8c1de22881452384b34545c06a0122b68f58e6cadd785a966135a8a8bf",
+      "bytes": 1127170
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -91261,7 +91261,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91304,18 +91312,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -91358,25 +91358,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.conformance.v03",
-          "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19",
-          "artifacts": [
-            "artifacts/conformance/live-first/index.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -91416,7 +91401,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -91496,25 +91489,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
-          ]
-        },
-        {
-          "id": "local.unit-recovery.v03",
-          "profileSha256": "89bab7c2d7934f55c52787d0c2033d9be3e6b397e13e3a1622b177c5e9947363",
-          "artifacts": [
-            "artifacts/object-model-unit-recovery.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -92048,7 +92026,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -92087,10 +92073,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -92132,10 +92118,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -92783,10 +92769,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -92828,10 +92814,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -92873,10 +92859,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -93471,7 +93457,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -95492,7 +95486,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -95609,18 +95611,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hardware.v02",
-          "profileSha256": "8b66af0ffde20117045ebe7931266c6f0867a912f23f4208b835cf4a762b70c8",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/hardware-to-smoke-first.json",
-            "artifacts/hardware-to-smoke-final.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96032,32 +96026,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.offline.v02",
-          "profileSha256": "6000199f1a80c5a77c6b9e6b3f4724f2af752fb995ac238c2747d5c6d7c821df",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/milestones-sixth.json",
-            "artifacts/smoke-integration.json"
-          ]
-        },
-        {
-          "id": "local.conformance.v03",
-          "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19",
-          "artifacts": [
-            "artifacts/conformance/live-first/index.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
-          ]
-        },
-        {
-          "id": "local.engineering.interruption-matrix.20261027",
-          "profileSha256": "0e4dc4703b2d640d8e3a1ae0d37afc1c1ea0d13481e01ec8a28fb38d65bef4cc",
-          "artifacts": [
-            "evidence/local.engineering.interruption-matrix.20261027.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96097,7 +96069,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
+          "artifacts": [
+            "evidence/local.plc_object_mutations.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -96136,10 +96116,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96181,10 +96161,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96230,19 +96210,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hardware.v02",
-          "profileSha256": "8b66af0ffde20117045ebe7931266c6f0867a912f23f4208b835cf4a762b70c8",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/hardware-to-smoke-first.json",
-            "artifacts/hardware-to-smoke-final.json"
-          ]
-        },
-        {
-          "id": "local.layers.units-expanded.20261008",
-          "profileSha256": "c875ccbae6d69db70bb5b6479b0c22e82d18aee4e99d388e9726e1f0eb3c2233",
-          "artifacts": [
-            "artifacts/object-model-expanded.json",
-            "artifacts/object-model-expanded-tag-name-collision.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96657,10 +96628,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96702,10 +96673,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.layers.objects.20261008",
-          "profileSha256": "dad93d3336d677934916019a52b517579216351b1418dc1b36d00112cf48776d",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/engineering-layers-release.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -96748,25 +96719,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.hardware.v02",
-          "profileSha256": "8b66af0ffde20117045ebe7931266c6f0867a912f23f4208b835cf4a762b70c8",
+          "id": "local.plc_object_mutations.20261028",
+          "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12",
           "artifacts": [
-            "artifacts/hardware-to-smoke-first.json",
-            "artifacts/hardware-to-smoke-final.json"
-          ]
-        },
-        {
-          "id": "local.conformance.v03",
-          "profileSha256": "bb03a6b120a58a76a82f3cc1489b5931ed3230afd521b22796977d4a2e1d7a19",
-          "artifacts": [
-            "artifacts/conformance/live-first/index.json"
-          ]
-        },
-        {
-          "id": "local.units.v03",
-          "profileSha256": "94bb91ba2aa80779bc8bfc272dc28de864784393390ff59d17578767a2301672",
-          "artifacts": [
-            "artifacts/object-model-live-fourth.json"
+            "evidence/local.plc_object_mutations.20261028.json"
           ]
         }
       ],
@@ -116137,6 +116093,11 @@
       "sha256": "1cfae83a61d3ee9524b60d5e1fc43c213f8ac79c22181b7055827467ce2dd2ef"
     },
     {
+      "path": "evidence/local.plc_object_mutations.20261028.json",
+      "state": "observed",
+      "sha256": "5588a813ff4194511ffc818989050124dc29c8d4a9364e01d77e556f62b8ce88"
+    },
+    {
       "path": "evidence/local.reliability.20261024.json",
       "state": "observed",
       "sha256": "fcec66b5d014bb2356bed9a04e8de4bd49d1a1e28940f1714994eac289932706"
@@ -116661,6 +116622,10 @@
     {
       "id": "local.plc_component.runtime.20261024",
       "profileSha256": "0c407f78a48be9a949ddf594c27603606eaa4584db929314c81c5773a0e6aabb"
+    },
+    {
+      "id": "local.plc_object_mutations.20261028",
+      "profileSha256": "2b96a9182a3eb5636214640bb1b28ecd4f68ec2726149c3237fd0a0df8862f12"
     },
     {
       "id": "local.reliability.20261024",
