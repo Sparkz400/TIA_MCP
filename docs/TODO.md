@@ -54,9 +54,9 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 
 ### Open matrix rows by owner
 
-Catalog `0.4.66`, 420 open cells, each row under its first owner (the matrix summary counts a shared row once per owner); deferred rows are not listed. The blocker named is the one the catalog records.
+Catalog `0.4.68`, 398 open cells, each row under its first owner (the matrix summary counts a shared row once per owner); deferred rows are not listed. The blocker named is the one the catalog records.
 
-- **D06 Test Suite (119 cells, 20 rows):** the eleven `testsuite_style_*` job and plan tools, the five `qualification_testsuite_*` tools, `testsuite_application_inventory`/`_plan_prepare`, `testsuite_system_inventory`/`_plan_prepare` and the `testsuite_application_import`/`testsuite_system_import` kinds. Native execution and recovery stay behind the disabled profile gate.
+- **D06 Test Suite (97 cells, 15 rows):** the nine `testsuite_style_*` job and plan tools, `qualification_testsuite_prepare`/`_execute`/`_recover`/`_reconcile`, and `testsuite_application_plan_prepare`/`testsuite_system_plan_prepare`. V21 Update 3 has no rule-set scope read route, so TS-Q01 needs an operator's scope-tree screenshot and license check at the desktop, and application/system execution has no qualification mode ([record](verification/testsuite-native-20261028.md)).
 - **C03 runtime OPC UA (68 cells, 17 rows):** `runtime_ua_*` client identity, credential binding, connect, browse, read, status, disconnect, capture and subscription tools. Needs the real-server qualification ([plan](plans/runtime-real-server-plan.md)).
 - **D16 physical runtime (41 cells, 11 rows):** `runtime_capture_*`, `runtime_web_write`, `runtime_web_operating_mode`, `runtime_ua_write`, `runtime_plcsim_bind` and `runtime.physical_plc`. Same real-server plan; physical targets stay a separate prerequisite.
 - **D04 OPC UA engineering (40 cells, 7 rows):** the `opcua_server_interface_*`, `opcua_reference_namespace_*` and `opcua_role_mapping_set` kinds and `opcua_engineering_export`. A reference-namespace import crashed TIA.

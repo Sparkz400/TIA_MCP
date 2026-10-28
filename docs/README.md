@@ -38,9 +38,10 @@ A qualification claim passes through four places; the first three are in git.
    [`evidence/raw-reports-lost.json`](../evidence/raw-reports-lost.json) lists the 84
    reports that were gone before the store existed.
 
-Catalog evidence records from before 24 October cite `artifacts/` paths directly; most
-of those files are no longer on the qualification PC, and no verified feature cites
-them. Prose records per run are under [verification](#verification).
+Catalog evidence records from before 24 October cite `artifacts/` paths directly, and no
+verified feature cites them. The 38 that no feature cited and whose files were gone were
+moved verbatim to [`history/catalog-evidence-retired-20261028.json`](history/catalog-evidence-retired-20261028.json)
+in catalog 0.4.68. Prose records per run are under [verification](#verification).
 
 ## Guides
 

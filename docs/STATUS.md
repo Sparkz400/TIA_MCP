@@ -5,10 +5,10 @@ simulators you own (see the [README](../README.md)). On `main`, 28 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.66`: 450 features, 354 verified, 96 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 121 shipped, 233 limited, 80 unqualified, 6 unavailable on V21, 10 deferred |
-| Matrix cells | 1,617 bound, **420 open**, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); its per-obligation fields were last refreshed on 27 October against catalog `0.4.30` |
+| Feature catalog | `0.4.68`: 450 features, 359 verified, 91 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 122 shipped, 237 limited, 75 unqualified, 6 unavailable on V21, 10 deferred |
+| Matrix cells | 1,639 bound, **398 open**, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -19,7 +19,8 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 names every row with an open cell.
 
 - **External prerequisites:** real OPC UA and web servers of an owned PLCSIM instance in
-  TCP/IP mode (runtime UA, web and capture rows), Test Suite execution, the VMware guest,
+  TCP/IP mode (runtime UA, web and capture rows), an operator at the desktop for Test Suite
+  scope checks (TS-Q01), the VMware guest,
   a V20 library input, RT Professional and other HMI targets, and a physical PLC.
 - **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
   online compare, upload and DB-snapshot routes need a PLC login they never perform, an
@@ -37,14 +38,15 @@ claim to raw report. In short: each verified feature cites curated summaries in
 [`evidence/`](../evidence/README.md); their raw reports are kept in the main checkout's
 ignored `artifacts/evidence/` store and checked by `scripts/audit_evidence_store.py`.
 84 raw reports of 74 evidence IDs were gone before that store existed
-([list](../evidence/raw-reports-lost.json)); 140 of the 354 verified features cite only
+([list](../evidence/raw-reports-lost.json)); 140 of the 359 verified features cite only
 those IDs, so their runs cannot be re-audited.
 
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
-[28 October](history/status-log.md#28-october-2026): raw evidence store and encoder test
-leak fix; runtime real-server Tasks 1–3; project translations under V21 Update 3; the
+[28 October](history/status-log.md#28-october-2026): catalog evidence retired and the release
+ledger refreshed; STATUS, TODO and the docs index restructured; raw evidence store and encoder
+test leak fix; Test Suite definitions and scope probe; runtime real-server Tasks 1–3; project translations under V21 Update 3; the
 safety F-block import with a STEP 7 Safety license; the composite rebind plan; I-device
 transfer areas and GSD export; watch-table lifecycle and Host-loss reconciliation;
 graphical network edits; connections, GRAPH, VCI mappings and CAx.

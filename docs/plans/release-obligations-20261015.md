@@ -6,6 +6,8 @@
 
 **27 October 2026 status refresh:** Each obligation's `implementation`, `qualification` and `currentResult` in the JSON, its plan status, and the current-state columns below now reflect current code, catalog 0.4.30, the [release matrix](release-matrix.v1.json) and retained verification records; the JSON's `statusRefresh` records the sources. Remaining work, next actions, dependencies, blockers, counts and the historical sections keep the 15 October audit, and the earlier status values are in Git history. Release acceptance is unchanged: no obligation or feature is accepted.
 
+**28 October 2026 status refresh:** Against catalog 0.4.68, each obligation's `currentResult` in the JSON now starts with its release-matrix counts, and the 30 obligations changed since 27 October add a dated note with rewritten `implementation`/`qualification` labels. The `current` text of eight blockers (B01–B05, B07–B09) and the blocker table below were refreshed too. The workstream table under [Current results](#current-results) still shows 27 October; [open matrix rows by owner](../TODO.md#open-matrix-rows-by-owner) lists what is open now, and the 27 October values are in commit `53d4be7`. Release acceptance is unchanged.
+
 Audit date: **15 October 2026, Europe/Berlin**. **1.0 is not ready. Every feasible capability is a release obligation.** This includes the existing plans, all 18 expansion prompts, the additional API roadmap families, and feasible capabilities discovered while closing the API inventory. Missing products, licenses, fixtures, hardware, supported hosts or qualification are blockers, not reasons to remove an obligation. Unresolved feasibility stays open; an impossible route needs an evidence-backed disposition and consideration of supported alternatives.
 
 This scope decision supersedes older wording about optional expansions, selected release packages, reduced PLC-only releases and deferring feasible work beyond 1.0. Delivery can proceed in useful increments, but those increments do not authorize a 1.0 release. Implementing safety tooling is distinct from certifying an application's functional safety. Release scope also does not authorize arbitrary physical operations, external publishing, installations or resuming the recorded native UI pause.
@@ -14,7 +16,9 @@ Use the [machine-readable ledger](release-obligations-20261015.json) for all **4
 
 ## Current results
 
-On 27 October the source contains **265 registered MCP tools, 57 prepared mutation kinds and 340 catalog features** (catalog 0.4.30). The catalog labels 134 implemented, 196 partial and 10 not implemented; its qualification labels are 121 verified and 219 unverified. The release matrix binds 441 of its 1,578 cells to evidence; 1,107 are open and 30 deferred. These are catalog classifications, **not a release completion percentage**. A verified fixture does not close an entire feature family or qualify a later combined binary, and Host-only verification does not qualify a native route.
+On 28 October the source contains **310 registered MCP tools, 117 prepared mutation kinds and 450 catalog features** (catalog 0.4.68); 359 features are verified and 91 unverified. The release matrix binds 1,639 cells to evidence; 398 are open and 30 deferred ([current status](../STATUS.md)).
+
+On 27 October the source contained **265 registered MCP tools, 57 prepared mutation kinds and 340 catalog features** (catalog 0.4.30). The catalog labels 134 implemented, 196 partial and 10 not implemented; its qualification labels are 121 verified and 219 unverified. The release matrix binds 441 of its 1,578 cells to evidence; 1,107 are open and 30 deferred. These are catalog classifications, **not a release completion percentage**. A verified fixture does not close an entire feature family or qualify a later combined binary, and Host-only verification does not qualify a native route.
 
 On 15 October the source had 87 tools, 55 mutation kinds and 160 features. That audit captured 1,031 source, contract, fixture, test, UI, build and documentation files. All 632 files in the previous roadmap source inventory still matched before these documentation edits. All referenced catalog evidence paths exist. Its `python -B scripts/test_contracts.py` check passed for all of them; on 27 October the same check passes for 265 tools, 57 mutation kinds and 340 features. No native run, build, simulator initialization, PLC connection or deployment was performed by this audit.
 
@@ -178,15 +182,15 @@ Do not schedule new shared/native work around historical session names or PIDs. 
 
 | ID | Blocker | Resolving action |
 | --- | --- | --- |
-| **B01** | Current native ownership; component07 startup/cleanup failure. | Obtain present coordinator handoff and reconcile exact terminal outcome before a new native packet. |
-| **B02** | Runtime isolation, post-RUN preservation and requested-stop. | Failure-driven bounded experiment, independent preservation/cleanup, then frozen corpus in exclusive window. |
-| **B03** | Native UI pause; clean HMI and bridge recovery prerequisites. | Supplied configured positive templates/public routes; UI work only after explicit resume; qualify bridge retrieval and native visuals separately. |
-| **B04** | Optional products/licenses/schemas/device profiles. | Exact per-operation acquisition/installation/license/fixture list; test actual target eligibility. File presence is insufficient. |
-| **B05** | Physical CPU/drive bench and program/security identity. | Supply exact nonproduction target, cert/credential and permitted operations; read-first, later action-specific tests. |
+| **B01** | Native ownership: VM ticket `090f8915…` unresolved, native05 recovery not auditable here, component07 failed. | Obtain present coordinator handoff and reconcile exact terminal outcome before a new native packet. |
+| **B02** | Runtime preservation: card-staging cause, project/opaque-storage preservation and trusted release open; VM zero-address and `.info` open. Requested stop, lock release and the frozen corpus passed (24 October). | Failure-driven bounded experiment, independent preservation/cleanup, then frozen corpus in exclusive window. |
+| **B03** | HMI: Unified preservation gate closed, no Unified text-list import route, RT Professional and other families lack targets. Bridge retrieval passed for five profiles (25 October). | Supplied configured positive templates/public routes; UI work only after explicit resume; qualify bridge retrieval and native visuals separately. |
+| **B04** | Optional products: SiVArc, RT Professional, Test Suite execution, licensed AX trace and drive device compile absent or unobserved. STEP 7 Safety is licensed (28 October). | Exact per-operation acquisition/installation/license/fixture list; test actual target eligibility. File presence is insufficient. |
+| **B05** | Physical CPU/drive bench and program/security identity not supplied; runtime qualification uses owned TCP/IP PLCSIM instances. | Supply exact nonproduction target, cert/credential and permitted operations; read-first, later action-specific tests. |
 | **B06** | Native trace public route and licensed AX package. | TD-AX-01 plus trigger/full-readback/TIA-object interoperability decision, or another documented supported route. |
-| **B07** | Real desktop MCP Apps acceptance. | Supported host resource/selection/tool/fallback fixture; browser mocks alone do not close it. |
-| **B08** | Vendor, older-library and scale assets. | Permitted independent PLC/PLC-HMI packages and exact upgrade/large-workload manifests. |
-| **B09** | Hosted CI and final release provenance. | Intended repository/ref/runners; final combined acceptance, immutable bundle and installation/rollback receipt. |
+| **B07** | Real desktop MCP Apps acceptance; VS Code retained-snapshot rendering passed (25 October). | Supported host resource/selection/tool/fallback fixture; browser mocks alone do not close it. |
+| **B08** | No V20 library input; real vendor byte volumes open because the vendor ZIPs are no longer on this PC. | Permitted independent PLC/PLC-HMI packages and exact upgrade/large-workload manifests. |
+| **B09** | Final release provenance: hosted CI exists; no combined accepted bundle, installation or rollback receipt. | Intended repository/ref/runners; final combined acceptance, immutable bundle and installation/rollback receipt. |
 | **B10** | Project Server/Teamcenter/UMC services. | Supplied isolated endpoint/version/license/account/data, then service-specific qualification. |
 | **B11** | Additional TIA/SDK feasibility. | Public version/SDK/operation inventory with supported-route evidence and target prerequisites. |
 
