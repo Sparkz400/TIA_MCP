@@ -43,6 +43,8 @@ LIMITATIONS = [
     "to_connect and to_disconnect use the output-cam role with a PLC output tag; the actor, sensor, torque, encoder and measuring-input roles and hardware or "
     "channel targets are only refused here.",
     "to_parameters writes one scalar PID_Compact parameter; the readback covers that parameter, the native XML export covers the object.",
+    "TIA adds the instructions and data types a technology object needs to the system groups (recorded under sideEffects); they are compared by identity, "
+    "because know-how protected system objects cannot be exported.",
     "Engineering only; nothing is downloaded and no motion or control behavior is observed.",
 ]
 
@@ -99,8 +101,13 @@ class Run(StateRun):
 
     def apply(self, label, kind, payload, preview=None, shown=None, **expected):
         prepared = self.prepare(label, kind, payload, preview, shown)
-        self.finish(label, kind, prepared, **expected)
+        self.finish(label, kind, prepared, tolerated=system_groups, **expected)
         return prepared
+
+
+def system_groups(category, key):
+    """TIA copies a technology object's instructions and data types into the system groups (PID_Compact FB and its types)."""
+    return category in ("added", "removed") and key.split(":", 1)[0] in ("block", "type") and "/systemGroups/" in key
 
 
 def selected(run, path, payload):
