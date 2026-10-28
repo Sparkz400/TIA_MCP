@@ -8,7 +8,7 @@ under checkpoint, device compile and save; the complete hardware, device-invento
 exactly the intended keys. hardware_gsd_export then exports the I-device GSD from the item that reports
 gsdExportAvailable: every returned file must exist with its SHA-256, the GSDML must be well-formed XML naming the
 designation, and the export must change nothing. Typed refusals cover an invented path, an item without the service, a
-missing designation or name, the interface before it is an I-device, an existing or absent area name. A fresh Portal
+blank designation, a missing name, the interface before it is an I-device, an existing or absent area name. A fresh Portal
 reopens the saved project, which must show the identical state and export a GSDML of the same name. Phase B creates
 TiaMcpTemp, deletes TiaMcpSpare and switches the interface back to IoController (which withdraws the export), restoring
 each checkpoint: every recovered copy equals the reopened state, and the last one exports again.
@@ -31,7 +31,7 @@ AREA, SPARE, TEMP = "TiaMcpArea", "TiaMcpSpare", "TiaMcpTemp"
 KINDS = ("hardware_transfer_area_create", "hardware_transfer_area_delete")
 CRITERIA = {
     **HARDWARE_CRITERIA,
-    "AC-identity": "refused: an invented hardware path, an item without GsdExportProvider, a missing designation and the interface before it is an I-device (and after it is switched back) "
+    "AC-identity": "refused: an invented hardware path, an item without GsdExportProvider, a blank designation and the interface before it is an I-device (and after it is switched back) "
                    "are typed export refusals; transfer-area kinds refuse the interface before it is an I-device, an item without a network interface, a missing name, "
                    "an existing name in another case (ObjectExists) and an absent exact name (ObjectNotFound); hardware_attributes refuses an operating-mode value naming an unknown mode. "
                    "Each refusal leaves the complete state unchanged.",
@@ -167,7 +167,8 @@ def phase_a(run, cpu, interface):
     paths = exportable(run)
     run.h.report["exportableAfter"] = paths
     require(paths == [interface], "Expected only the I-device interface to report gsdExportAvailable: %s" % paths)
-    refuse_export(run, "a missing designation", {"hardwarePath": paths[0]}, ["InvalidRequest"])
+    # The Host binds designation as a required parameter; a blank one reaches the worker's refusal.
+    refuse_export(run, "a blank designation", {"hardwarePath": paths[0], "designation": " "}, ["InvalidRequest"])
     return paths[0], export(run, "of the I-device", paths[0])
 
 
