@@ -607,10 +607,15 @@ namespace TiaMcp.Openness.V21
                     if (EngineeringDevices(project).Any(d => string.Equals(d.Name, name, StringComparison.OrdinalIgnoreCase))) throw new BridgeException("ObjectExists", "Device name already exists.");
                     ChangeText(payload, "itemName", 128);
                     effects.Add(new JObject { ["createDevice"] = name, ["typeIdentifier"] = identifier });
+                    bool failsafe = payload.Value<bool?>("failsafeRuntimeAccess") == true;
+                    if (failsafe && payload.Value<bool?>("configureScratchSecurity") != true)
+                        throw new BridgeException("InvalidRequest", "failsafeRuntimeAccess applies only together with configureScratchSecurity.");
                     if (payload.Value<bool?>("configureScratchSecurity") == true)
                     {
                         EnsureCurrentScratchProject(project);
                         effects.Add(new JObject { ["configureNewCpuSecurity"] = "Protect the new scratch CPU configuration and provision a new password-authenticated runtime user/role with standard full access scoped to that new device. Generated credentials are stored under Windows DPAPI CurrentUser. No existing protection or anonymous access is changed." });
+                        if (failsafe)
+                            effects.Add(new JObject { ["failsafeRuntimeAccess"] = "The generated role receives the F-CPU runtime right Full access including fail-safe instead of Full access, for this new scratch device only." });
                     }
                     break;
                 }
@@ -947,7 +952,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var device = project.Devices.CreateWithItem(payload.Value<string>("typeIdentifier"), payload.Value<string>("itemName"), payload.Value<string>("deviceName"));
                     if (payload.Value<bool?>("configureScratchSecurity") == true)
-                        change.ScratchSecurity = ConfigureNewScratchCpu(project, device, change.Directory);
+                        change.ScratchSecurity = ConfigureNewScratchCpu(project, device, change.Directory, payload.Value<bool?>("failsafeRuntimeAccess") == true);
                     break;
                 }
                 case "hardware_plug":

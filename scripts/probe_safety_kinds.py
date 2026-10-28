@@ -2,8 +2,8 @@
 
 Adds a CPU 1511F-1 PN and an ET 200SP station (IM 155-6 PN ST, server module, F-DI 8x24VDC HF) on its PROFINET IO
 system through the qualified remote-I/O change sequence, then records each probe's exact outcome and continues. A probe
-that fails after its apply was dispatched restores that change's checkpoint. Never logs in to a safety program, passes a
-password or downloads. Observations of this scratch only, not feature qualification.
+that fails after its apply was dispatched restores that change's checkpoint. The F-CPU's generated scratch user receives "Full access including fail-safe" (failsafeRuntimeAccess), which its
+compile requires. Never logs in to a safety program, passes a password or downloads. Observations of this scratch only, not feature qualification.
 """
 from __future__ import annotations
 
@@ -99,8 +99,11 @@ def body(h):
     h.owned_scratch("safety probe")
     fcpu = h.report["fCpu"] = catalog(h, "1511F-1 PN", "1511F-1 PN", "6ES7 ")[0]
     # A new CPU needs its confidential-data password before it compiles (qualify_cpu_memory_bytes.add_cpu).
-    change(h, "hardware_add", {"typeIdentifier": fcpu["typeIdentifier"], "deviceName": STATION, "itemName": "TiaMcpFPlc", "configureScratchSecurity": True}, {})
+    # The F-CPU compiles only when a local user holds "Full access including fail-safe"; granted in this owned scratch only.
+    change(h, "hardware_add", {"typeIdentifier": fcpu["typeIdentifier"], "deviceName": STATION, "itemName": "TiaMcpFPlc",
+                               "configureScratchSecurity": True, "failsafeRuntimeAccess": True}, {})
     plc = h.report["fPlc"] = next(p["path"] for p in h.tool("project_inventory", {"maxItems": 2000})["plcs"] if STATION in p["path"])
+    probe(h, "safety_inspect of the F-PLC", lambda: h.tool("safety_inspect", {"plcPath": plc, "maxItems": 2000}))
     try:
         fparameters(h, plc, {"plcPath": plc})
     finally:  # The printout needs only the F-CPU, so it is probed even when the F-I/O route fails.
