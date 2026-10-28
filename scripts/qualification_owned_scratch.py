@@ -207,8 +207,8 @@ def snapshot(call, destination):
         for row in sorted(inventory[collection], key=lambda item: item["path"]):
             key = kind + ":" + row["path"]
             require(key not in result["objects"], "Duplicate exact identity in native inventory.")
-            if kind in ("block", "type") and row.get("isKnowHowProtected") is True and "/systemGroups/" in row["path"]:
-                # TIA copies protected system FBs such as R_TRIG, and the PID_Compact types, into system groups; they cannot be exported, so their identity is kept.
+            if kind in ("block", "type") and row.get("isKnowHowProtected") is True:
+                # Protected objects cannot be exported (TIA's R_TRIG and PID_Compact copies, technology-object blocks), so their identity is kept.
                 identity = json.dumps({k: row.get(k) for k in ("path", "name", "number", "kind", "programmingLanguage", "isConsistent")}, sort_keys=True).encode()
                 result["objects"][key] = {"kind": "protectedSystemBlock", "path": row["path"], "name": row["name"],
                     "sha256": hashlib.sha256(identity).hexdigest(), "payloadSha256": hashlib.sha256(identity).hexdigest()}

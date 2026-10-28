@@ -94,7 +94,8 @@ def phase_a(run):
     base = {"hardwarePath": cpu, "localInterfacePath": local, "localNodeName": "X1", "partnerTargetPath": peer, "partnerInterfacePath": partner, "partnerNodeName": "X1"}
     run.refuse("connection_create", "an unknown connection type", {**base, "connectionType": "ModbusConnection"}, "InvalidRequest")
     run.refuse("connection_create", "a missing owner", {**base, "hardwarePath": cpu + "X", "connectionType": "S7Connection"}, "HardwareNotFound")
-    run.refuse("connection_create", "an owner without CommunicationManagement", {**base, "hardwarePath": local + "/items/Port_1", "connectionType": "S7Connection"}, "UnsupportedCapability")
+    # The rail exposes no CommunicationManagement (a port item does, natively).
+    run.refuse("connection_create", "an owner without CommunicationManagement", {**base, "hardwarePath": run.path("ScratchStation", "items", "Rail_0"), "connectionType": "S7Connection"}, "UnsupportedCapability")
     s7 = own(run, create(run, "S7Connection"))
     tcp = own(run, create(run, "TcpConnection"))
     name = tcp["properties"]["LocalConnectionName"]
