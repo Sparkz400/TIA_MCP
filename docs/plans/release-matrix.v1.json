@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.68",
-    "catalogSha256": "c0ca3cd84ff82b418893e83a755d9df621ede90ea0388419fb01e3f894c17665",
+    "catalogSha256": "25045c62dd9f179e03efe6ce8b96d46645859c8aad9c2819e81b1470e51d9e1d",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "d9cb98b2b4df28af0241526a8e0da8e364d0624f4fab9fd14eccd00536ae9ea7"
   },
@@ -2062,7 +2062,7 @@
       ],
       "evidenceIds": [
         "local.sim.creation.20261024",
-        "local.sim.state.20261024"
+        "local.sim.state.rerun.20261028"
       ],
       "cells": [
         {
@@ -2070,7 +2070,7 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.creation.20261024",
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
@@ -2078,7 +2078,7 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.creation.20261024",
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
@@ -2086,7 +2086,7 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.creation.20261024",
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
@@ -2094,7 +2094,7 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.creation.20261024",
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         }
       ]
@@ -2111,35 +2111,35 @@
         "L03"
       ],
       "evidenceIds": [
-        "local.sim.state.20261024"
+        "local.sim.state.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
           "gate": "AC-simulator-lifecycle",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024"
+            "local.sim.state.rerun.20261028"
           ]
         }
       ]
@@ -2277,32 +2277,32 @@
         "L03"
       ],
       "evidenceIds": [
-        "local.sim.state.20261024",
-        "local.sim.provision.20261024"
+        "local.sim.provision.20261024",
+        "local.sim.state.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024",
-            "local.sim.provision.20261024"
+            "local.sim.provision.20261024",
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
           "gate": "AC-runtime",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024",
-            "local.sim.provision.20261024"
+            "local.sim.provision.20261024",
+            "local.sim.state.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.20261024",
-            "local.sim.provision.20261024"
+            "local.sim.provision.20261024",
+            "local.sim.state.rerun.20261028"
           ]
         }
       ]
@@ -3512,63 +3512,63 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.remote-io.full-route.20261024",
-        "local.remote-io.lifecycle.20261024",
-        "local.engineering.interruption-matrix.20261027"
+        "local.engineering.interruption-matrix.20261027",
+        "local.remote-io.full-route.rerun.20261028",
+        "local.remote-io.lifecycle.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024",
-            "local.engineering.interruption-matrix.20261027"
+            "local.engineering.interruption-matrix.20261027",
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024",
-            "local.engineering.interruption-matrix.20261027"
+            "local.engineering.interruption-matrix.20261027",
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024",
-            "local.engineering.interruption-matrix.20261027"
+            "local.engineering.interruption-matrix.20261027",
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024",
-            "local.engineering.interruption-matrix.20261027"
+            "local.engineering.interruption-matrix.20261027",
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024",
-            "local.engineering.interruption-matrix.20261027"
+            "local.engineering.interruption-matrix.20261027",
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024",
-            "local.engineering.interruption-matrix.20261027"
+            "local.engineering.interruption-matrix.20261027",
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         }
       ]
@@ -6311,56 +6311,56 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.remote-io.full-route.20261024",
-        "local.remote-io.lifecycle.20261024"
+        "local.remote-io.full-route.rerun.20261028",
+        "local.remote-io.lifecycle.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         }
       ]
@@ -10144,56 +10144,56 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.remote-io.full-route.20261024",
-        "local.remote-io.lifecycle.20261024"
+        "local.remote-io.full-route.rerun.20261028",
+        "local.remote-io.lifecycle.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         }
       ]
@@ -10213,56 +10213,56 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.remote-io.full-route.20261024",
-        "local.composite_rebind.20261028"
+        "local.composite_rebind.20261028",
+        "local.remote-io.full-route.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.composite_rebind.20261028"
+            "local.composite_rebind.20261028",
+            "local.remote-io.full-route.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.composite_rebind.20261028"
+            "local.composite_rebind.20261028",
+            "local.remote-io.full-route.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.composite_rebind.20261028"
+            "local.composite_rebind.20261028",
+            "local.remote-io.full-route.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.composite_rebind.20261028"
+            "local.composite_rebind.20261028",
+            "local.remote-io.full-route.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.composite_rebind.20261028"
+            "local.composite_rebind.20261028",
+            "local.remote-io.full-route.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.composite_rebind.20261028"
+            "local.composite_rebind.20261028",
+            "local.remote-io.full-route.rerun.20261028"
           ]
         }
       ]
@@ -10653,56 +10653,56 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.remote-io.full-route.20261024",
-        "local.remote-io.lifecycle.20261024"
+        "local.remote-io.full-route.rerun.20261028",
+        "local.remote-io.lifecycle.rerun.20261028"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.remote-io.full-route.20261024",
-            "local.remote-io.lifecycle.20261024"
+            "local.remote-io.full-route.rerun.20261028",
+            "local.remote-io.lifecycle.rerun.20261028"
           ]
         }
       ]
@@ -24102,31 +24102,31 @@
       "notRetained": []
     },
     {
-      "id": "local.remote-io.full-route.20261024",
+      "id": "local.remote-io.full-route.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "47e295cf86ade4d98a5997014dfbe67bc8e9f238",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.remote-io.full-route.20261024.json",
-          "sha256": "de1947bace7937abc638b350261db48e839de30635494cecdf7a8c95e37c8ba7"
+          "path": "evidence/local.remote-io.full-route.rerun.20261028.json",
+          "sha256": "5a0c8a3f7ece94884977689326791f5f0bc2dc784bb60e10ab1a80227f0091e5"
         }
       ],
       "notRetained": []
     },
     {
-      "id": "local.remote-io.lifecycle.20261024",
+      "id": "local.remote-io.lifecycle.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "402e38ed45aac7360593a53aec288e7245d4a09b",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.remote-io.lifecycle.20261024.json",
-          "sha256": "bb785f44010c13da98761f6f2bfa02f6a95b644983544bedf74ced64f3828afb"
+          "path": "evidence/local.remote-io.lifecycle.rerun.20261028.json",
+          "sha256": "b9906c6820fa881d69a19ebaf8060279570a33ffdafacaf6205352dd393cce35"
         }
       ],
       "notRetained": []
@@ -24256,16 +24256,16 @@
       "notRetained": []
     },
     {
-      "id": "local.sim.state.20261024",
+      "id": "local.sim.state.rerun.20261028",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "e7497e5426a11cc4e526fefe6a5be1a10ec25c8d",
+      "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
       "retained": [
         {
-          "path": "evidence/local.sim.state.20261024.json",
-          "sha256": "adbf2ad4b7b84c01b8aca8368f906486949a9b26c9c5b37e31c3a4334c166a2f"
+          "path": "evidence/local.sim.state.rerun.20261028.json",
+          "sha256": "e23bc43c307aee7b368f029dd985e94c4b11c1a79307309d8bb4873291f93ed4"
         }
       ],
       "notRetained": []

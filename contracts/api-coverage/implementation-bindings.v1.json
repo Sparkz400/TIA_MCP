@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c0ca3cd84ff82b418893e83a755d9df621ede90ea0388419fb01e3f894c17665",
-      "bytes": 1319076
+      "sha256": "25045c62dd9f179e03efe6ce8b96d46645859c8aad9c2819e81b1470e51d9e1d",
+      "bytes": 1322551
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -92676,17 +92676,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.remote-io.full-route.20261024",
-          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "id": "local.remote-io.full-route.rerun.20261028",
+          "profileSha256": "358a764a81a5c895f322fa3767184afc979a9ebb380a9ae69df1eac1311c3579",
           "artifacts": [
-            "evidence/local.remote-io.full-route.20261024.json"
+            "evidence/local.remote-io.full-route.rerun.20261028.json"
           ]
         },
         {
-          "id": "local.remote-io.lifecycle.20261024",
-          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "id": "local.remote-io.lifecycle.rerun.20261028",
+          "profileSha256": "4e6b73b4a3841425f3f4a30d09b077996b17a51fc3dabe2366830b8720a1b19f",
           "artifacts": [
-            "evidence/local.remote-io.lifecycle.20261024.json"
+            "evidence/local.remote-io.lifecycle.rerun.20261028.json"
           ]
         }
       ],
@@ -92774,17 +92774,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.remote-io.full-route.20261024",
-          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
-          "artifacts": [
-            "evidence/local.remote-io.full-route.20261024.json"
-          ]
-        },
-        {
           "id": "local.composite_rebind.20261028",
           "profileSha256": "8b1e56469d988c4e8ddfdb3165a5dfed033dbad01e74abe804e13ec4e77dedba",
           "artifacts": [
             "evidence/local.composite_rebind.20261028.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.full-route.rerun.20261028",
+          "profileSha256": "358a764a81a5c895f322fa3767184afc979a9ebb380a9ae69df1eac1311c3579",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.rerun.20261028.json"
           ]
         }
       ],
@@ -92913,17 +92913,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.remote-io.full-route.20261024",
-          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "id": "local.remote-io.full-route.rerun.20261028",
+          "profileSha256": "358a764a81a5c895f322fa3767184afc979a9ebb380a9ae69df1eac1311c3579",
           "artifacts": [
-            "evidence/local.remote-io.full-route.20261024.json"
+            "evidence/local.remote-io.full-route.rerun.20261028.json"
           ]
         },
         {
-          "id": "local.remote-io.lifecycle.20261024",
-          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "id": "local.remote-io.lifecycle.rerun.20261028",
+          "profileSha256": "4e6b73b4a3841425f3f4a30d09b077996b17a51fc3dabe2366830b8720a1b19f",
           "artifacts": [
-            "evidence/local.remote-io.lifecycle.20261024.json"
+            "evidence/local.remote-io.lifecycle.rerun.20261028.json"
           ]
         }
       ],
@@ -92966,24 +92966,24 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.remote-io.full-route.20261024",
-          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
-          "artifacts": [
-            "evidence/local.remote-io.full-route.20261024.json"
-          ]
-        },
-        {
-          "id": "local.remote-io.lifecycle.20261024",
-          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
-          "artifacts": [
-            "evidence/local.remote-io.lifecycle.20261024.json"
-          ]
-        },
-        {
           "id": "local.engineering.interruption-matrix.20261027",
           "profileSha256": "0e4dc4703b2d640d8e3a1ae0d37afc1c1ea0d13481e01ec8a28fb38d65bef4cc",
           "artifacts": [
             "evidence/local.engineering.interruption-matrix.20261027.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.full-route.rerun.20261028",
+          "profileSha256": "358a764a81a5c895f322fa3767184afc979a9ebb380a9ae69df1eac1311c3579",
+          "artifacts": [
+            "evidence/local.remote-io.full-route.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.remote-io.lifecycle.rerun.20261028",
+          "profileSha256": "4e6b73b4a3841425f3f4a30d09b077996b17a51fc3dabe2366830b8720a1b19f",
+          "artifacts": [
+            "evidence/local.remote-io.lifecycle.rerun.20261028.json"
           ]
         }
       ],
@@ -95049,17 +95049,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.remote-io.full-route.20261024",
-          "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3",
+          "id": "local.remote-io.full-route.rerun.20261028",
+          "profileSha256": "358a764a81a5c895f322fa3767184afc979a9ebb380a9ae69df1eac1311c3579",
           "artifacts": [
-            "evidence/local.remote-io.full-route.20261024.json"
+            "evidence/local.remote-io.full-route.rerun.20261028.json"
           ]
         },
         {
-          "id": "local.remote-io.lifecycle.20261024",
-          "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8",
+          "id": "local.remote-io.lifecycle.rerun.20261028",
+          "profileSha256": "4e6b73b4a3841425f3f4a30d09b077996b17a51fc3dabe2366830b8720a1b19f",
           "artifacts": [
-            "evidence/local.remote-io.lifecycle.20261024.json"
+            "evidence/local.remote-io.lifecycle.rerun.20261028.json"
           ]
         }
       ],
@@ -110657,10 +110657,10 @@
           ]
         },
         {
-          "id": "local.sim.state.20261024",
-          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
+          "id": "local.sim.state.rerun.20261028",
+          "profileSha256": "7006d7890f7a1a87dbc98d00604e943dd493d94a498cfbf5a5f152f7ad50f327",
           "artifacts": [
-            "evidence/local.sim.state.20261024.json"
+            "evidence/local.sim.state.rerun.20261028.json"
           ]
         }
       ],
@@ -110688,10 +110688,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.sim.state.20261024",
-          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
+          "id": "local.sim.state.rerun.20261028",
+          "profileSha256": "7006d7890f7a1a87dbc98d00604e943dd493d94a498cfbf5a5f152f7ad50f327",
           "artifacts": [
-            "evidence/local.sim.state.20261024.json"
+            "evidence/local.sim.state.rerun.20261028.json"
           ]
         }
       ],
@@ -110791,17 +110791,17 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.sim.state.20261024",
-          "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff",
-          "artifacts": [
-            "evidence/local.sim.state.20261024.json"
-          ]
-        },
-        {
           "id": "local.sim.provision.20261024",
           "profileSha256": "0865a9b40d426150bbdd5d706ef87d0bcf64c51eeb3620c297d9049f9da61913",
           "artifacts": [
             "evidence/local.sim.provision.20261024.json"
+          ]
+        },
+        {
+          "id": "local.sim.state.rerun.20261028",
+          "profileSha256": "7006d7890f7a1a87dbc98d00604e943dd493d94a498cfbf5a5f152f7ad50f327",
+          "artifacts": [
+            "evidence/local.sim.state.rerun.20261028.json"
           ]
         }
       ],
@@ -116298,9 +116298,19 @@
       "sha256": "de1947bace7937abc638b350261db48e839de30635494cecdf7a8c95e37c8ba7"
     },
     {
+      "path": "evidence/local.remote-io.full-route.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "5a0c8a3f7ece94884977689326791f5f0bc2dc784bb60e10ab1a80227f0091e5"
+    },
+    {
       "path": "evidence/local.remote-io.lifecycle.20261024.json",
       "state": "observed",
       "sha256": "bb785f44010c13da98761f6f2bfa02f6a95b644983544bedf74ced64f3828afb"
+    },
+    {
+      "path": "evidence/local.remote-io.lifecycle.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "b9906c6820fa881d69a19ebaf8060279570a33ffdafacaf6205352dd393cce35"
     },
     {
       "path": "evidence/local.reopen.20261024.json",
@@ -116346,6 +116356,11 @@
       "path": "evidence/local.sim.state.20261024.json",
       "state": "observed",
       "sha256": "adbf2ad4b7b84c01b8aca8368f906486949a9b26c9c5b37e31c3a4334c166a2f"
+    },
+    {
+      "path": "evidence/local.sim.state.rerun.20261028.json",
+      "state": "observed",
+      "sha256": "e23bc43c307aee7b368f029dd985e94c4b11c1a79307309d8bb4873291f93ed4"
     },
     {
       "path": "evidence/local.smoke.20261024.json",
@@ -117062,8 +117077,16 @@
       "profileSha256": "8369f30c724a7be988b5994fcd6851aa7c171db12feaf523718c212e3b1fced3"
     },
     {
+      "id": "local.remote-io.full-route.rerun.20261028",
+      "profileSha256": "358a764a81a5c895f322fa3767184afc979a9ebb380a9ae69df1eac1311c3579"
+    },
+    {
       "id": "local.remote-io.lifecycle.20261024",
       "profileSha256": "6fd7740b432915718971c3d55d59e6fe483f862875d8b394d449e107f2f3deb8"
+    },
+    {
+      "id": "local.remote-io.lifecycle.rerun.20261028",
+      "profileSha256": "4e6b73b4a3841425f3f4a30d09b077996b17a51fc3dabe2366830b8720a1b19f"
     },
     {
       "id": "local.reopen.20261024",
@@ -117104,6 +117127,10 @@
     {
       "id": "local.sim.state.20261024",
       "profileSha256": "65a37a3ef8c807560734107536d646d2f0755b1b9ca1cdae949f62dc4a7a0aff"
+    },
+    {
+      "id": "local.sim.state.rerun.20261028",
+      "profileSha256": "7006d7890f7a1a87dbc98d00604e943dd493d94a498cfbf5a5f152f7ad50f327"
     },
     {
       "id": "local.smoke.20261024",
