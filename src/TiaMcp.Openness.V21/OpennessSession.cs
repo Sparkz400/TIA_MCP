@@ -57,6 +57,17 @@ namespace TiaMcp.Openness.V21
             if (_watchLease != null && operation != "watch_checkpoint" && operation != "watch_apply_native" && operation != "watch_end")
                 throw new BridgeException("ResourceBusy", "The native watch dispatch owns exclusive access.");
             ObserveIndexOperation(operation);
+            try { return Dispatch(operation, arguments); }
+            // TIA refuses exports and other writes in a secondary (read-only) project; report that as the typed read-only refusal.
+            catch (EngineeringTargetInvocationException ex) when (ex.Message.IndexOf("read-only context", StringComparison.OrdinalIgnoreCase) >= 0
+                && _portal != null && _portal.Projects.Any(project => !project.IsPrimary))
+            {
+                throw new BridgeException("ReadOnlyProject", "TIA refuses this operation in a read-only (secondary) project: " + ex.Message);
+            }
+        }
+
+        private JObject Dispatch(string operation, JObject arguments)
+        {
             switch (operation)
             {
                 case "addin_owner_context": return AddInOwnerContext(arguments);

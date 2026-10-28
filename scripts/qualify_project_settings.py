@@ -42,7 +42,8 @@ LIMITATIONS = [
     "project_languages_set adds and removes one supported language and switches the editing language. TIA adds or drops that culture's empty text "
     "item in the project comment and in every program export (recorded under sideEffects); texts in a removed language are not seeded, so their loss is not observed.",
     "project_copy copies a saved project; the UnsavedProject refusal is not exercised, because no read-only route leaves the source modified.",
-    "project_open readOnly: TIA opens the project as secondary; whether Siemens itself write-protects it is not established, the refusal is the worker's guard.",
+    "project_open readOnly: TIA opens the project as secondary and itself refuses exports there (block_read is reported as ReadOnlyProject), so the copy is "
+    "compared with its source through software_inspect and project_properties, not through program exports; the change refusal is the worker's guard.",
 ]
 
 
@@ -183,20 +184,27 @@ def phase_c(run):
     require(copied.get("copyClosed") is True and Path(copy).resolve() != Path(run.project).resolve() and Path(copy).is_file(), "The copy is not a closed project file in a new directory: %s" % copied)
     after = run.snap("source after project_copy")
     h.stage("project_copy left the source unchanged", lambda: require(after["view"] == source["view"], "Source changed: %s" % diff(source["view"], after["view"])) or len(source["view"]))
+    # TIA refuses exports in a secondary project, so the copy is compared without program exports.
+    plain = h.stage("source state without exports", run.state)
+    block = next(key.split(":", 1)[1] for key in plain if key.startswith("block:"))
     h.stage("close the session before the read-only open", lambda: h.tool("tia_detach"))
     h.owned_portal("read-only copy")
     opened = h.stage("open the copy read-only", lambda: h.tool("project_open", {"path": copy, "readOnly": True}))
     status = h.tool("tia_session_status")
     require([(p["path"], p.get("readOnly")) for p in status["projects"]] == [(copy, True)], "The copy is not the only, read-only project: %s" % status["projects"])
-    view_copy = run.snap("read-only copy")
     def equal():
-        mine, theirs = dict(view_copy["view"]), dict(source["view"])
-        require(mine.pop("project:properties").pop("isPrimary") is False, "The read-only copy reports itself as primary")
-        theirs["project:properties"] = {k: v for k, v in theirs["project:properties"].items() if k != "isPrimary"}
-        require(mine == theirs, "The copy differs from its source: %s" % diff(theirs, mine))
+        mine, theirs = run.state(), dict(plain)
+        mine_properties, their_properties = dict(mine.pop("project:properties")), dict(theirs.pop("project:properties"))
+        require(mine_properties.pop("isPrimary") is False and their_properties.pop("isPrimary") is True, "The read-only copy reports itself as primary")
+        require(mine == theirs and mine_properties == their_properties, "The copy differs from its source: %s %s" % (diff(theirs, mine), (their_properties, mine_properties)))
         return len(mine)
     h.stage("the read-only copy equals its source", equal)
-    for kind, payload in (("project_languages_set", {"editingLanguage": run.current["view"]["project:languages"]["reference"]}), ("tag_create", {"tagTableName": "Default tag table", "name": "RoTag", "dataTypeName": "Bool", "logicalAddress": "%M90.0"})):
+    def export_refused():
+        error = h.call_error("block_read", {"blockPath": block})
+        require(error.get("code") == "ReadOnlyProject", "Expected TIA's export refusal as ReadOnlyProject: %s" % error)
+        return error
+    h.report["readOnlyExport"] = h.stage("block_read in the read-only copy is refused", export_refused)
+    for kind, payload in (("project_languages_set", {"editingLanguage": plain["project:languages"]["reference"]}), ("tag_create", {"tagTableName": "Default tag table", "name": "RoTag", "dataTypeName": "Bool", "logicalAddress": "%M90.0"})):
         run.refuse(kind, "a read-only project", payload, "ReadOnlyProject")
     h.report["copy"] = {"opened": opened, "result": copied}
 
