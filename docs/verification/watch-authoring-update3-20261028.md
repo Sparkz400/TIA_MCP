@@ -111,9 +111,30 @@ recovery instead and is not exercised.
 
 ## Still open
 
-- Creation response loss (`qualify_watch_authoring_loss.py`) has not run under Update 3.
+- Creation response loss passed later the same day ([below](#creation-response-loss)).
 - Production authoring stays disabled. The profile covers one created root table with one
   direct-instance Active Bool row and the default reason. Additions to existing tables,
   removal, reorder, explicit comments, other types, CPUs, firmware and languages stay separate.
 - The pins follow the installed products. After the next TIA update they must be re-derived
   from a fresh capture, as here.
+
+## Creation response loss
+
+Evidence [`local.watch.creation_loss.20261028`](../../evidence/local.watch.creation_loss.20261028.json).
+Runner [`scripts/qualify_watch_authoring_loss.py`](../../scripts/qualify_watch_authoring_loss.py), run
+`cl2`, on a frozen Debug build in `D:\wp\b59`. It creates root `WT05_BoolCreation` with one Active Bool
+row through `watch_table_apply`, under a Host started with `--watch-qualification host.watch_apply_native`.
+
+- The native creation was applied and saved. The Host exited 74 before the reply.
+- A second Host refused the replay (`RecoveryRequired`) and a competing owner (`ResourceBusy`)
+  without native dispatch.
+- It recovered the checkpoint to a distinct destination, whose fresh reopen shows the table
+  absent, and reconciled the original as `verifiedApplied` without adopting the lost reply.
+- The independent oracle `verify_watch_authoring_loss` passed: a single dispatch, six preserved
+  peer exports, and exact lifetimes (first Host 74, every worker, Portal and the second Host 0).
+
+Fixed on the way: the oracle required the lost Host's process tree to report all-zero exits.
+The tree's completion flag excludes any non-zero exit, so a Host-loss trial could never pass,
+although the per-process check already expected 74 for that Host. The oracle now checks the
+tree's other conditions explicitly for that Host. Trial `cl1` (build `b58`) passed the same
+native flow and failed only on that check; it is retained and not cited.

@@ -23,6 +23,17 @@ def loss_boundary(records, marker, project):
     return response
 
 
+def terminal(close, index):
+    """Exact terminal proofs of one Host tree; the lost first Host exits 74, which the tree's all-zero completion flag excludes."""
+    tree=close['tree']
+    need((tree['completed'] or index==1) and not tree['startupOutcomeUnknown'] and not close['closeInterrupted'] and tree['workerStartupCaptured']
+         and tree['nativeStartupInventoryComplete'] and not any(tree[k] for k in ('errors','unknownReasons','finalizationErrors','startupInventoryUnknownReasons')),
+         'Exact terminal tree incomplete')
+    for row in tree['exits']:
+        proof=row['proof']; expected=74 if index==1 and row['role']=='host' else 0
+        need(proof['completed'] and proof['sameOsHandleRetained'] and proof['birthAndImageVerified'] and
+             not proof['deadlineOrCancellationObserved'] and not proof['forcedTermination'] and proof['exitCode']==expected, 'Unexpected exact process outcome')
+
 def verify(root):
     root = Path(root).resolve()
     try:
@@ -61,12 +72,7 @@ def verify(root):
         need(all(r['state']=='prepared' for r in expansion.journal(root,held['competitorId'])), 'Competing owner acquired')
         interruption = expansion.interruption_check(root,admission,records,operation)
         for index in (1,2):
-            close=load(root/f'host-{index:02}-close.json')['close']
-            need(close['tree']['completed'] and not close['tree']['startupOutcomeUnknown'] and not close['closeInterrupted'], 'Exact terminal tree incomplete')
-            for row in close['tree']['exits']:
-                proof=row['proof']; expected=74 if index==1 and row['role']=='host' else 0
-                need(proof['completed'] and proof['sameOsHandleRetained'] and proof['birthAndImageVerified'] and
-                     not proof['deadlineOrCancellationObserved'] and not proof['forcedTermination'] and proof['exitCode']==expected, 'Unexpected exact process outcome')
+            terminal(load(root/f'host-{index:02}-close.json')['close'], index)
         for row in load(root/'creation-loss-inputs.json')['sources']:
             need(base.sha((root/'controller-source'/Path(row['path']).name).read_bytes())==row['sha256'], 'Loss controller/verifier changed')
         for folder in (root/'engineering-admissions').iterdir():

@@ -61,4 +61,4 @@ Controller-device areas only, on an I-device without a higher-level IO controlle
 and mapping-rule areas, direction and length edits and controller assignment are not exercised. The GSDML is not
 imported into another tool. Engineering only: nothing is downloaded and no PROFINET communication is observed.
 
-Matrix: 527 of 2,031 cells open (catalog `0.4.59`; the two new rows add 12 cells).
+Matrix: 527 of 2,031 cells open (catalog `0.4.60`; the two new rows add 12 cells).
