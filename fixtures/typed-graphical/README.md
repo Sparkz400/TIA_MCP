@@ -89,6 +89,11 @@ R_TRIG/F_TRIG (`wave9-capture-packet.v1.json`, `wave9-cases.v1.json`). Their SIM
 for MOVE, arithmetic and edge boxes is unverified. See
 [the wave 9 runbook](../../docs/verification/typed-wave9-families-runbook.md).
 
+`crossscope-cases.v1.json` (written by `author_advanced_route_cases.py`) calls
+TiaMcp_UnitA's numeric FC from its alternate namespace and from the related unit
+TiaMcp_UnitB against the references captured from
+`route-capture-crossscope-call-packet.v1.json`; not yet run.
+
 `route-advanced-cases.v1.json` contains requests with available independent
 route references. `route-pending-references.v1.json` records requested cases
 whose reference capture remains unavailable. Their absence from the executable

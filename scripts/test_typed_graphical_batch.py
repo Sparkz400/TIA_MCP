@@ -640,8 +640,14 @@ class RouteCapturePacketTests(unittest.TestCase):
     def test_crossscope_call_packet_parses_exactly_and_names_the_callee_absolutely(self):
         root = pathlib.Path(__file__).resolve().parents[1]
         packet = json.loads((root / "fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json").read_bytes())
-        self.assertEqual("authored-not-executed", packet["status"])
-        self.assertFalse(packet["nativeReferenceQualification"] or packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        # Captured 28 October; the promoted profiles and authored cases await builder qualification.
+        self.assertEqual("captured-builder-not-qualified", packet["status"])
+        self.assertTrue(packet["nativeReferenceQualification"])
+        self.assertFalse(packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        deployed = {p["id"]: p for p in json.loads((root / "fixtures/typed-graphical/profiles.v1.json").read_bytes())["profiles"]}
+        [cross_unit] = [row for row in packet["captured"] if row["id"] == "crossUnit"]
+        self.assertEqual(["crossUnitQualified"] * 2, [deployed[i]["calleeNameEncoding"] for i in cross_unit["profiles"]])
+        self.assertTrue(all(not deployed[i][gate] for i in cross_unit["profiles"] for gate in ("engineeringVerified", "runtimeVerified")))
         for capture in packet["captures"]:
             self.assertEqual(capture["unit"], capture["command"][capture["command"].index("--unit") + 1])
             for entry in capture["sources"]:

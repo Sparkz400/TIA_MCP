@@ -48,12 +48,16 @@ block in another namespace of the caller's own software unit emits the callee's 
 call profile; without that profile it fails with `GraphicalCalleeUnsupported`. A call
 into another software unit needs a direct `SoftwareUnit` relation from the caller's unit
 (`GraphicalUnitRelationMissing`), a `Published` callee (`GraphicalCalleeUnpublished`) and
-its own `crossUnitQualified` call profile. No capture binds that profile yet, so these
-calls return `GraphicalProfileUnavailable`. The preview lists the callee's scope, access,
+its own `crossUnitQualified` call profile. The preview lists the callee's scope, access,
 namespace and interface hash, and apply rechecks them. Cross-unit FB calls accept
 existing storage in the caller's scope only; storage creation and instance DBs in other
-units are refused. Capture inputs are in
-`fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json`.
+units are refused. The native references were captured on 28 October
+(`fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json`): the
+cross-namespace callers confirm the absolute `Name` the namespace-route profiles emit,
+and the cross-unit callers bind `v21.fw41.softwareUnit.lad.call.crossUnit.v1` and
+`v21.fw41.softwareUnit.fbd.call.crossUnit.v1` (CPU 1511 V4.1). The builder is not yet
+natively qualified for either call; its cases are in
+`fixtures/typed-graphical/crossscope-cases.v1.json`.
 
 Added 27 October 2026 and **unqualified**: the model also accepts `compare` with
 `DInt` or `Real`, `move` (one exact scalar `dataType`), `math` (`ADD`/`SUB`/`MUL`/`DIV`

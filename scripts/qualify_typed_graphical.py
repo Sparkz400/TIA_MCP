@@ -106,6 +106,17 @@ def selected_blocks(call, case):
     return result, scope
 
 
+def block_path(blocks, reference):
+    """"$block:<name>" is a block of the case route; "$block:<namespace>/<name>" the one block of that namespace outside it."""
+    name = reference[len("$block:"):]
+    if "/" not in name:
+        return blocks[name]["block"]["path"]
+    matches = [value["block"]["path"] for key, value in blocks.items()
+               if key.startswith("@unselected:") and value["block"]["path"].endswith("/namespaces/" + name)]
+    assert len(matches) == 1, "Exactly one block outside the case route must be " + name
+    return matches[0]
+
+
 def snapshot(call, names, directory, case=None):
     directory.mkdir()
     exports = {}
@@ -287,17 +298,17 @@ def run_case(case, args, output):
         # Exact callee paths are observed from this scratch, never synthesized.
         for node in payload["model"].get("nodes", []):
             if node.get("calleePath", "").startswith("$block:"):
-                node["calleePath"] = before[node["calleePath"][7:]]["block"]["path"]
+                node["calleePath"] = block_path(before, node["calleePath"])
             if node.get("nativeUid", "").startswith("$part:"):
                 _, kind, ordinal = node["nativeUid"].split(":")
                 matches = [e for e in document.iter() if e.tag.rsplit("}", 1)[-1] == "Part" and e.get("Name") == kind]
                 node["nativeUid"] = matches[int(ordinal)].get("UId")
         for operand in payload["model"].get("operands", []):
             if operand.get("ownerPath", "").startswith("$block:"):
-                operand["ownerPath"] = before[operand["ownerPath"][7:]]["block"]["path"]
+                operand["ownerPath"] = block_path(before, operand["ownerPath"])
         for instance in payload.get("instances", []):
             if instance.get("blockPath", "").startswith("$block:"):
-                instance["blockPath"] = before[instance["blockPath"][7:]]["block"]["path"]
+                instance["blockPath"] = block_path(before, instance["blockPath"])
         for field in ("networkId", "insertAfterNetworkId"):
             if payload["model"].get(field) == "$first":
                 payload["model"][field] = next(e.attrib["ID"] for e in document.iter() if e.tag == "SW.Blocks.CompileUnit")

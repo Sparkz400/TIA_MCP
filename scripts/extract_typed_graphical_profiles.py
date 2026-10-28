@@ -20,6 +20,22 @@ INTERFACE = "http://www.siemens.com/automation/Openness/SW/Interface/v5"
 # Global IEC storage reference DB and its system type, by instruction (else kind).
 GLOBAL_STORAGE = {"timer": ("Tgp_GlobalTimer", "IEC_TIMER"), "counter": ("Tgp_GlobalCounter", "IEC_COUNTER"),
                   "TONR": ("Tgp_GlobalTonr", "IEC_TIMER"), "R_TRIG": ("Tgp_GlobalRTrig", "R_TRIG"), "F_TRIG": ("Tgp_GlobalFTrig", "F_TRIG")}
+# The callee every cross-scope caller names absolutely (route-capture-crossscope-call-packet.v1.json).
+CROSS_SCOPE_CALLEE = "TiaMcp_UnitA.TgpUnit_NumericFC"
+
+
+def authored_source(entry):
+    """A capture run from another checkout of this repository names its own copy; only identical bytes here stand in."""
+    path = pathlib.Path(entry["sourcePath"])
+    if path.resolve().is_relative_to(ROOT):
+        return path
+    parts = path.parts
+    if "fixtures" not in parts:
+        raise ValueError("Authored source is outside any repository fixtures: " + str(path))
+    local = ROOT.joinpath(*parts[len(parts) - 1 - parts[::-1].index("fixtures"):])
+    if not local.is_file() or hashlib.sha256(local.read_bytes()).hexdigest() != entry.get("fileSha256"):
+        raise ValueError("Authored source differs from the one captured in another checkout: " + str(path))
+    return local
 
 
 def fragment(node, namespace=None):
@@ -56,7 +72,7 @@ def extract(reports, route="standard", *, stage_output=None):
         for entry in report["fixtures"]:
             if not entry.get("engineeringVerified") or entry.get("route", "standard") != route:
                 continue
-            source_path = pathlib.Path(entry["sourcePath"])
+            source_path = authored_source(entry)
             for exported in entry["exports"]:
                 records = [row["result"] for row in report["calls"] if row["tool"] == "block_read" and
                            row.get("status") == "passed" and row["result"]["block"]["name"] == exported["name"]]
@@ -117,7 +133,7 @@ def extract(reports, route="standard", *, stage_output=None):
                     prefix = "Unit" if route == "softwareUnit" else "Namespace"
                     observed_name = observed_name.replace("Tgp_" + prefix + "_", "Tgp_Boolean_").replace("Tgp" + prefix + "_", "Tgp_")
                 observed[observed_name] = (minidom.parseString(raw), target, source_hash, cpu)
-    def add(block, language, kind, native_name, instruction=None, data_type=None, pins=None, reader_only=False):
+    def add(block, language, kind, native_name, instruction=None, data_type=None, pins=None, reader_only=False, cross_scope=None):
         if block not in observed:
             return
         document, target, source_hash, cpu = observed[block]
@@ -162,9 +178,18 @@ def extract(reports, route="standard", *, stage_output=None):
         if kind == "call" and route != "standard":
             call_info = part.getElementsByTagName("CallInfo")[0]
             namespace = document.getElementsByTagName("Namespace")[0].firstChild.data
-            assert call_info.getAttribute("Name").startswith(namespace + ".")
+            if cross_scope is None:
+                assert call_info.getAttribute("Name").startswith(namespace + ".")
+            elif call_info.getAttribute("Name") != CROSS_SCOPE_CALLEE or CROSS_SCOPE_CALLEE.startswith(namespace + "."):
+                raise ValueError("Cross-scope reference does not name its callee absolutely: " + block)
             assert not call_info.hasAttribute("Namespace")
-            profile["calleeNameEncoding"] = "namespaceQualified"
+            profile["calleeNameEncoding"] = "crossUnitQualified" if cross_scope == "crossUnit" else "namespaceQualified"
+            if cross_scope == "crossNamespace":
+                # Another namespace of the caller's own unit selects the route's in-unit namespaceQualified profile;
+                # this capture only confirms the absolute Name that profile emits, so it binds no slot of its own.
+                return
+            if cross_scope == "crossUnit":
+                profile["id"] = profile["id"][:-len(".v1")] + ".crossUnit.v1"
         if kind in ("timer", "counter", "edge"):
             member = next(m for m in document.getElementsByTagName("Member") if m.getAttribute("Name") == "Storage")
             profile["instanceType"] = member.getAttribute("Datatype")
@@ -232,7 +257,13 @@ def extract(reports, route="standard", *, stage_output=None):
         call_reference = "Tgp_FC_" + language
         if route != "standard" and call_reference not in observed:
             call_reference = "Tgp_NumericFC_" + language
-        add(call_reference, language, "call", "Call", pins=[pin("en", "input", "Bool"), pin("eno", "output", "Bool", False)])
+        call_pins = [pin("en", "input", "Bool"), pin("eno", "output", "Bool", False)]
+        add(call_reference, language, "call", "Call", pins=call_pins)
+        # Callers of TiaMcp_UnitA's numeric FC from outside its namespace; only the related unit binds its own slot.
+        if route == "softwareUnit":
+            add("TgpCrossUnit_NumericFC_" + language, language, "call", "Call", pins=call_pins, cross_scope="crossUnit")
+        if route == "namespace":
+            add("TgpCrossNamespace_NumericFC_" + language, language, "call", "Call", pins=call_pins, cross_scope="crossNamespace")
     creation_templates = []
     unresolved_templates = []
     global_instance_templates = []
@@ -317,7 +348,7 @@ def extract_catalog(reports, route_reports=(), *, append=False, stage_output=Non
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("reports", nargs="+", type=pathlib.Path)
+    parser.add_argument("reports", nargs="*", type=pathlib.Path)
     parser.add_argument("--route-reports", nargs="*", type=pathlib.Path, default=[])
     parser.add_argument("--append", action="store_true", help="Append newly captured resources without resetting existing qualification evidence.")
     parser.add_argument("--stage-output", type=pathlib.Path, help="Write inactive candidates and native copies to a new artifacts directory; never update deployable fixtures.")

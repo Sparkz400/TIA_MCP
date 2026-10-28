@@ -53,6 +53,20 @@ class CandidateAuditTests(unittest.TestCase):
             change(catalog, capture)
             self.assertFalse(self.run_audit(catalog, capture)["passed"])
 
+    def test_a_capture_from_another_checkout_binds_only_an_identical_source(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "fixtures") as folder:
+            authored = pathlib.Path(folder).resolve() / "x.s7dcl"
+            authored.write_text("authored", encoding="utf-8")
+            catalog, capture = copy.deepcopy(self.catalog), copy.deepcopy(self.capture)
+            catalog["sources"][0].update(authoredSourcePath=authored.relative_to(ROOT).as_posix(),
+                                         authoredSourceSha256=hashlib.sha256(authored.read_bytes()).hexdigest())
+            entry = capture["fixtures"][0]
+            entry["sourcePath"] = str(pathlib.Path(tempfile.gettempdir()) / "other-checkout" / authored.relative_to(ROOT))
+            for digest, passed in ((catalog["sources"][0]["authoredSourceSha256"], True), ("0" * 64, False)):
+                with self.subTest(passed=passed):
+                    entry["fileSha256"] = digest
+                    self.assertEqual(passed, self.run_audit(catalog, capture)["passed"])
+
     def test_prerequisite_number_is_ignored_only_when_auto_numbered(self):
         def db(number, auto):
             return (f'<Document><SW.Blocks.GlobalDB ID="0"><AttributeList><AutoNumber>{auto}</AutoNumber>'
