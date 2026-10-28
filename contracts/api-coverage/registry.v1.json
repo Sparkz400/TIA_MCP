@@ -3597,6 +3597,12 @@
       ]
     },
     {
+      "featureId": "change.opcua_server_settings_set",
+      "obligations": [
+        "D04"
+      ]
+    },
+    {
       "featureId": "change.webserver_page_set",
       "obligations": [
         "D12"

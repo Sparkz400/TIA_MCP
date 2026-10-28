@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Native OPC UA server attribute names and defaults pinned for opcua_server_settings_set. Observations of one owned scratch, not qualification evidence.",
+  "source": {
+    "runner": "scripts/probe_opcua_server_settings.py",
+    "sourceCommit": "98093ae7323be5cfc015424caa61cc3fa66f2d74",
+    "run": "us_9d26eed2",
+    "tiaPortal": "V21 Update 3",
+    "cpu": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+    "serverState": "off (fresh scratch)",
+    "captured": "2026-10-28"
+  },
+  "items": {
+    "cpu": {
+      "name": "ScratchPLC",
+      "attributes": {
+        "OpcUaPurchasedLicense": {
+          "accessMode": "ReadWrite",
+          "type": "System.UInt64",
+          "value": 0
+        },
+        "SysLogAutoAcceptClient": {
+          "accessMode": "ReadWrite",
+          "type": "System.Boolean",
+          "value": false
+        },
+        "WebserverActivate": {
+          "accessMode": "ReadWrite",
+          "type": "System.Boolean",
+          "value": false
+        }
+      }
+    },
+    "opcua": {
+      "name": "OPC UA_1",
+      "selection": "the CPU's one direct sub-item exposing OpcUaServer",
+      "attributes": {
+        "Classification": {
+          "accessMode": "Read",
+          "type": "Siemens.Engineering.HW.DeviceItemClassifications",
+          "value": "None"
+        },
+        "Container": {
+          "accessMode": "Read",
+          "type": "Siemens.Engineering.HW.DeviceItemImpl",
+          "value": {
+            "valueComplete": false,
+            "valueStatus": "displayOnly",
+            "truncated": false,
+            "engineeringType": "Siemens.Engineering.HW.DeviceItemImpl",
+            "identityComplete": false,
+            "name": "ScratchPLC",
+            "positionNumber": 1
+          }
+        },
+        "IsBuiltIn": {
+          "accessMode": "Read",
+          "type": "System.Boolean",
+          "value": true
+        },
+        "IsPlugged": {
+          "accessMode": "Read",
+          "type": "System.Boolean",
+          "value": true
+        },
+        "Items": {
+          "accessMode": "Read",
+          "type": "Siemens.Engineering.HW.DeviceItemAssociation",
+          "value": {
+            "valueComplete": false,
+            "valueStatus": "displayOnly",
+            "truncated": false,
+            "engineeringType": "Siemens.Engineering.HW.DeviceItemAssociation",
+            "identityComplete": false,
+            "expanded": false
+          }
+        },
+        "Name": {
+          "accessMode": "ReadWrite",
+          "type": "System.String",
+          "value": "OPC UA_1"
+        },
+        "OpcUaApplicationName": {
+          "accessMode": "ReadWrite",
+          "type": "System.String",
+          "value": "ScratchPLC"
+        },
+        "OpcUaApplicationUri": {
+          "accessMode": "ReadWrite",
+          "type": "System.String",
+          "value": "urn:SIMATIC:ScratchPLC"
+        },
+        "OpcUaClient": {
+          "accessMode": "ReadWrite",
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaExportArrayMembers": {
+          "accessMode": "ReadWrite",
+          "type": "System.Boolean",
+          "value": true
+        },
+        "OpcUaServer": {
+          "accessMode": "ReadWrite",
+          "type": "System.Boolean",
+          "value": false
+        },
+        "OpcUaServerCertificate": {
+          "accessMode": "ReadWrite",
+          "type": null,
+          "value": null
+        },
+        "PnSubslotNumber": {
+          "accessMode": "Read",
+          "type": "System.Int32",
+          "value": 254
+        },
+        "PositionNumber": {
+          "accessMode": "Read",
+          "type": "System.Int32",
+          "value": 254
+        },
+        "TypeIdentifier": {
+          "accessMode": "Read",
+          "type": null,
+          "value": null
+        },
+        "TypeIdentifierNormalized": {
+          "accessMode": "Read",
+          "type": null,
+          "value": null
+        }
+      }
+    }
+  },
+  "notExposedWhileOff": [
+    "port",
+    "guestAccess",
+    "autoAcceptClientCertificates"
+  ],
+  "licenseValues": {
+    "source": "PublicAPI V21 'TIA Portal Openness Hardware parameters.pdf', OpcUaPurchasedLicense (UInt64)",
+    "values": {
+      "0": "NoLicense",
+      "1": "SimaticOpcUaS71500Small",
+      "2": "SimaticOpcUaS71500Medium",
+      "3": "SimaticOpcUaS71500Large"
+    }
+  },
+  "pinned": {
+    "serverEnabled": {
+      "item": "opcua",
+      "attribute": "OpcUaServer"
+    },
+    "runtimeLicense": {
+      "item": "cpu",
+      "attribute": "OpcUaPurchasedLicense"
+    },
+    "port": null,
+    "guestAccess": null,
+    "autoAcceptClientCertificates": null
+  }
+}

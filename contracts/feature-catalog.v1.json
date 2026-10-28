@@ -24527,6 +24527,58 @@
         "AC-recovery",
         "AC-evidence"
       ]
+    },
+    {
+      "featureId": "change.opcua_server_settings_set",
+      "domain": "opc_ua",
+      "title": "Turn the CPU OPC UA server on or off and set its purchased runtime license from exact expected values",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "opcua_server_settings_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API: DeviceItem.GetAttribute/SetAttribute on the CPU's OPC UA sub-item (OpcUaServer, Boolean) and on the CPU (OpcUaPurchasedLicense, UInt64 0..3 NoLicense/SimaticOpcUaS71500Small/Medium/Large per the V21 hardware parameter description). Names pinned from a native capture on CPU 1511-1 PN V4.1 (fixtures/opcua/server-settings-v21-1511-v41.json)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Payload fields serverEnabled, port, guestAccess, autoAcceptClientCertificates and runtimeLicense, each optional and each { expected, value }; expected must equal the current native value at prepare (ExpectedValueMismatch otherwise). Any other field is refused; passwords, certificates and users are never accepted.",
+          "Only serverEnabled (OpcUaServer) and runtimeLicense (OpcUaPurchasedLicense) have pinned native attributes. port, guestAccess and autoAcceptClientCertificates were not exposed on the captured scratch CPU with the server off and are refused with UnsupportedCapability; nothing is written.",
+          "runtimeLicense records the purchased license in the project; it neither verifies nor activates an entitlement.",
+          "Apply writes serverEnabled first when enabling and last when disabling, then reads every requested attribute back. compile=true is mandatory and compiles all project devices. The change fingerprint adds every device item's pinned OPC UA server attribute values; interruption reconciliation holds the outcome for review.",
+          "Offline project settings only: nothing is downloaded, and clients, server certificates and endpoint reachability are not checked."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an S7-1500 CPU whose OPC UA sub-item exposes a writable OpcUaServer attribute; native eligibility is checked at prepare."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Offline project with an exact top-level plcPath (no scopePath)",
+        "S7-1500 CPU with an OPC UA sub-item",
+        "compile=true and a verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
     }
   ]
 }

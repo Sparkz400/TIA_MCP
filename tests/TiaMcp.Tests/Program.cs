@@ -145,6 +145,8 @@ internal static partial class Program
             ("Simulator admits Softbus and existing TCP/IP single-adapter instances only", SimulationNetworkAdmissionTests.SoftbusAndSingleAdapterAdmission),
             ("Simulator refuses mode switches and unknown network values", SimulationNetworkAdmissionTests.ModeSwitchesAndUnknownValuesRefuse),
             ("Simulator worker never assigns network mode, adapters or IPs", SimulationNetworkAdmissionTests.WorkerNeverAssignsNetworkMode),
+            ("OPC UA server settings map pinned native attributes and payload forms", OpcUaServerSettingsTests.PinnedFieldsAndPayloadForms),
+            ("OPC UA server settings refuse bad values and stale expectations", OpcUaServerSettingsTests.RefusesBadValuesAndStaleExpectations),
             ("Project reviews survive restart and reject tampering", ProjectReviewStoreTests.PersistenceAndTamper),
             ("Project reviews preserve native content and direct impacts", ProjectReviewStoreTests.ContentAndImpact),
             ("Project reviews retain incomplete coverage and exact copy identity", ProjectReviewStoreTests.CoverageAndCopyIdentity),
