@@ -1,0 +1,69 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.watch.lifecycle.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T16:10:18+00:00",
+  "source": {
+    "commit": "365085a745d192e9ea45c28076ab6333c6a80ac6",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_watch_lifecycle.py (lc2) on a frozen Debug build of 74bac9b (D:\\wp\\b53, git-archived sources with source-manifest.json) in a fresh owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21 Update 3, seeded with the MilestoneWatch fixture (root peers MilestoneWatch, UnchangedPeer and the scratch's force table): six chained lifecycle operations on the saved original project (create group WTL_Group, create table WTL_Table in it, rename the group to WTL_Renamed with the table inside, rename the table to WTL_Moved, delete it, delete the group), each prepared through its watch_table_prepare_* or watch_table_group_prepare_* tool, reviewed independently from the retained files (plan digest, inputs, an independently computed expected group subtree and profile gate), applied once through watch_table_apply with subtree readback and unchanged peers, verified by watch_table_verify_reopen after a fresh Portal reopen, recovered from its checkpoint into a new location whose fresh reopen equals the pre-operation subtree, and reconciled for restored and original; each next baseline equals the previous verified subtree; seven typed prepare refusals (WatchGroupCollision, WatchTableCollision, WatchGroupNotEmpty, WatchGroupNotFound twice, WatchTableNotFound twice); every owned Portal and worker lifetime closed with exit proofs.",
+  "limitations": [
+    "Isolated qualification Host (--component-qualification --watch-qualification none); production apply of the lifecycle profiles stays disabled.",
+    "One user group level below root, ASCII names, one empty table; force tables, nested groups deeper than one level, escaped names and web/display access rules are not exercised.",
+    "No Host or worker loss during lifecycle operations; offline stored configuration only, no monitoring, modify or forcing.",
+    "Trial lc1 (D:\\wp\\wt\\lc1) stopped at the second apply with ProjectIsolationRequired because the unseeded scratch was no longer owned after a reopen; it is retained as failed and not cited."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "57b40149d74e05bce0abe24091e1766854ccfd76f2a904b4d89c636621f37f6c"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "37ed650a9cbfabca7e3c69918e02cf9d7ab6a0ffbd62dd1fa4106994193cc003"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "3769c89921fdfa80382d1776e7c9212392b10a918c35c50e87850ae87ca43373",
+      "bytes": 9705,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_apply",
+        "watch_table_group_prepare_create",
+        "watch_table_group_prepare_delete",
+        "watch_table_group_prepare_rename",
+        "watch_table_prepare_create",
+        "watch_table_prepare_delete",
+        "watch_table_prepare_rename",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover",
+        "watch_table_verify_reopen"
+      ],
+      "toolsRejected": [
+        "watch_table_group_prepare_create",
+        "watch_table_group_prepare_delete",
+        "watch_table_group_prepare_rename",
+        "watch_table_prepare_create",
+        "watch_table_prepare_delete",
+        "watch_table_prepare_rename"
+      ]
+    }
+  ]
+}
