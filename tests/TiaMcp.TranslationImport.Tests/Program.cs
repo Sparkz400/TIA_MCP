@@ -64,6 +64,30 @@ byte[] ClosedProof(string worker) => Fixture.Json(new { tree = new { completed =
             proof = new { completed = true, processExitVerified = true, birthAndImageVerified = true, sameOsHandleRetained = true,
                 handleClosed = true, exitCode = 0, deadlineOrCancellationObserved = false } }).ToArray() } });
 
+Test("Main comment view accepts the German and English TIA UI labels only", () => {
+    string project = Path.Combine(output, "Fixture.ap21");
+    True(TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Programmbausteine\\Main\\Bausteinkommentar", project) &&
+        TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Program blocks\\Main\\Block comment", project) &&
+        !TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Program blocks\\Main\\Initial_Call", project) &&
+        !TranslationNativeComparison.MainCommentView("Fixture\\PLC\\Program blocks\\TiaMcp_IsEnabled\\Block comment", project) &&
+        !TranslationNativeComparison.MainCommentView("Other\\PLC\\Program blocks\\Main\\Block comment", project));
+    return Task.CompletedTask;
+});
+Test("import warnings are accepted only as read-only rows the candidate leaves unchanged", () => {
+    var f = New(); var c = new TranslationWorkflowStore(f.Root).NativeCandidate(f.CandidateRef, f.CandidateReceipt);
+    byte[] Log(params (string Type, string Message)[] entries) => Encoding.UTF8.GetBytes(new XElement("LogFile",
+        entries.Select(e => new XElement("LogEntry", new XAttribute("type", e.Type), new XElement("Message", e.Message)))).ToString());
+    (string, string) ReadOnly(string key) => ("Warning", "Object in row 3 with internal ID '" + key + "' is read-only and therefore cannot update value.");
+    (string, string) started = ("Information", "Text import started."), done = ("Warning", "Text import completed with warnings.");
+    bool Accepts(byte[] log) => TranslationWorkerAdapter.OnlyUnchangedReadOnlyWarnings(log, c.Baseline, c.Candidate, "en-GB");
+    True(Accepts(Log(started, ReadOnly("K-2"), done)), "unchanged read-only row refused");
+    True(!Accepts(Log(started, ReadOnly("K-1"), done)), "changed row accepted");
+    True(!Accepts(Log(started, ReadOnly("K-9"), done)), "unknown key accepted");
+    True(!Accepts(Log(started, ("Warning", "Something else."), done)), "other warning accepted");
+    True(!Accepts(Log(started, ReadOnly("K-2"))), "incomplete log accepted");
+    True(!Accepts(Encoding.UTF8.GetBytes("<!DOCTYPE x><LogFile/>")), "DTD accepted");
+    return Task.CompletedTask;
+});
 Test("completed owned fixture resumes by observation without repeating import or recovery", async () => {
     string root = Path.Combine(output, Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
     string worker = Path.Combine(root, "synthetic-worker"); File.WriteAllText(worker, "Synthetic test worker, never executable");

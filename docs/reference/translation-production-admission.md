@@ -1,6 +1,6 @@
 # Exact translation production admission
 
-Production import requires a fixed installation-owned, operator-reviewed admission registry. No registry is installed by this change. The ten offline tools support capture → inspection → proposal → exact approval → candidate → reconciliation. Six normal native tools expose capture, prepare, apply, status, recover and reconcile; all dispatching routes reject missing admission before starting a worker. Neither an uploaded workbook nor an MCP request flag enables a native write. See [the user workflow](translation-host-workflow.md) and [native execution/recovery](translation-native-import.md).
+Production import requires a fixed installation-owned, operator-reviewed admission registry. No registry ships with the repository or a package; [`build_translation_admission.py`](#building-and-installing-a-registry) builds one from a verified same-instance packet. The ten offline tools support capture → inspection → proposal → exact approval → candidate → reconciliation. Six normal native tools expose capture, prepare, apply, status, recover and reconcile; all dispatching routes reject missing admission before starting a worker. Neither an uploaded workbook nor an MCP request flag enables a native write. See [the user workflow](translation-host-workflow.md) and [native execution/recovery](translation-native-import.md).
 
 The accepted package-03/package-06 no-op and Main OB1 edit remain [historical native evidence](../verification/translation-native-import-20261016.md). The new [failure packet](../verification/translation-admission-20261016.md) adds separately frozen interruption evidence. These results are not silently reassigned to a newer worker or production assembly.
 
@@ -23,7 +23,9 @@ This is trusted deployment configuration. Its loader verifies receipt integrity 
 
 The explicit local startup argument `--translation-qualification` exposes qualification tools on those same binaries. It is mutually exclusive with component, watch and TestSuite qualification modes, forwarded by the Host to the worker, and cannot be enabled through MCP. Default tool registration contains no qualification surfaces. Qualification-only source-drift fixture actions remain unavailable in normal mode.
 
-## Remaining same-fixture qualification proposal
+## Same-fixture qualification
+
+This bounded procedure was executed natively under V21 Update 3 on 28 October 2026 ([record](../verification/translation-native-20261028.md)).
 
 Fresh fixtures have different exact project/view/native identities. Their failure receipts cannot collectively satisfy one exact instance key. Removing those identities to make the receipts match would require a separately justified profile-equivalence contract; none is asserted here.
 
@@ -37,3 +39,13 @@ The implemented bounded controller uses a new immutable package and one fresh fi
 6. Require normal retained-handle exits and zero owned pending resources at each closed window. Freeze the production admission implementation before executing cases whose receipts will enable that implementation. The final prepared B→F plan is retained unattempted, and its exact key must still match. Review/install the candidate registry separately, then prove a normal default-mode lifecycle on the unchanged binary.
 
 No reverse edit, source-drift mutation or registry installation is authorized by an earlier packet. `qualify_translation_import.py --same-instance` and the independent `verify_translation_admission.py` implement this concrete bounded continuation; they need fresh packet admission. Restore-to-original/overwrite remains excluded. Accepted historical fixtures and old packages remain untouched.
+
+## Building and installing a registry
+
+`scripts/build_translation_admission.py` packages one verified same-instance packet into a registry entry and installs the identical registry next to the Host and the worker (`translation-admission/registry.json` plus content-addressed `evidence/`). The key is the packet's Host-issued forward key. Every native case cites one evidence file holding the independent `verify_translation_admission.py` receipt and the hashes of the packet's result, admission, forward key and exact close receipts. Every portable case cites the `TiaMcp.TranslationImport.Tests` receipt built from the same frozen source, whose `source-manifest.json` hash is the entry's `sourcePackageSha256`. It refuses an existing installation, a verification for another key and a failed portable suite.
+
+```bash
+python -B scripts/build_translation_admission.py --packet <same-instance root> --verification <verifier output> --portable <TranslationImport.Tests verification.json> --source-manifest <frozen source-manifest.json> --host <deployed TiaMcp.Host.exe> --worker <deployed TiaMcp.Openness.V21.exe> --profile-id <id>
+```
+
+The resulting entry admits exactly the packet's scratch project and its one Main OB1 comment edit. Building it does not review the evidence for the operator; installing it into a deployment is the operator's decision. On 28 October it was installed only into a byte-identical copy of the frozen test binaries, never into a shipped package. `scripts/qualify_translation_native.py` then exercises the six default-mode tools on that installation.

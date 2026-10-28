@@ -69,12 +69,20 @@ namespace TiaMcp.Simulator.V8
             ECPUType cpu;
             if (!Enum.TryParse(cpuName, false, out cpu) || !Enum.IsDefined(typeof(ECPUType), cpu))
                 throw new SimulatorException("InvalidRequest", "cpuType must be an exact V8 ECPUType enum name, for example CPU1511.");
+            string communication = args.Value<string>("communicationInterface") ?? "Softbus";
+            if (communication != "Softbus" && communication != "TCPIP")
+                throw new SimulatorException("InvalidRequest", "communicationInterface must be Softbus or TCPIP.");
+            // V8 derives an instance's interface from the machine-wide mode, which is never assigned here. TCP/IP is
+            // admitted only in the operator's existing single-adapter mode; every later admission compares the live interface.
+            if (communication == "TCPIP" && SimulationNetworkAdmission.Refusal(SimulationRuntimeManager.NetworkMode.ToString(), "TCPIP", "TCPIP") != null)
+                throw new SimulatorException("TcpIpModeRequired", TcpIpMessage);
             string name = "TiaMcp_" + Guid.NewGuid().ToString("N");
             string storage = Path.Combine(root, name);
             if (storage.Length > 180) throw new SimulatorException("InvalidRequest", "Use a shorter artifact directory; instance storage must remain below 180 characters.");
             Directory.CreateDirectory(storage);
             string creationId = SimulationCreationJournal.ValidateId(args.Value<string>("creationId") ?? Guid.NewGuid().ToString("N"));
             var receipt = SimulationCreationJournal.Begin(root, creationId, name, storage, cpu.ToString());
+            receipt["communicationInterface"] = communication;
             IInstance instance = null;
             try
             {
@@ -194,8 +202,7 @@ namespace TiaMcp.Simulator.V8
             switch (action)
             {
                 case "powerOn":
-                    if (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
-                        throw new SimulatorException("SoftbusRequired", "This adapter only powers instances in existing local Softbus mode. It does not reconfigure shared adapters or network mode.");
+                    EnsureAdmitted(selected);
                     // LicenseStatus documents the currently used license; it cannot
                     // prove available entitlement for an Off CPU. PowerOn is the
                     // documented licensing check, and no ALM dialog is confirmed.
@@ -213,7 +220,7 @@ namespace TiaMcp.Simulator.V8
                     }
                     break;
                 case "powerOff": selected.Instance.PowerOff(timeout); break;
-                case "run": EnsureSoftbus(selected); selected.Instance.Run(timeout); break;
+                case "run": EnsureAdmitted(selected); selected.Instance.Run(timeout); break;
                 case "stop": selected.Instance.Stop(timeout); break;
                 default: throw new SimulatorException("InvalidRequest", "action must be powerOn, powerOff, run, or stop.");
             }
@@ -260,7 +267,7 @@ namespace TiaMcp.Simulator.V8
         private JObject Write(JObject args)
         {
             var selected = Get(args);
-            EnsureSoftbus(selected);
+            EnsureAdmitted(selected);
             var writes = Signals(args["writes"], true);
             var result = Envelope(selected);
             result["writes"] = ApplyWrites(selected, writes);
@@ -293,6 +300,7 @@ namespace TiaMcp.Simulator.V8
             using (var sha = System.Security.Cryptography.SHA256.Create())
                 result["markerSha256"] = BitConverter.ToString(sha.ComputeHash(File.ReadAllBytes(marker.FullName))).Replace("-", "").ToLowerInvariant();
             result["controllerAddresses"] = new JArray(selected.Instance.ControllerIP ?? new string[0]);
+            result["communicationInterface"] = EnsureAdmitted(selected);
             return result;
         }
 
@@ -301,7 +309,7 @@ namespace TiaMcp.Simulator.V8
         private JObject WriteOwned(JObject args)
         {
             var selected = Owned(args);
-            EnsureSoftbus(selected);
+            EnsureAdmitted(selected);
             var writes = Signals(args["writes"], true);
             var expected = Signals(new JArray(args["writes"].Select(w => new JObject { ["symbol"] = w["symbol"], ["type"] = w["type"], ["value"] = w["expected"] })), true);
             if (writes.Count > 16 || writes.Select(w => w.Symbol).Distinct(StringComparer.Ordinal).Count() != writes.Count)
@@ -430,7 +438,7 @@ namespace TiaMcp.Simulator.V8
         private JObject Test(JObject args)
         {
             var selected = Get(args);
-            EnsureSoftbus(selected);
+            EnsureAdmitted(selected);
             if (selected.Instance.OperatingState != EOperatingState.Run)
                 throw new SimulatorException("SimulationNotRunning", "Start the selected simulated CPU before running a scenario.");
             string root = DirectoryArgument(args);
@@ -665,10 +673,17 @@ namespace TiaMcp.Simulator.V8
             return selected;
         }
 
-        private static void EnsureSoftbus(Selection selected)
+        private const string TcpIpMessage = "TCP/IP instances require PLCSIM's existing TCP/IP single-adapter mode. This adapter never changes shared network configuration.";
+
+        // Returns the interface recorded at creation; selections without a receipt stay Softbus-only.
+        private static string EnsureAdmitted(Selection selected)
         {
-            if (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus || selected.Instance.CommunicationInterface != ECommunicationInterface.Softbus)
-                throw new SimulatorException("SoftbusRequired", "Runtime writes and RUN require a local Softbus instance. This adapter never changes shared network configuration.");
+            string required = selected.CreationReceipt?.Value<string>("communicationInterface") ?? "Softbus";
+            string code = SimulationNetworkAdmission.Refusal(SimulationRuntimeManager.NetworkMode.ToString(), selected.Instance.CommunicationInterface.ToString(), required);
+            if (code == "SoftbusRequired")
+                throw new SimulatorException(code, "Runtime writes and RUN require a local Softbus instance. This adapter never changes shared network configuration.");
+            if (code != null) throw new SimulatorException(code, TcpIpMessage);
+            return required;
         }
 
         private static JObject Info(Selection selected)

@@ -8,9 +8,11 @@ using System.Text.Json.Serialization;
 
 namespace TiaMcp.Core.PhysicalRuntime;
 
-/// <summary>An owned PLCSIM Advanced instance as the simulator worker observed it. Never a physical PLC or a caller claim.</summary>
+/// <summary>An owned PLCSIM Advanced instance as the simulator worker observed it. Never a physical PLC or a caller claim.
+/// CommunicationInterface is null only in bindings retained before it was recorded; those never back a network endpoint.</summary>
 public sealed record PlcsimTargetBinding(string SchemaVersion, int InstanceId, string InstanceName, string CreationId,
-    string StoragePath, string MarkerSha256, string[] ControllerAddresses, string? ProgramFingerprintSha256, DateTimeOffset ObservedUtc);
+    string StoragePath, string MarkerSha256, string[] ControllerAddresses, string? ProgramFingerprintSha256, DateTimeOffset ObservedUtc,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? CommunicationInterface = null);
 
 /// <summary>Retained, content-addressed owned-PLCSIM bindings. Runtime writes and control require one that covers the session endpoint.</summary>
 public static class PlcsimTargetBindings
@@ -32,7 +34,9 @@ public static class PlcsimTargetBindings
             var addresses = identity.GetProperty("controllerAddresses").EnumerateArray().Select(a => a.GetString()!)
                 .Where(a => a != "0.0.0.0").Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
             var binding = new PlcsimTargetBinding("plcsim-target-binding.v1", instanceId, instanceName, creationId,
-                instance.GetProperty("storagePath").GetString()!, identity.GetProperty("markerSha256").GetString()!, addresses, null, observedUtc);
+                instance.GetProperty("storagePath").GetString()!, identity.GetProperty("markerSha256").GetString()!, addresses, null, observedUtc,
+                identity.GetProperty("communicationInterface").GetString());
+            Require(binding.CommunicationInterface is not null);
             Validate(binding); return binding;
         }
         catch (Exception e) when (e is InvalidOperationException or KeyNotFoundException or FormatException or ArgumentNullException) { throw Error(); }
@@ -89,12 +93,14 @@ public static class PlcsimTargetBindings
         catch (JsonException) { throw Error(); }
     }
 
-    /// <summary>Only a literal controller address of the bound instance qualifies; host names, other addresses and physical PLCs stay unbound.</summary>
-    public static bool Covers(PlcsimTargetBinding binding, string endpoint) => Uri.TryCreate(endpoint, UriKind.Absolute, out var uri) &&
-        uri.HostNameType == UriHostNameType.IPv4 && binding.ControllerAddresses.Contains(uri.Host, StringComparer.Ordinal);
+    /// <summary>Only a literal controller address of a TCP/IP-bound instance qualifies; Softbus instances, host names, other addresses and physical PLCs stay unbound.</summary>
+    public static bool Covers(PlcsimTargetBinding binding, string endpoint) => binding.CommunicationInterface == "TCPIP" &&
+        Uri.TryCreate(endpoint, UriKind.Absolute, out var uri) && uri.HostNameType == UriHostNameType.IPv4 && binding.ControllerAddresses.Contains(uri.Host, StringComparer.Ordinal);
 
     public static void RequireEndpoint(PlcsimTargetBinding binding, string endpoint)
     {
+        if (binding.CommunicationInterface != "TCPIP") throw new BridgeException("PlcsimEndpointUnreachable",
+            "The bound owned PLCSIM instance is not on PLCSIM's TCP/IP network (Softbus, or a binding retained before the interface was recorded), so no network endpoint reaches it. Bind a TCPIP instance; nothing was sent.");
         if (!Covers(binding, endpoint)) throw new BridgeException("RuntimeTargetNotOwnedPlcsim",
             "The connected endpoint is not a controller address of the bound owned PLCSIM instance. Writes and control are refused for physical PLCs and unbound targets; nothing was sent.");
     }
@@ -102,7 +108,7 @@ public static class PlcsimTargetBindings
     public static void RequireSameInstance(PlcsimTargetBinding recorded, PlcsimTargetBinding current)
     {
         if (recorded.InstanceId != current.InstanceId || recorded.InstanceName != current.InstanceName || recorded.CreationId != current.CreationId ||
-            recorded.StoragePath != current.StoragePath || recorded.MarkerSha256 != current.MarkerSha256 ||
+            recorded.StoragePath != current.StoragePath || recorded.MarkerSha256 != current.MarkerSha256 || recorded.CommunicationInterface != current.CommunicationInterface ||
             !recorded.ControllerAddresses.SequenceEqual(current.ControllerAddresses, StringComparer.Ordinal))
             throw new BridgeException("PlcsimTargetBindingStale", "The owned PLCSIM instance no longer matches its binding. Bind it again; nothing was sent.");
     }
@@ -117,7 +123,7 @@ public static class PlcsimTargetBindings
         binding.ControllerAddresses is { Length: >= 1 and <= 16 } && binding.ControllerAddresses.All(a => IPAddress.TryParse(a, out var ip) &&
             ip.AddressFamily == AddressFamily.InterNetwork && ip.ToString() == a && a != "0.0.0.0") &&
         binding.ControllerAddresses.SequenceEqual(binding.ControllerAddresses.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)) &&
-        (binding.ProgramFingerprintSha256 is null || Hex(binding.ProgramFingerprintSha256, 64)));
+        (binding.ProgramFingerprintSha256 is null || Hex(binding.ProgramFingerprintSha256, 64)) && binding.CommunicationInterface is null or "Softbus" or "TCPIP");
     private static bool Text(string? value, int maximum) => !string.IsNullOrWhiteSpace(value) && value.Length <= maximum && !value.Any(char.IsControl);
     private static bool Hex(string? value, int length) => value?.Length == length && value.All(c => c is >= '0' and <= '9' or >= 'a' and <= 'f');
     private static void Require([DoesNotReturnIf(false)] bool condition) { if (!condition) throw Error(); }

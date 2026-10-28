@@ -141,6 +141,17 @@ try
             Check((await store.Disconnect(id)).State == "closed" && server.SessionCount == 0, "Owned CloseSession confirmed at server");
             Save("healthy-status", await store.Status(id));
         }
+        await using (var store = Store("advertised-form"))
+        {
+            // Siemens servers advertise opc.tcp://host:port without the root slash; the store canonicalizes it once at entry.
+            var bare = server.Selection with { Endpoint = server.Selection.Endpoint.TrimEnd('/') };
+            string id = Id(); var status = await store.Connect(id, bare);
+            Check(status.State == "connected" && status.Selection == server.Selection, "Endpoint without the root slash connects in canonical form");
+            Check((await store.Connect(id, server.Selection)) == status, "Both endpoint forms name the same attempt");
+            Check(OpcUaRuntimeSessionStore.Binding(User(bare)) == OpcUaRuntimeSessionStore.Binding(User(server.Selection)), "Credential binding uses the canonical endpoint");
+            await Refused(() => store.Connect(Id(), bare with { Endpoint = bare.Endpoint + "?x=1" }), "UaEndpointSelectionInvalid", "Canonicalization keeps query refusal");
+            Check((await store.Disconnect(id)).State == "closed", "Canonical session closes");
+        }
         foreach (var (name, selection) in new[] {
             ("wrongPin", server.Selection with { CertificateSha256 = new('0',64) }),
             ("wrongUri", server.Selection with { ApplicationUri = "urn:wrong:server" }) })

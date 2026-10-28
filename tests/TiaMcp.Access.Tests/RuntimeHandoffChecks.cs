@@ -144,7 +144,7 @@ internal static class RuntimeHandoffChecks
         }
         // An owned PLCSIM binding replaces the supplied target/program claims; its absence is stated, legacy requests keep their bytes.
         var bound = new PlcsimTargetBinding("plcsim-target-binding.v1", 3, "Sim1", new string('a',32), @"C:\sim\Sim1", new string('b',64),
-            ["192.168.0.10"], new string('c',64), DateTimeOffset.UnixEpoch);
+            ["192.168.0.10"], new string('c',64), DateTimeOffset.UnixEpoch, "TCPIP");
         var bindingRef = PlcsimTargetBindings.Retain(root, bound);
         JsonNode Endpoint(string endpoint) => JsonSerializer.SerializeToNode(WebRuntimeProtocol.Context(endpoint, new string('1',32), new string('2',32), new string('3',64)), BridgeProtocol.Json)!;
         JsonObject Bound(Action<JsonObject>? rowChange = null, Action<JsonObject>? requestChange = null, string endpoint = "https://192.168.0.10")
@@ -167,6 +167,8 @@ internal static class RuntimeHandoffChecks
             "Handoff: a supplied target claim cannot replace the bound identity");
         check(Invalid(Bound(rows => rows["program"]!["identity"] = Identity("program:original"))), "Handoff: program must match the bound fingerprint");
         check(Invalid(Bound(endpoint: "https://192.168.0.11")), "Handoff: endpoint outside the binding stays unbound");
+        var softbusRef = PlcsimTargetBindings.Retain(root, bound with { CommunicationInterface = "Softbus" });
+        check(Invalid(Bound(requestChange: p => p["plcsimBinding"] = softbusRef.DeepClone())), "Handoff: a Softbus binding never backs a network endpoint");
         check((string?)Bound(requestChange: p => p["plcsimBinding"] = null)["targetBinding"]!["state"] == "unbound", "Handoff: explicit unbound statement");
         check(Build(request)["targetBinding"] is null, "Handoff: requests without plcsimBinding keep their original report shape");
         Reject("binding outside the binding store", p => p["plcsimBinding"] = new JsonObject { ["path"] = targetRef["path"]!.DeepClone(), ["sha256"] = targetRef["sha256"]!.DeepClone() });

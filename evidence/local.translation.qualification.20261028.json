@@ -1,0 +1,68 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.qualification.20261028",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-28T16:57:52+00:00",
+  "source": {
+    "commit": "d0bc0b1bd9cc0bc5bb8ed58e1b32bad3e6179f8d",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "The ten qualification_translation_* tools in an explicit --translation-qualification session on a frozen Debug build of bf12c29 (D:\\wp\\tr07) under TIA Portal V21 Update 3: one same-instance packet (seven forward failure cases, three reviewed reverse edits, 8 imports, 10 distinct restorations, final unattempted plan with the same key; independent verify_translation_admission.py passed), a fresh fixture with category probes and a pre-checkpoint interruption, its read-only reconciliation by a new Host after exact close with a no-op lifecycle, and a resumed closed fixture with the Main edit and a lost restore reply.",
+  "limitations": [
+    "One owned CPU 1511-1 PN V4.1 scratch per packet, English TIA UI, de-DE reference and en-GB target, one PLC, target-only plain text; generalized culture pairs, several PLC owners, source-text mode, rich text, HMI and customer projects were not run.",
+    "Category leakage still holds: block-comment, hardware and alarm-class requests on the PLC each returned all six PLC rows; the populated-Main control is inconclusive on an English-UI scratch."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "8c471f38b962efa35f358a788da14650b966296dbffa7d443959ac702f0e79f8"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "4b0f85e5cb9de21bb861a0e48f1fede23e18c444fd8d7e6e71bc2568a1d66a3e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "5c8f2d7690f455566f3a6168af7b6d1439e822e137d17a3605c48502503d7d38",
+      "bytes": 22736,
+      "completed": true,
+      "steps": [
+        "si: completed",
+        "q1: completed",
+        "continuation-01: completed",
+        "continuation-02: completed",
+        "verifier si-verification.json: completed"
+      ],
+      "toolsPassed": [
+        "project_open",
+        "qualification_translation_apply",
+        "qualification_translation_capture",
+        "qualification_translation_categories",
+        "qualification_translation_fixture",
+        "qualification_translation_prepare",
+        "qualification_translation_reconcile",
+        "qualification_translation_reconcile_before_checkpoint",
+        "qualification_translation_recover",
+        "qualification_translation_resume_closed_fixture",
+        "qualification_translation_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_translation_apply",
+        "qualification_translation_recover"
+      ]
+    }
+  ]
+}

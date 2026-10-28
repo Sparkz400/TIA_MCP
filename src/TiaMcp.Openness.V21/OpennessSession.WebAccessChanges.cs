@@ -295,7 +295,10 @@ namespace TiaMcp.Openness.V21
                 string path = row.Value<string>("device"), id = row.Value<string>("identifier");
                 var umacDevice = devices.FirstOrDefault(d => d.Key == path).Value ?? throw new BridgeException("ObjectNotFound", "No UMAC device has the path " + path + ".");
                 var right = (grant ? umacDevice.AvailableDeviceFunctionRights.ToArray() : role.GetAssignedDeviceFunctionRights(umacDevice).ToArray()).FirstOrDefault(r => r.Identifier == id)
-                    ?? throw new BridgeException("ObjectNotFound", "Device function right " + id + (grant ? " is not available on " : " is not assigned to this role on ") + path + ".");
+                    ?? throw new BridgeException("ObjectNotFound", "Device function right " + id + (grant ? " is not available on " : " is not assigned to this role on ") + path + ".",
+                        // No inspection lists available device rights, so a refused grant names them (for example "OPC UA server access").
+                        grant ? new JObject { ["availableRights"] = new JArray(umacDevice.AvailableDeviceFunctionRights.Select(r => new JObject {
+                            ["identifier"] = r.Identifier, ["name"] = r.Name, ["group"] = r.Group })) } : null);
                 return new KeyValuePair<UmacDevice, DeviceFunctionRight>(umacDevice, right);
             }).ToArray();
         }

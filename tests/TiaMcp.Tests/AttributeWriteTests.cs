@@ -123,13 +123,14 @@ namespace TiaMcp.Tests
         }
 
         private enum Choice { First, Second }
+        [Flags] private enum Modes { None = 0, Controller = 1, Device = 2 }
         internal static async Task ScalarValues()
         {
             foreach (bool nullBefore in new[] { false, true })
-            foreach (object after in new object[] { (byte)2, (sbyte)-2, (short)-2, (ushort)2, 2, 2U, 9007199254740993L, ulong.MaxValue, 2.5F, 2.5D, 2.5M, true, "日本語\r\n😀", Choice.Second })
+            foreach (object after in new object[] { (byte)2, (sbyte)-2, (short)-2, (ushort)2, 2, 2U, 9007199254740993L, ulong.MaxValue, 2.5F, 2.5D, 2.5M, true, "日本語\r\n😀", Choice.Second, Modes.Controller | Modes.Device })
             {
                 var t = new Target(); t.Values["First"] = nullBefore ? null : after; t.Attributes[0].SupportedTypes = [after.GetType()];
-                var request = Request(("First", after is Choice ? new JValue(after.ToString()) : JToken.FromObject(after))); string original = request.ToString();
+                var request = Request(("First", after is Enum ? new JValue(after.ToString()) : JToken.FromObject(after))); string original = request.ToString();
                 var preview = OpennessSession.PreviewAttributesForTest(t, request, Allowed);
                 Check.Equal(after.GetType().FullName, (string?)preview[0]!["type"]); Check.Equal(0, t.Writes.Count);
                 var normalized = OpennessSession.NormalizedAttributesForTest(t, request, Allowed);
@@ -141,6 +142,7 @@ namespace TiaMcp.Tests
                 (1, JValue.CreateNull(), "InvalidRequest"), (1, new JArray(1), "InvalidRequest"), (1, new JValue(1.5), "InvalidRequest"),
                 (1, new JValue(long.MaxValue), "InvalidRequest"), (1F, new JValue(double.MaxValue), "InvalidRequest"), (1D, new JValue(double.NaN), "InvalidRequest"),
                 (false, new JValue(1), "InvalidRequest"), ("old", new JValue(1), "InvalidRequest"), (Choice.First, new JValue("second"), "InvalidRequest"),
+                (Choice.First, new JValue("First, Second"), "InvalidRequest"), (Modes.Controller, new JValue("Controller, Shared"), "InvalidRequest"),
                 (new object(), new JValue(2), "UnsupportedAttributeType") })
             {
                 var t = new Target(); t.Values["First"] = before;

@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
 from zipfile import ZipFile
@@ -11,6 +12,20 @@ from qualify_translation_category_probe import scan_store, require, WindowsFiles
 from verify_watch_workflow import canonical_sha
 
 S = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
+# ExportProjectTexts labels view paths in the TIA UI language; German and English were observed natively.
+MAIN_COMMENT_VIEWS = (['Programmbausteine', 'Main', 'Bausteinkommentar'], ['Program blocks', 'Main', 'Block comment'])
+READ_ONLY = re.compile(r"Object in row [0-9]+ with internal ID '([^']+)' is read-only and therefore cannot update value\.")
+
+
+def accepted_return(state, log, before, candidate):
+    """Info, or the Update 3 Warning made only of read-only rows the candidate leaves unchanged (TranslationWorkerAdapter)."""
+    if state == 'Info': return True
+    require(b'<!DOCTYPE' not in log, 'DTD refused')
+    entries = [(e.get('type'), e.findtext('Message')) for e in ET.fromstring(log).iter('LogEntry')]
+    if state != 'Warning' or len(entries) < 3 or entries[0] != ('Information', 'Text import started.') or \
+            entries[-1] != ('Warning', 'Text import completed with warnings.'): return False
+    keys = [READ_ONLY.fullmatch(message or '') for kind, message in entries[1:-1] if kind == 'Warning']
+    return len(keys) == len(entries) - 2 and all(m and m.group(1) in before and before[m.group(1)] == candidate.get(m.group(1)) for m in keys)
 
 
 def workbook(data):
@@ -114,7 +129,7 @@ def verify(root):
         if changes:
             key = changes[0]; require(before[key][:-1] == candidate[key][:-1] and candidate[key][-1] == edit_oracle['replacement'], 'Non-target edit')
             view = before[key][2].split('\\')
-            require(len(view) == 5 and view[2:] == ['Programmbausteine','Main','Bausteinkommentar'] and before[key][1] == '<BlockCommentCategoryData>', 'Edit does not bind exact Main comment')
+            require(len(view) == 5 and view[2:] in MAIN_COMMENT_VIEWS and before[key][1] == '<BlockCommentCategoryData>', 'Edit does not bind exact Main comment')
             old, new = before[key][-1], candidate[key][-1]
         else: old = new = ''
         evidence = {e['gate']: e['artifact'] for e in applied['evidence']}

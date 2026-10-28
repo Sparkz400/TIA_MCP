@@ -33,7 +33,9 @@ namespace TiaMcp.Openness.V21
         private static readonly HashSet<string> HardwareWriteAttributes = new HashSet<string>(new[]
         {
             "Name", "Author", "Comment", "InformationText", "PlantDesignation", "LocationIdentifier", "AdditionalInformation",
-            "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay"
+            "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay",
+            // A PROFINET interface's InterfaceOperatingModes flags: "IoController, IoDevice" makes an S7-1500 CPU an I-device.
+            "InterfaceOperatingMode"
         }, StringComparer.Ordinal);
         private static readonly HashSet<string> NetworkWriteAttributes = new HashSet<string>(new[]
         {
@@ -80,6 +82,7 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
+                if (change.Kind == "opcua_server_settings_set") change.Preview["fingerprintScope"] += " OPC UA server settings additionally cover every device item's pinned OPC UA server attribute values (server, port, automatic certificate acceptance, purchased license).";
                 if (change.Kind == "webserver_page_set") change.Preview["fingerprintScope"] += " Web page settings additionally cover every web-capable CPU's WebserverActivate value, system web page flag and web application names, types and default flags.";
                 if (change.Kind == "umac_role_set") change.Preview["fingerprintScope"] += " UMAC role changes additionally cover all custom and system roles with engineering and device function rights, and the role assignments and activation state of project, anonymous and UMC principals.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
@@ -223,6 +226,7 @@ namespace TiaMcp.Openness.V21
                     change.PrimaryFailure = ex.Message;
                     // The failure's own evidence (for example the rows a preservation check found changed) is journaled with the change.
                     if ((ex as BridgeException)?.Details is JObject details) change.Readbacks.Add(new JObject { ["role"] = "failure-details", ["details"] = details.DeepClone() });
+                    else change.Readbacks.Add(new JObject { ["role"] = "native-exception", ["chain"] = NativeFailureText.Chain(ex) });
                     CaptureTechnologyEvidence(change);
                     try { change.AfterFingerprint = EngineeringFingerprint(change, project); } catch { }
                     WriteChangeJournal(change);
@@ -506,6 +510,9 @@ namespace TiaMcp.Openness.V21
                 case "opcua_role_mapping_set":
                     PrepareOpcUaChange(change, preview);
                     break;
+                case "opcua_server_settings_set":
+                    PrepareOpcUaServerSettings(change, preview);
+                    break;
                 case "webserver_page_set":
                     PrepareWebServerPageSet(change, preview);
                     break;
@@ -607,10 +614,15 @@ namespace TiaMcp.Openness.V21
                     if (EngineeringDevices(project).Any(d => string.Equals(d.Name, name, StringComparison.OrdinalIgnoreCase))) throw new BridgeException("ObjectExists", "Device name already exists.");
                     ChangeText(payload, "itemName", 128);
                     effects.Add(new JObject { ["createDevice"] = name, ["typeIdentifier"] = identifier });
+                    bool failsafe = payload.Value<bool?>("failsafeRuntimeAccess") == true;
+                    if (failsafe && payload.Value<bool?>("configureScratchSecurity") != true)
+                        throw new BridgeException("InvalidRequest", "failsafeRuntimeAccess applies only together with configureScratchSecurity.");
                     if (payload.Value<bool?>("configureScratchSecurity") == true)
                     {
                         EnsureCurrentScratchProject(project);
                         effects.Add(new JObject { ["configureNewCpuSecurity"] = "Protect the new scratch CPU configuration and provision a new password-authenticated runtime user/role with standard full access scoped to that new device. Generated credentials are stored under Windows DPAPI CurrentUser. No existing protection or anonymous access is changed." });
+                        if (failsafe)
+                            effects.Add(new JObject { ["failsafeRuntimeAccess"] = "The generated role receives the F-CPU runtime right Full access including fail-safe instead of Full access, for this new scratch device only." });
                     }
                     break;
                 }
@@ -649,6 +661,10 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "hardware_replace":
                     PrepareHardwareReplace(change, project, preview);
+                    break;
+                case "hardware_transfer_area_create":
+                case "hardware_transfer_area_delete":
+                    PrepareTransferArea(change, project, preview);
                     break;
                 case "cax_import":
                     PrepareCaxImport(change, project, preview);
@@ -891,6 +907,9 @@ namespace TiaMcp.Openness.V21
                 case "opcua_role_mapping_set":
                     ApplyOpcUaChange(change);
                     break;
+                case "opcua_server_settings_set":
+                    ApplyOpcUaServerSettings(change);
+                    break;
                 case "webserver_page_set":
                     ApplyWebServerPageSet(change);
                     break;
@@ -947,7 +966,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var device = project.Devices.CreateWithItem(payload.Value<string>("typeIdentifier"), payload.Value<string>("itemName"), payload.Value<string>("deviceName"));
                     if (payload.Value<bool?>("configureScratchSecurity") == true)
-                        change.ScratchSecurity = ConfigureNewScratchCpu(project, device, change.Directory);
+                        change.ScratchSecurity = ConfigureNewScratchCpu(project, device, change.Directory, payload.Value<bool?>("failsafeRuntimeAccess") == true);
                     break;
                 }
                 case "hardware_plug":
@@ -997,6 +1016,10 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "hardware_replace":
                     ApplyHardwareReplace(change, project);
+                    break;
+                case "hardware_transfer_area_create":
+                case "hardware_transfer_area_delete":
+                    ApplyTransferArea(change, project);
                     break;
                 case "cax_import":
                     ApplyCaxImport(change, project);
@@ -1106,7 +1129,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1275,6 +1298,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);
             if (change.Kind == "webserver_page_set") snapshot["webServer"] = WebServerFingerprint(project);
+            if (change.Kind == "opcua_server_settings_set") snapshot["opcUaServerSettings"] = OpcUaServerSettingsFingerprint(project);
             if (change.Kind == "umac_role_set") snapshot["umac"] = UmacFingerprint(project);
             if (change.AttributeTarget != null && change.Kind != "tag_delete" && change.Kind != "constant_delete")
             {

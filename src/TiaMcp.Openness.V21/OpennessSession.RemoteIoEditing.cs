@@ -13,7 +13,8 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private static readonly HashSet<string> ChannelWriteAttributes = new HashSet<string>(new[]
-        { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay", "Smoothing" }, StringComparer.Ordinal);
+        // OperatingMode MotionControl lets a technology object use a TM PosInput/TM Count channel.
+        { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay", "Smoothing", "OperatingMode" }, StringComparer.Ordinal);
 
         private static JArray InspectChannelEngineeringAttributes(Channel channel, ScanBudget budget, JArray warnings, string path)
         {
@@ -239,6 +240,7 @@ namespace TiaMcp.Openness.V21
                 if (network != null) row["network"] = new JObject { ["nodes"] = new JArray(network.Nodes.Select(NodeSnapshot)),
                     ["controllers"] = new JArray(network.IoControllers.Select((controller, index) => new JObject { ["index"] = index, ["system"] = System(controller.IoSystem) })),
                     ["connectors"] = new JArray(network.IoConnectors.Select((connector, index) => new JObject { ["index"] = index, ["system"] = System(connector.ConnectedToIoSystem) })) };
+                if (network != null && IsIDeviceInterface(item)) row["network"]["transferAreas"] = TransferAreas(network);
                 if (ports && item.GetService<NetworkPort>() is NetworkPort port)
                     row["port"] = new JObject { ["connectedPorts"] = new JArray(port.ConnectedPorts.Select(partner => Owner(partner.OwnedBy)).OrderBy(value => value, StringComparer.Ordinal)) };
                 rows.Add(row);

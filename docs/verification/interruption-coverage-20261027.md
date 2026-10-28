@@ -104,7 +104,7 @@ overall because of a qualifier fault in two other cases, which the rerun fixed
 | `library_open` | **qualified**: released before receipt; held with partial working copy |
 | `simulation_download` | **qualified**: held admission released after a worker crash (`artifacts/f2`) |
 | `simulation_provision_scratch_credential` | **qualified** release path (`local.sim.reconcile.20261024`); refusal paths are managed tests |
-| `watch_authoring_source_negative` | own reconciler (`qualification_watch_authoring_source_reconcile`); qualification-only tool |
+| `watch_authoring_source_negative` | **qualified** with its own reconciler (`qualification_watch_authoring_source_reconcile`) after a Host loss at `host.watch_authoring_source_negative`: released as unchanged, replay refused (`local.watch.source_reconcile.20261028`); qualification-only tool |
 | `watch_fixture_seed` | **refused**: qualification-only fixture seeder without a trusted reconcile adapter (`ReconciliationUnsupported`); its admission stays held |
 
 ### Mutations with their own durable operation route
@@ -114,7 +114,15 @@ overall because of a qualifier fault in two other cases, which the rerun fixed
 admission. They keep their own journals and `*_recover`/`*_reconcile` tools, owned
 by D02, D03, X07/X08 and D06. Their native interruption stays with those owners and
 is not claimed here. On 28 October D02 qualified `watch_table_apply` at its three Host
-points and eight native worker-loss points ([record](review-criteria-and-watch-20261028.md)).
+points and eight native worker-loss points ([record](review-criteria-and-watch-20261028.md)),
+and watch creation through `watch_table_apply` after a Host loss at the native apply
+(`local.watch.creation_loss.20261028`, [record](watch-authoring-update3-20261028.md#creation-response-loss)).
+The same day D03 qualified `translation_native_apply` in default mode against an installed
+exact admission. Worker and Portal loss at checkpoint intent and inside the native import,
+and Host loss during the import, each reconciled from a fresh Host without replay. Lost
+import, compile, save, reopen and restore replies and a pre-dispatch interruption were run
+on the same workflow in qualification mode (`local.translation.native.20261028`,
+`local.translation.qualification.20261028`, [record](translation-native-20261028.md)).
 
 ## Limits
 

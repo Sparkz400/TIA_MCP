@@ -9,6 +9,14 @@ namespace TiaMcp.Translations;
 // this comparer enables native dispatch or treats arbitrary XML differences as text.
 internal static class TranslationNativeComparison
 {
+    // ExportProjectTexts labels view paths in the TIA UI language; the German and English labels were observed natively.
+    internal static bool MainCommentView(string viewPath, string projectFilePath)
+    {
+        string[] path = viewPath.Split('\\');
+        return path.Length == 5 && path[0] == Path.GetFileNameWithoutExtension(projectFilePath) &&
+            path[2] is "Programmbausteine" or "Program blocks" && path[3] == "Main" && path[4] is "Bausteinkommentar" or "Block comment";
+    }
+
     internal static byte[] Peer(byte[] bytes, string profile, TranslationImportCandidate candidate)
     {
         if (profile == "exact") return bytes;
@@ -32,10 +40,7 @@ internal static class TranslationNativeComparison
             var before = candidate.Baseline.ReadText(target.Location); var after = candidate.Candidate.ReadText(target.Location);
             if (before == after) continue;
             string view = candidate.Baseline.ReadText(new(row.SourceCell.Part, "B" + row.SourceCell.Cell[1..])).Text ?? "";
-            string[] path = view.Split('\\');
-            Require(row.Category == "<BlockCommentCategoryData>" && path.Length == 5 &&
-                path[0] == Path.GetFileNameWithoutExtension(candidate.Baseline.Project.Object.ProjectPath) &&
-                path[2] == "Programmbausteine" && path[3] == "Main" && path[4] == "Bausteinkommentar",
+            Require(row.Category == "<BlockCommentCategoryData>" && MainCommentView(view, candidate.Baseline.Project.Object.ProjectPath),
                 "TranslationPeerProfileUnqualified", "Only the captured Main OB1 block-comment target is admitted by this native peer profile.");
             var blocks = document.Root.Elements("SW.Blocks.OB").Where(b => b.Element("AttributeList")?.Element("Name")?.Value == "Main").ToArray();
             if (blocks.Length == 0) continue;

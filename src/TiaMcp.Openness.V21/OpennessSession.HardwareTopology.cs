@@ -60,12 +60,61 @@ namespace TiaMcp.Openness.V21
 
         private static JObject GsdInfo(IGsdObject gsd) => gsd == null ? null : new JObject { ["gsdId"] = gsd.GsdId, ["gsdName"] = gsd.GsdName, ["gsdType"] = gsd.GsdType, ["isProfinet"] = gsd.IsProfinet, ["isProfibus"] = gsd.IsProfibus };
 
+        // V21 offers GsdExportProvider on every device item, but Export works only on an interface in I-device mode.
+        private static bool IsIDeviceInterface(DeviceItem item)
+        {
+            var network = item.GetService<NetworkInterface>();
+            return network != null && (network.InterfaceOperatingMode & InterfaceOperatingModes.IoDevice) != 0;
+        }
+
+        // An I-device interface's transfer areas by exact name, as hardware_inspect and the preservation manifest report them.
+        private static JArray TransferAreas(NetworkInterface network) => new JArray(network.TransferAreas.Select(area => new JObject { ["name"] = area.Name, ["type"] = area.Type.ToString(),
+            ["direction"] = area.Direction.ToString(), ["positionNumber"] = area.PositionNumber, ["localToPartnerLength"] = area.LocalToPartnerLength, ["partnerToLocalLength"] = area.PartnerToLocalLength,
+            ["localAddresses"] = TransferAreaAddresses(area.LocalAddresses), ["partnerAddresses"] = TransferAreaAddresses(area.PartnerAddresses) }).OrderBy(area => area.Value<string>("name"), StringComparer.Ordinal));
+
+        private static JArray TransferAreaAddresses(AddressComposition addresses) => new JArray(addresses.Select(address => new JObject { ["ioType"] = address.IoType.ToString(), ["startAddress"] = address.StartAddress, ["lengthBits"] = address.Length }));
+
+        // One controller-device (CD) transfer area by exact name on an I-device PROFINET interface. TIA chooses its direction, lengths and local addresses.
+        private TransferArea PrepareTransferArea(EngineeringChange change, Project project, JObject preview)
+        {
+            var item = ChangeHardware(project, change.Payload);
+            if (!IsIDeviceInterface(item.Item))
+                throw new BridgeException("UnsupportedCapability", "Transfer areas are available only on a PROFINET interface in I-device mode (InterfaceOperatingMode IoDevice).");
+            string name = ChangeText(change.Payload, "name", 128);
+            bool create = change.Kind == "hardware_transfer_area_create";
+            var named = item.Item.GetService<NetworkInterface>().TransferAreas.Where(area => string.Equals(area.Name, name, create ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)).ToArray();
+            if (create && named.Length != 0) throw new BridgeException("ObjectExists", "The interface already has a transfer area named " + named[0].Name + ".");
+            if (!create && named.Length != 1) throw new BridgeException("ObjectNotFound", "The interface has no transfer area with this exact name.");
+            if (preview != null)
+            {
+                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["action"] = create ? "create" : "delete", ["name"] = name, ["type"] = create ? TransferAreaType.CD.ToString() : named[0].Type.ToString() });
+                ((JArray)preview["warnings"]).Add(create ? "TIA chooses the new area's direction, lengths and local addresses; the readback and hardware_inspect report them."
+                    : "The area's local addresses are released; program references to them are checked only by the mandatory device compile.");
+            }
+            return create ? null : named[0];
+        }
+
+        private void ApplyTransferArea(EngineeringChange change, Project project)
+        {
+            var area = PrepareTransferArea(change, project, null);
+            string name = change.Payload.Value<string>("name");
+            var network = ChangeHardware(project, change.Payload).Item.GetService<NetworkInterface>();
+            if (area == null) network.TransferAreas.Create(name, TransferAreaType.CD); else area.Delete();
+            var readback = TransferAreas(network);
+            var named = readback.Where(row => row.Value<string>("name") == name).ToArray();
+            if (area == null ? named.Length != 1 || named[0].Value<string>("type") != TransferAreaType.CD.ToString() : named.Length != 0)
+                throw new BridgeException("MutationVerificationFailed", "The interface's transfer areas do not show exactly the requested " + (area == null ? "creation." : "deletion."));
+            change.Readbacks.Add(new JObject { ["role"] = "transfer-areas", ["hardwarePath"] = change.Payload.Value<string>("hardwarePath"), ["transferAreas"] = readback });
+        }
+
         // Read-only for the project: Siemens writes the I-device GSD file(s) into a fresh artifact directory.
         private JObject HardwareGsdExport(JObject args)
         {
             var project = SelectProject(args);
             var item = ChangeHardware(project, args);
             var provider = item.Item.GetService<GsdExportProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected hardware item exposes no native GsdExportProvider (I-device GSD export).");
+            if (!IsIDeviceInterface(item.Item))
+                throw new BridgeException("UnsupportedCapability", "GSD export is available only on a PROFINET interface in I-device mode (InterfaceOperatingMode IoDevice).");
             string designation = ChangeText(args, "designation", 128);
             string description = args.Value<string>("description") ?? "";
             if (description.Length > 1024) throw new BridgeException("InvalidRequest", "description exceeds 1024 characters.");

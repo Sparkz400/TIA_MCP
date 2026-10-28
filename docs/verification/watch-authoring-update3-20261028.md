@@ -71,17 +71,70 @@ runs, and every owned Portal and worker process has an exit proof.
 Verified (catalog `0.4.49`, 19 cells): `watch_table_generate`,
 `watch_table_prepare_authoring`, `qualification_watch_authoring_source_negative`.
 
-Not verified: `qualification_watch_authoring_source_reconcile`. It only reconciles a
-source-negative admission left in `dispatchIntent` or `outcomeUnknown`, and the exact-profile
-runner calls it only when the negative itself fails. Neither run left such an admission, and
-no runner has an interruption point inside the helper. Verifying it needs a worker-loss point
-in `watch_authoring_source_negative`.
+Not verified by these runs: `qualification_watch_authoring_source_reconcile`. It only
+reconciles a source-negative admission left in `dispatchIntent` or `outcomeUnknown`, and the
+exact-profile runner calls it only when the negative itself fails. Neither run left such an
+admission. It passed later the same day after an actual Host loss
+([below](#source-negative-reconciliation-after-host-loss)).
+
+## Source-negative reconciliation after Host loss
+
+Evidence [`local.watch.source_reconcile.20261028`](../../evidence/local.watch.source_reconcile.20261028.json).
+Runner [`scripts/qualify_watch_source_reconcile.py`](../../scripts/qualify_watch_source_reconcile.py),
+run `src3`, on a frozen Debug build in `D:\wp\b58`. A new qualification-only Host point,
+`host.watch_authoring_source_negative`, stops the Host after the admitted native dispatch of
+the helper returned and before the Host records the outcome. The worker had finished: the saved
+`HeaderAuthor` drift, the `StaleSource` refusal and the restoration are in the Host's
+interruption marker.
+
+What the run proves:
+
+- The Host exited 74; its worker and Portal exited 0. The shared admission stayed in
+  `dispatchIntent` and owned the project.
+- A second Host opened the original in a fresh owned Portal. A replay of the helper was refused
+  with `ResourceBusy` before any native effect.
+- `qualification_watch_authoring_source_reconcile` compared the retained pre-effect baseline with
+  the fresh snapshot: absent table, identical content and peers, new session and process. It
+  reconciled the project as `unchanged` without a native mutation.
+- A second reconcile was refused with `InvalidOperationState`, `engineering_operation_status`
+  read the admission as reconciled, and a fresh capture reproduced the original FB and
+  instance DB hashes.
+
+Fixed on the way: the two source-negative qualification tools passed bridge exceptions through,
+so a refusal reached the client as an untyped `McpToolError` (trial `src1`). They now return typed
+errors like every engineering tool. Trial `src2` stopped before starting a Host because of a wrong
+path. Neither trial is cited.
+
+A worker loss inside the helper, between the drift and the restoration, leaves a changed
+project. The reconciler refuses that by design (`ReconciliationIncomplete`); it needs checkpoint
+recovery instead and is not exercised.
 
 ## Still open
 
-- Creation response loss (`qualify_watch_authoring_loss.py`) has not run under Update 3.
+- Creation response loss passed later the same day ([below](#creation-response-loss)).
 - Production authoring stays disabled. The profile covers one created root table with one
   direct-instance Active Bool row and the default reason. Additions to existing tables,
   removal, reorder, explicit comments, other types, CPUs, firmware and languages stay separate.
 - The pins follow the installed products. After the next TIA update they must be re-derived
   from a fresh capture, as here.
+
+## Creation response loss
+
+Evidence [`local.watch.creation_loss.20261028`](../../evidence/local.watch.creation_loss.20261028.json).
+Runner [`scripts/qualify_watch_authoring_loss.py`](../../scripts/qualify_watch_authoring_loss.py), run
+`cl2`, on a frozen Debug build in `D:\wp\b59`. It creates root `WT05_BoolCreation` with one Active Bool
+row through `watch_table_apply`, under a Host started with `--watch-qualification host.watch_apply_native`.
+
+- The native creation was applied and saved. The Host exited 74 before the reply.
+- A second Host refused the replay (`RecoveryRequired`) and a competing owner (`ResourceBusy`)
+  without native dispatch.
+- It recovered the checkpoint to a distinct destination, whose fresh reopen shows the table
+  absent, and reconciled the original as `verifiedApplied` without adopting the lost reply.
+- The independent oracle `verify_watch_authoring_loss` passed: a single dispatch, six preserved
+  peer exports, and exact lifetimes (first Host 74, every worker, Portal and the second Host 0).
+
+Fixed on the way: the oracle required the lost Host's process tree to report all-zero exits.
+The tree's completion flag excludes any non-zero exit, so a Host-loss trial could never pass,
+although the per-process check already expected 74 for that Host. The oracle now checks the
+tree's other conditions explicitly for that Host. Trial `cl1` (build `b58`) passed the same
+native flow and failed only on that check; it is retained and not cited.

@@ -14,8 +14,17 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
 {
     private string Root => options.ArtifactsDirectory;
     private TranslationImportWorkflow Runner => new(Root);
-    private TranslationProductionRegistry Registry => new(AppContext.BaseDirectory, options.WorkerPath,
-        options.ApiDirectory ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48");
+    private TranslationProductionRegistry Registry => new(AppContext.BaseDirectory, options.WorkerPath, ApiDirectory(options));
+
+    // Siemens registers the installed V21 API location, as the worker resolves it; C:\Program Files is only the setup default.
+    internal static string ApiDirectory(HostOptions options)
+    {
+        if (options.ApiDirectory is not null) return options.ApiDirectory;
+        using var hklm = Microsoft.Win32.RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, Microsoft.Win32.RegistryView.Registry64);
+        using var key = hklm.OpenSubKey(@"SOFTWARE\Siemens\Automation\Openness\21.0\PublicAPI\21.0.0.0\net48");
+        return key?.GetValue("Siemens.Engineering.Base") is string path && !string.IsNullOrWhiteSpace(path)
+            ? Path.GetDirectoryName(path)! : @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+    }
     private TranslationWorkerAdapter Worker(string profileId)
     {
         var entry = Registry.Resolve(profileId);
