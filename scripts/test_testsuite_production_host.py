@@ -110,9 +110,8 @@ def main():
     try:
         tools = client.request('tools/list')['tools']
         check('qualification_testsuite_scope_probe' in {t['name'] for t in tools}, 'Isolated Host registers only the additional scope probe')
-        invalid = client.request('tools/call', {'name': 'qualification_testsuite_scope_probe',
-            'arguments': {'action': 'run', 'projectPath': 'D:\\not-a-native-project.ap21'}})
-        check(invalid.get('isError') is True, 'Scope-probe Host refuses execution actions before worker launch')
+        # Typed before worker launch; close() then asserts that no worker ran.
+        reject(client, 'qualification_testsuite_scope_probe', {'action': 'run', 'projectPath': 'D:\\not-a-native-project.ap21'}, 'InvalidRequest')
         other = client.tool('testsuite_style_job_prepare', {**prepare, 'idempotencyKey': 'scope-probe-gate-job'})
         reject(client, 'testsuite_style_job_execute_next', {**action, 'jobId': other['job']['id'],
             'operationId': other['operations'][0]['id'], 'expectedRevision': 0}, 'TestSuiteProfileUnqualified')
