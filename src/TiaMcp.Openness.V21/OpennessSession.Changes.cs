@@ -33,7 +33,9 @@ namespace TiaMcp.Openness.V21
         private static readonly HashSet<string> HardwareWriteAttributes = new HashSet<string>(new[]
         {
             "Name", "Author", "Comment", "InformationText", "PlantDesignation", "LocationIdentifier", "AdditionalInformation",
-            "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay"
+            "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay",
+            // A PROFINET interface's single InterfaceOperatingModes value (IoController or IoDevice): IoDevice makes the CPU an I-device.
+            "InterfaceOperatingMode"
         }, StringComparer.Ordinal);
         private static readonly HashSet<string> NetworkWriteAttributes = new HashSet<string>(new[]
         {
