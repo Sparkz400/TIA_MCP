@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8009f79564d97fee309fb0a27c803516783ac77a1c350c4e56d513e71ac8b583",
-      "bytes": 1269406
+      "sha256": "516e536f9f9b6fd40b14752e469d74d153702bdb008c47a763a6869dc57f08f9",
+      "bytes": 1271802
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -114483,6 +114483,13 @@
           "artifacts": [
             "evidence/local.watch.authoring.20261028.json"
           ]
+        },
+        {
+          "id": "local.watch.creation_loss.20261028",
+          "profileSha256": "a2e753c055400d74b37ecd7890ed0151db1f46c2d51dc161ab30d36a42dc3ae6",
+          "artifacts": [
+            "evidence/local.watch.creation_loss.20261028.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -116185,6 +116192,11 @@
       "sha256": "3538b8b3b20fae95e137ca58dc8598c626c85fd418e7ea8c98675da8cf08dab6"
     },
     {
+      "path": "evidence/local.watch.creation_loss.20261028.json",
+      "state": "observed",
+      "sha256": "57f57789ee55465421c50e41b7a92668aa717683081b037e72b648399759fc28"
+    },
+    {
       "path": "evidence/local.watch.lifecycle.20261028.json",
       "state": "observed",
       "sha256": "38c0a2015cd771a2cb73872e4e7d4bf3eccb8a6e9b6015c7e5d992e9c70ef260"
@@ -116905,6 +116917,10 @@
     {
       "id": "local.watch.authoring.20261028",
       "profileSha256": "1fafec9325cf5ab83c89dea31ad6b03a451bae5df824fbabacef6fd1c193fb5a"
+    },
+    {
+      "id": "local.watch.creation_loss.20261028",
+      "profileSha256": "a2e753c055400d74b37ecd7890ed0151db1f46c2d51dc161ab30d36a42dc3ae6"
     },
     {
       "id": "local.watch.lifecycle.20261028",
