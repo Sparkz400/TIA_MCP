@@ -210,7 +210,7 @@ class Run:
         worker = owned_child(host_pid, self.args.worker)
         portal = owned_child(worker, TIA_EXE)
         require(portal == started['processId'], 'The owned Portal is not the worker child')
-        op, _, _, _ = self.prepare_edit('interrupt-' + state)
+        op, _, _, _ = self.prepare_edit('interrupt-' + loss + '-' + state)
         request = {'profileId': self.args.profile_id, 'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
         self.counter += 1
         self.save(f'{self.counter:03}-translation_native_apply-sent', {'request': request, 'interruption': case})
