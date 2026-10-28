@@ -2,9 +2,9 @@
   "schema": "tia-mcp.evidence-summary.v1",
   "evidenceId": "local.watch.native.20261028",
   "outcome": "passed",
-  "recordedAtUtc": "2026-10-28T07:27:55+00:00",
+  "recordedAtUtc": "2026-10-28T08:28:32+00:00",
   "source": {
-    "commit": "49e54dfdbba2990790702db9560d5519b613caa3",
+    "commit": "27c9d4c0184bc5896b35d487a4c86e04c9d1828a",
     "dirty": false
   },
   "environment": {
@@ -12,10 +12,10 @@
     "os": "Windows-11-10.0.26300-SP0",
     "tiaVersion": 21
   },
-  "scope": "scripts/qualify_watch_production_host.py (bool, host.watch_apply_native) and scripts/qualify_watch_mcp.py (host.watch_checkpoint, host.watch_restore_native) on a frozen Debug build of 18964f2 (D:\\wp\\b11, git-archived sources with source-manifest.json; src/ equals 7aee9ef) in fresh owned scratch CPU 1511-1 PN V4.1 projects under TIA Portal V21 Update 3: seeded MilestoneWatch fixture, saved fresh-reopen baseline, prepare with independent file-only review of the exact candidate, apply with native readback and peer preservation, fresh-reopen verification, checkpoint recovery to a distinct destination with restored and original reconciliation; Host loss at the checkpoint, at native apply and at native restore with replay and competing-owner refusals, exact reconciliation (interrupted or recovered) and no replay; every owned Portal/worker lifetime closed with exit proofs; independent oracle verify_watch_expansion passed each run.",
+  "scope": "scripts/qualify_watch_production_host.py (bool, host.watch_apply_native) and scripts/qualify_watch_mcp.py (host.watch_checkpoint, host.watch_restore_native and the eight native worker-loss points checkpoint.beforeArchive/afterArchive, import.before/after, save.before/after, retrieve.before/after with the registered OwnedPortalCleanup helper) on a frozen Debug build of 18964f2 (D:\\wp\\b11, git-archived sources with source-manifest.json; src/ equals 7aee9ef) in fresh owned scratch CPU 1511-1 PN V4.1 projects under TIA Portal V21 Update 3: seeded MilestoneWatch fixture, saved fresh-reopen baseline, prepare with independent file-only review of the exact candidate, apply with native readback and peer preservation, fresh-reopen verification, checkpoint recovery to a distinct destination with restored and original reconciliation; Host loss at three points and worker loss at eight points, each with replay and competing-owner refusals, exact reconciliation (interrupted or recovered) and no replay; the helper terminated only the captured owned orphan Portal; every owned Portal/worker lifetime closed with exit proofs; independent oracle verify_watch_expansion passed all twelve runs.",
   "limitations": [
     "One existing-row Bool ModifyValue edit (FALSE to TRUE) in an owned scratch table; clone/delete/reorder/comment edits, force tables, authoring, other CPUs, firmware and languages are not qualified.",
-    "Interruption covers the three Host points (host.watch_checkpoint, host.watch_apply_native, host.watch_restore_native). The native worker-loss points (checkpoint, import, save, retrieve) need the registered OwnedPortalCleanup helper and did not run.",
+    "Each interruption point ran once; worker loss is a terminated worker process at the named point, not power loss, disk failure or a hung TIA without process exit.",
     "Offline stored configuration only: no online modify, forcing, download or runtime behavior. Trial bool2 (D:\\wp\\wt\\bool2) stopped after watch_table_recover because the runner's controller sources were edited mid-run; it is retained as failed and not cited."
   ],
   "binaries": [
@@ -28,6 +28,11 @@
       "name": "net48",
       "files": 6,
       "sha256": "e2203af21a68a3e05514806fbd6c50ce25062afe7bcbcd6bb08df443be24f62c"
+    },
+    {
+      "name": "OwnedPortalCleanup.exe",
+      "files": 1,
+      "sha256": "0f83e40c0bb3587ff1ff33e3d7e4be001beb1b2d8a44cc282516ab2858b42e4b"
     }
   ],
   "runs": [
@@ -101,6 +106,192 @@
       "report": "verification.json",
       "sha256": "bd97ef0c963ee5dd6024bd88b1b51b5a8d08e696b83640753e6e7350e86b92e9",
       "bytes": 2375,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_apply",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_verify_reopen"
+      ],
+      "toolsRejected": [
+        "watch_table_apply",
+        "watch_table_recover"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "20e01539c30b43c20b001935ad2d1c9aba39df8336514594339910ecea6ea6e9",
+      "bytes": 1291,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_interrupted"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "98dffb8b42eacaf19aa16a31577482c157d4f85a9064a265a872abaed4f333eb",
+      "bytes": 1290,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_interrupted"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "d54cce7bf27d1d057785f3551b5272d74504137e64d7226b2e2275ffe8331320",
+      "bytes": 1782,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "7eb68f4702ecfe49e1912973611b978cdc1fdd81cdc20077bd220796df703d36",
+      "bytes": 1781,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "6f29108d7158e3b84de25a4d63404e7b4aa6a5b056ca3d30a08cf55f806d5e00",
+      "bytes": 1780,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "076bc01b8bbe86ccf2ad62bc40ff3a164a880e45e2f85c6cb145e34e74d33527",
+      "bytes": 1779,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover"
+      ],
+      "toolsRejected": [
+        "watch_table_apply"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "166d670d3cccc71ac8e7662d40e70e73a94b0fa366061534bab66f3cb3d3f691",
+      "bytes": 1858,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_compete",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_apply",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_interrupted",
+        "watch_table_verify_reopen"
+      ],
+      "toolsRejected": [
+        "watch_table_apply",
+        "watch_table_recover"
+      ]
+    },
+    {
+      "report": "verification.json",
+      "sha256": "23ade3051b25ced02578f7d51a2f08b0df33b5ae3c5e2e81f654794b9e39d6a7",
+      "bytes": 2440,
       "completed": true,
       "steps": [],
       "toolsPassed": [

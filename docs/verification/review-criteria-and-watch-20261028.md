@@ -62,7 +62,7 @@ decision.
 ## Native watch tables
 
 Evidence [`local.watch.native.20261028`](../../evidence/local.watch.native.20261028.json).
-Frozen Debug build of `18964f2` in `D:\wp\b11`: sources extracted with `git archive`, a
+Twelve runs. Frozen Debug build of `18964f2` in `D:\wp\b11`: sources extracted with `git archive`, a
 `source-manifest.json` of every file for the watch oracle, and the worker registered by its
 own post-build step. `src/` equals `7aee9ef`. Each run created a fresh owned scratch
 CPU 1511-1 PN V4.1 project; nothing touched a user project, a PLC or PLCSIM.
@@ -73,6 +73,7 @@ CPU 1511-1 PN V4.1 project; nothing touched a user project, a PLC or PLCSIM.
 | `hostapply1` | `qualify_watch_production_host.py --mode host.watch_apply_native` | Host lost during native apply; replay and competing owner refused; checkpoint recovery and reconciliation without replay |
 | `hostckpt1` | `qualify_watch_mcp.py --mode host.watch_checkpoint` | Host lost at the checkpoint, before any archive; replay and competing owner refused; `watch_table_reconcile_interrupted` against the original |
 | `hostrestore1` | `qualify_watch_mcp.py --mode host.watch_restore_native` | Host lost during the native restore; replay refused; the recovered destination located, then restored and original reconciliation |
+| `np-*` (8 runs) | `qualify_watch_mcp.py --mode <point> --native-cleanup-helper` for `checkpoint`, `import`, `save` and `retrieve`, each `.before` and `.after` | Worker terminated at the point; the helper ended only the captured owned orphan Portal; replay and competing owner refused; `reconcile_interrupted` where no usable archive existed (both checkpoint points, `retrieve.before`), otherwise checkpoint recovery and `reconcile_recovery` |
 
 The independent `verify_watch_expansion` oracle passed each run, and every owned Portal and
 worker process has an exit proof. Verified features: `watch_table_read`, `_prepare`,
@@ -86,8 +87,9 @@ Not cited: `bool2` stopped after `watch_table_recover` with "Admitted source/pac
 changed", because the runner's own sources were edited while it ran. The frozen-source
 guard worked as intended; the trial is kept as failed.
 
-All three Host interruption points are covered. Still open for D02: the native worker-loss points (`checkpoint.*`, `import.*`, `save.*`,
-`retrieve.*`) need a registered `OwnedPortalCleanup` helper, and `watch_table_force_document_edit`,
+All three Host points and all eight native worker-loss points are covered; the user
+registered the `OwnedPortalCleanup` helper (`D:\wp\b11\cleanup`) for the latter. Still open
+for D02: `watch_table_force_document_edit`,
 the create/rename/delete table and group features and the authoring features have no passing
 native run.
 

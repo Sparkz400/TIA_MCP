@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.48",
-    "catalogSha256": "072bd5662f2391fe942e2f8b7944d9a352ad357e792d32f7b14ab09e3b6a3a0f",
+    "catalogSha256": "c0f63bd38ed1e10372516cfcb9c838b6f5548a917eb3b36713dbeea293e12e7d",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "81088b0b258370f3fc98726c724fda9f94a489edfa6d19a78b712027a2621096"
   },
@@ -22275,11 +22275,11 @@
         "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
         "firmware": "V4.1"
       },
-      "sourceCommit": "49e54dfdbba2990790702db9560d5519b613caa3",
+      "sourceCommit": "27c9d4c0184bc5896b35d487a4c86e04c9d1828a",
       "retained": [
         {
           "path": "evidence/local.watch.native.20261028.json",
-          "sha256": "ab4dbc339753858d09840c916f30e87c826af8eb8f1074501c9d7738de09b9d0"
+          "sha256": "5cf94421eec475147273983d700a64224cb52577d2552be3961609de3bb1fee5"
         }
       ],
       "notRetained": []
