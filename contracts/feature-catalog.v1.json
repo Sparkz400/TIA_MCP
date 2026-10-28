@@ -3412,6 +3412,32 @@
         "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
         "Engineering only; runtime behavior is not observed."
       ]
+    },
+    {
+      "id": "local.access.qualify.rerun.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
+        "passedScope": "Re-run of local.access.qualify.20261028, whose raw report was lost: scripts/qualify_access_changes.py on a frozen Debug build of 2d5aa7c (D:/wp/b65) in one owned scratch CPU 1511-1 PN (V21), 214/215 steps: webserver_page_set, certificate_create, certificate_assign, certificate_delete, certificate_import, umac_role_set, vci_workspace_create and vci_workspace_delete each applied with exact preview assertions, checkpoint, compile and save, change_status, and a complete before/after state (every block, type and tag-table export plus certificate_inspect, access_inspect, web_inspect and vci_workspace_inspect) that differs in exactly the intended keys, with recorded web activation side effects (TIA's web server certificate); typed refusals per kind changed nothing; a fresh owned Portal reopened the project with an identical state and every journal applied; one further change per kind was restored by change_restore to the exact pre-change state. Created WebServer certificates were re-issued by the compile with the requested common name and validity end kept."
+      },
+      "artifacts": [
+        "evidence/local.access.qualify.rerun.20261028.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN with its local certificate store; the global certificate store, other CPUs, HMI devices and UMC servers are not exercised.",
+        "certificate_assign writes only PlcCommunicationCertificate on the store-owning CPU; WebserverCertificate, OPC UA attributes and null unassignment are not written. certificate_inspect renders certificate attributes display-only, so the assigned Id is read back through typed refusals (AssignmentDrift currentCertificateId, CertificateInUse references).",
+        "Certificates are created with usage WebServer and one Dns alternative name. The persisted identity after the device compile is compared with the request and recorded under certificateIdentity; the wave 10 probe saw the compile re-issue a created certificate (CN-only subject, new serial and notBefore, the CPU address as alternative names), and a mismatch lists the kind under notQualified.",
+        "certificate_import imports the public DER of a certificate this run created and deleted; PEM, CA-issued and foreign certificates are not imported natively.",
+        "umac_role_set: one custom role, one device function right taken from the scratch's custom role and one active project user; engineering function rights are never granted or revoked (no read tool lists the available ones), so AdministratorLockout is not exercised; anonymous and UMC principals are untouched.",
+        "webserver_page_set writes webServerActive and systemWebPages; defaultApplication is only refused (stale or missing application), never written.",
+        "Switching web serving on or off is allowed to change the CPU's web- and certificate-named attributes and to add or remove certificates in its store; these side effects are recorded under sideEffects.",
+        "VCI workspaces are created in the root workspace group without mappings, with roots outside the artifact store and the project; change_restore never restores workspace files.",
+        "Not covered here: vci_mapping_add, vci_mapping_remove, vci_synchronize.",
+        "Engineering only; nothing is downloaded and runtime behavior is not observed.",
+        "webserver_user_pages_generate is not qualified by this run: generation also added a system constant to the default tag table, which its preview does not declare."
+      ]
     }
   ],
   "features": [
@@ -18177,7 +18203,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -18232,7 +18258,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -19901,7 +19927,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20003,7 +20029,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20056,7 +20082,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20108,7 +20134,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20160,7 +20186,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
@@ -20261,7 +20287,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.access.qualify.20261028"
+          "local.access.qualify.rerun.20261028"
         ]
       },
       "availability": {
