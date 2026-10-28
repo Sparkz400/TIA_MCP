@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "48c0d2046daa6054e56193ae3eb98fe314222be1e407fdd436e6b5a19bec2bde",
-      "bytes": 1290464
+      "sha256": "0cc27e8723f7551ba6e183dbfbff96befd594e8594be9339d23b24d377fc8671",
+      "bytes": 1292887
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -95640,18 +95640,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.safety.v02",
-          "profileSha256": "0ba1b7decdf68ca80c31360d80863c30528b64db73e69b14fb01a80095b552cf",
+          "id": "local.safety_import.20261028",
+          "profileSha256": "950466d0d16ba13e9569bdf92a18bf15a41154d98af1e346700244fec580c365",
           "artifacts": [
-            "artifacts/safety-roundtrip-verified.json"
-          ]
-        },
-        {
-          "id": "local.layers.safety-requalified.20261008",
-          "profileSha256": "98fd123fd18130fe3a3810a271065d88ee8b32287476341951188c7a280fb517",
-          "artifacts": [
-            "artifacts/safety-gap-requalified.json",
-            "artifacts/safety-gap-native-preservation-audit.json"
+            "evidence/local.safety_import.20261028.json"
           ]
         }
       ],
@@ -116269,6 +116261,11 @@
       "sha256": "be47f77d600843111308847056c93bb78df683d22625890221a2315cdb6dcd8a"
     },
     {
+      "path": "evidence/local.safety_import.20261028.json",
+      "state": "observed",
+      "sha256": "5efd40e0386011f1cfc8ec63cc046d8f5b51ba3b8ef0a5d6967ae45a9bd4a169"
+    },
+    {
       "path": "evidence/local.sim.creation.20261024.json",
       "state": "observed",
       "sha256": "878e9514d47bb2616a92b6b188c0308fb86a92f8839e8be59a3df840bd434c6f"
@@ -117021,6 +117018,10 @@
     {
       "id": "local.safety_changes.20261028",
       "profileSha256": "7d5551c6fb3888fe5a5f92e4a27cc3687984d10f117d31af4ce97e17a5ddfa5e"
+    },
+    {
+      "id": "local.safety_import.20261028",
+      "profileSha256": "950466d0d16ba13e9569bdf92a18bf15a41154d98af1e346700244fec580c365"
     },
     {
       "id": "local.session.startup-requalified.20261008",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.63",
+  "catalogVersion": "0.4.64",
   "targetTiaVersions": [
     21
   ],
@@ -3645,6 +3645,26 @@
         "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
         "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
         "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
+      ]
+    },
+    {
+      "id": "local.safety_import.20261028",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "80b57a7f9b7ca8b1cfe5429f0961d4c98c0bb014",
+        "passedScope": "scripts/qualify_safety_changes.py (sf4) on a frozen Debug build of a2c2b11 (D:\\wp\\b64, git-archived sources with source-manifest.json) under TIA Portal V21 Update 3 with an activated STEP 7 Safety license, in a fresh owned scratch with a CPU 1511F-1 PN whose generated scratch user holds ProtectionLevelFailsafeAccess (failsafeRuntimeAccess, owned scratch only) and an ET 200SP station with two F-DI 8x24VDC HF: the full sf3 scope (safety reads, PDF printout, safety_fparameter_set) passed again, and safety_import_xml re-imported the generated F-FBD block Main_Safety_RTG1 with one filled comment text, with checkpoint, PLC compile and save, change_status, an exact state diff limited to that block except the recorded F-compiler block DB1_C (System blocks/STEP 7 Safety/Compiler blocks, know-how protected; its payload changes and it reads inconsistent after the import's PLC software compile until the next device compile), the comment in the native export, a wrong previewHash refused (PreviewMismatch), prepare refusals for a missing acknowledgement, a scope mismatch and a standard block (SafetyBoundary), persistence across a fresh Portal reopen and a second import restored from its checkpoint into a new directory equal to the reopened state."
+      },
+      "artifacts": [
+        "evidence/local.safety_import.20261028.json"
+      ],
+      "limitations": [
+        "One generated F-FBD block (Main_Safety_RTG1) re-imported with a comment change; no F-logic behavior, F-I/O commissioning, acceptance, login, password or download.",
+        "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
+        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
       ]
     }
   ],
@@ -7766,14 +7786,13 @@
           "Fingerprint coverage remains explicitly incomplete: protected native system-group generated payload checksums are excluded only with available owning-PLC safety signatures; identity, modification, protection, consistency and exposed safety metadata remain covered. User/editable fingerprint failures still fail closed.",
           "No changed F-logic behavior, safety-unit, F-I/O, commissioning or arbitrary safety-target qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Native observation (28 October 2026, local.safety_changes.20261028): on this machine TIA refuses the F-block import with 'No safety license available', so the apply is not qualified; its prepare refusals (missing acknowledgement, scope mismatch, standard block) passed. Qualifying the apply needs an activated STEP 7 Safety license."
+          "2026-10-28: natively qualified under an activated STEP 7 Safety license on a CPU 1511F-1 PN in an owned scratch (local.safety_import.20261028): the generated F-FBD block Main_Safety_RTG1 re-imported with a comment change, with checkpoint, PLC compile and save, an exact diff limited to that block, fresh reopen and checkpoint restore; refusals for a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash. After the import's PLC software compile, the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.safety.v02",
-          "local.layers.safety-requalified.20261008"
+          "local.safety_import.20261028"
         ]
       },
       "availability": {
