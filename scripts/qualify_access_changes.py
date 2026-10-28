@@ -371,7 +371,7 @@ def user_pages(run):
     run.refuse(k, "a relative htmlDirectory", {**payload, "htmlDirectory": run.pages.name}, "InvalidRequest")
     run.refuse(k, "an override block that does not exist", run.user_pages(True, ["TiaMcpMissingDb"]), "ObjectNotFound")
     label = "generate user pages"
-    prepared = run.prepare(label, k, payload, {"effects": [{"action": "generateUserPageBlocks", "plcPath": run.plc, "option": "None", "overrideBlocks": []}],
+    prepared = run.prepare(label, k, payload, {"effects": [{"action": "generateUserPageBlocks", "plcPath": run.plc, "option": "None", "overrideBlocks": [], "systemConstant": APP}],
                                                "webSource": {"defaultPage": "index.html", "applicationName": APP}, "backups": []})
     generated = {}
     def added(applied, state):
@@ -381,7 +381,10 @@ def user_pages(run):
         require(blocks and readback["overwritten"] == [] and len(keys) == len(blocks) and all(state[key]["number"] == blocks[state[key]["name"]] for key in keys),
                 "Generated blocks differ from the readback %s" % blocks)
         generated.update(names=sorted(blocks), keys=keys)
-        return keys
+        # The previewed system constant named after the application, which TIA adds to the default tag table.
+        constants = sorted(key for key in state if key.startswith("member:") and key.endswith("/systemConstants/" + APP))
+        require(len(constants) == 1, "Expected exactly one system constant %s: %s" % (APP, constants))
+        return keys + constants
     run.finish(label, k, prepared, added=added, tolerated=run.page_side_effects)
     run.page_keys = generated["keys"]
     return generated["names"]
@@ -390,7 +393,7 @@ def user_pages(run):
 def regenerate(run, names):
     """Regenerate with override=true over exactly the generated DBs; then restored."""
     k, label = "webserver_user_pages_generate", "regenerate user pages with override"
-    prepared = run.prepare(label, k, run.user_pages(True, names), {"effects": [{"action": "generateUserPageBlocks", "plcPath": run.plc, "option": "Override", "overrideBlocks": names}]})
+    prepared = run.prepare(label, k, run.user_pages(True, names), {"effects": [{"action": "generateUserPageBlocks", "plcPath": run.plc, "option": "Override", "overrideBlocks": names, "systemConstant": APP}]})
     overwritten = lambda applied: next(r for r in applied["readbacks"] if r["role"] == "webserver-generated-blocks")["overwritten"]
     run.finish(label, k, prepared, tolerated=lambda c, key: c == "changed" and key in run.page_keys or run.page_side_effects(c, key), restore=True,
                check=lambda applied, state: require(sorted(overwritten(applied)) == names, "Overwritten blocks differ from %s" % names))

@@ -205,7 +205,9 @@ namespace TiaMcp.Openness.V21
             change.ObjectNames = named;
             preview["webSource"] = new JObject { ["sha256"] = LibraryDirectoryHash(snapshot), ["defaultPage"] = page, ["applicationName"] = application };
             ((JArray)preview["effects"]).Add(new JObject { ["action"] = "generateUserPageBlocks", ["plcPath"] = plc.Path, ["option"] = overwrite ? "Override" : "None", ["overrideBlocks"] = new JArray(named),
-                ["affectedSet"] = "The block identities GenerateBlocks returns; apply lists them in its readback." });
+                ["affectedSet"] = "The block identities GenerateBlocks returns; apply lists them in its readback.",
+                // Natively (qualification ac_0165b47c) TIA also adds a system constant named after the application to the default tag table.
+                ["systemConstant"] = application });
             ((JArray)preview["warnings"]).Add("Generated DB names and numbers follow the CPU's web settings and are known only after generation. With override=false native generation refuses an existing target DB; with override=true the overwritten pre-existing blocks must equal overrideBlocks exactly, otherwise apply fails after the checkpoint and recovery is required. Generated block internals are never edited, no delete API exists and nothing is downloaded.");
         }
 
