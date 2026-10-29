@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "auditDate": "2026-10-15",
   "statusRefresh": {
-    "date": "2026-10-28",
+    "date": "2026-10-29",
     "fields": [
       "blockers[].current",
       "currentChecks",
@@ -13,17 +13,89 @@
       "remainingWork"
     ],
     "sources": [
-      "contracts/feature-catalog.v1.json (catalog 0.4.68)",
+      "contracts/feature-catalog.v1.json (catalog 0.4.76)",
       "docs/plans/release-matrix.v1.json",
       "docs/history/status-log.md",
       "docs/TODO.md"
     ],
-    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. D02, D04, D06, D09, D12 and X04 were refreshed on 29 October 2026 against catalog 0.4.70."
+    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md)."
   },
   "release": "1.0",
   "releaseReady": false,
   "scopePolicy": "All feasible capabilities in existing plans, prompts, roadmap and newly discovered residuals are release obligations. Missing prerequisites and unresolved feasibility remain blockers, not exclusions.",
   "interpretation": "Installed API presence is not feasibility/target support. A documented impossible route needs a reviewable disposition; it cannot be closed by a skipped test. Functional-safety certification is distinct from implementing/qualifying safety tooling.",
+  "dispositions": [
+    {
+      "featureId": "change.call_connection_set",
+      "obligations": [
+        "L01",
+        "X11"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-10-29",
+      "boundary": "V21",
+      "reason": "V21 import refuses an Access without a wire and one used by several wires, so moving a call-parameter wire between existing Accesses cannot apply; prepare refuses it with AccessWiringUnsupported.",
+      "evidenceIds": [
+        "local.graphical_changes.20261028"
+      ]
+    },
+    {
+      "featureId": "change.project_attributes_set",
+      "obligations": [
+        "X01"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-10-29",
+      "boundary": "V21",
+      "reason": "V21 native attribute info declares Author, Copyright, Family and Version read-only on a project, so every allowlisted attribute is refused with AttributeNotWritable.",
+      "evidenceIds": [
+        "local.project_settings.20261028"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_import",
+      "obligations": [
+        "D04"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-10-29",
+      "boundary": "V21",
+      "reason": "ReferenceNamespaces.Create terminates TIA V21 Update 3 for every NodeSet tried on 28-29 October 2026, headless and with the user interface, with the OPC UA server on or off.",
+      "evidenceIds": [
+        "local.opcua_changes.guarded.20261029"
+      ]
+    },
+    {
+      "featureId": "change.opcua_reference_namespace_delete",
+      "obligations": [
+        "D04"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-10-29",
+      "boundary": "V21",
+      "reason": "No reference namespace can be imported on V21 Update 3, so none exists to delete.",
+      "evidenceIds": [
+        "local.opcua_changes.guarded.20261029"
+      ]
+    },
+    {
+      "featureId": "change.hmi_engineering",
+      "obligations": [
+        "X07",
+        "X08"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-10-29",
+      "boundary": "V21 and repository gate",
+      "reason": "Behind the closed HMI preservation gate: V21 has no Screen.Export, so payloads without a public getter stay uncompared and no profile has passed every preservation, compile, persistence, recovery and visual gate.",
+      "evidenceIds": []
+    }
+  ],
   "auditArtifact": "artifacts/release-audit-20261015/current-results.json",
   "auditSha256": "e9cd2a18b338aabaa43df0a0d27d49dea7068302bf152f5c6583c40d1ba565d7",
   "nativeExecuted": false,
@@ -60,9 +132,9 @@
       "implementation": "partial_matrix_generated_variant_cells_open",
       "qualification": "offline_matrix_ci_test_audits_passed",
       "releaseAccepted": false,
-      "currentResult": "scripts/release_matrix.py freezes catalog 0.4.69 and this ledger into release-matrix.v1.json (450 rows; 1639 bound, 361 open, 37 blocked, 30 deferred cells), and test_release_matrix.py checks it in hosted CI. Raw evidence reports are kept in the main checkout's artifacts/evidence store and audited locally; 84 reports were lost before the store existed; on 28 October 40 re-run records replaced 44 of the 74 lost records, leaving only the three HMI bridge reads on lost reports (docs/verification/evidence-reruns-20261028.md). On 29 October the 53 catalog evidence records no feature cited were retired to docs/history/catalog-evidence-retired-20261029.json, and test_contracts.py now fails on an uncited record. Six unavailable_target rows (37 cells) are blocked and do not count toward 1.0 (maintainer decision, 29 October), and per-variant profile cells and the X12/X13 feasibility dispositions remain open.",
-      "remainingWork": "Close or disposition the open matrix cells; the six unavailable_target rows (37 cells) need a counting rule. Add per-variant profile cells as qualification names them, resolve the X12/X13 feasibility dispositions, and keep catalog, matrix, ledger and the raw evidence store consistent.",
-      "nextAction": "Decide how unavailable_target rows count; re-run the lost native evidence listed in the TODO's re-run queue; refresh this ledger with each catalog release.",
+      "currentResult": "29 October 2026 (catalog 0.4.76): scripts/release_matrix.py freezes the catalog and this ledger into release-matrix.v1.json (461 rows; 1,896 bound, 151 open, 49 blocked, 30 deferred cells), and test_release_matrix.py checks it in hosted CI. The eight unavailable_target rows (49 cells) are blocked and do not count toward 1.0 (maintainer decision, 29 October), recorded in dispositions. The ten deferred rows (30 cells) are not open matrix cells but stay 1.0 work, listed in docs/TODO.md with their dispositions. Raw evidence reports are kept in the main checkout's artifacts/evidence store; every lost record that can run on this PC was re-run on 28-29 October, and local.library_upgrades.20261024, local.library_vendor.20261025 and local.library_dmc_prerequisites.20261025 need vendor and DMC inputs no longer here. docs/plans/release-acceptance.md defines acceptance; no obligation is accepted.",
+      "remainingWork": "Close the open matrix cells and the ten deferred rows; resolve the X12/X13 feasibility dispositions; settle the per-variant cell rule (maintainer to confirm, docs/TODO.md); record one acceptance per obligation (docs/plans/release-acceptance.md); keep catalog, matrix, ledger and the raw evidence store consistent.",
+      "nextAction": "Maintainer reviews the acceptance candidates in docs/plans/release-acceptance.md and the open questions in docs/TODO.md; refresh this ledger with each catalog release.",
       "ownerRole": "Coordinator",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [],
@@ -74,7 +146,8 @@
         "docs/verification/release-matrix-audit-20261027.md",
         "docs/verification/host-only-qualification-20261027.md",
         "scripts/release_matrix.py",
-        "docs/plans/release-matrix.v1.json"
+        "docs/plans/release-matrix.v1.json",
+        "docs/plans/release-acceptance.md"
       ],
       "packages": [
         "AC-00"
@@ -82,7 +155,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "F01",
@@ -115,7 +188,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "F02",
@@ -148,7 +221,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "F03",
@@ -183,7 +256,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "L01",
@@ -191,11 +264,11 @@
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
       "implementation": "partial_builder_scoped_parents_shapes_missing",
-      "qualification": "native_routes_wave9_engineering_passed_runtime_open",
+      "qualification": "native_routes_wave9_engineering_runtime_passed_created_storage_runtime_open",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 11 release-matrix rows (9 limited, 1 unqualified, 1 unavailable on V21); 54 cells bound and 14 open. 62 of 66 wave 9 cases and cross-namespace/cross-unit calls pass the four engineering gates; graphical call and network edits are verified (28 October). Open: wave 9 runtime and change.graphical_typed_edit; change.call_connection_set is unavailable on V21.",
-      "remainingWork": "Wave 9 runtime; four wave 9 cases that fail the engineering gates; change.graphical_typed_edit; R_TRIG/F_TRIG global storage (TIA deletes an unreferenced instance DB at compile); candidate lineage before inactive profiles are enabled. change.call_connection_set is unavailable on V21.",
-      "nextAction": "Run the wave 9 runtime batch on the standard route and diagnose the four failing engineering cases.",
+      "currentResult": "29 October 2026 (catalog 0.4.76): 11 release-matrix rows (9 limited, 1 unqualified, 1 unavailable on V21); 54 cells bound, 8 open and 6 blocked. Wave 9 runtime passed on the standard route for all 60 cells with a runtime harness (local.typed.wave9.runtime.20261029), and the 14 wave 9 created-storage cells pass the four engineering gates (local.typed.wave9-created-storage.engineering.20261029). change.call_connection_set is blocked on V21 (dispositions).",
+      "remainingWork": "change.graphical_typed_edit (8 open cells): runtime of the wave 9 created-storage cells (in progress) and the four existing-global R_TRIG/F_TRIG cases, which have no profile because TIA deletes an unreferenced edge instance DB at compile (capture one or record the boundary). Candidate lineage before inactive profiles are enabled; a second CPU needs its own capture.",
+      "nextAction": "Finish the wave 9 created-storage runtime run, then settle the four existing-global R_TRIG/F_TRIG cases.",
       "ownerRole": "Typed",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -222,7 +295,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "L02",
@@ -260,7 +333,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "L03",
@@ -268,11 +341,11 @@
       "releaseObligation": true,
       "feasibility": "established_with_remaining_gates",
       "implementation": "partial_provisioning_simulation_enable_partial",
-      "qualification": "native_frozen_corpus_real_server_gate_passed_runtime_rows_open",
+      "qualification": "native_frozen_corpus_real_server_runtime_plcsim_gaps_passed",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 20 release-matrix rows (11 shipped, 5 limited, 4 unqualified); 59 cells bound and 14 open. The real-server gate and Tasks 1-3 passed: TCP/IP PLCSIM admission, interface-bound bindings and opcua_server_settings_set (28 October). Open: the runtime UA, web and capture rows against those servers (Tasks 4-5), the card-staging access-denied cause and the VM rows.",
-      "remainingWork": "Runtime UA, web and capture rows against owned TCP/IP PLCSIM servers; the card-staging access-denied cause; complete project and opaque-storage preservation with trusted release of the retained reservation; the VM rows.",
-      "nextAction": "Run the real-server plan's Tasks 4-5 (docs/plans/runtime-real-server-plan.md) once the operator sets PLCSIM Advanced to TCP/IP mode and its adapter IP.",
+      "currentResult": "29 October 2026 (catalog 0.4.76): 24 release-matrix rows (11 shipped, 13 limited); 90 cells bound and 0 open. The runtime UA, web and capture rows passed against the OPC UA and web servers of an owned TCP/IP PLCSIM instance in all five modes (local.runtime.plcsim-tcpip.20261029), and PLCSIM virtual time, OB82/OB83/OB86 injection, memory reset, storage archive/retrieve and online downloads passed (local.plcsim_gaps.20261029, local.plcsim_gaps.recovery.20261029). OB40 has no V21 hardware-interrupt configuration route (probe in progress).",
+      "remainingWork": "No open matrix cells. Outside the matrix: the card-staging access-denied cause; complete project and opaque-storage preservation with trusted release of the retained reservation and the updated runner's end-to-end acceptance; the file-storage helper's missed exit deadline; the VM rows (not a 1.0 gate if the maintainer confirms, docs/TODO.md).",
+      "nextAction": "Diagnose the card-staging access denial and the file-storage helper deadline; prove complete project and opaque-storage preservation with trusted release of the retained reservation.",
       "ownerRole": "Runtime",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -297,7 +370,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "L04",
@@ -334,7 +407,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "L05",
@@ -370,7 +443,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "L06",
@@ -449,7 +522,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D01",
@@ -496,7 +569,7 @@
       "prompt": "docs/plans/expansion-prompts/01-vci-and-git.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -514,8 +587,8 @@
       "qualification": "native_watch_lifecycle_authoring_force_edits_passed",
       "releaseAccepted": false,
       "currentResult": "29 October 2026 (catalog 0.4.70): 22 release-matrix rows (4 shipped, 18 limited); 137 cells bound and none open. watch_table_force_document_edit is verified natively on force rows an operator authored in the TIA editor (local.watch.force-edits.20261029): field, comment, clone and delete pass; reorder is refused at readback because TIA renumbers the rows' document IDs, and is recovered.",
-      "remainingWork": "Production Hosts still refuse force-table edits; enabling them is a maintainer decision. Live monitoring and forcing stay out of scope.",
-      "nextAction": "Maintainer decision on production force-table edits (docs/TODO.md).",
+      "remainingWork": "No open matrix cells. Production Hosts dispatch the qualified force-table edits (maintainer decision, 29 October); reorder and the Name field stay with the qualification harness, and watch_table_reconcile_interrupted is qualified on watch tables only. Force-table create, rename and delete have no V21 API. Live monitoring and active forcing are 1.0 scope (maintainer decision, 29 October); their V21 routes are being investigated.",
+      "nextAction": "Qualify interruption reconciliation and the Name field on a force table, or accept them as limitations at acceptance. Investigate and build live monitoring and active forcing for owned PLCSIM targets.",
       "ownerRole": "Diagnostics and watch tables",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -554,7 +627,7 @@
         "Existing D17 signal manifest and exact instance resolution; native AX acquisition is not a prerequisite."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D03",
@@ -600,7 +673,7 @@
       "prompt": "docs/plans/expansion-prompts/03-project-translations.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -659,7 +732,7 @@
       "prompt": "docs/plans/expansion-prompts/04-opc-ua-engineering.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -714,7 +787,7 @@
       "prompt": "docs/plans/expansion-prompts/05-automationml-cax.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -774,7 +847,7 @@
         "D16 only for system-test endpoints; simulator exclusive window for application tests."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D07",
@@ -821,7 +894,7 @@
       "prompt": "docs/plans/expansion-prompts/07-software-unit-lifecycle.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D08",
@@ -872,7 +945,7 @@
         "D05 only where a workflow uses AML; ordinary typed connections need no completed CAx adapter."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D09",
@@ -921,7 +994,7 @@
       "prompt": "docs/plans/expansion-prompts/09-online-compare-snapshots-upload.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D10",
@@ -971,7 +1044,7 @@
       "prompt": "docs/plans/expansion-prompts/10-startdrive.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D11",
@@ -1020,7 +1093,7 @@
       "prompt": "docs/plans/expansion-prompts/11-plc-alarms-prodiag.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D12",
@@ -1069,7 +1142,7 @@
       "prompt": "docs/plans/expansion-prompts/12-web-server-access-configuration.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D13",
@@ -1123,7 +1196,7 @@
         "D10 drive profile for connected drive/axis recipes; independent non-drive TO profiles can proceed separately."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D14",
@@ -1173,7 +1246,7 @@
       "prompt": "docs/plans/expansion-prompts/14-safety-validation-and-fio.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D15",
@@ -1226,7 +1299,7 @@
       "prompt": "docs/plans/expansion-prompts/15-sivarc-hmi-generation.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D16",
@@ -1278,7 +1351,7 @@
         "D04 for configured UA model handoff; Web-only and already configured UA targets do not require all UA engineering mutations first."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "D17",
@@ -1331,7 +1404,7 @@
       "prompt": "docs/plans/expansion-prompts/17-bug-driven-trace-diagnostics.md",
       "planStatus": "present",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -1348,9 +1421,9 @@
       "implementation": "partial_project_ops_attributes_unavailable",
       "qualification": "native_project_ops_verified",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 15 release-matrix rows (9 shipped, 5 limited, 1 unavailable on V21); 45 cells bound and 6 open. project_languages_set, project_copy, project_open.read_only, project_simulation_enable and engineering_operation_status are verified natively (28 October); change.project_attributes_set is unavailable on V21.",
-      "remainingWork": "change.project_attributes_set is unavailable on V21 and needs a disposition; project upgrade and compare breadth.",
-      "nextAction": "Record the V21 disposition for project attributes.",
+      "currentResult": "29 October 2026 (catalog 0.4.76): 15 release-matrix rows (9 shipped, 5 limited, 1 unavailable on V21); 45 cells bound, 0 open and 6 blocked. project_languages_set, project_copy, project_open.read_only, project_simulation_enable and engineering_operation_status are verified natively (28 October). change.project_attributes_set is blocked: V21 declares the attributes read-only (local.project_settings.20261028; dispositions).",
+      "remainingWork": "No open matrix cells. Outside the matrix: upgrading V14-V20 projects through OpenWithUpgrade on an owned copy (needs an old project file; no project upgrade route exists yet) and compare breadth.",
+      "nextAction": "Obtain a V14-V20 project file and implement and qualify project upgrade on an owned copy.",
       "ownerRole": "Platform",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1384,7 +1457,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X02",
@@ -1430,7 +1503,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X03",
@@ -1476,7 +1549,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X04",
@@ -1487,8 +1560,8 @@
       "qualification": "host_only_passed_uncurated_native_not_run",
       "releaseAccepted": false,
       "currentResult": "29 October 2026 (catalog 0.4.70): 3 release-matrix rows (3 limited); 14 cells bound and none open. addin_companion is verified natively inside TIA's Add-In sandbox (local.addin.companion.20261029); the companion opens the Host pipe through kernel32 handles and uses its own JSON.",
-      "remainingWork": "Run the Add-In inside TIA: install the published package and exercise selection handoff and enrollment in a real TIA session (4 open cells).",
-      "nextAction": "Publish with scripts/Publish-AddIn.ps1 and run the handoff in an owned TIA session; installation is an operator step.",
+      "remainingWork": "No open matrix cells. Limits: only a device-item selection was sent natively; the other mapped object kinds and multi-object selections share the path code without native runs, and package signing is not configured.",
+      "nextAction": "None for the matrix; at acceptance the maintainer decides whether the other selection kinds need native runs.",
       "ownerRole": "Add In",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1522,7 +1595,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X05",
@@ -1568,7 +1641,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X06",
@@ -1617,7 +1690,7 @@
         "D10/D13 for DCC/interpreter; GRAPH/CFC pure models can proceed independently."
       ],
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -1634,9 +1707,9 @@
       "implementation": "partial_inspection_backcolor_write_families_missing",
       "qualification": "native_readonly_passed_text_list_route_missing",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 9 release-matrix rows (3 shipped, 2 limited, 3 unqualified, 1 unavailable on V21); 19 cells bound and 20 open. Unified text-list authoring has no import route on V21, and change.hmi_engineering stays behind the closed preservation gate (28 October).",
-      "remainingWork": "Unified text-list import route; change.hmi_engineering behind the closed preservation gate; Classic families beyond the qualified profiles; an RT Professional target.",
-      "nextAction": "Close the Unified preservation gate (V21 has no Screen.Export) or record the boundary; obtain an RT Professional target.",
+      "currentResult": "29 October 2026 (catalog 0.4.79): 10 release-matrix rows (4 shipped, 3 limited, 2 unqualified, 1 unavailable on V21); 29 cells bound, 9 open and 7 blocked. hmi_text_list_author and hmi_text_list_generate_set are verified: their candidates import exactly through V21 HmiTextListComposition.Import via the independent seeder, and both refuse the content V21 would silently change (local.hmi.text-list-import.20261029). change.hmi_compile cannot pass: panels created through Openness have no start screen (29 October). change.hmi_engineering is blocked behind the closed preservation gate (dispositions).",
+      "remainingWork": "hmi.engineering and change.hmi_compile (a compilable HMI fixture with a start screen); a production Unified text-list import route (maintainer question); Classic families beyond the qualified profiles; an RT Professional target.",
+      "nextAction": "Build a compilable HMI fixture; get the maintainer's decision on a production text-list import route; obtain an RT Professional target.",
       "ownerRole": "HMI",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1672,7 +1745,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X08",
@@ -1682,9 +1755,9 @@
       "implementation": "partial_inspection_gated_writes_families_missing",
       "qualification": "native_readonly_prepare_passed_apply_open",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 9 release-matrix rows (3 shipped, 2 limited, 3 unqualified, 1 unavailable on V21); 19 cells bound and 20 open.",
-      "remainingWork": "Unified writes behind the closed preservation gate; visual and runtime acceptance.",
-      "nextAction": "Close the Unified preservation gate or record the V21 boundary.",
+      "currentResult": "29 October 2026 (catalog 0.4.76): 9 release-matrix rows (3 shipped, 2 limited, 3 unqualified, 1 unavailable on V21); 19 cells bound, 13 open and 7 blocked. Unified text lists have no worker import route yet (V21 has HmiTextListComposition.Import; in progress). change.hmi_engineering is blocked behind the closed preservation gate (dispositions).",
+      "remainingWork": "hmi.engineering and the two text-list rows; Unified writes behind the closed preservation gate (V21 has no Screen.Export); visual and runtime acceptance on Unified Comfort and Unified PC.",
+      "nextAction": "Finish the Unified text-list import route; close the Unified preservation gate or record the V21 boundary.",
       "ownerRole": "HMI",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1720,7 +1793,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X09",
@@ -1766,7 +1839,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X10",
@@ -1776,9 +1849,9 @@
       "implementation": "partial_hardware_kinds_transfer_areas",
       "qualification": "native_hardware_kinds_gsd_verified_families_open",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 24 release-matrix rows (3 shipped, 17 limited, 2 unqualified, 2 deferred); 105 cells bound and 6 open. The six X10 hardware kinds, I-device transfer areas and hardware_gsd_export are verified natively (28 October). Open: device_online_browse, device_identify, other device families and media-redundancy rings.",
-      "remainingWork": "device_online_browse and device_identify, other device families, address-changing replacements and media-redundancy rings.",
-      "nextAction": "Qualify device_online_browse and device_identify against an owned PLCSIM instance in TCP/IP mode.",
+      "currentResult": "29 October 2026 (catalog 0.4.76): 27 release-matrix rows (3 shipped, 20 limited, 2 unqualified, 2 deferred); 123 cells bound and 6 open. The X10 hardware kinds, I-device transfer areas, hardware_gsd_export, typed CPU parameters and device compile are verified natively (28-29 October). Open: device_online_browse and device_identify.",
+      "remainingWork": "device_online_browse and device_identify (6 cells) need a reachable S7-1500 web server: PLCSIM in TCP/IP mode, Modules.Browse support on PLCSIM (unverified) and the CPU's web certificate trusted in the Windows store, a security setting the user applies. Outside the matrix: the S7-1200 and ET 200MP families (in progress), ET 200SP on a second controller, shared devices, HMI, drive and GSD devices, address-changing replacements and media-redundancy rings; the deferred rows hardware.catalog_profiles and hardware.distributed_io.",
+      "nextAction": "Run device_online_browse and device_identify against an owned TCP/IP PLCSIM instance once the user has trusted its web certificate.",
       "ownerRole": "Hardware and remote IO",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1813,7 +1886,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X11",
@@ -1823,9 +1896,9 @@
       "implementation": "partial_move_protection_nvt_loadable_missing",
       "qualification": "native_mutations_graphical_reads_verified_protection_blocked",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 63 release-matrix rows (15 shipped, 41 limited, 1 unqualified, 4 unavailable on V21, 2 deferred); 255 cells bound and 32 open. 22 PLC object mutations, the graphical network and call edits and 34 read contracts are verified natively (28 October); the block-protection kinds wait for a Host-to-worker credential route.",
-      "remainingWork": "The block-protection kinds need a Host-to-worker protected credential route (18 cells); move, NVT and loadable breadth.",
-      "nextAction": "Design the reviewed credential route from the Host vault to a worker change.",
+      "currentResult": "30 October 2026 (catalog 0.4.81): 68 release-matrix rows (15 shipped, 49 limited, 1 unqualified, 1 unavailable on V21, 2 deferred); 303 cells bound, 8 open and 6 blocked. 22 PLC object mutations, the graphical network and call edits, 34 read contracts, PLC/project compile and the tag-table lifecycle are verified natively (28-29 October). The block-protection kinds are verified through the new Host-to-worker credential route (local.block_protection.20261030). change.call_connection_set is blocked (dispositions).",
+      "remainingWork": "change.graphical_typed_edit (8 cells, shared with L01); the deferred rows block.move and block.software_unit.create; NVT and loadable breadth; the CPU full-access password over the same credential route.",
+      "nextAction": "Reuse the credential route for the CPU protection level's full-access password; close the typed backlog.",
       "ownerRole": "PLC and typed",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1860,7 +1933,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X12",
@@ -1904,7 +1977,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "X13",
@@ -1950,7 +2023,7 @@
         ]
       },
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "C01",
@@ -1991,7 +2064,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "C02",
@@ -2032,7 +2105,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     },
     {
       "id": "C03",
@@ -2072,7 +2145,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass.",
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md.",
       "executionNotes": [
         {
           "date": "2026-10-27",
@@ -2123,7 +2196,7 @@
       "readyNow": "Read-only planning, evidence reconciliation and isolated pure work within agreed file boundaries",
       "nativeAdmission": "required separately; no historical grant is current authorization",
       "dependencyMeaning": "Dependencies order shared contract integration and dependent workflows; they do not prohibit independent planning, pure tests or continuation of existing qualified infrastructure.",
-      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass."
+      "completionCriteria": "Complete all feasible operations/profiles in remainingWork and roadmapSource, with exact effects, peer preservation, compile applicability, fresh reopen, recovery/interruption, runtime/visual/security/scale gates as applicable. No skipped/blocked gate is a pass. A row in the ledger's dispositions (maintainer decision) leaves the 1.0 count without being a pass; deferred rows stay 1.0 work. Acceptance follows docs/plans/release-acceptance.md."
     }
   ],
   "blockers": [
@@ -2144,7 +2217,7 @@
     {
       "id": "B03",
       "title": "Native UI pause and HMI prerequisites",
-      "current": "Bridge retrieval, read-only inspection, Explorer and persistence/recovery passed for five HMI profiles (25 October). The Unified preservation gate stays closed, Unified text lists have no import route, and RT Professional and other families lack eligible targets.",
+      "current": "Bridge retrieval, read-only inspection, Explorer and persistence/recovery passed for five HMI profiles (25 October). The Unified preservation gate stays closed, Unified text lists have no worker import route yet (V21 has HmiTextListComposition.Import; in progress), and RT Professional and other families lack eligible targets.",
       "resolution": "Obtain supported configured fixtures/public routes; native UI requires explicit resume, then independent visual/lifecycle evidence.",
       "releaseBlocking": true
     },
@@ -24284,7 +24357,8 @@
     "Missing licenses/products/fixtures/benches/CI/UI are blockers, never reduced-scope waivers.",
     "Retain failed/stopped original outcomes; separate recovery or copied persistence does not change them.",
     "Required native/runtime/visual/security/recovery/scale gates bind exact source/binary/fixture/target identities.",
-    "Final combined release requires all obligation closures, integrated regression/hosted CI, immutable packaging and installation evidence."
+    "Final combined release requires all obligation closures, integrated regression/hosted CI, immutable packaging and installation evidence.",
+    "A row that cannot close leaves the 1.0 count only through a maintainer disposition in dispositions (decision, date, boundary, reason, evidence); it is not a pass. Deferred (not implemented) rows have no disposition and remain 1.0 work."
   ],
   "limitations": [
     "Catalog labels are retained claims, not newly certified release acceptance.",
@@ -24296,8 +24370,8 @@
     {
       "command": "python -B scripts/test_contracts.py",
       "exitCode": 0,
-      "result": "PASS Contract coverage: 310 MCP tools, 117 mutation kinds, 450 feature entries; evidence/criteria references valid.",
-      "scope": "current file-only cross-contract checks (28 October 2026)"
+      "result": "PASS Contract coverage: 313 MCP tools, 125 mutation kinds, 461 feature entries; evidence/criteria references valid.",
+      "scope": "current file-only cross-contract checks (29 October 2026)"
     }
   ]
 }

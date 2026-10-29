@@ -3,7 +3,8 @@
 ## Keep the wiki current
 
 `docs/wiki/` is the source of the GitHub wiki; `.github/workflows/wiki.yml`
-publishes it on every push to `main` and overwrites edits made on the wiki itself.
+publishes it on every push to `main` that changes `docs/wiki/**` (or on manual dispatch)
+and overwrites edits made on the wiki itself.
 Never edit the wiki directly.
 
 In the same change, update the affected `docs/wiki/` page whenever you change:

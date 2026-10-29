@@ -224,7 +224,7 @@ class Run:
                 require(started['ownsPortalProcess'] and not started['projects'], 'Fresh empty owned Portal required')
                 if self.args.resume_root:
                     require(self.args.resume_operation, 'Explicit original operation required for continuation')
-                    previous = json.loads((self.artifacts / 'fixture-identity.json').read_text())
+                    previous = json.loads((self.artifacts / 'fixture-identity.json').read_text(encoding="utf-8"))
                     selector = {key: previous[key] for key in ('projectPath', 'plcPath')}
                     project, plc = selector['projectPath'], selector['plcPath']
                     old = self.call('qualification_translation_status', {'operationId': self.args.resume_operation})
@@ -237,7 +237,7 @@ class Run:
                         require(old['state'] == 'reconciled' and self.args.prior_receipts, 'Completed operation needs its exact prior receipts')
                         prior = self.args.prior_receipts.resolve()
                         require(prior.is_relative_to(self.artifacts), 'Prior receipts escaped owned artifact root')
-                        previous_result = json.loads((prior / 'result.json').read_text())
+                        previous_result = json.loads((prior / 'result.json').read_text(encoding="utf-8"))
                         require(len(previous_result['trials']) == 1 and previous_result['trials'][0]['name'] == 'noop' and
                                 previous_result['trials'][0]['id'] == old['id'], 'Only the completed no-op may be retained for edit continuation')
                         closed = ref(prior / 'exact-close.json')

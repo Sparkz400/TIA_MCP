@@ -138,7 +138,7 @@ def fbd_ob(main_xml, peer_xml, source_tag, target_tag):
 class IntegrateApplyRun(ComponentRun):
     def __init__(self, args):
         require(args.run_native, "Explicit --run-native is required.")
-        self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text())
+        self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))
         # Report, fixture documents and the Host's own artifacts share one fresh short run directory.
         self.output = self.native = args.artifacts.resolve() / ("i" + uuid.uuid4().hex[:6])
         require(len(str(self.native / "scratch" / ("TiaMcpScratch_" + "0" * 24) / ("TiaMcpScratch_" + "0" * 24))) <= 143,

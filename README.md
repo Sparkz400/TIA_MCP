@@ -84,6 +84,8 @@ Point a stdio MCP client at the resulting
 path. Set `--artifacts` to the directory where the Host should retain uploaded
 documents and reports. Add `--no-native-workers` to refuse Siemens calls before
 worker startup. A regular development Host otherwise starts workers on demand.
+Every Host option, its default and range are listed under
+[Host options](docs/guides/deployment.md#host-options).
 
 For a portable Windows package, run `./scripts/Package.ps1 -Offline`. This builds
 only the Host and portable libraries, creates a ZIP with hashes and dependency
@@ -113,7 +115,8 @@ Already available in this setup:
   This additionally requires the explicit `--git-executable` Host option.
   Supplied [package mappings and three-way conflicts](docs/reference/vci-package-workflow.md) can also be reviewed offline.
 - Review [detached Add-In selections](docs/reference/addin-selections.md) against
-  saved project reviews; native companion delivery remains open.
+  saved project reviews. The native TIA companion that sends them is verified
+  separately (`local.addin.companion.20261029`).
 - Compare [supplied Project Server observations](docs/reference/multiuser-observations.md),
   retaining session/lock/marking differences and coverage gaps without connecting
   to a server. Native collaboration workflows remain open.

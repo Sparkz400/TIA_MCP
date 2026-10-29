@@ -88,7 +88,7 @@ def qualify(root):
                 time.sleep(.02)
             proof = job.terminal_proof()
             write(directory / "observed-terminal.json", proof)
-            records = [json.loads(line) for line in (directory / "stdout.log").read_text().splitlines()]
+            records = [json.loads(line) for line in (directory / "stdout.log").read_text(encoding="utf-8").splitlines()]
             members = [row for row in records if row.get("originalJobMember")]
             check(len(members) == total and len({(row["pid"], row["created"]) for row in members}) == total,
                   mode + ": every expected interpreter independently observed original-job membership")

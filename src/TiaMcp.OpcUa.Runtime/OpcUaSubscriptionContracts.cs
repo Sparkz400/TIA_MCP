@@ -70,6 +70,11 @@ internal static class OpcUaSubscriptionContracts
             r.DurationSeconds is >= 1 and <= 3600 && r.MaximumNotifications is >= 1 and <= 100000 &&
             r.MaximumBytes is >= (1L<<20) and <= (64L<<20) && r.MaximumRepublish is >= 0 and <= 64);
     }
+    // A quiet Publish waits one keep-alive period inside the ten-second session deadline, which also covers the store gate
+    // and a shared-vault turn of up to 5 s. Retained plans are not rechecked, so older evidence still reopens.
+    internal const double MaximumKeepAliveMilliseconds = 4000;
+    internal static void RequireKeepAlive(double publishingInterval, uint keepAliveCount)
+    { if (publishingInterval * keepAliveCount > MaximumKeepAliveMilliseconds) throw OpcUaRuntimeClient.Error("UaSubscriptionKeepAliveLimit"); }
     internal static void ValidatePlan(OpcUaSubscriptionPlan p)
     {
         Validate(p.Request);

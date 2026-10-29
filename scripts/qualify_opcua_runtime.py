@@ -58,7 +58,7 @@ def main():
     secret = "fixture-only-secret"; vault = uuid.uuid4().hex; final_id = None
     identity_name = uuid.uuid4().hex
     identity_root = Path(os.environ["LOCALAPPDATA"]) / "TiaMcpOpcUaIdentities" / identity_name
-    schema = json.loads((ROOT / "contracts/opcua-runtime.v1.schema.json").read_text())
+    schema = json.loads((ROOT / "contracts/opcua-runtime.v1.schema.json").read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     def fixture(operation, **kwargs):
         server.stdin.write(json.dumps(dict(operation=operation, **kwargs)) + "\n"); server.stdin.flush()
@@ -116,7 +116,7 @@ def main():
         threading.Thread(target=stdout_reader, daemon=True).start()
         threading.Thread(target=stderr_reader, daemon=True).start()
         check(json.loads(server_lines.get(timeout=30)).get("ready"), "Actual fixture server ready")
-        ready = json.loads((out / "server/ready.json").read_text())
+        ready = json.loads((out / "server/ready.json").read_text(encoding="utf-8"))
         check(ready["processId"] == server.pid, "Fixture identity bound to original owned child")
         check(abs(dt.datetime.fromisoformat(ready["processBirthUtc"]).timestamp() - birth) < 0.02,
               "Managed fixture birth matches retained original process lifetime")
@@ -268,7 +268,7 @@ def main():
             report["serverLogs"] = server_errors
             cleanup_check(server.returncode == 0 and not forced, "Server original process clean exit")
         if final_id and report["status"] == "passed":
-            state = json.loads((out / "store/runtime-ua" / (final_id + ".json")).read_text())
+            state = json.loads((out / "store/runtime-ua" / (final_id + ".json")).read_text(encoding="utf-8"))
             cleanup_check(state["state"] == "closed", "Host disposal publishes terminal owned state")
         for path in (out / "store").rglob("*"):
             if path.is_file():

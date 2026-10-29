@@ -8,17 +8,17 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 
 | Exact fixture | E | X | P | R | B | Executed passing assertions | Selected report |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `typed-namespace-numeric-fb-fbd` | — | — | — | — | — | 0 | [report](<../../artifacts/rs6/typed-namespace-numeric-fb-fbd/typed-namespace-numeric-fb-fbd/result.json>) |
-| `typed-namespace-numeric-fb-fbd-createglobal` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-namespace-numeric-fb-fbd-createglobal/typed-namespace-numeric-fb-fbd-createglobal/result.json>) |
-| `typed-namespace-numeric-fb-fbd-global` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-namespace-numeric-fb-fbd-global/typed-namespace-numeric-fb-fbd-global/result.json>) |
-| `typed-namespace-numeric-fb-lad` | — | — | — | — | — | 0 | [report](<../../artifacts/rs6/typed-namespace-numeric-fb-lad/typed-namespace-numeric-fb-lad/result.json>) |
-| `typed-namespace-numeric-fb-lad-createglobal` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-namespace-numeric-fb-lad-createglobal/typed-namespace-numeric-fb-lad-createglobal/result.json>) |
-| `typed-namespace-numeric-fb-lad-global` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-namespace-numeric-fb-lad-global/typed-namespace-numeric-fb-lad-global/result.json>) |
-| `typed-unit-numeric-fb-fbd` | — | — | — | — | — | 0 | [report](<../../artifacts/rs6/typed-unit-numeric-fb-fbd/typed-unit-numeric-fb-fbd/result.json>) |
-| `typed-unit-numeric-fb-fbd-createglobal` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-unit-numeric-fb-fbd-createglobal/typed-unit-numeric-fb-fbd-createglobal/result.json>) |
-| `typed-unit-numeric-fb-fbd-global` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-unit-numeric-fb-fbd-global/typed-unit-numeric-fb-fbd-global/result.json>) |
-| `typed-unit-numeric-fb-lad` | — | — | — | — | — | 0 | [report](<../../artifacts/rs6/typed-unit-numeric-fb-lad/typed-unit-numeric-fb-lad/result.json>) |
-| `typed-unit-numeric-fb-lad-createglobal` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-unit-numeric-fb-lad-createglobal/typed-unit-numeric-fb-lad-createglobal/result.json>) |
-| `typed-unit-numeric-fb-lad-global` | pass | pass | pass | pass | pass | 8 | [report](<../../artifacts/rs6/typed-unit-numeric-fb-lad-global/typed-unit-numeric-fb-lad-global/result.json>) |
+| `typed-namespace-numeric-fb-fbd` | — | — | — | — | — | 0 | `artifacts/rs6/typed-namespace-numeric-fb-fbd/typed-namespace-numeric-fb-fbd/result.json` |
+| `typed-namespace-numeric-fb-fbd-createglobal` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-namespace-numeric-fb-fbd-createglobal/typed-namespace-numeric-fb-fbd-createglobal/result.json` |
+| `typed-namespace-numeric-fb-fbd-global` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-namespace-numeric-fb-fbd-global/typed-namespace-numeric-fb-fbd-global/result.json` |
+| `typed-namespace-numeric-fb-lad` | — | — | — | — | — | 0 | `artifacts/rs6/typed-namespace-numeric-fb-lad/typed-namespace-numeric-fb-lad/result.json` |
+| `typed-namespace-numeric-fb-lad-createglobal` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-namespace-numeric-fb-lad-createglobal/typed-namespace-numeric-fb-lad-createglobal/result.json` |
+| `typed-namespace-numeric-fb-lad-global` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-namespace-numeric-fb-lad-global/typed-namespace-numeric-fb-lad-global/result.json` |
+| `typed-unit-numeric-fb-fbd` | — | — | — | — | — | 0 | `artifacts/rs6/typed-unit-numeric-fb-fbd/typed-unit-numeric-fb-fbd/result.json` |
+| `typed-unit-numeric-fb-fbd-createglobal` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-unit-numeric-fb-fbd-createglobal/typed-unit-numeric-fb-fbd-createglobal/result.json` |
+| `typed-unit-numeric-fb-fbd-global` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-unit-numeric-fb-fbd-global/typed-unit-numeric-fb-fbd-global/result.json` |
+| `typed-unit-numeric-fb-lad` | — | — | — | — | — | 0 | `artifacts/rs6/typed-unit-numeric-fb-lad/typed-unit-numeric-fb-lad/result.json` |
+| `typed-unit-numeric-fb-lad-createglobal` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-unit-numeric-fb-lad-createglobal/typed-unit-numeric-fb-lad-createglobal/result.json` |
+| `typed-unit-numeric-fb-lad-global` | pass | pass | pass | pass | pass | 8 | `artifacts/rs6/typed-unit-numeric-fb-lad-global/typed-unit-numeric-fb-lad-global/result.json` |
 
 The report path and its SHA-256, native target, profile IDs, operation, binary hashes, diagnostics, failed-change recovery and assertion counts are recorded in `fixtures/typed-graphical/qualification.v1.json`. A newly built binary needs its own acceptance evidence; earlier results are retained as development evidence.

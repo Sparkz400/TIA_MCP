@@ -200,6 +200,7 @@ internal static partial class Program
             ("Malformed namespace and qualified declarations are rejected", NamespaceSourceTests.NamespaceMalformedAndQualifiedDeclarationsRejected),
             ("Namespace words in source comments and literals remain content", NamespaceSourceTests.NamespaceKeywordsInCommentsAndLiteralsRemainContent),
             ("Artifact transfer is bounded and hashes the complete immutable read", ArtifactTransfer),
+            ("Artifact continuation chunks reuse the sequence digest until length or write time changes", ArtifactDigestReuse),
             ("Artifact transfer rejects traversal, siblings and invalid ranges", ArtifactBoundaries),
             ("Artifact journal replacement preserves complete reads and truthful missing-path errors", ArtifactJournalReplacement),
             ("Journal replacement retries unchanged-name, sharing and lock failures within a finite bound", JournalReplacementRetry),
@@ -233,7 +234,8 @@ internal static partial class Program
             ("Bridge rejects a same-user impostor before sending any request", BridgeImpostor),
             ("Bridge rechecks the launched worker before another request", BridgePeerExit),
             ("Bridge owner observations never launch a worker and preserve explicit startup", BridgeOwnerObservation),
-            ("Bridge owner observations preserve disabled cancelled disposed and faulted states", BridgeOwnerRefusals),
+            ("Bridge owner observations preserve disabled cancelled disposed and exited-worker states", BridgeOwnerRefusals),
+            ("Bridge connect timeout and cancellation before sending leave the bridge usable", BridgeConnectTimeout),
             ("Bridge reports missing executable", BridgeMissingWorker),
             ("Disabled native bridge refuses existing executables without becoming faulted", BridgeDisabled),
             ("Bridge disposal rejects further calls", BridgeDisposed),
@@ -576,15 +578,16 @@ internal static partial class Program
     {
         await using var fixture = new BridgeFixture(delegateConnection: true);
         await Check.BridgeError("WorkerPeerMismatch", () => fixture.Client.CallAsync("mustNotBeSent", new { secret = "synthetic-private-payload" }));
-        await Check.BridgeError("BridgeFaulted", () => fixture.Client.CallAsync("mustNotBeReplayed"));
+        // Nothing was sent, so the bridge is not faulted: the next call launches a fresh worker and verifies it again.
+        await Check.BridgeError("WorkerPeerMismatch", () => fixture.Client.CallAsync("mustNotBeSent"));
         await fixture.Client.DisposeAsync();
         Check.Equal<bool?>(true, fixture.Client.WorkerShutdownSucceeded);
+        await BridgeFixture.WaitForAsync(() => fixture.Events().Count(e => e.Kind == "launcherStopped") == 2, "both launchers stopped");
         var events = fixture.Events();
-        Check.Equal(1, events.Count(e => e.Kind == "launcherStarted"));
-        Check.Equal(1, events.Count(e => e.Kind == "launcherStopped"));
-        Check.Equal(1, events.Count(e => e.Kind == "started"));
-        Check.Equal(1, events.Count(e => e.Kind == "stopped"));
-        Check.Equal(false, events.Single(e => e.Kind == "launcherStarted").Id == events.Single(e => e.Kind == "started").Id);
+        Check.Equal(2, events.Count(e => e.Kind == "launcherStarted"));
+        Check.Equal(2, events.Count(e => e.Kind == "started"));
+        Check.Equal(2, events.Count(e => e.Kind == "stopped"));
+        Check.Equal(false, events.Where(e => e.Kind == "launcherStarted").Select(e => e.Id).Intersect(events.Where(e => e.Kind == "started").Select(e => e.Id)).Any());
         Check.Equal(0, events.Count(e => e.Kind == "request"));
     }
 
@@ -598,8 +601,11 @@ internal static partial class Program
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         await worker.WaitForExitAsync(deadline.Token);
         await Check.BridgeError("WorkerExited", () => fixture.Client.CallAsync("mustNotBeSent"));
-        await Check.BridgeError("BridgeFaulted", () => fixture.Client.CallAsync("mustNotBeReplayed"));
-        Check.Equal(2, fixture.Events().Count(e => e.Kind == "request"));
+        // The refused request never reached a worker, so it is not replayed; the next call starts a fresh worker.
+        await fixture.Client.CallAsync("echo");
+        var events = fixture.Events();
+        Check.Equal(2, events.Count(e => e.Kind == "started"));
+        Check.Equal("echo,exitAfterReply,echo", string.Join(",", events.Where(e => e.Kind == "request").Select(e => e.Operation)));
     }
 
     private static async Task BridgeOwnerObservation()
@@ -647,7 +653,7 @@ internal static partial class Program
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         await worker.WaitForExitAsync(deadline.Token);
         await Check.BridgeError("WorkerExited", () => fixture.Client.CallAsync("addin_owner_context"));
-        await Check.BridgeError("BridgeFaulted", () => fixture.Client.CallAsync("addin_owner_context"));
+        await Check.BridgeError("AddInOwnerUnavailable", () => fixture.Client.CallAsync("addin_owner_context"));
         Check.Equal(0, fixture.Events().Count(e => e.Operation == "addin_owner_context"));
         Check.Equal(1, fixture.Events().Count(e => e.Kind == "started"));
         await fixture.Client.DisposeAsync();
@@ -659,14 +665,26 @@ internal static partial class Program
         await using var client = new BridgeClient(new BridgeOptions(BridgeFixture.DotnetPath(), TimeoutSeconds: 5,
             WorkerPrefixArguments: [Assembly.GetExecutingAssembly().Location, "--fake-worker", "--exit-before-connect"]));
         await Check.BridgeError("WorkerExited", () => client.CallAsync("echo"));
-        await Check.BridgeError("BridgeFaulted", () => client.CallAsync("echo"));
+        // No request was sent: a later call launches a new worker instead of reporting BridgeFaulted.
+        await Check.BridgeError("WorkerExited", () => client.CallAsync("echo"));
+    }
+
+    private static async Task BridgeConnectTimeout()
+    {
+        await using var client = new BridgeClient(new BridgeOptions(BridgeFixture.DotnetPath(), TimeoutSeconds: 1,
+            WorkerPrefixArguments: [Assembly.GetExecutingAssembly().Location, "--fake-worker", "--never-connect"]));
+        // A worker that never connects received nothing: the outcome is known and the bridge stays usable.
+        await Check.BridgeError("WorkerConnectTimeout", () => client.CallAsync("echo"));
+        using var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(300));
+        await Check.ThrowsAsync<OperationCanceledException>(() => client.CallAsync("echo", cancellationToken: cancellation.Token));
+        await Check.BridgeError("WorkerConnectTimeout", () => client.CallAsync("echo"));
     }
 
     private static async Task BridgeMissingWorker()
     {
         await using var client = new BridgeClient(new BridgeOptions(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "missing.exe")));
         await Check.BridgeError("WorkerNotFound", () => client.CallAsync("echo"));
-        await Check.BridgeError("BridgeFaulted", () => client.CallAsync("echo"));
+        await Check.BridgeError("WorkerNotFound", () => client.CallAsync("echo"));
     }
 
     private static async Task BridgeDisabled()

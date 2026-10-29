@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
 namespace TiaMcp.Core;
@@ -5,6 +6,8 @@ namespace TiaMcp.Core;
 /// <summary>Explicit, bounded transfer of artifacts from the engineering machine.</summary>
 public sealed class ArtifactStore(string root)
 {
+    private sealed record Digest(long Length, DateTime Written, string Sha256);
+    private static readonly ConcurrentDictionary<string, Digest> Digests = new(StringComparer.Ordinal);
     private readonly string _root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root));
 
     public object Read(string path, long offset = 0, int count = 65536)
@@ -40,7 +43,17 @@ public sealed class ArtifactStore(string root)
         using var stream = OpenRead(full);
         if (offset > stream.Length) throw new BridgeException("InvalidRequest", "offset is beyond the end of the file.");
         var length = stream.Length;
-        var hash = Convert.ToHexStringLower(SHA256.HashData(stream));
+        // Offset 0 always hashes; later chunks reuse that digest while this handle shows the same length and last write.
+        // A stale digest is still the true hash of an earlier version, so reassembled bytes can fail verification, never pass wrongly.
+        var written = File.GetLastWriteTimeUtc(stream.SafeFileHandle);
+        string hash;
+        if (offset > 0 && Digests.TryGetValue(full, out var known) && known.Length == length && known.Written == written) hash = known.Sha256;
+        else
+        {
+            hash = Convert.ToHexStringLower(SHA256.HashData(stream));
+            if (Digests.Count >= 64) Digests.Clear(); // shortcut: crude bound for a few concurrent transfers; use an LRU if many interleave.
+            Digests[full] = new(length, written, hash);
+        }
         stream.Position = offset;
         var buffer = new byte[(int)Math.Min(count, length - offset)];
         stream.ReadExactly(buffer);

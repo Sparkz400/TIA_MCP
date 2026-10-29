@@ -21,9 +21,11 @@ For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundl
 Requirements:
 
 - Windows with **TIA Portal V21** and **Openness**, configured for your user ([Openness registration](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md))
-- **PLCSIM Advanced V8** with a usable license and a supported CPU/firmware, for simulation
-- For the runtime OPC UA and web tools against PLCSIM: PLCSIM *Online Access* set to the PLCSIM
-  Virtual Ethernet Adapter, with a static address on that adapter only ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md))
+- **PLCSIM Advanced V8** with a usable license and a supported CPU/firmware, for simulation.
+  The default Softbus mode needs no network setup and covers simulation, download, online compare and upload.
+  - Only the runtime OPC UA and web tools against PLCSIM need TCP/IP: set PLCSIM *Online Access* to the
+    PLCSIM Virtual Ethernet Adapter with a static address, and create the instance with
+    `communicationInterface: "TCPIP"` at `sim_create` ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md#loading-an-engineering-program))
 - .NET 10 SDK and .NET Framework 4.8 reference assemblies
 - PowerShell 7, Python 3.13 and Node.js 24 for the development checks
 
@@ -39,7 +41,9 @@ If the probe reports missing prerequisites, follow [environment diagnostics](htt
 
 Optional combined library install: start the Host with `--enable-library-integrate-apply` to let `change_apply` install a prepared PLC `library_integrate` plan in one step. It is off by default, runs only the natively qualified shapes and refuses OB insertion. See [combined apply](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply-opt-in).
 
-Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll). It is not natively qualified.
+Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll); one native selection handoff is verified (`local.addin.companion.20261029`).
+
+The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--library-limits-file` or `--no-native-workers`; start the Host directly for those. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options).
 
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)

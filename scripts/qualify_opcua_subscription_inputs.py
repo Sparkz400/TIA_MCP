@@ -81,7 +81,7 @@ def main():
                 server_errors.append(line.rstrip())
         threading.Thread(target=read_lines, daemon=True).start(); threading.Thread(target=read_errors, daemon=True).start()
         check(json.loads(server_lines.get(timeout=30)).get("ready"), "Independent encrypted fixture ready")
-        ready = json.loads((out / "server/ready.json").read_text())
+        ready = json.loads((out / "server/ready.json").read_text(encoding="utf-8"))
         check(ready["processId"] == server.pid, "Fixture matches original owned process")
         client = Client(host, 20, ["--no-native-workers", "--artifacts", str(out / "store")])
         client.request("initialize", dict(protocolVersion="2025-11-25", capabilities={}, clientInfo=dict(name="ua-input-guard", version="1")))

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.77",
+  "catalogVersion": "0.4.81",
   "targetTiaVersions": [
     21
   ],
@@ -3008,6 +3008,65 @@
         "hardware_replace only to versions or successor articles that keep the addresses; acceptLoss and address-changing replacements are not exercised.",
         "CalculatedBandwidthForCyclicIoData of the IO controller interface is computed at the device compile and not saved, so it is not compared.",
         "Engineering only; nothing is downloaded and no physical topology is observed."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-created-storage.runtime.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7db882ca489ffd39a85f8e929e8cd84264804d15",
+        "passedScope": "scripts/qualify_typed_graphical.py --cases fixtures/typed-graphical/wave9-cases.v1.json --live --runtime --provision-runtime-credential --trust-owned-empty-cpu-certificate on build 7db882c (frozen artifacts/t9), one invocation per case, each in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1, standard route) with its own owned PLCSIM Advanced V8 instance on Softbus: the 8 wave 9 created-storage cells that have a runtime harness, typed-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (a new TONR_TIME, R_TRIG or F_TRIG multi-instance member) and typed-createglobal-tonr-{lad,fbd} (a new IEC_TIMER global DB), each passing all five gates: engineering, preservation, persistence, recovery and runtime behavior with the independent suites (TONR accumulate-pause-resume-hold-reset, R_TRIG one pulse per rising edge, F_TRIG one pulse per falling edge), semantic runtime preservation with only receipted project changes, owned cleanup verified, no physical PLC access."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-created-storage.runtime.20261029.json"
+      ],
+      "limitations": [
+        "Standard route only; the software-unit and namespace routes have no wave 9 profiles.",
+        "The six transitive createMulti cells (typed-transitive-createmulti-*) are engineering-only (local.typed.wave9-created-storage.engineering.20261029); they have no runtime harness.",
+        "R_TRIG/F_TRIG global storage, existing or created, stays refused: it has no captured global storage document and TIA deletes an unreferenced edge instance DB at compile.",
+        "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
+        "Each case trusts its owned, empty PLCSIM CPU's certificate on first use (--trust-owned-empty-cpu-certificate) to provision the runtime credential."
+      ]
+    },
+    {
+      "id": "local.hmi.text-list-import.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "47491ab44d6cbbf14bd4dbda83f572487f5985fa",
+        "passedScope": "Native import of Unified text-list candidates authored by hmi_text_list_author and hmi_text_list_generate_set (frozen artifacts/tl4, run q/tl4) on the build that refuses content V21 changes. The production Host (no native workers) authored the three v1 oracle variants and three boundary requests, refused every content class V21 imports but changes with its typed code (HmiTextListValueOutOfRange, HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue, HmiTextListTextUnsupported, HmiTextListNameUnsupported, HmiTextListUnresolvedText), and reopened the retained v1-v3 author and v1 set records. HmiSeeder textlist-import imported ten candidate pairs (v1, v2 Bool initial/regenerated, v3 integer initial/regenerated, both outputs of an initial and an evolved v1 set, and the v1 base that replaces an identical list) into a new owned MTP700 Unified Comfort V21.0.1.0 fixture with en-US/de-DE, screens, items, a tag, an alarm, a screen script and a documented peer list, through V21 HmiTextListComposition.Import. Every import reads back exactly through Export with the other lists unchanged; a no-change re-import of the whole export re-exports byte-identical files; the independent walk of every other HMI section is unchanged; compiler errors and warnings are unchanged by the imports and after reopen; a fresh Portal process reads equal text lists and walks after save/reopen and from the final archive, and the pre-import checkpoint restores the baseline twice without replaying an import. Five boundary candidates at the edge of what the tools accept import exactly: To/Range/From entries, signed 32-bit bounds, SingleValue 0 defaults, quotes, tab, LF, emoji, empty, U+2028/2029, soft hyphen, ZWSP, ZWJ, BOM, RLO, WJ, a 16384-character text, list names of 128 characters, Latin, umlaut, CJK, Cyrillic, Greek, Arabic, Hebrew, Hangul, Arabic-Indic digits and every allowed punctuation. Fresh Hosts reopen every author and set record with exact receipts and bytes (also through the actual-prior author and set-evolution runners)."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.20261029.json"
+      ],
+      "limitations": [
+        "The fixture's HMI compile keeps its two encrypted-transfer password errors (V21 has no public setter for that password); the gate is that imports add, remove or change no compiler error or warning, not a clean HMI compile.",
+        "Imported through the independent HmiSeeder, not a production route: no MCP tool imports or restores Unified text lists, and hmi_engineering stays behind the closed preservation gate.",
+        "The refusals cover what runs q/tl2 and q/tl3 showed V21 changes; list names use an allowlist (letters, digits, inner spaces, !&'()+,-;<=>@\\^_{|}, at most 128 characters), while text characters outside the control characters are refused only where observed. Records published before the refusals keep their meaning and still reopen, and their content is not re-qualified.",
+        "V21 export renames entries, pools all texts in one library with renumbered IDs, omits default fields, writes CRLF and leaves texts such as Off, On and Null unquoted (YAML 1.1 reads them as bool/null). Candidate library names, entry and text IDs and DefaultLanguage are not retained, so a native export never equals a candidate byte for byte.",
+        "One profile and language pair (MTP700 Unified Comfort, en-US/de-DE); no screen item consumes an imported list, and Unified PC, other devices and languages, runtime and visual behavior are not covered."
+      ]
+    },
+    {
+      "id": "local.block_protection.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b5fecd88c2b4a65d07e7a29508c871b3411f7bf1",
+        "passedScope": "scripts/qualify_block_protection.py on a frozen Debug build of b5fecd88 (artifacts/bp2, git archive), 38/38 steps, in an owned scratch CPU 1511-1 PN with an isolated named vault created through the Host credential CLI over stdin. Know-how: FC TiaMcp_IsEnabled protected and unprotected through the Host credential route with IsKnowHowProtected readback; a correctly bound wrong password fails in Unprotect (recovery_required, block still protected); the unprotect checkpoint restored holds the protected block, which the same credential reference unprotects again; the protect checkpoint restored holds the unprotected block. Write protection: FB TiaMcp_EnableGate define (does not enable), enable, change to a second credential, disable with the replaced password fails, disable with the new one passes, and the disable checkpoint restored holds enabled write protection. Refusals before admission and checkpoint, block unchanged and change still prepared: CredentialContextMismatch (with the expected binding), CredentialUnavailable, CredentialRetired, CredentialFormatInvalid, CredentialStoreBusy. TIA password policy refusal typed CredentialPolicyViolation after the checkpoint. All 6 generated passwords absent from every run file, tool response, report and Host log."
+      },
+      "artifacts": [
+        "evidence/local.block_protection.20261030.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with one SCL FC and one SCL FB; software units, namespaces, LAD/FBD, OBs and safety blocks are not exercised.",
+        "Generated ASCII passwords; non-ASCII passwords and the 120-character bound are not probed. TIA checks its password policy and a wrong password only in the native call, after the checkpoint; the wrong password is reported as EngineeringError.",
+        "The vault lives in the current Windows profile; another user, a roamed profile and packaged-context redirection are not exercised. CredentialAdmissionRequired (pinned reference) and worker-side CredentialRequired are covered offline only.",
+        "Persistence is read back after save in the same Portal; a fresh Portal reopen is not part of this run. Engineering only; a protected block is not downloaded or run."
       ]
     }
   ],
@@ -6611,24 +6670,26 @@
         "status": "partial",
         "limitations": [
           "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
-          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "At apply the Host checks each reference against its credential store and the public binding the worker derives from the exact block (provider siemensTiaPortalV21, authority plcPath, ownerId block path, resourceKind blockProtection, resourceId knowHow, purpose blockProtection) and seals the secret with DPAPI CurrentUser to that one admitted apply; only that lease's dispatch carries it. Mismatched, missing, retired, pinned, non-UTF-8 and busy credentials refuse before admission and the checkpoint (docs/reference/protected-credentials.md#change-apply-credential-route).",
           "Exact standard unprotected block with a before-XML backup; F-blocks, safety-unit objects and generated system-group blocks are refused.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope with an SCL FC and FB (local.block_protection.20261030); software units, namespaces, LAD/FBD blocks and non-ASCII passwords are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.block_protection.20261030"
+        ]
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "Protected credential reference from the Host credential store bound to the exact block and protection",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
       ],
@@ -6662,25 +6723,27 @@
         "status": "partial",
         "limitations": [
           "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
-          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "At apply the Host checks each reference against its credential store and the public binding the worker derives from the exact block (provider siemensTiaPortalV21, authority plcPath, ownerId block path, resourceKind blockProtection, resourceId knowHow, purpose blockProtection) and seals the secret with DPAPI CurrentUser to that one admitted apply; only that lease's dispatch carries it. Mismatched, missing, retired, pinned, non-UTF-8 and busy credentials refuse before admission and the checkpoint (docs/reference/protected-credentials.md#change-apply-credential-route).",
           "Exact standard know-how protected block; F-blocks, safety-unit objects and generated system-group blocks are refused.",
           "Protected content has no before-XML backup; the whole-project checkpoint archive is the recovery source.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope with an SCL FC and FB (local.block_protection.20261030); software units, namespaces, LAD/FBD blocks and non-ASCII passwords are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.block_protection.20261030"
+        ]
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "Protected credential reference from the Host credential store bound to the exact block and protection",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
       ],
@@ -6714,26 +6777,28 @@
         "status": "partial",
         "limitations": [
           "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
-          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "At apply the Host checks each reference against its credential store and the public binding the worker derives from the exact block (provider siemensTiaPortalV21, authority plcPath, ownerId block path, resourceKind blockProtection, resourceId write, purpose blockProtection) and seals the secret with DPAPI CurrentUser to that one admitted apply; only that lease's dispatch carries it. Mismatched, missing, retired, pinned, non-UTF-8 and busy credentials refuse before admission and the checkpoint (docs/reference/protected-credentials.md#change-apply-credential-route).",
           "Exact standard unprotected block with a before-XML backup; F-blocks, safety-unit objects and generated system-group blocks are refused.",
           "V21 exposes no call that removes a defined write-protection password; action disable only turns protection off.",
           "Whether Define also enables protection is undocumented, so define reads back only IsDefined. A password change is not observable; only the native call returning is evidence.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope with an SCL FC and FB (local.block_protection.20261030); software units, namespaces, LAD/FBD blocks and non-ASCII passwords are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.block_protection.20261030"
+        ]
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "Protected credential reference from the Host credential store bound to the exact block and protection",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
       ],
@@ -12248,7 +12313,8 @@
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests.",
+          "Created wave 9 storage at runtime (29 October 2026, local.typed.wave9-created-storage.runtime.20261029): a new TONR_TIME, R_TRIG or F_TRIG multi-instance member and a new IEC_TIMER global DB pass all five gates, runtime behavior included, in LAD and FBD on the standard route; created R_TRIG/F_TRIG global storage stays refused."
         ]
       },
       "qualification": {
@@ -12289,7 +12355,8 @@
           "local.typed.wave9.runtime.20261029",
           "local.typed.resolution-stale.20261029",
           "local.typed.iec-effect-standard-wave9.20261029",
-          "local.typed.wave9-created-storage.engineering.20261029"
+          "local.typed.wave9-created-storage.engineering.20261029",
+          "local.typed.wave9-created-storage.runtime.20261029"
         ]
       },
       "availability": {
@@ -22715,12 +22782,14 @@
           "4 MiB request, 128 lists, 4096 total entries/texts, 32 languages, conservative 8 MiB per candidate and shared 512 MiB retention. Nonoverlapping ranges and unambiguous ASCII text identifiers only.",
           "Explicit v2 Bool binding generation uses exact v7 saved component/output evidence, declared translations and a retained previous candidate pair. Manual drift or relevant conflicts suppress candidates; selected retained peers stay unchanged. Original reviews and predecessor chains are revalidated; 16 predecessor and 128 MiB lineage-input limits. This does not establish native preservation or complete C01 generation.",
           "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification.",
-          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22936,12 +23005,14 @@
           "Exact predecessor/current/proposed comparisons, captured lineage, manual edits and cross-output collisions are checked before candidate publication. Conflicts suppress the whole proposed set; old records retain their semantics.",
           "Established plain TextLists/TextLibrary YAML only. Removal/rename effects are previews, not source deletion or native writes. No implicit type conversion, general SiVArc template engine, complete project coverage or native preservation qualification.",
           "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified.",
-          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

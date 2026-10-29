@@ -285,7 +285,7 @@ def run(args):
         for version in released:
             stage("verify rejected update retained " + version["typeName"], lambda v=version: verify_use(consumer_library, v, 1))
         apply("source_upsert", {"scopePath": consumer_plc, "language": "SCL",
-              "source": (documents / "ConsumerReferences.scl").read_text(),
+              "source": (documents / "ConsumerReferences.scl").read_text(encoding="utf-8"),
               "expectedBlockNames": ["TiaMcpLibraryGate_DB", "TiaMcpLibraryState_DB", "Main"]})
         stage("consumer native cross references", lambda: client.tool("xref_query", {"plcPath": consumer_plc, "blockName": "Main", "maxItems": 1000}))
         for version in released:
