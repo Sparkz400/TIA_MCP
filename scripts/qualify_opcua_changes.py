@@ -220,8 +220,8 @@ def export(run):
         require([f["name"] for f in result["files"]] == [NAME] and not result["warnings"], "Interface export differs: %s" % result)
         return {"sha256": result["files"][0]["artifact"]["sha256"], "normalized": normalized_hash(result["files"][0]["artifact"]["path"])}
     h.report["exports"]["serverInterface"] = h.stage("export the server interface", one)
-    missing = h.stage("export a missing interface name", lambda: h.tool("opcua_engineering_export", {"plcPath": run.plc, "category": "serverInterface", "name": "TiaMcpMissing"}))
-    require(missing["files"] == [], "A missing name exported files: %s" % missing)
+    missing = h.stage("refuse exporting a missing interface name", lambda: h.call_error("opcua_engineering_export", {"plcPath": run.plc, "category": "serverInterface", "name": "TiaMcpMissing"}))
+    require(missing.get("code") == "ObjectNotFound", "Expected ObjectNotFound for a missing interface name: %s" % missing)
 
 
 def reference_boundary(run):
