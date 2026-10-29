@@ -74,14 +74,14 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                 if (existing.Login != login) throw Error("RuntimeAttemptContextMismatch");
                 return Observe(existing);
             }
-            if (live.Count >= 4 || Directory.EnumerateFiles(root, "*.json").Take(1025).Count() >= 1024) throw Error("RuntimeSessionCapacity");
+            if (live.Count >= 4) throw Error("RuntimeSessionCapacity");
+            var records = Directory.EnumerateFiles(root, "*.json").Select(path => Read(Path.GetFileNameWithoutExtension(path))).ToArray();
+            // Bounded retention: the oldest resolved records make room for a new attempt; unresolved records are never removed.
+            var retired = records.Where(r => Resolved(r.State)).OrderBy(r => File.GetLastWriteTimeUtc(PathFor(r.AttemptId))).Take(records.Length - 1023).ToArray();
+            if (records.Length - retired.Length >= 1024) throw Error("RuntimeSessionCapacity");
+            foreach (var old in retired) File.Delete(PathFor(old.AttemptId));
             // A new ID cannot bypass an unresolved login for the same endpoint in this artifact root.
-            foreach (string path in Directory.EnumerateFiles(root, "*.json"))
-            {
-                var prior = Read(Path.GetFileNameWithoutExtension(path));
-                if (prior.Context.Endpoint == login.Endpoint && prior.State is not ("closed" or "notConnected" or "abandonedRemoteUnknown"))
-                    throw Error("RuntimeEndpointSessionUnresolved");
-            }
+            if (records.Any(r => r.Context.Endpoint == login.Endpoint && !Resolved(r.State))) throw Error("RuntimeEndpointSessionUnresolved");
             var vault = Vault(login); vault.Use(login.Credential, binding, ValidatePassword);
             var context = WebRuntimeProtocol.Context(login.Endpoint, attemptId, Guid.NewGuid().ToString("N"), login.PeerCertificateSha256);
             var status = new RuntimeSessionStatus(attemptId, hostId, context, login, "connecting", null, false, [], "permissionUnknown");
@@ -215,25 +215,40 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             {
                 Permitted(entry, "change_operating_mode", cancellationToken);
                 WebRuntimeDiagnosticResult Observe() => entry.Client.DiagnosticAsync("operatingMode", null, null, cancellationToken).GetAwaiter().GetResult();
-                bool Is(WebRuntimeDiagnosticResult? read, string wanted) => read is { Status: "read", Value: { ValueKind: JsonValueKind.String } v } && v.GetString() == wanted;
                 var before = Observe();
-                if (!Is(before, expectedMode)) { result = new { attemptId, state = "preconditionMismatch", dispatched = false, before }; return; }
-                string dispatch; int? code; WebRuntimeDiagnosticResult? after = null;
-                try { (dispatch, code) = entry.Client.MutateAsync(WebRuntimeProtocol.ChangeOperatingMode(Guid.NewGuid().ToString("N"), mode), cancellationToken).GetAwaiter().GetResult(); }
-                catch (BridgeException error) { result = new { attemptId, state = "unknown", dispatched = true, before, errorCode = error.Code }; return; }
-                // Boolean success only acknowledges the request; observe Plc.ReadOperatingMode for a bounded time.
-                for (int i = 0; dispatch == "accepted" && i < 20 && !Is(after, mode); i++)
-                {
-                    if (i > 0) Task.Delay(250, cancellationToken).GetAwaiter().GetResult();
-                    after = Observe();
-                }
-                result = new { attemptId, state = Is(after, mode) ? "changed" : "incomplete", dispatched = true, expectedMode, requestedMode = mode,
-                    dispatch, providerErrorCode = code, before, readback = after, readbackMatches = Is(after, mode) };
+                if (!IsMode(before, expectedMode)) { result = new { attemptId, state = "preconditionMismatch", dispatched = false, before }; return; }
+                result = RequestMode(attemptId, expectedMode, mode, before,
+                    () => entry.Client.MutateAsync(WebRuntimeProtocol.ChangeOperatingMode(Guid.NewGuid().ToString("N"), mode), cancellationToken).GetAwaiter().GetResult(),
+                    Observe, cancellationToken);
             }, cancellationToken);
             return result!;
         }
         finally { gate.Release(); }
     }
+
+    /// <summary>Sends one RUN/STOP request and observes the mode for a bounded time. Once the request may have gone out, a lost
+    /// response or a failed or cancelled readback is reported as dispatched with an unknown outcome; nothing is retried.</summary>
+    internal static object RequestMode(string attemptId, string expectedMode, string mode, WebRuntimeDiagnosticResult before,
+        Func<(string Status, int? ProviderErrorCode)> mutate, Func<WebRuntimeDiagnosticResult> observe, CancellationToken cancellationToken)
+    {
+        string dispatch = "unknown"; int? code = null; WebRuntimeDiagnosticResult? after = null;
+        try
+        {
+            (dispatch, code) = mutate();
+            // Boolean success only acknowledges the request; observe Plc.ReadOperatingMode for a bounded time.
+            for (int i = 0; dispatch == "accepted" && i < 20 && !IsMode(after, mode); i++)
+            {
+                if (i > 0) Task.Delay(250, cancellationToken).GetAwaiter().GetResult();
+                after = observe();
+            }
+        }
+        catch (Exception error) when (error is BridgeException or OperationCanceledException)
+        { return new { attemptId, state = "unknown", dispatched = true, before, dispatch, errorCode = error is BridgeException e ? e.Code : "RuntimeCancelled" }; }
+        return new { attemptId, state = IsMode(after, mode) ? "changed" : "incomplete", dispatched = true, expectedMode, requestedMode = mode,
+            dispatch, providerErrorCode = code, before, readback = after, readbackMatches = IsMode(after, mode) };
+    }
+    private static bool IsMode(WebRuntimeDiagnosticResult? read, string wanted) =>
+        read is { Status: "read", Value: { ValueKind: JsonValueKind.String } v } && v.GetString() == wanted;
 
     private static bool Holds(WebRuntimeReadResult? read, JsonElement wanted) =>
         read is { Status: "read", Value: { } value } && JsonElement.DeepEquals(value, wanted);
@@ -370,8 +385,9 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         if (password.RootElement.ValueKind != JsonValueKind.String || bytes.Length > 32*1024) throw Error("RuntimeCredentialFormatInvalid");
         _ = new System.Text.UTF8Encoding(false,true).GetByteCount(password.RootElement.GetString()!);
     }
-    private RuntimeSessionStatus Observe(RuntimeSessionStatus status) => live.ContainsKey(status.AttemptId) ? status :
-        status.State is "closed" or "notConnected" or "abandonedRemoteUnknown" ? status : status with { State = "hostEndedRemoteUnknown" };
+    private RuntimeSessionStatus Observe(RuntimeSessionStatus status) => live.ContainsKey(status.AttemptId) || Resolved(status.State) ? status :
+        status with { State = "hostEndedRemoteUnknown" };
+    private static bool Resolved(string state) => state is "closed" or "notConnected" or "abandonedRemoteUnknown";
     private async Task ExpireIdle()
     {
         try

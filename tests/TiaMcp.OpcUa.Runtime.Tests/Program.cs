@@ -325,6 +325,34 @@ try
             string recovered = Id(); Check((await store.Connect(recovered, server.Selection)).State == "connected", "Capacity recovery opens healthy session");
             await store.Disconnect(recovered);
         }
+        // Retention: the oldest resolved records make room for a new attempt; unresolved records are never removed and still fill capacity.
+        string[] Seed(string name, Func<int, (OpcUaRuntimeSelection Selection, string State)> pick)
+        {
+            var ids = Enumerable.Range(0, 1024).Select(_ => Id()).ToArray(); var oldest = DateTimeOffset.UtcNow.AddHours(-1);
+            for (int i = 0; i < ids.Length; i++)
+            {
+                var (selection, state) = pick(i);
+                File.WriteAllText(Path.Combine(output, name, ids[i] + ".json"), JsonSerializer.Serialize(new OpcUaRuntimeStatus("opcua-runtime-session.v1",
+                    ids[i], Id(), selection, state, null, false, oldest.AddSeconds(i)), BridgeProtocol.Json));
+            }
+            return ids;
+        }
+        await using (var store = Store("retention"))
+        {
+            var ids = Seed("retention", i => i == 0 ? (second.Selection, "remoteSessionUnknown") : (server.Selection, "closed"));
+            string id = Id(); Check((await store.Connect(id, server.Selection)).State == "connected", "A full store of resolved records admits a new attempt");
+            Check(File.Exists(Path.Combine(output, "retention", ids[0] + ".json")) && !File.Exists(Path.Combine(output, "retention", ids[1] + ".json")) &&
+                Directory.EnumerateFiles(Path.Combine(output, "retention"), "*.json").Count() == 1024, "Only the oldest resolved record makes room; an older unresolved one stays");
+            int calls = server.Audit.Count;
+            Check((await store.Connect(ids[^1], server.Selection)).State == "closed" && server.Audit.Count == calls, "A retained attempt ID still observes its outcome without network");
+            await store.Disconnect(id);
+        }
+        await using (var store = Store("retention-full"))
+        {
+            Seed("retention-full", _ => (server.Selection, "remoteSessionUnknown"));
+            await Refused(() => store.Connect(Id(), server.Selection), "UaSessionCapacity", "1,024 unresolved records still refuse a new attempt");
+            Check(Directory.EnumerateFiles(Path.Combine(output, "retention-full"), "*.json").Count() == 1024, "A capacity refusal removes no record");
+        }
         var allowed = new HashSet<string> { "GetEndpoints", "CreateSession", "ActivateSession", "Read", "Browse", "BrowseNext", "Continuation", "CloseSession", "CreateSubscription", "CreateMonitoredItems", "Publish", "Republish", "DeleteSubscriptions", "SubscriptionCreated", "ItemsCreated", "PublishReturned", "RepublishRequested", "SubscriptionDeleteRequested", "FixtureDroppedPublish" };
         allowed.UnionWith(["PublishEntered","PublishCompleted","FixtureTransportReadFailure","FixtureLostPublishResponse"]);
         allowed.UnionWith(["FixtureEventEmitted","FixtureEventFilter","TransferSubscriptions","TransferRequested"]);

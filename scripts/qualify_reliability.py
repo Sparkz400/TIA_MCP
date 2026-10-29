@@ -180,7 +180,8 @@ def qualify_case(mode, host, worker, run_root):
         client.initialize()
         if mode == "early-exit":
             report["error"] = require_error(client.raw_tool("tia_capabilities"), "WorkerExited")
-            require_error(client.raw_tool("tia_capabilities"), "BridgeFaulted")
+            # Nothing was sent, so the bridge is not faulted: the next call launches a fresh worker, which exits again.
+            require_error(client.raw_tool("tia_capabilities"), "WorkerExited")
         elif mode == "operation-error":
             require_error(client.raw_tool("block_read", {"blockName": "fixture"}), "ProtectedBlock")
             require(client.tool("tia_capabilities")["testDouble"], "Session did not survive operation rejection")
