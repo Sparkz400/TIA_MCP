@@ -90,4 +90,4 @@ MCP client acceptance ran here. MCP resource delivery is not visual acceptance.
 The package manifest is a consistency check, not a publisher signature. ZIP
 timestamps and unique build paths mean bit-for-bit reproducibility is not claimed.
 The remaining L06 obligations and other workstreams stay open in the
-[offline execution queue](../plans/offline-execution-20261016.md).
+[offline execution queue](../history/offline-execution-20261016.md).

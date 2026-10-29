@@ -146,7 +146,7 @@ the full report retains its bytes. Review reads are available when capacity is f
 
 ## Remaining full C01 scope
 
-The [44-workstream queue](../plans/offline-execution-20261016.md#all-44-workstreams)
+The [44-workstream queue](../history/offline-execution-20261016.md#all-44-workstreams)
 and [release ledger](../plans/release-obligations-20261015.md) remain authoritative.
 This increment does not close C01, L02 or X07/X08. Remaining obligations include:
 

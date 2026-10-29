@@ -1,6 +1,6 @@
 # Library version, dependency, lifecycle, compatibility and vendor qualification — 24 October 2026
 
-Lane C of the [parallel completion plan](../plans/parallel-completion-20261024.md). Every run used the real MCP stdio Host,
+Lane C of the [parallel completion plan](../history/parallel-completion-20261024.md). Every run used the real MCP stdio Host,
 owned headless TIA V21 sessions and owned scratch projects, under the machine-wide native lane lock. Raw reports stay under
 `D:\lcq`; the committed summaries are in `evidence/`.
 

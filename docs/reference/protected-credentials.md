@@ -213,4 +213,4 @@ Managed tests exercise actual local DPAPI/ACL and separate processes; the CLI ha
 uses disposable random synthetic secrets over redirected stdin. Fake key sequences
 cover console input editing/cancellation; physical-console acceptance, a different
 Windows user, lost/roamed profiles, real key/password recovery and Siemens/native
-provider acceptance remain unexecuted. See the current [execution queue](../plans/offline-execution-20261016.md).
+provider acceptance remain unexecuted. See the current [execution queue](../history/offline-execution-20261016.md).

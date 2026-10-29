@@ -125,6 +125,6 @@ state/recovery remain WA-09 obligations. DPAPI/ACLs do not defend against the ac
 owner, administrator or equivalent same-user code; no anti-rollback hardware claim.
 
 Read the [workflow and recovery boundaries](../reference/protected-credentials.md)
-and [full remaining queue](../plans/offline-execution-20261016.md). No Siemens SDK,
+and [full remaining queue](../history/offline-execution-20261016.md). No Siemens SDK,
 TIA, PLCSIM, physical endpoint or native release acceptance was available. This
 increment does not complete WA-09, D12/X03 or the full goal.

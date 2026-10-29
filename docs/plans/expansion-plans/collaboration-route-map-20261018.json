@@ -11,7 +11,7 @@
     "sha256": "66c33cf070682c77e58f9000907bcab7928a79a191913c6fa5ecbb2ab7b02c23"
   },
   "scopeBaseline": {
-    "path": "docs/plans/offline-scope-reconciliation-20261017.json",
+    "path": "docs/history/offline-scope-reconciliation-20261017.json",
     "sha256": "a4ce92e57f19f42a148a7cdfb9abf3871fc25d6fe3a64770d8f14dafb05ce046"
   },
   "interpretation": "Selected exact XML member IDs and planned effect classes, not verified accessibility, return types, current SDK compatibility, live service semantics or dispatch authority. Unselected members remain in the complete hash-bound inventory. Primary-source findings and unresolved queries are recorded in the linked plans.",

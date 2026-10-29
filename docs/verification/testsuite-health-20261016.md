@@ -119,4 +119,4 @@ Hashes establish byte consistency, not publisher authenticity.
 Selected test evidence is not complete project health, authenticated source,
 current program identity, native compile/safety/physical inspection or execution
 qualification. Broader alarm/context orchestration, native provider/scope/license,
-recovery and runtime obligations remain open in the [full queue](../plans/offline-execution-20261016.md).
+recovery and runtime obligations remain open in the [full queue](../history/offline-execution-20261016.md).

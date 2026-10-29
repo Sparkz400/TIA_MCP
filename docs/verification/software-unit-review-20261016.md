@@ -3,7 +3,7 @@
 The current increment adds two offline Host tools for explicit supplied unit facts
 and proposed relation/publication/preset edits. No Siemens software, SDK, PLCSIM
 or PLC is installed. All fixtures are synthetic. The full D07 lifecycle and
-[44-stream queue](../plans/offline-execution-20261016.md) remain open.
+[44-stream queue](../history/offline-execution-20261016.md) remain open.
 
 Development evidence: `artifacts/software-units-dev/test-03/verification.json`
 passes 56 managed checks; `mcp-01/verification.json` passes 34 actual MCP checks

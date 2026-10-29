@@ -106,4 +106,4 @@ The evidence inventory still contains 106 unavailable historical files; their
 recorded hashes are preserved, never reclassified as passed.
 
 [Workflow](../guides/project-reviews.md), [full D11 plan](../plans/expansion-plans/plc-alarms-prodiag.md),
-and [complete execution queue](../plans/offline-execution-20261016.md).
+and [complete execution queue](../history/offline-execution-20261016.md).

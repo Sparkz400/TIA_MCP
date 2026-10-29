@@ -154,4 +154,4 @@ resource pools, exported document coverage and safe preservation of program/HMI
 references remain unproven for the general native adapter. CN02 now supplies the retained
 offline comparison workflow while leaving property/resource semantics unassessed.
 Continue CN01/CN03 and real consumer integration before native mutation.
-The complete D08 and [44-stream queue](../offline-execution-20261016.md) remain open.
+The complete D08 and [44-stream queue](../../history/offline-execution-20261016.md) remain open.

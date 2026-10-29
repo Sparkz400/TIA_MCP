@@ -93,7 +93,7 @@ pushed commit, hosted CI results and cleanup.
 
 ## Remaining work
 
-Continue TO-03–12 and the [full 44-workstream queue](../plans/offline-execution-20261016.md):
+Continue TO-03–12 and the [full 44-workstream queue](../history/offline-execution-20261016.md):
 service/family eligibility, parent-child lifecycle, connection mutation recipes,
 consumer effects and preservation/recovery. SDK compilation, genuine provider
 and channel behavior, cross-session persistence and physical acceptance remain open.

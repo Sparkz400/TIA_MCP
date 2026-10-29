@@ -22,7 +22,7 @@ Commits, PRs and merges are automatic checkpoints.
 4. **Shared files belong to the integrator.** Lanes do not edit
    `contracts/feature-catalog.v1.json`, `contracts/api-coverage/*`,
    `docs/STATUS.md`, `docs/TODO.md` or
-   `docs/plans/1.0-release-checklist-20261013.md`. Each lane:
+   `docs/history/1.0-release-checklist-20261013.md`. Each lane:
    - writes its new or changed feature rows and evidence IDs into its PR description;
    - curates evidence with `scripts/curate_evidence.py` into `evidence/` (new files only).
 

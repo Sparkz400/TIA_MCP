@@ -83,7 +83,7 @@ records the pushed commit, hosted CI outcome and cleanup.
 
 This delivers the documented child-inventory path in source and repairs its live
 viewer flow. It does not complete TO-03/TO-04/TO-06 or the full
-[44-workstream queue](../plans/offline-execution-20261016.md). Next, audit the
+[44-workstream queue](../history/offline-execution-20261016.md). Next, audit the
 connection-service readback boundary: unsupported/unobserved services, failed or
 truncated property values and typed owner/channel identities must remain explicit.
 Other service compositions, coupling, SDR, interpreter/cam content, exact CPU/type

@@ -139,4 +139,4 @@ unavailable historical evidence rows/hashes remain preserved. The previous base 
 `4e6663436f51d9dedeca59e3f99624e54a8f000b`; it passes Explorer `38993112983` and
 all four Python/.NET jobs `38993112982`, with the last managed job completed at
 `2026-10-17T02:14:50Z`. New-commit hosted acceptance remains separate.
-The [44-workstream queue](../plans/offline-execution-20261016.md) remains active.
+The [44-workstream queue](../history/offline-execution-20261016.md) remains active.

@@ -84,7 +84,7 @@ bundled catalog no longer contains one.
   features, 15 October) is historical and was not rewritten. Use the actual tool
   list and `counts` in the bindings registry for current numbers.
 - The 1.0 checklist's declared per-cell support matrix
-  ([release checklist](../plans/1.0-release-checklist-20261013.md)) is still
+  ([release checklist](../history/1.0-release-checklist-20261013.md)) is still
   unwritten. This reconciliation covers the catalog and the capability reference only.
 - PLCSIM provisioning tools may change in a parallel lane. This change touched
   only existing catalog entries: the 36 listed above, `hmi_capabilities` and

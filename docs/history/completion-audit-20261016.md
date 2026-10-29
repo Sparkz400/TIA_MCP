@@ -2,7 +2,7 @@
 
 **Superseded current-state observations:** the [post-session recheck](completion-recheck-20261016.md) has a stable 10:15 snapshot, GRAPH 51/51 passing, 139 declarations, 15 catalog omissions, 21 stale source bindings and the later Test Suite native preparation failure. This document retains the first snapshot's actual results and full roadmap analysis. Use the [updated assignments](completion-assignments-20261016.md) and [current ledger](completion-recheck-20261016.json) for new work.
 
-The project has substantial implemented and individually tested functionality, but **the integrated checkout is not green and 1.0 is not complete**. The best next increment is to finish the existing vertical workflows and make their verification reproducible before opening more implementation lanes. Every feasible capability remains a release obligation under the [release scope decision](release-obligations-20261015.md); finishing one explicit profile does not close its entire family.
+The project has substantial implemented and individually tested functionality, but **the integrated checkout is not green and 1.0 is not complete**. The best next increment is to finish the existing vertical workflows and make their verification reproducible before opening more implementation lanes. Every feasible capability remains a release obligation under the [release scope decision](../plans/release-obligations-20261015.md); finishing one explicit profile does not close its entire family.
 
 This audit separates implemented code, accepted historical evidence, fresh test results, active work and remaining acceptance. It does not enable profiles, start Siemens software, operate a PLC, deploy a package or clear another session's reservations.
 

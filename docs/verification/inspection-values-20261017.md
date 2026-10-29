@@ -80,7 +80,7 @@ pushed commit, hosted CI results and cleanup.
 ## Remaining work
 
 This repairs the shared property-value boundary; the
-[full offline queue](../plans/offline-execution-20261016.md) remains active.
+[full offline queue](../history/offline-execution-20261016.md) remains active.
 TechnologyConnections still needs bounded service/sensor enumeration, independently
 reported absent/failed/unvisited services and complete direct-field aggregation.
 Other display-only callers do not yet aggregate all value markers into scope-level

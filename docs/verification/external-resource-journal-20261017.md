@@ -107,4 +107,4 @@ The Windows DPAPI/ACL research remains a synthetic platform probe, not productio
 protected storage. General credential references, secure local input, lifecycle,
 owner/profile loss and native provider acceptance remain WA-09 work. No Siemens
 software, SDK, PLCSIM, physical endpoint or native release acceptance was available.
-The full [execution queue](../plans/offline-execution-20261016.md) remains open.
+The full [execution queue](../history/offline-execution-20261016.md) remains open.

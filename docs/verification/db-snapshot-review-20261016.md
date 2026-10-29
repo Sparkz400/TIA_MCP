@@ -86,7 +86,7 @@ read separately after push.
 
 [Workflow](../reference/db-snapshot-review.md),
 [full D09 plan](../plans/expansion-plans/online-compare-snapshots-upload.md), and
-[the full execution queue](../plans/offline-execution-20261016.md) retain genuine
+[the full execution queue](../history/offline-execution-20261016.md) retain genuine
 V21 XSD/export fixtures, native SDK compilation, CPU/program lineage, live freshness,
 structural compatibility, capture/export, upload, value writes and target/runtime
 acceptance as open obligations. No snapshot XML import or scalar conversion route

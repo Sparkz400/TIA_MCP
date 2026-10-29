@@ -71,7 +71,7 @@
       "sha256": "36d940bc34e2d1b87e8bff9ab36b518319c1e5096542d5d28ae63856916168f7"
     },
     {
-      "path": "docs/plans/1.0-release-checklist-20261013.md",
+      "path": "docs/history/1.0-release-checklist-20261013.md",
       "gitCommit": "9795cdcecf0e0412c415ff4dd9e41bdf66899486",
       "sha256": "56344c78b0c4dc548dc02124df0a40c89b5502bce79dcc3746c003de255199d6"
     },
@@ -281,7 +281,7 @@
       "sha256": "ba024026d2a706ea1f4ef4441c5e93affbeb7a7bf41c40d851a8ed1e3aa73423"
     },
     {
-      "path": "docs/plans/offline-execution-20261016.md",
+      "path": "docs/history/offline-execution-20261016.md",
       "gitCommit": "9795cdcecf0e0412c415ff4dd9e41bdf66899486",
       "sha256": "f90016d6a905aa6cc160ed356595c38d14b57dec5815eb2fdca46bbec41aad05"
     },
@@ -296,7 +296,7 @@
       "sha256": "0bd70b74f056132a284e6b42c915764c304374ea62e426d130c5e285bb444470"
     },
     {
-      "path": "docs/plans/runtime-proof-todo.md",
+      "path": "docs/history/runtime-proof-todo.md",
       "gitCommit": "9795cdcecf0e0412c415ff4dd9e41bdf66899486",
       "sha256": "7cbf58c3769dd4f8c8e39c8d47d5cc3ee0b0ffb2ba773ccb34ada761d5d4bf50"
     },
@@ -954,7 +954,7 @@
       "currentPortableEvidence": "Current queue, retained-evidence inventory and exact increment receipts exist.",
       "remainingAction": "Reconcile every remaining operation/profile against its actual scope; this triage does not prove full completion.",
       "sourceAnchors": [
-        "docs/plans/offline-execution-20261016.md"
+        "docs/history/offline-execution-20261016.md"
       ],
       "assessment": "partial_or_unproven_full_offline_scope",
       "fullOfflineCompletionProven": false

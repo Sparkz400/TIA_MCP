@@ -147,4 +147,4 @@ The catalog remains 197 static tools, 55 mutation kinds and 270 features; all 10
 unavailable historical evidence bindings retain their prior rows/hashes. Absence
 of Siemens software or historical receipts is not a passing native/release gate.
 
-See the [complete 44-workstream queue](../plans/offline-execution-20261016.md).
+See the [complete 44-workstream queue](../history/offline-execution-20261016.md).

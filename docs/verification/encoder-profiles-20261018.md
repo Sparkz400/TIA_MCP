@@ -2,7 +2,7 @@
 
 This increment extends the existing technology-profile review/report tools with
 explicit v4 encoder observations. It advances D13/C02 within the original
-[44-workstream scope](../plans/offline-scope-reconciliation-20261017.md), without
+[44-workstream scope](../history/offline-scope-reconciliation-20261017.md), without
 completing either workstream or native qualification.
 
 ## Implemented behavior

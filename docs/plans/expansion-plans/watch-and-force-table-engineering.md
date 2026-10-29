@@ -6,7 +6,7 @@ The first complete workflow is **exact FB instance → justified signals → rev
 
 ## 1. Current implementation, evidence and ownership
 
-The [README](../../../README.md), [STATUS](../../STATUS.md), [TODO](../../TODO.md), [release checklist](../1.0-release-checklist-20261013.md), [feature catalog](../../../contracts/feature-catalog.v1.json), [API roadmap](api-coverage-and-roadmap.md), [object identities](../../reference/object-model.md), [block-testing guide](../../guides/block-testing.md) and [diagnostic completion audit](../../verification/trace-diagnostics-completion-audit-20261014.md) were inspected. No applicable AGENTS.md was found at the workspace root or under docs/src/contracts/tests. No dedicated watch/force adapter, tool or native table qualification was found in current source.
+The [README](../../../README.md), [STATUS](../../STATUS.md), [TODO](../../TODO.md), [release checklist](../../history/1.0-release-checklist-20261013.md), [feature catalog](../../../contracts/feature-catalog.v1.json), [API roadmap](api-coverage-and-roadmap.md), [object identities](../../reference/object-model.md), [block-testing guide](../../guides/block-testing.md) and [diagnostic completion audit](../../verification/trace-diagnostics-completion-audit-20261014.md) were inspected. No applicable AGENTS.md was found at the workspace root or under docs/src/contracts/tests. No dedicated watch/force adapter, tool or native table qualification was found in current source.
 
 | Existing component | Reuse and exact limit |
 | --- | --- |

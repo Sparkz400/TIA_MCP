@@ -1,11 +1,11 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). On `main`, 28 October 2026:
+simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.68`: 450 features, 359 verified, 91 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.69`: 450 features, 359 verified, 91 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 122 shipped, 237 limited, 75 unqualified, 6 unavailable on V21, 10 deferred |
 | Matrix cells | 1,639 bound, **398 open**, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68` |
@@ -41,11 +41,16 @@ ignored `artifacts/evidence/` store and checked by `scripts/audit_evidence_store
 ([list](../evidence/raw-reports-lost.json)). Overnight re-runs replaced 44 of them with 40 new
 records ([re-runs](verification/evidence-reruns-20261028.md)), so only 3 of the 359 verified
 features (`hmi_inspect`, `hmi_references`, `hmi_capabilities`) still rest solely on a lost
-report; the [TODO](TODO.md#lost-evidence-still-to-re-run) lists the rest.
+report; the [TODO](TODO.md#lost-evidence-still-to-re-run) lists the rest. Every catalog evidence
+record is cited by a feature; records no feature cites any more are in the retired lists under
+[history](README.md#history).
 
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
+[29 October](history/status-log.md#29-october-2026): 53 uncited catalog evidence records
+retired (catalog 0.4.69), dated plans moved to history, the TODO made the one open list, and
+local run folders moved into the project. On
 [28 October](history/status-log.md#28-october-2026): lost evidence re-run (21 host-only and 18
 native records); `safety_import_xml` now compiles every device; catalog evidence retired and
 the release ledger refreshed; STATUS, TODO and the docs index restructured; raw evidence store

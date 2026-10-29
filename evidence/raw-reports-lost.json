@@ -422,5 +422,63 @@
       "report": "qualification.json",
       "sha256": "9d7c2c6bdc9f93b38173f6d63813b8ea33b0bd9c5110929c65a7ba2a687bbeb9"
     }
-  ]
+  ],
+  "uncuratedArtifacts": [
+    {
+      "evidenceId": "typed.builders.checkpoint.20261008",
+      "artifact": "artifacts/tq05/user-stop-checkpoint.json",
+      "sha256": "8736f5f51b442fe2529287b485d18af830ba44bbeea9552267e95c51cf09a48d"
+    },
+    {
+      "evidenceId": "vm.ssh.recovery.20261008",
+      "artifact": "artifacts/ssh-recovery-vm-qualified.json",
+      "sha256": "3384e5743a3a328034ba014d479fe91da15f6a870e8f1c80269547dd07f71eae"
+    },
+    {
+      "evidenceId": "vm.ssh.recovery.20261008",
+      "artifact": "artifacts/deployment-vm-recovery-release.json",
+      "sha256": "354fc7e0dff19cadfeb7e5e260d16a321fcc56d8d47862bbc503140a79c04922"
+    },
+    {
+      "evidenceId": "vm.ssh.recovery.20261008",
+      "artifact": "artifacts/ssh-transport-vm-qualified.json",
+      "sha256": "c0f0e3a1aa818af98264affe0418f94041dcf3f4f24233f8a353e4cf1e41ca57"
+    },
+    {
+      "evidenceId": "vm.ssh.recovery.20261008",
+      "artifact": "artifacts/vm-access/deployment-recovery.json",
+      "sha256": "8399ec45c16391e4fd5a624c74878a5e7387e6428c94ee2d83de9570a548b164"
+    },
+    {
+      "evidenceId": "vm.ssh.recovery.20261008",
+      "artifact": "artifacts/vm-access/qualified-session-evidence.json",
+      "sha256": "21838de6774f413575981d8e8036ccb3f6b03aee62217b95cd9d194907318b76"
+    },
+    {
+      "evidenceId": "vm.ssh.recovery.20261008",
+      "artifact": "artifacts/vm-access/qualification-summary.json",
+      "sha256": "c153484508cde69be7ffb765c3ffc89525cd8d39cb43ae4b06f7320f209faa55"
+    },
+    {
+      "evidenceId": "typed.builders.advanced-unit.20261012",
+      "artifact": "artifacts/p16t/advanced-final-01/batch.json",
+      "sha256": "1210fe60a4bcab1c2f6f45cf923cbc7469f308f752a81262b48c73faec52789e"
+    },
+    {
+      "evidenceId": "typed.builders.advanced-unit.20261012",
+      "artifact": "artifacts/p16t/advanced-final-01-audit.json",
+      "sha256": "c5cf63d665773017dcffbaeeeb4b0de735380534b89b74be80882b73f0129b17"
+    },
+    {
+      "evidenceId": "typed.builders.advanced-unit.20261012",
+      "artifact": "artifacts/p16t/advanced-final-01-compile-audit.json",
+      "sha256": "676398e2aac227b85dcd35187e418a43c25beb09bbcb468518b96f6e8078447d"
+    },
+    {
+      "evidenceId": "typed.builders.advanced-unit.20261012",
+      "artifact": "artifacts/p16t/advanced-final-harness/manifest.json",
+      "sha256": "887bad2632a317f7d8c4c4d4e9d3e8e2a40dd37e370caf6bd990f950c3e51b5b"
+    }
+  ],
+  "uncuratedDescription": "Raw files that catalog records from before curation (8-12 October 2026) cite directly, with the SHA-256 the API-coverage bindings pin; none existed on the qualification PC on 29 October 2026, and both features that cite them are unverified."
 }

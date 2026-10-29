@@ -52,7 +52,7 @@ Each resulting plan belongs under `docs/plans/expansion-plans/`. The prompts req
 
 ## Scope and evidence
 
-This prompt collection was prepared on 13 October 2026. It is a planning input, not evidence that a capability is implemented or qualified. Re-read the live [TODO](../../TODO.md), [status](../../STATUS.md) and [release checklist](../1.0-release-checklist-20261013.md) when starting a session.
+This prompt collection was prepared on 13 October 2026. It is a planning input, not evidence that a capability is implemented or qualified. Re-read the live [TODO](../../TODO.md), [status](../../STATUS.md) and [release checklist](../../history/1.0-release-checklist-20261013.md) when starting a session.
 
 Useful source entry points are the installed V21 PublicAPI XML/schema files and Siemens' [V21 Openness capability additions](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/what-s-new-in-tia-portal-openness). Every domain prompt requires verification of actual public routes and target limits, including explicit findings when an optional product or API is unavailable.
 

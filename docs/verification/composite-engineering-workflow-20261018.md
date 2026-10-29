@@ -3,7 +3,7 @@
 This increment delivers five offline MCP routes for C02: retain a supplied
 combined review, reopen it, page its evidence, download exact artifacts and
 discover complete or interrupted publications. It does not complete C02, C03
-or the original [44-workstream scope](../plans/offline-scope-reconciliation-20261017.md).
+or the original [44-workstream scope](../history/offline-scope-reconciliation-20261017.md).
 
 ## Behavior and implementation
 

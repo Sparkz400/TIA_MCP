@@ -77,7 +77,7 @@ No account setting or workflow gate was changed to bypass that refusal.
 | Native provider implementation | `StylePrerequisiteProbe` deliberately returns incomplete scope and unknown execution license; the owning worker refuses before checkpoint/Run. Service/DLL presence, SetScope success, screenshots or diagnostic mentions cannot become a current complete provider. Requires supported-route research and native qualification. |
 | Production admission | `TestSuiteProductionAdapter.QualifiedProfiles` remains empty. Application/system/endpoint execution and recovery retain their separate native/simulator/hardware obligations. |
 
-The [full queue](../plans/offline-execution-20261016.md) remains open. No D06 or
+The [full queue](../history/offline-execution-20261016.md) remains open. No D06 or
 release acceptance is inferred from synthetic checks or retained historical
 observations. GitHub account billing/limits require account-owner action; offline
 implementation remains possible while hosted jobs cannot start.

@@ -36,12 +36,16 @@ A qualification claim passes through four places; the first three are in git.
    project content, in the main checkout's `artifacts/evidence/<evidence-id>/`.
    `scripts/audit_evidence_store.py` checks them against the summaries;
    [`evidence/raw-reports-lost.json`](../evidence/raw-reports-lost.json) lists the 84
-   reports that were gone before the store existed.
+   reports that were gone before the store existed. Native runs write their reports and
+   logs under the main checkout's `artifacts/` too, never into a folder outside the project.
 
-Catalog evidence records from before 24 October cite `artifacts/` paths directly, and no
-verified feature cites them. The 38 that no feature cited and whose files were gone were
-moved verbatim to [`history/catalog-evidence-retired-20261028.json`](history/catalog-evidence-retired-20261028.json)
-in catalog 0.4.68. Prose records per run are under [verification](#verification).
+Every catalog evidence record is cited by a feature. Records no feature cites any more
+move verbatim to a retired list: 38 old records in catalog 0.4.68
+([list](history/catalog-evidence-retired-20261028.json)) and 53 superseded or doc-only
+records in 0.4.69 ([list](history/catalog-evidence-retired-20261029.json)); their
+summaries stay in `evidence/`. Three records from before 24 October still cite
+`artifacts/` paths directly; only unverified features cite them, and their files are
+listed as lost. Prose records per run are under [verification](#verification).
 
 ## Guides
 
@@ -77,8 +81,7 @@ a current blocker. Use [TODO](TODO.md) for the current order of work.
 - [Library plan](plans/library-management-plan.md), [library acceptance backlog](plans/library-management-todo.md)
 - [HMI plan](plans/hmi-integration-plan.md), [HMI acceptance backlog](plans/hmi-remaining-work.md)
 - [Typed LAD/FBD plan](plans/typed-lad-fbd-builders-plan.md), [typed acceptance backlog](plans/typed-lad-fbd-todo.md)
-- [Project explorer plan](plans/project-explorer-plan.md)
-- [Runtime proof and failure history](plans/runtime-proof-todo.md)
+- [Project explorer plan](plans/project-explorer-plan.md), [runtime real-server plan](plans/runtime-real-server-plan.md)
 
 ## Verification
 
@@ -114,6 +117,11 @@ current counts instead of treating older counts or checklists as current.
 - [Verification history](history/verification.md), [v0.3 evidence ledger](history/generalization-verification.md)
 - [8 October environment observations](history/environment-notes.md), [HMI delivery checkpoint](history/hmi-delivery-status.md)
 - [Typed model handoff](history/typed-lad-fbd-remaining-model.md), [native-profile handoff](history/typed-lad-fbd-remaining-native.md), [test handoff](history/typed-lad-fbd-remaining-tests.md)
+- [Runtime proof failure history, 8–12 October](history/runtime-proof-todo.md)
+- [13 October 1.0 release checklist](history/1.0-release-checklist-20261013.md) (checkboxes not maintained), [15 October handoffs](history/active-handoffs-20261015.md)
+- 16–17 October: [completion audit](history/completion-audit-20261016.md), [recheck](history/completion-recheck-20261016.md), [assignments](history/completion-assignments-20261016.md), [execution without Siemens products](history/offline-execution-20261016.md), [offline scope reconciliation](history/offline-scope-reconciliation-20261017.md)
+- 21–24 October: [fifth](history/parallel-wave5-20261021.md) and [sixth parallel increments](history/parallel-wave6-20261021.md), [overnight report](history/overnight-report-20261022.md), [parallel completion plan](history/parallel-completion-20261024.md)
+- Retired catalog evidence records: [28 October](history/catalog-evidence-retired-20261028.json), [29 October](history/catalog-evidence-retired-20261029.json)
 
 ## Maintaining these docs
 

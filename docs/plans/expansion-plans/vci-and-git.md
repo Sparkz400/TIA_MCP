@@ -4,7 +4,7 @@
 now implements uploaded raw-file review, independent local revisions, history,
 exact-revision export and missing-receipt reconciliation. See its
 [validation record](../../verification/vci-host-workflow-20261016.md) for executed
-checks and the [current queue](../offline-execution-20261016.md) for remaining work.
+checks and the [current queue](../../history/offline-execution-20261016.md) for remaining work.
 The pure manifest/comparison library and restricted Git runner also exist. The
 15 October inventory and proposed names below are historical planning evidence;
 its statements about absent Git metadata or unimplemented Host tools are superseded.

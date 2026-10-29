@@ -2,7 +2,7 @@
 
 This increment extends C02 with versioned, bounded consumer context. It does
 not complete C02, C03 or the immutable
-[44-workstream scope](../plans/offline-scope-reconciliation-20261017.md).
+[44-workstream scope](../history/offline-scope-reconciliation-20261017.md).
 
 ## Behavior
 

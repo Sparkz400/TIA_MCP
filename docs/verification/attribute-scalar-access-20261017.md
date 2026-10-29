@@ -86,6 +86,6 @@ changed implementation.
 The parameter-read source repair is now implemented and tracked in its
 [own verification record](technology-parameter-read-20261017.md). Continue TO-03
 capture/metadata, TO-04–12 and the full
-[44-workstream queue](../plans/offline-execution-20261016.md). Native evidence cannot
+[44-workstream queue](../history/offline-execution-20261016.md). Native evidence cannot
 be manufactured by additional synthetic tests. GitHub refused all five jobs for
 base `66eb800` before execution because of account payment/spending limits.

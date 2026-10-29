@@ -67,4 +67,4 @@ Context7 offered V20 indexing only, so official V21 pages supplied the primary A
 basis. Remaining API inventory and original capture gaps stay explicit.
 
 [Verification](../../verification/software-unit-review-20261016.md) records exact
-portable evidence. The [44-stream queue](../offline-execution-20261016.md) remains active.
+portable evidence. The [44-stream queue](../../history/offline-execution-20261016.md) remains active.

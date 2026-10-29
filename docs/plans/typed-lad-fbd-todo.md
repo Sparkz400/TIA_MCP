@@ -41,9 +41,10 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   absolutely, as the deployed namespace-route call profiles emit. The extractor binds the
   cross-unit slot; `v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1` are audited
   (`crossscope-candidates-20261028.audit.json`) and promoted, every qualification flag false.
-- [ ] Run the authored cases `fixtures/typed-graphical/crossscope-cases.v1.json` (cross-namespace
+- [x] Run the authored cases `fixtures/typed-graphical/crossscope-cases.v1.json` (cross-namespace
   and cross-unit, LAD and FBD; engineering only) to qualify the builder for both calls; the
-  command is in the packet's `afterCapture`.
+  command is in the packet's `afterCapture`. Both calls pass the four engineering gates in LAD
+  and FBD (`local.typed.crossscope.engineering.20261028`).
 
 ## Lane A — 25 October 2026
 

@@ -97,6 +97,6 @@ names do not establish Siemens semantics. `nativeQualified`,
 
 See the [user workflow](../reference/automationml-workflow.md),
 [D05/C02 implementation and native gates](../plans/expansion-plans/automationml-cax.md)
-and [full offline queue](../plans/offline-execution-20261016.md). The broad goal
+and [full offline queue](../history/offline-execution-20261016.md). The broad goal
 and those obligations remain open. No task branch or additional worktree was
 created; unique validation evidence is retained under `artifacts`.

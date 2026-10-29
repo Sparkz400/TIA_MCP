@@ -96,4 +96,4 @@ D06/C04 remain open: automatic project-health/diagnostic composition, applicatio
 and system execution providers, genuine current scope/license observations,
 native compilation, recovery, endpoint/runtime behavior and release qualification.
 Historical native snapshots must not be rebased to fabricate exact associations.
-The full [44-workstream queue](../plans/offline-execution-20261016.md) remains active.
+The full [44-workstream queue](../history/offline-execution-20261016.md) remains active.
