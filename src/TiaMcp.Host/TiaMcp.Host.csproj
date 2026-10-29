@@ -8,6 +8,11 @@
     <DefineConstants Condition="'$(OfflinePackage)' == 'true'">$(DefineConstants);OFFLINE_PACKAGE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Advertised as MCP output schemas by ToolSurface. -->
+    <EmbeddedResource Include="../../contracts/automationml-workflow.v1.schema.json;../../contracts/graph-workflow.v1.schema.json;../../contracts/opc-ua-workflow.v1.schema.json;../../contracts/project-review-import.v1.schema.json;../../contracts/vci-workspace.v1.schema.json" LogicalName="TiaMcp.Contracts.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TiaMcp.Inventory.Tests" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="ModelContextProtocol" Version="2.3.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.13" />

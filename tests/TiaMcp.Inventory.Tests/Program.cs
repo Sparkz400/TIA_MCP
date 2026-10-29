@@ -345,6 +345,25 @@ File.WriteAllText(Path.Combine(output, "excel-fixture.json"), JsonSerializer.Ser
     new { snapshotId = controls.Metadata.SnapshotId, names = controlNames, warnings = controls.Metadata.Coverage.Warnings },
     new { snapshotId = snapshot.Metadata.SnapshotId, names = Enumerable.Range(0, 30000).Select(i => "Module " + i).ToArray(), warnings = snapshot.Metadata.Coverage.Warnings }
 } }, InventoryStore.Json));
+// Progress heartbeats count up, stop before the call's result and never fail the call.
+var beats = new List<int>();
+using (var stopBeats = new CancellationTokenSource())
+{
+    var heartbeat = ToolSurface.Heartbeat(TimeSpan.FromMilliseconds(20), "probe", stopBeats.Token, (beat, message) =>
+    { lock (beats) beats.Add(beat); Check(message.StartsWith("probe still running", StringComparison.Ordinal), "Heartbeat names the running tool"); return Task.CompletedTask; });
+    await Task.Delay(200);
+    stopBeats.Cancel(); await heartbeat;
+}
+int beatsAtStop; lock (beats) beatsAtStop = beats.Count;
+await Task.Delay(100);
+Check(beatsAtStop >= 3 && beats.SequenceEqual(Enumerable.Range(1, beatsAtStop)) && beats.Count == beatsAtStop, "Heartbeats increase strictly and stop with the call");
+using (var stopFailing = new CancellationTokenSource())
+{
+    var failing = ToolSurface.Heartbeat(TimeSpan.FromMilliseconds(10), "probe", stopFailing.Token, (_, _) => throw new IOException("transport closed"));
+    await Task.Delay(50);
+    stopFailing.Cancel(); await failing;
+    Check(failing.IsCompletedSuccessfully, "A failed heartbeat never faults the call it accompanies");
+}
 Console.WriteLine("Export artifacts: " + output);
 Console.WriteLine($"PASS Inventory: {checks} checks, 30000 rows / {pages} pages; protocol fixtures, exports and host guards. No physical hardware qualification.");
 

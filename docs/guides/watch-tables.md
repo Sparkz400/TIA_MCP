@@ -36,7 +36,7 @@ Apply, fresh-reopen verification and recovery use `watch_table_apply`, `watch_ta
 
 Forcing is never selected or activated. `ForceIntention` cannot be set; asking for it, for a field the export lacks or for a row out of range is refused with `UnsupportedProfile`. A force table whose typed rows or exported XML show any `ForceIntention` other than false is refused at prepare, before import and before save. Nothing is monitored, forced or written online.
 
-Force edits are expanded document profiles. Production Hosts refuse both prepare and apply with `UnsupportedProfile`; only the isolated qualification harness (`--component-qualification --watch-qualification`) dispatches them until native lifecycle evidence exists.
+Force edits are expanded document profiles. The ForceValue, Address and DisplayFormat field edits, comment, clone and delete passed natively on operator-authored rows (`local.watch.force-edits.20261029`) and run on production Hosts (maintainer decision of 29 October 2026). Reorder (TIA renumbers force rows' document IDs on export) and the Name field are refused there with `UnsupportedProfile`; only the isolated qualification harness (`--component-qualification --watch-qualification`) dispatches them.
 
 ## Limits
 
