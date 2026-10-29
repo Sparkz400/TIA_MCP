@@ -126,7 +126,7 @@ def body(h):
 
     # Fresh reopen of the saved consumer.
     h.owned_portal("reopen")
-    h.stage("reopen consumer", lambda: h.tool("project_open", {"path": consumer_path}))
+    h.stage("reopen consumer", lambda: h.reopen_project(consumer_path))
     reopened = h.project_library()
     for name, version in released.items():
         h.stage("reopened exact link " + name, lambda v=version: h.verify_use(reopened, v, 1))

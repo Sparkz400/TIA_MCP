@@ -91,7 +91,7 @@ def body(h):
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
     h.owned_portal("reopen")
-    h.stage("reopen consumer", lambda: h.tool("project_open", {"path": project_path}))
+    h.stage("reopen consumer", lambda: h.reopen_project(project_path))
     consumer = h.project_library()
     h.stage("reopened: both PLCs at 1.1.0, UDT unchanged", lambda: {"fb": uses_by_plc(second, {first_plc: 1, second_plc: 1}),
                                                                     "udt": uses_by_plc(udt, {first_plc: 1, second_plc: 1})})

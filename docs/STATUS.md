@@ -7,7 +7,7 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 | --- | --- |
 | Feature catalog | `0.4.69`: 450 features, 359 verified, 91 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 122 shipped, 237 limited, 75 unqualified, 6 unavailable on V21, 10 deferred |
-| Matrix cells | 1,639 bound, **398 open**, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Matrix cells | 1,639 bound, **361 open**, 37 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -26,9 +26,10 @@ names every row with an open cell.
   online compare, upload and DB-snapshot routes need a PLC login they never perform, an
   OPC UA reference-namespace import crashed TIA, Unified text lists have no import route,
   and force-table rows can only be authored in the TIA editor.
-- **Rows that cannot close on V21:** six `unavailable_target` rows hold 37 open cells
-  (`change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`
-  and the three block-protection kinds). They need a disposition before every cell can close.
+- **Rows that cannot close on V21:** six `unavailable_target` rows (37 cells:
+  `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`
+  and the three block-protection kinds) are blocked and do not count toward 1.0 (decision of
+  29 October).
 - **Release mechanics:** the engineering package, version, tag and release notes.
 
 ## Where the evidence is

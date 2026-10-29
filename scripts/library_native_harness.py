@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import tempfile
 import time
 import traceback
 import uuid
@@ -159,8 +160,11 @@ class Harness:
             authorization.write_text(json.dumps({"processId": status["processId"], "projectPath": status["projects"][0]["path"],
                                                  "ownsPortalProcess": True, "creationTool": "tia_create_scratch"}), encoding="utf-8")
             command = [str(self.args.unit_seeder)] + ([arguments[0], str(authorization)] + list(arguments[1:]) if arguments else [str(authorization)])
-            completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", timeout=300)
-            result = json.loads(completed.stdout.strip().splitlines()[-1])
+            with tempfile.TemporaryFile("w+", encoding="utf-8") as output:
+                # A file, not a pipe: a timeout must not wait for a pipe that another process still holds open.
+                completed = subprocess.run(command, stdout=output, stderr=subprocess.STDOUT, timeout=300)
+                output.seek(0)
+                result = json.loads(output.read().strip().splitlines()[-1])
             result["exitCode"] = completed.returncode
             require(not required or completed.returncode == 0 and result.get("completed") is True, "Fixture seeding failed: %s" % result)
             return result

@@ -6,7 +6,7 @@
     "catalogVersion": "0.4.69",
     "catalogSha256": "4fb74aba016169379333bd87bcf57b1a964eeb5120b4c15a7f614b0fc533a5ba",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "d45c7673fae892818f2323b11c960b60012f26325121a1bca476607d46aba1fc"
+    "ledgerSha256": "6843b503a8181e2a275fb103c72817b9d05336d5a217a8c4573767df74ba853d"
   },
   "targetTiaVersions": [
     21
@@ -21,9 +21,10 @@
       "unqualified": 75
     },
     "cells": {
+      "blocked": 37,
       "bound": 1639,
       "deferred": 30,
-      "open": 398
+      "open": 361
     },
     "openCellsByOwner": {
       "C03": {
@@ -60,7 +61,7 @@
       },
       "L01": {
         "role": "Typed",
-        "open": 14
+        "open": 8
       },
       "L03": {
         "role": "Runtime",
@@ -74,21 +75,17 @@
         "role": "Coordinator and release",
         "open": 3
       },
-      "X01": {
-        "role": "Platform",
-        "open": 6
-      },
       "X04": {
         "role": "Add In",
         "open": 4
       },
       "X07": {
         "role": "HMI",
-        "open": 20
+        "open": 13
       },
       "X08": {
         "role": "HMI",
-        "open": 20
+        "open": 13
       },
       "X10": {
         "role": "Hardware and remote IO",
@@ -96,7 +93,7 @@
       },
       "X11": {
         "role": "PLC and typed",
-        "open": 32
+        "open": 8
       }
     }
   },

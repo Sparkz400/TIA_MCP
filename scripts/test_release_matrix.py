@@ -28,6 +28,13 @@ class ReleaseMatrixTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             owners("unowned_feature", {})
 
+    def test_unavailable_target_cells_are_blocked_not_open(self):
+        matrix = build()
+        blocked = sum(len(row["cells"]) for row in matrix["rows"] if row["support"] == "unavailable_target")
+        self.assertEqual(matrix["summary"]["cells"].get("blocked", 0), blocked)
+        opened = sum(len(row["cells"]) for row in matrix["rows"] if row["support"] == "unqualified")
+        self.assertEqual(matrix["summary"]["cells"]["open"], opened)
+
     def test_only_verified_features_bind_cells(self):
         for row in build()["rows"]:
             bound = row["support"] in ("shipped", "limited")
