@@ -94,15 +94,16 @@ class Harness:
         return self.stage("prepare " + kind, lambda: self.tool("change_prepare", {"kind": kind, "payload": payload}))
 
     @staticmethod
-    def apply_args(prepared):
+    def apply_args(prepared, deferred=False):
+        # deferred: no compile and no save, for a state that compiles only after a later change (an unassigned IO device).
         return {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"],
-                "idempotencyKey": "libqualify-" + uuid.uuid4().hex, "checkpointSave": True, "compile": True, "save": True}
+                "idempotencyKey": "libqualify-" + uuid.uuid4().hex, "checkpointSave": True, "compile": not deferred, "save": not deferred}
 
-    def apply_prepared(self, kind, prepared):
+    def apply_prepared(self, kind, prepared, deferred=False):
         dispatch = {"kind": kind, "changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "state": "dispatching"}
         self.report["mutations"].append(dispatch)
         self.persist()
-        result = self.stage("apply " + kind, lambda: self.tool("change_apply", self.apply_args(prepared)))
+        result = self.stage("apply " + kind, lambda: self.tool("change_apply", self.apply_args(prepared, deferred)))
         require(result["state"] == "applied", "Native change did not reach applied")
         dispatch["state"] = "applied"
         self.persist()

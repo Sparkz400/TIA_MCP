@@ -224,14 +224,19 @@ class Run:
         require(sorted(prepared["preview"]["effects"][0]["storeCertificateIds"]) == ids, "Previewed store Ids differ from certificate_inspect %s" % ids)
         return prepared
 
-    def finish(self, label, kind, prepared, added=(), removed=(), changed=(), rows=None, tolerated=None, check=None, restore=False):
-        """Apply with checkpoint, compile and save, read change_status, then require a complete state that differs in exactly
-        the listed keys (lists or callables of (applied, state)); tolerated(category, key) names recorded native side effects."""
+    def finish(self, label, kind, prepared, added=(), removed=(), changed=(), rows=None, tolerated=None, check=None, restore=False, deferred=False):
+        """Apply with checkpoint, compile and save (deferred: checkpoint only), read change_status, then require a complete state
+        that differs in exactly the listed keys (lists or callables of (applied, state)); tolerated(category, key) names recorded
+        native side effects."""
         h, before = self.h, self.current
-        applied = h.apply_prepared(kind, prepared)
+        applied = h.apply_prepared(kind, prepared, deferred)
         require(applied["recoveryArchiveSha256"] and applied["preview"] == prepared["preview"], "Applied change lost its checkpoint or preview")
-        require(in_order(applied["stages"], STAGES), "Checkpoint, apply, compile and save stages differ: %s" % applied["stages"])
-        if kind in self.plc_compiled:
+        stages = STAGES[:3] if deferred else STAGES
+        require(in_order(applied["stages"], stages) and not (deferred and set(STAGES[3:]) & set(applied["stages"])),
+                "Checkpoint, apply, compile and save stages differ: %s" % applied["stages"])
+        if deferred:
+            require(applied.get("compile") is None, "A deferred change compiled")
+        elif kind in self.plc_compiled:
             require_plc_compile(applied["compile"], self.plc)
         else:
             require(applied["compile"].get("targetIdentityPolicy") == "device-path-v1", "Expected the all-devices compile receipt")

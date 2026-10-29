@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.76",
+  "catalogVersion": "0.4.77",
   "targetTiaVersions": [
     21
   ],
@@ -2986,6 +2986,28 @@
         "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1; other CPUs, firmware and TCP/IP instances are not qualified.",
         "The online download is a CPU write: change_restore recovers only the project, and the recovered copy can no longer download to the instance whose card came from the original project.",
         "OB40 stays a V21 boundary (no hardware-interrupt configuration through V21 Openness; PLCSIM answers NotSupportedByModule)."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.families.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0",
+        "firmware": "V4.1; V4.7; V4.1",
+        "sourceCommit": "556cee52b14c386ce48b846b14b08c4cc469b344",
+        "passedScope": "scripts/qualify_hardware_changes.py on a frozen Debug build of 556cee5 (artifacts/x4), 276/276 steps: the S7-1500 gates of local.hardware_changes.20261028 plus a CPU 1214C DC/DC/DC V4.7 with two SM 1221 DI16x24VDC (successor-article replacement 6ES7 221-1BH30 V1.0 to -1BH32 V2.0 and back, port link to the scratch CPU, last-module delete) and an ET 200MP IM 155-5 PN ST V4.1 station assigned to a new IO system of the added CPU 1511-1 PN (two DI 16x24VDC HF, firmware replacement V1.0/V2.0, port link to that CPU, last-module delete); every change with asserted preview, checkpoint, device compile and save (the unassigned station's add and node change deferred to the assignment), exact state deltas, fresh-Portal reopen and per-family checkpoint restore; typed refusals change nothing."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.families.20261029.json"
+      ],
+      "limitations": [
+        "Families: CPU 1511-1 PN V4.1, CPU 1214C DC/DC/DC V4.7 and one ET 200MP IM 155-5 PN ST V4.1 station on one IO controller; ET 200SP on a second controller, shared devices, HMI, drive and GSD devices are not exercised.",
+        "The ET 200MP station's hardware_add and network_configure apply without compile and save, because an unassigned IO device fails the device compile; network_io_assign compiles and saves them.",
+        "hardware_replace only to versions or successor articles that keep the addresses; acceptLoss and address-changing replacements are not exercised.",
+        "CalculatedBandwidthForCyclicIoData of the IO controller interface is computed at the device compile and not saved, so it is not compared.",
+        "Engineering only; nothing is downloaded and no physical topology is observed."
       ]
     }
   ],
@@ -6794,7 +6816,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. A CPU 1214C DC/DC/DC V4.7 with configureScratchSecurity and an ET 200MP IM 155-5 PN ST V4.1 head (applied without compile until its IO assignment, because an unassigned IO device fails the device compile) passed the same gates (local.hardware_changes.families.20261029); HMI, drive and GSD devices are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -6804,7 +6826,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6858,7 +6881,8 @@
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
           "local.remote-io.full-route.rerun.20261028",
-          "local.remote-io.lifecycle.rerun.20261028"
+          "local.remote-io.lifecycle.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6909,7 +6933,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6962,7 +6987,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -7016,7 +7042,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12743,7 +12770,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12795,7 +12823,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12838,6 +12867,7 @@
         "status": "partial",
         "limitations": [
           "One pluggable module in an existing rack; built-in and software-bearing items are refused. typeIdentifier must be an exact installed catalog identifier different from the current one.",
+          "SM 1221 DI16x24VDC 6ES7 221-1BH30-0XB0 V1.0 replaced by its successor article 6ES7 221-1BH32-0XB0 V2.0 and back in a CPU 1214C rack, and DI 16x24VDC HF firmware V1.0/V2.0 in an ET 200MP rack (local.hardware_changes.families.20261029).",
           "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
           "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
           "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
@@ -12847,7 +12877,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12994,6 +13025,7 @@
         "status": "partial",
         "limitations": [
           "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract; shared-device and multi-controller assignments remain excluded.",
+          "A second S7-1500 CPU (not the scratch CPU, selected by its plcPath) assigning an ET 200MP IM 155-5 PN ST V4.1 to a new IO system passed with exact state deltas, reopen and restore (local.hardware_changes.families.20261029); the assignment sets SharedDeviceAccessType PLC on the head's items and adds the IO-system and station system constants to the controller's PLC.",
           "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation. Shared-device/multi-controller configurations remain excluded.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
@@ -13005,7 +13037,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.remote-io.full-route.rerun.20261028",
-          "local.remote-io.lifecycle.rerun.20261028"
+          "local.remote-io.lifecycle.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
