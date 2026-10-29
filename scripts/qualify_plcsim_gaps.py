@@ -7,8 +7,8 @@ hardware interrupt is enabled and linked to OB40 (change.hardware_channel_attrib
 station on the CPU's IO system, a global DB GapDb with one counter per interrupt OB, an IEC timer and the CPU clock, the
 interrupt OBs (imported with their explicit numbers and event classes) and Main. The program is downloaded to a fresh
 owned instance, provisioned and started like the D09 runner. Every injected event must raise its OB's counter; a rising
-edge written to the input is recorded. After the instance is released, the same interrupt edit on channel 1 is restored
-from its checkpoint. A fixture V21 refuses is recorded as a boundary with the exact refusal.
+edge written to the input is recorded. After the instance is released, channel 1's interrupt is enabled and disabled
+again, and the disabling change is restored from its checkpoint.
 """
 from __future__ import annotations
 
@@ -249,6 +249,7 @@ def configure_interrupt(h, plc, module):
     h.refuse("refuse an OB link to a diagnostic error OB", kind, interrupt_payload(selector, attributes, OBS[82][0]), "InvalidRequest", "not a hardware interrupt OB")
     h.refuse("refuse an OB link to a missing block", kind, interrupt_payload(selector, attributes, "GapMissingOb"), "BlockNotFound")
     h.refuse("refuse a non-string OB link", kind, {**payload, "attributes": {INTERRUPT_OB: 40}}, "InvalidRequest")
+    h.refuse("refuse enabling the interrupt without its OB", kind, {**payload, "attributes": {INTERRUPT_ACTIVE: payload["attributes"][INTERRUPT_ACTIVE]}}, "InvalidRequest", "requires")
     applied = h.apply_prepared(kind, prepared)
     require("configured_hardware_preservation_verified" in applied["stages"], "Interrupt preservation stage missing: %s" % applied["stages"])
     # The worker verified the OB link by name; hardware_inspect's rendering of the linked object is recorded, the flag asserted.
@@ -266,17 +267,28 @@ def configure_interrupt(h, plc, module):
 
 
 def restore_interrupt(h, interrupt):
-    """The same edit on channel 1, restored from its checkpoint: the restored hardware manifest must equal the prechange one."""
+    """Channel 1: enable and link, then disable (V21 then undeclares the OB link); the disabling change is restored from its
+    checkpoint, and the restored hardware manifest must equal the enabled one."""
     def run():
-        _, selector, attributes = interrupt_channel(h, interrupt["module"], 1)
-        prepared = h.prepare("hardware_channel_attributes", interrupt_payload(selector, attributes))
-        h.apply_prepared("hardware_channel_attributes", prepared)
+        kind = "hardware_channel_attributes"
+        _, selector, before = interrupt_channel(h, interrupt["module"], 1)
+        payload = interrupt_payload(selector, before)
+        h.apply(kind, payload)
+        enabled = interrupt_channel(h, interrupt["module"], 1)[2]
+        require(enabled[INTERRUPT_OB] is not None, "Enabling did not declare the OB link: %s" % enabled)
+        flag = payload["attributes"][INTERRUPT_ACTIVE]
+        h.refuse("refuse disabling the interrupt with an OB link", kind, {**selector, "attributes": {INTERRUPT_ACTIVE: False if flag is True else "Deactivated", INTERRUPT_OB: OBS[40][0]}}, "InvalidRequest", "omit")
+        prepared = h.prepare(kind, {**selector, "attributes": {INTERRUPT_ACTIVE: False if flag is True else "Deactivated"}})
+        disabling = h.apply_prepared(kind, prepared)
+        require("configured_hardware_preservation_verified" in disabling["stages"], "Disable preservation stage missing: %s" % disabling["stages"])
+        disabled = interrupt_channel(h, interrupt["module"], 1)[2]
+        require(disabled[INTERRUPT_OB] is None and disabled[INTERRUPT_ACTIVE]["value"] in (False, "Deactivated"), "Disabling left the interrupt: %s" % disabled)
         restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
         require(restored["state"] == "restored" and "configured_hardware_recovery_verified" in restored["stages"], "Interrupt restore: %s" % restored["stages"])
         back = interrupt_channel(h, interrupt["module"], 1)[2]
-        require(back == attributes, "The restored channel 1 interrupt differs from its prechange state: %s -> %s" % (attributes, back))
-        return {"selector": selector, "stages": restored["stages"], "attributes": back}
-    h.report["hardwareInterruptRestore"] = h.stage("restore a channel 1 hardware interrupt edit from its checkpoint", run)
+        require(back == enabled, "The restored channel 1 interrupt differs from its prechange state: %s -> %s" % (enabled, back))
+        return {"selector": selector, "before": before, "enabled": enabled, "disabled": disabled, "stages": restored["stages"], "restored": back}
+    h.report["hardwareInterruptRestore"] = h.stage("enable, disable and restore channel 1's hardware interrupt", run)
 
 
 def online_downloads(h, lab, plc, ticket, login, secret):

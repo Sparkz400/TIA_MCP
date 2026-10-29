@@ -61,6 +61,12 @@ void Linked(JArray rows) { rows[1]["channels"][0]["attributes"]["HardwareInterru
 Check("hardware interrupt flag and OB link of one channel", "hardware_channel_attributes", interrupt, Linked, true, Unlinked);
 Check("hardware interrupt linked to another OB rejected", "hardware_channel_attributes", interrupt, rows => { Linked(rows); rows[1]["channels"][0]["attributes"]["HardwareInterruptRisingEdgeInterrupt"] = "Other"; }, false, Unlinked);
 Check("hardware interrupt of a second channel rejected", "hardware_channel_attributes", interrupt, rows => { Linked(rows); rows[1]["channels"][1]["attributes"]["HardwareInterruptRisingEdgeActive"] = true; }, false, Unlinked);
+// V21 declares the OB link only while the flag is on: enabling adds it, disabling removes it.
+void Undeclared(JArray rows) { foreach (var row in rows[1]["channels"]) { row["attributes"]["HardwareInterruptRisingEdgeActive"] = false; ((JObject)row["attributes"]).Remove("HardwareInterruptRisingEdgeInterrupt"); } }
+Check("enabling declares the OB link", "hardware_channel_attributes", interrupt, Linked, true, Undeclared);
+var interruptOff = new JObject { ["hardwarePath"] = module, ["channelNumber"] = 0, ["channelType"] = "Digital", ["channelIoType"] = "Input", ["attributes"] = new JObject { ["HardwareInterruptRisingEdgeActive"] = false } };
+Check("disabling undeclares the OB link", "hardware_channel_attributes", interruptOff, Undeclared, true, rows => { Undeclared(rows); Linked(rows); });
+Check("disabling that keeps the OB link rejected", "hardware_channel_attributes", interruptOff, rows => rows[1]["channels"][0]["attributes"]["HardwareInterruptRisingEdgeActive"] = false, false, rows => { Undeclared(rows); Linked(rows); });
 foreach (var (label, plcs, types, code) in new[] { ("no PLC in the device", 0, new[] { "HardwareInterrupt" }, "UnsupportedCapability"), ("two PLCs", 2, new[] { "HardwareInterrupt" }, "UnsupportedCapability"),
     ("missing block", 1, new string[0], "BlockNotFound"), ("ambiguous name", 1, new[] { "HardwareInterrupt", "HardwareInterrupt" }, "AmbiguousTarget"),
     ("a non-OB block", 1, new string[] { null }, "InvalidRequest"), ("another OB event class", 1, new[] { "DiagnosticErrorInterrupt" }, "InvalidRequest") })

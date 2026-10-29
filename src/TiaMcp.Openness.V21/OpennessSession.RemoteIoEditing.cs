@@ -18,8 +18,8 @@ namespace TiaMcp.Openness.V21
         // OperatingMode MotionControl lets a technology object use a TM PosInput/TM Count channel. The rising-edge hardware
         // interrupt of a digital input channel is its ...Active flag plus ...Interrupt, a link to a hardware interrupt OB.
         { "ChannelActivation", "MeasuringType", "MeasuringRange", "InputDelay", "SubstituteValue", "DigitalInputDelay", "Smoothing", "OperatingMode",
-          "HardwareInterruptRisingEdgeActive", ChannelInterruptOb }, StringComparer.Ordinal);
-        private const string ChannelInterruptOb = "HardwareInterruptRisingEdgeInterrupt";
+          ChannelInterruptActive, ChannelInterruptOb }, StringComparer.Ordinal);
+        private const string ChannelInterruptActive = "HardwareInterruptRisingEdgeActive", ChannelInterruptOb = "HardwareInterruptRisingEdgeInterrupt";
 
         // A linked OB is identified by its block name, unique within its PLC.
         private static JToken ChannelValue(object value) => value is PlcBlock block ? (JToken)block.Name : ChangeScalar(value);
@@ -87,7 +87,12 @@ namespace TiaMcp.Openness.V21
             // matches native numeric/enum values rather than JSON input spelling.
             foreach (var property in scalars.Properties())
                 attributes[property.Name] = ChangeScalar(converted[property.Name]);
-            interrupt = attributes[ChannelInterruptOb] == null ? null : ChannelInterruptBlock(project, module, channel, attributes[ChannelInterruptOb], changes);
+            // V21 declares the OB link only while the flag is on (DI 16x24VDC HF, 30 October 2026), so both change together.
+            bool? flag = converted.TryGetValue(ChannelInterruptActive, out var active) ? Equals(active, true) || active?.ToString() == "Active" : (bool?)null;
+            if (flag.HasValue && flag.Value != (attributes[ChannelInterruptOb] != null))
+                throw new BridgeException("InvalidRequest", flag.Value ? "Enabling " + ChannelInterruptActive + " requires " + ChannelInterruptOb + " (the hardware interrupt OB) in the same request."
+                    : "Disabling " + ChannelInterruptActive + " removes its OB link; omit " + ChannelInterruptOb + ".");
+            interrupt = attributes[ChannelInterruptOb] == null ? null : ChannelInterruptBlock(project, module, channel, attributes[ChannelInterruptOb], changes, flag == true);
             if (preview != null) preview["attributeChanges"] = changes;
             return channel;
         }
@@ -96,13 +101,14 @@ namespace TiaMcp.Openness.V21
             .Select(property => new JProperty(property.Name, property.Value.DeepClone())));
 
         // The OB link takes a hardware interrupt OB of the one PLC in the module's own device, named exactly.
-        private PlcBlock ChannelInterruptBlock(Project project, HardwareEntry module, Channel channel, JToken value, JArray changes)
+        private PlcBlock ChannelInterruptBlock(Project project, HardwareEntry module, Channel channel, JToken value, JArray changes, bool enabling)
         {
             string name = value.Type == JTokenType.String ? value.Value<string>() : null;
             if (string.IsNullOrWhiteSpace(name)) throw new BridgeException("InvalidRequest", ChannelInterruptOb + " takes the exact name of a hardware interrupt OB.");
-            var declared = channel.GetAttributeInfos().Where(info => info.Name == ChannelInterruptOb).Take(2).ToArray();
-            if (declared.Length != 1 || (declared[0].AccessMode & EngineeringAttributeAccessMode.Read) == 0 || (declared[0].AccessMode & EngineeringAttributeAccessMode.Write) == 0)
-                throw new BridgeException("AttributeNotWritable", "The channel declares no single readable and writable " + ChannelInterruptOb + ".");
+            int declared = channel.GetAttributeInfos().Count(info => info.Name == ChannelInterruptOb);
+            // Enabling the flag in the same request declares the link; apply checks its access after the flag is written.
+            if (!(declared == 0 && enabling) && !ChannelInterruptWritable(channel))
+                throw new BridgeException("AttributeNotWritable", "The channel declares no single readable and writable " + ChannelInterruptOb + "; V21 declares it only while " + ChannelInterruptActive + " is true.");
             string device = module.Path.Substring(0, module.Path.IndexOf("/items/", StringComparison.Ordinal));
             var budget = new ScanBudget(50000);
             var plcs = DeviceItems(project, budget).Where(entry => entry.Path.StartsWith(device + "/items/", StringComparison.Ordinal))
@@ -112,9 +118,15 @@ namespace TiaMcp.Openness.V21
                 .Where(block => string.Equals(block.Item.Name, name, StringComparison.Ordinal)).Take(2).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Block lookup of the module's PLC is incomplete.");
             HardwareEngineeringRules.RequireInterruptOb(name, plcs.Length, blocks.Select(block => block.Item is OB ob ? ob.SecondaryType : null).ToArray());
-            changes.Add(new JObject { ["name"] = ChannelInterruptOb, ["type"] = blocks[0].Item.GetType().FullName, ["before"] = ChannelValue(channel.GetAttribute(ChannelInterruptOb)),
+            changes.Add(new JObject { ["name"] = ChannelInterruptOb, ["type"] = blocks[0].Item.GetType().FullName, ["before"] = declared == 0 ? null : ChannelValue(channel.GetAttribute(ChannelInterruptOb)),
                 ["after"] = name, ["blockPath"] = blocks[0].Path });
             return blocks[0].Item;
+        }
+
+        private static bool ChannelInterruptWritable(Channel channel)
+        {
+            var declared = channel.GetAttributeInfos().Where(info => info.Name == ChannelInterruptOb).Take(2).ToArray();
+            return declared.Length == 1 && (declared[0].AccessMode & EngineeringAttributeAccessMode.Read) != 0 && (declared[0].AccessMode & EngineeringAttributeAccessMode.Write) != 0;
         }
 
         private void ApplyHardwareChannel(EngineeringChange change, Project project)
@@ -123,6 +135,7 @@ namespace TiaMcp.Openness.V21
             // Scalars first: the interrupt flag precedes its OB link.
             ApplyAttributes(channel, ChannelScalars(ChangeObject(change.Payload, "attributes")), ChannelWriteAttributes);
             if (interrupt == null) return;
+            if (!ChannelInterruptWritable(channel)) throw new BridgeException("AttributeNotWritable", "After enabling " + ChannelInterruptActive + ", the channel declares no single readable and writable " + ChannelInterruptOb + ". Restore the checkpoint.");
             channel.SetAttribute(ChannelInterruptOb, interrupt);
             if (!JToken.DeepEquals(ChannelValue(channel.GetAttribute(ChannelInterruptOb)), interrupt.Name))
                 throw new BridgeException("MutationVerificationFailed", "The channel's hardware interrupt OB readback differs from the request.");

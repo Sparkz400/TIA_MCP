@@ -174,6 +174,9 @@ namespace TiaMcp.Openness.V21
             {
                 var channel = ((JArray)selected["channels"]).OfType<JObject>().Single(row => row.Value<int>("number") == payload.Value<int>("channelNumber") && row.Value<string>("type") == payload.Value<string>("channelType") && row.Value<string>("ioType") == payload.Value<string>("channelIoType"));
                 foreach (var property in ((JObject)payload["attributes"]).Properties()) channel["attributes"][property.Name] = property.Value.DeepClone();
+                // V21 undeclares a channel's hardware interrupt OB link while its rising-edge interrupt is off.
+                var flag = payload["attributes"]["HardwareInterruptRisingEdgeActive"];
+                if (flag != null && (flag.Type == JTokenType.Boolean ? !flag.Value<bool>() : flag.ToString() == "Deactivated")) ((JObject)channel["attributes"]).Remove("HardwareInterruptRisingEdgeInterrupt");
                 // TIA applies a technology module's OperatingMode to all its channels and resizes that item's own address ranges in place.
                 if (payload["attributes"]["OperatingMode"] != null)
                 {
