@@ -56,7 +56,7 @@ CRITERIA = {
         "AC-recovery": "The new project and its station-upload.json are saved.",
         "AC-evidence": "This report."},
     "db_snapshot_capture": {
-        "AC-identity": "A DB without a stored snapshot refuses with DbSnapshotUnavailable; the record names the exact project and DB.",
+        "AC-identity": "A DB without a stored snapshot refuses: V21 exports an empty snapshot, which the review refuses as InvalidDbSnapshot; the record names the exact project and DB.",
         "AC-completeness": "The review holds the value db_snapshot_create stored (Count = 42).",
         "AC-preserve": "The complete project state is unchanged.",
         "AC-evidence": "This report."},
@@ -258,7 +258,8 @@ def body(h):
             return error
         lab.unchanged("refuse plc_online_compare: no runtime credential", unauthenticated)
         lab.refuse("an open project", "plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login}, "ProjectIsolationRequired")
-        lab.refuse("a DB without a stored snapshot", "db_snapshot_capture", {"reviewId": review, "objectPath": db}, "DbSnapshotUnavailable")
+        # V21 exports an empty snapshot for a DB without one; the review refuses it (observed 29 October 2026).
+        lab.refuse("a DB without a stored snapshot", "db_snapshot_capture", {"reviewId": review, "objectPath": db}, "InvalidDbSnapshot", "Expected one unqualified Snapshot")
         lab.refuse("db_snapshot_create without a download ticket", "change_prepare", {"kind": "db_snapshot_create", "payload": {"blockPath": db}, "plcPath": run.plc}, "PhysicalPlcRefused")
 
         def compare():
@@ -304,7 +305,7 @@ def body(h):
             after = run.state()
             require(after == run.current, "The recovered state differs: %s" % diff(run.current, after))
             error = h.call_error("db_snapshot_capture", {"reviewId": review, "objectPath": db})
-            require(error.get("code") == "DbSnapshotUnavailable", "The recovered DB still has a snapshot: %s" % error)
+            require(error.get("code") == "InvalidDbSnapshot" and "Expected one unqualified Snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
             return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
         h.stage("restore db_snapshot_create from its checkpoint", restore)
 

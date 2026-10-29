@@ -77,8 +77,13 @@ def answer(challenge_path, screenshot_folder):
         answers["licenseProduct"] = PRODUCT if yes("Did the check run on '%s'?" % PRODUCT) else input("  Type the product checked: ").strip()
         answers["validKeys"] = number("How many valid keys does the check show?")
         answers["defectiveKeys"] = number("How many defective keys?")
-    taken = sorted((p for p in screenshot_folder.glob("*") if p.suffix.lower() in (".png", ".jpg", ".jpeg")
-                    and p.stat().st_mtime >= issued.timestamp()), key=lambda p: p.stat().st_mtime)
+    while True:
+        taken = sorted((p for p in screenshot_folder.glob("*") if p.suffix.lower() in (".png", ".jpg", ".jpeg")
+                        and p.stat().st_mtime >= issued.timestamp()), key=lambda p: p.stat().st_mtime)
+        # The Snipping Tool can save a few seconds after the snip; never send an observation without its screenshots.
+        if taken:
+            break
+        input("  No screenshot taken since %s UTC is in %s yet. Save them there, then press Enter to look again. " % (issued.strftime("%H:%M:%S"), screenshot_folder))
     screenshots = []
     for path in taken:
         purpose = {"s": "scope", "l": "license"}.get(input("  %s: [s]cope, [l]icense or [i]gnore? " % path.name).strip().lower())
