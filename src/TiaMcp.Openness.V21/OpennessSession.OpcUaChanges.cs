@@ -173,13 +173,23 @@ namespace TiaMcp.Openness.V21
                     else role = OpcUaRoles(group).Create(name, definedIn);
                     if (payload["projectRole"] != null) role.SetProjectRole(payload.Value<string>("projectRole"));
                     var wanted = OpcUaRequestedPermissions(payload);
+                    var routes = new JObject();
                     foreach (var row in wanted)
                     {
                         string uri = row.Value<string>("namespaceUri");
                         var permission = role.NamespacePermissions.FirstOrDefault(item => item.NamespaceUri == uri) ?? throw new BridgeException("MutationVerificationFailed", "The new role exposes no permissions for namespace " + uri + ".");
-                        foreach (string permissionName in OpcUaPermissionNames) permission.SetPermission(permissionName, row.Value<bool>(permissionName));
+                        foreach (string permissionName in OpcUaPermissionNames)
+                        {
+                            bool value = row.Value<bool>(permissionName);
+                            permission.SetPermission(permissionName, value);
+                            string route = "SetPermission";
+                            // shortcut: SetPermission left a standard role's permission unchanged natively (29 October 2026); the attribute route is tried and recorded until one is confirmed.
+                            if (!Equals(permission.GetAttribute(permissionName), value)) { permission.SetAttribute(permissionName, value); route = "SetAttribute"; }
+                            routes[uri + "/" + permissionName] = Equals(permission.GetAttribute(permissionName), value) ? route : "unchanged";
+                        }
                     }
                     readback = OpcUaRoleInfo(OpcUaRole(group, name) ?? throw new BridgeException("MutationVerificationFailed", "Created OPC UA role mapping was not found."));
+                    readback["permissionWriteRoutes"] = routes;
                     var actual = (JArray)readback["namespacePermissions"];
                     if (payload["projectRole"] != null && readback.Value<string>("projectRole") != payload.Value<string>("projectRole") || wanted.Any(row => !actual.Any(item => JToken.DeepEquals(item, row))))
                         throw new BridgeException("MutationVerificationFailed", "OPC UA role mapping read-back differs from the requested project role or namespace permissions: " + readback.ToString(Newtonsoft.Json.Formatting.None));
