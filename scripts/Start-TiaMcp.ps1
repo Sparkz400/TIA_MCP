@@ -4,6 +4,7 @@ param(
     [string]$SimulatorApiDirectory,
     [string]$GitExecutable,
     [string]$UaClientIdentity,
+    [ValidatePattern('^[a-z]+(,[a-z]+)*$')][string]$Toolsets,
     [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
     [switch]$StrictBundle,
     [switch]$InteractiveSession,
@@ -49,6 +50,7 @@ $launchArguments = @('--worker', $engineeringWorker, '--sim-worker', $simulatorW
 if ($verification.bundleKind -eq 'offline') { $launchArguments += '--no-native-workers' }
 if ($GitExecutable) { $launchArguments += @('--git-executable', $GitExecutable) }
 if ($UaClientIdentity) { $launchArguments += @('--ua-client-identity', $UaClientIdentity) }
+if ($Toolsets) { $launchArguments += @('--toolsets', $Toolsets) }
 if ($Diagnose) { $launchArguments += '--diagnose' }
 if ($TiaApiDirectory) { $launchArguments += @('--api-dir', $TiaApiDirectory) }
 if ($SimulatorApiDirectory) { $launchArguments += @('--sim-api-dir', $SimulatorApiDirectory) }

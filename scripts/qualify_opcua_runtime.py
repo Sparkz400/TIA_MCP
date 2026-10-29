@@ -47,7 +47,7 @@ def main():
         "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Arrays.cs", "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
         "src/TiaMcp.Host/OpcUaRuntimeSessions.cs", "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "src/TiaMcp.Host/Security/CredentialVault.OpcUaIdentity.cs", "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
-        "src/TiaMcp.Host/Security/CredentialVault.cs", "src/TiaMcp.Host/HostOptions.cs", "src/TiaMcp.Host/Program.cs",
+        "src/TiaMcp.Host/Security/CredentialVault.cs", "src/TiaMcp.Host/HostOptions.cs", "src/TiaMcp.Host/ToolGroups.cs", "src/TiaMcp.Host/Program.cs",
         "tests/TiaMcp.OpcUa.Runtime.Tests/Program.cs", "tests/TiaMcp.OpcUa.Runtime.Tests/FixtureServer.cs",
     ]
     def source_inputs():
