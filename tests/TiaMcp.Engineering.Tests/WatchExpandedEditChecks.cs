@@ -63,9 +63,14 @@ internal static class WatchExpandedEditChecks
             string root = Path.Combine(Path.GetTempPath(), "force-expanded-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
             var native = new ProductionRecoveryChecks.FakeWatch(root, force.ToBytes());
             edit["tableName"] = "Force table"; edit["targetKind"] = "forceTable"; edit["idempotencyKey"] = "force-review";
-            try { await new WatchTableDispatcher(native, root).CallAsync("watch_prepare", edit); throw new Exception("Unqualified force profile was accepted."); }
-            catch (BridgeException e) when (e.Code == "UnsupportedProfile") { passed++; }
-            var dispatcher = new WatchTableDispatcher(native, root, allowUnqualifiedDocumentEdits: true);
+            // Natively qualified force edits run on a production Host (decision of 29 October 2026); reorder stays isolated.
+            bool production = (string)edit["editKind"]! != "reorder";
+            if (!production)
+            {
+                try { await new WatchTableDispatcher(native, root).CallAsync("watch_prepare", edit); throw new Exception("Unqualified force profile was accepted."); }
+                catch (BridgeException e) when (e.Code == "UnsupportedProfile") { passed++; }
+            }
+            var dispatcher = new WatchTableDispatcher(native, root, allowUnqualifiedDocumentEdits: !production);
             var plan = JsonNode.Parse((await dispatcher.CallAsync("watch_prepare", edit)).GetRawText())!;
             if ((string?)plan["review"]?["selector"]?["targetKind"] != "forceTable") throw new Exception("Force target is absent from the immutable review selector.");
             string id = (string)plan["operation"]!["id"]!;
@@ -76,6 +81,13 @@ internal static class WatchExpandedEditChecks
             native.SelectOriginal(); var final = JsonNode.Parse((await dispatcher.CallAsync("watch_reconcile_recovery", new { operationId = id, role = "original" })).GetRawText())!;
             if ((string)final["operation"]!["state"]! != "reconciled" || native.ApplyCount != 1 || native.RestoreCount != 1) throw new Exception("Force edit did not reconcile exactly once.");
             passed++;
+        }
+        {
+            // The Name field was not exercised natively, so production Hosts keep refusing it.
+            string root = Path.Combine(Path.GetTempPath(), "force-name-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
+            var edit = new JsonObject { ["editKind"] = "field", ["ordinal"] = 0, ["field"] = "Name", ["value"] = "Valve", ["tableName"] = "Force table", ["targetKind"] = "forceTable", ["idempotencyKey"] = "force-name" };
+            try { await new WatchTableDispatcher(new ProductionRecoveryChecks.FakeWatch(root, force.ToBytes()), root).CallAsync("watch_prepare", edit); throw new Exception("An unqualified force field was accepted on a production Host."); }
+            catch (BridgeException e) when (e.Code == "UnsupportedProfile") { passed++; }
         }
         foreach (var (code, bytes, edit, selected) in new (string, byte[], JsonObject, bool)[] {
             ("ForceSelectionRefused", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceValue", ["value"] = "TRUE" }, true),
