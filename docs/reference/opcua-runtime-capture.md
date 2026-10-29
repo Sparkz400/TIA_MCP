@@ -29,7 +29,7 @@ Capture stop cancels this Host's own worker. Host shutdown stops workers before 
 
 This profile provides polling only. [Bounded UA subscriptions](opcua-runtime-subscriptions.md) separately retain monitored-item revisions and Publish/Republish evidence. Subscription transfer and implicit reconnect remain unsupported; bounded same-session recovery requires the explicit option below. There is no subscription-to-polling relabeling, diagnostic behavioral verdict, physical-device qualification, runtime write, or native TIA operation. Polling reserves the session against competing acquisitions and manual read/browse/disconnect until the capture releases its lease.
 
-Contract: [opcua-runtime-capture.v1](../../contracts/opcua-runtime-capture.v1.schema.json). Qualification is exercised by the existing managed UA suite plus `scripts/qualify_opcua_capture.py`; the latter starts an actual encrypted loopback server and Host, verifies exact values independently, downloads artifacts, crashes its original owned Host, and reopens without replay.
+Contract: [opcua-runtime-capture.v1](../../contracts/opcua-runtime-capture.v1.schema.json). Qualification is exercised by the existing managed UA suite plus `scripts/qualify_opcua_capture.py`; the latter starts an actual encrypted loopback server and Host, verifies exact values independently, downloads artifacts, crashes its original owned Host, and reopens without replay. The [real-server runs](../verification/runtime-real-server-20261029.md) (`local.runtime.plcsim-tcpip.20261029`) repeat a polling capture with page and export against the OPC UA server of an owned PLCSIM instance in TCP/IP mode.
 
 ## Optional transport recovery
 
