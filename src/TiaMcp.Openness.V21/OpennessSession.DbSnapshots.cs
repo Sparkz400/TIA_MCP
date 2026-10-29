@@ -39,7 +39,8 @@ namespace TiaMcp.Openness.V21
             // The documented accessor is the block; the interface fallback costs one lookup if V21 moved it.
             var snapshot = target.Block.Item.GetService<InterfaceSnapshot>() ?? ((DataBlock)target.Block.Item).Interface?.GetService<InterfaceSnapshot>()
                 ?? throw new BridgeException("UnsupportedCapability", "The selected DB exposes no InterfaceSnapshot service.");
-            try { snapshot.Export(new FileInfo(path), ExportOptions.WithDefaults); }
+            // Snapshot and SnapshotDate are read-only attributes: without WithReadOnly V21 exports only the DB's Name.
+            try { snapshot.Export(new FileInfo(path), ExportOptions.WithDefaults | ExportOptions.WithReadOnly); }
             catch (EngineeringException ex) { throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no exportable stored snapshot: " + ex.Message); }
             if (!File.Exists(path)) throw new BridgeException("DbSnapshotUnavailable", "InterfaceSnapshot.Export produced no file.");
         }
