@@ -39,12 +39,14 @@ S7_1200, IM = "OrderNumber:6ES7 214-1AG40-0XB0/V4.7", "OrderNumber:6ES7 155-5AA0
 SM, SM_NEXT = "OrderNumber:6ES7 221-1BH30-0XB0/V1.0", "OrderNumber:6ES7 221-1BH32-0XB0/V2.0"
 CONFIGURED = ("hardware_replace", "hardware_port_connect", "hardware_port_disconnect", "network_configure", "hardware_plug",
               "hardware_transfer_area_create", "hardware_transfer_area_delete", "network_io_assign")
-# A rack, and the PLC whose default tag table holds its modules' system constants, named prefix + module name.
-Station = namedtuple("Station", "device rack plc_device plc prefix")
-SCRATCH = Station("ScratchStation", "Rail_0", "ScratchStation", "ScratchPLC", "Local~")
-S1200 = Station("Hw1200", "Rack_0", "Hw1200", "Hw1200Cpu", "Local~")
-MP = Station("HwMp", "Rail_0", "HwPeer", "HwPeerCpu", "HwMp~")
+# A rack, the PLC whose default tag table holds its modules' system constants (named prefix + module name), and an IO device's interface.
+Station = namedtuple("Station", "device rack plc_device plc prefix interface")
+SCRATCH = Station("ScratchStation", "Rail_0", "ScratchStation", "ScratchPLC", "Local~", None)
+S1200 = Station("Hw1200", "Rack_0", "Hw1200", "Hw1200Cpu", "Local~", None)
+MP = Station("HwMp", "Rail_0", "HwPeer", "HwPeerCpu", "HwMpHead~", ("HwMpHead", "items", "PROFINET%20interface"))
 IO_SYSTEM = "HwPeerIo"
+# An IO controller's cyclic IO bandwidth is computed at the device compile and not saved (a fresh open reads 0), so it is not compared.
+DERIVED = ("CalculatedBandwidthForCyclicIoData",)
 # Per family: its rack, the module plugged at slots 2 and 3, and the replacement of the first one.
 FAMILIES = ((S1200, ("HwSm", "HwSm2"), SM, SM_NEXT), (MP, ("MpDi", "MpDi2"), MODULE, MODULE_V2))
 CRITERIA = {
@@ -78,7 +80,8 @@ def hardware(inspect):
     state = {}
     for item in inspect["items"]:
         row = {key: item.get(key) for key in ("name", "typeIdentifier", "positionNumber", "isBuiltIn", "isPlugged", "classification", "addresses", "channels", "gsd", "network")}
-        row["attributes"] = {a["name"]: a.get("value") for a in item["attributes"] if a.get("valueComplete") and a.get("valueStatus") == "captured"}
+        row["attributes"] = {a["name"]: a.get("value") for a in item["attributes"]
+                             if a.get("valueComplete") and a.get("valueStatus") == "captured" and a["name"] not in DERIVED}
         state["hw:" + item["path"]] = row
     return state
 
@@ -181,12 +184,17 @@ def constant(run, station, name):
     return "member:" + run.path(station.plc_device, "items", station.plc, "plc", station.plc, "tags", "Default%20tag%20table", "systemConstants", name)
 
 
-def plug(run, name, slot, station=SCRATCH, module=MODULE):
+def timing(run, station):
+    """An IO device's interface recomputes its connector's update and watchdog times when its first module arrives or its last one goes."""
+    return ["hw:" + run.path(station.device, "items", *station.interface)] if station.interface else []
+
+
+def plug(run, name, slot, station=SCRATCH, module=MODULE, changed=()):
     rail = run.path(station.device, "items", station.rack)
     item = run.hw(station.device, "items", name)
     run.apply("plug " + name, "hardware_plug", {"hardwarePath": rail, "typeIdentifier": module, "name": name, "positionNumber": slot},
               {"effects": [{"parentPath": rail, "createItem": name, "positionNumber": slot, "typeIdentifier": module}]},
-              added=under(item[3:], constant(run, station, station.prefix + name)), rows={item: {"typeIdentifier": module, "positionNumber": slot}})
+              added=under(item[3:], constant(run, station, station.prefix + name)), changed=changed, rows={item: {"typeIdentifier": module, "positionNumber": slot}})
 
 
 def node(run, device, interface, address, deferred=False):
@@ -200,19 +208,23 @@ def node(run, device, interface, address, deferred=False):
 
 def station(run):
     """The ET 200MP head is added and put on HwNet without compile, then assigned to a new IO system of HwPeerCpu with compile."""
-    interface = ("HwMpHead", "items", "PROFINET%20interface")
+    interface = MP.interface
     run.apply("add ET 200MP station " + MP.device, "hardware_add", {"typeIdentifier": IM, "deviceName": MP.device, "itemName": "HwMpHead"},
               {"effects": [{"createDevice": MP.device, "typeIdentifier": IM}]}, added=under(run.path(MP.device)),
               rows={run.hw(MP.device, "items", "HwMpHead"): {"typeIdentifier": IM}}, deferred=True)
     node(run, MP.device, interface, "192.168.0.4", deferred=True)
     device, controller = run.path(MP.device, "items", *interface), run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
-    # The assignment generates system constants for the IO system and the station's hardware in HwPeerCpu.
-    generated = lambda applied, state: [key for key in state if key.startswith((constant(run, MP, MP.device), constant(run, MP, IO_SYSTEM)))]
+    # HwPeerCpu gets system constants for the IO system (Local~HwPeerIo) and the station's head, interface and ports (HwMpHead~...).
+    generated = lambda applied, state: [key for key in state if key.startswith((constant(run, MP, MP.prefix), constant(run, MP, "Local~" + IO_SYSTEM)))]
+    # Every item of the head reads SharedDeviceAccessType PLC instead of Unknown, and the interface gets its IO-device attributes.
+    head = [run.hw(MP.device, "items", *parts) for parts in (("HwMpHead",), ("HwMpHead", "items", "HwMpHead"))] + \
+           ["hw:" + device] + ["hw:" + device + "/items/Port_%d" % number for number in (1, 2)]
     payload = {"hardwarePath": device, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": IO_SYSTEM}
     # The worker records the controller's owning CPU item in the reviewed payload.
     run.apply("assign %s to HwPeerCpu" % MP.device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False}]},
-              shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")}, changed=["hw:" + device, "hw:" + controller], added=generated)
+              shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")}, changed=head + ["hw:" + controller], added=generated,
+              rows={key: {"attributes": {"SharedDeviceAccessType": "PLC"}} for key in head})
 
 
 def network(run):
@@ -267,11 +279,11 @@ def linked(state, local, partner, connected):
         require(partners == ([other] if connected else []), "Port %s lists partners %s" % (port, partners))
 
 
-def delete(run, name, restore=False, station=SCRATCH):
+def delete(run, name, restore=False, station=SCRATCH, changed=()):
     module = run.hw(station.device, "items", name)
     run.apply("delete " + name, "hardware_delete", {"hardwarePath": module[3:]},
               {"effects": [{"deleteHardwarePath": module[3:], "positionNumber": int(run.current["view"][module]["positionNumber"])}]},
-              removed=under(module[3:], constant(run, station, station.prefix + name))(None, run.current["view"]), restore=restore)
+              removed=under(module[3:], constant(run, station, station.prefix + name))(None, run.current["view"]), changed=changed, restore=restore)
 
 
 def refusals(run):
@@ -302,7 +314,7 @@ def phase_a(run):
     node(run, "Hw1200", ("Hw1200Cpu", "items", "PROFINET%20interface_1"), "192.168.0.3")
     station(run)
     for station_, (first, second), module, after in FAMILIES:
-        plug(run, first, 2, station_, module)
+        plug(run, first, 2, station_, module, changed=timing(run, station_))
         plug(run, second, 3, station_, module)
         attributes(run, first, {"Comment": "HwComment", "Author": "HwAuthor"}, station=station_)
         replace(run, first, module, after, station=station_)
@@ -354,7 +366,7 @@ def phase_b(run):
         attributes(run, first, {"Comment": "HwAgain"}, restore=True, station=station_)
         replace(run, first, after, module, restore=True, station=station_)
         link(run, "hardware_port_disconnect", 1, restore=True, pair=pairs[station_.device], label=station_.device + " Port_1")
-        delete(run, first, restore=True, station=station_)
+        delete(run, first, restore=True, station=station_, changed=timing(run, station_))
 
 
 def body(h):

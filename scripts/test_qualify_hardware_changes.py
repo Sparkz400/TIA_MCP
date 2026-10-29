@@ -45,7 +45,7 @@ class HardwareChangeTests(unittest.TestCase):
         devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
         self.assertEqual({("Hw1200", "ScratchStation"), ("HwMp", "HwPeer"), ("ScratchStation", "HwPeer")}, set(devices))
         self.assertEqual(4, len({d for link in devices for d in link}))  # Four devices joined by three links: a line, no ring.
-        self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMp~MpDi",
+        self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMpHead~MpDi",
                          q.constant(run, q.MP, q.MP.prefix + "MpDi"))
 
     def test_deferred_apply_skips_compile_and_save_only(self):
