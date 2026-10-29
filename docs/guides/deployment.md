@@ -72,7 +72,7 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--enable-library-integrate-apply` | Off | Lets `change_apply` install a prepared PLC `library_integrate` plan ([combined apply](plc-library-integration-recipes.md#combined-apply-opt-in)) | None |
 | `--library-limits-file <json>` | Built-in limits | Library package intake limits, a JSON object of at most 64 KiB ([storage policy](library-management.md#storage-policy-and-errors)) | None |
 
-Neither launcher script passes `--no-native-workers`, `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply` or `--library-limits-file`. To use them, launch `TiaMcp.Host.exe` directly with an explicit `--artifacts` directory, or add them to the `args` of the generated MCP configuration.
+Neither launcher script passes `--no-native-workers`, `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply` or `--library-limits-file`. The generated configuration runs `Start-TiaMcp.ps1`, so extra `args` do not reach the Host either. To use these options, point the MCP client at `TiaMcp.Host.exe` directly, with an explicit `--artifacts` directory.
 
 Qualification-only options register gated test tools and interruption points for the native runners. They stay out of the normal feature advertisement, are refused together with `--no-native-workers`, and are not for production use:
 
