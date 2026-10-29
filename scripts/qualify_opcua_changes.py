@@ -55,6 +55,9 @@ LIMITATIONS = [
     "Interface lastModified times are not compared: importing one interface moves the others' times; content is compared by export hash.",
     "TIA derives the interface namespace's row in the namespace access restrictions and in every role mapping from the interface: it appears on "
     "import and vanishes on delete, and a copy recovered from a checkpoint lacks it until TIA rebuilds it; those rows are not compared.",
+    "TIA caches OPC UA role mappings per Portal process, keyed by an object id a recovered copy keeps: the Portal that restored a role "
+    "change shows the mappings from before the restore. Role restores are therefore compared after a fresh Portal opens the recovered "
+    "copy, and the worker refuses OPC UA changes in the restoring Portal (StaleRevision).",
     "Engineering only; nothing is downloaded and no OPC UA client connects.",
 ]
 
@@ -113,6 +116,19 @@ class Run(StateRun):
         prepared = self.prepare(label, kind, payload, {"effects": [effect]})
         self.finish(label, kind, prepared, **expected)
         return prepared
+
+    def restore(self, label, kind, prepared, recovered=None):
+        """The restoring Portal keeps showing the role mappings from before the restore (TIA caches them per process), so a role
+        restore is compared after a fresh Portal opens the recovered copy; until then OPC UA changes are refused."""
+        if kind != "opcua_role_mapping_set":
+            return super().restore(label, kind, prepared, recovered)
+        h = self.h
+        recovered = h.stage("restore " + label, lambda: h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
+        self.refuse(kind, "a change in the Portal that restored " + label, role_payload(self, "Engineer"), "StaleRevision")
+        h.stage("close the restoring Portal", lambda: h.tool("tia_detach"))
+        h.owned_portal("restored " + label)
+        h.stage("open the recovered copy of " + label, lambda: h.reopen_project(recovered["recoveredProject"]["path"]))
+        return super().restore(label, kind, prepared, recovered)
 
 
 def interface(name):
