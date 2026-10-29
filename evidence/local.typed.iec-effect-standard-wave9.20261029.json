@@ -1,0 +1,60 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.iec-effect-standard-wave9.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T17:39:23+00:00",
+  "source": {
+    "commit": "b4abe48803874ea53344082ab2eefa1c16fc20f5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py --unit '' (standard PLC program scope) on build b4abe48 (frozen at the short project path y): the 2 inputs of route-capture-iec-effect-standard-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound baseline (CPU 1511-1 PN V4.1): an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type, now including TONR_TIME, R_TRIG and F_TRIG, while the dependent DB was observed. Both inputs compiled clean and saved; only the declared redeclaration and its observed DB changed (the R_TRIG/F_TRIG system FBs TIA copies into System blocks are generated, not authored); the saved state matched a fresh-process reopen. scripts/extract_typed_instance_effects.py --iec --route standard rewrote instance-effects-iec.v1.json: the DB keeps its full payload and appends exactly the nine members, and the six members of the replaced capture (local.typed.iec-effect-standard.20261026) are structurally identical in caller and DB.",
+  "limitations": [
+    "Native reference capture only; the builder's created TONR/R_TRIG/F_TRIG storage cells are qualified separately (local.typed.wave9-created-storage.engineering.20261029); runtime is not run.",
+    "Standard route only: the software-unit and namespace IEC effect profiles keep their six timer/counter members, and those routes have no wave 9 profiles."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "61277dc82eb75be5738050d217654ce30faee004648de3a97e1c26d510b0ea52"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "86ed88b78e5f2c6f223ff90042168f3b0f38377238ab7a2f395c722f8607d6ba"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-cap.json",
+      "sha256": "9ecacd5b41480d2a2151a969b4bc94caf3d65a0f55d816934c3f96db03be5716",
+      "bytes": 11867,
+      "completed": true,
+      "steps": [
+        "iec-effect-before.scl: captured",
+        "iec-effect-after.scl: captured",
+        "saved reopen: verified"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

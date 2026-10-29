@@ -12,6 +12,7 @@ from xml.etree import ElementTree as ET
 from block_test_runtime import NativeToolError
 import qualification_owned_scratch as owned
 import qualify_typed_resolution as runner
+import typed_resolution_curation as curation
 
 
 class FakeWatcher:
@@ -495,11 +496,48 @@ class StaleAddressTests(unittest.TestCase):
                     self.assertEqual([{"changeId": "stale-original"}], [arguments for tool, arguments in calls if tool == "change_status"])
                     self.assertFalse(result["cases"][0]["staleApplyAttempt"]["expectedRejectionVerified"])
 
+    def test_refused_competitor_db_is_a_preserved_native_boundary_without_stale_apply(self):
+        for drift in (False, True):
+            with self.subTest(drift=drift), tempfile.TemporaryDirectory() as directory:
+                root = pathlib.Path(directory)
+                args = types.SimpleNamespace(output=root / "evidence", artifacts=root / "native", phase="stale", language="LAD",
+                    host=root / "host.exe", worker=root / "worker.exe", timeout=30, case=["stale-db-ambiguity"], artifact_policy_root=root)
+                run = runner.ResolutionRun(args)
+                before = self.state(root, "before")
+                after = self.state(root, "after", self.xml.replace("%M100.0", "%M100.1")) if drift else before
+                calls = []
+                class Session:
+                    def __init__(self, *args, **kwargs):
+                        pass
+                    def call(self, tool, arguments):
+                        calls.append(tool)
+                        if tool == "change_prepare":
+                            return {"changeId": "original", "previewHash": "p"}
+                        raise AssertionError(tool)
+                    def close(self):
+                        pass
+                row = {"result": {"duplicateCreated": False, "nativeRejection": {"message": "A program element with this fully qualified name already exists in this CPU."}}}
+                def seed(operation):
+                    self.assertEqual("duplicate-db-diagnostic", operation)
+                    run.report["nativeDuplicateSetup"] = row
+                    return row
+                bound = {"tool": "change_prepare", "arguments": {}, "expect": {}}
+                with mock.patch.object(runner, "OwnedScratch", Session), mock.patch.object(run, "setup"), mock.patch.object(run, "request", return_value=bound), \
+                        mock.patch.object(run, "resolution_seed", side_effect=seed), mock.patch.object(runner, "verify_prepared"), \
+                        mock.patch.object(runner, "complete_inventory", return_value={"softwareScopes": [{"name": "TiaMcp_UnitB", "path": "/plc/units/B"}]}), \
+                        mock.patch.object(runner, "snapshot", side_effect=[before, after]):
+                    self.assertEqual(1, run.run())
+                result = json.loads((args.output / "result.json").read_text())
+                # Nothing beyond the original prepare is dispatched: no stale apply and no restore of a change that never applied.
+                self.assertEqual(["change_prepare"], calls)
+                self.assertEqual("blocked", result["cases"][0]["status"])
+                self.assertEqual(not drift, curation.rejection(result)[1])
+
 
 class CompetingDbTests(unittest.TestCase):
     def test_competing_db_requires_exact_addition_and_preserves_every_existing_object(self):
-        path = "/plc/units/B/blocks/namespaces/TiaMcp_UnitB/Tgp_ResolutionOne"
-        xml = '<Document><SW.Blocks.GlobalDB ID="0"><AttributeList><Name>Tgp_ResolutionOne</Name><Namespace>TiaMcp_UnitB</Namespace><Interface><Sections><Section Name="Static"><Member Name="Flag" Datatype="Bool"><StartValue>false</StartValue></Member><Member Name="RetainedMarker" Datatype="Int"><StartValue>91</StartValue></Member></Section></Sections></Interface></AttributeList></SW.Blocks.GlobalDB></Document>'
+        path = "/plc/units/B/blocks/Tgp_ResolutionOne"
+        xml = '<Document><SW.Blocks.GlobalDB ID="0"><AttributeList><Name>Tgp_ResolutionOne</Name><Namespace /><Interface><Sections><Section Name="Static"><Member Name="Flag" Datatype="Bool"><StartValue>false</StartValue></Member><Member Name="RetainedMarker" Datatype="Int"><StartValue>91</StartValue></Member></Section></Sections></Interface></AttributeList></SW.Blocks.GlobalDB></Document>'
         with tempfile.TemporaryDirectory() as directory:
             file = pathlib.Path(directory) / "competing.xml"
             file.write_text(xml, encoding="utf-8")
@@ -509,7 +547,7 @@ class CompetingDbTests(unittest.TestCase):
                 "inventory": {"blocks": [{"name": "Tgp_ResolutionOne", "path": path, "scopePath": "/plc/units/B"}]}}
             self.assertEqual(path, runner.verify_competing_db_change(before, after, "/plc/units/B"))
             for content in (xml.replace("91", "0"), xml.replace('Datatype="Bool"', 'Datatype="Int"'),
-                            xml.replace("GlobalDB", "InstanceDB"), xml.replace("TiaMcp_UnitB", "TiaMcp_UnitA")):
+                            xml.replace("GlobalDB", "InstanceDB"), xml.replace("<Namespace />", "<Namespace>TiaMcp_UnitB</Namespace>")):
                 file.write_text(content, encoding="utf-8")
                 with self.assertRaises(RuntimeError):
                     runner.verify_competing_db_change(before, after, "/plc/units/B")

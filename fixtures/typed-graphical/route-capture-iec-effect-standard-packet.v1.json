@@ -31,6 +31,18 @@
     {
       "name": "Counter_CTUD",
       "datatype": "CTUD_INT"
+    },
+    {
+      "name": "Timer_TONR",
+      "datatype": "TONR_TIME"
+    },
+    {
+      "name": "Edge_RTRIG",
+      "datatype": "R_TRIG"
+    },
+    {
+      "name": "Edge_FTRIG",
+      "datatype": "F_TRIG"
     }
   ],
   "sources": [
@@ -47,7 +59,7 @@
     },
     {
       "path": "fixtures/typed-graphical/sources/iec-effect-after.scl",
-      "sha256": "496197aa156e97372aa06f735b4d25b9105cec599df59a1996d7087fd8c25347",
+      "sha256": "405e0bac8a7466e50aeaa5d00eb1b45fc4cdd54d2202b19663c60e101c4c1a20",
       "route": "standard",
       "authoredFormat": "SCL",
       "names": [
