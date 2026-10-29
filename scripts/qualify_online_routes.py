@@ -96,11 +96,15 @@ def differences(tree):
     return [{k: node[k] for k in ("left", "right", "state")} for node in nodes(tree) if node["state"] not in SAME]
 
 
-def online_session(report, username, reused=False):
-    """An online report that answered exactly one challenge, the project-user login as username, kept the instance in RUN
-    and completed every cleanup. reused: the same Portal logged in before, and TIA reuses that login without a challenge
-    (observed 29 October 2026), so no answered challenge is also accepted."""
-    answered = [(c["type"], c["decision"], c.get("username")) for c in report["onlineChallenges"] if c["decision"] != "unanswered"]
+def online_session(report, username, reused=False, pin=None):
+    """An online report that answered exactly one login challenge, the project-user login as username, kept the instance in
+    RUN and completed every cleanup. reused: the same Portal logged in before, and TIA reuses that login without a challenge
+    (observed 29 October 2026), so no answered challenge is also accepted. pin: the station upload's first-use certificate pin;
+    only then are TLS challenges answered Trusted, each with that pin."""
+    trusted = [c for c in report["onlineChallenges"] if c["decision"] == "Trusted"]
+    require(not trusted or pin and all(c["type"] == "TlsVerificationConfiguration" and c.get("pinnedCertificateSha256") == pin for c in trusted),
+            "TLS was trusted without the upload's one pin %s: %s" % (pin, trusted))
+    answered = [(c["type"], c["decision"], c.get("username")) for c in report["onlineChallenges"] if c["decision"] not in ("unanswered", "Trusted")]
     require(answered == [("OnlineAuthenticationConfiguration", "ProjectUser", username)] or reused and answered == [],
             "Expected one project-user login as %s: %s" % (username, report["onlineChallenges"]))
     require(report.get("completed") is True and "failure" not in report and report["login"]["username"] == username and report["login"]["secretReturned"] is False,
@@ -220,6 +224,7 @@ def body(h):
         provisioned = h.stage("simulation_provision_scratch_credential",
                               lambda: h.tool("simulation_provision_scratch_credential", {**card, "trustOwnedEmptyCpuCertificate": True}))
         h.report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download, trust_owned_empty_cpu_certificate=True)
+        lab.provisioning_pin = provisioned["tlsPinnedCertificateSha256"]
         h.report["restoredMemoryCard"] = verify_memory_card(download)
         h.stage("power on", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "powerOn", "timeoutMs": 60000}))
         running = h.stage("run", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "run", "timeoutMs": 30000}))
@@ -314,20 +319,24 @@ def body(h):
                 return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
             h.stage("restore db_snapshot_create from its checkpoint", restore)
 
-        # --skip-upload: in an empty Portal the upload meets TLS verification, which these routes never trust (29 October 2026).
+        # In an empty Portal the upload meets TLS verification (29 October 2026); it trusts the owned CPU's certificate only on
+        # explicit first-use authorization, pinned for the upload attempt.
         if not h.args.skip_upload:
             h.stage("close the scratch before the upload", lambda: h.tool("tia_detach"))
             h.owned_portal("for the station upload")
             def upload():
-                report = h.tool("plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login})
-                session = online_session(report, lab.username)
+                report = h.tool("plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login, "trustOwnedSimulationCertificate": True})
+                pin = report["tlsPinnedCertificateSha256"]
+                require(report["trustOwnedSimulationCertificate"] is True and report["tlsCertificatePinScope"] == "currentUploadAttemptOnly"
+                        and pin and any(c["decision"] == "Trusted" for c in report["onlineChallenges"]), "The upload trusted no pinned certificate: %s" % report["onlineChallenges"])
+                session = online_session(report, lab.username, pin=pin)
                 require(report["saved"] is True and report["uploadedStation"] and Path(report["project"]["path"]).is_file() and Path(report["reportPath"]).is_file(),
                         "The upload saved no station: %s" % {k: report.get(k) for k in ("saved", "uploadedStation", "project", "reportPath")})
                 plcs = h.tool("project_inventory", {"maxItems": 1000})["plcs"]
                 require(len(plcs) == 1, "Expected one uploaded PLC: %s" % plcs)
                 uploaded = program(h.tool("software_inspect", {"plcPath": plcs[0]["path"], "maxItems": 2000}))
                 require(uploaded == lab.downloaded, "The uploaded blocks differ: downloaded %s, uploaded %s" % (lab.downloaded, uploaded))
-                return {**session, "project": report["project"], "uploadedStation": report["uploadedStation"], "devices": report["devices"],
+                return {**session, "tlsPinnedCertificateSha256": pin, "provisioningPinnedCertificateSha256": lab.provisioning_pin, "project": report["project"], "uploadedStation": report["uploadedStation"], "devices": report["devices"],
                         "upload": {k: report["upload"][k] for k in ("state", "errors", "warnings")}, "blocks": uploaded}
             h.stage("plc_station_upload with the runtime user", upload)
 

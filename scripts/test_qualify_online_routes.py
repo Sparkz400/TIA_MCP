@@ -41,6 +41,14 @@ class OnlineRoutesRunnerTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             q.online_session(SESSION, "TiaMcpTest_y")
 
+    def test_only_the_upload_pin_may_answer_tls_trusted(self):
+        report = copy.deepcopy(SESSION)
+        report["onlineChallenges"][:0] = [{"type": "TlsVerificationConfiguration", "decision": "Trusted", "pinnedCertificateSha256": "a" * 64}] * 2
+        q.online_session(report, "TiaMcpTest_x", pin="a" * 64)
+        for pin in (None, "b" * 64):
+            with self.assertRaises(AssertionError):
+                q.online_session(report, "TiaMcpTest_x", pin=pin)
+
     def test_an_edited_metadata_copy_keeps_its_file_name_and_leaves_the_source(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)

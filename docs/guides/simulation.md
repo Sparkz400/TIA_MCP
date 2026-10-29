@@ -42,7 +42,7 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `simulation_provision_scratch_credential` | Opt-in engineering operation: the exact `downloadTicket`, required generated `credentialMetadataPath`, optional `projectName`, `plcPath` and `credentialLineageJournalPaths`. Validates the original card and owned scratch/Softbus target, starts the same CPU empty, then attempts `OnlineProvider.SetPlcMasterSecret` with the generated DPAPI credential. Optional `trustOwnedEmptyCpuCertificate` defaults false. One attempt per owned instance; success requires OFF with protection enabled and the original card restored unchanged. Does not establish RUN or live values. |
 | `sim_state` | `instanceId`, `action` (`powerOn`, `powerOff`, `run`, `stop`), optional bounded `timeoutMs`. No automatic RUN following download. |
 | `plc_online_compare` | Engineering operation: `downloadTicket`, optional `projectName`, `plcPath`, `maxItems` and `expectedFingerprintSha256`. Goes online to the already powered owned instance and returns a bounded `PlcSoftware.CompareToOnline` tree plus fingerprint items. See [Online compare and station upload](#online-compare-and-station-upload). |
-| `plc_station_upload` | Engineering operation: `downloadTicket`. Uploads the owned instance's station into a new worker-owned project and returns its path. Shared mutation admission. See [Online compare and station upload](#online-compare-and-station-upload). |
+| `plc_station_upload` | Engineering operation: `downloadTicket`, optional `runtimeCredentialMetadataPath`, `trustOwnedSimulationCertificate`. Uploads the owned instance's station into a new worker-owned project and returns its path. Shared mutation admission. See [Online compare and station upload](#online-compare-and-station-upload). |
 | `sim_tags` | `instanceId`, optional `filter`, `maxItems` and `refresh`. Reads bounded symbolic tag metadata. |
 | `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation and completion time and quality, with error text and code for a bad read. |
 | `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Validates all values before writing and reports completed writes if a later write fails. |
@@ -83,8 +83,10 @@ TIA instance, a current `downloadTicket` (15 minutes from `sim_create`), the exa
 the only registered local Softbus simulator, and that instance already powered in STOP or RUN
 through `sim_state`. A fresh observer Portal (as in provisioning) must see exactly one addressable
 PN/IE / PLCSIM (1) endpoint, at the instance's own controller address; zero-address entries such as
-the Runtime Manager placeholder are recorded only. TLS verification is answered `NonTrusted` and
-login or password challenges are never answered, so a target that needs either fails closed. Every
+the Runtime Manager placeholder are recorded only. TLS verification is answered `NonTrusted` (except
+the upload's opt-in below) and password challenges are never answered, so a target that needs either
+fails closed; with `runtimeCredentialMetadataPath` the one project-user login is answered with the
+instance's generated runtime user. Every
 connection is taken offline in a `finally` block, the observer Portal is stopped and the instance's
 power state is reported before and after.
 
@@ -99,7 +101,14 @@ power state is reported before and after.
 - `plc_station_upload` needs an empty worker-owned Portal, creates `TiaMcpUpload` in a new directory
   under the artifact root and calls `StationUploadProvider.StationUpload` at the verified address.
   Missing products are answered `NoAction` and make the result partial; any other upload request,
-  passwords included, fails the upload. Every message is kept in the response and in
+  passwords included, fails the upload. In an empty Portal TIA asks to verify the CPU's TLS
+  certificate; `trustOwnedSimulationCertificate: true` (explicit user authorization, default off)
+  trusts it on first use like provisioning's `trustOwnedEmptyCpuCertificate`: only after the owned
+  instance and its address are revalidated, only for exactly one certificate within its validity
+  interval, pinned for this upload attempt, and every later challenge must present the same one.
+  The compare and DB-snapshot routes never trust TLS: they run in the scratch project's Portal,
+  which downloaded the CPU's certificate configuration, and TIA asked them no TLS question in the
+  native runs. Every message is kept in the response and in
   `station-upload.json`; the new project is saved, also when partial, and stays open. It is a shared
   mutation: a structured failure is a returned outcome, while a lost worker leaves the admission
   unknown, with no reconciliation adapter yet.

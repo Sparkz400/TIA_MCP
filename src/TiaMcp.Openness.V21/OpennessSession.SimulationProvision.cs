@@ -527,7 +527,7 @@ namespace TiaMcp.Openness.V21
                                 catch (Exception ex) { tlsEvidence["targetRevalidationExceptionType"] = ex.GetType().FullName; }
                             }
                             DateTime policyTime = DateTime.UtcNow;
-                            string decision = SimulationProvisionTlsPinDecision(trustOwnedEmptyCpuCertificate, attemptTlsPin, observedSha256, certificateCount,
+                            string decision = SimulationTlsPin.Decide(trustOwnedEmptyCpuCertificate, attemptTlsPin, observedSha256, certificateCount,
                                 certificateNotBefore, certificateNotAfter, policyTime, metadataComplete, ownedTargetVerified,
                                 report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed"),
                                 callbackFailure != null || failure != null || tlsCallbackCount > 8);
@@ -537,7 +537,7 @@ namespace TiaMcp.Openness.V21
                             tlsEvidence["ownedTargetRevalidated"] = ownedTargetVerified;
                             tlsEvidence["pinPolicyDecision"] = decision;
                             cleanupCheckpoint("tlsVerificationMetadata");
-                            if ((decision == "allowOwnedEmptyCpuFirstUse" || decision == "allowSameAttemptPinnedCertificate") && failure == null)
+                            if (SimulationTlsPin.Allows(decision) && failure == null)
                             {
                                 bool firstUse = attemptTlsPin == null;
                                 if (firstUse) attemptTlsPin = observedSha256;
@@ -1074,31 +1074,6 @@ namespace TiaMcp.Openness.V21
                 output.Append(filtered.Substring(0, Math.Min(filtered.Length, budget - output.Length)));
             }
             return output.ToString();
-        }
-
-        private static string SimulationProvisionTlsPinDecision(bool firstUseAuthorized, string attemptPin, string observedSha256, int certificateCount,
-            DateTime notBeforeUtc, DateTime notAfterUtc, DateTime nowUtc, bool metadataComplete, bool ownedTargetVerified,
-            bool credentialOpened, bool rejectionLatched)
-        {
-            if (!firstUseAuthorized) return "firstUseTrustNotAuthorized";
-            if (rejectionLatched) return "priorRejectionLatched";
-            if (credentialOpened) return "credentialAlreadyOpened";
-            if (!ownedTargetVerified) return "ownedTargetNotVerified";
-            if (!metadataComplete) return "certificateMetadataIncomplete";
-            if (certificateCount != 1) return "certificateCountNotOne";
-            if (!SimulationProvisionValidTlsPin(observedSha256)) return "invalidObservedCertificateHash";
-            if (notBeforeUtc.Kind != DateTimeKind.Utc || notAfterUtc.Kind != DateTimeKind.Utc || nowUtc.Kind != DateTimeKind.Utc ||
-                notBeforeUtc > nowUtc || nowUtc > notAfterUtc) return "certificateOutsideValidityInterval";
-            if (attemptPin == null) return "allowOwnedEmptyCpuFirstUse";
-            if (!SimulationProvisionValidTlsPin(attemptPin) || !string.Equals(attemptPin, observedSha256, StringComparison.Ordinal))
-                return "attemptCertificateHashChanged";
-            return "allowSameAttemptPinnedCertificate";
-        }
-
-        private static bool SimulationProvisionValidTlsPin(string value)
-        {
-            return value != null && value.Length == 64 && value.All(character =>
-                (character >= '0' && character <= '9') || (character >= 'a' && character <= 'f'));
         }
 
         private static JObject SimulationProvisionPublicCertificate(System.Security.Cryptography.X509Certificates.X509Certificate2 certificate)

@@ -154,6 +154,10 @@ namespace TiaMcp.Openness.V21
             EnsureAttached();
             if (!_ownsPortal || _portal.Projects.Count != 0)
                 throw new BridgeException("ProjectIsolationRequired", "Station upload requires an empty worker-owned TIA instance started with tia_start; it never uploads into an open project.");
+            var trustArgument = args["trustOwnedSimulationCertificate"];
+            if (trustArgument != null && trustArgument.Type != JTokenType.Boolean)
+                throw new BridgeException("InvalidSimulationTlsTrustPolicy", "The optional owned simulator certificate trust policy must be an explicit boolean.");
+            bool trustCertificate = trustArgument?.Value<bool>() == true;
             var marker = OwnedSimulationMarker(args);
             string destination = StationUploadDestination(args);
             if (Path.Combine(destination, StationUploadProjectName).Length > 143)
@@ -167,7 +171,9 @@ namespace TiaMcp.Openness.V21
             if (login != null) report["login"] = login.Evidence;
             report["destination"] = destination;
             report["reportPath"] = Path.Combine(destination, "station-upload.json");
-            var challenges = new OwnedSimulationChallenges(login);
+            report["trustOwnedSimulationCertificate"] = trustCertificate;
+            report["tlsCertificatePinScope"] = "currentUploadAttemptOnly";
+            var challenges = new OwnedSimulationChallenges(login, trustCertificate);
             report["onlineChallenges"] = challenges.Observed;
             var decisions = new JArray();
             report["uploadConfigurations"] = decisions;
@@ -271,6 +277,7 @@ namespace TiaMcp.Openness.V21
                     }
                 }
                 failure = OwnedSimulationRelease(observer, instance, report, failure);
+                report["tlsPinnedCertificateSha256"] = challenges.CertificatePin;
                 report["completed"] = failure == null;
                 if (Directory.Exists(destination))
                 {
@@ -461,18 +468,23 @@ namespace TiaMcp.Openness.V21
             return failure;
         }
 
-        // Fails closed like credential provisioning without its first-use trust: TLS is answered NonTrusted, passwords are
-        // never answered, and the first unanswered challenge is latched for the caller to throw. With a login, the one
-        // project-user login challenge is answered with the instance's generated runtime user (SimulationOnlineLogin).
+        // Fails closed: TLS is answered NonTrusted, passwords are never answered, and the first unanswered challenge is latched
+        // for the caller to throw. With a login, the one project-user login challenge is answered with the instance's generated
+        // runtime user (SimulationOnlineLogin). Only the station upload may pass trustCertificate, the caller's explicit
+        // first-use authorization: like credential provisioning, the revalidated owned instance's first certificate is pinned
+        // for this attempt and each later challenge must present it (SimulationTlsPin).
         private sealed class OwnedSimulationChallenges
         {
             internal BridgeException Failure;
             internal readonly JArray Observed = new JArray();
+            internal string CertificatePin;
             private readonly SimulationCredential _login;
+            private readonly bool _trustCertificate;
             private bool _answered;
-            internal Action Reverify; // Re-checks the owned powered instance and endpoint before the login is sent.
+            private int _tlsChallenges;
+            internal Action Reverify; // Re-checks the owned powered instance and endpoint before the login is sent or a certificate trusted.
 
-            internal OwnedSimulationChallenges(SimulationCredential login = null) { _login = login; }
+            internal OwnedSimulationChallenges(SimulationCredential login = null, bool trustCertificate = false) { _login = login; _trustCertificate = trustCertificate; }
 
             internal void Reject(OnlineConfiguration request)
             {
@@ -497,14 +509,42 @@ namespace TiaMcp.Openness.V21
                     }
                     if (request is TlsVerificationConfiguration tls)
                     {
+                        _tlsChallenges++;
+                        entry["initialSelection"] = tls.CurrentSelection.ToString();
                         tls.CurrentSelection = TlsVerificationConfigurationSelection.NonTrusted;
                         entry["decision"] = "NonTrusted";
-                        entry["certificates"] = new JArray(tls.Certificates.Take(8).Select(certificate => SimulationProvisionPublicCertificate(certificate.Certificate)));
+                        entry["plcName"] = SimulationProvisionFilterPreCredentialText(tls.PlcName ?? "", 512);
+                        entry["verificationInfo"] = SimulationProvisionFilterPreCredentialText(tls.VerificationInfo ?? "", 2048);
+                        var certificates = tls.Certificates.Take(9).Select(certificate => SimulationProvisionPublicCertificate(certificate.Certificate)).ToArray();
+                        entry["certificates"] = new JArray(certificates.Take(8));
+                        if (_trustCertificate && TrustCertificate(entry, certificates))
+                        {
+                            tls.CurrentSelection = TlsVerificationConfigurationSelection.Trusted;
+                            entry["decision"] = "Trusted";
+                            return;
+                        }
                     }
                 }
                 catch (Exception ex) { entry["exceptionType"] = ex.GetType().FullName; }
                 Failure = Failure ?? new BridgeException("SimulationOnlineAuthenticationRequired", "The owned PLCSIM connection requested " + type +
-                    "; TLS trust is never granted and no login, password or credential is supplied.");
+                    "; it was not answered. TLS trust needs the station upload's explicit first-use authorization and its pinned certificate; no other login, password or credential is supplied.");
+            }
+
+            private bool TrustCertificate(JObject entry, JObject[] certificates)
+            {
+                bool owned = false;
+                try { (Reverify ?? throw new BridgeException("SimulationOnlineRequired", "The owned instance was not verified."))(); owned = true; }
+                catch (Exception ex) { entry["targetRevalidationExceptionType"] = ex.GetType().FullName; }
+                var certificate = certificates.Length == 1 ? certificates[0] : null;
+                Func<string, DateTime> utc = name => DateTime.Parse(certificate.Value<string>(name), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
+                string observed = certificate?.Value<string>("sha256");
+                string decision = SimulationTlsPin.Decide(true, CertificatePin, observed, certificates.Length, certificate == null ? default(DateTime) : utc("notBeforeUtc"),
+                    certificate == null ? default(DateTime) : utc("notAfterUtc"), DateTime.UtcNow, true, owned, false, Failure != null || _tlsChallenges > 8);
+                entry["pinPolicyDecision"] = decision;
+                if (!SimulationTlsPin.Allows(decision)) return false;
+                CertificatePin = CertificatePin ?? observed;
+                entry["pinnedCertificateSha256"] = CertificatePin;
+                return true;
             }
         }
     }
