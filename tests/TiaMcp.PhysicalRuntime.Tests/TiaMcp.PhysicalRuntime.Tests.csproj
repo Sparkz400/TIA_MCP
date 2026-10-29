@@ -4,5 +4,6 @@
   <ItemGroup>
     <Compile Include="../../src/TiaMcp.Host/RuntimeCaptures.cs" Link="RuntimeCaptures.cs" />
     <Compile Include="../../src/TiaMcp.Host/HostOptions.cs" Link="HostOptions.cs" />
+    <Compile Include="../../src/TiaMcp.Host/ToolGroups.cs" Link="ToolGroups.cs" />
   </ItemGroup>
 </Project>

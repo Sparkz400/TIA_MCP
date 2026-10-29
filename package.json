@@ -1,10 +1,10 @@
 {
   "name": "tia_mcp",
-  "version": "1.0.0",
+  "version": "0.0.0",
+  "private": true,
   "license": "Apache-2.0",
   "author": "Nico Schürmann",
   "description": "[Documentation](docs/README.md) · [Current status](docs/STATUS.md) · [Remaining TODO](docs/TODO.md)",
-  "main": "index.js",
   "directories": {
     "doc": "docs",
     "test": "tests"

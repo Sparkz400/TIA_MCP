@@ -65,8 +65,10 @@ listed as lost. Prose records per run are under [verification](#verification).
 
 ## Reference
 
+- [MCP surface](reference/mcp-surface.md): `--toolsets` groups, tool titles, output schemas, prompts and progress
 - [Target capabilities](reference/capabilities.md), [object identities and scopes](reference/object-model.md)
 - [Engineering coverage](reference/engineering-coverage.md), [native explorer extraction](reference/project-explorer-native.md)
+- [MCP tool reference](reference/tools.md): every tool with its feature, support class and Host option, generated from the catalog by `scripts/tool_reference.py`
 - [Supplied technology profiles and relationships](reference/technology-profile-review.md)
 - [Supplied safety evidence](reference/safety-evidence-review.md), [full safety/F-I/O plan](plans/expansion-plans/safety-validation-and-fio.md)
 - [HMI capability matrix](reference/hmi-capability-matrix.md), [relationship evidence](reference/hmi-relationship-evidence.md)

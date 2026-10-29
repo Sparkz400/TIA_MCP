@@ -74,6 +74,35 @@
         },
         "scopeComplete": {
           "const": true
+        },
+        "peerPlcUses": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "object",
+            "properties": {
+              "plcPath": {
+                "$ref": "#/$defs/path"
+              },
+              "typeGuid": {
+                "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+              },
+              "versionGuid": {
+                "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version/properties/typeGuid"
+              },
+              "uses": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "plcPath",
+              "typeGuid",
+              "versionGuid",
+              "uses"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
@@ -228,6 +257,27 @@
           "items": {
             "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
           }
+        },
+        "projectDefaultBefore": {
+          "oneOf": [
+            {
+              "$ref": "urn:tia-mcp:library-inspection:v1#/$defs/version"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "forceDefault": {
+          "type": "boolean"
+        },
+        "defaultEffect": {
+          "enum": [
+            "preserveDefault",
+            "promoteIfHigher",
+            "forcedDowngrade",
+            "forcedDefault"
+          ]
         }
       },
       "required": [
@@ -274,6 +324,9 @@
         },
         "runtimeCompatibilityVerified": {
           "const": false
+        },
+        "forceDefault": {
+          "type": "boolean"
         }
       },
       "required": [

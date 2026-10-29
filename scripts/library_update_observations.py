@@ -74,19 +74,34 @@ def check_update(plan, same):
     for row in selected:
         require(row['typeGuid'].lower() in pins, 'selected type')
         same(row['versionGuid'].lower(), pins[row['typeGuid'].lower()]['versionGuid'].lower(), 'selected version')
+    force = plan['payload'].get('forceDefault') is True
+    if 'forceDefault' in impact:
+        same(impact['forceDefault'], force, 'impact forceDefault')
+    for row in baseline.get('peerPlcUses', []):
+        require(path(row['plcPath']) != plc, 'peer PLC is the selected PLC')
+    indexed(baseline.get('peerPlcUses', []), lambda r: (r['plcPath'], r['versionGuid'].lower()), 'peer PLC use')
     complete = True
     for type_id, item in types.items():
         requested = item['requested']
         same(requested, pins[type_id], 'requested dependency identity')
         require(requested['state'] == 'Committed' and requested['isDefault'], 'committed source default')
+        # forceDefault applies to selected roots only; it waives "highest release" and "newer project default".
+        forced = item.get('forceDefault') is True
+        require(not forced or force and type_id in roots, 'forced type outside the forced roots')
+        if 'defaultEffect' in item:
+            before = item['projectDefaultBefore']
+            newer = before is not None and _version(before['version']) > _version(requested['version'])
+            require(forced or not newer, 'newer project default')
+            same(item['defaultEffect'], 'preserveDefault' if before is not None and before['versionGuid'].lower() == requested['versionGuid'].lower()
+                 else 'promoteIfHigher' if not forced else 'forcedDowngrade' if newer else 'forcedDefault', 'default effect')
         releases = indexed(item['libraryVersionsEligibleForCopy'], lambda r: r['versionGuid'].lower(), 'eligible release')
         version_id = requested['versionGuid'].lower()
         require(version_id in releases, 'missing requested release')
         same(releases[version_id], requested, 'requested release')
         require(all(r['typeGuid'].lower() == type_id for r in releases.values()), 'eligible release type')
         require([key for key, row in releases.items() if row['isDefault']] == [version_id], 'eligible default coverage')
-        require(all(_version(r['version']) <= _version(requested['version'])
-                    for r in releases.values() if r['state'] == 'Committed'), 'newer committed release')
+        require(forced or all(_version(r['version']) <= _version(requested['version'])
+                              for r in releases.values() if r['state'] == 'Committed'), 'newer committed release')
         local = [r for r in affected.values() if r['typeGuid'].lower() == type_id]
         same(item['affectedUseCount'], len(local), 'affected use count')
         same(item['scope'], 'allNativeUsesInSelectedPlc' if local else 'librarySynchronizationOnly_NoNewEngineeringInstance', 'type scope')
@@ -119,7 +134,8 @@ def check_update(plan, same):
         same(row['typeGuid'].lower(), uses[p]['typeGuid'].lower(), 'baseline type')
         same(row['beforeVersionGuid'].lower(), uses[p]['versionGuid'].lower(), 'baseline version')
     same(impact['nativeComparisonsComplete'], complete, 'comparison completeness')
-    same(impact['noOp'], bool(affected) and all(r['action'] == 'keepExactVersion' for r in affected.values()), 'noOp')
+    same(impact['noOp'], bool(affected) and all(r['action'] == 'keepExactVersion' for r in affected.values())
+         and all(t.get('defaultEffect') == 'preserveDefault' for t in types.values() if t.get('forceDefault')), 'noOp')
     for field in ('requiredLibraryUses', 'obRoots', 'reachablePaths', 'objectsWithoutCrossReferenceService'):
         for value in guard[field]:
             path(value)

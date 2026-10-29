@@ -7,6 +7,13 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**MCP surface — 29 October 2026:** ([reference](../reference/mcp-surface.md))
+- **`--toolsets`:** the Host (and `New-McpConfiguration.ps1`/`Start-TiaMcp.ps1 -Toolsets`) can advertise only named tool groups. The default stays all, about 290 tools.
+- **Titles, prompts, progress:** every tool now has a title. There are four workflow prompts (`safe_change`, `project_health`, `block_test`, `diagnose_fault`). Calls that carry a progress token get a start notification and a heartbeat every 10 s.
+- **Output schemas:** 33 contract-validated workflow tools advertise output schemas (AutomationML, GRAPH, OPC UA NodeSet, VCI, project-snapshot import).
+- **Version:** `serverInfo` now reports the catalog version instead of the assembly default `1.0.0.0`. The root npm metadata no longer claims `1.0.0`.
+- **Unchanged:** no catalog or matrix change; offline Host tests only, no native run.
+
 **Native re-runs and new qualifications — 29 October 2026:** ([record](../verification/native-reruns-20261029.md))
 - **Re-runs:** 20 records re-ran the remaining re-runnable lost records (HMI bridge, four library, four engineering/explorer/probe and eleven typed records); 21 uncited records, including the same day's two superseded OPC UA records, moved to [`catalog-evidence-retired-20261029-reruns.json`](catalog-evidence-retired-20261029-reruns.json). The typed resolution stale phase no longer reproduces, since the resolver compares qualified names.
 - **New native qualifications:** web user pages (D12), the OPC UA server-interface kinds, role mappings and export (D04), the Add-In companion inside TIA (X04), force-table document edits on operator-authored rows (D02), `plc_online_compare` with the runtime-user login (D09), and the 60-cell wave 9 typed runtime run.

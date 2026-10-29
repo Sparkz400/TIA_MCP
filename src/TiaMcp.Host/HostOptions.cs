@@ -11,6 +11,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public string? GitExecutable { get; init; }
     public string? UaClientIdentity { get; init; }
     public bool NoNativeWorkers { get; init; }
+    // Selected --toolsets groups; null advertises every tool.
+    public IReadOnlySet<string>? Toolsets { get; init; }
     public bool AddInHandoff { get; init; }
     // Opt-in production combined PLC library_integrate apply; off keeps every recipe plan-only.
     public bool LibraryIntegrateApply { get; init; }
@@ -54,6 +56,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var translationQualification = false;
         string? watchQualificationPoint = null;
         string? runtimeQualificationPoint = null;
+        IReadOnlySet<string>? toolsets = null;
+        var toolsetsGiven = false;
         var libraryLimits = new PackageIntakeLimits();
         for (var i = 0; i < args.Length; i++)
         {
@@ -91,6 +95,9 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                     if (addInEnrollment is not null) throw new ArgumentException("--addin-enrollment may be given once.");
                     addInEnrollment = TiaMcp.Core.AddIns.AddInEnrollment.Read(args[i]); break;
                 case "--library-limits-file": libraryLimits = ReadLibraryLimits(args[i]); break;
+                case "--toolsets":
+                    if (toolsetsGiven) throw new ArgumentException("--toolsets may be given once.");
+                    toolsets = ToolGroups.Parse(args[i]); toolsetsGiven = true; break;
                 case "--api-dir": api = Path.GetFullPath(args[i]); break;
                 case "--timeout-seconds":
                     if (!int.TryParse(args[i], out timeout) || timeout < 5 || timeout > 900)
@@ -120,7 +127,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

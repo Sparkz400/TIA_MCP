@@ -180,5 +180,5 @@ As built: `--runtime-qualification` takes one point and only beside `--component
 ## Out of scope
 
 - Physical CPUs (`runtime.physical_plc`, bench B05) and other CPU or firmware profiles.
-- Authenticated sessions with project users: V21 Openness cannot set UMAC passwords. `runtime_ua_credential_binding` and authenticated web sessions need an operator-made seed archive with one test user, and a credential stored in the Windows vault by the operator. Plan that separately if guest access is not enough.
+- Authenticated sessions with operator-chosen project users. V21 Openness can create a password user: the scratch's runtime user (`TiaMcpTest_*`) gets a generated password that stays DPAPI-protected ([`OpennessSession.ScratchRuntimeUser.cs`](../../src/TiaMcp.Openness.V21/OpennessSession.ScratchRuntimeUser.cs)), and `plc_online_compare` logged in with it on 29 October ([record](../verification/native-reruns-20261029.md#new-qualifications)). What V21 cannot set is guest access (Task 3). Any other user, or a credential the operator owns, needs an operator-made seed archive and a credential the operator stores in the Windows vault. Plan that separately if the generated runtime user is not enough.
 - Trusting a specific client certificate in the CPU (instead of automatic acceptance): `certificate_assign` writes no OPC UA attributes yet.
