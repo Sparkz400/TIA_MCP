@@ -31,7 +31,7 @@ Monitoring has no Openness route either, but an honest composition exists: read 
 - Reads the resolved symbols 1–20 times, 100–5000 ms apart, with `sim_read`. Rows per page: 1–64.
 - Reports comment rows, absolute-address-only rows, missing or ambiguous symbols and types without a typed PLCSIM read per row, and does not read them.
 - Read only: no modify, no force, no physical PLC. Stored `ModifyValue`/`ForceValue`/`ForceIntention` are returned as configuration. `programMatchVerified` is always false.
-- Code: `src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs`, tool `WatchMonitorTools` in `src/TiaMcp.Host/WatchTableTools.cs`. Offline checks: `tests/TiaMcp.WatchTables.Tests/MonitorChecks.cs`. Native runner: `scripts/qualify_watch_monitor.py`.
+- Code: `src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs`, tool `WatchMonitorTools` in `src/TiaMcp.Host/WatchTableTools.cs`. Offline checks: `tests/TiaMcp.WatchTables.Tests/MonitorChecks.cs`. Native runner: `scripts/qualify_watch_monitor.py`, passed 23/23 on a frozen build of 01bbf2b3 (`local.watch.monitor.20261030`).
 
 Not built (no caller yet): absolute-address reads (PLCSIM area reads), Web API or OPC UA monitoring of a table, `MonitorTrigger` points, scan-consistent sampling (`ReadSignals` lists or the cycle-synchronous capture mode).
 

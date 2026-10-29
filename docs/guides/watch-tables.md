@@ -51,6 +51,8 @@ Each row reports its stored fields and a `resolution`: `resolved` (with symbol, 
 
 The tool only reads. The values of one sample come from reads made one after another, not from one scan. `ModifyValue`, `ForceValue` and `ForceIntention` are stored configuration and are never applied. The instance's program is not compared with the project (`programMatchVerified: false`). Physical PLCs, the Web API and OPC UA are not used.
 
+It passed natively on an owned CPU 1511 instance on Softbus, with two Bool rows of an instance DB, in RUN and STOP (`local.watch.monitor.20261030`). There, PLCSIM's tag list spelled the symbols without quotes (`TiaMcp_EnableGate_DB.Active`).
+
 Forcing is not available: V21 Openness, the PLCSIM Advanced V8 API, the S7-1500 Web API and OPC UA have no force route, and a write is an assignment, not a force. The evidence is in the [live monitoring and forcing plan](../plans/live-monitoring-forcing-plan.md).
 
 ## Limits
