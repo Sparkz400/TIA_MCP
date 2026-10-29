@@ -39,7 +39,8 @@ Comparison inputs must be documents; comparisons cannot be chained as documents.
 ## Native CAx export and import
 
 Both routes use Siemens `CaxProvider` from the attached TIA Portal V21 project.
-They are compiled against the V21 PublicAPI only and are not natively qualified.
+Both are verified: `cax_export` by `local.cax_export.20261028`, `cax_import` with
+`RetainTiaDevice` by `local.cax_import.20261028`.
 
 `cax_export` exports the open project, or one exact device (`hardwarePath`, the
 device path from `device_inventory`), into a new `cax-<id>.aml` under the Host

@@ -43,7 +43,7 @@ A crash retains only the committed prefix and unknown uncommitted loss. A partia
 
 The profile does not establish independent PLC/program/address association, complete physical sampling, scan synchronization, native TIA behavior or physical server/CPU compatibility. Exact local hashes establish consistency, not remote authenticity beyond the selected encrypted session's certificate pin.
 
-Contract: [opcua-runtime-subscription.v1](../../contracts/opcua-runtime-subscription.v1.schema.json). Qualification: [21 October 2026](../verification/opcua-subscriptions-20261021.md). Protocol references: [OPC Foundation subscription behavior](https://reference.opcfoundation.org/specs/OPC-10000-4/5.14.1.1), [Publish](https://reference.opcfoundation.org/Core/Part4/v105/docs/5.14.5) and [Republish](https://reference.opcfoundation.org/Core/Part4/v105/docs/5.14.6). Production uses the already pinned OPC Foundation .NET Standard 1.5.378.182 package.
+Contract: [opcua-runtime-subscription.v1](../../contracts/opcua-runtime-subscription.v1.schema.json). Qualification: [21 October 2026](../verification/opcua-subscriptions-20261021.md); against a real PLCSIM OPC UA server in TCP/IP mode: [29 October 2026](../verification/runtime-real-server-20261029.md) (`local.runtime.plcsim-tcpip.20261029`). Protocol references: [OPC Foundation subscription behavior](https://reference.opcfoundation.org/specs/OPC-10000-4/5.14.1.1), [Publish](https://reference.opcfoundation.org/Core/Part4/v105/docs/5.14.5) and [Republish](https://reference.opcfoundation.org/Core/Part4/v105/docs/5.14.6). Production uses the already pinned OPC Foundation .NET Standard 1.5.378.182 package.
 
 ## Recovery evidence
 

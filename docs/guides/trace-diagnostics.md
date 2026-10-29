@@ -60,7 +60,7 @@ Every row names its source: `nativeXref`, `interface` or `simaticMlExport`. `lan
 
 `maxItems` bounds the rows, a fixed 2000-item native scan budget bounds the xref traversal, and `maxXmlBlocks` (max 50) and `maxDepth` (max 8) bound exports and nesting. `completeness` reports each truncation, every unresolved candidate and the protected or omitted exports.
 
-The tool is read-only and not natively qualified. Each non-array instance row carries a `diagnosticInstanceSelector` `{dbPath, memberPath}` in the shape `diagnostic_plan` takes as `instance`. The planner does not trust the live row: it re-resolves the selector against its saved review and refuses a mismatch. A live lookup therefore narrows the choice, but the saved review still has to contain the root DB, the FB exports and the call evidence. Array instances need an element selector the planner does not support yet.
+The tool is read-only and verified (`local.read_contracts.20261028`, `local.wave-kinds.probe.rerun.20261029`). Each non-array instance row carries a `diagnosticInstanceSelector` `{dbPath, memberPath}` in the shape `diagnostic_plan` takes as `instance`. The planner does not trust the live row: it re-resolves the selector against its saved review and refuses a mismatch. A live lookup therefore narrows the choice, but the saved review still has to contain the root DB, the FB exports and the call evidence. Array instances need an element selector the planner does not support yet.
 
 ## Resolve a justified signal manifest
 

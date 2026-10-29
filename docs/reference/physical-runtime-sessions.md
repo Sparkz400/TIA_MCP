@@ -83,9 +83,9 @@ If the remote outcome cannot be established, `runtime_web_disconnect` with expli
 
 ## Evidence and remaining work
 
-The [session baseline](../verification/physical-runtime-sessions-20261017.md) and [profile verification record](../verification/physical-runtime-profiles-20261017.md) distinguishes focused tests from frozen aggregate/package validation. The loopback harness uses actual TLS, actual DPAPI and actual MCP Host processes, including a forced restart; it does not contact a physical PLC or change OS trust.
+The [session baseline](../verification/physical-runtime-sessions-20261017.md) and [profile verification record](../verification/physical-runtime-profiles-20261017.md) distinguishes focused tests from frozen aggregate/package validation. The loopback harness uses actual TLS, actual DPAPI and actual MCP Host processes, including a forced restart; it does not contact a physical PLC or change OS trust. The web, capture and OPC UA tools also passed against the real servers of an owned PLCSIM Advanced V8 instance in TCP/IP mode, including server restart and Host loss ([real-server runs](../verification/runtime-real-server-20261029.md), `local.runtime.plcsim-tcpip.20261029`).
 
-Remaining RT-02 work includes genuine firmware-specific profile transcripts, additional device/I&M observations, unresolved alternate quantity spellings and broader transport/compatibility stress cases. RT-03 capture/reopen/export, OPC UA, physical qualification of the [CPU diagnostics](#cpu-diagnostics), program association, physical write/control gates and the rest of D16 remain open. Only bound [owned PLCSIM](#owned-plcsim-writes-and-runstop) endpoints accept writes or RUN/STOP; nothing enables forcing or download.
+Open: a physical PLC (`runtime.physical_plc`) with its firmware-specific profile transcripts, device/I&M observations, alternate quantity spellings, [CPU diagnostics](#cpu-diagnostics) and write/control gates; other CPU types and networks; broader transport/compatibility stress cases, program association and the rest of D16. Only bound [owned PLCSIM](#owned-plcsim-writes-and-runstop) endpoints accept writes or RUN/STOP; nothing enables forcing or download.
 
 ## Sources
 
@@ -95,7 +95,7 @@ Remaining RT-02 work includes genuine firmware-specific profile transcripts, add
 
 ## Bounded acquisition
 
-Use the [retained capture workflow](runtime-captures.md) to poll exact owned selections, reopen committed prefixes, export JSON/CSV and view results offline in Explorer. Capture stop sends no logout, but cancellation during session identity verification can invalidate that session and require explicit disconnect/reconnect. Full RT-03 and native qualification remain open.
+Use the [retained capture workflow](runtime-captures.md) to poll exact owned selections, reopen committed prefixes, export JSON/CSV and view results offline in Explorer. Capture stop sends no logout, but cancellation during session identity verification can invalidate that session and require explicit disconnect/reconnect. Capture against a real PLCSIM web server is verified (`local.runtime.plcsim-tcpip.20261029`); a physical PLC remains open.
 
 ## Connection lifetime
 
