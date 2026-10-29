@@ -7,10 +7,10 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
-**Station upload TLS trust — 29 October 2026:**
-- **Opt-in landed, still refused:** `plc_station_upload` takes `trustOwnedSimulationCertificate` and pins the owned CPU's first certificate per attempt, sharing the rule with credential provisioning. Every TLS challenge now records its initial selection, PLC name and verification text.
-- **Native D09 run:** `plc_online_compare` passed again. The upload's three TLS challenges each offered zero certificates ("certificate not matching"), so nothing could be pinned and the upload failed closed. Whether to trust a challenge without a certificate is a new open maintainer decision.
-- **Unchanged:** `plc_station_upload` stays unverified; no matrix cell changed.
+**Station upload qualified — 29 October 2026:**
+- **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.
+- **Native D09:** a first run refused, because the upload's three TLS challenges offered zero certificates ("certificate not matching"). After the decision, `local.online.upload.20261029` passed: one certificate-less challenge was trusted unauthenticated, then one runtime-user login, and the upload succeeded with the downloaded blocks. `plc_online_compare` passed again.
+- **Catalog 0.4.72:** 369 of 450 features verified; matrix 1,693 bound, 295 open, 49 blocked, 30 deferred.
 
 **MCP surface — 29 October 2026:** ([reference](../reference/mcp-surface.md))
 - **`--toolsets`:** the Host (and `New-McpConfiguration.ps1`/`Start-TiaMcp.ps1 -Toolsets`) can advertise only named tool groups. The default stays all, about 290 tools.

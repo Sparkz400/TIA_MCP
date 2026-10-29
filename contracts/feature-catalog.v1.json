@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.71",
+  "catalogVersion": "0.4.72",
   "targetTiaVersions": [
     21
   ],
@@ -2761,6 +2761,25 @@
       ]
     },
     {
+      "id": "local.online.upload.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b78ace00df288fc6c2646908cd8226165f04032b",
+        "passedScope": "scripts/qualify_online_routes.py --run-native --skip-snapshots from frozen commit 0f3a44e (curated at b78ace0, which only refreshes source bindings; src identical) on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb, downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN: plc_online_compare with the generated runtime user passed again with every typed refusal; then plc_station_upload in an empty owned Portal with trustOwnedSimulationCertificate true met one TlsVerificationConfiguration challenge (initial selection NonVerified, verification text 'certificate not matching', zero offered certificates), answered Trusted as unauthenticated TLS for the revalidated owned instance (allowOwnedSimulationWithoutCertificate), and exactly one ProjectUser login as the runtime user; UploadResult Success with 0 errors and 0 warnings, one uploaded S7-1500 station whose blocks equal the downloaded ones, the new project saved; then stop, power off, owned release, detach and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.upload.20261029.json"
+      ],
+      "limitations": [
+        "The upload's TLS is unauthenticated: V21 offered no certificate, so identity rests on the ticket, ownership and observer-endpoint checks, not on a certificate (maintainer decision of 29 October 2026, 'Allow, owned PLCSIM only').",
+        "Uploaded hardware/software completeness beyond the block list, compile and reopen of the uploaded project are not verified.",
+        "The DB-snapshot routes were skipped (--skip-snapshots); they are not part of this record.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
+    },
+    {
       "id": "local.library_scopes.forced.20261029",
       "status": "passed",
       "profile": {
@@ -4780,18 +4799,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Requires an empty worker-owned Portal; creates a new project under the artifact root and never opens or changes an existing project. Goes through shared mutation admission; a structured failure is a returned outcome, while a lost worker leaves the admission unknown with no reconciliation adapter.",
-          "Same owned-instance, observer-endpoint and fail-closed TLS/login rules as plc_online_compare, except the opt-in trustOwnedSimulationCertificate (explicit user authorization, default false): after the owned instance and its address are revalidated, exactly one offered certificate within its validity interval is trusted and pinned for this upload attempt, later challenges must present it, and none is newly trusted after the login was answered. Missing products are answered NoAction and make the result partial; any other upload request (passwords included) fails the upload.",
+          "Same owned-instance, observer-endpoint and fail-closed TLS/login rules as plc_online_compare, except the opt-in trustOwnedSimulationCertificate (explicit user authorization, default false): after the owned instance and its address are revalidated, exactly one offered certificate within its validity interval is trusted and pinned for this upload attempt, later challenges must present it; a challenge offering no certificate is trusted as unauthenticated TLS for that owned instance only (maintainer decision of 29 October 2026, \"Allow, owned PLCSIM only\"); more than one certificate refuses, and no trust starts after the login was answered. Missing products are answered NoAction and make the result partial; any other upload request (passwords included) fails the upload.",
           "Every upload message is kept (bounded at 10000 with explicit truncation) in the response and station-upload.json; the partial destination project is saved and retained on failure.",
           "Uploaded hardware/software completeness, compile and reopen of the new project are not verified.",
           "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does.",
-          "Native observation (29 October 2026, frozen ca2f8f8, trustOwnedSimulationCertificate true): plc_online_compare passed again; the upload in an empty Portal met three TlsVerificationConfiguration challenges, each with initial selection NonVerified, verification text 'certificate not matching' and zero offered certificates. With nothing to pin the opt-in refused (certificateCountNotOne) and the upload failed closed with SimulationOnlineAuthenticationRequired. Trusting a challenge that offers no certificate needs a new maintainer decision."
+          "Native (29 October 2026, local.online.upload.20261029): in an empty owned Portal the one TlsVerificationConfiguration challenge offered no certificate ('certificate not matching') and was trusted as unauthenticated TLS for the revalidated owned instance; after one runtime-user login the upload succeeded with no errors or warnings and the uploaded blocks equal the downloaded ones. An earlier run the same day without certificate-less trust refused at that challenge."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.upload.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
