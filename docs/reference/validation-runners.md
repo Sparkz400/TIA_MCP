@@ -1,8 +1,7 @@
 # Reproducible validation runners
 
 Install Python dependencies with `python -m pip install -r scripts/requirements-test.txt`.
-Use the .NET SDK in `global.json`, the .NET 8 runtime for HMI admission checks,
-Git on PATH, and Node/npm for explorer checks. Each runner preserves prior output
+Use the .NET SDK in `global.json`, Git on PATH, and Node/npm for explorer checks. Each runner preserves prior output
 and requires a fresh evidence directory. A successful offline run does not admit
 a native mutation or certify runtime behavior.
 

@@ -128,9 +128,8 @@ Already available in this setup:
 Opening TIA projects, exporting fresh native documents, compiling PLC programs,
 applying native changes and running PLC simulations still require their Siemens
 products. The full solution build, `--diagnose` and the discovery smoke check
-below belong to that engineering environment. See the
-[complete implementation queue without Siemens](docs/history/offline-execution-20261016.md)
-for what is delivered, what remains implementable here and what needs native testing.
+below belong to that engineering environment. See the [TODO](docs/TODO.md) for
+the remaining work and [current status](docs/STATUS.md) for what is qualified.
 
 ## Quick start
 
@@ -192,9 +191,10 @@ prepare → preview → checkpoint → apply → verify workflow, and
 Support varies by target and feature. Use `feature_catalog` for implementation
 scope and `target_capabilities` for the selected target. This is an evolving
 prototype; offline tests, native compilation and runtime qualification are
-separate claims. Consult [current status](docs/STATUS.md),
-[engineering coverage](docs/reference/engineering-coverage.md) and the
-[runtime qualification ledger](docs/history/runtime-proof-todo.md).
+separate claims. Consult [current status](docs/STATUS.md), the
+[tool reference](docs/reference/tools.md),
+[engineering coverage](docs/reference/engineering-coverage.md), the
+[release matrix](docs/plans/release-matrix.v1.json) and the [TODO](docs/TODO.md).
 
 Changes can partially fail and require recovery from their checkpoint; they are
 not transactions across Siemens calls. The public simulation workflow operates
