@@ -270,7 +270,7 @@ def verify(root):
             need(records[0] == outer['operation'] and operation['id'] == reviewed['operationId'], 'Journal/operation mismatch')
             approved = load(root/'independent-review.json')
             need(approved == dict(reviewed, approved=True) and operation['digest'] == reviewed['reviewedPlanSha256']
-                 == (root/'approved-digest').read_text().strip(), 'Independent approval differs')
+                 == (root/'approved-digest').read_text(encoding="utf-8").strip(), 'Independent approval differs')
             need(sum(r['state'] == 'dispatchIntent' and (i == 0 or records[i-1]['state'] != 'dispatchIntent') for i, r in enumerate(records)) == 1, 'Exactly one dispatch required')
             final = records[-1]
             need(final['state'] == 'reconciled' and len(final['checkpoints']) == len(final['recoveryDestinations'])

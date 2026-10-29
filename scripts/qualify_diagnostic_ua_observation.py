@@ -121,7 +121,7 @@ def main():
         if code:check(value["error"]["code"]==code,name+" refuses "+code)
         return value
     try:
-        source=json.loads((prior/"result.json").read_text());check(source["status"]=="passed","Prior producer qualification passed")
+        source=json.loads((prior/"result.json").read_text(encoding="utf-8"));check(source["status"]=="passed","Prior producer qualification passed")
         snapshots={}
         for entry in source["responses"]:
             if entry["name"] not in ("runtime_ua_capture_status","runtime_ua_subscription_status"):continue

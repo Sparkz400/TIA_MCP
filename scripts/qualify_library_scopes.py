@@ -17,7 +17,7 @@ FB, UDT = "TiaMcpLibraryGate", "TiaMcpLibraryState"
 def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
-    change = (ROOT / "fixtures/libraries/release-changes/TiaMcpLibraryGate.implementation.scl").read_text()
+    change = (ROOT / "fixtures/libraries/release-changes/TiaMcpLibraryGate.implementation.scl").read_text(encoding="utf-8")
 
     # Authoring: generation 1 (FB 1.0.0) and generation 2 (FB 1.1.0) archives.
     plc = h.owned_scratch("authoring")
@@ -55,10 +55,10 @@ def body(h):
         for version in (udt, fb):
             h.apply("library_instantiate", h.selected(source, [version], target={"plcPath": target}))
     h.tool("library_close", {"libraryId": source})
-    h.apply("source_upsert", {"scopePath": first_plc, "language": "SCL", "source": (documents / "ConsumerReferences.scl").read_text(),
+    h.apply("source_upsert", {"scopePath": first_plc, "language": "SCL", "source": (documents / "ConsumerReferences.scl").read_text(encoding="utf-8"),
             "expectedBlockNames": [FB + "_DB", UDT + "_DB", "Main"]})
     h.apply("source_upsert", {"scopePath": second_plc, "language": "SCL",
-            "source": (ROOT / "fixtures/libraries/scopes/SecondPlcReferences.scl").read_text(), "expectedBlockNames": [FB + "_DB", UDT + "_DB", "TiaMcpScopeCycle"]})
+            "source": (ROOT / "fixtures/libraries/scopes/SecondPlcReferences.scl").read_text(encoding="utf-8"), "expectedBlockNames": [FB + "_DB", UDT + "_DB", "TiaMcpScopeCycle"]})
     consumer = h.project_library()
 
     def uses_by_plc(version, expected):

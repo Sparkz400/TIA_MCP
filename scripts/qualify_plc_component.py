@@ -473,7 +473,7 @@ def review_step(value, selection, manifest, read_artifact, expected_instance_num
 class ComponentRun:
     def __init__(self, args):
         require(args.run_native, "Explicit --run-native is required.")
-        self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text())
+        self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))
         if getattr(args, "caller_mode", None) == "existing":
             # The same caller source exists before import; the component call is inserted after its network.
             self.manifest["callerMode"] = "existing"

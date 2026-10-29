@@ -43,7 +43,7 @@ def body(h):
     # Authoring: one plain protected FB (master copy route) and one protected type test instance (type route).
     plc = h.owned_scratch("authoring")
     library = h.project_library()
-    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": (FIXTURES / (PLAIN + ".scl")).read_text(), "expectedBlockNames": [PLAIN]})
+    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": (FIXTURES / (PLAIN + ".scl")).read_text(encoding="utf-8"), "expectedBlockNames": [PLAIN]})
     h.seed("protect plain FB", "protect", PLAIN)
     h.stage("plain FB is protected", lambda: protected(plc, PLAIN))
     h.stage("block_read refuses the protected FB", lambda: refused_read(plc, PLAIN))

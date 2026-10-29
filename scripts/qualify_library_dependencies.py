@@ -55,7 +55,7 @@ def body(h):
     generation_one = h.archive(global_library)
 
     # Parent 1.1.0 no longer uses Child: a reference removed by an update.
-    in_work = h.edit_source(library, plc, released[PARENT], PARENT, (FIXTURES / "changes" / (PARENT + ".scl")).read_text())
+    in_work = h.edit_source(library, plc, released[PARENT], PARENT, (FIXTURES / "changes" / (PARENT + ".scl")).read_text(encoding="utf-8"))
     parent_two = h.release(library, in_work, "1.1.0")
     h.stage("closure of Parent 1.1.0", lambda: dependencies(library, parent_two, "1.1.0"))
     h.apply("library_set_default", h.selected(library, [parent_two]))
@@ -85,7 +85,7 @@ def body(h):
     consumer_library = h.project_library()
     for name, version in released.items():
         h.stage("consumer exact link " + name, lambda v=version: h.verify_use(consumer_library, v, 1))
-    h.apply("source_upsert", {"scopePath": consumer, "language": "SCL", "source": (documents / "ConsumerReferences.scl").read_text(),
+    h.apply("source_upsert", {"scopePath": consumer, "language": "SCL", "source": (documents / "ConsumerReferences.scl").read_text(encoding="utf-8"),
             "expectedBlockNames": [PARENT + "_DB", PARENT + "_DB2", "Main"]})
     h.stage("two instance DBs keep one exact Parent link", lambda: h.verify_use(consumer_library, released[PARENT], 1))
     no_op = h.apply("library_update_project", h.selected(source, [released[PARENT]], updateScope="entireSelectedPlc", target=target))
@@ -118,7 +118,7 @@ def body(h):
     source = h.open_archive(generation_one)
     h.refuse("refuse same-name different-GUID dependency", "library_instantiate",
              h.selected(source, [released[PARENT]], target={"plcPath": other}), "LibraryConflict", INNER)
-    h.apply("type_source_upsert", {"scopePath": other, "source": (collision / (OUTER + ".udt")).read_text(), "expectedTypeNames": [OUTER]})
+    h.apply("type_source_upsert", {"scopePath": other, "source": (collision / (OUTER + ".udt")).read_text(encoding="utf-8"), "expectedTypeNames": [OUTER]})
     h.refuse("refuse same-name unlinked dependency", "library_instantiate",
              h.selected(source, [released[PARENT]], target={"plcPath": other}), "LibraryConflict", OUTER)
     h.tool("library_close", {"libraryId": source})

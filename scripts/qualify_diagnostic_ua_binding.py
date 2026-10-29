@@ -96,7 +96,7 @@ def main():
         threading.Thread(target=read_lines, daemon=True).start()
         threading.Thread(target=read_errors, daemon=True).start()
         check(json.loads(lines.get(timeout=30)).get("ready"), "Owned fixture server ready")
-        ready = json.loads((out / "server/ready.json").read_text())
+        ready = json.loads((out / "server/ready.json").read_text(encoding="utf-8"))
         client = start_host()
         tools = {t["name"]: t for t in client.request("tools/list")["tools"]}
         check("diagnostic_ua_binding_plan" in tools, "New offline tool is registered")

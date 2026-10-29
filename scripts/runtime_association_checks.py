@@ -11,7 +11,7 @@ def run_association_checks(client, attempt, state, output, check):
     fixture=Path(__file__).resolve().parents[1]/'fixtures/physical-runtime'
     raw=(fixture/'association-review.json').read_bytes();review_id=hashlib.sha256(raw).hexdigest()
     review_path=output/'store/project-reviews'/(review_id+'.json');review_path.parent.mkdir(parents=True,exist_ok=True);review_path.write_bytes(raw)
-    request=json.loads((fixture/'association-request.json').read_text());check(request['reviewId']==review_id,'Diagnostic fixture hash matches exact saved review')
+    request=json.loads((fixture/'association-request.json').read_text(encoding="utf-8"));check(request['reviewId']==review_id,'Diagnostic fixture hash matches exact saved review')
     request['hypotheses'].append(dict(id='captured',statement='Captured sequential pattern <script> remains unqualified.',prediction=dict(
         when=[dict(signalId='enable',op='eq',value=True)],expect=[dict(signalId='step',op='eq',value=65535,unit='count')])))
     case=client.tool('diagnostic_plan',dict(request=request));case_id=case['id']

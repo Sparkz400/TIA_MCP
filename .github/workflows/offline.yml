@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Scripts read UTF-8 JSON and text; never fall back to the runner's ANSI code page.
+  PYTHONUTF8: '1'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
