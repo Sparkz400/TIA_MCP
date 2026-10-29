@@ -15,6 +15,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private static readonly string[] OpcUaPermissionNames = { "Browse", "Read", "Write", "Call", "ReceiveEvents", "ReadRolePermissions" };
+        private const string OpcUaStandardNamespace = "http://opcfoundation.org/UA/";
         // Exact payload fields per prepared OPC UA kind; anything else (passwords, certificates, users) is refused.
         private static readonly Dictionary<string, string[]> OpcUaPayloadFields = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
@@ -165,7 +166,11 @@ namespace TiaMcp.Openness.V21
                 }
                 else
                 {
-                    var role = OpcUaRoles(group).Create(name, payload.Value<string>("definedInNamespace"));
+                    // V21 refuses Create for an OPC UA standard role (Operator, Observer, ...); those are added by name.
+                    string definedIn = payload.Value<string>("definedInNamespace");
+                    RoleMapping role;
+                    if (definedIn == OpcUaStandardNamespace) { OpcUaRoles(group).AddStandardOpcUaRole(name); role = OpcUaRole(group, name) ?? throw new BridgeException("MutationVerificationFailed", "The added standard OPC UA role mapping was not found."); }
+                    else role = OpcUaRoles(group).Create(name, definedIn);
                     if (payload["projectRole"] != null) role.SetProjectRole(payload.Value<string>("projectRole"));
                     var wanted = OpcUaRequestedPermissions(payload);
                     foreach (var row in wanted)
