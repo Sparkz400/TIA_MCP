@@ -18,27 +18,28 @@ def eligible_preview():
 
 class Previews(unittest.TestCase):
     def test_eligible_preview_requires_exact_combined_effect(self):
-        self.assertTrue(subject.require_combined_preview(eligible_preview(), True, eligible=True)["eligible"])
+        self.assertTrue(subject.require_combined_preview(eligible_preview(), eligible=True)["eligible"])
         preview = eligible_preview(); preview["effects"][1]["steps"] = 1
         with self.assertRaisesRegex(RuntimeError, "two-step"):
-            subject.require_combined_preview(preview, True, eligible=True)
+            subject.require_combined_preview(preview, eligible=True)
 
     def test_refused_preview_names_its_reason(self):
         preview = {"applySupported": False, "combinedApply": {"enabled": True, "eligible": False, "refusal": "OB insertion is refused; add it."}}
-        subject.require_combined_preview(preview, True, refusal="OB insertion is refused")
+        subject.require_combined_preview(preview, refusal="OB insertion is refused")
         with self.assertRaisesRegex(RuntimeError, "Unexpected combined-apply refusal"):
-            subject.require_combined_preview(preview, True, refusal="Only a new or existing FBD FC caller")
+            subject.require_combined_preview(preview, refusal=subject.LAD_REFUSAL)
         with self.assertRaisesRegex(RuntimeError, "eligibility differs"):
-            subject.require_combined_preview(preview, True, eligible=True)
+            subject.require_combined_preview(preview, eligible=True)
 
-    def test_flag_off_preview_and_capabilities_stay_plan_only(self):
-        self.assertIsNone(subject.require_combined_preview({"applySupported": False}, False))
-        with self.assertRaisesRegex(RuntimeError, "plan-only"):
-            subject.require_combined_preview(eligible_preview(), False)
-        subject.require_capabilities({"plcIntegration": {"applySupported": False}}, False)
-        subject.require_capabilities({"plcIntegration": {"applySupported": True, "combinedApply": "Enabled"}}, True)
-        with self.assertRaisesRegex(RuntimeError, "Host flag"):
-            subject.require_capabilities({"plcIntegration": {"applySupported": True, "combinedApply": "Enabled"}}, False)
+    def test_default_host_must_report_combined_apply(self):
+        # Combined apply is the default: the old plan-only preview and capabilities are now failures.
+        for expectation in ({"eligible": True}, {"refusal": subject.LAD_REFUSAL}):
+            with self.subTest(expectation=expectation), self.assertRaisesRegex(RuntimeError, "eligibility differs"):
+                subject.require_combined_preview({"applySupported": False}, **expectation)
+        subject.require_capabilities({"plcIntegration": {"applySupported": True, "combinedApply": "Enabled"}})
+        for plan_only in ({"applySupported": False}, {"applySupported": True}, {}):
+            with self.subTest(plan_only=plan_only), self.assertRaisesRegex(RuntimeError, "default combined apply"):
+                subject.require_capabilities({"plcIntegration": plan_only})
 
     def test_refusal_requires_the_exact_error_code(self):
         error = NativeToolError("change_apply", {"error": {"code": "PlcIntegrationNotQualified", "message": "plan only"}})

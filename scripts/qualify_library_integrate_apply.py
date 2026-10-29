@@ -1,7 +1,8 @@
-"""Native qualification of the Host-gated production library_integrate combined apply.
+"""Native qualification of the production library_integrate combined apply, on by default since 29 October 2026.
 
-Starts the frozen Host with --enable-library-integrate-apply in owned TIA sessions and
-owned scratch projects only. Reuses the component qualification fixture (FB->UDT global
+Starts the frozen Host in owned TIA sessions and owned scratch projects only: with the former
+opt-in flag --enable-library-integrate-apply (still accepted, now a no-op) for the installs and
+refusals, and without it to prove the default. Reuses the component qualification fixture (FB->UDT global
 library, peer and existing FBD FC callers, mapped tags) and its independent oracles.
 Each eligible plan is applied once; a failed or uncertain apply is never replayed or
 restored automatically. A failed step is retained as failed, never converted to success.
@@ -27,6 +28,7 @@ from typed_graphical_transport import artifact_bytes
 
 FLAG = "--enable-library-integrate-apply"
 REFUSED = "PlcIntegrationNotQualified"
+LAD_REFUSAL = "Only a new or existing FBD FC caller is verified"
 MODES = ("createStandaloneFc", "existing")
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "library_capabilities")
 OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
@@ -35,7 +37,7 @@ HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compil
 
 
 def host_client(enabled):
-    """Client factory for the frozen Host, with or without the production combined-apply flag."""
+    """Client factory for the frozen Host, with or without the former opt-in flag."""
     return lambda host, timeout, arguments: Client(host, timeout, [*arguments, *([FLAG] if enabled else [])])
 
 
@@ -50,19 +52,16 @@ def german_only_scratch(apply):
     require(state == {"active": ["de-DE"], "reference": "de-DE", "editing": "de-DE"}, "Scratch languages are not exactly de-DE: " + str(state))
 
 
-def require_capabilities(capabilities, enabled):
+def require_capabilities(capabilities):
+    """Every Host, with or without the former flag, reports combined apply."""
     plc = capabilities.get("plcIntegration") or {}
-    require(plc.get("applySupported") is enabled and ("combinedApply" in plc) is enabled,
-            "library_capabilities plcIntegration differs from the Host flag state.")
+    require(plc.get("applySupported") is True and "combinedApply" in plc, "library_capabilities does not report the default combined apply.")
     return plc
 
 
-def require_combined_preview(preview, enabled, eligible=False, refusal=None):
-    """Only an enabled Host adds combinedApply, so the reviewed previewHash states whether change_apply installs."""
+def require_combined_preview(preview, eligible=False, refusal=None):
+    """Every PLC recipe preview carries combinedApply, so the reviewed previewHash states whether change_apply installs."""
     block = preview.get("combinedApply")
-    if not enabled:
-        require(block is None and preview.get("applySupported") is False, "A Host without the flag must keep the plan-only preview.")
-        return None
     require(isinstance(block, dict) and block.get("enabled") is True and block.get("eligible") is eligible
             and preview.get("applySupported") is eligible, "combinedApply eligibility differs: " + str(block))
     if eligible:
@@ -148,7 +147,7 @@ class IntegrateApplyRun(ComponentRun):
         self.report = {"schemaVersion": 1, "qualification": "library_integrate_combined_apply", "status": "running",
             "startedAtUtc": utc_now(), "hostFlag": FLAG, "fixture": copy.deepcopy(self.manifest), "workspace": str(self.output),
             "steps": [], "cases": {}, "events": [], "fixtureChanges": [],
-            "combinedApplyVerified": False, "refusalsVerified": False, "noFlagRefusalVerified": False,
+            "combinedApplyVerified": False, "refusalsVerified": False, "defaultHostVerified": False,
             "runtimeVerified": False, "automaticReplayAllowed": False,
             "harnessFiles": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                              for path in (Path(__file__), *(Path(__file__).with_name(name) for name in HARNESS))]}
@@ -208,12 +207,12 @@ class IntegrateApplyRun(ComponentRun):
         existing, out = mode == "existing", self.output / mode
         case = self.case(mode, True)
         scratch, opened, plc = self.stage_consumer(archive, released)
-        case["capabilities"] = require_capabilities(self.call("library_capabilities"), True)
+        case["capabilities"] = require_capabilities(self.call("library_capabilities"))
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
         case["plan"] = {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}
-        case["combinedApply"] = require_combined_preview(prepared["preview"], True, eligible=True)
+        case["combinedApply"] = require_combined_preview(prepared["preview"], eligible=True)
         request = step_request(prepared)
         self.retain("combined_apply_dispatching", request)
         try:
@@ -294,26 +293,29 @@ class IntegrateApplyRun(ComponentRun):
         for name, caller, caller_recipe, reason in (
                 ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused"),
                 ("ladCaller", plc + "/blocks/" + self.manifest["caller"], {"mode": "createStandaloneFc", "name": self.manifest["caller"],
-                    "language": "LAD", "numberPolicy": "firstAvailable"}, "Only a new or existing FBD FC caller is verified")):
+                    "language": "LAD", "numberPolicy": "firstAvailable"}, LAD_REFUSAL)):
             prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-            case[name] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], True, refusal=reason)}
+            case[name] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=reason)}
             case[name]["refusal"] = self.refused_apply(prepared); self.persist()
         assert_snapshot(baseline, snapshot(self.call, out / "after"))
         case["projectUnchanged"] = True; self.persist()
         self.session.close()
 
-    def no_flag(self, archive, released):
-        """Host without the flag: the otherwise eligible standalone plan stays plan-only and apply changes nothing."""
+    def default_host(self, archive, released):
+        """Host without the former flag: combined apply is the default, so the standalone FBD plan previews eligible (the
+        install steps already applied it; it is not applied again) and an unverified LAD FC plan is refused with no change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         self.session.client_factory = host_client(False)
-        case, out = self.case("noFlag", False), self.output / "noFlag"
+        case, out = self.case("defaultHost", False), self.output / "defaultHost"
         scratch, opened, plc = self.stage_consumer(archive, released)
-        case["capabilities"] = require_capabilities(self.call("library_capabilities"), False)
+        case["capabilities"] = require_capabilities(self.call("library_capabilities"))
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, _ = self.select_caller(baseline, plc)
         prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-        require_combined_preview(prepared["preview"], False)
-        case["refusal"] = self.refused_apply(prepared)
+        case["combinedApply"] = require_combined_preview(prepared["preview"], eligible=True)
+        prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, dict(caller_recipe, language="LAD"))
+        case["ladCaller"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=LAD_REFUSAL),
+                             "refusal": self.refused_apply(prepared)}
         assert_snapshot(baseline, snapshot(self.call, out / "after"))
         case["projectUnchanged"] = True; self.persist()
         self.session.close()
@@ -329,8 +331,8 @@ class IntegrateApplyRun(ComponentRun):
             self.report["combinedApplyVerified"] = True
             self.step("refusals", lambda: self.refusals(archive, released))
             self.report["refusalsVerified"] = True
-            self.step("noFlag", lambda: self.no_flag(archive, released))
-            self.report["noFlagRefusalVerified"] = True
+            self.step("defaultHost", lambda: self.default_host(archive, released))
+            self.report["defaultHostVerified"] = True
             self.report["status"] = "passed"
         except Exception as error:
             primary = error
