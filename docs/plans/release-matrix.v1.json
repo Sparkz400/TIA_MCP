@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.70",
-    "catalogSha256": "583dbdf1bae3207b09d5fa6dc36501e1373405c24b7ac00617a34dc4f94fb4af",
+    "catalogSha256": "d84bc5882f7c1871ab02fd7030eed48edeb199f6ba03cf76fff9f66c75934c1c",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "6843b503a8181e2a275fb103c72817b9d05336d5a217a8c4573767df74ba853d"
   },
@@ -9718,7 +9718,8 @@
         "local.typed.runtime.reruns.rerun.20261029",
         "local.typed.wave9.engineering.rerun.20261029",
         "local.typed.native-boundaries.rerun.20261029",
-        "local.typed.resolution.rerun.20261029"
+        "local.typed.resolution.rerun.20261029",
+        "local.typed.wave9.runtime.20261029"
       ],
       "cells": [
         {
@@ -24764,6 +24765,21 @@
         {
           "path": "evidence/local.typed.wave9.engineering.rerun.20261029.json",
           "sha256": "86417280fb127c7f842f0f0aa405e01ec816d31a4f0b195fa83a2f4080ab76b0"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.typed.wave9.runtime.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+      "retained": [
+        {
+          "path": "evidence/local.typed.wave9.runtime.20261029.json",
+          "sha256": "bf7d1d6fb790cd0b07310c0e94ab3dd9e375ce413d6c7e340b2a328581fe30fa"
         }
       ],
       "notRetained": []

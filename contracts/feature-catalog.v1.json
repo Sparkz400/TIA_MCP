@@ -2720,6 +2720,25 @@
         "Production Hosts still refuse force-table edits with UnsupportedProfile; only the qualification harness (--component-qualification --watch-qualification) dispatches them.",
         "Offline engineering only: nothing is forced, monitored or written online; every F checkbox stayed unticked."
       ]
+    },
+    {
+      "id": "local.typed.wave9.runtime.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate on build 9774d1a (frozen artifacts/f in the project), one fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1) and one owned PLCSIM Advanced V8 instance per case: the 60 wave 9 cells that have a runtime harness (SUB/DIV, compare, MOVE/ADD/MUL Int/DInt/Real, R_TRIG/F_TRIG multi-instance and TONR, LAD and FBD), each passing all five gates: engineering, preservation, persistence, recovery and runtime behavior. In 5 of them TIA added System/~PEData.1 when the project opened, which the semantic preservation rule excuses since b30c1f9."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9.runtime.20261029.json"
+      ],
+      "limitations": [
+        "Standard route only; software-unit and namespace routes at runtime are not covered.",
+        "Engineering-only wave 9 cases and the existing-global R_TRIG/F_TRIG cases have no runtime harness (TIA deletes an unreferenced edge instance DB at compile) and are not run here.",
+        "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
+        "Each case trusts its owned, empty PLCSIM CPU's certificate on first use (--trust-owned-empty-cpu-certificate) to provision the runtime credential."
+      ]
     }
   ],
   "features": [
@@ -11693,7 +11712,8 @@
           "local.typed.runtime.reruns.rerun.20261029",
           "local.typed.wave9.engineering.rerun.20261029",
           "local.typed.native-boundaries.rerun.20261029",
-          "local.typed.resolution.rerun.20261029"
+          "local.typed.resolution.rerun.20261029",
+          "local.typed.wave9.runtime.20261029"
         ]
       },
       "availability": {
