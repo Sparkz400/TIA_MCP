@@ -40,13 +40,17 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `sim_select` | `instanceId`, `expectedName`. Explicitly select an existing local simulated instance. Such an instance is not adapter-owned and cannot be unregistered by this worker. |
 | `simulation_download` | Engineering operation: `downloadTicket`, optional `projectName`, exact `plcPath`, `credentialMetadataPath` and `credentialLineageJournalPaths` array. The singular `credentialLineageJournalPath` remains available for one hop; do not supply both forms. Compiles the selected in-memory PLC and generates a fresh virtual memory card. |
 | `simulation_provision_scratch_credential` | Opt-in engineering operation: the exact `downloadTicket`, required generated `credentialMetadataPath`, optional `projectName`, `plcPath` and `credentialLineageJournalPaths`. Validates the original card and owned scratch target (Softbus, or the TCP/IP route below for a `TCPIP` ticket), starts the same CPU empty, then attempts `OnlineProvider.SetPlcMasterSecret` with the generated DPAPI credential. Optional `trustOwnedEmptyCpuCertificate` defaults false. One attempt per owned instance; success requires OFF with protection enabled and the original card restored unchanged. Does not establish RUN or live values. |
-| `sim_state` | `instanceId`, `action` (`powerOn`, `powerOff`, `run`, `stop`), optional bounded `timeoutMs`. No automatic RUN following download. |
+| `sim_state` | `instanceId`, `action` (`powerOn`, `powerOff`, `run`, `stop`, `memoryReset`), optional bounded `timeoutMs`. `memoryReset` (owned instances only) restarts the virtual controller with its loaded program and must end in STOP or RUN. No automatic RUN following download. |
+| `change.simulation_download_online` | Engineering change kind through `change_prepare`/`change_apply`: download a changed program to the same owned, powered instance. See [Changed programs on an existing owned instance](#changed-programs-on-an-existing-owned-instance). |
 | `plc_online_compare` | Engineering operation: `downloadTicket`, optional `projectName`, `plcPath`, `maxItems` and `expectedFingerprintSha256`. Goes online to the already powered owned instance and returns a bounded `PlcSoftware.CompareToOnline` tree plus fingerprint items. See [Online compare and station upload](#online-compare-and-station-upload). |
 | `plc_station_upload` | Engineering operation: `downloadTicket`, optional `runtimeCredentialMetadataPath`, `trustOwnedSimulationCertificate`. Uploads the owned instance's station into a new worker-owned project and returns its path. Shared mutation admission. See [Online compare and station upload](#online-compare-and-station-upload). |
 | `sim_tags` | `instanceId`, optional `filter`, `maxItems` and `refresh`. Reads bounded symbolic tag metadata. |
 | `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation and completion time and quality, with error text and code for a bad read. |
 | `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Validates all values before writing and reports completed writes if a later write fails. |
-| `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. |
+| `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs` and `virtualTime`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. `virtualTime: true` steps virtual time; see [Virtual time, events and storage](#virtual-time-events-and-storage). |
+| `sim_time` | `instanceId`, optional `scaleFactor` and `systemTimeUtc`. Reads, or on an owned instance sets and reads back, the virtual clock. |
+| `sim_event` | `instanceId`, optional `event`. Lists the configured hardware-interrupt events and injects one interrupt or fault into an owned instance in RUN. |
+| `sim_storage` | `instanceId`, `artifactDirectory`, `action` (`archive`, `retrieve`), and for retrieve `archivePath` and `expectedSha256`. Archives or restores an owned, powered-off instance's virtual memory card. |
 | `sim_release` | `instanceId`, optional `deleteOwned`. Releases the worker's interface. Explicit `deleteOwned:true` powers off and unregisters only an instance created by this worker. Storage files are retained. |
 
 Runtime action calls require an instance created or explicitly selected by the current worker. The worker verifies that the recorded ID/name still exists; it does not substitute another instance if an ID is reused. Power-on, RUN, writes, scenarios and `sim_identity` require the network mode that matches the interface recorded at creation: Softbus instances need existing local `Softbus` mode and a Softbus interface (otherwise `SoftbusRequired`); `TCPIP` instances need existing TCP/IP single-adapter mode and a TCP/IP interface (otherwise `TcpIpModeRequired`, also when the operator switches back to Softbus mid-window). PLCSIM V8 derives an instance's interface from the machine-wide mode, so the worker only compares it. Selections without a creation receipt stay Softbus-only. This adapter never changes shared adapter bindings/network mode or IP addresses and never uses remote instance discovery or an online physical-PLC download API. Engineering-side provisioning (`simulation_download`, credential provisioning) still requires Softbus.
@@ -61,7 +65,7 @@ The supported sequence is create → download → power-on → inspect tags → 
 
 For a protected generated scratch program, optional credential provisioning runs between download and normal power-on. It is a separate operation with a persistent `.provision.claim`, exact ownership and original-card checks, validated credential lineage, and a singleton local Softbus target. It does not accept raw passwords or arbitrary target addresses. The PLCSIM engineering interface becomes visible only while the virtual CPU is powered; route discovery therefore occurs during bounded recovery startup. Runtime-created `retain.pms` is recorded separately and is never included retroactively in the original generated-card revision. A failed attempt requires a fresh owned instance. Attempt fifteen qualified provisioning and the protected baseline on this machine; attempt seventeen reconfirmed it on the retained binary lineage below.
 
-A `TCPIP` ticket (from `sim_create` with `communicationInterface: "TCPIP"`, while PLCSIM is already in TCP/IP single-adapter mode) is admitted by memory-card generation and provisioning on the same terms. Provisioning then goes online only through the sole PN/IE PG/PC interface whose name contains *PLCSIM Virtual Ethernet Adapter*, never another network card. TIA's TCP/IP discovery can keep showing the empty CPU by its MAC address instead of an IP. The owned empty CPU therefore qualifies as the one new `S7-1500 (PLCSIM)` device that appeared after its startup; it gets the documented bootstrap address 192.168.0.1/24, and the instance must read that address back. If discovery never shows the address, the target is decided by the MAC it showed before the bootstrap (`runtimeTargetIdentity.basis: tcpipMacIdentity`) and rechecked by MAC before and after going online; the device must also present an S7-1500 TLS certificate before the credential is opened. Only the operator sets the network mode and the adapter's own address. `plc_online_compare`, `plc_station_upload` and the discovery baseline stay Softbus-only. The real-server runs of 29 October used this route (`local.runtime.plcsim-tcpip.20261029`).
+A `TCPIP` ticket (from `sim_create` with `communicationInterface: "TCPIP"`, while PLCSIM is already in TCP/IP single-adapter mode) is admitted by memory-card generation and provisioning on the same terms. Provisioning then goes online only through the sole PN/IE PG/PC interface whose name contains *PLCSIM Virtual Ethernet Adapter*, never another network card. TIA's TCP/IP discovery can keep showing the empty CPU by its MAC address instead of an IP. The owned empty CPU therefore qualifies as the one new `S7-1500 (PLCSIM)` device that appeared after its startup; it gets the documented bootstrap address 192.168.0.1/24, and the instance must read that address back. If discovery never shows the address, the target is decided by the MAC it showed before the bootstrap (`runtimeTargetIdentity.basis: tcpipMacIdentity`) and rechecked by MAC before and after going online; the device must also present an S7-1500 TLS certificate before the credential is opened. Only the operator sets the network mode and the adapter's own address. `plc_online_compare`, `plc_station_upload`, `simulation_download_online` and the discovery baseline stay Softbus-only. The real-server runs of 29 October used this route (`local.runtime.plcsim-tcpip.20261029`).
 
 TLS verification rejects trust by default. Explicit `trustOwnedEmptyCpuCertificate: true` authorizes first-use trust only during this owned empty CPU's provisioning attempt. The worker revalidates ownership and the local route, requires one untruncated certificate within its UTC validity dates, pins its SHA-256 within that attempt and rejects a later change. This is caller-authorized first-use trust; `certificateIdentityIndependentlyVerified` remains false. Matching certificate subjects or validity dates do not authenticate identity. The Python runners require matching authorization, target, date and pin evidence before continuing, then independently recheck the restored original card. The user explicitly authorized this scoped first-use trust, and attempt fifteen verified the route with the protected baseline. This does not qualify arbitrary targets or another machine.
 
@@ -76,6 +80,77 @@ TIA can request a `PlcMasterSecretPassword` callback when generating the first v
 New scratch CPUs on recent firmware also require a runtime user with the CPU's Full access function right. The scratch-only setup creates a unique password-authenticated `TiaMcpTest_*` user and a unique role assigned to that newly created device. It generates the password locally and stores it only in a CurrentUser DPAPI file with separate nonsecret metadata. It does not enable anonymous full access, disable existing protection, edit an existing user or connect to a PLC. This helper is restricted to the current worker-owned scratch project. It checks the exposed native rights and declines unknown/ambiguous matches. The implementation follows Siemens' [project-user API](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-data-of-the-user-management/functions-for-accessing-user-roles-and-function-rights/project-users) and [device-function-right API](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-data-of-the-user-management/functions-for-accessing-user-roles-and-function-rights/device-function-rights).
 
 `simulation-download.json` contains compile/download diagnostics, target identity, relative card-file hashes and a `programRevision` derived from that generated card manifest. This is evidence of what was generated, not proof of the program currently executing. It is not a source-control revision or a safety signature. Simulator test reports include this evidence when available and explicitly mark runtime readback verification as false. Later external card/program changes are not detected by the retained manifest.
+
+## Changed programs on an existing owned instance
+
+`simulation_download_online` replaces the fresh-instance loop for an edit → compile → test cycle. The
+first program still arrives through `simulation_download` (a fresh virtual memory card, then provisioning
+and power-on); later edits are downloaded online to the same instance:
+
+```json
+{"kind": "simulation_download_online", "plcPath": "<exact PLC>", "payload": {
+  "downloadTicket": "<from sim_create>", "runtimeCredentialMetadataPath": "<scratch runtime user>",
+  "credentialMetadataPath": "<scratch configuration password>",
+  "softwareScope": "changes", "dataBlockValues": "keepActualValues", "allowStop": false }}
+```
+
+Apply with `checkpointSave: true`, `compile: false` and `save: false`: the change compiles the PLC itself
+and downloads nothing when compilation fails, and the applied PLCSIM route is never saved. The route is the
+one `plc_online_compare` uses: a current ticket (15 minutes from `sim_create`) and marker, the sole
+registered local Softbus instance already powered in STOP or RUN, one addressable endpoint at the
+instance's own address, PN/IE / PLCSIM (1) with one target interface, TLS answered `NonTrusted` and only the
+generated runtime-user login answered. The PLC must be the one whose generated card the instance holds
+(`simulation-download.json`); another PLC refuses with `SimulationTargetMismatch`.
+
+`DownloadProvider.Download` runs with `DownloadOptions.Software` (`softwareScope: "all"`) or
+`SoftwareOnlyChanges` (`"changes"`), never with hardware. Every download configuration is answered from the
+reviewed options or refused:
+
+| Configuration | Answer |
+| --- | --- |
+| `ConsistentBlocksDownload`, `AlarmTextLibrariesDownload` | `ConsistentDownload` |
+| `UserManagementDownload` | `KeepOnlineUserManagementData` (the runtime-user login depends on it) |
+| `DataBlockReinitializationOrKeepActualValues` | `KeepActualValues` or `StopPlcAndReinitialize`, from `dataBlockValues` |
+| `DataBlockReinitialization` | `StopPlcAndReinitialize` with `dataBlockValues: "reinitialize"`; otherwise `SimulationDownloadReinitializationRequired` |
+| `StopModules` | `StopAll` with `allowStop: true`; otherwise `SimulationDownloadStopRequired` |
+| `PlcMasterSecretPassword` | the generated configuration password from `credentialMetadataPath` |
+| `StartModules` (after the download) | `StartModule` when the CPU was in RUN, otherwise `NoAction` |
+| anything else | refused with `UnsupportedDownloadConfiguration` |
+
+`reinitialize` requires `allowStop: true`. A CPU found in RUN must be in RUN again afterwards
+(`SimulationRunNotRestored` otherwise). After the download PLCSIM answers reads with `NotUpToDate` (-47) until its tag list is refreshed: call `sim_tags` (its default `refresh: true`) before `sim_read`, `sim_write` or `sim_test`; the same applies after `memoryReset` and a storage retrieve. Each completed download is recorded in the instance storage as
+`simulation-download-online-<changeId>.json`; `programEvidence` then reports `status: "online-download"`,
+because the card's `programRevision` no longer describes the running program. This is a CPU write:
+`change_restore` recovers only the project, and an interrupted admission is held for manual
+reconciliation.
+
+## Virtual time, events and storage
+
+Writes need an instance this worker created or adopted, in its admitted network mode; reads work on any
+selected instance. None of them touches the machine-wide network mode, adapters or addresses.
+
+- **Virtual clock.** `sim_time` reads `ScaleFactor`, the virtual `SystemTime` and the operating mode.
+  `scaleFactor` (greater than 0, at most 1000) makes the virtual clock run faster or slower in the default
+  operating mode from the next cycle control point; `systemTimeUtc` (ISO 8601 ending in `Z`, 1970–2200) sets
+  the virtual system time. Both are read back.
+- **Virtual-time scenarios.** `sim_test` with `virtualTime: true` switches the owned instance to
+  `TimespanSynchronized_C`. Every wait of a step becomes `StartProcessing(span)` followed by the next sync
+  point, samples are read while the CPU is frozen, and `elapsedMs` is the virtual `SystemTime` since the
+  scenario started (`wallElapsedMs` is kept beside it). The previous operating mode is restored afterwards,
+  also after a failure; a cycle-synchronous capture and a virtual-time scenario exclude each other. Timer
+  tests then depend on virtual time, not on wall-clock polling.
+- **Events.** `sim_event` without `event` lists the downloaded hardware-interrupt configuration
+  (`GetConfiguredProcessEvents`). With `event` it injects one of `hardwareInterrupt` (`ProcessEvent`, OB40),
+  `pullOrPlug` (`PullOrPlugEvent`, OB83), `rackOrStationFault` (`RackOrStationFaultEvent`, OB86; distributed
+  devices only), `diagnosticAlarm` (`AlarmNotification`, OB82) or `statusEvent` (`StatusEvent`, OB55) into an
+  instance in RUN. Hardware IDs come from the PLC's system constants. The runtime's acceptance and sequence
+  number are reported; whether the OB ran is shown only by program values, for example an OB counter read
+  with `sim_read`.
+- **Memory reset.** `sim_state` `memoryReset` calls `MemoryReset` and requires STOP or RUN afterwards.
+- **Storage.** `sim_storage` needs the owned instance powered off. `archive` writes
+  `<instance>-<guid>.zip` and a receipt with its SHA-256 to the Host's `simulation-archives` directory;
+  `retrieve` accepts only an unchanged archive written there from the same instance. The instance's storage
+  path and ownership marker must be unchanged afterwards (`SimulationOwnershipUnverified` otherwise).
 
 ## Online compare and station upload
 
@@ -160,7 +235,7 @@ A floating PLCSIM Advanced license is expected for this direct virtual-memory-ca
 
 Supported types are `bool`, `int8`, `uint8`, `int16`, `uint16`, `int32`, `uint32`, `int64`, `uint64`, `float`, `double`, `string`, and `wstring`. Types are explicit and should match the simulator's tag metadata. Integer range checks preserve the full 64-bit range, including JSON values above signed `int64`. Real values must be finite; NaN/infinity produce bad-quality captures or failed assertions. Writes are assignments, not forces; the PLC scan can immediately overwrite them.
 
-Scenarios require an already running selected instance, 1–64 captured signals, 1–128 steps, at most 60 seconds of requested delays and at most 500 snapshots. The interval is 20–5000 ms (default 100 ms). Actual execution including API overhead is capped at 90 seconds between polling calls. Individual vendor API calls may still take their own timeout. Sampling is wall-clock polling, not scan-accurate synchronization, and multi-signal samples are not atomic.
+Scenarios require an already running selected instance, 1–64 captured signals, 1–128 steps, at most 60 seconds of requested delays and at most 500 snapshots. The interval is 20–5000 ms (default 100 ms). Actual execution including API overhead is capped at 90 seconds between polling calls. Individual vendor API calls may still take their own timeout. By default sampling is wall-clock polling, not scan-accurate synchronization, and multi-signal samples are not atomic. With `virtualTime: true` the same bounds apply to virtual milliseconds, and each sample is read while the CPU is frozen at a sync point.
 
 Each step applies optional `writes`, waits/captures for `delayMs`, then evaluates optional `assertions`. Assertions contain `symbol`, `type`, `operator` (`eq`, `ne`, `gt`, `gte`, `lt`, `lte`), `expected`, and optional absolute nonnegative `tolerance`. Strings and booleans support only `eq`/`ne`. Numeric comparisons treat values within tolerance as equal. The entire scenario's value/shape validation precedes the first stimulus write. Failed assertions, runtime failures and bad-quality samples retain a report and return an error with the report details. No automatic write rollback is claimed.
 

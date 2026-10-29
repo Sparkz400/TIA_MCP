@@ -226,9 +226,9 @@ namespace TiaMcp.Openness.V21
                         observation["fingerprint"] = EngineeringFingerprint(change, project); observation["previewHash"] = change.PreviewHash; observation["idempotentReadback"] = returnedApply;
                         string expected = operation == "change_apply" ? change.BaseFingerprint : change.AfterFingerprint;
                         if (!returnedApply && observation.Value<string>("fingerprint") != expected) throw new BridgeException("StaleRevision", "Project changed since its retained preparation or outcome.");
-                        if (operation == "change_apply" && !returnedApply && change.Kind.StartsWith("db_snapshot_", StringComparison.Ordinal))
+                        if (operation == "change_apply" && !returnedApply && (change.Kind.StartsWith("db_snapshot_", StringComparison.Ordinal) || change.Kind == "simulation_download_online"))
                         {
-                            // Online DB snapshot kinds also reserve the owned simulator and plan the observer project before dispatch.
+                            // Online simulator kinds also reserve the owned simulator and plan the observer project before dispatch.
                             var marker = OwnedSimulationMarker(change.Payload);
                             add("workspace", marker.Value<string>("storagePath"), "ownedSimulatorOnlineValues");
                             observation["markerSha256"] = SharedMutationHash(marker);

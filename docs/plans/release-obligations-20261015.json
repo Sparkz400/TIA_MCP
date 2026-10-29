@@ -882,7 +882,7 @@
       "implementation": "partial_native_online_routes_implemented",
       "qualification": "native_online_compare_snapshots_and_station_upload_verified",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.75): 7 release-matrix rows (7 limited); 35 cells bound and none open. plc_online_compare is verified natively with the owned instance's generated runtime-user login (local.online.compare.20261029); db_snapshot_create, db_snapshot_capture and db_snapshot_load_actual are verified on owned PLCSIM (local.online.snapshots.20261029); plc_station_upload is verified natively (local.online.upload.20261029): its TLS challenge offered no certificate and was trusted as unauthenticated TLS for the adapter-owned PLCSIM instance only (maintainer decision, \"Allow, owned PLCSIM only\").",
+      "currentResult": "29 October 2026 (catalog 0.4.76): 8 release-matrix rows (8 limited); 42 cells bound and none open. plc_online_compare is verified natively with the owned instance's generated runtime-user login (local.online.compare.20261029); db_snapshot_create, db_snapshot_capture and db_snapshot_load_actual are verified on owned PLCSIM (local.online.snapshots.20261029); plc_station_upload is verified natively (local.online.upload.20261029): its TLS challenge offered no certificate and was trusted as unauthenticated TLS for the adapter-owned PLCSIM instance only (maintainer decision, \"Allow, owned PLCSIM only\"). The shared row change.simulation_download_online (first owner L03) is verified by local.plcsim_gaps.20261029.",
       "remainingWork": "No open matrix cell.",
       "nextAction": "Maintainer acceptance review.",
       "ownerRole": "Online diagnostics",

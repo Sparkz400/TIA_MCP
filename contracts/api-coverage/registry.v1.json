@@ -961,6 +961,24 @@
       ]
     },
     {
+      "featureId": "sim_time",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_event",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_storage",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
       "featureId": "artifact_read",
       "obligations": [
         "F03"
@@ -1015,6 +1033,24 @@
     },
     {
       "featureId": "change.tag_table_import_xml",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_create",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_rename",
+      "obligations": [
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_delete",
       "obligations": [
         "X11"
       ]
@@ -1840,6 +1876,12 @@
     },
     {
       "featureId": "change.hardware_cpu_memory_bytes",
+      "obligations": [
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hardware_cpu_parameters",
       "obligations": [
         "X10"
       ]
@@ -2781,6 +2823,13 @@
       ]
     },
     {
+      "featureId": "change.simulation_download_online",
+      "obligations": [
+        "L03",
+        "D09"
+      ]
+    },
+    {
       "featureId": "drive_profile_review",
       "obligations": [
         "D10",
@@ -2941,6 +2990,26 @@
         "D13",
         "D14",
         "X11"
+      ]
+    },
+    {
+      "featureId": "change.device_compile",
+      "obligations": [
+        "X10",
+        "X11"
+      ]
+    },
+    {
+      "featureId": "change.project_compile",
+      "obligations": [
+        "X11",
+        "X10"
+      ]
+    },
+    {
+      "featureId": "change.hmi_compile",
+      "obligations": [
+        "X07"
       ]
     },
     {

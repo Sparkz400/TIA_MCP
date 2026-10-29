@@ -189,7 +189,7 @@ namespace TiaMcp.Openness.V21
         private JArray CaptureHardwareEngineering(Project project, string kind = null)
         {
             bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind);
-            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes : HardwareWriteAttributes;
+            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes : HardwareWriteAttributes;
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
