@@ -28,14 +28,14 @@ NON_RETAIN
    VAR
       Start : Bool;
       TimerDone : Bool;
-      Version : Int;
+      ProgramVersion : Int;
       Ob40 : DInt;
       Ob82 : DInt;
       Ob83 : DInt;
       Ob86 : DInt;
       Year : UInt;
       Clock : DTL;
-      Timer : TON_TIME;%s
+      Delay : TON_TIME;%s
    END_VAR
 
 BEGIN
@@ -51,10 +51,10 @@ VERSION : 0.1
    END_VAR
 
 BEGIN
-    "GapDb".Timer(IN := "GapDb".Start, PT := T#5S, Q => "GapDb".TimerDone);
+    "GapDb".Delay(IN := "GapDb".Start, PT := T#5S, Q => "GapDb".TimerDone);
     #Status := RD_SYS_T(OUT => "GapDb".Clock);
     "GapDb".Year := "GapDb".Clock.YEAR;
-    "GapDb".Version := %d;
+    "GapDb".ProgramVersion := %d;
 END_ORGANIZATION_BLOCK
 
 '''
@@ -116,7 +116,8 @@ def rack(h, device):
 
 def hardware_ids(h, plc):
     """System constant name -> hardware identifier, from the PLC's system constants."""
-    return {c["name"]: c["value"] for c in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}).get("constants", []) if c.get("kind") == "system"}
+    tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 5000})["tagTables"]
+    return {c["name"]: c["value"] for table in tables for c in table.get("constants", []) if c.get("kind") == "system"}
 
 
 class Lab:
@@ -196,8 +197,8 @@ def body(h):
         h.report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download, trust_owned_empty_cpu_certificate=True)
         h.stage("power on", lambda: lab.state("powerOn"))
         require(h.stage("run", lambda: lab.state("run", 30000)) == "Run", "The instance did not enter RUN")
-        h.stage("resolve GapDb in PLCSIM", lambda: lab.resolve(["Start", "TimerDone", "Version", "Ob40", "Ob82", "Ob83", "Ob86", "Year"]))
-        require(h.stage("program version 1 runs", lambda: lab.read(Version="int16"))["Version"] == 1, "Version 1 is not running")
+        h.stage("resolve GapDb in PLCSIM", lambda: lab.resolve(["Start", "TimerDone", "ProgramVersion", "Ob40", "Ob82", "Ob83", "Ob86", "Year"]))
+        require(h.stage("program version 1 runs", lambda: lab.read(ProgramVersion="int16"))["ProgramVersion"] == 1, "Version 1 is not running")
 
         online_downloads(h, lab, plc, ticket, login, secret)
         virtual_time(h, lab)
@@ -237,8 +238,8 @@ def online_downloads(h, lab, plc, ticket, login, secret):
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MAIN_SOURCE % 2, "expectedBlockNames": ["Main"]})
     _, _, report = download("code change", {"softwareScope": "changes", "dataBlockValues": "keepActualValues", "allowStop": False})
     h.report["onlineCodeChange"] = report
-    values = h.stage("version 2 runs with kept values", lambda: lab.read(Version="int16", Ob82="int32"))
-    require(values == {"Version": 2, "Ob82": 7}, "Expected Version 2 and the kept counter 7: %s" % values)
+    values = h.stage("version 2 runs with kept values", lambda: lab.read(ProgramVersion="int16", Ob82="int32"))
+    require(values == {"ProgramVersion": 2, "Ob82": 7}, "Expected Version 2 and the kept counter 7: %s" % values)
     # 2. A DB layout change with keepActualValues: TIA either keeps the values or demands a reinitialization, which is
     # refused without allowStop. Either way a further layout change then downloads reinitialized, with a stop and restart.
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "\n      Added : Int;", "expectedBlockNames": [DB]})
@@ -249,19 +250,19 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         readbacks = content.get("readbacks") or ((content.get("error") or {}).get("details") or {}).get("readbacks") or []
         report = next((r["report"] for r in readbacks if r.get("role") == "owned-simulation-download"), {})
         result = {"isError": outcome.get("isError"), "error": (content.get("error") or {}).get("code"), "configurations": report.get("downloadConfigurations"),
-                  "operatingStateAfter": report.get("operatingStateAfter"), "values": lab.read(Version="int16", Ob82="int32")}
+                  "operatingStateAfter": report.get("operatingStateAfter"), "values": lab.read(ProgramVersion="int16", Ob82="int32")}
         if outcome.get("isError"):
             require(result["error"] in ("SimulationDownloadReinitializationRequired", "SimulationDownloadStopRequired") and result["values"]["Ob82"] == 7,
                     "A refused keep-values download must be typed and change nothing: %s" % result)
         else:
-            require(result["values"] == {"Version": 2, "Ob82": 7}, "A kept-values layout download must keep the counter: %s" % result)
+            require(result["values"] == {"ProgramVersion": 2, "Ob82": 7}, "A kept-values layout download must keep the counter: %s" % result)
         return result
     h.report["layoutChangeKeepValues"] = h.stage("layout change downloaded with keepActualValues", keep_layout)
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "\n      Added : Int;\n      Again : Int;", "expectedBlockNames": [DB]})
     _, _, report = download("layout change, reinitialized", {"softwareScope": "changes", "dataBlockValues": "reinitialize", "allowStop": True})
     h.report["onlineLayoutChange"] = report
-    values = h.stage("reinitialized values after the layout change", lambda: lab.read(Version="int16", Ob82="int32"))
-    require(values == {"Version": 2, "Ob82": 0}, "Expected the reinitialized counter 0 with Version 2: %s" % values)
+    values = h.stage("reinitialized values after the layout change", lambda: lab.read(ProgramVersion="int16", Ob82="int32"))
+    require(values == {"ProgramVersion": 2, "Ob82": 0}, "Expected the reinitialized counter 0 with Version 2: %s" % values)
     if time.monotonic() < lab.deadline:
         compare = h.stage("plc_online_compare after the online downloads", lambda: h.tool("plc_online_compare", {"downloadTicket": ticket, "plcPath": plc, "maxItems": 2000, "runtimeCredentialMetadataPath": login}))
         h.report["compareAfterDownload"] = {"truncated": compare["compareTruncated"], "root": compare["compare"]["state"]}
@@ -357,8 +358,8 @@ def memory_reset(h, lab):
         state = lab.state("memoryReset")
         if state != "Run":
             state = lab.state("run", 30000)
-        values = lab.read(Ob82="int32", Version="int16")
-        require(state == "Run" and values == {"Ob82": 0, "Version": 2}, "After memory reset: %s %s" % (state, values))
+        values = lab.read(Ob82="int32", ProgramVersion="int16")
+        require(state == "Run" and values == {"Ob82": 0, "ProgramVersion": 2}, "After memory reset: %s %s" % (state, values))
         return {"state": state, "values": values}
     h.report["memoryReset"] = h.stage("memory reset restarts the loaded program with start values", reset)
 
@@ -378,8 +379,8 @@ def storage(h, lab):
     require(retrieved["ownershipMarkerUnchanged"] is True, "The ownership marker changed")
     h.stage("power on the retrieved card", lambda: lab.state("powerOn"))
     require(h.stage("run the retrieved card", lambda: lab.state("run", 30000)) == "Run", "The retrieved card did not enter RUN")
-    values = h.stage("the retrieved card runs the online-downloaded program", lambda: lab.read(Version="int16"))
-    require(values["Version"] == 2, "The retrieved card runs %s" % values)
+    values = h.stage("the retrieved card runs the online-downloaded program", lambda: lab.read(ProgramVersion="int16"))
+    require(values["ProgramVersion"] == 2, "The retrieved card runs %s" % values)
     require(lab.state("stop", 30000) == "Stop", "The instance did not stop")
     require(lab.state("powerOff") == "Off", "The instance did not switch off")
     h.report["storage"] = {"archive": receipt, "retrieved": retrieved["retrieved"]}

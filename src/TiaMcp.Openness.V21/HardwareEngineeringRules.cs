@@ -70,7 +70,11 @@ namespace TiaMcp.Openness.V21
 
         // Reviewed V21 CPU parameter attributes: cycle monitoring, minimum cycle time, startup, time synchronization and
         // access protection. The names are the native ones declared on S7-1500 CPU device items (observed 29 October 2026).
-        internal static readonly string[] CpuParameterAttributes = { "CPU_PARAMETER_NAMES" };
+        internal static readonly string[] CpuParameterAttributes = {
+            "CycleMaximumCycleTime", "CycleMinimumCycleTime", "CycleEnableMinimumCycleTime", "CycleCommunicationLoad",
+            "StartupActionAfterPowerOn", "StartupComparisonPresetToActualModule", "StartupConfigurationTimeout",
+            "TimeSynchronizationNtpV2", "TimeOfDayLocalTimeZone", "TimeOfDayActivateDaylightSavingTime",
+            "PlcAccessControlConfiguration" };
 
         internal static void RequireCpuParameterRequest(JObject requested)
         {
@@ -81,6 +85,9 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("UnsupportedAttribute", "Attribute is outside the reviewed CPU parameter subset: " + property.Name);
                 if (!(property.Value is JValue) || property.Value.Type == JTokenType.Null)
                     throw new BridgeException("InvalidRequest", property.Name + " must be a non-null scalar.");
+                // Like scratch security, this route never removes existing CPU access protection.
+                if (property.Name == "PlcAccessControlConfiguration" && (property.Value.ToString() == "Disabled" || property.Value.ToString() == "0"))
+                    throw new BridgeException("ProtectionDowngradeRefused", "Disabling CPU access control is not offered by this route.");
             }
         }
 

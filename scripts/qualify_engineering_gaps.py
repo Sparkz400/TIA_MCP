@@ -15,7 +15,11 @@ import time
 from library_native_harness import Harness, require
 
 # Reviewed parameter -> new value on the scratch CPU 1511-1 PN; the names are HardwareEngineeringRules.CpuParameterAttributes.
-PARAMETERS = {}
+PARAMETERS = {"CycleMaximumCycleTime": 200, "CycleMinimumCycleTime": 5, "CycleCommunicationLoad": 30,
+              "StartupActionAfterPowerOn": 2, "StartupComparisonPresetToActualModule": 1, "StartupConfigurationTimeout": 30000,
+              "TimeOfDayLocalTimeZone": 23, "TimeOfDayActivateDaylightSavingTime": False}
+# Applied one at a time after the reviewed set; V21 may reject them at compile (they need NTP servers or access-level passwords).
+OBSERVED = {"CycleEnableMinimumCycleTime": False, "TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
 TABLE, RENAMED, RESTORED_TABLE = "TiaMcpGapTable", "TiaMcpGapRenamed", "TiaMcpGapRestore"
 POLICY = {"dependencyPolicy": "rejectReferenced"}
 HMI_PANEL = "TP700 Comfort"
@@ -31,7 +35,7 @@ def cpu_values(h, path):
     items = h.tool("engineering_read", {"selectors": {"scope": "hardware", "hardwarePath": path, "maxItems": 1000}})["items"]
     require(len(items) == 1, "Expected one hardware item for " + path)
     attributes = {a["name"]: a.get("value") for a in items[0]["attributes"]}
-    return {name: attributes.get(name) for name in PARAMETERS}
+    return {name: attributes.get(name) for name in (*PARAMETERS, *OBSERVED)}
 
 
 def tables(h, plc):
@@ -127,8 +131,9 @@ def body(h):
 
     # Typed CPU parameters.
     original = h.stage("discover CPU parameters", lambda: cpu_values(h, cpu))
-    require(all(original[name] is not None for name in PARAMETERS), "The CPU does not expose every reviewed parameter: %s" % original)
-    require(all(original[name] != value for name, value in PARAMETERS.items()), "A planned value equals the scratch default: %s" % original)
+    require(all(original[name] is not None for name in original), "The CPU does not expose every reviewed parameter: %s" % original)
+    require(all(original[name] != value for name, value in {**PARAMETERS, **OBSERVED}.items()), "A planned value equals the scratch default: %s" % original)
+    h.refuse("refuse disabling access control", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {"PlcAccessControlConfiguration": "Disabled"}}, "ProtectionDowngradeRefused")
     h.refuse("refuse an attribute outside the subset", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {"Comment": "x"}}, "UnsupportedAttribute")
     first = next(iter(PARAMETERS))
     h.refuse("refuse an unchanged parameter", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {first: original[first]}}, "InvalidRequest")
@@ -138,6 +143,8 @@ def body(h):
         applied = h.apply("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: value}})
         require("configured_hardware_preservation_verified" in applied["stages"], "Hardware preservation was not verified for " + name)
         h.stage("read back " + name, lambda name=name, value=value: require(cpu_values(h, cpu)[name] == value, "Native readback differs for " + name) or cpu_values(h, cpu))
+    for name, value in OBSERVED.items():
+        h.report.setdefault("observedParameters", {})[name] = observe(h, cpu, name, value)
     configured = cpu_values(h, cpu)
 
     # Persistence: a fresh Portal reopens the saved project.
@@ -159,9 +166,27 @@ def body(h):
     prepared = h.prepare("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: original[name]}})
     h.apply_prepared("hardware_cpu_parameters", prepared)
     restore(h, prepared, "hardware_cpu_parameters", lambda: require(cpu_values(h, cpu) == configured, "The restored CPU parameters differ from the checkpoint"))
-    for name in PARAMETERS:
+    for name in reversed([n for n in (*PARAMETERS, *OBSERVED) if cpu_values(h, cpu)[n] != original[n]]):
         h.apply("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: original[name]}})
     h.stage("original CPU parameters restored", lambda: require(cpu_values(h, cpu) == original, "Original CPU parameters not restored") or original)
+
+
+def observe(h, cpu, name, value):
+    """Apply one parameter whose compile outcome V21 decides; a failed compile is recorded and restored from its checkpoint."""
+    def run():
+        prepared = h.prepare("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: value}})
+        outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
+        content = outcome.get("structuredContent") or {}
+        if not outcome.get("isError"):
+            require("configured_hardware_preservation_verified" in content["stages"] and cpu_values(h, cpu)[name] == value, "Readback or preservation failed for " + name)
+            return {"outcome": "applied", "value": value}
+        error = content.get("error") or {}
+        compilation = (error.get("details") or {}).get("compilation") or {}
+        recovered = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        require(recovered["state"] == "restored", "The refused parameter was not restored")
+        return {"outcome": "refused", "error": error.get("code"), "message": error.get("message"),
+                "messages": [t.get("messages") for t in compilation.get("targets", [])], "restored": cpu_values(h, cpu)[name]}
+    return h.stage("observe " + name, run)
 
 
 def rack(h, device):
