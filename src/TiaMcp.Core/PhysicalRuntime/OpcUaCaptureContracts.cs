@@ -184,7 +184,7 @@ public static class OpcUaCaptureContracts
     public static readonly string[] ReadErrors = ["UaCancelled", "UaTimeout", "UaTransportInterrupted", "UaSessionUnavailable", "UaSessionExpired",
         "UaSessionRecordChanged", "UaSessionIdentityMismatch", "UaSessionIdentityChanged", "UaCredentialUnavailable",
         "UaNamespaceUnavailable", "UaAuthenticationDenied", "UaCertificateRejected", "UaProtocolFailure",
-        "UaResponseInvalid", "UaResponseLimit", "UaSecretEchoRejected", "UaCaptureReadFailed"];
+        "UaResponseInvalid", "UaResponseLimit", "UaSecretEchoRejected", "UaCaptureReadFailed", "UaCredentialStoreBusy"];
     public static string ReadError(Exception error) => error is OperationCanceledException ? "UaCancelled" :
         error is BridgeException e && ReadErrors.Contains(e.Code, StringComparer.Ordinal) ? e.Code : "UaCaptureReadFailed";
     public static void ValidateNode(OpcUaRuntimeNode node)
