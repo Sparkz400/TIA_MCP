@@ -2739,6 +2739,26 @@
         "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
         "Each case trusts its owned, empty PLCSIM CPU's certificate on first use (--trust-owned-empty-cpu-certificate) to provision the runtime credential."
       ]
+    },
+    {
+      "id": "local.online.compare.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "94d7c490f1f4f71616aa9c578fec4b452da1db59",
+        "passedScope": "scripts/qualify_online_routes.py --skip-snapshots --skip-upload from commit 94d7c49 (binaries built from 1c272fc; src identical) on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb, downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN: plc_online_compare with the instance's generated scratch runtime user answered exactly one OnlineAuthenticationConfiguration challenge (ProjectUser), stayed in RUN, completed its cleanup and found every compare row identical; typed refusals for an unknown ticket, the CPU's protection credential, runtime-user metadata naming another project or CPU, a copy outside scratch-credentials (InvalidSimulationCredential / SimulationLoginTargetMismatch) and no credential (SimulationOnlineAuthenticationRequired), each leaving the project unchanged; then stop, power off, owned release and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.compare.20261029.json"
+      ],
+      "limitations": [
+        "plc_station_upload is not qualified: in an empty Portal the upload meets TLS verification for the owned CPU, which these routes never trust (SimulationOnlineAuthenticationRequired, 29 October 2026).",
+        "The DB-snapshot routes are not qualified: after an online db_snapshot_create, V21's InterfaceSnapshot.Export returned the same value-less document as before, so the capture refused it.",
+        "Provisioning the protection credential trusts the owned, empty CPU's certificate on first use (trustOwnedEmptyCpuCertificate); the online route itself answers TLS NonTrusted.",
+        "TIA reuses an online login within the same Portal without a new challenge; later online sessions in that Portal answer none.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
     }
   ],
   "features": [
@@ -4671,18 +4691,20 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Only a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN; never powers, addresses, writes or downloads it and never targets a physical PLC.",
           "Endpoint identity uses the credential-provisioning observer Portal: exactly one addressable PLCSIM endpoint, equal to the instance's own controller address. Zero-address entries such as the Runtime Manager placeholder are recorded, not excluded by a baseline.",
-          "TLS verification is answered NonTrusted and every login/password challenge is left unanswered (fail closed); a target that requires either cannot be compared.",
+          "TLS verification is answered NonTrusted. The one login challenge is answered with the owned instance's generated scratch runtime user when runtimeCredentialMetadataPath names it and the CPU offers project-user authentication; every other login or password challenge stays unanswered (fail closed).",
           "Applies the PLC's sole PLCSIM target interface like provisioning; whether TIA marks the in-memory project modified is reported (projectModifiedBefore/After), never saved.",
           "Bounded tree (maxItems, depth 64) with explicit truncation. The FingerprintDataProvider owner (TiaPortal) and fingerprint coverage are unqualified; an unavailable or failing provider is reported and does not stop the compare.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does.",
+          "Native (29 October 2026, local.online.compare.20261029): logged in once as the runtime user, the compare of the downloaded scratch found every row identical; the credential refusals are typed and change nothing."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.compare.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

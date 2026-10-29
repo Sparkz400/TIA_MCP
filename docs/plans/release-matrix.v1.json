@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.70",
-    "catalogSha256": "d84bc5882f7c1871ab02fd7030eed48edeb199f6ba03cf76fff9f66c75934c1c",
+    "catalogSha256": "43e5515d67f758c22c6f804e148c65b845db5f51d39a5fd07898a6d820253667",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "6843b503a8181e2a275fb103c72817b9d05336d5a217a8c4573767df74ba853d"
   },
@@ -15,21 +15,21 @@
     "features": 450,
     "support": {
       "deferred": 10,
-      "limited": 245,
+      "limited": 246,
       "shipped": 122,
       "unavailable_target": 8,
-      "unqualified": 65
+      "unqualified": 64
     },
     "cells": {
       "blocked": 49,
-      "bound": 1684,
+      "bound": 1688,
       "deferred": 30,
-      "open": 304
+      "open": 300
     },
     "openCellsByOwner": {
       "C03": {
         "role": "UA security and runtime integration",
-        "open": 78
+        "open": 74
       },
       "D06": {
         "role": "Test Suite",
@@ -37,7 +37,7 @@
       },
       "D09": {
         "role": "Online diagnostics",
-        "open": 25
+        "open": 21
       },
       "D10": {
         "role": "Drives",
@@ -1760,32 +1760,42 @@
         "plc_online_compare"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D09",
         "C03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.online.compare.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.compare.20261029"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.compare.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.compare.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.compare.20261029"
+          ]
         }
       ]
     },
@@ -23816,6 +23826,21 @@
         {
           "path": "evidence/local.milestones.rerun.20261028.json",
           "sha256": "0c0c70e95e8a7d8b6c187be7f79eff50a36797c29128538d6ddbb6e905b90203"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.online.compare.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "94d7c490f1f4f71616aa9c578fec4b452da1db59",
+      "retained": [
+        {
+          "path": "evidence/local.online.compare.20261029.json",
+          "sha256": "ac2ca2e06385c7094ae27428e6a2c49e57e52bf5cb0cf5dc35b2f7d696bdb860"
         }
       ],
       "notRetained": []
