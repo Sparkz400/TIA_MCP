@@ -2759,6 +2759,25 @@
         "TIA reuses an online login within the same Portal without a new challenge; later online sessions in that Portal answer none.",
         "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
       ]
+    },
+    {
+      "id": "local.engineering_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ec90975f0e89959ad0ebf29e8894f62334f998d6",
+        "passedScope": "scripts/qualify_engineering_gaps.py on a frozen Debug build of ec90975 (artifacts/gx4), 80/80 steps, in an owned scratch CPU 1511-1 PN V4.1. Tag tables: tag_table_create of an empty table, tag_table_rename and tag_table_delete of the emptied table, with refusals (default-table name in other case, case-only duplicate, rename onto the default table, missing table, non-empty TagTableNotEmpty, DefaultTagTable) and a created table restored from its checkpoint. Compile-only: device_compile and project_compile of the station with zero errors, no mutation stage and unchanged blocks, types and tag tables; refusals for a payload, a missing device and compile=false. CPU parameters: hardware_cpu_parameters sets CycleMaximumCycleTime 200, CycleMinimumCycleTime 5, CycleCommunicationLoad 30, CycleEnableMinimumCycleTime false (V21 then undeclares CycleMinimumCycleTime), StartupActionAfterPowerOn 1, StartupComparisonPresetToActualModule 1, StartupConfigurationTimeout 30000, TimeOfDayActivateDaylightSavingTime false, TimeOfDayLocalTimeZone 23 and TimeSynchronizationNtpV2 1, each device-compiled with configured-hardware preservation and native readback; refusals for an attribute outside the subset, an unchanged value, null, the rack, Disabled access control, a minimum cycle time while disabled and enabling it without a value; a fresh Portal reopens identical parameters, blocks, types and tag tables; one parameter change is restored from its checkpoint and the original values return in one combined change. Recorded native outcomes: PlcAccessControlConfiguration EnabledWithAccessControlViaAccessLevel fails compilation (full-access password required) and is restored; hmi_compile of a TP700 Comfort and an MTP700 Unified Basic created by hardware_add returns TIA's compile errors (no start screen; the Unified panel also its runtime password) as CompileFailed, and both restore from their checkpoints."
+      },
+      "artifacts": [
+        "evidence/local.engineering_gaps.20261029.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21; other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "The CPU protection level cannot be changed through this route: V21 compiles access-level modes only with a full-access password, and the route never accepts passwords.",
+        "No successful HMI compilation: panels created through Openness have no start screen (the Unified panel also lacks its runtime password), and screen creation stays behind the closed HMI preservation gate; hmi_compile is not qualified by this run.",
+        "Runtime effects of the CPU parameters are not observed; tag tables are exercised at PLC-root scope only."
+      ]
     }
   ],
   "features": [
@@ -5921,7 +5940,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_create",
@@ -5934,13 +5952,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope, with refusals for a case-only duplicate and the default table's name; checkpoint recovery restores the project without the created table.",
           "Payload tagTableName and optional scopePath/groupPath; the name must be free in the software scope across every tag-table group (case-insensitive). compile=true."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5968,7 +5989,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_rename",
@@ -5981,13 +6001,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope, with refusals for a missing table and a rename onto the default table.",
           "Payload tagTableName or tagTablePath and newName; the table keeps its members and newName must be free in the software scope. compile=true."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -6015,7 +6038,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_delete",
@@ -6028,13 +6050,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope on an emptied table, with refusals for a non-empty table (TagTableNotEmpty) and the default tag table (DefaultTagTable).",
           "Payload tagTableName or tagTablePath; only an empty user table (no tags, no user constants) is deleted and the default tag table never. compile=true."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12412,7 +12437,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "hardware_cpu_parameters",
@@ -12425,14 +12449,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
-          "Only the reviewed CPU parameter attributes declared by the selected hardware item; every value is converted to its native type, written, read back and compared. Unchanged requests and undeclared attributes refuse.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Reviewed subset: CycleMaximumCycleTime, CycleMinimumCycleTime, CycleEnableMinimumCycleTime, CycleCommunicationLoad, StartupActionAfterPowerOn, StartupComparisonPresetToActualModule, StartupConfigurationTimeout, TimeSynchronizationNtpV2, TimeOfDayLocalTimeZone, TimeOfDayActivateDaylightSavingTime and PlcAccessControlConfiguration, each only where the selected item declares it. Coded values are V21's own numbers; V21 refused StartupActionAfterPowerOn = 2 in its setter (29 October 2026).",
+          "CycleMinimumCycleTime exists only while CycleEnableMinimumCycleTime is true: disabling drops it, a value for a disabled flag is refused, and enabling needs an explicit value (the flag is written first). A zone without daylight saving makes TIA switch TimeOfDayActivateDaylightSavingTime off, so request both together; any other dependent change fails preservation and needs checkpoint recovery.",
+          "PlcAccessControlConfiguration accepts only the exact names of the enabled access-control modes, never Disabled or a number. Changing the protection level is a recorded boundary: V21 compiles the access-level modes only with a full-access password, and this route never accepts passwords (the change fails compilation and is restored from its checkpoint).",
+          "Device compilation and configured-hardware preservation are mandatory; the runtime effect of the parameters is not observed.",
           "Device compilation and configured-hardware preservation (identities, slots, reviewed attributes including the parameter subset, addresses and network associations) are mandatory; the runtime effect is not observed by this kind."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20541,7 +20570,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "device_compile",
@@ -20554,13 +20582,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified on the scratch station (CPU 1511-1 PN): zero errors, no mutation stage, unchanged blocks, types and tag tables, and refusals for a missing device and compile=false.",
           "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20588,7 +20619,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "project_compile",
@@ -20601,13 +20631,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified on a one-station project. A project whose devices do not all compile (for example an HMI panel without a start screen) fails with CompileFailed and needs checkpoint recovery.",
           "Empty payload; compile=true. Every device needs a compiler service and the inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20649,7 +20682,8 @@
         "status": "partial",
         "limitations": [
           "Compiled against the installed API only; not natively qualified.",
-          "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified."
+          "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified.",
+          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile is not qualified."
         ]
       },
       "qualification": {

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "7ede47ee9239c9e070113cde9f795a2f2f7cc09dd1a5faa7ffbe9943ffd1d781",
-      "bytes": 1311054
+      "sha256": "feecd7caa08f074373de4094e70d7d25aa87fa76df3085ed088dbba9d71fd545",
+      "bytes": 1317438
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2292,8 +2292,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
-      "sha256": "cb36d21c91bb18d0769238ecade4a15ac047fc3143034f4213767d488ba0212d",
-      "bytes": 27775
+      "sha256": "37ae3ab5a73f5b330937cb5b8d326d6ae0220d52b6bc7bacee499258de991497",
+      "bytes": 29548
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs",
@@ -2462,8 +2462,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
-      "sha256": "60e410f47d13ae3329407ceb8f4b6cc14c917480f57e2433d4c42ec602972d14",
-      "bytes": 3147
+      "sha256": "9af39b02bfa925f4149f50c2fef6f03bff537a5d8bf62ced03fc8a80417ff7e7",
+      "bytes": 4649
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
@@ -83656,8 +83656,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "PrepareCpuParameters",
               "line": 19,
-              "endLine": 39,
-              "sha256": "967b5045924a91cb291ab181b4c2eb0f1c8a69afe3583ae2f9afa050b96c374f"
+              "endLine": 45,
+              "sha256": "b26856a7f7a4912fc5b73f42dc59dad3160f1f9beb16d3d95edacf6b99fcdae6"
             }
           ]
         },
@@ -83675,9 +83675,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "ApplyCpuParameters",
-              "line": 41,
-              "endLine": 42,
-              "sha256": "d11e84f0a5aacf41aa77217aff16f59ecf3a490d6852efbf268694cdf85bfd41"
+              "line": 47,
+              "endLine": 54,
+              "sha256": "8789dd0b315e2c59a6b39ef4132d2d7db229c16846c513cd53abf8500faf7ab0"
             }
           ]
         }
@@ -84445,8 +84445,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "PrepareCpuParameters",
               "line": 19,
-              "endLine": 39,
-              "sha256": "967b5045924a91cb291ab181b4c2eb0f1c8a69afe3583ae2f9afa050b96c374f"
+              "endLine": 45,
+              "sha256": "b26856a7f7a4912fc5b73f42dc59dad3160f1f9beb16d3d95edacf6b99fcdae6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
@@ -84807,9 +84807,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "ApplyCpuParameters",
-              "line": 41,
-              "endLine": 42,
-              "sha256": "d11e84f0a5aacf41aa77217aff16f59ecf3a490d6852efbf268694cdf85bfd41"
+              "line": 47,
+              "endLine": 54,
+              "sha256": "8789dd0b315e2c59a6b39ef4132d2d7db229c16846c513cd53abf8500faf7ab0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
@@ -93469,7 +93469,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "device_compile",
@@ -93491,7 +93490,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering_gaps.20261029",
+          "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef",
+          "artifacts": [
+            "evidence/local.engineering_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -94422,7 +94429,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "hardware_cpu_parameters",
@@ -94444,7 +94450,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering_gaps.20261029",
+          "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef",
+          "artifacts": [
+            "evidence/local.engineering_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97267,7 +97281,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "project_compile",
@@ -97289,7 +97302,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering_gaps.20261029",
+          "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef",
+          "artifacts": [
+            "evidence/local.engineering_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97887,7 +97908,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_create",
@@ -97909,7 +97929,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering_gaps.20261029",
+          "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef",
+          "artifacts": [
+            "evidence/local.engineering_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -97923,7 +97951,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_delete",
@@ -97945,7 +97972,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering_gaps.20261029",
+          "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef",
+          "artifacts": [
+            "evidence/local.engineering_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -98008,7 +98043,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_rename",
@@ -98030,7 +98064,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.engineering_gaps.20261029",
+          "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef",
+          "artifacts": [
+            "evidence/local.engineering_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -117616,6 +117658,11 @@
       "sha256": "062936b0490cc3cf9c1aef503356df86557bd52adba22fa8e952c92c912ba201"
     },
     {
+      "path": "evidence/local.engineering_gaps.20261029.json",
+      "state": "observed",
+      "sha256": "a0723f2cd2aa8c5ed1e6230d2d63d1726eba438a8df7ca7b59ee24961b904743"
+    },
+    {
       "path": "evidence/local.explorer.20261024.json",
       "state": "observed",
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
@@ -118326,6 +118373,10 @@
     {
       "id": "local.engineering.interruption.20261029",
       "profileSha256": "0e4520478247d2a2543f553555cd6d3d7da59583e584f7d07df2ef9cbf3adfa6"
+    },
+    {
+      "id": "local.engineering_gaps.20261029",
+      "profileSha256": "185691ce5f7e9f29fa0bafb51eb5a88f607ac50a2713702333f8cf74a7b8d6ef"
     },
     {
       "id": "local.explorer.20261024",

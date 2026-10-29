@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.71",
-    "catalogSha256": "7ede47ee9239c9e070113cde9f795a2f2f7cc09dd1a5faa7ffbe9943ffd1d781",
+    "catalogSha256": "feecd7caa08f074373de4094e70d7d25aa87fa76df3085ed088dbba9d71fd545",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "42863ba916167b5a4343481facc40d4cbbe1786ee70ab0db80d087b6a1337086"
   },
@@ -15,16 +15,16 @@
     "features": 461,
     "support": {
       "deferred": 10,
-      "limited": 246,
+      "limited": 252,
       "shipped": 122,
       "unavailable_target": 8,
-      "unqualified": 75
+      "unqualified": 69
     },
     "cells": {
       "blocked": 49,
-      "bound": 1688,
+      "bound": 1724,
       "deferred": 30,
-      "open": 359
+      "open": 323
     },
     "openCellsByOwner": {
       "C03": {
@@ -77,11 +77,11 @@
       },
       "X10": {
         "role": "Hardware and remote IO",
-        "open": 24
+        "open": 6
       },
       "X11": {
         "role": "PLC and typed",
-        "open": 38
+        "open": 8
       }
     }
   },
@@ -2998,45 +2998,58 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_create",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X11"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.engineering_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         }
       ]
     },
@@ -3046,45 +3059,58 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_rename",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X11"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.engineering_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         }
       ]
     },
@@ -3094,45 +3120,58 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "tag_table_delete",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X11"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.engineering_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         }
       ]
     },
@@ -10419,45 +10458,58 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "hardware_cpu_parameters",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.engineering_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         }
       ]
     },
@@ -19254,46 +19306,59 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "device_compile",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X10",
         "X11"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.engineering_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         }
       ]
     },
@@ -19303,46 +19368,59 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "project_compile",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X11",
         "X10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.engineering_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.engineering_gaps.20261029"
+          ]
         }
       ]
     },
@@ -23444,6 +23522,21 @@
         {
           "path": "evidence/local.engineering.interruption.20261029.json",
           "sha256": "062936b0490cc3cf9c1aef503356df86557bd52adba22fa8e952c92c912ba201"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.engineering_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "ec90975f0e89959ad0ebf29e8894f62334f998d6",
+      "retained": [
+        {
+          "path": "evidence/local.engineering_gaps.20261029.json",
+          "sha256": "a0723f2cd2aa8c5ed1e6230d2d63d1726eba438a8df7ca7b59ee24961b904743"
         }
       ],
       "notRetained": []
