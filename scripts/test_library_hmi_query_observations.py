@@ -109,7 +109,7 @@ class LibraryHmiQueryObservations(unittest.TestCase):
         self.reject(result, 'hmi-capabilities')
 
     def test_capability_pairs_and_false_flags_match_producer(self):
-        source = (validation.ROOT / 'src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs').read_text()
+        source = (validation.ROOT / 'src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs').read_text(encoding="utf-8")
         actual = {(family, operation): implementation for family, operation, implementation in
                   re.findall(r'HmiCapability\("(classic|unified)", "([a-z_]+)", "([a-z]+)"', source)}
         self.assertEqual(OPERATIONS, actual)

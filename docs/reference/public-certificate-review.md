@@ -82,8 +82,7 @@ export file is deleted.
 The result also lists dynamic certificate-management services and certificate- or
 syslog-named CPU attributes as the exposed assignment evidence, the global-store
 enable flag and the project syslog servers. Supply the saved owner and
-`evaluatedAtUtc` yourself. The capture is compiled against the V21 API and not yet
-natively qualified.
+`evaluatedAtUtc` yourself. The capture is verified (`local.read_contracts.20261028`).
 
 Bounds: 384 KiB request JSON, 96 KiB decoded input/phase, 64 KiB DER/phase, 128
 extensions, 512 SAN entries and 128 EKU OIDs. Reports are limited to 16 MiB; retained

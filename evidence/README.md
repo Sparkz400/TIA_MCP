@@ -8,6 +8,11 @@ local raw reports of one qualification. It keeps the exact source commit, a hash
 of every binary tree that ran, each raw report's SHA-256 and size, whether the
 run completed, its step names, and the MCP tools that answered with and without
 error. A verified feature's bound tools must all appear as answered without error.
+Each cited summary must come from a clean worktree (`source.dirty: false`) at a
+commit that is an ancestor of `HEAD`, so merge evidence PRs, never squash them.
+A feature with a native acceptance gate needs every bound tool answered in a
+record that is not Host-only (`.hostonly.`). The three catalog records that
+predate curation are named in `LEGACY_UNCURATED`; every newer record needs a summary.
 
 Raw reports, native exports, project files and logs stay in the ignored
 `artifacts/` tree. They may contain local paths, process IDs or project content;

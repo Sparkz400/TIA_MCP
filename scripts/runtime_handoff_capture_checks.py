@@ -27,7 +27,7 @@ def prepare_handoff(client, attempt, output, check):
     def tool(name, args): return client.tool(name, args)
     session=tool('runtime_web_status',dict(attemptId=attempt))
     fixtures=Path(__file__).resolve().parents[1]/'fixtures/physical-runtime'
-    review=json.loads((fixtures/'association-review.json').read_text())
+    review=json.loads((fixtures/'association-review.json').read_text(encoding="utf-8"))
     owner=dict(nodeId='handoff-cpu',objectPath='/projects/Fixture/devices/CPU')
     review['model']['nodes'].append(dict(**owner,kind='hardware',name='Synthetic CPU',parentId='project'))
     saved=retain_input(client, 'project_snapshot_import',review);review_id=saved['reviewId']
@@ -50,7 +50,7 @@ def prepare_handoff(client, attempt, output, check):
     packet=dict(schemaVersion='runtime-handoff-request.v1',reviewId=review_id,accessRecordId=access['recordId'],accessPhase='before',owner=owner,expected=expected,operations=[dict(**right,requiredOutcome='allowed'),dict(id='ModifyTag',scope='synthetic-cpu',requiredOutcome='denied')],baseline=copy.deepcopy(references),current=copy.deepcopy(references))
     handoff=retain_input(client, 'runtime_handoff_review',packet)
     handoff_path=output/'store/runtime-handoff/records'/handoff['recordRef'].split(':')[1]
-    verify_handoff(output/'store',json.loads((handoff_path/'request.json').read_text()),json.loads((handoff_path/'report.json').read_text()))
+    verify_handoff(output/'store',json.loads((handoff_path/'request.json').read_text(encoding="utf-8")),json.loads((handoff_path/'report.json').read_text(encoding="utf-8")))
     check(True,'Independent original-input evaluator verifies bound handoff, access and source model')
     return session, packet, handoff, originals
 
@@ -60,7 +60,7 @@ def run_handoff_capture_checks(client, attempt, state, output, check):
     session, packet, handoff, originals = prepare_handoff(client, attempt, output, check)
     review_id=packet["reviewId"]
     fixtures=Path(__file__).resolve().parents[1]/"fixtures/physical-runtime"
-    case_request=json.loads((fixtures/'association-request.json').read_text());case_request['reviewId']=review_id
+    case_request=json.loads((fixtures/'association-request.json').read_text(encoding="utf-8"));case_request['reviewId']=review_id
     case_request['hypotheses'].append(dict(id='bound',statement='Observed pattern stays unqualified.',prediction=dict(when=[dict(signalId='enable',op='eq',value=True)],expect=[dict(signalId='step',op='eq',value=65535,unit='count')])))
     case=tool('diagnostic_plan',dict(request=case_request))
     state['symbols']={'"DB_Line".Conv2.Enable':dict(name='Enable',datatype='bool',value=True),'"DB_Line".Conv2.Step':dict(name='Step',datatype='uint',value=65535)}
@@ -90,7 +90,7 @@ def run_handoff_capture_checks(client, attempt, state, output, check):
         if mode=='providerDenied':check(quality['providerFailures']==4 and next(h for h in analysis['report']['hypotheses'] if h['id']=='bound')['unknownCycles']==2,'Denied provider samples remain unknown despite matching handoff')
         if mode=='deniedRights':check(quality['hostReadErrors']==1 and state['calls'].count('PlcProgram.Read')==before,'Changed effective read permission dispatches no value read')
         if mode=='gapped':check(quality['skippedPolls']>=1 and analysis['report']['observedChangeCount']==0,'Bound capture retains missed polls without inventing intermediate transitions')
-        exported=call('export',snapshotRef=status['snapshotRef']);document=json.loads(Path(exported['artifacts'][0]['path']).read_text());validator().validate(document)
+        exported=call('export',snapshotRef=status['snapshotRef']);document=json.loads(Path(exported['artifacts'][0]['path']).read_text(encoding="utf-8"));validator().validate(document)
         check(document['capture']['plan']['handoff']==binding,'Export retains exact handoff: '+mode)
         retained.append(dict(captureId=identity,snapshotRef=status['snapshotRef'],state='ended',reviewId=review_id,handoff=binding,reportId=analysis['id']))
     state['mode']='normal';state['rights']=True;state['readDelay']=0

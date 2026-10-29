@@ -111,7 +111,9 @@ seventh result qualifies only the explicit configured-module lifecycle profile.
 
 ## 24 October requalification on current main
 
-Two scenarios ran once each on the current bridge (owned scratch projects, English TIA UI):
+Two scenarios ran once each on the current bridge (owned scratch projects, English TIA UI).
+Both records are retired from the catalog; the current evidence is the 28 October re-runs
+`local.remote-io.lifecycle.rerun.20261028` and `local.remote-io.full-route.rerun.20261028`.
 
 | Evidence | Profile | Result |
 | --- | --- | --- |
@@ -238,8 +240,8 @@ checkpoint and a whole-project device compile, refuses a changed owner table at
 apply time and verifies that every other connection of the owner reads back
 unchanged. Partner-side counterparts are not read back.
 
-These routes are compiled against the V21 PublicAPI only. They have no native
-qualification yet, and resource, capacity and runtime communication are not assessed.
+These routes are verified for S7 and TCP connections (`local.connection_changes.20261028`);
+resource, capacity and runtime communication are not assessed.
 
 ## Supplied connection comparison without Siemens
 

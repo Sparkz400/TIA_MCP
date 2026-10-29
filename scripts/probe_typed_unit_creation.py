@@ -19,7 +19,7 @@ def main(args):
     output.mkdir(exist_ok=False)
     report = {"schemaVersion": 1, "startedAtUtc": utc_now(), "builderUsed": False, "calls": [], "cases": [], "completed": False}
     def persist():
-        (output / "report.json").write_text(canonical(report))
+        (output / "report.json").write_text(canonical(report), encoding="utf-8")
     client = Client(args.host.resolve(), 300, ["--worker", str(args.worker.resolve()), "--artifacts", str(output)])
     call = Audit(client, report["calls"], persist)
     try:

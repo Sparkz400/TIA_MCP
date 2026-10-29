@@ -233,7 +233,8 @@ def decision_index(registry):
         ids.add(operation["id"])
         if operation["releaseObligation"] is not True or operation["releaseAccepted"] is not False:
             raise ValueError("First-slice registry cannot accept or defer a release obligation")
-        if operation["implementation"] != "not_implemented" or operation["qualification"] != "not_run" or operation["availability"] != "unobserved":
+        # Implementation is recorded from source review; qualification and availability never come from this seed.
+        if operation["implementation"] not in {"not_implemented", "partial", "implemented"} or operation["qualification"] != "not_run" or operation["availability"] != "unobserved":
             raise ValueError("Seed operation incorrectly promoted from metadata")
         for symbol in operation["symbols"]:
             if symbol in symbols:

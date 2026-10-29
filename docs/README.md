@@ -42,7 +42,7 @@ A qualification claim passes through four places; the first three are in git.
 Every catalog evidence record is cited by a feature. Records no feature cites any more
 move verbatim to a retired list: 38 old records in catalog 0.4.68
 ([list](history/catalog-evidence-retired-20261028.json)) and 53 superseded or doc-only
-records in 0.4.69 ([list](history/catalog-evidence-retired-20261029.json)) and 21 replaced
+records in 0.4.69 ([list](history/catalog-evidence-retired-20261029.json)) and 23 replaced
 or superseded records in 0.4.70 ([list](history/catalog-evidence-retired-20261029-reruns.json)); their
 summaries stay in `evidence/`. Three records from before 24 October still cite
 `artifacts/` paths directly; only unverified features cite them, and their files are
@@ -54,9 +54,9 @@ listed as lost. Prose records per run are under [verification](#verification).
 - [Remote qualification](guides/remote-qualification.md), [VMware guest setup](guides/vmware-guest-test.md)
 - [Engineering changes](guides/engineering-workflows.md), [typed LAD/FBD builders](guides/typed-lad-fbd-builders.md)
 - [Simulation](guides/simulation.md), [isolated block testing](guides/block-testing.md), [conformance fixtures](guides/conformance-fixtures.md)
-- [Library management](guides/library-management.md)
+- [Library management](guides/library-management.md), [PLC library integration recipes](guides/plc-library-integration-recipes.md), [component source reuse qualification](guides/plc-component-source-reuse-qualification.md)
 - [HMI integration](guides/hmi-integration.md), [HMI engineering](guides/hmi-engineering.md)
-- [Offline Unified text-list authoring](reference/unified-text-list-authoring.md)
+- [Offline Unified text-list authoring](reference/unified-text-list-authoring.md), [coordinated generation](reference/unified-coordinated-generation.md)
 - [Project explorer](guides/project-explorer.md), [metadata index](guides/project-index.md), [persistent reviews](guides/project-reviews.md)
 - [Configured network inspection](guides/network-inspection.md)
 - [Offline bug and trace diagnostics](guides/trace-diagnostics.md)
@@ -70,8 +70,9 @@ listed as lost. Prose records per run are under [verification](#verification).
 - [Engineering coverage](reference/engineering-coverage.md), [native explorer extraction](reference/project-explorer-native.md)
 - [MCP tool reference](reference/tools.md): every tool with its feature, support class and Host option, generated from the catalog by `scripts/tool_reference.py`
 - [Supplied technology profiles and relationships](reference/technology-profile-review.md)
+- [Retained diagnostic experiments](reference/diagnostic-experiments.md), [repeated experiments and combined reports](reference/diagnostic-repeated-experiments.md)
 - [Supplied safety evidence](reference/safety-evidence-review.md), [full safety/F-I/O plan](plans/expansion-plans/safety-validation-and-fio.md)
-- [HMI capability matrix](reference/hmi-capability-matrix.md), [relationship evidence](reference/hmi-relationship-evidence.md)
+- [HMI capability matrix](reference/hmi-capability-matrix.md), [relationship evidence](reference/hmi-relationship-evidence.md), [fixture preparation](reference/hmi-fixture-preparation.md)
 - [HMI/explorer integration contract](reference/hmi-explorer-handoff.md), [library HMI support](reference/library-hmi-support.md)
 - [Machine-readable contracts](../contracts/README.md)
 
@@ -81,6 +82,7 @@ Plans describe intended scope; an unchecked historical item is not automatically
 a current blocker. Use [TODO](TODO.md) for the current order of work.
 
 - [Overall implementation plan](plans/overview.md), [graphical/project roadmap](plans/graphical-project-roadmap.md)
+- [Release ledger](plans/release-obligations-20261015.md), [release acceptance](plans/release-acceptance.md)
 - [Library plan](plans/library-management-plan.md), [library acceptance backlog](plans/library-management-todo.md)
 - [HMI plan](plans/hmi-integration-plan.md), [HMI acceptance backlog](plans/hmi-remaining-work.md)
 - [Typed LAD/FBD plan](plans/typed-lad-fbd-builders-plan.md), [typed acceptance backlog](plans/typed-lad-fbd-todo.md)

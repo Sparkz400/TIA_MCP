@@ -15,6 +15,7 @@ internal static class FakeWorker
     internal static async Task<int> RunAsync(string[] args)
     {
         if (args.Contains("--exit-before-connect")) return 23;
+        if (args.Contains("--never-connect")) { await Task.Delay(2500); return 24; }
         string? pipeName = null;
         string? eventsPath = null;
         for (var i = 0; i < args.Length; i++)
@@ -231,7 +232,7 @@ internal sealed class BridgeFixture : IAsyncDisposable
         Directory.Delete(_directory); // Only this fixture's known, now-empty directory; never recursive.
     }
 
-    private static async Task WaitForAsync(Func<bool> predicate, string description)
+    internal static async Task WaitForAsync(Func<bool> predicate, string description)
     {
         var timer = Stopwatch.StartNew();
         while (!predicate())

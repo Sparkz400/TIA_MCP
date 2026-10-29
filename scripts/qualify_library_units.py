@@ -15,7 +15,7 @@ FB, UDT, UNIT = "TiaMcpLibraryGate", "TiaMcpLibraryState", "TiaMcp_LibUnit"
 def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
-    change = (ROOT / "fixtures/libraries/release-changes/TiaMcpLibraryGate.implementation.scl").read_text()
+    change = (ROOT / "fixtures/libraries/release-changes/TiaMcpLibraryGate.implementation.scl").read_text(encoding="utf-8")
 
     # Authoring: generation 1 (FB 1.0.0) and generation 2 (FB 1.1.0).
     plc = h.owned_scratch("authoring")

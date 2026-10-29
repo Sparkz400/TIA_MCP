@@ -26,6 +26,7 @@ New-Item -ItemType Directory -Path $output -Force | Out-Null
 $buildOutput = Join-Path $output 'dotnet'
 $previousTemp = $env:TEMP
 $previousTmp = $env:TMP
+$previousPythonUtf8 = $env:PYTHONUTF8
 # Measured hosted-runner seconds per managed suite (CI run 40077018589); suites missing here count as 60 s.
 $ManagedSuiteSeconds = @{
     'TiaMcp.Access.Tests' = 2.7
@@ -109,6 +110,8 @@ Push-Location $repoRoot
 try {
     $env:TEMP = Join-Path $output 'temp'
     $env:TMP = $env:TEMP
+    # Python must read the repository's UTF-8 files the same way on a German (cp1252) Windows as on CI.
+    $env:PYTHONUTF8 = '1'
     New-Item -ItemType Directory -Path $env:TEMP -Force | Out-Null
     Start-Transcript -Path (Join-Path $output 'validation.log') | Out-Null
     if ($Suite -in @('All','Python')) {
@@ -516,5 +519,6 @@ try {
     Stop-Transcript -ErrorAction SilentlyContinue | Out-Null
     $env:TEMP = $previousTemp
     $env:TMP = $previousTmp
+    $env:PYTHONUTF8 = $previousPythonUtf8
     Pop-Location
 }

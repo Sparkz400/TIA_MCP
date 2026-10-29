@@ -29,7 +29,7 @@ class Run(authoring.Run):
             self.save('expected-response-loss', {'error': str(error), 'automaticReplay': False})
             marker = self.root/'interruption-marker.json'
             require(marker.exists(), 'Unexpected failure without admitted creation reply-loss marker; never retry')
-            retained = json.loads(marker.read_text())
+            retained = json.loads(marker.read_text(encoding="utf-8"))
             require(retained['point'] == oracle.POINT and retained['response']['saved'] is True
                     and retained['response']['target']['exists'] is True, 'Saved creation response-loss marker required')
             self.close_host(expected_loss=True)
@@ -41,7 +41,7 @@ class Run(authoring.Run):
     def execute(self):
         pid = self.start_host(oracle.POINT)
         self.save('authoring-host', {'hostProcessId': pid})
-        admission = json.loads((self.root/'admission.json').read_text())
+        admission = json.loads((self.root/'admission.json').read_text(encoding="utf-8"))
         admission['hostProcessId'] = pid
         (self.root/'admission.json').write_text(json.dumps(admission, indent=2), encoding='utf-8')
         self.start_tia()

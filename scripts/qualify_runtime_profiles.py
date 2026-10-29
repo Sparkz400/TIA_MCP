@@ -162,7 +162,7 @@ def qualify(assembly, tls, root, runtime_directory=None):
     staged_inputs = hashes(sorted(staged.iterdir()))
     loaded = {key: {"path": str((staged / name).resolve()), "sha256": hashlib.sha256((staged / name).read_bytes()).hexdigest()}
               for key, name in [("loadedCore", "TiaMcp.Core.dll"), ("loadedGraph", "TiaMcp.Graph.dll")]}
-    pin = json.loads((tls / "pins.json").read_text())["server"]
+    pin = json.loads((tls / "pins.json").read_text(encoding="utf-8"))["server"]
     state = {"case": None, "calls": [], "infoIndex": 0, "serverErrors": []}
 
     class Handler(http.server.BaseHTTPRequestHandler):

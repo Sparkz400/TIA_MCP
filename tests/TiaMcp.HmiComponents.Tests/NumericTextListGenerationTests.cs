@@ -91,6 +91,14 @@ internal static class NumericTextListGenerationTests
             Check(JsonNode.DeepEquals(result, new HmiComponentWorkflowStore(root).AuthorTextLists(recordId: (string)result["recordId"]!)), "Released exact reopen: " + label);
             cases.Add(new JsonObject { ["label"] = label, ["request"] = request.DeepClone(), ["receipt"] = result.DeepClone() }); return result;
         }
+        void OutOfRange(JsonObject request, string label)
+        {
+            int published = Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Length;
+            try { Author(request); }
+            catch (BridgeException e) when (e.Code == "HmiTextListValueOutOfRange" && e.Message.Contains("List States, entry"))
+            { Check(Directory.GetFiles(Path.Combine(root, "hmi-component-reviews")).Length == published, "Nothing published: " + label); return; }
+            throw new Exception("Expected HmiTextListValueOutOfRange: " + label);
+        }
         var installRequest = Request(Packet()); var first = Record(installRequest, "initial bounded states");
         Check(first["valueCoverage"]!["unlistedIntervals"]!.AsArray().Count == 2, "Both negative and high unlisted intervals remain visible");
         Check(!(bool)first["dependencyCoverage"]!["allObservedSelectedIndicesMatched"]!, "Unavailable dependency observation never means empty closure");
@@ -116,13 +124,20 @@ internal static class NumericTextListGenerationTests
             var packet = Packet(); packet["afterComponent"] = Component(Snapshot(type)); packet["bindings"]![0]!["declaredHmiType"] = type;
             var request = Request(packet); request["template"]!["dataType"] = type; request["template"]!["requireFullTypeCoverage"] = true;
             request["template"]!["states"] = new JsonArray(State("EveryValue", min, max));
-            var result = Record(request, "full domain " + type);
-            Check((bool)result["valueCoverage"]!["allTypeValuesListed"]! && result["valueCoverage"]!["unlistedIntervals"]!.AsArray().Count == 0, "Exact extrema without overflow: " + type);
+            // V21 imports values outside signed 32-bit as 0, so UDInt and LInt bounds beyond it refuse before publication.
+            bool fits = min >= int.MinValue && max <= int.MaxValue;
+            if (fits)
+            {
+                var result = Record(request, "full domain " + type);
+                Check((bool)result["valueCoverage"]!["allTypeValuesListed"]! && result["valueCoverage"]!["unlistedIntervals"]!.AsArray().Count == 0, "Exact extrema without overflow: " + type);
+            }
+            else OutOfRange(request, "full domain " + type);
             foreach (long endpoint in new[] { min, max })
             {
                 var narrow = request.DeepClone().AsObject(); narrow["template"]!["requireFullTypeCoverage"] = false;
                 narrow["template"]!["states"] = new JsonArray(State("Endpoint", endpoint, endpoint));
-                Record(narrow, "single endpoint " + type + " " + endpoint);
+                if (endpoint is >= int.MinValue and <= int.MaxValue) Record(narrow, "single endpoint " + type + " " + endpoint);
+                else OutOfRange(narrow, "single endpoint " + type + " " + endpoint);
             }
         }
         foreach (var (label, edit) in new (string, Action<JsonObject>)[] {

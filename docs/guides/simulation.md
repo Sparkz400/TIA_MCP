@@ -197,7 +197,8 @@ power state is reported before and after.
   mutation: a structured failure is a returned outcome, while a lost worker leaves the admission
   unknown, with no reconciliation adapter yet.
 
-Neither tool is natively qualified; both are compiled against the V21 public API only.
+Both are verified on one owned Softbus instance: `plc_online_compare` by `local.online.compare.20261029`,
+`plc_station_upload` by `local.online.upload.20261029`.
 
 ## Authentication prompts
 

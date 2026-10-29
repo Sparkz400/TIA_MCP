@@ -8,9 +8,9 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 
 | Exact fixture | E | X | P | R | B | Executed passing assertions | Selected report |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `typed-namespace-dboperand-fbd` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/rt5/typed-namespace-dboperand-fbd/result.json>) |
-| `typed-namespace-dboperand-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/rt5/typed-namespace-dboperand-lad/result.json>) |
-| `typed-unit-dboperand-fbd` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/rt5/typed-unit-dboperand-fbd/result.json>) |
-| `typed-unit-dboperand-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/rt5/typed-unit-dboperand-lad/result.json>) |
+| `typed-namespace-dboperand-fbd` | pass | pass | pass | pass | — | 0 | `artifacts/rt5/typed-namespace-dboperand-fbd/result.json` |
+| `typed-namespace-dboperand-lad` | pass | pass | pass | pass | — | 0 | `artifacts/rt5/typed-namespace-dboperand-lad/result.json` |
+| `typed-unit-dboperand-fbd` | pass | pass | pass | pass | — | 0 | `artifacts/rt5/typed-unit-dboperand-fbd/result.json` |
+| `typed-unit-dboperand-lad` | pass | pass | pass | pass | — | 0 | `artifacts/rt5/typed-unit-dboperand-lad/result.json` |
 
 The report path and its SHA-256, native target, profile IDs, operation, binary hashes, diagnostics, failed-change recovery and assertion counts are recorded in `fixtures/typed-graphical/qualification.v1.json`. A newly built binary needs its own acceptance evidence; earlier results are retained as development evidence.

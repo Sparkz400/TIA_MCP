@@ -57,7 +57,7 @@ Forcing is not available: V21 Openness, the PLCSIM Advanced V8 API, the S7-1500 
 
 ## Limits
 
-- The code is compiled against the V21 PublicAPI only and has not run natively. The manual describes `PlcWatchTable.Name` as read-only, but the installed metadata has a setter. A native run must show which is right.
+- The six profiles ran natively only in the isolated qualification harness (`local.watch.lifecycle.20261028`). That run renamed a table, so `PlcWatchTable.Name` is writable although the manual describes it as read-only.
 - References to a table outside the watch/force manifest are not inventoried, for example from other products. Access rules are checked only to refuse rename or delete.
 - There is no recursive group delete, no group or table move or copy, and no master-copy creation (`CreateFrom`). See the [watch and force table plan](../plans/expansion-plans/watch-and-force-table-engineering.md).
 - Force tables: the installed metadata does not state that a PLC has exactly one force table (the manual does), so edits target the exact named table and all other tables stay peers. Typed readback treats a field the export omits as empty, so rows with omitted fields (for example an `Undef` display format) are refused. Force rows get no document ID reindex. The planner-backed `watch_table_prepare_authoring` route stays watch-only.

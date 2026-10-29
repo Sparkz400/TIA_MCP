@@ -97,8 +97,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--fixture', required=True, type=Path)
     args = parser.parse_args()
-    document = json.loads((args.fixture/'capture-cancellation-scenarios.json').read_text())
-    verification = json.loads((args.fixture/'verification.json').read_text())
+    document = json.loads((args.fixture/'capture-cancellation-scenarios.json').read_text(encoding="utf-8"))
+    verification = json.loads((args.fixture/'verification.json').read_text(encoding="utf-8"))
     assert verification['captureCancellationSequence'] == document
     verify(document, verification['rpcMethods'])
     controls = negative_controls(document, verification['rpcMethods'])

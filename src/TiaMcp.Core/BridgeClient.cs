@@ -16,7 +16,7 @@ public interface IBridgeClient
     Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default);
 }
 
-/// <summary>One serialized engineering session. Failed transport is terminal; mutations are never replayed.</summary>
+/// <summary>One serialized engineering session. Transport failure after a request was sent is terminal; mutations are never replayed.</summary>
 public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncDisposable
 {
     public const int WorkerExitBudgetSeconds = 120;
@@ -44,10 +44,12 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
                 throw new BridgeException("AddInOwnerUnavailable", "No connected worker owns this Host session. Owner observation never starts or attaches a worker.");
             using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             deadline.CancelAfter(TimeSpan.FromSeconds(options.TimeoutSeconds));
+            bool sent = false;
             try
             {
                 await EnsureConnectedAsync(deadline.Token);
                 var bytes = Encoding.UTF8.GetBytes(frame + "\n");
+                sent = true; // From here the worker may have received the request.
                 await _pipe!.WriteAsync(bytes, deadline.Token);
                 await _pipe.FlushAsync(deadline.Token);
                 var response = await _reader!.ReadAsync(deadline.Token);
@@ -56,9 +58,15 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             catch (BridgeOperationException) { throw; }
             catch (Exception ex)
             {
-                _faulted = true;
+                // Before the frame is written nothing can run in TIA: drop only this connection; the next call starts a worker.
+                _faulted = sent;
                 if (_pipe is not null) await _pipe.DisposeAsync();
                 _pipe = null;
+                if (ex is OperationCanceledException && !sent)
+                {
+                    if (cancellationToken.IsCancellationRequested) throw;
+                    throw new BridgeException("WorkerConnectTimeout", "The worker did not connect within the bridge timeout; no request was sent.", ex);
+                }
                 // Do not kill an engineering operation in progress. The worker observes EOF after its call returns.
                 if (ex is OperationCanceledException)
                     throw new BridgeException(cancellationToken.IsCancellationRequested ? "CancelledOutcomeUnknown" : "TimeoutOutcomeUnknown",
@@ -96,6 +104,8 @@ public sealed class BridgeClient(BridgeOptions options) : IBridgeClient, IAsyncD
             start.ArgumentList.Add("--api-dir");
             start.ArgumentList.Add(options.ApiDirectory);
         }
+        // A previous worker never received a request on its dropped pipe; it exits on its own, so only the handle is released.
+        _worker?.Dispose(); _worker = null;
         _worker = Process.Start(start) ?? throw new BridgeException("WorkerStartFailed", "Could not launch the V21 worker.");
         // Retain the launched process handle; never reopen a possibly recycled PID.
         _ = _worker.SafeHandle;

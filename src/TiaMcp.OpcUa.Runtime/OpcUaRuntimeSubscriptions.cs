@@ -33,6 +33,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                     throw OpcUaRuntimeClient.Error("UaSubscriptionRequestChanged");
                 return Observe(captureId);
             }
+            OpcUaSubscriptionContracts.RequireKeepAlive(request.PublishingIntervalMilliseconds,request.KeepAliveCount);
             if(running.Values.Count(x=>!x.Work.IsCompleted)>=4)throw OpcUaRuntimeClient.Error("UaSubscriptionCapacity");
             if (request.DiagnosticBindingId is { } bindingId)
                 _ = new DiagnosticUaBindings(artifactsRoot).ValidateForCapture(bindingId, request.AttemptId, request.Nodes);
@@ -97,6 +98,8 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
             if(Expired())return;
             var created=await sessions.CreateSubscription(plan.CaptureId,plan.Request,CancellationToken.None);subscription=created.SubscriptionId;
             Append(new("created",subscription,Created:created));
+            // A server may revise timing upward past the Publish budget; the subscription is then deleted, never polled into timeouts.
+            OpcUaSubscriptionContracts.RequireKeepAlive(created.RevisedPublishingInterval,created.RevisedKeepAliveCount);
             if(OpcUaSubscriptionContracts.AllItemsFailed(created)){reason="allItemsFailed";return;}
             while(!Expired())
             {
@@ -108,6 +111,7 @@ public sealed class OpcUaRuntimeSubscriptions(OpcUaRuntimeSessionStore sessions,
                     var again=await sessions.CreateSubscription(plan.CaptureId,plan.Request,CancellationToken.None);
                     subscription=again.SubscriptionId;Append(new("created",subscription,Created:again));
                     recreate=false;seen.Clear();missingRanges.Clear();acknowledgements.Clear();expected=1;
+                    OpcUaSubscriptionContracts.RequireKeepAlive(again.RevisedPublishingInterval,again.RevisedKeepAliveCount);
                     if(OpcUaSubscriptionContracts.AllItemsFailed(again))throw OpcUaRuntimeClient.Error("UaSubscriptionRecreateFailed");
                     continue;
                 }

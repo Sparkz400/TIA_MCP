@@ -16,9 +16,9 @@ from referencing import Registry, Resource
 def validator(name='runtime-capture'):
     registry=Registry();root=Path(__file__).resolve().parents[1]
     for dependency in ["physical-runtime","diagnostic-case","diagnostic-signal-manifest","diagnostic-alarm-bindings","runtime-capture","runtime-capture-analysis","diagnostic-report-export"]:
-        schema=json.loads((root/"contracts"/(dependency+".v1.schema.json")).read_text())
+        schema=json.loads((root/"contracts"/(dependency+".v1.schema.json")).read_text(encoding="utf-8"))
         registry=registry.with_resource(schema["$id"],Resource.from_contents(schema))
-    schema=json.loads((root/"contracts"/(name+".v1.schema.json")).read_text())
+    schema=json.loads((root/"contracts"/(name+".v1.schema.json")).read_text(encoding="utf-8"))
     return Draft202012Validator(schema,registry=registry)
 
 
@@ -63,7 +63,7 @@ def run_capture_checks(client, attempt, selection, state, output, check):
     review_root = output/'store/project-reviews'
     review_root.mkdir(parents=True, exist_ok=True)
     review = dict(schemaVersion='project-review.v1',
-                  model=json.loads((Path(__file__).resolve().parents[1]/'fixtures/project-explorer/representative.project-model.json').read_text()),
+                  model=json.loads((Path(__file__).resolve().parents[1]/'fixtures/project-explorer/representative.project-model.json').read_text(encoding="utf-8")),
                   documents=[], capture=dict(syntheticFixture=True), wholeProjectContentComplete=False)
     review_bytes = json.dumps(review).encode()
     review_id = hashlib.sha256(review_bytes).hexdigest()
@@ -87,7 +87,7 @@ def run_capture_checks(client, attempt, selection, state, output, check):
     before = len(state['calls'])
     repeated = call('start', captureId=associated_id, request=associated_request)
     associated_export = call('export', snapshotRef=associated['snapshotRef'])
-    exported = json.loads(Path(associated_export['artifacts'][0]['path']).read_text())
+    exported = json.loads(Path(associated_export['artifacts'][0]['path']).read_text(encoding="utf-8"))
     check(repeated['snapshotRef'] == associated['snapshotRef'] and exported['capture']['plan']['request']['reviewId'] == review_id and len(state['calls']) == before, 'Removing source review does not rewrite or restart a retained declaration')
     retained.append(dict(captureId=associated_id, snapshotRef=associated['snapshotRef'], state='ended', reviewId=review_id))
     # The failure is after a valid prefix, while a real polling worker owns the capture.
@@ -157,7 +157,7 @@ def run_capture_checks(client, attempt, selection, state, output, check):
     call('start', captureId=raw_id, request={**request, 'maximumSamples': 1, 'representation': 'raw'})
     raw = wait(raw_id)
     check(json.loads(call('page', snapshotRef=raw['snapshotRef'])['rows'][0]['readResultJson'])['value'] == [0,255,17], 'Capture raw byte representation')
-    (output/'capture-retention-cases.json').write_text(json.dumps(retained,indent=2)+'\n')
+    (output/'capture-retention-cases.json').write_text(json.dumps(retained,indent=2)+'\n', encoding="utf-8")
     return retained
 
 

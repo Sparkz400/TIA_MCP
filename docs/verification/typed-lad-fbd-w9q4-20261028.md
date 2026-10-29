@@ -8,14 +8,14 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 
 | Exact fixture | E | X | P | R | B | Executed passing assertions | Selected report |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `typed-add-dint-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-add-dint-lad/result.json>) |
-| `typed-add-real-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-add-real-lad/result.json>) |
-| `typed-move-dint-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-move-dint-lad/result.json>) |
-| `typed-move-real-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-move-real-lad/result.json>) |
-| `typed-mul-dint-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-mul-dint-lad/result.json>) |
-| `typed-mul-int-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-mul-int-lad/result.json>) |
-| `typed-mul-real-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-mul-real-lad/result.json>) |
-| `typed-rtrig-lad` | — | — | — | — | — | 0 | [report](<../../artifacts/w9q4/typed-rtrig-lad/result.json>) |
-| `typed-tonr-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/w9q4/typed-tonr-lad/result.json>) |
+| `typed-add-dint-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-add-dint-lad/result.json` |
+| `typed-add-real-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-add-real-lad/result.json` |
+| `typed-move-dint-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-move-dint-lad/result.json` |
+| `typed-move-real-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-move-real-lad/result.json` |
+| `typed-mul-dint-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-mul-dint-lad/result.json` |
+| `typed-mul-int-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-mul-int-lad/result.json` |
+| `typed-mul-real-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-mul-real-lad/result.json` |
+| `typed-rtrig-lad` | — | — | — | — | — | 0 | `artifacts/w9q4/typed-rtrig-lad/result.json` |
+| `typed-tonr-lad` | pass | pass | pass | pass | — | 0 | `artifacts/w9q4/typed-tonr-lad/result.json` |
 
 The report path and its SHA-256, native target, profile IDs, operation, binary hashes, diagnostics, failed-change recovery and assertion counts are recorded in `fixtures/typed-graphical/qualification.v1.json`. A newly built binary needs its own acceptance evidence; earlier results are retained as development evidence.

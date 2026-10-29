@@ -101,7 +101,7 @@ class CopyAdmissionTests(unittest.TestCase):
             opens = [name for _, name, _ in self.harness.calls[start:] if name == 'project_open']
             self.assertEqual(1 if target == 'retry' else 0, len(opens))
             report_path = self.harness.root/'companion.json'
-            report = json.loads(report_path.read_text()); self.assertFalse(report['completed'])
+            report = json.loads(report_path.read_text(encoding="utf-8")); self.assertFalse(report['completed'])
             self.assertTrue(report['cleanupVerified'])
             self.sidecar.write_bytes(original); report_path.unlink()
 
@@ -139,7 +139,7 @@ class CopyAdmissionTests(unittest.TestCase):
         def changed(*args):
             self.sidecar.write_bytes(b'changed during cleanup'); return real(*args)
         with patch.object(admission, 'finish_copies', side_effect=changed), self.assertRaises(AssertionError): self.harness.run_companion()
-        report = json.loads((self.harness.root/'companion.json').read_text())
+        report = json.loads((self.harness.root/'companion.json').read_text(encoding="utf-8"))
         self.assertFalse(report['completed']); self.assertTrue(report['cleanupVerified']); self.assertIn('postCleanupFailure', report)
 
     def test_independent_audit_binds_file_receipts_to_each_original_open(self):

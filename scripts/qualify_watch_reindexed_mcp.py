@@ -13,7 +13,7 @@ from retained_native_lifecycle import require
 class Run(workflow.Run):
     def __init__(self,args):
         super().__init__(args)
-        admission=json.loads((self.root/'admission.json').read_text())
+        admission=json.loads((self.root/'admission.json').read_text(encoding="utf-8"))
         admission['reviewedDocumentIdProfile']=oracle.PROFILE
         admission['nativeOutputNormalization']=False
         admission['productionProfileEnabled']=False

@@ -118,13 +118,13 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 return Observe(old);
             }
             if (ClientCertificateState(certificate) != "current") throw Error("UaClientIdentityTimeInvalid");
-            var records = Directory.EnumerateFiles(root, "*.json").Take(1025).ToArray();
-            if (live.Count >= 4 || records.Length >= 1024) throw Error("UaSessionCapacity");
-            foreach (var path in records)
-            {
-                var old = Load(Path.GetFileNameWithoutExtension(path));
-                if (old.Selection.Endpoint == selection.Endpoint && !Terminal(old.State)) throw Error("UaEndpointSessionUnresolved");
-            }
+            if (live.Count >= 4) throw Error("UaSessionCapacity");
+            var records = Directory.EnumerateFiles(root, "*.json").Select(path => Load(Path.GetFileNameWithoutExtension(path))).ToArray();
+            // Bounded retention: the oldest resolved records make room for a new attempt; unresolved records are never removed.
+            var retired = records.Where(r => Terminal(r.State)).OrderBy(r => r.UpdatedAt).Take(records.Length - 1023).ToArray();
+            if (records.Length - retired.Length >= 1024) throw Error("UaSessionCapacity");
+            foreach (var old in retired) File.Delete(PathFor(old.AttemptId));
+            if (records.Any(r => r.Selection.Endpoint == selection.Endpoint && !Terminal(r.State))) throw Error("UaEndpointSessionUnresolved");
             if (selection.Authentication == "username") credentialConsumer(selection, _ => { });
             var status = new OpcUaRuntimeStatus("opcua-runtime-session.v1", attemptId, hostId, selection,
                 "connecting", null, false, DateTimeOffset.UtcNow);
@@ -247,9 +247,11 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         try
         {
             Open();
-            if(acquisition.GetValueOrDefault(attemptId)!=captureId || !live.TryGetValue(attemptId,out var entry) ||
-                entry.Status.State!="remoteSessionUnknown" || !entry.Client.CanReconnect || Load(attemptId)!=entry.Status)
+            if(acquisition.GetValueOrDefault(attemptId)!=captureId || !live.TryGetValue(attemptId,out var entry) || Load(attemptId)!=entry.Status)
                 throw Error("UaReconnectUnavailable");
+            // A busy vault refused the call before anything was sent and left the session connected: nothing to reactivate.
+            if(entry.Status.State=="connected")return transfer;
+            if(entry.Status.State!="remoteSessionUnknown" || !entry.Client.CanReconnect)throw Error("UaReconnectUnavailable");
             var status=entry.Status;
             try
             {

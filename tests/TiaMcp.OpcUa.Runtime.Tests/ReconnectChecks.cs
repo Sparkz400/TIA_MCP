@@ -160,6 +160,36 @@ internal static class ReconnectChecks
             check(server.ActivationRequests==activated && (await sessions.Status(attempt)).ErrorCode=="UaCredentialUnavailable","Retired credential blocks reactivation before network");
             await sessions.Disconnect(attempt);
         }
+        // Another Host user holding the shared vault past its turn refuses one call before anything is sent; a reconnect budget rides it out.
+        foreach(bool subscription in new[]{false,true})
+        {
+            string root=Path.Combine(output,"reconnect-busy-vault-"+subscription),attempt=Id(),capture=Id();int calls=0,busyAt=-1;
+            var selected=server.Selection with {Authentication="username",User="reader",VaultName="default"};
+            selected=selected with {Credential=new("protected-credential-reference.v1",new('a',32),new('b',32),ProtectedCredentialGuard.BindingHash(OpcUaRuntimeSessionStore.Binding(selected)),new('c',64))};
+            await using var sessions=new OpcUaRuntimeSessionStore(Path.Combine(root,"sessions"),(_,consume)=>{
+                if(Interlocked.Increment(ref calls)==busyAt)throw new BridgeException("CredentialStoreBusy","Fixture vault is busy.");
+                byte[] bytes=JsonSerializer.SerializeToUtf8Bytes("fixture-only-secret");
+                try {consume(bytes);}finally {System.Security.Cryptography.CryptographicOperations.ZeroMemory(bytes);}
+            });
+            await using var polling=new OpcUaRuntimeCaptures(sessions,root);
+            await using var subscriptions=new OpcUaRuntimeSubscriptions(sessions,root);
+            await sessions.Connect(attempt,selected);int activated=server.ActivationRequests;
+            busyAt=calls+2; // The second vault use of the capture: a read after the first sample, or the first Publish after creation.
+            if(subscription)await subscriptions.Start(capture,new(attempt,[FixtureServer.Node("int64"),FixtureServer.Node("bool")],DurationSeconds:5,MaximumNotifications:2,MaximumReconnectAttempts:1),default);
+            else await polling.Start(capture,new(attempt,[FixtureServer.Node("bool")],100,8,4,MaximumReconnectAttempts:1),default);
+            Task<object> Status()=>subscription?subscriptions.Status(capture,default):polling.Status(capture,default);
+            await Wait(async()=>Json(await Status()).GetProperty("state").GetString()!="running");
+            var status=Json(await Status());string snapshot=status.GetProperty("snapshotRef").GetString()!;
+            var rows=Json(subscription?subscriptions.Page(snapshot,0,200):polling.Page(snapshot,0,200)).GetProperty("rows").EnumerateArray()
+                .Select(r=>subscription?r.GetProperty("event"):r).ToArray();
+            File.WriteAllText(Path.Combine(root,"observed.json"),JsonSerializer.Serialize(new{status,rows},BridgeProtocol.Json));
+            var recovery=rows.Where(r=>r.TryGetProperty("reconnect",out var e) && e.ValueKind==JsonValueKind.Object).Select(r=>r.GetProperty("reconnect")).ToArray();
+            check(recovery.Length==2 && recovery[0].GetProperty("errorCode").GetString()=="UaCredentialStoreBusy" && recovery[1].GetProperty("state").GetString()=="succeeded",
+                "A busy vault is a retryable interruption: "+(subscription?"subscription":"polling"));
+            check(status.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()==(subscription?"notificationLimit":"sampleLimit") &&
+                server.ActivationRequests==activated && (await sessions.Status(attempt)).State=="connected","Capture continues on the still-connected session without reactivation: "+(subscription?"subscription":"polling"));
+            await sessions.Disconnect(attempt);
+        }
         foreach(int maximum in new[]{-1,4})
         {
             bool refused=false;

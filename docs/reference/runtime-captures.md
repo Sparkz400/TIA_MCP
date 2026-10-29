@@ -1,6 +1,6 @@
 # Retained Web polling captures
 
-Six `runtime_capture_*` tools extend the [owned Web session](physical-runtime-sessions.md) with bounded acquisition, local evidence and diagnostic observation reports. This implementation needs no local Siemens installation. Acquiring physical data still needs a reachable configured controller; all current execution evidence uses a disposable loopback server.
+Six `runtime_capture_*` tools extend the [owned Web session](physical-runtime-sessions.md) with bounded acquisition, local evidence and diagnostic observation reports. This implementation needs no local Siemens installation. Acquiring physical data still needs a reachable configured controller. The tools passed against the web server of an owned PLCSIM Advanced V8 instance in TCP/IP mode ([real-server runs](../verification/runtime-real-server-20261029.md), `local.runtime.plcsim-tcpip.20261029`); a physical PLC remains open.
 
 The same tools can instead poll an owned local PLCSIM Advanced V8 instance, optionally one sample per PLC cycle; see [PLCSIM capture source](#plcsim-capture-source).
 

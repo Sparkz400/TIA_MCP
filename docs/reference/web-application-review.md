@@ -68,7 +68,7 @@ hold every completely captured scalar web-named CPU attribute, at most 128.
 web_inspect reads no page sources, so replace the archive selector with a committed
 ZIP selector to compare files, and pick `selectedApplicationId` from `applications`.
 It never generates blocks. Legacy web users are reported by `access_inspect`. The
-capture is compiled against the V21 API and not yet natively qualified.
+capture is verified (`local.read_contracts.20261028`).
 
 ## Results and retained evidence
 
