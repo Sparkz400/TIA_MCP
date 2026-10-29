@@ -2759,6 +2759,47 @@
         "TIA reuses an online login within the same Portal without a new challenge; later online sessions in that Portal answer none.",
         "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
       ]
+    },
+    {
+      "id": "local.online.snapshots.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+        "passedScope": "scripts/qualify_online_routes.py --skip-upload from commit 4963644 on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb (Count : Int := 5), downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN, logged in only as the instance's generated scratch runtime user: typed refusals that change nothing (unknown ticket, the CPU's protection credential, runtime-user metadata naming another project or CPU, a copy outside scratch-credentials, no credential, an upload into an open project, db_snapshot_capture of a DB without a stored snapshot with DbSnapshotUnavailable, db_snapshot_create without a ticket with PhysicalPlcRefused, db_snapshot_load_actual without acknowledgement); plc_online_compare identical in every row; Count set to 42 through PLCSIM, db_snapshot_create applied with checkpoint, compile and save (preview without a previous snapshot), db_snapshot_capture reviews Count = 42; Count set to 7, db_snapshot_load_actual applied without compile and save, and PLCSIM reads Count back as 42 after a tag-list refresh; each online session completed its cleanup in RUN with at most one project-user login and the project state stayed unchanged; change_restore of the create gives the pre-change state, whose DB again has no stored snapshot; then stop, power off, owned release and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.snapshots.20261029.json"
+      ],
+      "limitations": [
+        "plc_station_upload ran only as its ProjectIsolationRequired refusal (--skip-upload); its TLS trust in an empty Portal is implemented on another branch.",
+        "One global DB with one Int; arrays, structures, instance DBs, retain values and a DB that already had a snapshot are not exercised.",
+        "InterfaceSnapshot.Export needs ExportOptions.WithReadOnly: Snapshot and SnapshotDate are read-only attributes. A DB without a stored snapshot exports empty SnapshotValues dated 0001-01-01, which the worker refuses as DbSnapshotUnavailable.",
+        "Each export carries a new DocumentInfo/Created, so the capture's file hash never equals a fresh export; the load compares the InterfaceSnapshot element of a fresh export with the reviewed capture's retained file, bound by its hash.",
+        "After LoadSnapshotAsActualValues PLCSIM reports its old tag list NotUpToDate (-47); the readback refreshes it through sim_tags. No public V21 API reads actual values back; PLCSIM is the independent reader.",
+        "Provisioning the protection credential trusts the owned, empty CPU's certificate on first use (trustOwnedEmptyCpuCertificate); the online sessions answer TLS NonTrusted and TIA asked them none. TIA reuses an online login within the same Portal.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.runtime.timers.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+        "passedScope": "scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate --fixture runtime-timers from commit 4963644: the updated runtime runner end to end on Softbus, both timer cases each on a fresh Host, owned TIA session and owned CPU1511, with download, the explicit checkpoint/compile/save of the generated scratch state (generatedProjectSave), credential provisioning through the discovery observer with card staging and restoration (every card move succeeded on its first attempt), RUN, the stimulus and assertion sequences, owned release and verified exits."
+      },
+      "artifacts": [
+        "evidence/local.runtime.timers.20261029.json"
+      ],
+      "limitations": [
+        "Two timer cases only; the full 65-case corpus last passed on 24 October (local.runtime.frozen.20261024).",
+        "The card-staging access denial of 23 October did not recur; the new lock-holder record stayed empty because no move was refused.",
+        "Certificate trust is the authorized first-use pin of each owned empty CPU, not independent CA verification; timing covers host-observed windows only.",
+        "PLCSIM Advanced V8 on local Softbus with the generated scratch fixture; never a physical PLC."
+      ]
     }
   ],
   "features": [
@@ -4605,7 +4646,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.provision.20261024"
+          "local.sim.provision.20261024",
+          "local.runtime.timers.20261029"
         ]
       },
       "availability": {
@@ -4703,7 +4745,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.online.compare.20261029"
+          "local.online.compare.20261029",
+          "local.online.snapshots.20261029"
         ]
       },
       "availability": {
@@ -18924,16 +18967,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Exports the snapshot stored on the offline DB (taken in TIA or by change kind db_snapshot_create); it is not a current CPU read, never goes online and leaves the project unchanged. A DB without a stored snapshot refuses with DbSnapshotUnavailable.",
           "The record binds the export's project path, PLC path and DB path to the selected saved review DB. It proves neither CPU/program identity nor freshness, structural compatibility or XSD conformance; all verification flags stay false.",
-          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Exported with WithDefaults and WithReadOnly (the snapshot values and date are read-only attributes); exports differ in DocumentInfo/Created, so loads compare the InterfaceSnapshot element. A DB without a stored snapshot (empty SnapshotValues dated 0001-01-01) refuses with DbSnapshotUnavailable.",
+          "Native (29 October 2026, local.online.snapshots.20261029): the capture of a DB on an owned PLCSIM scratch reviewed Count = 42 after db_snapshot_create; arrays, structures and a DB that already held a snapshot are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18973,17 +19017,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Payload: exact blockPath of a standard GlobalDB/InstanceDB/ArrayDB and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
-          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS trust and logins rejected, always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
-          "CreateSnapshot replaces the snapshot stored in the project. The previous snapshot export is kept as a backup; the readback export must differ from it. Recovery is the project checkpoint archive.",
+          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS answered NonTrusted, and the one project-user login answered with the owned instance's generated runtime user (runtimeCredentialMetadataPath), always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
+          "CreateSnapshot replaces the snapshot stored in the project. A previous snapshot is backed up only if one exists (previousSnapshotExported false otherwise); the readback export must differ from it. Recovery is the project checkpoint archive.",
           "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Native (29 October 2026, local.online.snapshots.20261029): logged in as the runtime user, the create stored Count = 42 with checkpoint, compile and save, and the checkpoint restore left the DB without a snapshot. Replacing an existing snapshot is not exercised natively."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19027,17 +19072,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Writes CPU values. Payload: snapshotRecordId of a db_snapshot_capture review, acknowledgeActualValueWrite=true and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
           "The Host reopens the review and binds blockPath, project path and snapshot SHA-256 from it; supplied-upload reviews refuse with DbSnapshotSourceRequired and another DB with DbSnapshotIdentityMismatch. Prepare and apply re-export the stored snapshot and refuse with DbSnapshotChanged unless its hash equals the reviewed capture.",
-          "No public V21 API reads actual values back, so the write is reported, not verified. The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false, so the applied PLCSIM route is never saved.",
+          "No public V21 API reads actual values back, so the write is reported by TIA; PLCSIM read the loaded value back natively (its tag list is NotUpToDate (-47) after the load until sim_tags refreshes it). The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false.",
           "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "The Host binds the reviewed snapshot's SHA-256 and retained file; prepare and apply refuse with DbSnapshotChanged unless that file keeps its hash and its InterfaceSnapshot element equals a fresh export's.",
+          "Native (29 October 2026, local.online.snapshots.20261029): with Count set to 7 in PLCSIM, loading the captured snapshot (Count = 42) as actual values read back 42."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

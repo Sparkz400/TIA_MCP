@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.70",
-    "catalogSha256": "5596183d9932cac0aba54ed2ceceaaed33173a6c62b3563daa0c1775ea756d8b",
+    "catalogSha256": "f7600edc532891d07b4125360ab08e30c2d117b6463e1448c9890e5f8beb5501",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "42863ba916167b5a4343481facc40d4cbbe1786ee70ab0db80d087b6a1337086"
   },
@@ -15,16 +15,16 @@
     "features": 450,
     "support": {
       "deferred": 10,
-      "limited": 246,
+      "limited": 249,
       "shipped": 122,
       "unavailable_target": 8,
-      "unqualified": 64
+      "unqualified": 61
     },
     "cells": {
       "blocked": 49,
-      "bound": 1688,
+      "bound": 1704,
       "deferred": 30,
-      "open": 300
+      "open": 284
     },
     "openCellsByOwner": {
       "C03": {
@@ -37,7 +37,7 @@
       },
       "D09": {
         "role": "Online diagnostics",
-        "open": 21
+        "open": 5
       },
       "D10": {
         "role": "Drives",
@@ -1682,28 +1682,32 @@
         "L03"
       ],
       "evidenceIds": [
-        "local.sim.provision.20261024"
+        "local.sim.provision.20261024",
+        "local.runtime.timers.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.provision.20261024"
+            "local.sim.provision.20261024",
+            "local.runtime.timers.20261029"
           ]
         },
         {
           "gate": "AC-simulation-download",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.provision.20261024"
+            "local.sim.provision.20261024",
+            "local.runtime.timers.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.provision.20261024"
+            "local.sim.provision.20261024",
+            "local.runtime.timers.20261029"
           ]
         }
       ]
@@ -1766,35 +1770,40 @@
         "C03"
       ],
       "evidenceIds": [
-        "local.online.compare.20261029"
+        "local.online.compare.20261029",
+        "local.online.snapshots.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.online.compare.20261029"
+            "local.online.compare.20261029",
+            "local.online.snapshots.20261029"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.online.compare.20261029"
+            "local.online.compare.20261029",
+            "local.online.snapshots.20261029"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.online.compare.20261029"
+            "local.online.compare.20261029",
+            "local.online.snapshots.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.online.compare.20261029"
+            "local.online.compare.20261029",
+            "local.online.snapshots.20261029"
           ]
         }
       ]
@@ -17543,31 +17552,41 @@
         "db_snapshot_capture"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D09"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.online.snapshots.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         }
       ]
     },
@@ -17581,41 +17600,55 @@
         "change_restore"
       ],
       "changeKind": "db_snapshot_create",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D09"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.online.snapshots.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         }
       ]
     },
@@ -17629,41 +17662,55 @@
         "change_restore"
       ],
       "changeKind": "db_snapshot_load_actual",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D09"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.online.snapshots.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.online.snapshots.20261029"
+          ]
         }
       ]
     },
@@ -23846,6 +23893,21 @@
       "notRetained": []
     },
     {
+      "id": "local.online.snapshots.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+      "retained": [
+        {
+          "path": "evidence/local.online.snapshots.20261029.json",
+          "sha256": "e492a8b69100f2912e22c3a02d251e54194cb5acb061d32a58be5660af54bd30"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.opcua.server-settings.20261028",
       "status": "passed",
       "profile": {
@@ -24121,6 +24183,21 @@
         {
           "path": "evidence/local.runtime.frozen.20261024.json",
           "sha256": "182e81481a87391ca88805f6a81f139751881240bd7505e03cfb2dd5f3f699ba"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.runtime.timers.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+      "retained": [
+        {
+          "path": "evidence/local.runtime.timers.20261029.json",
+          "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
         }
       ],
       "notRetained": []
