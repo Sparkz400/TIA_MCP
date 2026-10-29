@@ -274,6 +274,8 @@ try {
         }
         Invoke-CheckGroup 1 {
             & (Join-Path $PSScriptRoot 'Test-AddInOwner.ps1') -OutputDirectory (Join-Path $output 'addin-owner-framework')
+            & (Join-Path $PSScriptRoot 'Test-AddInSandbox.ps1') -OutputDirectory (Join-Path $output 'addin-sandbox')
+            $result.addInSandbox = 'passed; companion JSON and Host pipe client in a partial-trust AppDomain with only the declared permissions, synthetic server'
             python -B scripts/test_addin_handoff.py --log (Join-Path $output 'general-managed.log') --output (Join-Path $output 'addin-handoff-lifecycle.json')
             if ($LASTEXITCODE -ne 0) { throw 'Add-In handoff independent receipt-chain checks failed.' }
             $result.addInHandoffLifecycle = 'passed; internal lifecycle with synthetic authority, no transport or production enrollment'

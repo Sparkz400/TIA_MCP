@@ -25,7 +25,7 @@
         <Comment>Reads the Host discovery file and saved project reviews; writes nothing.</Comment>
       </System.Security.Permissions.FileIOPermission>
       <System.Security.Permissions.SecurityPermission.UnmanagedCode>
-        <Comment>Verifies the local pipe server process (GetNamedPipeServerProcessId, GetProcessTimes).</Comment>
+        <Comment>Opens the local Host pipe and verifies its server process (kernel32 pipe calls, GetNamedPipeServerProcessId, GetProcessTimes).</Comment>
       </System.Security.Permissions.SecurityPermission.UnmanagedCode>
     </SecurityPermissions>
   </RequiredPermissions>

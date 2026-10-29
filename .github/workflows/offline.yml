@@ -142,6 +142,7 @@ jobs:
             artifacts/offline-validation/*/technology-profiles/verification.json
             artifacts/offline-validation/*/technology-profiles/encoders-v4/**
             artifacts/offline-validation/*/addin-owner-framework/result.json
+            artifacts/offline-validation/*/addin-sandbox/result.json
             artifacts/offline-validation/*/addin-handoff-lifecycle.json
             artifacts/offline-validation/*/addin-receiver-processes.json
             artifacts/offline-validation/*/addin-receiver-host/*.json

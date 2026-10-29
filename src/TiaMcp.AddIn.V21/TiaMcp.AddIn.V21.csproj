@@ -11,7 +11,6 @@
     <!-- The Add-In reports the hash of these exact bytes; Publish-AddIn.ps1 publishes and enrolls the same file. -->
     <EmbeddedResource Include="AddIn.Publisher.xml" LogicalName="TiaMcp.AddIn.Publisher.xml" />
     <None Include="AddIn.Publisher.xml" CopyToOutputDirectory="PreserveNewest" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="Siemens.Engineering.AddIn.Base"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.AddIn.Base.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Siemens.Engineering.Base"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.Base.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Siemens.Engineering.Step7"><HintPath>$(TiaApiDirectory)\Siemens.Engineering.Step7.dll</HintPath><Private>false</Private></Reference>
