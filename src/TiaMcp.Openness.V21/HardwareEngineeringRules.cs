@@ -9,7 +9,7 @@ namespace TiaMcp.Openness.V21
     // This deliberately makes no claim about unexposed vendor payloads or wiring.
     internal static class HardwareEngineeringRules
     {
-        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
+        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes", "hardware_cpu_parameters",
             "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
             "hardware_transfer_area_create", "hardware_transfer_area_delete" }.Contains(kind);
 
@@ -66,6 +66,29 @@ namespace TiaMcp.Openness.V21
             if (effective["SystemMemoryByteAddress"] != null && effective["ClockMemoryByteAddress"] != null &&
                 effective.Value<long>("SystemMemoryByteAddress") == effective.Value<long>("ClockMemoryByteAddress"))
                 throw new BridgeException("AddressConflict", "System memory and clock memory must use different bit-memory bytes.");
+        }
+
+        // Reviewed V21 CPU parameter attributes: cycle monitoring, minimum cycle time, startup, time synchronization and
+        // access protection. The names are the native ones declared on S7-1500 CPU device items (observed 29 October 2026).
+        internal static readonly string[] CpuParameterAttributes = { "CPU_PARAMETER_NAMES" };
+
+        internal static void RequireCpuParameterRequest(JObject requested)
+        {
+            if (requested == null || requested.Count == 0) throw new BridgeException("InvalidRequest", "At least one CPU parameter is required.");
+            foreach (var property in requested.Properties())
+            {
+                if (Array.IndexOf(CpuParameterAttributes, property.Name) < 0)
+                    throw new BridgeException("UnsupportedAttribute", "Attribute is outside the reviewed CPU parameter subset: " + property.Name);
+                if (!(property.Value is JValue) || property.Value.Type == JTokenType.Null)
+                    throw new BridgeException("InvalidRequest", property.Name + " must be a non-null scalar.");
+            }
+        }
+
+        // Compares the native-normalized request with the CPU's current values; Siemens validates ranges during the write and compile.
+        internal static void RequireCpuParametersChanged(JObject current, JObject normalized)
+        {
+            if (normalized.Properties().All(property => current[property.Name] != null && JToken.DeepEquals(current[property.Name], property.Value)))
+                throw new BridgeException("InvalidRequest", "The requested CPU parameters are unchanged.");
         }
 
         // Newtonsoft's implicit string conversion keeps a String token for a
@@ -130,6 +153,10 @@ namespace TiaMcp.Openness.V21
                 var memory = CpuMemoryBytesAfter(new JObject(((JObject)selected["attributes"]).Properties().Where(p => Array.IndexOf(CpuMemoryByteAttributes, p.Name) >= 0)), (JObject)payload["attributes"]);
                 foreach (string name in CpuMemoryByteAttributes) ((JObject)selected["attributes"]).Remove(name);
                 foreach (var property in memory.Properties()) selected["attributes"][property.Name] = property.Value.DeepClone();
+            }
+            else if (kind == "hardware_cpu_parameters")
+            {
+                foreach (var property in ((JObject)payload["attributes"]).Properties()) selected["attributes"][property.Name] = property.Value.DeepClone();
             }
             else if (kind == "hardware_address_set")
             {

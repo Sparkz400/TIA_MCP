@@ -176,6 +176,13 @@ var disable = new JObject { ["hardwarePath"] = controller, ["attributes"] = new 
 void EnabledRows(JArray rows) { MemoryRows(rows); rows[2]["attributes"]["SystemMemoryByte"] = true; rows[2]["attributes"]["SystemMemoryByteAddress"] = 20UL; }
 Check("cpu memory disable drops its byte number", "hardware_cpu_memory_bytes", disable, rows => { rows[2]["attributes"]["SystemMemoryByte"] = false; ((JObject)rows[2]["attributes"]).Remove("SystemMemoryByteAddress"); }, true, EnabledRows);
 Check("cpu memory disable keeping its byte number rejected", "hardware_cpu_memory_bytes", disable, rows => rows[2]["attributes"]["SystemMemoryByte"] = false, false, EnabledRows);
+string cpuParameter = HardwareEngineeringRules.CpuParameterAttributes[0];
+var cpuParameters = new JObject { ["hardwarePath"] = controller, ["attributes"] = new JObject { [cpuParameter] = 150L } };
+void CpuParameterRows(JArray rows) => rows[2]["attributes"][cpuParameter] = 100L;
+Check("cpu parameter set on the exact item", "hardware_cpu_parameters", cpuParameters, rows => rows[2]["attributes"][cpuParameter] = 150L, true, CpuParameterRows);
+Check("cpu parameter request not applied rejected", "hardware_cpu_parameters", cpuParameters, _ => { }, false, CpuParameterRows);
+Check("cpu parameter collateral comment rejected", "hardware_cpu_parameters", cpuParameters, rows => { rows[2]["attributes"][cpuParameter] = 150L; rows[2]["attributes"]["Comment"] = "lost"; }, false, CpuParameterRows);
+Check("cpu parameter on another item rejected", "hardware_cpu_parameters", cpuParameters, rows => { rows[2]["attributes"][cpuParameter] = 150L; rows[0]["attributes"]["Comment"] = "lost"; }, false, CpuParameterRows);
 var fParameters = new JObject { ["safetyAcknowledged"] = true, ["parameters"] = new JArray(new JObject { ["hardwarePath"] = module, ["name"] = "Failsafe_FDestinationAddress", ["expected"] = 100, ["value"] = 120 }) };
 void FRows(JArray rows) { rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 100; rows[1]["attributes"]["Failsafe_FMonitoringtime"] = 150; rows[3]["attributes"]["Failsafe_FDestinationAddress"] = 101; }
 Check("f-destination address on the exact F-I/O", "safety_fparameter_set", fParameters, rows => rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 120, true, FRows);
@@ -288,4 +295,5 @@ if (chain.Count != 2 || (string)chain[0]["text"] != "Import failed." || ((string
     || (string)chain[0]["details"][0]["text"] != "The required worksheet 'TextList' is missing." || (string)chain[1]["message"] != "inner" || chain[1]["details"] != null)
     throw new Exception("Native failure chain differs: " + chain);
 count++; Console.WriteLine("PASS native failure chain keeps Siemens message data, bounded");
+count += RuntimeRouteChecks.Run();
 Console.WriteLine($"{count} hardware preservation checks passed.");

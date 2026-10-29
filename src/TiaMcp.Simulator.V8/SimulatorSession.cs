@@ -13,7 +13,7 @@ using TiaMcp.Simulation;
 
 namespace TiaMcp.Simulator.V8
 {
-    internal sealed class SimulatorSession : IDisposable
+    internal sealed partial class SimulatorSession : IDisposable
     {
         private readonly Dictionary<int, Selection> _instances = new Dictionary<int, Selection>();
         private bool _initialized;
@@ -42,6 +42,9 @@ namespace TiaMcp.Simulator.V8
                 case "sim_capture_end": return CaptureEnd(args);
                 case "sim_identity": return Identity(args);
                 case "sim_write_owned": return WriteOwned(args);
+                case "sim_time": return Time(args);
+                case "sim_event": return Event(args);
+                case "sim_storage": return Storage(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }
@@ -58,7 +61,7 @@ namespace TiaMcp.Simulator.V8
             result["selections"] = new JArray(_instances.Values.Select(Info));
             result["licensePolicy"] = "No activation API or licensing-dialog confirmation. Explicit bounded PowerOn supplies the licensing result; trial and Test Suite warnings are rejected. LicenseStatus reports current use, not available entitlement.";
             result["downloadRoute"] = "Owned fresh virtual memory card, verified through a CurrentUser DPAPI ticket and independent local runtime identity check.";
-            result["timing"] = "Wall-clock polling only; no scan-accurate or synchronized simulation claim.";
+            result["timing"] = "Wall-clock polling by default; sim_test virtualTime advances TimespanSynchronized_C spans and sim_time sets the virtual clock. No scan-accurate claim.";
             return result;
         }
 
@@ -222,10 +225,13 @@ namespace TiaMcp.Simulator.V8
                 case "powerOff": selected.Instance.PowerOff(timeout); break;
                 case "run": EnsureAdmitted(selected); selected.Instance.Run(timeout); break;
                 case "stop": selected.Instance.Stop(timeout); break;
-                default: throw new SimulatorException("InvalidRequest", "action must be powerOn, powerOff, run, or stop.");
+                // Restarts the virtual controller with its loaded program; only an owned instance.
+                case "memoryReset": RequireOwned(selected); EnsureAdmitted(selected); selected.Instance.MemoryReset(timeout); break;
+                default: throw new SimulatorException("InvalidRequest", "action must be powerOn, powerOff, run, stop or memoryReset.");
             }
             var observed = selected.Instance.OperatingState;
-            bool reached = action == "powerOn" ? new[] { EOperatingState.Run, EOperatingState.Stop, EOperatingState.Freeze, EOperatingState.Hold }.Contains(observed)
+            bool reached = action == "memoryReset" ? observed == EOperatingState.Stop || observed == EOperatingState.Run
+                : action == "powerOn" ? new[] { EOperatingState.Run, EOperatingState.Stop, EOperatingState.Freeze, EOperatingState.Hold }.Contains(observed)
                 : action == "powerOff" ? observed == EOperatingState.Off : action == "run" ? observed == EOperatingState.Run : observed == EOperatingState.Stop;
             if (!reached) throw new SimulatorException("SimulationStateNotReached", "The runtime call returned but the requested state was not observed.",
                 new JObject { ["action"] = action, ["observedState"] = observed.ToString(), ["runtimeCode"] = resultCode, ["retrySafe"] = false, ["instance"] = Info(selected) });
@@ -446,6 +452,9 @@ namespace TiaMcp.Simulator.V8
             var steps = args["steps"] as JArray;
             if (steps == null || steps.Count < 1 || steps.Count > 128) throw new SimulatorException("InvalidRequest", "Provide 1–128 scenario steps.");
             int interval = OptionalInteger(args, "intervalMs", 100, 20, 5000);
+            if (Given(args, "virtualTime") && args["virtualTime"].Type != JTokenType.Boolean) throw new SimulatorException("InvalidRequest", "virtualTime must be a boolean.");
+            bool virtualTime = args.Value<bool?>("virtualTime") ?? false;
+            if (virtualTime) RequireOwned(selected);
             long duration = 0;
             int snapshots = 1;
             foreach (var token in steps)
@@ -460,34 +469,47 @@ namespace TiaMcp.Simulator.V8
             if (duration > 60000 || snapshots > 500) throw new SimulatorException("ScenarioLimit", "Scenario is limited to 60 seconds and 500 snapshots. Increase intervalMs or reduce steps.");
             var report = Envelope(selected);
             report["instance"] = Info(selected);
-            report["timing"] = "Wall-clock polling, including API overhead. Not scan-accurate; samples are not atomic across symbols.";
+            report["timing"] = virtualTime ? VirtualTimingBasis : "Wall-clock polling, including API overhead. Not scan-accurate; samples are not atomic across symbols.";
             report["scenario"] = args.DeepClone();
             var samples = new JArray(); var actions = new JArray(); var assertions = new JArray();
             report["samples"] = samples; report["actions"] = actions; report["assertions"] = assertions;
             string reportPath = Path.Combine(root, "simulation-test-" + Guid.NewGuid().ToString("N") + ".json");
             var clock = Stopwatch.StartNew();
+            VirtualClock virtualClock = null;
+            Func<long> now = () => virtualClock?.ElapsedMs ?? clock.ElapsedMilliseconds;
+            JObject Take() { var sample = Sample(selected, signals, now); if (virtualClock != null) sample["wallElapsedMs"] = clock.ElapsedMilliseconds; return sample; }
             bool completed = false;
             try
             {
-                samples.Add(Sample(selected, signals, clock));
+                if (virtualTime) virtualClock = VirtualClock.Start(selected);
+                samples.Add(Take());
                 foreach (JObject step in steps)
                 {
-                    if (step["writes"] != null) actions.Add(new JObject { ["elapsedMs"] = clock.ElapsedMilliseconds, ["writes"] = ApplyWrites(selected, Signals(step["writes"], true)) });
-                    long until = clock.ElapsedMilliseconds + OptionalInteger(step, "delayMs", 0, 0, 60000);
+                    if (step["writes"] != null) actions.Add(new JObject { ["elapsedMs"] = now(), ["writes"] = ApplyWrites(selected, Signals(step["writes"], true)) });
+                    long until = now() + OptionalInteger(step, "delayMs", 0, 0, 60000);
                     do
                     {
-                        int wait = (int)Math.Min(interval, Math.Max(0, until - clock.ElapsedMilliseconds));
-                        if (wait > 0) Thread.Sleep(wait);
-                        samples.Add(Sample(selected, signals, clock));
+                        int wait = (int)Math.Min(interval, Math.Max(0, until - now()));
+                        if (wait > 0) { if (virtualClock != null) virtualClock.Advance(wait); else Thread.Sleep(wait); }
+                        samples.Add(Take());
                         if (samples.Count > 500 || clock.ElapsedMilliseconds > 90000)
                             throw new SimulatorException("ScenarioLimit", "Actual execution exceeded 90 seconds or 500 samples including API overhead.");
-                    } while (clock.ElapsedMilliseconds < until);
+                    } while (now() < until);
                     foreach (JObject assertion in (step["assertions"] as JArray) ?? new JArray())
-                        assertions.Add(Evaluate(selected, assertion, clock));
+                        assertions.Add(Evaluate(selected, assertion, now));
                 }
                 completed = true;
             }
             catch (Exception ex) { report["failure"] = new JObject { ["message"] = ex.Message, ["exceptionType"] = ex.GetType().FullName }; }
+            finally
+            {
+                if (virtualClock != null)
+                {
+                    report["virtualTime"] = virtualClock.Evidence;
+                    try { virtualClock.Evidence["elapsedMs"] = virtualClock.ElapsedMs; virtualClock.Dispose(); }
+                    catch (Exception ex) { virtualClock.Evidence["restoreFailure"] = ex.Message; completed = false; }
+                }
+            }
             report["completed"] = completed;
             report["passed"] = completed && assertions.All(a => a.Value<bool>("passed")) && samples.All(s => s["values"].All(v => v.Value<string>("quality") == "good"));
             report["elapsedMs"] = clock.ElapsedMilliseconds;
@@ -497,8 +519,8 @@ namespace TiaMcp.Simulator.V8
             return report;
         }
 
-        private static JObject Sample(Selection selected, List<Signal> signals, Stopwatch clock) =>
-            new JObject { ["elapsedMs"] = clock.ElapsedMilliseconds, ["values"] = Capture(selected, signals) };
+        private static JObject Sample(Selection selected, List<Signal> signals, Func<long> now) =>
+            new JObject { ["elapsedMs"] = now(), ["values"] = Capture(selected, signals) };
 
         private static JArray Capture(Selection selected, List<Signal> signals)
         {
@@ -647,10 +669,10 @@ namespace TiaMcp.Simulator.V8
             }
         }
 
-        private static JObject Evaluate(Selection selected, JObject assertion, Stopwatch clock)
+        private static JObject Evaluate(Selection selected, JObject assertion, Func<long> now)
         {
             var signal = Signals(new JArray(new JObject { ["symbol"] = assertion["symbol"], ["type"] = assertion["type"] }), false)[0];
-            var result = (JObject)assertion.DeepClone(); result["elapsedMs"] = clock.ElapsedMilliseconds;
+            var result = (JObject)assertion.DeepClone(); result["elapsedMs"] = now();
             try
             {
                 var actual = ReadValue(selected.Instance, signal); result["actual"] = actual;
@@ -724,6 +746,15 @@ namespace TiaMcp.Simulator.V8
                 result["generatedAtUtc"] = manifest["completedAtUtc"];
                 result["reportPath"] = path;
                 result["basis"] = "Retained engineering generation manifest; subsequent external card/program changes are not detected by this evidence.";
+                // Online downloads (change.simulation_download_online) record themselves beside the card manifest.
+                var online = new DirectoryInfo(selected.Storage).GetFiles("simulation-download-online-*.json").OrderBy(f => f.LastWriteTimeUtc).ToArray();
+                result["onlineDownloadsAfterCard"] = online.Length;
+                if (online.Length > 0)
+                {
+                    result["status"] = "online-download";
+                    result["latestOnlineDownloadPath"] = online.Last().FullName;
+                    result["basis"] = "The generated card was followed by " + online.Length + " recorded online download(s); programRevision describes the original card, not the latest online program.";
+                }
             }
             catch (Exception ex) { result["status"] = "unavailable"; result["error"] = ex.Message; }
             return result;
