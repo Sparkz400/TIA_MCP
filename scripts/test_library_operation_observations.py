@@ -133,6 +133,14 @@ class LibraryOperationObservations(unittest.TestCase):
         self.validate(self.plan('library_instantiate', selection=[{**self.pin, 'masterCopyPath': '/masterCopies/A'}], destinationComposition='blocks'))
         self.reject(self.plan('library_instantiate', selection=[{'masterCopyPath': '/masterCopies/A'}] * 2, destinationComposition='blocks'))
 
+    def test_explicit_instance_namespace_is_a_declared_identifier(self):
+        value = self.plan('library_instantiate', namespace='Unit.Sub')
+        value['instanceNamespace'] = {'namespace': 'Unit.Sub', 'unitNamespacePreset': 'Unit', 'scope': 'Selected roots only.',
+                                      'objects': [{'typeName': 'Synthetic', 'typeNamespace': ''}]}
+        self.validate(value)
+        self.reject(self.plan('library_instantiate', namespace='1 bad'))
+        value['instanceNamespace']['extra'] = True; self.reject(value)
+
     def test_every_supplied_type_policy_flag_must_be_boolean(self):
         for bad in (None, 0, 'true', [], {}):
             for field in ('doNotUse', 'setForUpdate'):

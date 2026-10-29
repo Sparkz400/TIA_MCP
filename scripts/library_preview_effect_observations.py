@@ -161,7 +161,7 @@ def check_preview_effects(plan, same):
         require(len(effects) == 2, 'update effect count')
         require(isinstance(plan.get('updateImpact'), dict) and isinstance(plan['updateImpact'].get('plcPath'), str), 'update target observation')
         same(effects[0], dict(action='updateAllSelectedTypeUses',plcPath=plan['updateImpact']['plcPath'],
-                             forceDefault=False,deleteUnusedVersions=False), 'update effect')
+                             forceDefault=payload.get('forceDefault') is True,deleteUnusedVersions=False), 'update effect')
     elif specialized == 'component':
         same(actions, ['planPlcComponent'], 'component effect count/order')
     elif kind == 'library_save' and 'existingRecoveryCheckpoint' in plan:

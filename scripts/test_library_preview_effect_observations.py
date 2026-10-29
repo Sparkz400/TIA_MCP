@@ -151,6 +151,9 @@ class LibraryPreviewEffectObservations(unittest.TestCase):
 
     def test_update_analysis_and_effect_are_both_checked(self):
         self.reject('library_update_project',lambda p:p['effects'][0].update(forceDefault=True))
+        forced = self.plan('library_update_project'); forced['payload']['forceDefault'] = True; forced['effects'][0]['forceDefault'] = True
+        self.validate(forced)
+        self.reject('library_update_project',lambda p:p['payload'].update(forceDefault=True))
         self.reject('library_update_project',lambda p:p['effects'][0].update(plcPath='/other'))
         self.reject('library_update_project',lambda p:p['updateCleanupGuard']['proofEdges'].clear())
         self.reject('library_update_project',lambda p:p.pop('updateImpact'))
