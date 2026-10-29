@@ -9,9 +9,12 @@ internal static class Program
 {
     private static int Main()
     {
-        string api = @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+        // The same overrides the builds take from MSBuild's TiaApiDirectory and SimulatorApiDirectory properties.
+        string api = Environment.GetEnvironmentVariable("TiaApiDirectory") ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+        string simulator = Environment.GetEnvironmentVariable("SimulatorApiDirectory") ?? @"C:\Program Files (x86)\Common Files\Siemens\PLCSIMADV\API\8.0";
         AppDomain.CurrentDomain.AssemblyResolve += (_, e) => {
-            string path = Path.Combine(api, new AssemblyName(e.Name).Name + ".dll");
+            string name = new AssemblyName(e.Name).Name;
+            string path = Path.Combine(name.StartsWith("Siemens.Simatic.Simulation.", StringComparison.Ordinal) ? simulator : api, name + ".dll");
             return File.Exists(path) ? Assembly.LoadFrom(path) : null;
         };
         var type = Assembly.Load("TiaMcp.Openness.V21").GetType("TiaMcp.Openness.V21.OpennessSession", true);

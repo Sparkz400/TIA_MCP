@@ -106,8 +106,11 @@ internal static class Program
         UiEvidenceChecks.Run(Check, Reject);
 
         // Actual production worker dispatch, with no TiaPortal constructed. No fake constructor gets registered.
-        string api = @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
-        AppDomain.CurrentDomain.AssemblyResolve += (_, e) => { string path = Path.Combine(api, new AssemblyName(e.Name).Name + ".dll"); return File.Exists(path) ? Assembly.LoadFrom(path) : null; };
+        // The same override the builds take from MSBuild's TiaApiDirectory property.
+        string api = Environment.GetEnvironmentVariable("TiaApiDirectory") ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+        string simulator = Environment.GetEnvironmentVariable("SimulatorApiDirectory") ?? @"C:\Program Files (x86)\Common Files\Siemens\PLCSIMADV\API\8.0";
+        // The worker's type initializer also binds the PLCSIM Advanced API, which lives in its own directory.
+        AppDomain.CurrentDomain.AssemblyResolve += (_, e) => { string name = new AssemblyName(e.Name).Name, path = Path.Combine(name.StartsWith("Siemens.Simatic.Simulation.", StringComparison.Ordinal) ? simulator : api, name + ".dll"); return File.Exists(path) ? Assembly.LoadFrom(path) : null; };
         var type = Assembly.Load("TiaMcp.Openness.V21").GetType("TiaMcp.Openness.V21.OpennessSession", true);
         object worker = Activator.CreateInstance(type, BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { api, false }, null);
         var execute = type.GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
