@@ -52,6 +52,7 @@ namespace TiaMcp.Openness.V21
             if (kind == "project")
             {
                 AddTargetFeature(features, "project_inventory", directApi, "partial", "Bounded configured hardware and exposed software scopes; library internals and runtime values are excluded.");
+                AddTargetFeature(features, "change.project_compile", directApi, "partial", "Compiles every device of the project (hardware and software) under a checkpoint; no other mutation runs. Each device needs a compiler service.");
                 AddTargetFeature(features, "project_index", directApi, "implemented", "Bounded metadata snapshots and stable pages; external edits require explicit verification and no whole-project or logic freshness is certified.");
                 AddTargetFeature(features, "hardware_inspect", directApi, "partial", "Module-specific attributes/channels are limited to the installed API's exposed metadata.");
                 AddTargetFeature(features, "hardware_catalog_search", directApi, "implemented", "Installed catalog content and optional products determine catalog results.");
@@ -98,6 +99,9 @@ namespace TiaMcp.Openness.V21
                             blocked: safetyScope, blocker: "Safety-unit mutations require the dedicated safety import workflow.");
                     AddTargetFeature(features, "change.graphical_typed_edit", directApi, "partial", "Versioned separate LAD/FBD models, explicit declaration/storage effects and immutable native artifacts use the existing checkpoint workflow. Exact CPU, instruction, data type, language and route profiles are required. Native-format evidence and runtime qualification are separate; inspect the shipped typed profile catalog.",
                         blocked: safetyScope, blocker: "Typed graphical changes exclude safety scopes.");
+                    foreach (string feature in new[] { "tag_table_create", "tag_table_rename", "tag_table_delete" })
+                        AddTargetFeature(features, "change." + feature, directApi, "partial", "Create an empty table, rename one, or delete an empty user table; names are unique in the software scope and the default tag table is never deleted. Mandatory compilation and recovery checkpoint.",
+                            blocked: safetyScope, blocker: "Safety-unit tag tables are excluded from this workflow.");
                     foreach (string feature in new[] { "group_create", "group_rename", "group_delete" })
                         AddTargetFeature(features, "change." + feature, directApi, "partial", "Exact user groups in blocks/types/tags; generated/root groups are excluded, deletion requires an empty group, and moves are not implemented. Mandatory compilation and recovery checkpoints apply; recorded fixture evidence does not qualify the current target.",
                             blocked: safetyScope, blocker: "Safety-unit group mutations are excluded from this workflow.");
@@ -224,6 +228,7 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "change.hardware_move", directApi, "partial", "Same-rack pluggable-module slot moves require native CanPlugMove, compiled readback and configured hardware preservation.");
                 AddTargetFeature(features, "change.hardware_channel_attributes", directApi, "partial", "Exact native channel type/I-O-type/number plus reviewed scalar allowlist and native read/write metadata; compiled preservation and checkpoint required.");
                 AddTargetFeature(features, "change.hardware_cpu_memory_bytes", directApi, "partial", "CPU device items declaring the native system and clock memory attributes only; boolean enable flags, byte numbers 0-65535, distinct enabled bytes, compiled preservation and checkpoint required.");
+                AddTargetFeature(features, "change.hardware_cpu_parameters", directApi, "partial", "Only the reviewed CPU parameter attributes this item declares; native conversion, readback, device compilation and configured-hardware preservation are mandatory.");
                 AddTargetFeature(features, "change.hardware_delete", directApi, "partial", "The mutation workflow also rejects software-bearing descendants; that subtree is not traversed here.",
                     blocked: hardware.IsBuiltIn, blocker: "Built-in hardware items cannot be deleted by this workflow.");
                 AddTargetFeature(features, "change.hardware_replace", directApi, "partial", "DeviceItem.ChangeType to an exact installed catalog identifier for a pluggable module without software; lost addresses/children fail after the write unless acceptLoss is true. Compiled preservation and checkpoint required.",

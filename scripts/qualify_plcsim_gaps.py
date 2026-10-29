@@ -182,6 +182,8 @@ def body(h):
 
     h.stage("discovery baseline", lambda: h.tool("simulation_discovery_baseline", {})["baseline"])
     created = h.stage("sim_create", lambda: h.tool("sim_create", {"cpuType": "CPU1511", "creationId": uuid.uuid4().hex}))
+    # The ticket expires 15 minutes after sim_create; online steps start only with two minutes to spare.
+    lab.deadline = time.monotonic() + 13 * 60
     lab.instance = verify_owned_instance(created["instance"])
     try:
         ticket = created["downloadTicket"]
@@ -210,6 +212,7 @@ def body(h):
 def online_downloads(h, lab, plc, ticket, login, secret):
     base = {"downloadTicket": ticket, "runtimeCredentialMetadataPath": login, "credentialMetadataPath": secret}
     def download(label, payload):
+        require(time.monotonic() < lab.deadline, "The download ticket is about to expire before " + label)
         prepared = h.stage("prepare simulation_download_online " + label, lambda: h.tool("change_prepare", {"kind": "simulation_download_online", "plcPath": plc, "payload": {**base, **payload}}))
         row = {"kind": "simulation_download_online", "changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "state": "dispatching"}
         h.report["mutations"].append(row)
@@ -236,8 +239,6 @@ def online_downloads(h, lab, plc, ticket, login, secret):
     h.report["onlineCodeChange"] = report
     values = h.stage("version 2 runs with kept values", lambda: lab.read(Version="int16", Ob82="int32"))
     require(values == {"Version": 2, "Ob82": 7}, "Expected Version 2 and the kept counter 7: %s" % values)
-    compare = h.stage("plc_online_compare after the online download", lambda: h.tool("plc_online_compare", {"downloadTicket": ticket, "plcPath": plc, "maxItems": 2000, "runtimeCredentialMetadataPath": login}))
-    h.report["compareAfterDownload"] = {"truncated": compare["compareTruncated"], "root": compare["compare"]["state"]}
     # 2. A DB layout change with keepActualValues: TIA either keeps the values or demands a reinitialization, which is
     # refused without allowStop. Either way a further layout change then downloads reinitialized, with a stop and restart.
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "\n      Added : Int;", "expectedBlockNames": [DB]})
@@ -261,6 +262,11 @@ def online_downloads(h, lab, plc, ticket, login, secret):
     h.report["onlineLayoutChange"] = report
     values = h.stage("reinitialized values after the layout change", lambda: lab.read(Version="int16", Ob82="int32"))
     require(values == {"Version": 2, "Ob82": 0}, "Expected the reinitialized counter 0 with Version 2: %s" % values)
+    if time.monotonic() < lab.deadline:
+        compare = h.stage("plc_online_compare after the online downloads", lambda: h.tool("plc_online_compare", {"downloadTicket": ticket, "plcPath": plc, "maxItems": 2000, "runtimeCredentialMetadataPath": login}))
+        h.report["compareAfterDownload"] = {"truncated": compare["compareTruncated"], "root": compare["compare"]["state"]}
+    else:
+        h.report["compareAfterDownload"] = "skipped: the download ticket expires before another online session"
 
 
 def virtual_time(h, lab):
