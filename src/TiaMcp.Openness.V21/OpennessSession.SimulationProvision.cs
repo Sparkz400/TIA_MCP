@@ -39,6 +39,7 @@ namespace TiaMcp.Openness.V21
             JObject marker;
             try { marker = SimulationTicket.Decode(args.Value<string>("downloadTicket")); }
             catch { throw new BridgeException("InvalidSimulationTicket", "A current owned simulator ticket is required for scratch credential provisioning."); }
+            string network = SimulationTicket.Interface(marker);
             var plc = SelectPlc(args);
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(plc.Project, budget).Where(entry =>
@@ -102,7 +103,8 @@ namespace TiaMcp.Openness.V21
             var report = Envelope();
             report["recoveryBaseline"] = recoveryBaseline;
             report["origin"] = "TIA Portal V21 Openness / owned PLCSIM Advanced V8 credential provisioning";
-            report["route"] = "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
+            report["route"] = network == "TCPIP" ? "OnlineProvider.SetPlcMasterSecret via PN/IE / the sole PLCSIM Virtual Ethernet Adapter, existing TCP/IP single-adapter mode only"
+                : "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
             report["project"] = ProjectInfo(plc.Project);
             report["plcPath"] = plc.Path;
             report["instanceId"] = marker["instanceId"].DeepClone();
@@ -217,8 +219,7 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionRegistration(marker);
                     instance = VerifySimulationInstance(marker); // Requires exact identity and OFF.
                     VerifySimulationProvisionIdentity(instance, marker, true);
-                    if (instance.CommunicationInterface != ECommunicationInterface.Softbus)
-                        throw new BridgeException("SoftbusRequired", "The owned simulator must already use local Softbus; shared network settings are not changed.");
+                    RequireSimulationNetwork(marker, instance, "The owned simulator must already use local Softbus; shared network settings are not changed.");
                     provider = hardware[0].Item.GetService<OnlineProvider>();
                     if (provider == null)
                         throw new BridgeException("UnsupportedCapability", "The selected scratch CPU has no OnlineProvider service.");
@@ -246,7 +247,7 @@ namespace TiaMcp.Openness.V21
                                 throw new BridgeException("OfflineRequired", "The scratch CPU must remain offline during pre-start discovery.");
                         },
                         () => {
-                            var beforePc = provider.Configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
+                            var beforePc = SimulationPcInterface(provider.Configuration, network);
                             var beforeDevices = beforePc == null ? null : beforePc.GetAccessibleDevices().Take(65).ToArray();
                             var unexplained = beforeDevices == null ? null : WithoutSimulationPlaceholder(beforeDevices, AcceptedSimulationPlaceholder(discoveryBaseline), beforeDevices.Length > 64);
                             bool empty = beforeDevices == null || unexplained.Length == 0;
@@ -338,7 +339,7 @@ namespace TiaMcp.Openness.V21
                     provisionConfiguration = provider.Configuration;
                     var configuration = provisionConfiguration;
                     var mode = configuration.Modes.Find("PN/IE");
-                    var pc = mode?.PcInterfaces.Find("PLCSIM", 1);
+                    var pc = SimulationPcInterface(configuration, network);
                     report["routeLookupOperatingState"] = instance.OperatingState.ToString();
                     if (pc == null)
                     {
@@ -356,17 +357,19 @@ namespace TiaMcp.Openness.V21
                         // Siemens documents this operation for Softbus; it ignores
                         // the subnet/gateway and remanence flag in that mode.
                         const string documentedStartupAddress = "192.168.0.1";
-                        var observedBefore = observer.Read(65);
+                        var observedBefore = observer.Read(65, network);
                         var before = WithoutSimulationPlaceholder(observedBefore, AcceptedSimulationPlaceholder(discoveryBaseline), observedBefore.Length > 64);
                         report["postStartupDiscovery"] = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
                             ["accessibleDevices"] = new JArray(observedBefore.Take(64).Select(device => new JObject {
                                 ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })),
                             ["baselinePlaceholderExcluded"] = observedBefore.Length - before.Length,
                             ["truncated"] = observedBefore.Length > 64, ["causalTargetVerified"] = false };
-                        if (before.Length != 1 || before[0].Address != documentedStartupAddress ||
+                        // An empty TCP/IP CPU may show no address yet; it then gets the same documented default (/24, on the operator's subnet).
+                        bool unassigned = network == "TCPIP" && before.Length == 1 && (string.IsNullOrEmpty(before[0].Address) || before[0].Address == "0.0.0.0");
+                        if (before.Length != 1 || before[0].Address != documentedStartupAddress && !unassigned ||
                             (before[0].DeviceSeries != "S7-1500" && before[0].DeviceSeries != "S7-1500 CPU"))
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
-                        string bootstrapAddress = before[0].Address;
+                        string bootstrapAddress = documentedStartupAddress;
                         report["postStartupDiscovery"]["causalTargetVerified"] = true;
                         report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint observed by a fresh owned discovery-only Portal; exact IInstance address assignment and readback; fresh exact discovery match.";
                         var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
@@ -379,7 +382,7 @@ namespace TiaMcp.Openness.V21
                                 ["defaultGateway"] = suite.DefaultGateway.IPString })),
                             ["assignedAddress"] = bootstrapAddress, ["requestedSubnetMask"] = "255.255.255.0",
                             ["requestedDefaultGateway"] = "0.0.0.0", ["requestedRemanent"] = false,
-                            ["softbusIgnoresSubnetGatewayAndRemanence"] = true, ["readbackVerified"] = false,
+                            ["softbusIgnoresSubnetGatewayAndRemanence"] = network != "TCPIP", ["observedStartupAddress"] = before[0].Address, ["readbackVerified"] = false,
                             ["scope"] = "Owned simulator runtime only; owned instance is powered off on every exit and its storage is retained." };
                         VerifySimulationProvisionIdentity(instance, marker, false);
                         if (instance.OperatingState != EOperatingState.Stop || (instance.ControllerIP ?? new string[0]).Any(SimulationProvisionUsableIPv4))
@@ -425,13 +428,13 @@ namespace TiaMcp.Openness.V21
                         provisionConfiguration = provider.Configuration;
                         configuration = provisionConfiguration;
                         mode = configuration.Modes.Find("PN/IE");
-                        pc = mode?.PcInterfaces.Find("PLCSIM", 1);
+                        pc = SimulationPcInterface(configuration, network);
                         if (pc == null)
                         {
                             report["connectionInventory"] = SimulationProvisionConnectionInventory(configuration);
                             throw new BridgeException("SimulationProvisionRouteUnavailable", "The exact PLCSIM (1) route disappeared during read-only address discovery.");
                         }
-                        var observedAccessible = observer.Read(65);
+                        var observedAccessible = observer.Read(65, network);
                         accessible = WithoutSimulationPlaceholder(observedAccessible, AcceptedSimulationPlaceholder(discoveryBaseline), observedAccessible.Length > 64);
                         var visible = new JArray(observedAccessible.Take(64).Select(device => new JObject {
                             ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries }));
@@ -604,7 +607,7 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed before credential submission.");
-                    var read = observer.Read(3);
+                    var read = observer.Read(3, network);
                     var rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
                     if (rechecked.Length != 1 || rechecked[0].Address != address)
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before credential submission.");
@@ -632,7 +635,7 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed while establishing the scratch connection.");
-                    read = observer.Read(3);
+                    read = observer.Read(3, network);
                     rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
                     if (rechecked.Length != 1 || rechecked[0].Address != address)
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact unique PLCSIM endpoint changed while establishing the scratch connection.");
@@ -1145,8 +1148,7 @@ namespace TiaMcp.Openness.V21
             var registered = SimulationRuntimeManager.RegisteredInstanceInfo.Take(2).ToArray();
             if (registered.Length != 1 || registered[0].ID != marker.Value<int>("instanceId") || registered[0].Name != marker.Value<string>("instanceName"))
                 throw new BridgeException("SimulationProvisionIsolationRequired", "Credential provisioning requires the exact owned simulator to be the only registered local instance. Other instances are never stopped or selected.");
-            if (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
-                throw new BridgeException("SoftbusRequired", "Credential provisioning requires existing local Softbus mode.");
+            RequireSimulationNetwork(marker, null, "Credential provisioning requires existing local Softbus mode.");
         }
 
         private static void VerifySimulationProvisionIdentity(IInstance instance, JObject marker, bool requireOff, bool requireExclusive = true)
@@ -1160,8 +1162,7 @@ namespace TiaMcp.Openness.V21
             var markerFile = SimulationCredentialFile(Path.Combine(instance.StoragePath, SimulationTicket.MarkerName), 16384);
             if (!JToken.DeepEquals(marker, JObject.Parse(File.ReadAllText(markerFile.FullName))))
                 throw new BridgeException("SimulationProvisionTargetMismatch", "The simulator ownership marker changed.");
-            if (requireExclusive && (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus || instance.CommunicationInterface != ECommunicationInterface.Softbus))
-                throw new BridgeException("SoftbusRequired", "The exact owned simulator is no longer isolated through local Softbus.");
+            if (requireExclusive) RequireSimulationNetwork(marker, instance, "The exact owned simulator is no longer isolated through local Softbus.");
             if (requireOff && instance.OperatingState != EOperatingState.Off)
                 throw new BridgeException("SimulationMustBeOff", "The owned simulator must be OFF before credential recovery starts.");
         }
@@ -1183,6 +1184,15 @@ namespace TiaMcp.Openness.V21
             IPAddress address;
             return IPAddress.TryParse(value, out address) && address.AddressFamily == AddressFamily.InterNetwork &&
                 address.ToString() == value && !IPAddress.Any.Equals(address) && !IPAddress.Broadcast.Equals(address) && !IPAddress.IsLoopback(address);
+        }
+
+        // Softbus instances answer on PN/IE / PLCSIM (1); TCP/IP ones on the operator's sole PLCSIM virtual Ethernet adapter, never another NIC.
+        internal static ConfigurationPcInterface SimulationPcInterface(ConnectionConfiguration configuration, string network)
+        {
+            var mode = configuration.Modes.Find("PN/IE");
+            if (mode == null || network != "TCPIP") return mode?.PcInterfaces.Find("PLCSIM", 1);
+            var adapters = mode.PcInterfaces.Where(pc => (pc.Name ?? "").IndexOf("PLCSIM Virtual Ethernet Adapter", StringComparison.OrdinalIgnoreCase) >= 0).Take(2).ToArray();
+            return adapters.Length == 1 ? adapters[0] : null;
         }
 
         private static JArray SimulationProvisionConnectionInventory(ConnectionConfiguration configuration)
