@@ -23,7 +23,7 @@ names every row with an open cell.
   Test Suite session (TS-Q01), the VMware guest,
   a V20 library input, RT Professional and other HMI targets, and a physical PLC.
 - **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
-  station upload meets TLS verification it never trusts and the snapshot export carries no
+  station upload's TLS challenges offer no certificate to pin and the snapshot export carries no
   values after an online snapshot create, an OPC UA reference-namespace import crashes TIA,
   Unified text lists have no import route, and force-table rows can only be authored in the
   TIA editor.

@@ -107,7 +107,9 @@ power state is reported before and after.
   instance and its address are revalidated, only for exactly one certificate within its validity
   interval, pinned for this upload attempt, and every later challenge must present the same one;
   no certificate is newly trusted after the login was answered. A challenge that offers no
-  certificate is refused: the native run of 29 October, before this opt-in, met three such challenges.
+  certificate is refused. In the native run of 29 October with this opt-in, all three upload
+  challenges offered none (initial selection `NonVerified`, "certificate not matching"), so the
+  upload still refuses; trusting such a challenge needs a maintainer decision.
   The compare and DB-snapshot routes never trust TLS: they run in the scratch project's Portal,
   which downloaded the CPU's certificate configuration, and TIA asked them no TLS question in the
   native runs. Every message is kept in the response and in

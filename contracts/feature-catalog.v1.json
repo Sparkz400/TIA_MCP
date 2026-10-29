@@ -4786,7 +4786,7 @@
           "Every upload message is kept (bounded at 10000 with explicit truncation) in the response and station-upload.json; the partial destination project is saved and retained on failure.",
           "Uploaded hardware/software completeness, compile and reopen of the new project are not verified.",
           "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does.",
-          "Native observation (29 October 2026, before the trust opt-in): with the runtime-user login, the upload in an empty Portal met three TlsVerificationConfiguration challenges, each offering zero certificates; the first-use pin needs exactly one certificate, so such a challenge is still refused."
+          "Native observation (29 October 2026, frozen ca2f8f8, trustOwnedSimulationCertificate true): plc_online_compare passed again; the upload in an empty Portal met three TlsVerificationConfiguration challenges, each with initial selection NonVerified, verification text 'certificate not matching' and zero offered certificates. With nothing to pin the opt-in refused (certificateCountNotOne) and the upload failed closed with SimulationOnlineAuthenticationRequired. Trusting a challenge that offers no certificate needs a new maintainer decision."
         ]
       },
       "qualification": {

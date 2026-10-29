@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "4cf192f24fa5cfe2734a8f710eeb7fb4d417940eff02cee62c4b4b7f95b6c41e",
-      "bytes": 1304681
+      "sha256": "01b11e74435e800c1e4701df3223324e06e4c5c31f85be767e364f0548804c12",
+      "bytes": 1304930
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1852,8 +1852,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "0cf0a6218cde439c0a4ca0207d35d7069f4432584590e79124e5140b96bc6264",
-      "bytes": 37283
+      "sha256": "7fd147a2cb9474d58264ac12b5074a43fb07311c6838204f4741dd8f3cf0762b",
+      "bytes": 37378
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
