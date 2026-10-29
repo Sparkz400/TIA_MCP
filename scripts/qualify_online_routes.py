@@ -77,8 +77,7 @@ CRITERIA = {
 }
 LIMITATIONS = [
     "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1. Power-on needs the provisioned protection credential, provisioned with "
-    "first-use TLS trust under the owned-empty-CPU policy. The compare and DB-snapshot sessions only log in as the generated runtime user and never trust a certificate; "
-    "the station upload in an empty Portal also trusts the owned CPU's certificate on first use (trustOwnedSimulationCertificate), pinned for that upload attempt.",
+    "first-use TLS trust under the owned-empty-CPU policy; the online routes themselves only log in as the generated runtime user and never trust a certificate.",
     "One global DB with one Int; arrays, structures, instance DBs and retain values are not exercised.",
     "The other-project and other-CPU refusals use edited copies of the runtime user's nonsecret metadata; the encrypted secret is never copied.",
     "Online compare is checked identical right after the download only; no online/offline difference is produced. The fingerprint is recorded, not asserted.",
@@ -149,6 +148,15 @@ class Lab:
             require(error.get("code") == code and text in (error.get("message") or ""), "Expected %s (%s), observed %s: %s" % (code, text, error.get("code"), error.get("message")))
             return error
         return self.unchanged("refuse %s: %s" % (name, label), check)
+
+    def resolve(self):
+        """Refresh PLCSIM's tag list through sim_tags and resolve OnDb.Count. After db_snapshot_load_actual PLCSIM reads the
+        old list as NotUpToDate (-47, observed 29 October 2026)."""
+        tags = self.h.tool("sim_tags", {"instanceId": self.instance["id"], "filter": DB, "maxItems": 2000})["tags"]
+        found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == DB + ".Count"]
+        require(len(found) == 1, "PLCSIM symbol %s.Count is missing or ambiguous: %s" % (DB, [t["symbol"] for t in tags]))
+        self.symbol = found[0]
+        return self.symbol
 
     def count(self, value=None):
         """Count read through PLCSIM; with a value, written first and read back."""
@@ -226,10 +234,7 @@ def body(h):
         running = h.stage("run", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "run", "timeoutMs": 30000}))
         require(running["instance"]["operatingState"] == "Run", "The instance did not enter RUN")
         def resolve():
-            tags = h.tool("sim_tags", {"instanceId": lab.instance["id"], "filter": DB, "maxItems": 2000})["tags"]
-            found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == DB + ".Count"]
-            require(len(found) == 1, "PLCSIM symbol %s.Count is missing or ambiguous: %s" % (DB, [t["symbol"] for t in tags]))
-            lab.symbol = found[0]
+            lab.resolve()
             require(lab.count() == 5, "Count does not start at its start value 5")
             return lab.symbol
         h.stage("resolve OnDb.Count in PLCSIM", resolve)
@@ -300,7 +305,11 @@ def body(h):
             require(load["preview"]["effects"] == [{"action": "loadSnapshotAsActualValues", "blockPath": db, "snapshotRecordId": captured["recordId"],
                                                     "snapshotSha256": captured["snapshotSha256"]}], "Unexpected db_snapshot_load_actual effects: %s" % load["preview"]["effects"])
             lab.apply("db_snapshot_load_actual", load, compile=False, save=False)
-            h.stage("PLCSIM reads back the loaded snapshot", lambda: require(lab.count() == 42, "Count is not 42 after the load") or 42)
+            def loaded():
+                lab.resolve()
+                require(lab.count() == 42, "Count is not 42 after the load")
+                return 42
+            h.stage("PLCSIM reads back the loaded snapshot", loaded)
 
             def restore():
                 recovered = h.tool("change_restore", {"changeId": create["changeId"], "previewHash": create["previewHash"]})
