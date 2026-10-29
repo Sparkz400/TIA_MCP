@@ -37,7 +37,9 @@ With the server connected, ask your MCP client in plain language:
   → `sim_create`, `sim_test`
 - *"Give me a health report of this project."* → `project_health_report`
 
-Ask `feature_catalog` and `target_capabilities` what your target supports.
+Ask `feature_catalog` and `target_capabilities` what your target supports. The server
+also offers workflow prompts (`safe_change`, `project_health`, `block_test`,
+`diagnose_fault`) that walk through these steps.
 
 ## Explore a project
 
@@ -151,6 +153,10 @@ Configure your MCP client's stdio server using your actual checkout path:
   }
 }
 ```
+
+The Host advertises about 290 tools. If your client limits tools per server, add
+`"--toolsets", "core,simulation"` (or other groups) to `args`; see
+[MCP surface](docs/reference/mcp-surface.md#tool-groups---toolsets) for the groups.
 
 ### Example: discover available TIA sessions
 
