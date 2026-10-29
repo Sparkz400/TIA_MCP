@@ -192,23 +192,31 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             if (acquisition.TryGetValue(attemptId,out var reserved) && reserved!=acquisitionId) throw Error("UaSessionAcquisitionBusy");
             if (acquisitionId is not null && reserved!=acquisitionId) throw Error("UaSessionAcquisitionUnavailable");
             if (Load(attemptId) != entry.Status) throw Error("UaSessionRecordChanged");
+            bool vaultBusy = false;
             try
             {
                 if (entry.Status.Selection.Authentication == "username")
                 {
                     T? value = default;
                     BridgeException? failure = null;
-                    credentialConsumer(entry.Status.Selection, _ => {
-                        try { value = action(entry.Client, deadline.Token).GetAwaiter().GetResult(); }
-                        catch (Exception e) { failure = e is UaContinuationCleanupFailure cleanup
-                            ? new UaContinuationCleanupFailure(cleanup.OperationErrorCode) : Error(Code(e)); }
-                    });
+                    bool consumed = false;
+                    try
+                    {
+                        credentialConsumer(entry.Status.Selection, _ => {
+                            consumed = true;
+                            try { value = action(entry.Client, deadline.Token).GetAwaiter().GetResult(); }
+                            catch (Exception e) { failure = e is UaContinuationCleanupFailure cleanup
+                                ? new UaContinuationCleanupFailure(cleanup.OperationErrorCode) : Error(Code(e)); }
+                        });
+                    }
+                    // The vault stayed busy past its bounded wait before anything was sent: the session stays as it is.
+                    catch (BridgeException busy) when (!consumed && busy.Code == "CredentialStoreBusy") { vaultBusy = true; throw Error("UaCredentialStoreBusy"); }
                     if (failure is not null) throw failure;
                     return value!;
                 }
                 return await action(entry.Client, deadline.Token);
             }
-            catch (Exception e)
+            catch (Exception e) when (!vaultBusy)
             {
                 var status = entry.Status with { State = "remoteSessionUnknown",
                     ErrorCode = e is UaContinuationCleanupFailure ? Code(e) :
@@ -390,6 +398,7 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
                 throw Error("UaUnsafeArtifactPath");
     }
     private static string Code(Exception error) => error switch {
+        BridgeException { Code: "CredentialStoreBusy" } => "UaCredentialStoreBusy", // A busy vault is not a missing credential.
         BridgeException e => e.Code.StartsWith("Ua", StringComparison.Ordinal) ? e.Code : "UaCredentialUnavailable",
         OperationCanceledException => "UaCancelled",
         ServiceResultException e when e.StatusCode == StatusCodes.BadRequestCancelledByClient => "UaCancelled",

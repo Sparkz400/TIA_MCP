@@ -8,8 +8,8 @@ read diagnostics and change the operating mode; the web server and the OPC UA se
 client-certificate acceptance) are switched on; a saved review and a diagnostic case on DiagGate. A TCP/IP instance gets
 the program (download, generated-state save, protection-credential provisioning); the OPC UA and web certificate pins
 come from certificate_inspect after the last compile; the CPU runs and TIA closes. The OPC UA and web login is the
-scratch's generated runtime user: its DPAPI password is copied into two run-owned Host credential vaults, one per channel,
-and retired at the end.
+scratch's generated runtime user: its DPAPI password is copied into one run-owned Host credential vault, which the
+concurrent UA and web acquisitions share, and retired at the end.
 
 --mode normal: every runtime_ua_*, runtime_web_* and runtime_capture_* tool plus runtime_plcsim_bind. Stale pins are
   refused, UA and web values equal PLCSIM API reads, writes need their expected values, RUN/STOP through the Web API.
@@ -145,9 +145,9 @@ class Runner(Harness):
         self.report["simWorker"] = {"path": str(args.sim_worker.resolve()), "sha256": hashlib.sha256(args.sim_worker.read_bytes()).hexdigest()}
         self.report.update(mode=args.mode, cpuIp=args.cpu_ip, hosts=[], comparisons=[], pins={}, attempts={"ua": [], "web": []})
         self.calls, self.credentials, self.password, self.selections, self.watched = [], [], None, {}, []
-        # One vault per channel: the vault lock refuses a concurrent user at once (CredentialStoreBusy), which ended a UA
-        # subscription as UaCredentialUnavailable while a web capture polled the same vault (runs rs_abde1bb3, rs_db5b4b21).
-        self.vaults = {"ua": uuid.uuid4().hex, "web": uuid.uuid4().hex}
+        # One vault for both channels: concurrent UA and web users must take turns on it (runs rs_abde1bb3 and rs_db5b4b21
+        # failed while the vault refused a concurrent user at once).
+        self.vault = uuid.uuid4().hex
 
     def persist(self):
         self.report["toolCalls"] = self.calls + (self.client.tool_calls if self.client else [])
@@ -211,7 +211,7 @@ class Runner(Harness):
         return row
 
     def credential(self, label, binding, vault):
-        """Store the runtime user's password under one public binding in one of this run's vaults, through the Host's credential CLI."""
+        """Store the runtime user's password under one public binding in this run's vault, through the Host's credential CLI."""
         folder = self.directory / "credentials"
         folder.mkdir(exist_ok=True)
         path = folder / (label + ".binding.json")
@@ -424,7 +424,7 @@ def compare(r, channel, label, session, member):
 def ua_selection(r, pin=None, anonymous=False):
     selection = {"endpoint": "opc.tcp://%s:4840/" % r.args.cpu_ip, "applicationUri": r.app_uri, "certificateSha256": pin or r.report["pins"]["ua"]["sha256"]}
     if not anonymous:
-        selection.update(authentication="username", user=r.username, vaultName=r.vaults["ua"])
+        selection.update(authentication="username", user=r.username, vaultName=r.vault)
         if getattr(r, "ua_credential", None):
             selection["credential"] = r.ua_credential
     return selection
@@ -432,18 +432,18 @@ def ua_selection(r, pin=None, anonymous=False):
 
 def web_login(r, pin=None, credential=None):
     return {"endpoint": "https://" + r.args.cpu_ip, "peerCertificateSha256": pin or r.report["pins"]["web"]["sha256"], "user": r.username, "mode": "local",
-            "vaultName": r.vaults["web"], "credential": credential or r.web_credential}
+            "vaultName": r.vault, "credential": credential or r.web_credential}
 
 
 def credentials(r):
     """The runtime user's vault credentials for the pinned UA and web endpoints."""
     r.ua_credential = None
-    r.ua_credential = r.credential("ua", r.stage("runtime_ua_credential_binding", lambda: r.tool("runtime_ua_credential_binding", {"selection": ua_selection(r)})), r.vaults["ua"])
+    r.ua_credential = r.credential("ua", r.stage("runtime_ua_credential_binding", lambda: r.tool("runtime_ua_credential_binding", {"selection": ua_selection(r)})), r.vault)
     def web(pin):
         return r.tool("runtime_web_credential_binding", {"endpoint": "https://" + r.args.cpu_ip, "peerCertificateSha256": pin, "user": r.username, "mode": "local"})
-    r.web_credential = r.credential("web", r.stage("runtime_web_credential_binding", lambda: web(r.report["pins"]["web"]["sha256"])), r.vaults["web"])
+    r.web_credential = r.credential("web", r.stage("runtime_web_credential_binding", lambda: web(r.report["pins"]["web"]["sha256"])), r.vault)
     r.stale_web_credential = r.credential("web-stale", r.stage("runtime_web_credential_binding for the stale pin", lambda: web(r.report["stalePins"]["web"]["sha256"])),
-                                          r.vaults["web"])
+                                          r.vault)
 
 
 def connect(r, channel, label, argument, connected=True):
