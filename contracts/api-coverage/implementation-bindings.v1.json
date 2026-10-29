@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b4c8acb3a038ad332019419043d10702f0aa84ed6e18ff4409ab17300ef1ddb2",
-      "bytes": 1339800
+      "sha256": "c1b980713ef03867d73311864e4c644e9e6223237f9c7105cd25d5a33bfbedc4",
+      "bytes": 1342134
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -97572,7 +97572,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plcsim_gaps.20261029",
+          "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.20261029.json"
+          ]
+        },
+        {
+          "id": "local.plcsim_gaps.recovery.20261029",
+          "profileSha256": "19697ff5d6be8fa172361b9515a6c736332b6a280a2b6be53187d0a2c8f7bad6",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.recovery.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -118362,6 +118377,11 @@
       "sha256": "58f288ed0debc5a29522c25d338f569e9273db4cd00d7175034b44054c2d6d4c"
     },
     {
+      "path": "evidence/local.plcsim_gaps.recovery.20261029.json",
+      "state": "observed",
+      "sha256": "a43f017f7fd00e3d8505b5f34582e040919190c63253612f962fb08e7be321c5"
+    },
+    {
       "path": "evidence/local.project_index.20261028.json",
       "state": "observed",
       "sha256": "4d67417f23fd66146f0395efd16d2daa3d3b063d5789b821ec8d01c00233cb81"
@@ -119027,6 +119047,10 @@
     {
       "id": "local.plcsim_gaps.20261029",
       "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d"
+    },
+    {
+      "id": "local.plcsim_gaps.recovery.20261029",
+      "profileSha256": "19697ff5d6be8fa172361b9515a6c736332b6a280a2b6be53187d0a2c8f7bad6"
     },
     {
       "id": "local.project_index.20261028",

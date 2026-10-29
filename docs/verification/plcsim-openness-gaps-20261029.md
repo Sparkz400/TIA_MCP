@@ -7,7 +7,7 @@ documented in [simulation](../guides/simulation.md) and [engineering workflows](
 
 | Gap | Feature | Disposition | Evidence |
 | --- | --- | --- | --- |
-| 1. Download a changed program to an existing owned PLCSIM instance | `change.simulation_download_online` | Natively exercised; unverified until its recovery top-up run | `local.plcsim_gaps.20261029` |
+| 1. Download a changed program to an existing owned PLCSIM instance | `change.simulation_download_online` | Verified | `local.plcsim_gaps.20261029`, `local.plcsim_gaps.recovery.20261029` |
 | 2. Virtual time and time scaling | `sim_time`, `sim_test` `virtualTime` | Verified | `local.plcsim_gaps.20261029` |
 | 3. Interrupt and fault injection | `sim_event` | Verified for OB82, OB83 and OB86; OB40 is a V21 boundary | `local.plcsim_gaps.20261029` |
 | 4. Memory reset, storage archive/retrieve | `sim_state` `memoryReset`, `sim_storage` | Verified | `local.plcsim_gaps.20261029` |
@@ -111,7 +111,14 @@ Boundaries:
   no hardware interrupt is configured: `GetConfiguredProcessEvents` lists nothing and PLCSIM answers
   `ProcessEvent` with `NotSupportedByModule` (-55); OB40 does not run. `statusEvent` on the central module
   is answered `NotSupportedByModule` too (OB55 serves distributed modules).
-- **Recovery of the online download.** The run never called `change_status` or `change_restore` on a
-  download, so `change.simulation_download_online` stays unverified. The runner now restores the last
-  download's checkpoint (the CPU keeps its program; the recovered copy cannot download to the instance)
-  and waits, frozen as `ad7096c`, for a native slot.
+
+### Recovery top-up
+
+The passed run never called `change_status` or `change_restore` on a download. A top-up run of the
+same runner (`ad7096c`, 74 of 74 steps, `local.plcsim_gaps.recovery.20261029`) repeated every step and
+then, after the reinitialized download: `change_status` kept the applied state and its checkpoint
+archive; `change_restore` retrieved the checkpoint into a new directory while the CPU kept the
+downloaded program (ProgramVersion 2, reinitialized counter 0); a download prepared from the recovered
+copy refused with `SimulationTargetMismatch`, because that copy did not produce the instance's card; and
+`plc_online_compare` of the recovered project reported `FolderContentsIdentical` (its checkpoint was
+taken after the layout change and before its download).

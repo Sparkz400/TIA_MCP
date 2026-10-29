@@ -2855,6 +2855,24 @@
         "Virtual-time scenarios at scale factor 1 run at wall-clock speed in deterministic StartProcessing spans; the speed-up comes from scaleFactor, and the combination of both is not exercised. Scan-exact timing is not claimed.",
         "Each online download must start within the 15-minute ticket from sim_create; after a program change PLCSIM answers NotUpToDate until its tag list is refreshed with sim_tags. Archive and retrieve restore the same state that was archived; a cross-state restore is not exercised."
       ]
+    },
+    {
+      "id": "local.plcsim_gaps.recovery.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ad7096c5e3b43c067b11177d277c50576fa6e642",
+        "passedScope": "Recovery top-up of local.plcsim_gaps.20261029: scripts/qualify_plcsim_gaps.py on a frozen Debug build of ad7096c (artifacts/gs4), 74/74 steps, same fixture and checks on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus. Added after the reinitialized online download: change_status keeps its applied state and checkpoint archive; change_restore retrieves the checkpoint into a new directory while the CPU keeps the downloaded program (ProgramVersion 2, reinitialized counter 0); a simulation_download_online prepared from the recovered copy refuses with SimulationTargetMismatch, because that copy is not the project that produced the instance's card; plc_online_compare of the recovered project reports FolderContentsIdentical (the checkpoint was taken after the layout change and before its download). Every other step of the 29 October run (code change keeping values, kept and reinitialized layout changes, virtual time, OB82/OB83/OB86, memory reset, storage archive and retrieve) passed again."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.recovery.20261029.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1; other CPUs, firmware and TCP/IP instances are not qualified.",
+        "The online download is a CPU write: change_restore recovers only the project, and the recovered copy can no longer download to the instance whose card came from the original project.",
+        "OB40 stays a V21 boundary (no hardware-interrupt configuration through V21 Openness; PLCSIM answers NotSupportedByModule)."
+      ]
     }
   ],
   "features": [
@@ -19521,17 +19539,21 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029, local.plcsim_gaps.recovery.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "Native outcomes: a code change downloads in RUN keeping actual values (TIA asks only ConsistentBlocksDownload); a layout change answers DataBlockReinitializationOrKeepActualValues with KeepActualValues or, with reinitialize and allowStop, StopPlcAndReinitialize and returns to RUN; plc_online_compare reports FolderContentsIdentical. change_restore recovers only the project into a new directory: the CPU keeps the downloaded program, and the recovered copy refuses further online downloads with SimulationTargetMismatch.",
+          "After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Softbus only, like plc_online_compare.",
           "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
           "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
           "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
-          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence.",
-          "Natively exercised (local.plcsim_gaps.20261029): a code change downloaded in RUN keeping values, a layout change answered DataBlockReinitializationOrKeepActualValues with KeepActualValues, a reinitialized layout download returned to RUN, and plc_online_compare reported FolderContentsIdentical. After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Recovery (change_status, change_restore) is not exercised yet, so the feature stays unverified."
+          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029",
+          "local.plcsim_gaps.recovery.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

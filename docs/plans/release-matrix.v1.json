@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.73",
-    "catalogSha256": "b4c8acb3a038ad332019419043d10702f0aa84ed6e18ff4409ab17300ef1ddb2",
+    "catalogSha256": "c1b980713ef03867d73311864e4c644e9e6223237f9c7105cd25d5a33bfbedc4",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "0739b50bdfb0be4f6f2cda6abdda8d29e632d6b0d1104e042eb208c9f2062321"
   },
@@ -15,16 +15,16 @@
     "features": 461,
     "support": {
       "deferred": 10,
-      "limited": 289,
+      "limited": 290,
       "shipped": 122,
       "unavailable_target": 8,
-      "unqualified": 32
+      "unqualified": 31
     },
     "cells": {
       "blocked": 49,
-      "bound": 1868,
+      "bound": 1875,
       "deferred": 30,
-      "open": 179
+      "open": 172
     },
     "openCellsByOwner": {
       "D06": {
@@ -33,7 +33,7 @@
       },
       "D09": {
         "role": "Online diagnostics",
-        "open": 28
+        "open": 21
       },
       "D10": {
         "role": "Drives",
@@ -46,10 +46,6 @@
       "L01": {
         "role": "Typed",
         "open": 8
-      },
-      "L03": {
-        "role": "Runtime",
-        "open": 7
       },
       "L05": {
         "role": "Qualification and libraries",
@@ -18064,47 +18060,71 @@
         "change_restore"
       ],
       "changeKind": "simulation_download_online",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "L03",
         "D09"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.plcsim_gaps.20261029",
+        "local.plcsim_gaps.recovery.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         },
         {
           "gate": "AC-runtime",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029",
+            "local.plcsim_gaps.recovery.20261029"
+          ]
         }
       ]
     },
@@ -24972,6 +24992,21 @@
         {
           "path": "evidence/local.plcsim_gaps.20261029.json",
           "sha256": "58f288ed0debc5a29522c25d338f569e9273db4cd00d7175034b44054c2d6d4c"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.plcsim_gaps.recovery.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "ad7096c5e3b43c067b11177d277c50576fa6e642",
+      "retained": [
+        {
+          "path": "evidence/local.plcsim_gaps.recovery.20261029.json",
+          "sha256": "a43f017f7fd00e3d8505b5f34582e040919190c63253612f962fb08e7be321c5"
         }
       ],
       "notRetained": []

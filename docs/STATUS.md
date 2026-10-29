@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.73`: 461 features, 411 verified, 50 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 122 shipped, 289 limited, 32 unqualified, 8 unavailable on V21, 10 deferred |
-| Matrix cells | 1,868 bound, **179 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.73`: 461 features, 412 verified, 49 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 122 shipped, 290 limited, 31 unqualified, 8 unavailable on V21, 10 deferred |
+| Matrix cells | 1,875 bound, **172 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06, D09 and X04 on 29 October against `0.4.70`, and C03, D12 and D16 against `0.4.72` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -51,7 +51,7 @@ record is cited by a feature; records no feature cites any more are in the retir
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
-[29 October](history/status-log.md#29-october-2026): online downloads to an owned PLCSIM instance, PLCSIM virtual time, interrupt injection, memory reset and storage, typed CPU parameters, device/project compile and the tag-table lifecycle were added, most natively qualified ([record](verification/plcsim-openness-gaps-20261029.md)); the runtime UA, web and capture tools passed
+[29 October](history/status-log.md#29-october-2026): online downloads to an owned PLCSIM instance, PLCSIM virtual time, interrupt injection, memory reset and storage, typed CPU parameters, device/project compile and the tag-table lifecycle were added and natively qualified except HMI compilation ([record](verification/plcsim-openness-gaps-20261029.md)); the runtime UA, web and capture tools passed
 against the real servers of an owned TCP/IP PLCSIM instance ([record](verification/runtime-real-server-20261029.md)); the [MCP surface](reference/mcp-surface.md)
 gained `--toolsets`, tool titles, workflow prompts, progress heartbeats and output schemas; the remaining re-runnable lost records
 re-run and 21 replaced records retired (catalog 0.4.70); native qualification of web user
