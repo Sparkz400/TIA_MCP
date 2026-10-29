@@ -36,15 +36,18 @@ def run(path):
     # Qualifiers that log each MCP call as a step (tool + isError) have no separate toolCalls list;
     # Host-only workflow runners keep each Host lifetime's calls in its close receipt instead.
     calls = (report.get("toolCalls")
-             or [c for receipt in report.get("hostExits", []) + report.get("cleanups", []) + report.get("shutdowns", [])
+             or [c for receipt in report.get("hostExits", []) + report.get("cleanups", []) + report.get("shutdowns", []) + [report.get("launcherShutdown") or {}]
                  for c in receipt.get("toolCalls", [])]
              or [{"name": st["tool"], "isError": st["isError"]}
                  for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st]
              # Owned-session runners keep each lifetime's audited calls as {tool, status}.
              or [{"name": call["tool"], "isError": call.get("status") != "passed"}
                  for session in report.get("sessions", []) if isinstance(session, dict) for call in session.get("calls", [])])
-    steps = [step if isinstance(step, str) else step.get("name") or step.get("tool")
-             for step in report.get("steps", [])] or list(report.get("checks", []))
+    steps = ([step if isinstance(step, str) else step.get("name") or step.get("tool") for step in report.get("steps", [])]
+             or list(report.get("checks", []))
+             # The HMI bridge qualifier (qualify_hmi.py) reports one gate row per profile.
+             or ["%s: %s=%s" % (p["profile"], gate, row.get("status")) for p in report.get("profiles", []) if isinstance(p, dict)
+                 for gate, row in (p.get("gates") or {}).items()])
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
             "completed": report.get("completed") is True or report.get("status") == "passed",
             "steps": steps,

@@ -3,7 +3,8 @@
 The matrix is derived from the feature catalog: one row per catalog feature, one
 cell per acceptance criterion. A cell is bound only when the feature is verified,
 and then names the evidence records and the hashes of their retained artifacts.
-Every other cell is open work. Owners come from the release-obligation ledger;
+Every other cell is open work, except in deferred rows and in unavailable_target
+rows, which are blocked on V21 and do not count toward 1.0. Owners come from the release-obligation ledger;
 features added after the ledger take the owner of their feature-name prefix.
 """
 import argparse
@@ -17,6 +18,8 @@ CATALOG = "contracts/feature-catalog.v1.json"
 LEDGER = "docs/plans/release-obligations-20261015.json"
 MATRIX = "docs/plans/release-matrix.v1.json"
 PROFILE_KEYS = ("tiaVersion", "cpu", "firmware", "language", "languages", "simulatorVersion")
+# Support classes whose unbound cells are summarized apart from open 1.0 work.
+NOT_OPEN = {"deferred": "deferred", "unavailable_target": "blocked"}
 
 # Obligation owners for features newer than the 15 October ledger, by feature-name prefix.
 PREFIX_OWNERS = {
@@ -103,7 +106,8 @@ def build(root=ROOT):
     cells = collections.Counter()
     for row in rows:
         for cell in row["cells"]:
-            state = "deferred" if row["support"] == "deferred" else cell["status"]
+            # Maintainer decision, 29 October 2026: rows V21 cannot close stay blocked and do not count toward 1.0.
+            state = NOT_OPEN.get(row["support"], cell["status"])
             cells[state] += 1
             if state == "open":
                 open_by_owner.update(row["owners"])

@@ -1,0 +1,83 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.watch.force-edits.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T15:12:49+00:00",
+  "source": {
+    "commit": "5eca54504cf5c7d8a874259c32ff80118d775873",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_watch_force_edits.py from commit 5eca545, operator-assisted, on an owned scratch CPU 1511-1 PN (TIA V21 Update 3): the operator authored three force rows (%I0.0:P Bool TRUE, %Q0.1:P Bool FALSE, %IW2:P Hex) and a comment line in the TIA editor, unticked, offline; the runner captured them independently, then ran each force edit through watch_table_prepare/apply with checkpoint and save, readback with unchanged peers, a fresh reopen and a checkpoint restore to a new location: ForceValue, Address and DisplayFormat field edits, comment, comment-line clone, delete of the last row and signal-row clone verified; ten typed refusals.",
+  "limitations": [
+    "Reorder is refused at readback (VerificationFailed) and recovered: TIA renumbers the force rows' document IDs on export, and force rows have no ID reindex; only the IDs differed.",
+    "The Name field is not edited: the fixture has no tags, since a symbolic row could refuse every edit at prepare.",
+    "watch_table_reconcile_interrupted is not exercised: it needs a Host or worker loss on a second authored scratch.",
+    "Production Hosts still refuse force-table edits with UnsupportedProfile; only the qualification harness (--component-qualification --watch-qualification) dispatches them.",
+    "Offline engineering only: nothing is forced, monitored or written online; every F checkbox stayed unticked."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "27f18cc8bbde6b0dd003db0757979236d67086e4389c0c37ec37e913273f33a7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6017d55bf6fc7a431fdbd7b8e72ded00b7201aa56142c0a420fc4375ebd0aca5"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "064028738d05a153b40750523905f315b8ac3a69f1c5fbf14ef10c20bd342682",
+      "bytes": 18980,
+      "completed": true,
+      "steps": [
+        "authored table captured independently: 4 rows",
+        "peers unchanged by the editor session: True",
+        "refusal-unknown-table: WatchTableNotFound",
+        "refusal-force-intention: UnsupportedProfile",
+        "refusal-modify-value: UnsupportedProfile",
+        "refusal-unknown-kind: UnsupportedProfile",
+        "refusal-reindex: UnsupportedProfile",
+        "refusal-missing-value: InvalidRequest",
+        "refusal-no-change: NoChange",
+        "field-forcevalue: verified",
+        "refusal-wrong-digest: ReviewMismatch",
+        "refusal-stale-plan: StaleNativeTarget",
+        "refusal-replay: RecoveryRequired",
+        "field-address: verified",
+        "field-displayformat: verified",
+        "comment: verified",
+        "clone-comment-line: verified",
+        "delete-last: verified",
+        "reorder: refused VerificationFailed (only document IDs differ: True)",
+        "clone-signal: verified"
+      ],
+      "toolsPassed": [
+        "engineering_operation_status",
+        "project_open",
+        "qualification_watch_fixture_seed",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start",
+        "watch_table_apply",
+        "watch_table_prepare",
+        "watch_table_read",
+        "watch_table_reconcile_recovery",
+        "watch_table_recover",
+        "watch_table_verify_reopen"
+      ],
+      "toolsRejected": [
+        "watch_table_apply",
+        "watch_table_prepare"
+      ]
+    }
+  ]
+}

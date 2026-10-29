@@ -1,15 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web.Script.Serialization;
-using Microsoft.Win32.SafeHandles;
 using Siemens.Engineering;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
@@ -31,7 +26,6 @@ namespace TiaMcp.AddIn
         internal const int MaximumReferences = 64;
         private const string ProductId = "TiaMcp.AddIn.V21", Version = "0.1.0";
         private const long DiscoveryLimit = 64 << 10, ReviewLimit = 64 << 20, ResponseLimit = 2 << 20;
-        private static readonly JavaScriptSerializer Json = new JavaScriptSerializer { MaxJsonLength = int.MaxValue };
 
         internal static string Send(IEnumerable<IEngineeringObject> selected)
         {
@@ -61,7 +55,7 @@ namespace TiaMcp.AddIn
                 ["references"] = references };
             string requestId = Guid.NewGuid().ToString("N");
             var challenge = Exchange(discovery, new Dictionary<string, object> { ["protocolVersion"] = 1, ["action"] = "begin", ["requestId"] = requestId,
-                ["reviewId"] = reviewId, ["selectionBase64"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(Json.Serialize(document))) });
+                ["reviewId"] = reviewId, ["selectionBase64"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(HandoffJson.Write(document))) });
             var status = Exchange(discovery, new Dictionary<string, object> { ["protocolVersion"] = 1, ["action"] = "complete", ["requestId"] = requestId,
                 ["challenge"] = Text(challenge, "challenge") });
             return "Record " + Text(Object(status["selection"]), "recordId") + ": " + references.Count + " object(s) bound to saved review " + reviewId + ". Open it with addin_selection_page.";
@@ -119,37 +113,17 @@ namespace TiaMcp.AddIn
         private static IDictionary<string, object> Exchange(IDictionary<string, object> discovery, Dictionary<string, object> request)
         {
             var host = Object(discovery["host"]);
-            using (var pipe = new NamedPipeClientStream(".", Text(discovery, "pipeName"), PipeDirection.InOut))
-            {
-                pipe.Connect(5000);
-                // Discovery is only a hint: send nothing unless the server is the exact Host process instance it names.
-                if (!GetNamedPipeServerProcessId(pipe.SafePipeHandle, out uint id) || id != Convert.ToUInt32(host["processId"]) || StartedAtUtc(id) != Text(host, "startedAtUtc"))
-                    throw new InvalidOperationException("The pipe server is not the Host named in discovery.");
-                byte[] frame = Encoding.UTF8.GetBytes(Json.Serialize(request) + "\n");
-                pipe.Write(frame, 0, frame.Length); pipe.Flush();
-                var reader = new BufferedStream(pipe); var response = new MemoryStream(); int next;
-                while ((next = reader.ReadByte()) != '\n')
-                {
-                    if (next < 0 || response.Length >= ResponseLimit) throw new InvalidOperationException("The Host response was truncated or exceeded its bound.");
-                    response.WriteByte((byte)next);
-                }
-                var value = Object(Json.DeserializeObject(new UTF8Encoding(false, true).GetString(response.ToArray())));
-                if (!(value.TryGetValue("success", out var success) && success is true))
-                    throw new InvalidOperationException("The TIA MCP Host refused the selection: " + Text(value, "error") + ". Its request is retained; nothing was replayed.");
-                return Object(value["result"]);
-            }
+            var value = Object(HandoffJson.Parse(HostPipe.Exchange(Text(discovery, "pipeName"), Convert.ToUInt32(host["processId"]), Text(host, "startedAtUtc"),
+                HandoffJson.Write(request), ResponseLimit)));
+            if (!(value.TryGetValue("success", out var success) && success is true))
+                throw new InvalidOperationException("The TIA MCP Host refused the selection: " + Text(value, "error") + ". Its request is retained; nothing was replayed.");
+            return Object(value["result"]);
         }
 
-        private static string StartedAtUtc(uint processId)
-        {
-            using (var process = OpenProcess(0x1000, false, processId))
-                return !process.IsInvalid && GetProcessTimes(process, out long created, out _, out _, out _)
-                    ? DateTime.FromFileTimeUtc(created).ToString("O") : throw new Win32Exception(Marshal.GetLastWin32Error());
-        }
         private static object Read(string path, long limit)
         {
             if (new FileInfo(path).Length > limit) throw new InvalidOperationException(path + " exceeds its size bound.");
-            return Json.DeserializeObject(File.ReadAllText(path, new UTF8Encoding(false, true)));
+            return HandoffJson.Parse(File.ReadAllText(path, new UTF8Encoding(false, true)));
         }
         private static byte[] Configuration()
         {
@@ -159,12 +133,5 @@ namespace TiaMcp.AddIn
         private static string Hash(byte[] bytes) { using (var sha = SHA256.Create()) return string.Concat(sha.ComputeHash(bytes).Select(b => b.ToString("x2"))); }
         private static IDictionary<string, object> Object(object value) => value as IDictionary<string, object> ?? throw new InvalidDataException("Expected a JSON object.");
         private static string Text(IDictionary<string, object> value, string key) => value.TryGetValue(key, out var text) ? text as string : null;
-
-        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetNamedPipeServerProcessId(SafePipeHandle pipe, out uint processId);
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern SafeProcessHandle OpenProcess(int access, bool inherit, uint processId);
-        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetProcessTimes(SafeProcessHandle process, out long creation, out long exit, out long kernel, out long user);
     }
 }

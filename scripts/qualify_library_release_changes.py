@@ -281,7 +281,7 @@ def body(h):
     h.stage("recovered FB body 1.1.0", lambda: require_shape(block_shape(FB), "1.1.0", "Recovered FB"))
     h.stage("close recovery session", lambda: h.tool("tia_detach"))
     h.owned_portal("reopen")
-    h.stage("reopen original consumer", lambda: h.tool("project_open", {"path": consumer_path}))
+    h.stage("reopen original consumer", lambda: h.reopen_project(consumer_path))
     reopened = h.project_library()
     h.stage("reopened FB at 1.1.0", lambda: h.verify_use(reopened, implementation, 1))
     h.stage("reopened UDT at 1.0.0", lambda: h.verify_use(reopened, initial[UDT], 1))

@@ -1,0 +1,87 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-transitive-effects.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T09:24:44+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.route-transitive-effects.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): all 28 cases pass the four engineering gates, as in the original. Original scope: Software-unit and namespace route numeric FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep in its own namespace (<prefix>Host.Inner, <prefix>HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (28 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured route transitive effect (local.typed.route-transitive-capture.20261027); native readback matched every prediction exactly and each cell passed the four engineering gates.",
+  "limitations": [
+    "Engineering-only; runtime behavior inside the parent chain is not claimed.",
+    "Parent chains share the caller's namespace; parents in another namespace or unit and custom declaration shapes stay refused."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1078f9db615efb31fbf9e054a3b7e5b86d137589140ecb355bee5c4edb454cec"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7b544f62ca84c4a827ce485f9b7d1ef6c3ad9eca36ee7b0a4725c90d469d5123"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-route-transitive.json",
+      "sha256": "caaa642b0ef86ef611015cc4214743b3301a08f1f639b40a4a4d4a8c7ff89851",
+      "bytes": 260759,
+      "completed": true,
+      "steps": [
+        "typed-namespace-transitive-createmulti-ctd-fbd: passed",
+        "typed-namespace-transitive-createmulti-ctd-lad: passed",
+        "typed-namespace-transitive-createmulti-ctu-fbd: passed",
+        "typed-namespace-transitive-createmulti-ctu-lad: passed",
+        "typed-namespace-transitive-createmulti-ctud-fbd: passed",
+        "typed-namespace-transitive-createmulti-ctud-lad: passed",
+        "typed-namespace-transitive-createmulti-tof-fbd: passed",
+        "typed-namespace-transitive-createmulti-tof-lad: passed",
+        "typed-namespace-transitive-createmulti-ton-fbd: passed",
+        "typed-namespace-transitive-createmulti-ton-lad: passed",
+        "typed-namespace-transitive-createmulti-tp-fbd: passed",
+        "typed-namespace-transitive-createmulti-tp-lad: passed",
+        "typed-namespace-transitive-numeric-fb-fbd-createmulti: passed",
+        "typed-namespace-transitive-numeric-fb-lad-createmulti: passed",
+        "typed-unit-transitive-createmulti-ctd-fbd: passed",
+        "typed-unit-transitive-createmulti-ctd-lad: passed",
+        "typed-unit-transitive-createmulti-ctu-fbd: passed",
+        "typed-unit-transitive-createmulti-ctu-lad: passed",
+        "typed-unit-transitive-createmulti-ctud-fbd: passed",
+        "typed-unit-transitive-createmulti-ctud-lad: passed",
+        "typed-unit-transitive-createmulti-tof-fbd: passed",
+        "typed-unit-transitive-createmulti-tof-lad: passed",
+        "typed-unit-transitive-createmulti-ton-fbd: passed",
+        "typed-unit-transitive-createmulti-ton-lad: passed",
+        "typed-unit-transitive-createmulti-tp-fbd: passed",
+        "typed-unit-transitive-createmulti-tp-lad: passed",
+        "typed-unit-transitive-numeric-fb-fbd-createmulti: passed",
+        "typed-unit-transitive-numeric-fb-lad-createmulti: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

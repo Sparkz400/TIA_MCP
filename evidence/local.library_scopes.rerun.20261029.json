@@ -1,0 +1,125 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_scopes.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T08:39:12+00:00",
+  "source": {
+    "commit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.library_scopes.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner, whose reopen now waits out TIA's project lock: a second PLC of the scratch CPU type is added with scratch security; FB and UDT 1.0.0 are instantiated into both PLCs and referenced from an OB in each; uses are attributed per PLC; updating the second PLC to FB 1.1.0 (updateScope=entireSelectedPlc) moves only that PLC while the first keeps 1.0.0 and every native block export of the first PLC is unchanged; updating the first PLC then brings both to 1.1.0; a fresh reopen confirms both PLCs at 1.1.0 and the UDT unchanged. All 58 retained observations (19 lock receipts) validate.",
+  "limitations": [
+    "Software units and namespaces are not exercised: creating a unit needs a native fixture tool whose Openness AllowList key requires an elevated grant.",
+    "Both PLCs use the scratch CPU type; mixed CPU families are not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d94291d335d7d65e3003fe28d285e10760e969c16a0fb90d5bf2ca93a0223946"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d6f5048b4e950222c7caa6e09e772f6afdebb4393bb62493d7b620ec6ad51f6d"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "0379ad454bbf2737677ca1e7964c4de2b18c5838112368fff9ad64f0f035e558",
+      "bytes": 817042,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "prepare library_edit_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "FB 1.0.0 used once in each PLC",
+        "UDT 1.0.0 used once in each PLC",
+        "capture the first PLC before updating the second",
+        "open staged archive",
+        "prepare library_update_project",
+        "apply library_update_project",
+        "only the second PLC moved to 1.1.0",
+        "the first PLC kept 1.0.0",
+        "capture the first PLC after updating the second",
+        "prepare library_update_project",
+        "apply library_update_project",
+        "both PLCs at 1.1.0",
+        "close consumer session",
+        "start owned TIA reopen",
+        "reopen consumer",
+        "reopened: both PLCs at 1.1.0, UDT unchanged"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_open"
+      ]
+    }
+  ]
+}

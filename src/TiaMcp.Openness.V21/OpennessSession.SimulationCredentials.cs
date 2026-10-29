@@ -18,6 +18,38 @@ namespace TiaMcp.Openness.V21
         {
             internal string ProtectedPath;
             internal JObject Evidence;
+            internal byte[] Entropy;  // Null: the CPU master secret.
+            internal string Username; // The generated runtime user; null for the master secret.
+        }
+
+        // The generated runtime user that simulation_download put onto this owned instance (UserManagementDownload resets the
+        // CPU's users to the scratch project's), bound through the instance's own download report; never a user credential.
+        private static SimulationCredential OwnedSimulationLogin(JObject args, JObject marker)
+        {
+            string metadataPath = args.Value<string>("runtimeCredentialMetadataPath");
+            if (string.IsNullOrWhiteSpace(metadataPath)) return null;
+            var downloaded = ReadSimulationCredentialJson(Path.Combine(marker.Value<string>("storagePath"), "simulation-download.json"), 16 * 1024 * 1024);
+            if (!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(downloaded, marker))
+                throw new BridgeException("SimulationLoginTargetMismatch", "This owned instance has no completed generated-card download to bind a runtime login to.");
+            var metadata = ReadSimulationCredentialJson(metadataPath);
+            string id = metadata.Value<string>("credentialId");
+            if (!Guid.TryParseExact(id, "N", out _) || Path.GetFileName(metadataPath) != id + ".json" ||
+                metadata.Value<string>("format") != "Windows DPAPI CurrentUser" || metadata.Value<string>("state") != "configured" ||
+                metadata.Value<string>("purpose") != "Generated password for one new isolated scratch CPU runtime user" || string.IsNullOrWhiteSpace(metadata.Value<string>("username")))
+                throw new BridgeException("InvalidSimulationCredential", "Only a configured adapter-generated scratch CPU runtime-user credential can log in to the owned instance.");
+            string project = metadata.Value<string>("projectPath"), plcPath = downloaded.Value<string>("plcPath") ?? "";
+            if (!Path.GetFileName(project ?? "").StartsWith("TiaMcpScratch_", StringComparison.Ordinal) || !SameSimulationPath(project, downloaded["project"]?.Value<string>("path")) ||
+                !plcPath.Contains("/items/" + Segment(metadata.Value<string>("cpuName") ?? "") + "/plc/"))
+                throw new BridgeException("SimulationLoginTargetMismatch", "The runtime credential does not belong to the scratch project and CPU downloaded to this owned instance.");
+            string directory = Path.GetDirectoryName(Path.GetFullPath(metadataPath));
+            if (Path.GetFileName(directory) != "scratch-credentials") throw new BridgeException("InvalidSimulationCredential", "Expected the adapter's scratch-credentials directory.");
+            string protectedPath = Path.Combine(directory, id + ".dpapi");
+            if (!SameSimulationPath(protectedPath, metadata.Value<string>("protectedPath")))
+                throw new BridgeException("InvalidSimulationCredential", "Credential metadata cannot redirect to another encrypted file.");
+            SimulationCredentialFile(protectedPath, 65536);
+            return new SimulationCredential { ProtectedPath = protectedPath, Entropy = ScratchRuntimeUserEntropy, Username = metadata.Value<string>("username"),
+                Evidence = new JObject { ["runtimeCredentialMetadataPath"] = Path.GetFullPath(metadataPath), ["credentialId"] = id, ["username"] = metadata.Value<string>("username"),
+                    ["boundTo"] = "the owned instance's simulation-download.json project and PLC", ["secretReturned"] = false } };
         }
 
         private static SimulationCredential ValidateSimulationCredential(JObject args, Project project, DeviceItem cpu)
@@ -106,7 +138,7 @@ namespace TiaMcp.Openness.V21
             {
                 var file = SimulationCredentialFile(credential.ProtectedPath, 65536);
                 encrypted = File.ReadAllBytes(file.FullName);
-                clear = ProtectedData.Unprotect(encrypted, ScratchCredentialEntropy, DataProtectionScope.CurrentUser);
+                clear = ProtectedData.Unprotect(encrypted, credential.Entropy ?? ScratchCredentialEntropy, DataProtectionScope.CurrentUser);
                 if (clear.Length == 0 || clear.Length > 4096) throw new BridgeException("InvalidSimulationCredential", "Invalid generated credential length.");
                 characters = new UTF8Encoding(false, true).GetChars(clear);
                 password = new SecureString();

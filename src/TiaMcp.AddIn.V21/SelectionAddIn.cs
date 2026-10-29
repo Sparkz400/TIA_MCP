@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.AddIn;
 using Siemens.Engineering.AddIn.Menu;
@@ -27,9 +28,23 @@ namespace TiaMcp.AddIn
             NotificationIcon icon; string message, detail;
             try { detail = SelectionHandoff.Send(selection.GetSelection<IEngineeringObject>()); icon = NotificationIcon.Success; message = "Selection handed to TIA MCP."; }
             // A throwing click handler would end the Add-In; report every refusal instead.
-            catch (Exception error) { detail = error.Message; icon = NotificationIcon.Error; message = "Selection was not handed to TIA MCP."; }
+            catch (Exception error) { detail = Describe(error); icon = NotificationIcon.Error; message = "Selection was not handed to TIA MCP."; }
             // No other UI channel exists; the Host retains any admitted request whether or not this shows.
             try { _portal.GetService<MessageBoxProvider>()?.ShowNotification(icon, "TIA MCP", message, detail); } catch (Exception) { }
+        }
+
+        // TIA's Add-In sandbox reports a denied permission only as "Request failed.", so name the type and the failing call.
+        private static string Describe(Exception error)
+        {
+            string where = "";
+            try
+            {
+                var frames = (error.StackTrace ?? "").Split('\n').Select(line => line.Trim()).Where(line => line.Length > 0).ToList();
+                where = string.Join(" | ", frames.Take(2).Concat(frames.Where(line => line.Contains("TiaMcp.AddIn")).Take(1)).Distinct());
+            }
+            catch (Exception) { }
+            string text = error.GetType().FullName + ": " + error.Message + (where.Length == 0 ? "" : " at " + where);
+            return text.Length > 600 ? text.Substring(0, 600) : text;
         }
     }
 }

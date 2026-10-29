@@ -1,0 +1,99 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-profiles.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T11:27:26+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.route-profiles.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): all 40 cases pass the four engineering gates, as in the original. Original scope: scripts/qualify_typed_graphical.py, engineering-only, the 40 route builder cases enabled by activating the 28 audited route profiles and 4 namespace storage templates staged from local.typed.route-capture.20261025: software-unit Ne/Lt/Le/Gt/Ge and TON (local and existing global), alternate-namespace Eq/Ne/Lt/Le/Gt/Ge and TON (local and existing global), and namespace numeric FC and FB calls with local, existing global, created multi and created global storage, LAD and FBD. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Engineering only; scoped runtime is not covered.",
+    "TOF/TP/CTU/CTD/CTUD route cells are not covered; their native references are captured separately."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1078f9db615efb31fbf9e054a3b7e5b86d137589140ecb355bee5c4edb454cec"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7b544f62ca84c4a827ce485f9b7d1ef6c3ad9eca36ee7b0a4725c90d469d5123"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-route-profiles.json",
+      "sha256": "87568d8b4791ee43e09c789bf860f6d079c31406b4befdcee648d40d3ac74948",
+      "bytes": 313563,
+      "completed": true,
+      "steps": [
+        "typed-namespace-eq-fbd: passed",
+        "typed-namespace-eq-lad: passed",
+        "typed-namespace-existingglobal-ton-fbd: passed",
+        "typed-namespace-existingglobal-ton-lad: passed",
+        "typed-namespace-ge-fbd: passed",
+        "typed-namespace-ge-lad: passed",
+        "typed-namespace-gt-fbd: passed",
+        "typed-namespace-gt-lad: passed",
+        "typed-namespace-le-fbd: passed",
+        "typed-namespace-le-lad: passed",
+        "typed-namespace-lt-fbd: passed",
+        "typed-namespace-lt-lad: passed",
+        "typed-namespace-ne-fbd: passed",
+        "typed-namespace-ne-lad: passed",
+        "typed-namespace-numeric-fb-fbd: passed",
+        "typed-namespace-numeric-fb-fbd-createglobal: passed",
+        "typed-namespace-numeric-fb-fbd-createmulti: passed",
+        "typed-namespace-numeric-fb-fbd-global: passed",
+        "typed-namespace-numeric-fb-lad: passed",
+        "typed-namespace-numeric-fb-lad-createglobal: passed",
+        "typed-namespace-numeric-fb-lad-createmulti: passed",
+        "typed-namespace-numeric-fb-lad-global: passed",
+        "typed-namespace-numeric-fc-fbd: passed",
+        "typed-namespace-numeric-fc-lad: passed",
+        "typed-namespace-ton-fbd: passed",
+        "typed-namespace-ton-lad: passed",
+        "typed-unit-existingglobal-ton-fbd: passed",
+        "typed-unit-existingglobal-ton-lad: passed",
+        "typed-unit-ge-fbd: passed",
+        "typed-unit-ge-lad: passed",
+        "typed-unit-gt-fbd: passed",
+        "typed-unit-gt-lad: passed",
+        "typed-unit-le-fbd: passed",
+        "typed-unit-le-lad: passed",
+        "typed-unit-lt-fbd: passed",
+        "typed-unit-lt-lad: passed",
+        "typed-unit-ne-fbd: passed",
+        "typed-unit-ne-lad: passed",
+        "typed-unit-ton-fbd: passed",
+        "typed-unit-ton-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

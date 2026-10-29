@@ -72,6 +72,15 @@ class CurateEvidenceTests(unittest.TestCase):
         self.assertEqual(["inspect", "reopen"], summary["steps"])
         self.assertEqual((["vci_prepare"], ["vci_commit"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_reads_hmi_bridge_gates_and_launcher_calls(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "hmi-bridge.json")
+            path.write_text(json.dumps({"completed": True, "profiles": [{"profile": "unified-pc", "gates": {"retrieval": {"status": "passed"}, "compile": {"status": "failed"}}}],
+                                        "launcherShutdown": {"toolCalls": [{"name": "hmi_inspect", "isError": False}, {"name": "project_retrieve", "isError": True}]}}), encoding="utf-8")
+            summary = run(path)
+        self.assertEqual(["unified-pc: retrieval=passed", "unified-pc: compile=failed"], summary["steps"])
+        self.assertEqual((["hmi_inspect"], ["project_retrieve"]), (summary["toolsPassed"], summary["toolsRejected"]))
+
     def test_run_reads_shutdown_receipts(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "verification.json")

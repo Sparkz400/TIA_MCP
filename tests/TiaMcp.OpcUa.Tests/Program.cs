@@ -62,6 +62,11 @@ Test("GUID and opaque identities", () => {
 Test("numeric overflow", () => Reject("OpcUaInvalidIdentity", () => OpcUaModelReview.Inspect(Xml("<UAObject NodeId=\"i=4294967296\" BrowseName=\"A\"/>"))));
 Test("unknown namespace index", () => Reject("OpcUaInvalidIdentity", () => OpcUaModelReview.Inspect(Xml("<UAObject NodeId=\"ns=2;i=1\" BrowseName=\"A\"/>"))));
 Test("duplicate namespace", () => Reject("OpcUaInvalidIdentity", () => OpcUaModelReview.Inspect(Xml("", "<Uri>urn:a</Uri><Uri>urn:a</Uri>"))));
+Test("TIA's empty local namespace", () => {
+    var report = OpcUaModelReview.Inspect(Xml("<UAObject NodeId=\"ns=1;i=5\" BrowseName=\"1:A\"/>", "<Uri /><Uri>urn:a</Uri>"));
+    Equal(OpcUaModelReview.UnnamedLocalNamespace, report["nodes"]![0]!["identity"]!["namespaceUri"]!.GetValue<string>());
+    Reject("OpcUaInvalidIdentity", () => OpcUaModelReview.Inspect(Xml("", "<Uri>urn:a</Uri><Uri />")));
+});
 Test("normalized ID collision", () => Reject("OpcUaIdentityCollision", () => OpcUaModelReview.Inspect(Xml("<UAObject NodeId=\"ns=1;i=01\" BrowseName=\"A\"/><UAObject NodeId=\"ns=1;i=1\" BrowseName=\"B\"/>"))));
 Test("duplicate aliases", () => Reject("OpcUaInvalidIdentity", () => OpcUaModelReview.Inspect(Xml("<Aliases><Alias Alias=\"A\">i=1</Alias><Alias Alias=\"A\">i=2</Alias></Aliases>"))));
 Test("recursive alias rejected", () => Reject("OpcUaInvalidIdentity", () => OpcUaModelReview.Inspect(Xml("<Aliases><Alias Alias=\"A\">B</Alias><Alias Alias=\"B\">i=1</Alias></Aliases>"))));

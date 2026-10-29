@@ -162,6 +162,12 @@ internal static partial class ProductionJobChecks
         await Reject(() => f.Jobs.Recover(f.Job.Job.Id, f.Review.Sha256, f.State.Id, f.State.Revision,
             [new(f.State.Plan.Resources[0].ResourceKey, Path.Combine(f.Root, "new.ap21"))], f.Adapter), "ArtifactChanged");
         Check(f.Adapter.Restores == 0, "Corrupt checkpoint refused before restore");
+        f = F("tampered-baseline"); f.Adapter.Mode = "lostResponse"; await Reject(() => f.Execute(), "FakeResponseLost");
+        Check(f.State.Checkpoints.Count == f.State.Plan.Resources.Count, "The worker's checkpoint shape is one pinned manifest per planned resource");
+        var pinned = TestSuiteStyleJobs.Parse<PinnedCheckpoint>(f.Jobs.ReadBytes(f.State.Checkpoints[0]));
+        File.WriteAllText(Path.Combine(f.Root, pinned.Preservation.RelativePath), "tampered"); f.Adapter.Mode = "ok";
+        await Reject(() => f.Jobs.Reconcile(f.Job.Job.Id, f.Review.Sha256, f.State.Id, f.State.Revision, f.Adapter), "ArtifactChanged");
+        Check(f.State.State == "outcomeUnknown", "A tampered checkpoint baseline cannot pass reconciliation or release the project");
         f = F("shared-mutation-contention");
         var legacy = new EngineeringMutationAdmissionStore(f.Root);
         legacy.Acquire(new EngineeringMutationScope("change_apply", new('a',64), new('b',64), "authored-session", new('c',64), 123, new('d',64),
@@ -240,6 +246,8 @@ internal static partial class ProductionJobChecks
         public Task<TestSuiteStyleJobStatus> Execute(ITestSuiteStyleAdapter? adapter = null) => Jobs.ExecuteNext(Job.Job.Id, Review.Sha256, Job.Operations[0].Id, 0, adapter ?? Adapter);
     }
 
+    private sealed record PinnedCheckpoint(EngineeringArtifactReference Archive, EngineeringArtifactReference Preservation);
+
     private sealed class FakeAdapter(Fixture fixture, EngineeringArtifactReference[] probes) : ITestSuiteStyleAdapter
     {
         public string Mode = "ok";
@@ -278,8 +286,10 @@ internal static partial class ProductionJobChecks
                 owner.Checkpoints++;
                 if (new EngineeringOperationStore(f.Root).Read(ctx.Operation.Id).State != "checkpointIntent") throw new Exception("Missing checkpoint intent");
                 if (owner.Mode == "lostCheckpoint") throw new BridgeException("FakeResponseLost", "Authored checkpoint interruption");
-                var archive = f.Jobs.Retain(new { syntheticArchive = true, preservationManifest = "authored immutable inventory", nativeExecuted = false });
-                owner.AfterCheckpoint?.Invoke(); return Task.FromResult(new[] { archive });
+                // The worker's shape: one manifest per planned resource that pins the archive and the preservation baseline.
+                var manifest = f.Jobs.Retain(new PinnedCheckpoint(f.Jobs.Retain(new { syntheticArchive = true, nativeExecuted = false }),
+                    f.Jobs.Retain(new { authoredBaseline = "immutable inventory" })));
+                owner.AfterCheckpoint?.Invoke(); return Task.FromResult(new[] { manifest });
             }
             public async Task<byte[]> Run(CancellationToken token)
             {
@@ -312,6 +322,8 @@ internal static partial class ProductionJobChecks
             }
             public Task<TestSuiteStyleReconciliation> Reconcile(CancellationToken token)
             {
+                // Like the worker, compare against the baseline that the durable record pins through the manifest.
+                if (ctx.Operation.Checkpoints.Count == 1) _ = f.Jobs.ReadBytes(TestSuiteStyleJobs.Parse<PinnedCheckpoint>(f.Jobs.ReadBytes(ctx.Operation.Checkpoints[0])).Preservation);
                 var artifact = f.Jobs.Retain(new { authoredFakeIndependentObservation = true });
                 return Task.FromResult(new TestSuiteStyleReconciliation([new(ctx.Operation.Plan.Resources[0].ResourceKey, "unchanged", null, artifact)],
                     owner.Mode == "missingDestination" ? [] : ctx.Operation.RecoveryDestinations.Select(d => new EngineeringRecoveryResolution(d.ResourceKey, d.RecoveryLocation, "retainedPartial", artifact)).ToArray()));

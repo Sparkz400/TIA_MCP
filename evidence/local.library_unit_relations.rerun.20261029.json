@@ -1,0 +1,126 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_unit_relations.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T08:39:11+00:00",
+  "source": {
+    "commit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.library_unit_relations.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner and the LibraryUnitSeeder fixture tool, which its build now registers on the Openness AllowList: software units TiaMcp_LibProvider and TiaMcp_LibConsumer with one SoftwareUnit relation consumer->provider. Library FB and UDT 1.0.0 instantiate into the provider; instantiating either in the related consumer unit is refused before any write (LibraryConflict, one instance of a library type per device, relations included). The seeder sets the provider instances' Access attribute Unpublished->Published (TIA accepts it on typed instances); a consumer-unit cycle OB, instance DB and UDT DB call them through the relation and compile. The PLC-wide update to exactly FB 1.1.0 applies: the cleanup guard proves the provider uses through native cross-unit references from the consumer OB; the UDT stays at 1.0.0 and every path is unchanged. A fresh reopen keeps the relation, FB 1.1.0 and placement. 58/58 steps; all 49 retained library observations (16 original-byte lock receipts) validate.",
+  "limitations": [
+    "Units, the relation and the Access flag are set by a registered fixture tool, not by MCP routes.",
+    "One SoftwareUnit relation; NonUnitDB and TODB relations, namespaces on library instances and safety units are not exercised.",
+    "One PLC, no runtime execution."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d94291d335d7d65e3003fe28d285e10760e969c16a0fb90d5bf2ca93a0223946"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d6f5048b4e950222c7caa6e09e772f6afdebb4393bb62493d7b620ec6ad51f6d"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "ef8e3d2ec9d0702b576c7d0ce8d5638927f262bf77da0e0f61859972ca41def7"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "95713f8697aec0f031e446133de224a8cf498e482f3b7357f820372e672127af",
+      "bytes": 648163,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "prepare library_edit_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "seed related software units",
+        "units and their relation are visible",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "refuse the FB in the related consumer unit",
+        "refuse the UDT in the related consumer unit",
+        "publish the provider's library instances",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "instances in the provider, callers in the consumer",
+        "FB 1.0.0 used once (in the provider)",
+        "open staged archive",
+        "prepare library_update_project",
+        "guard proved the provider uses through the consumer OB",
+        "apply library_update_project",
+        "FB at exactly 1.1.0 in the provider",
+        "UDT stays at 1.0.0",
+        "placement unchanged after the update",
+        "close consumer session",
+        "start owned TIA reopen",
+        "reopen consumer",
+        "reopened: relation intact",
+        "reopened: FB 1.1.0 and placement intact"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

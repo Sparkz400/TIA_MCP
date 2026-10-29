@@ -2,11 +2,8 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 import shutil
-import subprocess
-import time
 
 from library_native_harness import Harness, require
 
@@ -38,17 +35,8 @@ def body(h):
 
     # Consumer: seed one software unit with a namespace preset through the registered native fixture tool.
     plc = h.owned_scratch("consumer")
-    status = h.tool("tia_session_status")
-    authorization = h.directory / "unit-authorization.json"
-    authorization.write_text(json.dumps({"processId": status["processId"], "projectPath": status["projects"][0]["path"],
-                                         "ownsPortalProcess": True, "creationTool": "tia_create_scratch"}), encoding="utf-8")
-
-    def seed():
-        completed = subprocess.run([str(h.args.unit_seeder), str(authorization)], capture_output=True, text=True, encoding="utf-8", timeout=300)
-        result = json.loads(completed.stdout.strip().splitlines()[-1])
-        require(completed.returncode == 0 and result.get("completed") is True and result.get("namespacePreset") == UNIT, "Unit seeding failed: %s" % result)
-        return result
-    h.stage("seed software unit " + UNIT, seed)
+    seeded = h.seed("seed software unit " + UNIT)
+    require(seeded.get("namespacePreset") == UNIT, "Unit seeding failed: %s" % seeded)
     scopes = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["softwareScopes"]
     units = [s for s in scopes if s.get("name") == UNIT]
     require(len(units) == 1 and units[0].get("namespacePreset") == UNIT, "The seeded unit is not visible with its namespace preset: %s" % scopes)
@@ -88,19 +76,7 @@ def body(h):
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
     h.owned_portal("reopen")
-    def reopen():
-        # The seeder's extra Openness attachment can hold TIA's project lock briefly; TIA states a 2-minute release delay.
-        attempts = []
-        for _ in range(13):
-            result = h.client.request("tools/call", {"name": "project_open", "arguments": {"path": project_path}})
-            if not result.get("isError"):
-                return {"attempts": attempts, "opened": result.get("structuredContent")}
-            message = ((result.get("structuredContent") or {}).get("error") or {}).get("message", "")
-            require("already been opened" in message, "Reopen failed for another reason: %s" % message)
-            attempts.append(time.strftime("%H:%M:%S"))
-            time.sleep(15)
-        raise AssertionError("The project lock was not released within three minutes")
-    h.stage("reopen consumer", reopen)
+    h.stage("reopen consumer", lambda: h.reopen_project(project_path))
     h.stage("reopened: unit use intact", lambda: h.verify_use(h.project_library(), fb, 1) and placement())
 
 

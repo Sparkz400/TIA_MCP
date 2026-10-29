@@ -49,7 +49,8 @@ namespace TiaMcp.Openness.V21
             if (!_ownsPortal) throw new BridgeException("ScratchIsolationRequired", "DB snapshot capture and actual-value loads require a worker-owned TIA instance started with tia_start.");
             if (string.IsNullOrWhiteSpace(change.Payload.Value<string>("downloadTicket")))
                 throw new BridgeException("PhysicalPlcRefused", "DB snapshot capture and actual-value loads are limited to a ticket-bound owned PLCSIM Advanced instance (downloadTicket from sim_create); physical PLCs are refused.");
-            OwnedSimulationMarker(change.Payload);
+            var login = OwnedSimulationLogin(change.Payload, OwnedSimulationMarker(change.Payload));
+            if (login != null) preview["login"] = login.Evidence;
             var target = DbSnapshotTarget(change.Selector, change.Payload);
             EnsureEditableBlock(target.Block.Item, false);
             if (target.Block.NativeSystemGroup) throw new BridgeException("GeneratedObject", "Generated system-group DBs are excluded.");
@@ -100,7 +101,7 @@ namespace TiaMcp.Openness.V21
                 report["stage"] = create ? "createSnapshot" : "loadSnapshotAsActualValues";
                 if (create) values.CreateSnapshot(); else values.LoadSnapshotAsActualValues();
                 if (challenges.Failure != null) throw challenges.Failure;
-            });
+            }, OwnedSimulationLogin(change.Payload, marker));
             if (failure != null) throw failure;
             report["completed"] = true;
             if (!create)

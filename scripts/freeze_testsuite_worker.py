@@ -35,7 +35,7 @@ def main():
     source = output / "source"
     source.mkdir()
     listed = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=REPO).decode().split("\0")
-    paths = sorted({p for p in listed if p and (p.startswith(("src/", "tests/", "contracts/", "fixtures/", "scripts/")) or
+    paths = sorted({p for p in listed if p and (p.startswith(("src/", "tests/", "contracts/", "fixtures/", "scripts/", "third-party/")) or
                     p in {"Directory.Build.props", "TiaMcp.slnx", "NuGet.Config", "global.json"}) and (REPO / p).is_file()})
     hashes = {p: sha(REPO / p) for p in paths}
     for p in paths:

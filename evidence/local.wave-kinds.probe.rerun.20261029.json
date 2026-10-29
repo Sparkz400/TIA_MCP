@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.wave-kinds.probe.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T08:39:58+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.wave-kinds.probe.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/fe in the project); the current probe also applies and reverts web activation. Original scope: Exploratory native probe on one owned scratch CPU 1511-1 PN (V21): certificate_create/assign (PlcCommunicationCertificate, there and back)/delete applied with exact readback; umac_role_set create/grant/assign/unassign/revoke applied; vci_workspace_create/delete applied; instance_lookup found the single-instance DB and both call-site sources; webserver_page_set refused WebServerNotActivated on a CPU with web serving off.",
+  "limitations": [
+    "Exploratory probe of one scratch project and one CPU: not feature qualification, no reopen/recovery/interruption gates beyond each apply's own readback.",
+    "Web page settings were only probed for their refusal; no change kind activates web serving.",
+    "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f6f315ad1d089c9e224905b0357f79885b840013d28a7ad37fbef459b7f71b7b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "07b750e9979d73bb5bcad738bacee42e5dd4437261993ab8a9b8835577c34c62"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "76140fa7472e2c019ab769e13d04d8ab120d6dfad786c8366de09cbcaa277723",
+      "bytes": 522795,
+      "completed": true,
+      "steps": [
+        "start owned TIA wave probe",
+        "create owned scratch wave probe",
+        "apply webserver_page_set",
+        "apply webserver_page_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply umac_role_set",
+        "apply certificate_create",
+        "apply certificate_delete",
+        "apply source_upsert",
+        "apply vci_workspace_create",
+        "apply vci_workspace_delete"
+      ],
+      "toolsPassed": [
+        "access_inspect",
+        "certificate_inspect",
+        "change_apply",
+        "change_prepare",
+        "instance_lookup",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "vci_workspace_inspect",
+        "web_inspect"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

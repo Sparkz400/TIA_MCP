@@ -34,7 +34,7 @@ Use `watch_table_read` and `watch_table_prepare` with `forceTable=true` and the 
 
 Apply, fresh-reopen verification and recovery use `watch_table_apply`, `watch_table_verify_reopen` and the recovery tools exactly as for watch documents. The review selector keeps `targetKind: forceTable`, so every later observation targets the force table, and every watch table stays in the peer manifest.
 
-Forcing is never selected or activated. `ForceIntention` cannot be set. A force table whose typed rows or exported XML show any `ForceIntention` other than false is refused at prepare, before import and before save. Nothing is monitored, forced or written online.
+Forcing is never selected or activated. `ForceIntention` cannot be set; asking for it, for a field the export lacks or for a row out of range is refused with `UnsupportedProfile`. A force table whose typed rows or exported XML show any `ForceIntention` other than false is refused at prepare, before import and before save. Nothing is monitored, forced or written online.
 
 Force edits are expanded document profiles. Production Hosts refuse both prepare and apply with `UnsupportedProfile`; only the isolated qualification harness (`--component-qualification --watch-qualification`) dispatches them until native lifecycle evidence exists.
 

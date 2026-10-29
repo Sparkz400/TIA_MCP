@@ -16,6 +16,8 @@ public static class OpcUaModelReview
     public const int MaxBytes = 16 * 1024 * 1024;
     public const int MaxNodes = 20000;
     public const int MaxXmlEvents = 500000;
+    /// <summary>Stands for the empty first namespace URI of a TIA server export, the PLC's own namespace.</summary>
+    public const string UnnamedLocalNamespace = "urn:tiamcp:unnamed-local-namespace";
     public const int MaxReportBytes = 32 * 1024 * 1024;
     public const string SchemaSha256 = "c7ac09ea7504d54174e1eb4c5a8123c0cc491040703dfcd6bfe085bf6c53f9f0";
     private static readonly XNamespace Ns = "http://opcfoundation.org/UA/2011/03/UANodeSet.xsd";
@@ -122,6 +124,8 @@ public static class OpcUaModelReview
         if (root.Name != Ns + "UANodeSet") throw Error("OpcUaSchemaMismatch", "Expected the UANodeSet root in the pinned namespace.");
         var namespaces = new[] { OpcUaNodeIdentity.StandardNamespace }.Concat(
             root.Element(Ns + "NamespaceUris")?.Elements(Ns + "Uri").Select(e => e.Value) ?? []).ToArray();
+        // TIA's whole-server export leaves the PLC's own namespace (index 1) empty; the server names it only at runtime.
+        if (namespaces.Length > 1 && namespaces[1].Length == 0) namespaces[1] = UnnamedLocalNamespace;
         if (namespaces.Length > ushort.MaxValue + 1 || namespaces.Any(n => n.Length is 0 or > 4096 || !Uri.TryCreate(n, UriKind.Absolute, out _))
             || namespaces.Distinct(StringComparer.Ordinal).Count() != namespaces.Length)
             throw Error("OpcUaInvalidIdentity", "Namespace URIs must be unique absolute URIs, at most 4096 characters each.");

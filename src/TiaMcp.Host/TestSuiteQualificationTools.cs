@@ -1,6 +1,7 @@
 #if TESTSUITE_QUALIFICATION
 using System.ComponentModel;
 using System.Text.Json;
+using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using TiaMcp.Core;
 using TiaMcp.Core.Engineering;
@@ -23,7 +24,7 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
     });
     [McpServerTool(Name = "qualification_testsuite_prepare", Destructive = true, OpenWorld = false)]
     [Description("Qualification build only: prepare the owned fixture, wait for independently reviewed current scope/license evidence, and retain an exact durable review. No executor invocation.")]
-    public async Task<object> Prepare(string projectPath, string fixture, string idempotencyKey, int runs = 1, CancellationToken cancellationToken = default)
+    public Task<CallToolResult> Prepare(string projectPath, string fixture, string idempotencyKey, int runs = 1, CancellationToken cancellationToken = default) => Typed(async () =>
     {
         if (!options.TestSuiteQualification || runs is < 1 or > 2) throw new BridgeException("InvalidRequest", "One or two qualification runs required.");
         var observed = await bridge.CallAsync("testsuite_qualification_prepare", new { projectPath, fixture, artifactRoot = options.ArtifactsDirectory }, cancellationToken);
@@ -36,11 +37,11 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
             Profile, Read<EngineeringObjectReference[]>(d.GetProperty("requiredScope")), [], true, true, []);
         var review = Jobs.Review([capture], Enumerable.Range(0, runs).Select(_ => new TestSuiteStyleSelection([capture.Manifest.Id], [])).ToArray(), target, Profile);
         return new { observation = observed, review, status = Jobs.Prepare(review, review.Sha256, idempotencyKey) };
-    }
+    });
     [McpServerTool(Name = "qualification_testsuite_execute", Destructive = true, OpenWorld = false)]
     [Description("Qualification build only: one durable style dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.")]
-    public async Task<TestSuiteStyleJobStatus> Execute(string jobId, string reviewedSha256, string operationId, int expectedRevision,
-        string? fault = null, CancellationToken cancellationToken = default)
+    public Task<CallToolResult> Execute(string jobId, string reviewedSha256, string operationId, int expectedRevision,
+        string? fault = null, CancellationToken cancellationToken = default) => Typed(async () =>
     {
         if (fault != null)
         {
@@ -50,11 +51,11 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
             await bridge.CallAsync("testsuite_qualification_fault", new { operationId, fault }, cancellationToken);
         }
         return await Jobs.ExecuteNext(jobId, reviewedSha256, operationId, expectedRevision, Adapter, cancellationToken);
-    }
+    });
     [McpServerTool(Name = "qualification_testsuite_recover", Destructive = true, OpenWorld = false)]
     [Description("Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation.")]
-    public async Task<TestSuiteStyleJobStatus> Recover(string jobId, string reviewedSha256, string operationId, int expectedRevision, string recoveryLocation,
-        bool loseRestoreReply = false, CancellationToken cancellationToken = default)
+    public Task<CallToolResult> Recover(string jobId, string reviewedSha256, string operationId, int expectedRevision, string recoveryLocation,
+        bool loseRestoreReply = false, CancellationToken cancellationToken = default) => Typed(async () =>
     {
         var op = Jobs.Status(jobId).Operations.Single(o => o.Id == operationId);
         if (loseRestoreReply)
@@ -64,10 +65,19 @@ public sealed class TestSuiteQualificationTools(IBridgeClient bridge, HostOption
         }
         return await Jobs.Recover(jobId, reviewedSha256, operationId, expectedRevision,
             [new(op.Plan.Resources.Single().ResourceKey, recoveryLocation)], Adapter, cancellationToken);
-    }
+    });
     [McpServerTool(Name = "qualification_testsuite_reconcile", Destructive = false, OpenWorld = false)]
     [Description("Qualification build only: independently reopen the original and each admitted recovery destination, compare complete fixture preservation and read the scope editor again.")]
-    public Task<TestSuiteStyleJobStatus> Reconcile(string jobId, string reviewedSha256, string operationId, int expectedRevision, CancellationToken cancellationToken) =>
-        Jobs.Reconcile(jobId, reviewedSha256, operationId, expectedRevision, Adapter, cancellationToken);
+    public Task<CallToolResult> Reconcile(string jobId, string reviewedSha256, string operationId, int expectedRevision, CancellationToken cancellationToken) =>
+        Typed(async () => await Jobs.Reconcile(jobId, reviewedSha256, operationId, expectedRevision, Adapter, cancellationToken));
+
+    // Typed result like TestSuiteScopeProbeTools: a thrown BridgeException (such as QualificationResponseLost) would reach the client as the SDK's generic message without its code.
+    private static async Task<CallToolResult> Typed(Func<Task<object>> call)
+    {
+        string json; bool failed = false;
+        try { json = JsonSerializer.Serialize(await call(), BridgeProtocol.Json); }
+        catch (BridgeException error) { json = JsonSerializer.Serialize(new { error = new { code = error.Code, message = error.Message } }, BridgeProtocol.Json); failed = true; }
+        return new() { IsError = failed, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+    }
 }
 #endif

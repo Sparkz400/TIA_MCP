@@ -1,0 +1,110 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.online.compare.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T16:40:30+00:00",
+  "source": {
+    "commit": "94d7c490f1f4f71616aa9c578fec4b452da1db59",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_online_routes.py --skip-snapshots --skip-upload from commit 94d7c49 (binaries built from 1c272fc; src identical) on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb, downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN: plc_online_compare with the instance's generated scratch runtime user answered exactly one OnlineAuthenticationConfiguration challenge (ProjectUser), stayed in RUN, completed its cleanup and found every compare row identical; typed refusals for an unknown ticket, the CPU's protection credential, runtime-user metadata naming another project or CPU, a copy outside scratch-credentials (InvalidSimulationCredential / SimulationLoginTargetMismatch) and no credential (SimulationOnlineAuthenticationRequired), each leaving the project unchanged; then stop, power off, owned release and unchanged preexisting TIA processes.",
+  "limitations": [
+    "plc_station_upload is not qualified: in an empty Portal the upload meets TLS verification for the owned CPU, which these routes never trust (SimulationOnlineAuthenticationRequired, 29 October 2026).",
+    "The DB-snapshot routes are not qualified: after an online db_snapshot_create, V21's InterfaceSnapshot.Export returned the same value-less document as before, so the capture refused it.",
+    "Provisioning the protection credential trusts the owned, empty CPU's certificate on first use (trustOwnedEmptyCpuCertificate); the online route itself answers TLS NonTrusted.",
+    "TIA reuses an online login within the same Portal without a new challenge; later online sessions in that Portal answer none.",
+    "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "7d10870dc77bb8f98ec9992607048ea2b841a49342fe3600160ade79727c3826"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "bcdeaf7e7e3fcf9a240d524c2fccaf781e2785667b4f4098f15ee608f0e9a0f3"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "5ef9d9e4d20b522e97cace18f50a075b6c791cb7029f7b9fd280dbaf97c819f1"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "0d0ee618a2a46b4eb8d7309a5831d22df5bc54fa4f9e05cc8e1474d9ad418ba0",
+      "bytes": 361194,
+      "completed": true,
+      "steps": [
+        "TIA processes before the run",
+        "start owned TIA online routes",
+        "create owned scratch online routes",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "project_snapshot_capture",
+        "discovery baseline",
+        "sim_create",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "resolve OnDb.Count in PLCSIM",
+        "project state after the download",
+        "refuse plc_online_compare: an unknown ticket",
+        "refuse plc_online_compare: the CPU's protection credential",
+        "refuse plc_online_compare: runtime-user metadata naming another scratch project",
+        "refuse plc_online_compare: runtime-user metadata naming another CPU",
+        "refuse plc_online_compare: a runtime-user metadata copy outside scratch-credentials",
+        "refuse plc_online_compare: no runtime credential",
+        "refuse plc_station_upload: an open project",
+        "refuse db_snapshot_capture: a DB without a stored snapshot",
+        "refuse change_prepare: db_snapshot_create without a download ticket",
+        "plc_online_compare with the runtime user",
+        "stop",
+        "power off",
+        "sim_release",
+        "tia_detach",
+        "preexisting TIA processes are unchanged"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "device_inventory",
+        "hardware_inspect",
+        "plc_online_compare",
+        "project_inventory",
+        "project_snapshot_capture",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "simulation_discovery_baseline",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "db_snapshot_capture",
+        "plc_online_compare",
+        "plc_station_upload"
+      ]
+    }
+  ]
+}

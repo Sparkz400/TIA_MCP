@@ -1,0 +1,11 @@
+<Project>
+  <!-- Fixture seeders and probes attach to TIA through Openness. An unregistered build makes TIA ask for access,
+       and an unattended run then waits forever (LibraryUnitSeeder, 28 October 2026). Register each Debug build like the worker. -->
+  <Target Name="RegisterDevOpennessTool" AfterTargets="Build"
+          Condition="'$(Configuration)' == 'Debug' and '$(OutputType)' == 'Exe' and '@(Reference->AnyHaveMetadataValue('Identity', 'Siemens.Engineering.Base'))' == 'true'">
+    <Exec Command="&quot;$(SystemRoot)\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\Register-DevOpennessWorker.ps1&quot; -WorkerPath &quot;$(TargetPath)&quot;" IgnoreExitCode="true" StandardOutputImportance="low">
+      <Output TaskParameter="ExitCode" PropertyName="OpennessAllowListExitCode" />
+    </Exec>
+    <Warning Condition="'$(OpennessAllowListExitCode)' != '0'" Text="TIA will ask to allow $(TargetFileName), and an unattended run waits for that answer. Run once in an elevated PowerShell: scripts\Register-DevOpennessWorker.ps1 -Grant -AllNativeTools" />
+  </Target>
+</Project>

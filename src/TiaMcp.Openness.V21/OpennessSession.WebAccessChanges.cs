@@ -207,7 +207,8 @@ namespace TiaMcp.Openness.V21
             ((JArray)preview["effects"]).Add(new JObject { ["action"] = "generateUserPageBlocks", ["plcPath"] = plc.Path, ["option"] = overwrite ? "Override" : "None", ["overrideBlocks"] = new JArray(named),
                 ["affectedSet"] = "The block identities GenerateBlocks returns; apply lists them in its readback.",
                 // Natively (qualification ac_0165b47c) TIA also adds a system constant named after the application to the default tag table.
-                ["systemConstant"] = application });
+                ["systemConstant"] = application,
+                ["cpuSettings"] = new JObject { [PagesApplicationName] = application, [PagesHtmlDirectory] = Path.GetFullPath(source), [PagesDefaultPage] = page } });
             ((JArray)preview["warnings"]).Add("Generated DB names and numbers follow the CPU's web settings and are known only after generation. With override=false native generation refuses an existing target DB; with override=true the overwritten pre-existing blocks must equal overrideBlocks exactly, otherwise apply fails after the checkpoint and recovery is required. Generated block internals are never edited, no delete API exists and nothing is downloaded.");
         }
 
@@ -228,7 +229,26 @@ namespace TiaMcp.Openness.V21
             if (generated.Length == 0) throw new BridgeException("MutationVerificationFailed", "GenerateBlocks returned no blocks.");
             if (!new HashSet<string>(overwritten, StringComparer.OrdinalIgnoreCase).SetEquals(change.ObjectNames)) throw new BridgeException("MutationVerificationFailed", "The overwritten pre-existing blocks differ from overrideBlocks.");
             if (!before.IsSubsetOf(after) || generated.Any(b => !after.Contains(b.Name))) throw new BridgeException("MutationVerificationFailed", "A pre-existing or generated block is missing after generation.");
+            // GenerateBlocks sets these CPU settings in memory only: they read back empty after a save and a fresh reopen
+            // (access qualification, 28 October 2026). Writing the caller's values explicitly lets the saved project keep them.
+            var settings = (JObject)change.Preview["effects"][0]["cpuSettings"];
+            string directory = settings.Value<string>(PagesHtmlDirectory);
+            cpu.SetAttribute(PagesApplicationName, settings.Value<string>(PagesApplicationName));
+            cpu.SetAttribute(PagesHtmlDirectory, new DirectoryInfo(directory));
+            cpu.SetAttribute(PagesDefaultPage, new FileInfo(Path.Combine(directory, settings.Value<string>(PagesDefaultPage))));
+            change.Stages.Add("webserver_page_settings_written");
+            var written = new JObject
+            {
+                [PagesApplicationName] = cpu.GetAttribute(PagesApplicationName) as string,
+                [PagesHtmlDirectory] = (cpu.GetAttribute(PagesHtmlDirectory) as DirectoryInfo)?.FullName,
+                [PagesDefaultPage] = (cpu.GetAttribute(PagesDefaultPage) as FileInfo)?.FullName
+            };
+            change.Readbacks.Add(new JObject { ["role"] = "webserver-page-settings", ["after"] = written });
+            if (written.Value<string>(PagesApplicationName) != settings.Value<string>(PagesApplicationName) || !string.Equals(written.Value<string>(PagesHtmlDirectory)?.TrimEnd('\\'), directory.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase))
+                throw new BridgeException("MutationVerificationFailed", "The CPU's user-defined page settings read back differently than written.");
         }
+
+        private const string PagesApplicationName = "WebserverApplicationName", PagesHtmlDirectory = "WebserverHTMLDirectory", PagesDefaultPage = "WebserverDefaultHTMLPage";
 
         private static List<KeyValuePair<string, UmacDevice>> UmacDevices(Project project)
         {

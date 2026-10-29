@@ -64,7 +64,7 @@ The script builds the project, validates `AddIn.Publisher.xml` against the insta
 
 To use it:
 
-1. Install the `.addin` in TIA Portal yourself and grant its declared permissions: `TIA.ReadOnly`, environment and file read, and unmanaged code for the pipe-server check.
+1. Install the `.addin` in TIA Portal yourself and grant its declared permissions: `TIA.ReadOnly`, environment and file read, and unmanaged code for the pipe client and its server check (TIA's sandbox refuses the .NET pipe client and serializer, so the companion uses kernel32 handles and its own JSON).
 2. Set the user environment variable `TIAMCP_ARTIFACTS` to the Host's absolute `--artifacts` directory, then start TIA.
 3. Start the Host with `--addin-handoff --addin-enrollment <addin-enrollment.json>`. The enrollment option is refused without `--addin-handoff`, and the file must contain exactly `schemaVersion`, `assemblySha256` and `configurationSha256`.
 4. Through MCP, attach the worker to that TIA instance and save a review of the project (`project_snapshot_import`).
@@ -78,4 +78,6 @@ With enrollment, the Host asks the already attached worker for `addin_owner_cont
 
 The 30-second challenge stays one-use and is rechecked against the same owner tuple at `begin` and twice during `complete`.
 
-Limits: the companion is compiled and packaged only. No install, menu, sandbox permission, loader lineage or pipe exchange has run inside TIA Portal. Enrollment is an OS-lineage and declared-hash binding, not attestation of the loaded package, so `producerAuthenticated` and `liveSelectionVerified` stay false. The selection binds saved references, not live content. Only project-tree projects, device groups, devices, device items, PLC software, software units, block/type/tag-table groups, blocks, types, tag tables and tags are mapped. Other objects and the devices-and-networks, library and workflow-hook surfaces are refused. Package signing is not configured.
+Native run (29 October 2026, `local.addin.companion.20261029`): installed in TIA Portal V21 Update 3, the companion sent one project-tree selection (a device item) from inside TIA's Add-In sandbox; the Host admitted the loader peer, bound the selection to the saved review, and the stored record carries the enrolled hashes. [`scripts/qualify_addin_companion.py`](../../scripts/qualify_addin_companion.py) runs this with an operator at the desktop, and [`scripts/Test-AddInSandbox.ps1`](../../scripts/Test-AddInSandbox.ps1) replays the companion's pipe and JSON code offline under the declared permissions.
+
+Limits: only one device-item selection has run natively; the other mapped kinds and multi-object selections share the same path code but have not. Enrollment is an OS-lineage and declared-hash binding, not attestation of the loaded package, so `producerAuthenticated` and `liveSelectionVerified` stay false. The selection binds saved references, not live content. Only project-tree projects, device groups, devices, device items, PLC software, software units, block/type/tag-table groups, blocks, types, tag tables and tags are mapped. Other objects and the devices-and-networks, library and workflow-hook surfaces are refused. Package signing is not configured.

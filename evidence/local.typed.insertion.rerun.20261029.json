@@ -1,0 +1,61 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.insertion.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T09:24:44+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.insertion.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): both cases pass the four engineering gates in one batch. Original scope: scripts/qualify_typed_graphical.py, engineering-only, typed-insert-lad and typed-insert-fbd on fresh owned TIA V21 scratch projects: a typed Boolean network inserted after the first network of an existing native caller (Tgp_Boolean_LAD/FBD). The builder predicted V21's renumbering (inserted unit IDs 8..C; block title IDs 8->D, 9->E). Each case passed import/compile, complete prepared XML equal to the native readback, the independent insertion contract (only following IDs shifted by exactly the inserted count; removing the unit and undoing the shift recovers the original caller exactly), untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen.",
+  "limitations": [
+    "Under the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md, PR #49): renumbered following document-local IDs count as preserved; nothing else may change.",
+    "Engineering only, standard route, insertion after an existing network. First-network insertion into a network-free caller still refuses; insertion combined with storage creation needs its own composite contract."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1078f9db615efb31fbf9e054a3b7e5b86d137589140ecb355bee5c4edb454cec"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7b544f62ca84c4a827ce485f9b7d1ef6c3ad9eca36ee7b0a4725c90d469d5123"
+    }
+  ],
+  "runs": [
+    {
+      "report": "insertion.json",
+      "sha256": "b7d723b3a19093a46714e02fa45c4e132698ddfaabddccf2744e8b6284bf860a",
+      "bytes": 10230,
+      "completed": true,
+      "steps": [
+        "typed-insert-fbd: passed",
+        "typed-insert-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

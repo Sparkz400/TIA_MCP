@@ -134,6 +134,7 @@ internal static partial class Program
             ("Journal directory publication tolerates an actual Windows handle", JournalDirectoryPublicationTests.ActualWindowsHandle),
             ("Journal publication bounds retries and never overwrites or replays", JournalDirectoryPublicationTests.BoundsAndNoOverwrite),
             ("Card moves tolerate transient locks and reconcile without replay", SimulationCardMoveRetryTests.TransientLockAndReconciliation),
+            ("Owned PLCSIM routes answer only the offered project-user login, once", SimulationOnlineLoginTests.OnlyTheOfferedProjectUserLoginOnce),
             ("Provisioning checkpoint refuses unsaved state and existing destinations", SimulationCheckpointTests.SavedStateAndCollisions),
             ("Provisioning checkpoint and durable receipt precede runtime continuation", SimulationCheckpointTests.ArchiveAndDurableReceiptPrecedeContinuation),
             ("Card move retries retain deadlines and never replay other operations", SimulationCardMoveRetryTests.BoundsAndNoNativeReplay),
