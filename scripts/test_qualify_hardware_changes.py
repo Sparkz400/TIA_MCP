@@ -9,6 +9,7 @@ import qualify_hardware_changes as q
 import qualify_project_settings as ps
 import qualify_software_unit_changes as u
 import qualify_technology_changes as tc
+from qualify_plc_object_mutations import STAGES
 
 D = "/projects/S/devices/St/items/"
 
@@ -34,6 +35,43 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertTrue(q.coupled_comment("hw:" + D + "Di")("changed", "hw:" + D + "Di/items/Di"))
         self.assertFalse(q.coupled_comment("hw:" + D + "Di")("added", "hw:" + D + "Di/items/Di"))
         self.assertFalse(q.port_defaults(["hw:a"])("changed", "hw:b"))
+
+    def test_family_links_with_the_cpu_link_form_a_line(self):
+        run = q.Run.__new__(q.Run)
+        run.base = "/projects/P/devices/"
+        links = [*q.family_ports(run).values(), tuple(q.ports(run, 2))]
+        ends = [port for link in links for port in link]
+        self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
+        devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
+        self.assertEqual({("Hw1200", "ScratchStation"), ("HwMp", "HwPeer"), ("ScratchStation", "HwPeer")}, set(devices))
+        self.assertEqual(4, len({d for link in devices for d in link}))  # Four devices joined by three links: a line, no ring.
+        self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMpHead~MpDi",
+                         q.constant(run, q.MP, q.MP.prefix + "MpDi"))
+
+    def test_deferred_apply_skips_compile_and_save_only(self):
+        class Fake:
+            def __init__(self, stages, compile=None):
+                self.report, self.result = {"certificateIdentity": {}, "notQualified": {}}, {"stages": stages, "compile": compile, "preview": {}, "recoveryArchiveSha256": "a", "afterFingerprint": "f"}
+            def apply_prepared(self, kind, prepared, deferred=False):
+                self.deferred = deferred
+                return self.result
+            def stage(self, name, operation):
+                return operation()
+            def tool(self, name, arguments):
+                return {"state": "applied", **self.result, "recoveryArchive": {}}
+        checkpoint = list(STAGES[:3])
+        for stages, ok in ((checkpoint, True), (checkpoint + ["compile_finished", "changed_project_saved"], False)):
+            h = Fake(stages)
+            run = q.Run(h)
+            run.current, run.snap = {"view": {}}, lambda label: {"view": {"hw:x": 1}}
+            call = lambda: run.finish("add", "hardware_add", {"changeId": "c", "preview": {}}, added=["hw:x"], deferred=True)
+            if ok:
+                call()
+                self.assertTrue(h.deferred)
+                self.assertEqual(["add"], run.coverage["hardware_add"]["applied"])
+            else:
+                with self.assertRaises(AssertionError):
+                    call()
 
     def test_linked_reads_both_directions(self):
         local, partner = D + "C/items/I/items/P1", D + "Q/items/I/items/P1"

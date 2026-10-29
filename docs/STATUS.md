@@ -5,7 +5,7 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.76`: 461 features, 416 verified, 45 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.77`: 461 features, 416 verified, 45 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 122 shipped, 294 limited, 27 unqualified, 8 unavailable on V21, 10 deferred |
 | Matrix cells | 1,896 bound, **151 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09 against `0.4.76` |
