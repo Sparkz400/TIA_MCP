@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UANodeSet LastModified="2026-10-29T00:00:00Z" xmlns="http://opcfoundation.org/UA/2011/03/UANodeSet.xsd">
+  <NamespaceUris><Uri>urn:tiamcp:interface:1</Uri></NamespaceUris>
+  <Aliases><Alias Alias="Organizes">i=35</Alias><Alias Alias="HasTypeDefinition">i=40</Alias></Aliases>
+  <UAObject NodeId="ns=1;i=5001" BrowseName="1:TiaMcpMachine" ParentNodeId="i=85">
+    <DisplayName>TiaMcpMachine</DisplayName>
+    <References><Reference ReferenceType="Organizes" IsForward="false">i=85</Reference><Reference ReferenceType="HasTypeDefinition">i=58</Reference></References>
+  </UAObject>
+  <UAObject NodeId="ns=1;i=5002" BrowseName="1:TiaMcpLine" ParentNodeId="i=85">
+    <DisplayName>TiaMcpLine</DisplayName>
+    <References><Reference ReferenceType="Organizes" IsForward="false">i=85</Reference><Reference ReferenceType="HasTypeDefinition">i=58</Reference></References>
+  </UAObject>
+</UANodeSet>
