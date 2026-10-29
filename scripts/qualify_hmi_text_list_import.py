@@ -1,17 +1,17 @@
 """Native import of Host-authored Unified text-list candidates.
 
 Phase 1 runs the production Host without native workers: the hmi_text_list_author MCP oracle authors its
-three variants, and the retained v1-v3 author and v1 set records are reopened. Phase 2 runs
-`HmiSeeder textlist-import`, which imports every candidate pair into a new owned MTP700 Unified Comfort
-fixture through HmiTextListComposition.Import (main sequence), saves, archives, reopens in a fresh Portal,
-retrieves both archives and runs boundary probes on the restored checkpoint. Phase 3 compares the native
-exports with the candidates; phase 4 reopens every record on a fresh Host.
+three variants plus three boundary requests, and the retained v1-v3 author and v1 set records are reopened.
+Phase 2 runs `HmiSeeder textlist-import`, which imports every candidate pair into a new owned MTP700 Unified
+Comfort fixture through HmiTextListComposition.Import (main sequence), saves, archives, reopens in a fresh
+Portal, retrieves both archives and runs the boundary probes on the restored checkpoint. Phase 3 compares
+the native exports with the candidates; phase 4 reopens every record on a fresh Host.
 """
 import argparse
 import base64
+import copy
 import hashlib
 import json
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -22,6 +22,10 @@ from hmi_text_list_author_checks import run as author_text_lists, reopen as reop
 RETAINED = {'author': ROOT / 'fixtures/hmi-coordinated/retained-v1-v3', 'set': ROOT / 'fixtures/hmi-evolution/retained-v1-sets'}
 AUTHOR_LABELS = ['author-v1-retained', 'author-v2-initial', 'author-v2-regenerated', 'author-v3-initial', 'author-v3-regenerated']
 SET_LABELS = ['set-v1', 'set-v1-evolved']
+MAIN = AUTHOR_LABELS + ['set-v1-run', 'set-v1-state', 'set-v1-evolved-run', 'set-v1-evolved-state', 'author-v1-base']
+PROBES = ['boundary-values', 'boundary-texts', 'boundary-names', 'author-v1-expanded', 'author-v1-extremes', 'unresolved-text-probe']
+# V21 exports omit these entry fields at their default value (observed in run q/tl1: an imported SingleValue 0 entry exports bare).
+ENTRY_DEFAULTS = {'Type': 'SingleValue', 'Value': 0, 'FromValue': 0, 'ToValue': 0, 'IsDefaultEntry': False}
 # A runner-made pair, not tool output: one valid list and one list whose text reference is missing.
 UNRESOLVED_PROBE = (
     '#Version: 2.0\nTextListContainers:\n  TextList:\n    ResourceListType: TextList\n    ResourceLists:\n'
@@ -33,6 +37,11 @@ UNRESOLVED_PROBE = (
     '    DefaultLanguage: "en-US"\n    Entries:\n      "Zero":\n        Text:\n          - "Zero"\n          - "Null"\n')
 
 
+class TextLibraryLoader(yaml.SafeLoader):
+    """Every plain scalar of a text library is text: V21 exports texts such as Off, On or Null unquoted, which YAML 1.1 reads as bool/null."""
+TextLibraryLoader.yaml_implicit_resolvers = {}
+
+
 def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
@@ -42,63 +51,76 @@ def canonical(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
+def boundary_requests():
+    """hmi_text_list_author requests that isolate one native boundary per list."""
+    base = json.loads((ROOT / 'fixtures/hmi/unified-text-list/author-request.json').read_text(encoding='utf-8'))
+    def request(file_base, texts, lists):
+        return dict(copy.deepcopy(base), fileBase=file_base, textLibrary=file_base + 'Texts', lists=lists,
+                    texts=[dict(id=key, translations={'en-US': value, 'de-DE': value + ' DE' if value else value}) for key, value in texts.items()])
+    def entry(identity, text, kind='SingleValue', low=0, high=0, default=False):
+        return dict(id=identity, type=kind, fromValue=low, toValue=high, isDefault=default, textId=text)
+    def plain(name, *entries, kind='Decimal'):
+        return dict(name=name, rangeType=kind, entries=list(entries))
+    texts = {'Quote': '"quoted" \\ backslash', 'Whitespace': 'tab\there\r\nCRLF and\nLF', 'Unicode': 'Über 日本語 😀', 'Empty': '',
+             'Yaml': '---\n!tag &anchor #hash: colon', 'Nul': 'a\0b', 'Separators': 'x\x85y z '}
+    return {
+        'boundary-values': request('ProbeValues', {'T': 'Value'}, [
+            plain('EntryTypes', entry('Low', 'T', 'To', None, -1), entry('Middle', 'T', 'Range', 0, 10), entry('High', 'T', 'From', 11, None)),
+            plain('Int32Bounds', entry('Min', 'T', low=-2**31, high=-2**31), entry('Max', 'T', low=2**31 - 1, high=2**31 - 1)),
+            plain('BeyondInt32', entry('Below', 'T', low=-2**31 - 1, high=-2**31 - 1), entry('Above', 'T', low=2**31, high=2**31)),
+            plain('BoolDefault', entry('False', 'T', default=True), entry('True', 'T', low=1, high=1), kind='Bool'),
+            plain('BitDefault', entry('Bit0', 'T', default=True), entry('Bit5', 'T', low=5, high=5), kind='BitNumber')]),
+        'boundary-texts': request('ProbeTexts', texts, [
+            plain('TextChars', *(entry(key, key, low=index, high=index) for index, key in enumerate(['Quote', 'Whitespace', 'Unicode', 'Empty', 'Yaml']))),
+            plain('NulText', entry('Nul', 'Nul')), plain('SeparatorText', entry('Separators', 'Separators'))]),
+        'boundary-names': request('ProbeNames', {'T': 'Name'}, [plain(name, entry('Zero', 'T')) for name in (
+            'Plain_Name1', 'Name with space', 'Umlaut_Ä', 'Unicode_日本語', 'Dot.Name', 'Colon:Name', 'Hash#Name', 'Quote"Name', 'Bracket[Name]', 'Dash-Name')])}
+
+
 def resolve(config_raw, library_raw):
-    """Text lists by name; each entry's Text reference is replaced by its {language: text} from the paired library."""
-    config, library = yaml.safe_load(config_raw) or {}, yaml.safe_load(library_raw) or {}
+    """Text lists by name as V21 reads them. V21 renames entries and pools all texts in one library on export and omits
+    default fields, so entries become a sorted multiset with defaults applied and each Text reference replaced by
+    {language: text}. Every stated value stays significant."""
+    config, library = yaml.safe_load(config_raw) or {}, yaml.load(library_raw, Loader=TextLibraryLoader) or {}
     libraries = library.get('TextLibraries') or {}
-    lists = ((config.get('TextListContainers') or {}).get('TextList') or {}).get('ResourceLists') or {}
     result = {}
-    for name, row in lists.items():
-        entries = {}
-        for key, entry in (row.get('Entries') or {}).items():
-            value = dict(entry)
-            reference = value.pop('Text', None)
-            owner = next((lib for lib in libraries if isinstance(reference, str) and reference.startswith(str(lib) + '.')), None)
-            texts = ((libraries[owner].get('Entries') or {}).get(reference[len(str(owner)) + 1:]) or {}).get('Text') if owner is not None else None
-            languages = libraries[owner].get('Languages') if owner is not None else None
-            value['Text'] = dict(zip(languages, texts)) if texts is not None and len(texts) == len(languages) else {'unresolved': reference, 'texts': texts}
-            entries[key] = value
-        result[name] = {**{k: v for k, v in row.items() if k != 'Entries'}, 'Entries': entries}
+    for container in (config.get('TextListContainers') or {}).values():
+        for name, row in (container.get('ResourceLists') or {}).items():
+            assert name not in result, 'Duplicate text-list name across containers: ' + str(name)
+            entries = []
+            for entry in (row.get('Entries') or {}).values():
+                value = {**ENTRY_DEFAULTS, **entry}
+                reference = value.pop('Text', None)
+                owner = next((lib for lib in libraries if isinstance(reference, str) and reference.startswith(str(lib) + '.')), None)
+                texts = ((libraries[owner].get('Entries') or {}).get(reference[len(str(owner)) + 1:]) or {}).get('Text') if owner is not None else None
+                languages = libraries[owner].get('Languages') if owner is not None else None
+                value['Text'] = dict(zip(languages, texts)) if texts is not None and len(texts) == len(languages) else {'unresolved': reference, 'texts': texts}
+                entries.append(value)
+            result[name] = {'RangeType': 'Decimal', **{k: v for k, v in row.items() if k != 'Entries'}, 'Entries': sorted(entries, key=canonical)}
     return result
 
 
-def orphan_texts(library_raw, resolved_config_raw):
+def orphan_texts(library_raw, config_raw):
     """Library entries no list references; reported, never excused."""
-    config, library = yaml.safe_load(resolved_config_raw) or {}, yaml.safe_load(library_raw) or {}
-    lists = ((config.get('TextListContainers') or {}).get('TextList') or {}).get('ResourceLists') or {}
-    used = {entry.get('Text') for row in lists.values() for entry in (row.get('Entries') or {}).values()}
+    config, library = yaml.safe_load(config_raw) or {}, yaml.safe_load(library_raw) or {}
+    used = {entry.get('Text') for container in (config.get('TextListContainers') or {}).values()
+            for row in (container.get('ResourceLists') or {}).values() for entry in (row.get('Entries') or {}).values()}
     return sorted(f'{lib}.{key}' for lib, row in (library.get('TextLibraries') or {}).items()
                   for key in (row.get('Entries') or {}) if f'{lib}.{key}' not in used)
 
 
-def compare(expected, actual, path):
-    """Mismatches of every field the candidate states; fields only native adds are listed as extras."""
-    mismatches, extras = [], []
-    if isinstance(expected, dict) and isinstance(actual, dict):
-        for key, value in expected.items():
-            if key not in actual: mismatches.append(f'{path}/{key}: absent')
-            else:
-                m, e = compare(value, actual[key], f'{path}/{key}')
-                mismatches += m; extras += e
-        extras += [f'{path}/{key}' for key in actual if key not in expected]
-    elif canonical(expected) != canonical(actual):
-        mismatches.append(f'{path}: {canonical(expected)} != {canonical(actual)}')
-    return mismatches, extras
-
-
 def evaluate_import(before, after, candidate, accepted):
-    result = dict(accepted=accepted, mismatches=[], extras=[], peersChanged=[], unexpectedLists=[])
+    """Per-list result: candidate lists must read back exactly; every other list must be unchanged."""
+    lists = {name: 'exact' if canonical(row) == canonical(after.get(name)) else 'absent' if name not in after else 'changed'
+             for name, row in candidate.items()}
+    result = dict(accepted=accepted, lists=lists,
+                  mismatches={name: dict(candidate=candidate[name], native=after.get(name)) for name, state in lists.items() if state == 'changed'},
+                  peersChanged=sorted(name for name in set(before) - set(candidate) if canonical(before[name]) != canonical(after.get(name))),
+                  unexpectedLists=sorted(set(after) - set(before) - set(candidate)))
     if accepted:
-        for name, row in candidate.items():
-            if name not in after: result['mismatches'].append(f'{name}: absent after import'); continue
-            m, e = compare(row, after[name], name)
-            result['mismatches'] += m; result['extras'] += e
-        result['peersChanged'] = sorted(name for name in set(before) - set(candidate) if canonical(before[name]) != canonical(after.get(name)))
-        result['unexpectedLists'] = sorted(set(after) - set(before) - set(candidate))
-    elif canonical(before) != canonical(after):
-        result['peersChanged'] = sorted(name for name in set(before) | set(after) if canonical(before.get(name)) != canonical(after.get(name)))
-    result['outcome'] = ('exact' if not (result['mismatches'] or result['peersChanged'] or result['unexpectedLists']) else 'inexact') if accepted \
-        else ('refusedUnchanged' if not result['peersChanged'] else 'refusedChanged')
+        result['outcome'] = 'exact' if all(s == 'exact' for s in lists.values()) and not result['peersChanged'] and not result['unexpectedLists'] else 'inexact'
+    else:
+        result['outcome'] = 'refusedUnchanged' if canonical(before) == canonical(after) else 'refusedChanged'
     return result
 
 
@@ -121,6 +143,75 @@ def compile_messages(results):
             yield from flatten(row.get('children') or [])
     if not results or any('error' in r or r.get('messagesComplete') is not True for r in results): return None
     return {r['name']: sorted(flatten(r['messages']), key=canonical) for r in results}
+
+
+def problems(messages):
+    # TIA compiles incrementally, so Information rows (up-to-date hardware, tag/screen statistics) depend on the previous compile.
+    return None if messages is None else {name: [m for m in rows if m[0] in ('Error', 'Warning')] for name, rows in messages.items()}
+
+
+def export(row):
+    """The paired native export bytes (configuration, library) recorded by the seeder, hash-checked."""
+    files = {Path(f['path']).name: Path(f['path']).read_bytes() for f in (row or {}).get('export') or []}
+    assert row and row.get('status') == 'observed' and len(files) == 2, 'Native text-list export unavailable'
+    for f in row['export']: assert digest(files[Path(f['path']).name]) == f['sha256'], 'Native export changed after capture'
+    library = next(name for name in files if name.endswith('.TextLibrary.hmi.yml'))
+    return files[next(name for name in files if name != library)], files[library]
+
+
+def assess(nat, manifest, candidates_dir, gate):
+    """Phase 3: compare the seeder's recorded native exports and walks with the candidates."""
+    resolved = lambda row: resolve(*export(row))
+    rows = {row['label']: row for group in manifest.values() for row in group}
+    def candidate(label):
+        row = rows[label]; directory = candidates_dir / row['directory']
+        library = next(f['name'] for f in row['files'] if f['name'] != row['configuration'])
+        return resolve((directory / row['configuration']).read_bytes(), (directory / library).read_bytes())
+    result = {}
+    baseline = resolved(nat['baseline']['textListEvidence'])
+    gate(canonical(baseline) == canonical(resolved(nat['baselineRepeat']['textListEvidence'])), 'Repeated baseline text-list export is equal')
+    gate(stripped(nat['baseline']) == stripped(nat['baselineRepeat']), 'Repeated independent baseline walk is equal')
+    peer = resolve((ROOT / 'fixtures/hmi/unified-text-list/QualificationTextLists.hmi.yml').read_bytes(),
+                   (ROOT / 'fixtures/hmi/unified-text-list/QualificationTextLists.TextLibrary.hmi.yml').read_bytes())
+    gate(canonical(baseline) == canonical(peer), 'Baseline holds exactly the documented bilingual peer list', list(baseline))
+    gate([row['label'] for row in nat['imports']] == [row['label'] for row in manifest['main']], 'Seeder imported every main candidate in order')
+    result['imports'], before = [], baseline
+    for row in nat['imports']:
+        after = resolved(row['export'])
+        outcome = evaluate_import(before, after, candidate(row['label']), row.get('accepted') is True)
+        outcome.update(label=row['label'], error=row.get('error'), elapsedMs=row.get('elapsedMs'), orphanTexts=orphan_texts(*reversed(export(row['export']))))
+        result['imports'].append(outcome)
+        gate(outcome['outcome'] == 'exact', 'Native import reads back exactly, other lists unchanged: ' + row['label'],
+             {k: outcome[k] for k in ('outcome', 'lists', 'peersChanged', 'unexpectedLists', 'error')})
+        before = after
+    final = before
+    roundtrip = nat['roundtrip']
+    gate(roundtrip.get('accepted') is True and canonical(resolved(roundtrip['export'])) == canonical(final),
+         'No-change roundtrip of the whole native export is semantically unchanged', roundtrip.get('error'))
+    gate(export(roundtrip['export']) == export(nat['imports'][-1]['export']), 'No-change roundtrip re-exports byte-identical files')
+    gate(unrelated(nat['after']) == unrelated(nat['baseline']), 'Unrelated HMI content (screens, items, events, tags, alarms, scripts, connections, graphic lists) unchanged by the imports')
+    gate(canonical(resolved(nat['after']['textListEvidence'])) == canonical(final), 'Post-import walk export equals the last import readback')
+    for stage, expected, walk in (('reopened', final, nat['after']), ('retrieved', final, nat['after']),
+                                  ('restored', baseline, nat['baseline']), ('restoredAgain', baseline, nat['baseline'])):
+        row = nat.get(stage)
+        gate(row is not None and canonical(resolved(row['textListEvidence'])) == canonical(expected), f'{stage}: text lists equal the expected state')
+        gate(row is not None and stripped({k: v for k, v in row.items() if k not in ('textListEvidence', 'compile', 'projectPath')}) ==
+             stripped({k: v for k, v in walk.items() if k != 'textListEvidence'}), f'{stage}: independent HMI walk equals the expected state')
+    gate(nat.get('checkpointUnchanged') is True, 'Checkpoint archive unchanged by the restores')
+    compiles = {'baseline': compile_messages(nat.get('compileBaseline')), 'after': compile_messages(nat.get('compileAfter')),
+                'reopened': compile_messages((nat.get('reopened') or {}).get('compile'))}
+    result['compile'] = {name: dict(complete=value is not None, problems=problems(value), messages=value) for name, value in compiles.items()}
+    gate(all(value is not None for value in compiles.values()), 'Complete native compiler diagnostics at baseline, after import and after reopen')
+    gate(problems(compiles['after']) == problems(compiles['baseline']) == problems(compiles['reopened']), 'Imports add, remove or change no compiler error or warning')
+    result['probes'], before = [], baseline
+    for row in nat['probes']:
+        after = resolved(row['export'])
+        outcome = evaluate_import(before, after, candidate(row['label']), row.get('accepted') is True)
+        outcome.update(label=row['label'], error=row.get('error'))
+        result['probes'].append(outcome)
+        before = after
+    gate([row['label'] for row in nat['probes']] == [row['label'] for row in manifest['probes']], 'Seeder ran every boundary probe in order')
+    return result
 
 
 def main():
@@ -190,7 +281,7 @@ def main():
 
     try:
         # Phase 1: author and reopen candidates on the production Host.
-        for _, root in RETAINED.items():
+        for root in RETAINED.values():
             for row in json.loads((root / 'fixture.json').read_text(encoding='utf-8'))['files']:
                 raw = (root / 'store' / row['path']).read_bytes()
                 check(digest(raw) == row['sha256'], 'Retained actual-producer byte')
@@ -202,8 +293,13 @@ def main():
         try:
             (output / 'authoring').mkdir()
             authored = author_text_lists(client, upload, read, check, refuse, output / 'authoring')
-            for (request, receipt, candidates), label in zip(authored, ('author-v1-base', 'author-v1-expanded', 'author-v1-extremes')):
+            for (_, receipt, candidates), label in zip(authored, ('author-v1-base', 'author-v1-expanded', 'author-v1-extremes')):
                 pairs[label] = list(zip((row['fileName'] for row in receipt['files']), candidates))
+            for label, request in boundary_requests().items():
+                receipt = client.tool('hmi_text_list_author', dict(uploadRef=upload(client, json.dumps(request, ensure_ascii=False).encode('utf-8'))))
+                check(receipt['listCount'] == len(request['lists']), 'Boundary request authored: ' + label)
+                receipts[label] = receipt
+                pairs[label] = [(row['fileName'], read(client, row['artifact'])) for row in receipt['files']]
             labels = iter(AUTHOR_LABELS + SET_LABELS)
             for kind, record in retained_records():
                 tool = 'hmi_text_list_author' if kind == 'author' else 'hmi_text_list_generate_set'
@@ -217,12 +313,9 @@ def main():
         finally:
             close(client)
         pairs['unresolved-text-probe'] = [('Probe.hmi.yml', UNRESOLVED_PROBE[0].encode()), ('Probe.TextLibrary.hmi.yml', UNRESOLVED_PROBE[1].encode())]
-        order = ['author-v1-retained', 'author-v2-initial', 'author-v2-regenerated', 'author-v3-initial', 'author-v3-regenerated',
-                 'set-v1-run', 'set-v1-state', 'set-v1-evolved-run', 'set-v1-evolved-state', 'author-v1-base']
-        probes = ['author-v1-expanded', 'author-v1-extremes', 'unresolved-text-probe']
-        assert sorted(order + probes) == sorted(pairs), sorted(pairs)
+        assert sorted(MAIN + PROBES) == sorted(pairs), sorted(pairs)
         manifest = {}
-        for group, labels in (('main', order), ('probes', probes)):
+        for group, labels in (('main', MAIN), ('probes', PROBES)):
             manifest[group] = []
             for index, label in enumerate(labels):
                 directory = candidates_dir / f'{group[0]}{index}'; directory.mkdir(parents=True)
@@ -235,7 +328,7 @@ def main():
         report['candidates'] = manifest
         persist()
 
-        # Phase 2: native import in owned Portals.
+        # Phase 2: native import in owned Portals, one at a time.
         with open(output / 'seeder.log', 'wb') as log:
             seeder = subprocess.run([str(args.seeder.resolve()), 'textlist-import', str(native), str(candidates_dir)],
                                     stdout=log, stderr=subprocess.STDOUT, timeout=args.timeout)
@@ -243,69 +336,11 @@ def main():
         native_report_path = native / 'native-report.json'
         nat = json.loads(native_report_path.read_text(encoding='utf-8'))
         report['nativeReport'] = dict(path=str(native_report_path), sha256=digest(native_report_path.read_bytes()), exitCode=seeder.returncode)
-        gate(seeder.returncode == 0 and nat.get('completed') is True, 'Seeder completed and every owned Portal process exited',
-             nat.get('portals'))
+        gate(seeder.returncode == 0 and nat.get('completed') is True, 'Seeder completed and every owned Portal process exited', nat.get('portals'))
 
-        # Phase 3: compare native exports with candidates.
-        def export(row):
-            files = {Path(f['path']).name: Path(f['path']).read_bytes() for f in (row or {}).get('export') or []}
-            assert row and row.get('status') == 'observed' and len(files) == 2, 'Native text-list export unavailable'
-            for f in row['export']: assert digest(files[Path(f['path']).name]) == f['sha256']
-            library = next(name for name in files if name.endswith('.TextLibrary.hmi.yml'))
-            configuration = next(name for name in files if name != library)
-            return files[configuration], files[library]
-
-        def resolved(row): return resolve(*export(row))
-        candidate_files = {row['label']: row for group in manifest.values() for row in group}
-
-        def candidate(label):
-            row = candidate_files[label]; directory = candidates_dir / row['directory']
-            library = next(f['name'] for f in row['files'] if f['name'] != row['configuration'])
-            return resolve((directory / row['configuration']).read_bytes(), (directory / library).read_bytes())
-
-        baseline = resolved(nat['baseline']['textListEvidence'])
-        gate(canonical(baseline) == canonical(resolved(nat['baselineRepeat']['textListEvidence'])), 'Repeated baseline text-list export is equal')
-        gate(stripped(nat['baseline']) == stripped(nat['baselineRepeat']), 'Repeated independent baseline walk is equal')
-        gate(list(baseline) == ['QualificationStates'], 'Documented bilingual peer list is the only baseline list', list(baseline))
-        report['imports'] = []
-        before = baseline
-        for row in nat['imports']:
-            after = resolved(row['export'])
-            outcome = evaluate_import(before, after, candidate(row['label']), row.get('accepted') is True)
-            outcome.update(label=row['label'], error=row.get('error'), elapsedMs=row.get('elapsedMs'),
-                           orphanTexts=orphan_texts(export(row['export'])[1], export(row['export'])[0]))
-            report['imports'].append(outcome)
-            gate(outcome['outcome'] == 'exact', 'Native import reads back exactly, unrelated lists unchanged: ' + row['label'],
-                 {k: outcome[k] for k in ('outcome', 'mismatches', 'peersChanged', 'unexpectedLists', 'error')})
-            before = after
-        final = before
-        roundtrip = nat['roundtrip']
-        gate(roundtrip.get('accepted') is True and canonical(resolved(roundtrip['export'])) == canonical(final),
-             'No-change roundtrip of the whole native export is semantically unchanged', roundtrip.get('error'))
-        report['roundtripByteEqual'] = export(roundtrip['export']) == export(nat['imports'][-1]['export'])
-        gate(unrelated(nat['after']) == unrelated(nat['baseline']), 'Unrelated HMI content (screens, items, events, tags, alarms, scripts, connections, graphic lists) unchanged by the imports')
-        gate(canonical(resolved(nat['after']['textListEvidence'])) == canonical(final), 'Post-import walk export equals the last import readback')
-        for stage, expected, walk in (('reopened', final, nat['after']), ('retrieved', final, nat['after']),
-                                      ('restored', baseline, nat['baseline']), ('restoredAgain', baseline, nat['baseline'])):
-            row = nat.get(stage)
-            gate(row is not None and canonical(resolved(row['textListEvidence'])) == canonical(expected), f'{stage}: text lists equal the expected state')
-            gate(row is not None and stripped({k: v for k, v in row.items() if k not in ('textListEvidence', 'compile', 'projectPath')}) ==
-                 stripped({k: v for k, v in walk.items() if k != 'textListEvidence'}), f'{stage}: independent HMI walk equals the expected state')
-        gate(nat.get('checkpointUnchanged') is True, 'Checkpoint archive unchanged by the restores')
-        compiles = {name: compile_messages(nat.get(key) if key != 'reopened' else (nat.get('reopened') or {}).get('compile'))
-                    for name, key in (('baseline', 'compileBaseline'), ('after', 'compileAfter'), ('reopened', 'reopened'))}
-        report['compile'] = {name: dict(complete=value is not None, errors=None if value is None else sum(1 for m in sum(value.values(), []) if m[0] == 'Error'),
-                                        messages=value) for name, value in compiles.items()}
-        gate(all(value is not None for value in compiles.values()), 'Complete native compiler diagnostics at baseline, after import and after reopen')
-        gate(compiles['after'] == compiles['baseline'] == compiles['reopened'], 'Imports add, remove or change no compiler diagnostic')
-        report['probes'] = []
-        before = baseline
-        for row in nat['probes']:
-            after = resolved(row['export'])
-            outcome = evaluate_import(before, after, candidate(row['label']), row.get('accepted') is True)
-            outcome.update(label=row['label'], error=row.get('error'))
-            report['probes'].append(outcome)
-            before = after
+        # Phase 3: compare native exports with the candidates.
+        report.update(assess(nat, manifest, candidates_dir, gate))
+        persist()
 
         # Phase 4: every record reopens on a fresh Host after the native run.
         client = start()
@@ -314,6 +349,8 @@ def main():
             for kind, record in retained_records():
                 tool = 'hmi_text_list_author' if kind == 'author' else 'hmi_text_list_generate_set'
                 check(client.tool(tool, dict(recordId=record['recordId'])) == receipts[record['recordId']], 'Retained record reopens unchanged after restart: ' + record['recordId'][:12])
+            for label in boundary_requests():
+                check(client.tool('hmi_text_list_author', dict(recordId=receipts[label]['recordId'])) == receipts[label], 'Boundary record reopens unchanged after restart: ' + label)
         finally:
             close(client)
         report['completed'] = not report['failures']
