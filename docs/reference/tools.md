@@ -238,7 +238,7 @@ option registers or admits the tool only on a qualification Host.
 
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
-| `db_snapshot_capture` | Capture the stored snapshot of one exact DB into a snapshot review | unqualified | simulation |  |  |
+| `db_snapshot_capture` | Capture the stored snapshot of one exact DB into a snapshot review | limited | simulation |  |  |
 | `db_snapshot_review` | Inspect and compare supplied DB snapshot XML | limited | simulation |  |  |
 | `db_snapshot_review_page` | Reopen retained DB snapshot values and differences | limited | simulation |  |  |
 

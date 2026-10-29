@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "68e6fa31b8bd2949038cd3832557e3684e49e4f389441997cfac4518e12b7bab",
-      "bytes": 1315562
+      "sha256": "800edf8c9a710e0103e651efdad5cf093e6c348ab3e093dc2674dfefb5c06437",
+      "bytes": 1319974
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -927,8 +927,8 @@
     },
     {
       "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
-      "sha256": "8e27bfe1eee5d8ea5868e5897c6120f9ecde5a39096ff7e1692154e961a6d657",
-      "bytes": 10563
+      "sha256": "6c9308f687276a97fa27d7c3b6ddba5c1b7e5d927074920ca6f56983a5f801e7",
+      "bytes": 10803
     },
     {
       "path": "src/TiaMcp.Core/DbSnapshots/DbSnapshotReview.cs",
@@ -1454,6 +1454,11 @@
       "path": "src/TiaMcp.Core/Security/PublicCertificateReview.cs",
       "sha256": "20e957b76026fdfcec595d71e7a54a33be6e8bd15c9fcc702d314bf9466f485c",
       "bytes": 20298
+    },
+    {
+      "path": "src/TiaMcp.Core/SimulationCardLockHolders.cs",
+      "sha256": "9b920d9d6423e0e9855ed9f77bc55a4ef56e94024c40818ef32373a6a55bf0e8",
+      "bytes": 4135
     },
     {
       "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -2457,8 +2462,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
-      "sha256": "274b555a2e123f4ee9a55d477565926985438ce0c370509ded55e20eed2efaf1",
-      "bytes": 9132
+      "sha256": "f2aadd4a42b4981b17d94ac8e8b134194768b38516f16fca54f5fdea17a3ed35",
+      "bytes": 10489
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.DeviceCompilation.cs",
@@ -2747,8 +2752,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "7dca7bc2fc062be4f9cdd9f892ede1cd3c45a5077debd36ce178b307e3d00b1e",
-      "bytes": 103681
+      "sha256": "48ee7e9e2908d5affe1d8f19c8e96f46f977b30f633d1a6799d3a06b7f3f6c84",
+      "bytes": 104597
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvisionReconcile.cs",
@@ -2997,8 +3002,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TiaMcp.Openness.V21.csproj",
-      "sha256": "8af0ec9bf322d3b962fbcbac99306395989bf848e9a7be5e10c2bece120956fe",
-      "bytes": 5603
+      "sha256": "700c17fa2d7b5fa2b1fd0f8099185e12b73374587a55991f21b2dc68f88610ce",
+      "bytes": 5709
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",
@@ -3886,8 +3891,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -4380,8 +4385,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -10655,8 +10660,8 @@
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "LoadPayload",
           "line": 36,
-          "endLine": 50,
-          "sha256": "fca4ea01369a7bc1df432208302710ca83878beb6e14f3bf880bed5bcc0028d1"
+          "endLine": 52,
+          "sha256": "a72094aa845a4623bb8469631f5aee875d56fc6150303cc3be827b6e13106c8a"
         },
         {
           "path": "src/TiaMcp.Host/EngineeringTools.cs",
@@ -11686,8 +11691,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -13820,8 +13825,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -15282,8 +15287,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -16503,8 +16508,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -22329,8 +22334,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -26750,8 +26755,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -30709,8 +30714,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -38403,8 +38408,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -40247,8 +40252,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "new",
-          "line": 104,
-          "endLine": 104,
+          "line": 106,
+          "endLine": 106,
           "sha256": "47c3cf9d85bc369ff3be52d2110e4c97cae0aad46d71ad29ba465bee4300e1e2"
         },
         {
@@ -41951,8 +41956,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "new",
-          "line": 104,
-          "endLine": 104,
+          "line": 106,
+          "endLine": 106,
           "sha256": "47c3cf9d85bc369ff3be52d2110e4c97cae0aad46d71ad29ba465bee4300e1e2"
         },
         {
@@ -44245,8 +44250,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -46513,8 +46518,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -48779,8 +48784,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -52756,8 +52761,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -58140,8 +58145,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -61574,8 +61579,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -62354,8 +62359,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -63314,8 +63319,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -65244,8 +65249,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "new",
-          "line": 104,
-          "endLine": 104,
+          "line": 106,
+          "endLine": 106,
           "sha256": "47c3cf9d85bc369ff3be52d2110e4c97cae0aad46d71ad29ba465bee4300e1e2"
         },
         {
@@ -66520,8 +66525,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "new",
-          "line": 104,
-          "endLine": 104,
+          "line": 106,
+          "endLine": 106,
           "sha256": "47c3cf9d85bc369ff3be52d2110e4c97cae0aad46d71ad29ba465bee4300e1e2"
         },
         {
@@ -71803,8 +71808,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "new",
-          "line": 104,
-          "endLine": 104,
+          "line": 106,
+          "endLine": 106,
           "sha256": "47c3cf9d85bc369ff3be52d2110e4c97cae0aad46d71ad29ba465bee4300e1e2"
         },
         {
@@ -79734,8 +79739,8 @@
         {
           "path": "src/TiaMcp.Core/DbSnapshotWorkflowStore.cs",
           "name": "Page",
-          "line": 62,
-          "endLine": 103,
+          "line": 64,
+          "endLine": 105,
           "sha256": "babbecc8f5ece4bfe8b7e22f894b95d7a649e4399470cd6380d2628cfb2e792f"
         },
         {
@@ -81972,9 +81977,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
               "name": "PrepareDbSnapshotChange",
-              "line": 47,
-              "endLine": 79,
-              "sha256": "5b42ceaf560b9593cd0592c2add42c2144b45c0b5bd789e56da567273f2929ca"
+              "line": 63,
+              "endLine": 95,
+              "sha256": "6251e4d40d6f841dfbb019114ed0ac0fc725e5fda965c8b721946997bd7f2408"
             }
           ]
         },
@@ -81992,9 +81997,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
               "name": "ApplyDbSnapshotChange",
-              "line": 81,
-              "endLine": 118,
-              "sha256": "ea8c4af9a5129cc58cc3002fa0129dc9eed994deb4262c3555387dbbde048037"
+              "line": 97,
+              "endLine": 134,
+              "sha256": "cbebd357bb5889093f598fe1ea16eaec5c6b96a7dea4d19dd99bad739629c05e"
             }
           ]
         }
@@ -82023,9 +82028,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
               "name": "PrepareDbSnapshotChange",
-              "line": 47,
-              "endLine": 79,
-              "sha256": "5b42ceaf560b9593cd0592c2add42c2144b45c0b5bd789e56da567273f2929ca"
+              "line": 63,
+              "endLine": 95,
+              "sha256": "6251e4d40d6f841dfbb019114ed0ac0fc725e5fda965c8b721946997bd7f2408"
             }
           ]
         },
@@ -82043,9 +82048,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
               "name": "ApplyDbSnapshotChange",
-              "line": 81,
-              "endLine": 118,
-              "sha256": "ea8c4af9a5129cc58cc3002fa0129dc9eed994deb4262c3555387dbbde048037"
+              "line": 97,
+              "endLine": 134,
+              "sha256": "cbebd357bb5889093f598fe1ea16eaec5c6b96a7dea4d19dd99bad739629c05e"
             }
           ]
         }
@@ -84071,9 +84076,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
               "name": "PrepareDbSnapshotChange",
-              "line": 47,
-              "endLine": 79,
-              "sha256": "5b42ceaf560b9593cd0592c2add42c2144b45c0b5bd789e56da567273f2929ca"
+              "line": 63,
+              "endLine": 95,
+              "sha256": "6251e4d40d6f841dfbb019114ed0ac0fc725e5fda965c8b721946997bd7f2408"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.ObjectEditing.cs",
@@ -84413,9 +84418,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
               "name": "ApplyDbSnapshotChange",
-              "line": 81,
-              "endLine": 118,
-              "sha256": "ea8c4af9a5129cc58cc3002fa0129dc9eed994deb4262c3555387dbbde048037"
+              "line": 97,
+              "endLine": 134,
+              "sha256": "cbebd357bb5889093f598fe1ea16eaec5c6b96a7dea4d19dd99bad739629c05e"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareEditing.cs",
@@ -92769,7 +92774,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.online.snapshots.20261029",
+          "profileSha256": "5953226ad35f906b67e2c8903141233bdd7c42ab8c5411db7afe30e1040ad5fc",
+          "artifacts": [
+            "evidence/local.online.snapshots.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -92805,7 +92818,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.online.snapshots.20261029",
+          "profileSha256": "5953226ad35f906b67e2c8903141233bdd7c42ab8c5411db7afe30e1040ad5fc",
+          "artifacts": [
+            "evidence/local.online.snapshots.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -98877,7 +98898,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.online.snapshots.20261029",
+          "profileSha256": "5953226ad35f906b67e2c8903141233bdd7c42ab8c5411db7afe30e1040ad5fc",
+          "artifacts": [
+            "evidence/local.online.snapshots.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -104675,6 +104704,13 @@
           "profileSha256": "733fe79afaa0e37d915d17385e63201613696eabf8078c689ca4d172b9f2b4ee",
           "artifacts": [
             "evidence/local.online.compare.20261029.json"
+          ]
+        },
+        {
+          "id": "local.online.snapshots.20261029",
+          "profileSha256": "5953226ad35f906b67e2c8903141233bdd7c42ab8c5411db7afe30e1040ad5fc",
+          "artifacts": [
+            "evidence/local.online.snapshots.20261029.json"
           ]
         }
       ],
@@ -112072,6 +112108,13 @@
           "artifacts": [
             "evidence/local.sim.provision.20261024.json"
           ]
+        },
+        {
+          "id": "local.runtime.timers.20261029",
+          "profileSha256": "619abb75a6897820c6e846289f62af816f4201c253e31585815bc0f764899ce8",
+          "artifacts": [
+            "evidence/local.runtime.timers.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -117221,6 +117264,11 @@
       "sha256": "ac2ca2e06385c7094ae27428e6a2c49e57e52bf5cb0cf5dc35b2f7d696bdb860"
     },
     {
+      "path": "evidence/local.online.snapshots.20261029.json",
+      "state": "observed",
+      "sha256": "e492a8b69100f2912e22c3a02d251e54194cb5acb061d32a58be5660af54bd30"
+    },
+    {
       "path": "evidence/local.opcua.server-settings.20261028.json",
       "state": "observed",
       "sha256": "d29d254cf57615658e722884b1a20073db75aace2de3c98e3f3a67bca3a59850"
@@ -117314,6 +117362,11 @@
       "path": "evidence/local.runtime.plcsim-tcpip.20261029.json",
       "state": "observed",
       "sha256": "1e07b43e2efd5a4cac3c520dd652c1b419d382853ee8ac506a71e9c94632449c"
+    },
+    {
+      "path": "evidence/local.runtime.timers.20261029.json",
+      "state": "observed",
+      "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
     },
     {
       "path": "evidence/local.safety_changes.20261028.json",
@@ -117903,6 +117956,10 @@
       "profileSha256": "733fe79afaa0e37d915d17385e63201613696eabf8078c689ca4d172b9f2b4ee"
     },
     {
+      "id": "local.online.snapshots.20261029",
+      "profileSha256": "5953226ad35f906b67e2c8903141233bdd7c42ab8c5411db7afe30e1040ad5fc"
+    },
+    {
       "id": "local.opcua.server-settings.20261028",
       "profileSha256": "1aa05da5c8af66dd4218cd24516e0222ffcd16623c4a0e9ed009f9b7c489c910"
     },
@@ -117977,6 +118034,10 @@
     {
       "id": "local.runtime.plcsim-tcpip.20261029",
       "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47"
+    },
+    {
+      "id": "local.runtime.timers.20261029",
+      "profileSha256": "619abb75a6897820c6e846289f62af816f4201c253e31585815bc0f764899ce8"
     },
     {
       "id": "local.safety_changes.20261028",

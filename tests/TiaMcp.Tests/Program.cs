@@ -138,6 +138,7 @@ internal static partial class Program
             ("Provisioning checkpoint refuses unsaved state and existing destinations", SimulationCheckpointTests.SavedStateAndCollisions),
             ("Provisioning checkpoint and durable receipt precede runtime continuation", SimulationCheckpointTests.ArchiveAndDurableReceiptPrecedeContinuation),
             ("Card move retries retain deadlines and never replay other operations", SimulationCardMoveRetryTests.BoundsAndNoNativeReplay),
+            ("An open file below the card refuses its move and the probe names the holder", SimulationCardLockHoldersTests.OpenFileBelowCardRefusesMoveAndIsNamed),
             ("Discovery retains nonempty snapshots and requires repeated absence", SimulationDiscoveryWaitTests.TransientEntriesAndStableAbsence),
             ("Discovery never accepts persistent devices or late empty snapshots", SimulationDiscoveryWaitTests.PersistentDevicesAndLateSnapshots),
             ("Discovery guard, read and evidence errors are not retried", SimulationDiscoveryWaitTests.GuardAndReadFailuresNeverRetry),

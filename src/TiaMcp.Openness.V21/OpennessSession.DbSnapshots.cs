@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.SW.Blocks;
@@ -39,9 +40,24 @@ namespace TiaMcp.Openness.V21
             // The documented accessor is the block; the interface fallback costs one lookup if V21 moved it.
             var snapshot = target.Block.Item.GetService<InterfaceSnapshot>() ?? ((DataBlock)target.Block.Item).Interface?.GetService<InterfaceSnapshot>()
                 ?? throw new BridgeException("UnsupportedCapability", "The selected DB exposes no InterfaceSnapshot service.");
-            try { snapshot.Export(new FileInfo(path), ExportOptions.WithDefaults); }
+            // Snapshot and SnapshotDate are read-only attributes: without WithReadOnly V21 exports only the DB's Name.
+            try { snapshot.Export(new FileInfo(path), ExportOptions.WithDefaults | ExportOptions.WithReadOnly); }
             catch (EngineeringException ex) { throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no exportable stored snapshot: " + ex.Message); }
             if (!File.Exists(path)) throw new BridgeException("DbSnapshotUnavailable", "InterfaceSnapshot.Export produced no file.");
+            // A DB without a stored snapshot exports an empty SnapshotValues dated 0001-01-01.
+            if (!XDocument.Load(path).Descendants().Any(e => e.Name.LocalName == "Value" && e.Parent?.Name.LocalName == "SnapshotValues"))
+                throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no stored snapshot: InterfaceSnapshot.Export returned no snapshot values.");
+        }
+
+        // Each export has a new DocumentInfo/Created, so a fresh export equals the reviewed capture (the Host-bound file with
+        // the reviewed hash) when their InterfaceSnapshot elements are equal.
+        private static bool SameStoredSnapshot(JObject payload, string current)
+        {
+            string reviewed = ChangeText(payload, "snapshotPath", 4096);
+            if (!File.Exists(reviewed) || ChangeFileHash(reviewed) != ChangeText(payload, "snapshotSha256", 64)) return false;
+            Func<string, XElement> snapshot = path => XDocument.Load(path).Root?.Elements().SingleOrDefault(e => e.Name.LocalName == "SW.Blocks.InterfaceSnapshot");
+            var expected = snapshot(reviewed);
+            return expected != null && XNode.DeepEquals(expected, snapshot(current));
         }
 
         private void PrepareDbSnapshotChange(EngineeringChange change, JObject preview)
@@ -71,7 +87,7 @@ namespace TiaMcp.Openness.V21
             string expected = ChangeText(change.Payload, "snapshotSha256", 64);
             string current = Path.Combine(change.Directory, "snapshot-to-load.xml");
             DbSnapshotExportTo(target, current);
-            if (ChangeFileHash(current) != expected) throw new BridgeException("DbSnapshotChanged", "The DB's stored snapshot differs from the reviewed capture; capture and review it again.");
+            if (!SameStoredSnapshot(change.Payload, current)) throw new BridgeException("DbSnapshotChanged", "The DB's stored snapshot differs from the reviewed capture; capture and review it again.");
             change.Backups.Add(new JObject { ["role"] = "snapshot-to-load", ["artifact"] = ChangeArtifact(current) });
             effects.Add(new JObject { ["action"] = "loadSnapshotAsActualValues", ["blockPath"] = target.Identity["objectPath"].DeepClone(),
                 ["snapshotRecordId"] = change.Payload["snapshotRecordId"]?.DeepClone(), ["snapshotSha256"] = expected });
@@ -88,7 +104,7 @@ namespace TiaMcp.Openness.V21
             {
                 string current = Path.Combine(change.Directory, "snapshot-before-load.xml");
                 DbSnapshotExportTo(target, current);
-                if (ChangeFileHash(current) != change.Payload.Value<string>("snapshotSha256"))
+                if (!SameStoredSnapshot(change.Payload, current))
                     throw new BridgeException("DbSnapshotChanged", "The DB's stored snapshot changed since preparation; nothing was loaded.");
             }
             var values = ((DataBlock)target.Block.Item).Interface?.GetService<ValueService>() ?? throw new BridgeException("UnsupportedCapability", "The selected DB interface exposes no ValueService.");

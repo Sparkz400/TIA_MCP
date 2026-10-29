@@ -46,6 +46,8 @@ public sealed class DbSnapshotWorkflowStore(string artifactsRoot)
         request["blockPath"] = record["objectPath"]!.DeepClone();
         request["projectPath"] = source["projectPath"]!.DeepClone();
         request["snapshotSha256"] = record["input"]!["sha256"]!.DeepClone();
+        // Every export has a new DocumentInfo, so the worker compares its fresh export with these reviewed bytes, not with the hash alone.
+        request["snapshotPath"] = Path.Combine(Root, (string)record["input"]!["sha256"]! + ".xml");
         return request;
     }
 

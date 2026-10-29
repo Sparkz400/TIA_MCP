@@ -7,6 +7,11 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**DB snapshots on owned PLCSIM — 29 October 2026:**
+- **Runs:** `scripts/qualify_online_routes.py --skip-upload` passed on build `4963644` with the runtime-user login: `db_snapshot_create` with checkpoint, compile and save, `db_snapshot_capture` reviewing the stored value, `db_snapshot_load_actual` without compile and save read back through PLCSIM, and `change_restore` of the create (`local.online.snapshots.20261029`).
+- **Fixes found natively:** snapshot export needs `ExportOptions.WithReadOnly` (Snapshot and SnapshotDate are read-only attributes); an export without stored values is refused as `DbSnapshotUnavailable`; the load compares snapshot content instead of file hashes; PLCSIM's tag list is refreshed before the readback.
+- **Catalog 0.4.74:** 405 of 450 features verified; matrix 1,838 bound, 150 open. D09 keeps only `plc_station_upload`.
+
 **Typed stale phase and created wave 9 IEC storage — 29 October 2026:** ([record](../verification/typed-stale-and-created-iec-20261029.md))
 - **Stale phase:** V21 keeps fully qualified program element names unique per CPU and refuses every route to a second DB with the root DB's qualified name, so `stale-db-ambiguity` is recorded as that native boundary (`local.typed.resolution-stale.20261029`); the last open lost-evidence item is closed.
 - **Created storage:** the builder's created TONR, R_TRIG and F_TRIG storage passes engineering in 14 cells (`local.typed.wave9-created-storage.engineering.20261029`), and the standard IEC effect profile was recaptured with those members (`local.typed.iec-effect-standard-wave9.20261029`). Their runtime cells stay open.
