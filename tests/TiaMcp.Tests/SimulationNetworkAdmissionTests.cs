@@ -27,6 +27,29 @@ internal static class SimulationNetworkAdmissionTests
         return Task.CompletedTask;
     }
 
+    internal static Task EmptyStartupEndpointRecognition()
+    {
+        const string boot = "192.168.0.1", mac = "02-C0-A8-00-0A-00";
+        // Exact observation of the first TCP/IP window (29 October 2026): no IP yet, so TIA shows the MAC as the address.
+        Check.Equal(true, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", mac, mac, "S7-1500 (PLCSIM)", boot));
+        Check.Equal(true, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", "02:c0:a8:00:0a:01", mac, "S7-1500 (PLCSIM)", boot));
+        foreach (var none in new[] { null, "", "0.0.0.0" })
+            Check.Equal(true, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", none, mac, "S7-1500 (PLCSIM)", boot));
+        Check.Equal(true, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", boot, mac, "S7-1500", boot));
+        // Another IP, a partial MAC or another device series is never the owned empty CPU.
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", "192.168.0.7", mac, "S7-1500 (PLCSIM)", boot));
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", "02-C0-A8-00-0A", mac, "S7-1500 (PLCSIM)", boot));
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", mac, mac, "S7-1200 (PLCSIM)", boot));
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("TCPIP", mac, mac, null, boot));
+        // Softbus stays exactly as before: only the documented address and the two plain series names.
+        Check.Equal(true, SimulationNetworkAdmission.EmptyStartupEndpoint("Softbus", boot, mac, "S7-1500", boot));
+        Check.Equal(true, SimulationNetworkAdmission.EmptyStartupEndpoint("Softbus", boot, mac, "S7-1500 CPU", boot));
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("Softbus", mac, mac, "S7-1500", boot));
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("Softbus", "0.0.0.0", mac, "S7-1500", boot));
+        Check.Equal(false, SimulationNetworkAdmission.EmptyStartupEndpoint("Softbus", boot, mac, "S7-1500 (PLCSIM)", boot));
+        return Task.CompletedTask;
+    }
+
     // The machine-wide network mode is an operator setting; the simulator worker only reads it.
     internal static Task WorkerNeverAssignsNetworkMode()
     {

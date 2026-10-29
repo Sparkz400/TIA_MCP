@@ -364,10 +364,8 @@ namespace TiaMcp.Openness.V21
                                 ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })),
                             ["baselinePlaceholderExcluded"] = observedBefore.Length - before.Length,
                             ["truncated"] = observedBefore.Length > 64, ["causalTargetVerified"] = false };
-                        // An empty TCP/IP CPU may show no address yet; it then gets the same documented default (/24, on the operator's subnet).
-                        bool unassigned = network == "TCPIP" && before.Length == 1 && (string.IsNullOrEmpty(before[0].Address) || before[0].Address == "0.0.0.0");
-                        if (before.Length != 1 || before[0].Address != documentedStartupAddress && !unassigned ||
-                            (before[0].DeviceSeries != "S7-1500" && before[0].DeviceSeries != "S7-1500 CPU"))
+                        // An empty TCP/IP CPU has no IP yet; it then gets the same documented default (/24, on the operator's subnet).
+                        if (before.Length != 1 || !SimulationNetworkAdmission.EmptyStartupEndpoint(network, before[0].Address, before[0].MACAddress, before[0].DeviceSeries, documentedStartupAddress))
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
                         string bootstrapAddress = documentedStartupAddress;
                         report["postStartupDiscovery"]["causalTargetVerified"] = true;

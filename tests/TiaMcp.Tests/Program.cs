@@ -145,6 +145,7 @@ internal static partial class Program
             ("Runtime Manager placeholder baseline is short-lived and session-bound", SimulationDiscoveryWaitTests.RuntimePlaceholderBaselineLifetime),
             ("Simulator admits Softbus and existing TCP/IP single-adapter instances only", SimulationNetworkAdmissionTests.SoftbusAndSingleAdapterAdmission),
             ("Simulator refuses mode switches and unknown network values", SimulationNetworkAdmissionTests.ModeSwitchesAndUnknownValuesRefuse),
+            ("An empty TCP/IP CPU without an IP qualifies for the bootstrap address", SimulationNetworkAdmissionTests.EmptyStartupEndpointRecognition),
             ("Simulator worker never assigns network mode, adapters or IPs", SimulationNetworkAdmissionTests.WorkerNeverAssignsNetworkMode),
             ("OPC UA server settings map pinned native attributes and payload forms", OpcUaServerSettingsTests.PinnedFieldsAndPayloadForms),
             ("OPC UA server settings refuse bad values and stale expectations", OpcUaServerSettingsTests.RefusesBadValuesAndStaleExpectations),
