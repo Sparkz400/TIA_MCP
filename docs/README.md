@@ -81,6 +81,7 @@ Plans describe intended scope; an unchecked historical item is not automatically
 a current blocker. Use [TODO](TODO.md) for the current order of work.
 
 - [Overall implementation plan](plans/overview.md), [graphical/project roadmap](plans/graphical-project-roadmap.md)
+- [Release ledger](plans/release-obligations-20261015.md), [release acceptance](plans/release-acceptance.md)
 - [Library plan](plans/library-management-plan.md), [library acceptance backlog](plans/library-management-todo.md)
 - [HMI plan](plans/hmi-integration-plan.md), [HMI acceptance backlog](plans/hmi-remaining-work.md)
 - [Typed LAD/FBD plan](plans/typed-lad-fbd-builders-plan.md), [typed acceptance backlog](plans/typed-lad-fbd-todo.md)

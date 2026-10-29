@@ -6,7 +6,7 @@
     "catalogVersion": "0.4.76",
     "catalogSha256": "4223861b93253350e5757434842221121627d11aeb26986643a051961823a8d1",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "2fcfeaea1be2aded89ac81bd001bab6ea3befa6049841c6ca07d10fbadcd2c43"
+    "ledgerSha256": "962c54f38a91cce896a0eedf10345017b2f895a0cb1df0e0c43d9a9407c68526"
   },
   "targetTiaVersions": [
     21
@@ -26196,7 +26196,7 @@
         },
         {
           "path": "docs/plans/typed-lad-fbd-todo.md",
-          "sha256": "f3bd51054c8de8d3437c0b45142d199f64fc88821efe881ec7027a347de94423"
+          "sha256": "47ad2979bc04e9dddae2f788e60bf41331ea79a196267c3526f296b0dd4c5f34"
         }
       ],
       "notRetained": [

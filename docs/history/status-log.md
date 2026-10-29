@@ -7,6 +7,8 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Release tracking reconciled — 29 October 2026:** [Release acceptance](../plans/release-acceptance.md) defines how the maintainer accepts an obligation; the ledger records the eight blocked rows in `dispositions` and amends `completionCriteria`, and ten obligations were refreshed against catalog `0.4.76`. The TODO now lists the ten deferred rows with their dispositions, the work outside the matrix, capability gaps, release mechanics, one acceptance box per obligation group, open maintainer questions, and a "Not a 1.0 gate" section for the VM and recurring items (maintainer to confirm). Matrix counts are unchanged (151 open cells).
+
 **Station upload qualified — 29 October 2026:**
 - **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.
 - **Native D09:** a first run refused, because the upload's three TLS challenges offered zero certificates ("certificate not matching"). After the decision, `local.online.upload.20261029` passed: one certificate-less challenge was trusted unauthenticated, then one runtime-user login, and the upload succeeded with the downloaded blocks. `plc_online_compare` passed again.

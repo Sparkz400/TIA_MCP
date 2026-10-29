@@ -8,7 +8,7 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 | Feature catalog | `0.4.76`: 461 features, 416 verified, 45 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 122 shipped, 294 limited, 27 unqualified, 8 unavailable on V21, 10 deferred |
 | Matrix cells | 1,896 bound, **151 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09 against `0.4.76` |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -19,18 +19,30 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 names every row with an open cell.
 
 - **External prerequisites:** an operator at the desktop for the last Test Suite session
-  (TS-Q01), the VMware guest, a V20 library input, RT Professional and other HMI targets, and a
-  physical PLC.
+  (TS-Q01), the VMware guest, a V20 library input, RT Professional and other HMI targets, a
+  physical PLC (B05), optional products and licenses such as SiVArc, Test Suite execution
+  prerequisites and the licensed AX trace package (B04), a native trace route (B06),
+  nonproduction Project Server, Teamcenter and UMC endpoints (B10), and installations and SDKs
+  of other TIA versions (B11).
 - **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
-  Unified text lists have no import route, force-table rows can only be authored in the
+  force-table rows can only be authored in the
   TIA editor, V21 Openness cannot configure a DI module's hardware interrupt (OB40), and the
   CPU protection level needs a full-access password no route accepts.
-- **Rows that cannot close on V21:** eight `unavailable_target` rows (49 cells:
+- **In progress:** a worker route for the Unified text-list import (V21 has
+  `HmiTextListComposition.Import`; no worker route yet), typed created-storage runtime cells,
+  the S7-1200 and ET 200MP hardware families, and the OB40 and Startdrive device-compile probes.
+- **Rows blocked by decision:** eight `unavailable_target` rows (49 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`,
   the three block-protection kinds and the two OPC UA reference-namespace kinds) are blocked
-  and do not count toward 1.0 (decision of 29 October).
-- **Release mechanics:** the engineering package, version, tag and release notes.
+  and do not count toward 1.0 (decision of 29 October; each row's disposition is in the
+  ledger). The block-protection kinds lack a repository route, not a V21 one; whether to build
+  it is an [open question](TODO.md#decisions-for-the-maintainer).
+- **Deferred rows:** ten `not_implemented` rows (30 cells) are not open cells but stay 1.0
+  work ([TODO](TODO.md#deferred-rows)).
+- **Release mechanics:** one version source, a CHANGELOG, a release workflow, a pre-release
+  security review, a contract freeze policy, the engineering package, tag and release notes
+  ([TODO](TODO.md#release-mechanics-and-policy)).
 
 ## Where the evidence is
 
