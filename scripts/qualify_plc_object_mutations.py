@@ -22,7 +22,7 @@ KINDS = ("tag_set", "tag_create", "tag_delete", "constant_set", "constant_create
          "type_source_upsert", "type_rename", "type_delete", "plc_type_import_xml",
          "source_upsert", "block_import_xml", "block_rename", "block_delete", "block_number_set", "block_attributes_set",
          "group_create", "group_rename", "group_delete", "plc_compile", "instance_db_create")
-_CREDENTIAL = "Apply refuses with CredentialRouteUnavailable before the checkpoint: no route hands a Host credential to the worker."
+_CREDENTIAL = "Qualified by scripts/qualify_block_protection.py, which routes generated vault credentials to each apply."
 _GRAPHICAL = "Qualified by scripts/qualify_graphical_changes.py on native LAD/FBD fixtures; a plain scratch holds SCL blocks only."
 # X11-owned change kinds a plain scratch cannot qualify; scripts/test_qualify_plc_object_mutations.py keeps
 # KINDS plus these equal to the catalog's X11-owned change kinds.

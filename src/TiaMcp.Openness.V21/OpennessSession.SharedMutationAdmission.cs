@@ -36,8 +36,12 @@ namespace TiaMcp.Openness.V21
             {
                 _sharedMutationLease = _portal.ExclusiveAccess("TIA MCP: shared resource admission " + operation);
                 _sharedMutationScope = SharedMutationResolve();
-                return new JObject { ["leaseToken"] = _sharedMutationToken, ["scope"] = _sharedMutationScope.DeepClone(),
+                var begun = new JObject { ["leaseToken"] = _sharedMutationToken, ["scope"] = _sharedMutationScope.DeepClone(),
                     ["nativeDispatched"] = false, ["nativeQualified"] = false };
+                // Public slots only; the Host validates each reference against its vault binding before admission.
+                var credentials = SharedMutationCredentials();
+                if (credentials != null) begun["credentials"] = credentials.DeepClone();
+                return begun;
             }
             catch { SharedMutationRelease(); throw; }
         }
@@ -51,9 +55,16 @@ namespace TiaMcp.Openness.V21
             var fresh = SharedMutationResolve();
             if (!JToken.DeepEquals(fresh, _sharedMutationScope)) throw new BridgeException("StaleMutationScope", "Native resources or prepared content changed before dispatch.");
             if (_sharedMutationOperation == "component_window_step") ComponentWindowAuthorizeDispatch(args);
+            AcceptRoutedCredentials(args);
             _sharedMutationDispatched = true;
             ObserveIndexOperation(_sharedMutationOperation);
             var arguments = (JObject)_sharedMutationArguments.DeepClone();
+            try { return SharedMutationExecute(arguments); }
+            finally { ClearRoutedCredentials(); }
+        }
+
+        private JObject SharedMutationExecute(JObject arguments)
+        {
             switch (_sharedMutationOperation)
             {
                 case "change_apply": return (arguments.Value<string>("changeId") ?? "").StartsWith("lib-", StringComparison.Ordinal) ? LibraryChangeApply(arguments) : ChangeApply(arguments);
@@ -86,7 +97,7 @@ namespace TiaMcp.Openness.V21
         {
             var lease = _sharedMutationLease; _sharedMutationLease = null; _sharedMutationToken = null;
             _sharedMutationArguments = null; _sharedMutationScope = null; _sharedMutationOperation = null;
-            _sharedMutationDispatched = false; _sharedMutationDestinations.Clear(); lease?.Dispose();
+            _sharedMutationDispatched = false; _sharedMutationDestinations.Clear(); ClearRoutedCredentials(); lease?.Dispose();
         }
         private sealed class SharedMutationNestedScope : IDisposable { public void Dispose() { } }
         // Existing mutation methods use this instead of attempting a second native ExclusiveAccess lease.

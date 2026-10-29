@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Security;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering.SW.Blocks;
 
@@ -55,7 +54,12 @@ namespace TiaMcp.Openness.V21
             if (action == "enable" && state.Value<bool>("writeProtectionEnabled") || action == "disable" && !state.Value<bool>("writeProtectionEnabled"))
                 throw new BridgeException("InvalidChangeState", "Write protection is already " + (action == "enable" ? "enabled." : "disabled."));
             preview["protectionBefore"] = state; preview["protectionAfter"] = after;
-            warnings.Add("Only credential references are recorded. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker; no secret is read, previewed, journaled or returned.");
+            // Each reference must be bound to exactly this public binding; the Host checks that against its vault before admission.
+            var binding = new JObject { ["resource"] = new JObject { ["provider"] = "siemensTiaPortalV21", ["authority"] = plc.Path, ["ownerId"] = entry.Path,
+                ["resourceKind"] = "blockProtection", ["resourceId"] = write ? "write" : "knowHow" }, ["purpose"] = "blockProtection", ["subjectId"] = "blockPassword" };
+            preview["credentials"] = new JArray(new[] { "credential", "newCredential" }.Where(slot => payload[slot] != null).Select(slot => new JObject {
+                ["slot"] = slot, ["vaultName"] = payload.Value<string>("vaultName") ?? "default", ["reference"] = payload[slot].DeepClone(), ["binding"] = binding.DeepClone() }));
+            warnings.Add("Only credential references and their public binding are recorded. At apply the Host checks each reference against its credential store and seals the secret to that one admitted apply; no secret is previewed, journaled, checkpointed or returned.");
         }
 
         private void ApplyBlockProtection(EngineeringChange change)
@@ -63,14 +67,14 @@ namespace TiaMcp.Openness.V21
             var plc = SelectPlc(change.Selector);
             var block = BlockProtectionTarget(change, plc).Item;
             string action = change.Payload.Value<string>("action");
-            using (var password = OpenBlockProtectionCredential(change.Payload, "credential"))
+            using (var password = OpenRoutedCredential(change, "credential"))
             {
                 if (change.Kind == "block_protect") BlockProtectionProvider(block).Protect(password);
                 else if (change.Kind == "block_unprotect") BlockProtectionProvider(block).Unprotect(password);
                 else if (action == "define") WriteProtectionProvider(block).Define(password);
                 else if (action == "enable") WriteProtectionProvider(block).Protect(password);
                 else if (action == "disable") WriteProtectionProvider(block).Unprotect(password);
-                else using (var next = OpenBlockProtectionCredential(change.Payload, "newCredential")) WriteProtectionProvider(block).Change(password, next);
+                else using (var next = OpenRoutedCredential(change, "newCredential")) WriteProtectionProvider(block).Change(password, next);
             }
             var readback = BlockProtectionState(FindBlockByName(plc, change.BlockNames[0], true, change).Item, action != null);
             change.Readbacks.Add(new JObject { ["role"] = "protection-readback", ["state"] = readback });
@@ -115,10 +119,5 @@ namespace TiaMcp.Openness.V21
         }
 
         private static bool LowerHex(string value, int length) => value != null && value.Length == length && value.All(c => c >= '0' && c <= '9' || c >= 'a' && c <= 'f');
-
-        // shortcut: no route hands a Host vault secret to a worker change apply (docs/reference/protected-credentials.md);
-        // resolve the reference here as a read-only SecureString once the Host provides one.
-        private static SecureString OpenBlockProtectionCredential(JObject payload, string key) =>
-            throw new BridgeException("CredentialRouteUnavailable", "No protected credential route from the Host credential store to a change apply exists yet. Nothing was saved, archived or changed; only the credential reference is recorded.");
     }
 }

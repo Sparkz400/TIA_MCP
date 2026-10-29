@@ -44,7 +44,7 @@ try
             builder.Services.AddSingleton<OpcUaRuntimeSessions>();
             builder.Services.AddSingleton(services => new RuntimeCaptures(services.GetRequiredService<PhysicalRuntimeSessions>(), options, TimeProvider.System, simulator.Bridge));
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.IInventoryIdentityFactory, TiaMcp.Core.Inventory.SiemensWebIdentityFactory>();
-            IBridgeClient native = options.WatchQualificationPoint is null ? bridge : new WatchQualificationBridge(bridge, options);
+            IBridgeClient native = new CredentialRoute(options.WatchQualificationPoint is null ? bridge : new WatchQualificationBridge(bridge, options));
             builder.Services.AddSingleton<IBridgeClient>(new TiaMcp.Core.WatchTables.WatchTableDispatcher(native, options.ArtifactsDirectory,
                 allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification));
             builder.Services.AddSingleton(simulator);

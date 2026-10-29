@@ -14,6 +14,7 @@ for exact limits and qualification boundaries.
 - **Native workers** (.NET Framework 4.8) run each Siemens call in an isolated process:
   - `TiaMcp.Openness.V21` for TIA Portal V21
   - `TiaMcp.Simulator.V8` for PLCSIM Advanced V8
+- **Protected credentials** stay in the Host's per-user store. A worker receives a secret only for one block protection apply, sealed to that apply; see the [credential route](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/protected-credentials.md#change-apply-credential-route).
 - **TIA Add-In companion** (`TiaMcp.AddIn.V21`, .NET Framework 4.8) runs inside TIA Portal. It sends a project-tree selection to a Host that was started with explicit enrollment, over the Host's one-use pipe challenge. It reads only and is not natively qualified; see the [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll).
 - **Project Explorer** is a read-only browser view. It works as a standalone offline HTML snapshot or through a compatible MCP Apps host.
 
