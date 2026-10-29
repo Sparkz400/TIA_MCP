@@ -1,0 +1,78 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.resolution-stale.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T17:35:32+00:00",
+  "source": {
+    "commit": "dff2201826c4e96c8a1080bb81cce8b846887c2c",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_resolution.py --phase stale on build dff2201 (frozen at the short project path y), each run in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1) with the UnitSeeder units, LAD and FBD. tag-duplicate-setup-guard (the production collision guard refuses a second Ready tag table with TagScopeMismatch, original unchanged) and stale-tag-address (a deliberate address change makes the prepared change fail at apply with StaleRevision/StaleDeclaration, then checkpoint recovery and a fresh reopen match the original) pass in both languages. stale-db-ambiguity now asks TIA itself for a competitor of the root DB Tgp_ResolutionOne with the same qualified name: ResolutionSeeder duplicate-db-diagnostic tries four routes in unit TiaMcp_UnitB and V21 refuses each one. A namespace-free source, generated under the unit's namespace preset or under an empty preset, fails with 'The block cannot be overwritten because it is already contained in another software unit'. Clearing the namespace of a generated TiaMcp_UnitB.Tgp_ResolutionOne, or renaming a namespace-free Tgp_ResolutionOne_Renamed to Tgp_ResolutionOne, fails with 'A program element with this fully qualified name already exists in this CPU'. Each refused route was removed again, the complete original project XML stayed unchanged and the project compiled clean.",
+  "limitations": [
+    "V21 keeps fully qualified program element names unique per CPU, so two DBs with one qualified name cannot exist. A native AmbiguousOperand for a DB operand, and a StaleDeclaration from a new same-name DB at apply, therefore cannot occur on V21; the dbSymbol uniqueness checks stay as a defensive guard with offline tests only. The stale-db-ambiguity runs end blocked by design and count only as this native boundary.",
+    "Duplicate PLC tag names are likewise refused by TIA itself (local.typed.native-boundaries.rerun.20261029).",
+    "A first probe on 84114ff (artifacts/q/yz/probe-db-lad) tried only the namespace-free source routes; it is not curated.",
+    "Owned local engineering only; runtime not run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "61277dc82eb75be5738050d217654ce30faee004648de3a97e1c26d510b0ea52"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "86ed88b78e5f2c6f223ff90042168f3b0f38377238ab7a2f395c722f8607d6ba"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "883dcfef0ec2933ea43049efb9d6d100a6b955cd8c7df9133b9591ab7e96cde6"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "cd9b375853081026611c49d0d64412c5f697961b8ef63c011d65398dd3980792"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-stale.json",
+      "sha256": "847f521ac8b2442dd964bcf7c6099bb1c586b6aa00c338fa10b46162604f6821",
+      "bytes": 37105,
+      "completed": true,
+      "steps": [
+        "stl-lad/tag-duplicate-setup-guard: passed",
+        "stl-lad/stale-tag-address: passed",
+        "stl-fbd/tag-duplicate-setup-guard: passed",
+        "stl-fbd/stale-tag-address: passed",
+        "db-lad: native rejection observed, original preserved",
+        "db-fbd: native rejection observed, original preserved"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}
