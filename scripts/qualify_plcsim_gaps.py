@@ -273,15 +273,32 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         h.report["onlineLayoutChange"] = "skipped: the download ticket expires before another online session"
         return
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "\n      Added : Int;\n      Again : Int;", "expectedBlockNames": [DB]})
-    _, _, report = download("layout change, reinitialized", {"softwareScope": "changes", "dataBlockValues": "reinitialize", "allowStop": True})
+    last, _, report = download("layout change, reinitialized", {"softwareScope": "changes", "dataBlockValues": "reinitialize", "allowStop": True})
     h.report["onlineLayoutChange"] = report
     values = h.stage("reinitialized values after the layout change", lambda: lab.read(ProgramVersion="int16", Ob82="int32"))
     require(values == {"ProgramVersion": 2, "Ob82": 0}, "Expected the reinitialized counter 0 with Version 2: %s" % values)
+    # 3. Recovery: the checkpoint restores the project into a new directory; the CPU keeps the downloaded program, and the
+    # recovered copy is not the project that produced the card, so it cannot download to the instance.
+    def recover():
+        status = h.tool("change_status", {"changeId": last["changeId"]})
+        require(status["state"] == "applied" and status["recoveryArchiveSha256"], "change_status lost the checkpoint: %s" % status.get("state"))
+        recovered = h.tool("change_restore", {"changeId": last["changeId"], "previewHash": last["previewHash"]})
+        require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery was not verified: %s" % recovered["stages"])
+        cpu = lab.read(ProgramVersion="int16", Ob82="int32")
+        require(cpu == {"ProgramVersion": 2, "Ob82": 0}, "The CPU must keep the downloaded program: %s" % cpu)
+        result = {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "cpu": cpu}
+        if time.monotonic() < lab.deadline:
+            error = h.call_error("change_prepare", {"kind": "simulation_download_online", "plcPath": plc, "payload": {**base, "softwareScope": "changes", "dataBlockValues": "keepActualValues", "allowStop": False}})
+            require(error.get("code") == "SimulationTargetMismatch", "A download from the recovered copy was not refused: %s" % error)
+            result["recoveredCopyRefusal"] = error.get("code")
+        return result
+    h.report["recovery"] = h.stage("restore the last online download's project checkpoint", recover)
     if time.monotonic() < lab.deadline:
-        compare = h.stage("plc_online_compare after the online downloads", lambda: h.tool("plc_online_compare", {"downloadTicket": ticket, "plcPath": plc, "maxItems": 2000, "runtimeCredentialMetadataPath": login}))
-        h.report["compareAfterDownload"] = {"truncated": compare["compareTruncated"], "root": compare["compare"]["state"]}
+        # Recorded, not asserted: the recovered project predates the reinitialized layout the CPU runs.
+        compare = h.stage("plc_online_compare of the recovered project", lambda: h.tool("plc_online_compare", {"downloadTicket": ticket, "plcPath": plc, "maxItems": 2000, "runtimeCredentialMetadataPath": login}))
+        h.report["compareAfterRecovery"] = {"truncated": compare["compareTruncated"], "root": compare["compare"]["state"]}
     else:
-        h.report["compareAfterDownload"] = "skipped: the download ticket expires before another online session"
+        h.report["compareAfterRecovery"] = "skipped: the download ticket expires before another online session"
 
 
 def virtual_time(h, lab):
