@@ -159,6 +159,16 @@ editing, rich-text export, native range acceptance, import, compile, reopen or H
 runtime acceptance is supplied. Full C01/SiVArc authoring and regeneration remain
 open.
 
+Native import was qualified separately on 29 October 2026 for MTP700 Unified Comfort
+with en-US/de-DE ([record](../verification/hmi-text-list-import-20261029.md)). Authored
+v1–v3 and set candidates import exactly through `HmiTextListComposition.Import` and
+survive save/reopen and archive retrieval. Within these bounds only: values within
+signed 32-bit, no default entry in a `Bool` list, no NUL, CR or NEL in texts, and list
+names without `.`, `:`, `#`, `"` or `[`. Outside them V21 reports success and changes
+the content, and this tool does not refuse it. V21's own export renames entries, pools
+the texts in one library and omits default fields, so a native export is never a valid
+current file set for regeneration; supply the retained candidate pair.
+
 The official [V21 export description](https://docs.tia.siemens.cloud/r/en-us/v21/functions-for-accessing-the-data-of-an-hmi-unified-device/hmisoftware/text-lists/export-of-text-lists)
 documents the paired configuration/translation files and entry attributes. Its
 examples and retained repository fixtures informed this authoring format. The
