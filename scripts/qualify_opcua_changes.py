@@ -54,6 +54,7 @@ LIMITATIONS = [
     "opcua_role_mapping_set is only refused here (prepare-time checks); see EXCLUDED for its native findings.",
     "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
     _CRASH,
+    "Interface lastModified times are not compared: importing one interface moves the others' times; content is compared by export hash.",
     "TIA derives the interface namespace's row in the namespace access restrictions and in every role mapping from the interface: it appears on "
     "import and vanishes on delete, and a copy recovered from a checkpoint lacks it until TIA rebuilds it; those rows are not compared.",
     "Engineering only; nothing is downloaded and no OPC UA client connects.",
@@ -80,7 +81,9 @@ def opcua_state(h, plc):
         state["opcua:settings:" + row["hardwarePath"]] = {a["name"]: a.get("value") for a in row["attributes"]}
     for key, rows in (("serverInterface", "serverInterfaces"), ("simaticInterface", "simaticInterfaces"), ("referenceNamespace", "referenceNamespaces"), ("roleMapping", "roleMappings")):
         for row in inspected[rows] or []:
-            state["opcua:%s:%s" % (key, row["name"])] = {**row, **({"namespacePermissions": derived(row["namespacePermissions"])} if key == "roleMapping" else {})}
+            # TIA moves every interface's lastModified when another one is imported; content is compared by its export hash instead.
+            kept = {k: v for k, v in row.items() if k != "lastModified"}
+            state["opcua:%s:%s" % (key, row["name"])] = {**kept, **({"namespacePermissions": derived(row["namespacePermissions"])} if key == "roleMapping" else {})}
     if inspected["serverInterfaces"]:
         exported = h.tool("opcua_engineering_export", {"plcPath": plc, "category": "serverInterface", "maxItems": 32})
         require(not exported["warnings"] and len(exported["files"]) == len(inspected["serverInterfaces"]), "Server interface export is incomplete: %s" % exported["warnings"])
