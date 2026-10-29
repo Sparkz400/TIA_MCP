@@ -2,9 +2,9 @@
   "schema": "tia-mcp.evidence-summary.v1",
   "evidenceId": "local.hmi.text-list-import.20261029",
   "outcome": "passed",
-  "recordedAtUtc": "2026-10-29T20:33:15+00:00",
+  "recordedAtUtc": "2026-10-29T23:00:55+00:00",
   "source": {
-    "commit": "52d440a3cf71c1f29a509a30284881e3b3bcc6d6",
+    "commit": "47491ab44d6cbbf14bd4dbda83f572487f5985fa",
     "dirty": false
   },
   "environment": {
@@ -12,11 +12,11 @@
     "os": "Windows-11-10.0.26300-SP0",
     "tiaVersion": 21
   },
-  "scope": "Native import of Unified text-list candidates authored by hmi_text_list_author and hmi_text_list_generate_set (frozen artifacts/tl2, run q/tl2). The production Host (no native workers) authored the three v1 oracle variants and three boundary requests and reopened the retained v1-v3 author and v1 set records; HmiSeeder textlist-import imported ten candidate pairs (v1, v2 Bool initial/regenerated, v3 integer initial/regenerated, both outputs of an initial and an evolved v1 set, and the v1 base that replaces an identical list) into a new owned MTP700 Unified Comfort V21.0.1.0 fixture with en-US/de-DE, screens, items, a tag, an alarm, a screen script and a documented peer list, through V21 HmiTextListComposition.Import. Every import reads back exactly through Export with the other lists unchanged; a no-change re-import of the whole export re-exports byte-identical files; the independent walk of every other HMI section is unchanged; compiler errors and warnings are unchanged by the imports and after reopen; a fresh Portal process reads equal text lists and walks after save/reopen and from the final archive, and the pre-import checkpoint restores the baseline twice, after boundary probes on the restored copy, without replaying an import. Fresh Hosts reopen every author and set record with exact receipts and bytes (also through the actual-prior author and set-evolution runners).",
+  "scope": "Native import of Unified text-list candidates authored by hmi_text_list_author and hmi_text_list_generate_set (frozen artifacts/tl4, run q/tl4) on the build that refuses content V21 changes. The production Host (no native workers) authored the three v1 oracle variants and three boundary requests, refused every content class V21 imports but changes with its typed code (HmiTextListValueOutOfRange, HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue, HmiTextListTextUnsupported, HmiTextListNameUnsupported, HmiTextListUnresolvedText), and reopened the retained v1-v3 author and v1 set records. HmiSeeder textlist-import imported ten candidate pairs (v1, v2 Bool initial/regenerated, v3 integer initial/regenerated, both outputs of an initial and an evolved v1 set, and the v1 base that replaces an identical list) into a new owned MTP700 Unified Comfort V21.0.1.0 fixture with en-US/de-DE, screens, items, a tag, an alarm, a screen script and a documented peer list, through V21 HmiTextListComposition.Import. Every import reads back exactly through Export with the other lists unchanged; a no-change re-import of the whole export re-exports byte-identical files; the independent walk of every other HMI section is unchanged; compiler errors and warnings are unchanged by the imports and after reopen; a fresh Portal process reads equal text lists and walks after save/reopen and from the final archive, and the pre-import checkpoint restores the baseline twice without replaying an import. Five boundary candidates at the edge of what the tools accept import exactly: To/Range/From entries, signed 32-bit bounds, SingleValue 0 defaults, quotes, tab, LF, emoji, empty, U+2028/2029, soft hyphen, ZWSP, ZWJ, BOM, RLO, WJ, a 16384-character text, list names of 128 characters, Latin, umlaut, CJK, Cyrillic, Greek, Arabic, Hebrew, Hangul, Arabic-Indic digits and every allowed punctuation. Fresh Hosts reopen every author and set record with exact receipts and bytes (also through the actual-prior author and set-evolution runners).",
   "limitations": [
     "The fixture's HMI compile keeps its two encrypted-transfer password errors (V21 has no public setter for that password); the gate is that imports add, remove or change no compiler error or warning, not a clean HMI compile.",
     "Imported through the independent HmiSeeder, not a production route: no MCP tool imports or restores Unified text lists, and hmi_engineering stays behind the closed preservation gate.",
-    "V21 Import returns true and silently alters content the tools can author: values outside signed 32-bit become 0, a Bool list's default entry is dropped, a text containing NUL becomes empty, CR and NEL read back as LF through the export, lists whose name contains . : # \" or [ are not created, and an unresolved text reference imports as empty texts. The tools do not refuse or flag such content.",
+    "The refusals cover what runs q/tl2 and q/tl3 showed V21 changes; list names use an allowlist (letters, digits, inner spaces, !&'()+,-;<=>@\\^_{|}, at most 128 characters), while text characters outside the control characters are refused only where observed. Records published before the refusals keep their meaning and still reopen, and their content is not re-qualified.",
     "V21 export renames entries, pools all texts in one library with renumbered IDs, omits default fields, writes CRLF and leaves texts such as Off, On and Null unquoted (YAML 1.1 reads them as bool/null). Candidate library names, entry and text IDs and DefaultLanguage are not retained, so a native export never equals a candidate byte for byte.",
     "One profile and language pair (MTP700 Unified Comfort, en-US/de-DE); no screen item consumes an imported list, and Unified PC, other devices and languages, runtime and visual behavior are not covered."
   ],
@@ -24,19 +24,19 @@
     {
       "name": "net10.0-windows",
       "files": 26,
-      "sha256": "5bb81ac70ca81bef6a0d1f1d48f19b157b44b9eca5fbb4cd26ab2f58b6b5e74e"
+      "sha256": "f8ccb3fb97117d1dac2e0cccb55a7fc301caed1005f4b499b7facbdb6933f25d"
     },
     {
       "name": "net48",
       "files": 6,
-      "sha256": "44128d18807d03e70af0d0db6a7fd48c7f287ac37036c066b0b9fa627d504dd9"
+      "sha256": "616d4b1cdb1a128608e73c310ad2f6d0779eb732e63ff5371130be656e1557a2"
     }
   ],
   "runs": [
     {
       "report": "report.json",
-      "sha256": "2c2a9550633ed42e3e97733d026098a2fb8e223e70aaa0e62b81264354ec2783",
-      "bytes": 58143,
+      "sha256": "8a2828cff9d65957958f9dad131b815de2cfd87013f328358ddbd56beb838641",
+      "bytes": 48959,
       "completed": true,
       "steps": [
         "Retained actual-producer byte",
@@ -144,8 +144,19 @@
         "Structured offline refusal InvalidHmiComponentReview",
         "Structured offline refusal InvalidHmiComponentReview",
         "Structured offline refusal PackageInvalid",
+        "Structured offline refusal HmiTextListUnresolvedText",
         "Structured offline refusal InvalidHmiComponentReview",
-        "Structured offline refusal InvalidHmiComponentReview",
+        "Structured offline refusal HmiTextListValueOutOfRange",
+        "Structured offline refusal HmiTextListBoolDefaultEntry",
+        "Structured offline refusal HmiTextListTextUnsupported",
+        "Structured offline refusal HmiTextListTextUnsupported",
+        "Structured offline refusal HmiTextListTextUnsupported",
+        "Structured offline refusal HmiTextListTextUnsupported",
+        "Structured offline refusal HmiTextListDefaultEntryValue",
+        "Structured offline refusal HmiTextListNameUnsupported",
+        "Structured offline refusal HmiTextListNameUnsupported",
+        "Structured offline refusal HmiTextListNameUnsupported",
+        "Structured offline refusal HmiTextListNameUnsupported",
         "Boundary request authored: boundary-values",
         "Downloaded artifact exact digest",
         "Downloaded artifact exact digest",
@@ -211,6 +222,11 @@
         "Checkpoint archive unchanged by the restores",
         "Complete native compiler diagnostics at baseline, after import and after reopen",
         "Imports add, remove or change no compiler error or warning",
+        "Boundary candidate the tool accepts imports exactly: boundary-values",
+        "Boundary candidate the tool accepts imports exactly: boundary-texts",
+        "Boundary candidate the tool accepts imports exactly: boundary-names",
+        "Boundary candidate the tool accepts imports exactly: author-v1-expanded",
+        "Boundary candidate the tool accepts imports exactly: author-v1-extremes",
         "Seeder ran every boundary probe in order",
         "Authoring survives Host restart and upload release",
         "Downloaded artifact exact digest",
@@ -265,8 +281,8 @@
     },
     {
       "report": "native-report.json",
-      "sha256": "716b3361cf77ffc66954c55a6849999ca5089e162345d0313c4c09959f3fd9f5",
-      "bytes": 226608,
+      "sha256": "8ad663b40c587a4dfd1c0e667a0df0189daaed95f0a0ed7e9b1f293563599abe",
+      "bytes": 372593,
       "completed": true,
       "steps": [],
       "toolsPassed": [],
@@ -274,7 +290,7 @@
     },
     {
       "report": "verification.json",
-      "sha256": "291a27d2b1ab3122fa4846ee54e82be109000097fe5f13686af3023baa001980",
+      "sha256": "506d39e837442bec0d96b75e492407db6afa51d2da17e0cc6ddb3538a163848a",
       "bytes": 11832,
       "completed": true,
       "steps": [
@@ -474,7 +490,7 @@
     },
     {
       "report": "verification.json",
-      "sha256": "d7c666f2082b66708ab4837a584169136f24759d65f77c0c0335584bc4ec20f7",
+      "sha256": "32098aaf6bfc67b3ca7a805a98eef590dae92f3f404fbd444a0ac2902adf33e3",
       "bytes": 132738,
       "completed": true,
       "steps": [
