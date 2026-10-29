@@ -119,6 +119,22 @@ class CompilationEvidenceTests(unittest.TestCase):
             if defect == 'wrongExpected': expected = ['/projects/Other/devices/Same', paths[1]]
             with self.subTest(defect=defect), self.assertRaises(RuntimeError): require_clean_compile(bad, expected_targets=expected)
 
+    def test_uncompiled_devices_pass_only_when_named_by_the_caller(self):
+        paths = ['/projects/P/devices/Station', '/projects/P/devices/Drive']
+        receipt = device_compile(paths[:1]); receipt['requiredTargets'] = paths
+        receipt['notCompiled'] = [{'target': 'Drive', 'targetPath': paths[1], 'reason': 'no compiler service'}]
+        require_clean_compile(receipt, expected_targets=paths, not_compiled=[paths[1]])
+        for defect in ('unnamed', 'otherNamed', 'alsoCompiled', 'notRequired', 'pathless', 'legacyScope'):
+            bad = copy.deepcopy(receipt); allowed = [paths[1]]
+            if defect == 'unnamed': allowed = []
+            if defect == 'otherNamed': allowed = ['/projects/P/devices/Other']
+            if defect == 'alsoCompiled': bad['targets'].append({**bad['targets'][0], 'targetPath': paths[1]})
+            if defect == 'notRequired': bad['requiredTargets'] = paths[:1]
+            if defect == 'pathless': bad['notCompiled'][0].pop('targetPath')
+            if defect == 'legacyScope':
+                bad = clean_compile(); bad['notCompiled'] = receipt['notCompiled']
+            with self.subTest(defect=defect), self.assertRaises(RuntimeError): require_clean_compile(bad, expected_targets=paths, not_compiled=allowed)
+
     def test_inventory_pages_keep_empty_devices_and_exact_complete_scope(self):
         paths = ['/projects/P/devices/A', '/projects/P/ungrouped/B']
         first = device_page('P.ap21', paths); second = copy.deepcopy(first)

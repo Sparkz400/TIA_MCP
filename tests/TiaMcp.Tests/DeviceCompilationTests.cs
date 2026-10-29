@@ -113,8 +113,18 @@ namespace TiaMcp.Tests
         {
             var first = Device("A"); var last = Device("Z"); last.Compiler = null;
             var project = new Project { Devices = [first, last] };
-            await Refuse("UnsupportedCapability", () => OpennessSession.CompileDevicesForTest(project));
-            Check.Equal(0, first.Compiler!.Calls);
+            // A device without a compiler service (a Startdrive drive) is listed under notCompiled, never counted as compiled.
+            var receipt = OpennessSession.CompileDevicesForTest(project);
+            Check.Equal(1, first.Compiler!.Calls);
+            Check.Equal("/projects/Fixture/devices/A", (string?)receipt["targets"]!.Single()["targetPath"]);
+            Check.Equal("/projects/Fixture/devices/Z", (string?)receipt["notCompiled"]!.Single()["targetPath"]);
+            Check.Equal("Z", (string?)receipt["notCompiled"]![0]!["target"]);
+            Check.Equal(2, receipt["requiredTargets"]!.Count());
+            Check.Equal(0, ((JArray)OpennessSession.CompileDevicesForTest(new() { Devices = [first] })["notCompiled"]!).Count);
+            first.Compiler.Calls = 0; var none = Device("N"); none.Compiler = null;
+            await Refuse("UnsupportedCapability", () => OpennessSession.CompileDevicesForTest(new() { Devices = [none, last] }));
+            await Refuse("CompileScopeChanged", () => DeviceCompilation.Compile(project, expectedTargets: ["/projects/Fixture/devices/A"]));
+            Check.Equal(0, first.Compiler.Calls);
             last.Read = () => throw new InvalidOperationException("Synthetic getter failure");
             await Check.ThrowsAsync<InvalidOperationException>(() => { OpennessSession.CompileDevicesForTest(project); return Task.CompletedTask; });
             Check.Equal(0, first.Compiler.Calls);

@@ -22,7 +22,9 @@ def require_successful_result(result, *, error_count_field='errorCount', truncat
     messages(result.get('messages'))
 
 
-def require_clean_compile(receipt, *, expected_targets=None):
+def require_clean_compile(receipt, *, expected_targets=None, not_compiled=()):
+    """not_compiled names the exact device paths a caller accepts under the receipt's notCompiled (devices without a
+    compiler service, such as a Startdrive drive); any other uncompiled device fails."""
     require(isinstance(receipt, dict) and type(receipt.get('errorCount')) is int and receipt['errorCount'] == 0
             and 'error' not in receipt and isinstance(receipt.get('targets'), list) and receipt['targets'],
             'Complete native compile targets and an explicit zero error count are required.')
@@ -33,6 +35,12 @@ def require_clean_compile(receipt, *, expected_targets=None):
         require_successful_result(target)
 
     device_scope = 'targetIdentityPolicy' in receipt or 'requiredTargets' in receipt or any('targetPath' in row for row in receipt['targets'])
+    skipped = receipt.get('notCompiled', [])
+    require(isinstance(skipped, list) and all(isinstance(row, dict) and isinstance(row.get('targetPath'), str) for row in skipped)
+            and (device_scope or not skipped), 'Uncompiled devices require exact device paths.')
+    skipped = [row['targetPath'] for row in skipped]
+    require(len(skipped) == len(set(skipped)) and set(skipped) == set(not_compiled),
+            'Devices were not compiled: %s' % sorted(set(skipped) ^ set(not_compiled)))
     if device_scope:
         require(receipt.get('targetIdentityPolicy') == 'device-path-v1' and receipt.get('scopeComplete') is True,
                 'Complete exact device compiler scope is required.')
@@ -40,8 +48,8 @@ def require_clean_compile(receipt, *, expected_targets=None):
         require(all(isinstance(path, str) and path.startswith('/projects/') for path in observed), 'Exact device compiler paths are required.')
         required = receipt.get('requiredTargets')
         require(isinstance(required, list) and required and all(isinstance(path, str) for path in required)
-                and len(required) == len(set(required)) and set(required) == set(observed),
-                'Compiler receipts do not cover the declared complete device scope.')
+                and len(required) == len(set(required)) and set(required) == set(observed) | set(skipped)
+                and not set(observed) & set(skipped), 'Compiler receipts do not cover the declared complete device scope.')
     else:
         observed = [row['target'] for row in receipt['targets']]
     require(len(observed) == len(set(observed)), 'Duplicate compiler targets cannot establish coverage.')
@@ -49,7 +57,7 @@ def require_clean_compile(receipt, *, expected_targets=None):
         require(isinstance(expected_targets, (list, tuple)) and expected_targets
                 and all(isinstance(path, str) and path.strip() for path in expected_targets)
                 and len(expected_targets) == len(set(expected_targets)), 'Exact distinct expected compiler targets are required.')
-        require(set(observed) == set(expected_targets), 'Compiler targets differ from the required selection.')
+        require(set(observed) | set(skipped) == set(expected_targets), 'Compiler targets differ from the required selection.')
 
     # Retain the original route-capture guard over all nested diagnostic metadata.
     def inspect(value, depth=0):
