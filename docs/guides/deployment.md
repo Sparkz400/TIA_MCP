@@ -50,6 +50,43 @@ Keep each run's reports, exact manifest snapshots and referenced native checkpoi
 
 Every MCP client connection owns separate workers and session state. Do not point concurrent editing clients at the same project. Bridge interruptions have uncertain outcomes and are never replayed automatically; inspect the change journal and TIA state before resuming.
 
+## Host options
+
+`TiaMcp.Host.exe` accepts these options ([`HostOptions.cs`](../../src/TiaMcp.Host/HostOptions.cs)); an unknown option or a missing value stops startup. The last column names the parameter of `scripts/Start-TiaMcp.ps1` and `scripts/New-McpConfiguration.ps1` that sets it.
+
+| Option | Default | Effect | Launcher parameter |
+| --- | --- | --- | --- |
+| `--worker <exe>` | Bundle: `workers/openness/TiaMcp.Openness.V21.exe`; checkout: the worker's Debug `net48` build | Engineering (TIA Openness V21) worker | Set from the bundle |
+| `--sim-worker <exe>` | Bundle: `workers/simulator/TiaMcp.Simulator.V8.exe`; checkout: the worker's Debug `net48` build | PLCSIM Advanced V8 worker | Set from the bundle |
+| `--artifacts <dir>` | `artifacts` below the checkout or bundle root | Artifact store: projects, checkpoints, uploads, reports and journals | `-ArtifactsDirectory` |
+| `--api-dir <dir>` | The V21 PublicAPI path Siemens registers, else the setup default below `C:\Program Files` | TIA Openness PublicAPI directory for the engineering worker and native translation import | `-TiaApiDirectory` |
+| `--sim-api-dir <dir>` | The worker's own lookup | PLCSIM Advanced API directory, forwarded to both workers | `-SimulatorApiDirectory` |
+| `--timeout-seconds <n>` | `120` (launcher: `300`) | Deadline of one native worker call; 5 to 900 | `-TimeoutSeconds` |
+| `--toolsets <groups>` | All tools | Comma-separated [tool groups](../reference/mcp-surface.md#tool-groups---toolsets), or `all`; once | `-Toolsets` |
+| `--git-executable <exe>` | None; VCI Git tools refuse with `GitNotConfigured` | Absolute path of an installed Git | `-GitExecutable` |
+| `--ua-client-identity <name>` | None | `default` or a 32-character lowercase hex name of a [protected OPC UA client identity](../reference/opcua-runtime.md#protected-persistent-client-identity); once | `-UaClientIdentity` |
+| `--diagnose` | Off | Prints worker information and TIA discovery as JSON, then exits; no MCP server | `-Diagnose` (`Start-TiaMcp.ps1` only) |
+| `--no-native-workers` | Off; always on in the portable package | Native calls return `NativeWorkersDisabled` without starting a worker | None |
+| `--addin-handoff` | Off | Runs the [Add-In selection receiver](../reference/addin-selections.md); not with `--diagnose` | None |
+| `--addin-enrollment <file>` | None | Enrollment file written by `scripts/Publish-AddIn.ps1`; requires `--addin-handoff`; once | None |
+| `--enable-library-integrate-apply` | Off | Lets `change_apply` install a prepared PLC `library_integrate` plan ([combined apply](plc-library-integration-recipes.md#combined-apply-opt-in)) | None |
+| `--library-limits-file <json>` | Built-in limits | Library package intake limits, a JSON object of at most 64 KiB ([storage policy](library-management.md#storage-policy-and-errors)) | None |
+
+Neither launcher script passes `--no-native-workers`, `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply` or `--library-limits-file`. To use them, launch `TiaMcp.Host.exe` directly with an explicit `--artifacts` directory, or add them to the `args` of the generated MCP configuration.
+
+Qualification-only options register gated test tools and interruption points for the native runners. They stay out of the normal feature advertisement, are refused together with `--no-native-workers`, and are not for production use:
+
+| Option | Constraint |
+| --- | --- |
+| `--component-qualification` | Registers the component qualification tools and is passed to the engineering worker |
+| `--watch-qualification <point>` | Requires `--component-qualification`; one watch-table interruption point such as `save.after` or `host.watch_apply_native`; adds the watch authoring qualification tools |
+| `--runtime-qualification <point>` | Requires `--component-qualification`; `ua.write.afterSend` or `web.write.afterSend` ends the Host right after a runtime write is sent |
+| `--testsuite-scope-probe` | Its own sequential Host |
+| `--testsuite-qualification` | Its own sequential Host; only in builds with the `TESTSUITE_QUALIFICATION` constant |
+| `--translation-qualification` | Its own sequential Host |
+
+As the first argument, `--credential-store` and `--ua-identity-store` run the [protected credential](../reference/protected-credentials.md) and OPC UA identity commands instead of the server. `--session-relay-server` and `--session-relay-client` are internal to `Start-TiaMcp.ps1 -InteractiveSession`.
+
 ## Portable package without Siemens
 
 Build on Windows with PowerShell 7 and the .NET SDK from `global.json`:
