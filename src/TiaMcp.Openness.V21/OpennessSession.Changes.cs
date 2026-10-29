@@ -647,7 +647,7 @@ namespace TiaMcp.Openness.V21
                     PrepareHardwareMove(change, project, preview);
                     break;
                 case "hardware_channel_attributes":
-                    PrepareHardwareChannel(change, project, preview);
+                    PrepareHardwareChannel(change, project, preview, out _);
                     break;
                 case "hardware_cpu_memory_bytes":
                     PrepareCpuMemoryBytes(change, project, preview);
@@ -1019,7 +1019,7 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "hardware_channel_attributes":
-                    ApplyAttributes(PrepareHardwareChannel(change, project, null), ChangeObject(payload, "attributes"), ChannelWriteAttributes);
+                    ApplyHardwareChannel(change, project);
                     break;
                 case "hardware_cpu_memory_bytes":
                     ApplyCpuMemoryBytes(change, project);

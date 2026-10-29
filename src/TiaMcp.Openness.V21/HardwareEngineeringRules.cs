@@ -13,6 +13,16 @@ namespace TiaMcp.Openness.V21
             "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
             "hardware_transfer_area_create", "hardware_transfer_area_delete" }.Contains(kind);
 
+        // A channel's hardware interrupt links exactly one hardware interrupt OB of the module's own PLC. secondaryTypes holds
+        // the OB event class of each block with the exact name, null for a block that is no OB.
+        internal static void RequireInterruptOb(string name, int plcs, string[] secondaryTypes)
+        {
+            if (plcs != 1) throw new BridgeException("UnsupportedCapability", "A hardware interrupt OB link requires exactly one PLC in the module's own device; remote, shared and PLC-less modules are not covered.");
+            if (secondaryTypes.Length == 0) throw new BridgeException("BlockNotFound", "The module's PLC has no block named " + name + ".");
+            if (secondaryTypes.Length > 1) throw new BridgeException("AmbiguousTarget", "More than one block of the module's PLC is named " + name + ".");
+            if (secondaryTypes[0] != "HardwareInterrupt") throw new BridgeException("InvalidRequest", name + " is not a hardware interrupt OB (SecondaryType HardwareInterrupt).");
+        }
+
         // Port interconnections join the manifest only for kinds that change or can lose them.
         internal static bool CapturesPorts(string kind) => kind == "hardware_port_connect" || kind == "hardware_port_disconnect" || kind == "hardware_replace";
 
