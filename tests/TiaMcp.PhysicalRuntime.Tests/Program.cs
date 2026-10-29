@@ -163,6 +163,17 @@ Fails(() => WebRuntimeProtocol.DiagnosticResult(context, "operatingMode", WebRun
 Fails(() => WebRuntimeProtocol.DiagnosticResult(context, "alarms",
     Json($$$"""{"jsonrpc":"2.0","id":"{{{id}}}","method":"Alarms.Browse","params":{"language":"en-US","count":5,"alarm_id":"1"}}"""), Response("{\"entries\":[]}"), start, start, TimeSpan.Zero), "RuntimeRequestChanged");
 
+// The runtime write fault hook parses only beside --component-qualification and only at a known point.
+Check(TiaMcp.Host.HostOptions.Parse([]).RuntimeQualificationPoint is null, "No runtime fault point by default");
+foreach (var point in new[] { "ua.write.afterSend", "web.write.afterSend" })
+    Check(TiaMcp.Host.HostOptions.Parse(["--component-qualification", "--runtime-qualification", point]).RuntimeQualificationPoint == point, "Runtime fault point parses: " + point);
+foreach (var refused in new[] { new[] { "--runtime-qualification", "ua.write.afterSend" }, new[] { "--component-qualification", "--runtime-qualification", "ua.write.beforeSend" },
+    new[] { "--component-qualification", "--runtime-qualification", "host.watch_checkpoint" }, new[] { "--component-qualification", "--runtime-qualification", "ua.write.afterSend", "--runtime-qualification", "web.write.afterSend" } })
+{
+    try { TiaMcp.Host.HostOptions.Parse(refused); throw new Exception("Runtime fault point accepted: " + string.Join(' ', refused)); }
+    catch (ArgumentException) { checks++; }
+}
+
 checks += RuntimeCaptureChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".captures" : Path.Combine(Path.GetTempPath(),"tia-capture-"+Guid.NewGuid().ToString("N")),Read("18446744073709551615"),metadata);
 checks += await RuntimePollingChecks.Run(args.Length == 1 ? Path.GetFullPath(args[0])+".polling" : Path.Combine(Path.GetTempPath(),"tia-polling-"+Guid.NewGuid().ToString("N")));
 checks += await RuntimeCaptureSoakChecks.CheckAcquisitionWaitBoundaries();

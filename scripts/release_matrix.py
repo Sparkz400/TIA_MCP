@@ -3,9 +3,12 @@
 The matrix is derived from the feature catalog: one row per catalog feature, one
 cell per acceptance criterion. A cell is bound only when the feature is verified,
 and then names the evidence records and the hashes of their retained artifacts.
-Every other cell is open work, except in deferred rows and in unavailable_target
-rows, which are blocked on V21 and do not count toward 1.0. Owners come from the release-obligation ledger;
-features added after the ledger take the owner of their feature-name prefix.
+Every other cell is open, except in two support classes summarized apart. Cells of
+unavailable_target rows are blocked: they do not count toward 1.0 (maintainer decision,
+29 October 2026; the ledger's dispositions records each row). Cells of deferred (not
+implemented) rows are deferred: not open cells, but still 1.0 work, listed in docs/TODO.md.
+Owners come from the release-obligation ledger; features added after the ledger take the
+owner of their feature-name prefix.
 """
 import argparse
 import collections
@@ -36,6 +39,8 @@ PREFIX_OWNERS = {
     "runtime_plcsim_bind": ["D16", "C03", "L03"], "runtime_web_write": ["D16", "L03"], "runtime_web_operating_mode": ["D16", "L03"], "runtime_ua_write": ["D16", "C03", "L03"],
     "library_update_check": ["X02", "L02"], "change.library_cleanup": ["X02", "L02"], "change.library_harmonize": ["X02", "L02"], "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"], "safety_printout": ["D14"], "change.safety_fparameter_set": ["D14"], "library.integrate_combined_apply": ["X02", "L02"],
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
+    "sim_time": ["L03"], "sim_event": ["L03"], "sim_storage": ["L03"], "change.simulation_download_online": ["L03", "D09"],
+    "change.hardware_cpu_parameters": ["X10"], "change.device_compile": ["X10", "X11"], "change.project_compile": ["X11", "X10"], "change.hmi_compile": ["X07"], "change.tag_table_": ["X11"],
     "technology_profile": ["D13"], "testsuite_": ["D06"], "translation_": ["D03"],
     "vci_": ["D01"], "watch_table": ["D02"], "web_application": ["D12"],
     "change.vci_workspace_create": ["D01"], "change.vci_workspace_delete": ["D01"], "change.vci_mapping_add": ["D01"], "change.vci_mapping_remove": ["D01"], "change.vci_synchronize": ["D01"],

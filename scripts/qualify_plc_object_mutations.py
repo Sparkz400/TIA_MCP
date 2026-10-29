@@ -32,6 +32,8 @@ EXCLUDED = {
     "call_connection_set": "Unavailable on V21: TIA refuses an Access without a wire or on two wires; prepare refuses it (qualify_graphical_changes.py).",
     "call_parameter_set": _GRAPHICAL,
     "graphical_typed_edit": "Qualified by its own typed LAD/FBD program, which also carries AC-completeness and AC-runtime.",
+    **{kind: "Qualified by the engineering-gap runner (qualify_engineering_gaps.py)." for kind in
+       ("tag_table_create", "tag_table_rename", "tag_table_delete", "device_compile", "project_compile")},
 }
 NEEDS = ("applied", "persisted", "refused", "restored")
 STAGES = ("prechange_project_saved", "recovery_archive_created", "mutation_applied", "compile_finished", "changed_project_saved")

@@ -227,8 +227,18 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("SimulationTargetMismatch", "Simulator identity or storage changed. No substitute target is selected.");
             if (requireOff && instance.OperatingState != EOperatingState.Off)
                 throw new BridgeException("SimulationMustBeOff", "The verified simulated instance must remain powered off during memory-card generation.");
-            if (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
-                throw new BridgeException("SoftbusRequired", "Simulation memory-card generation requires existing local Softbus mode.");
+            RequireSimulationNetwork(marker, null, "Simulation memory-card generation requires existing local Softbus mode.");
+        }
+
+        // The interface sim_create recorded in the ticket decides the admitted network mode; nothing here ever switches it.
+        // Without an instance only the machine-wide mode is compared, as the Softbus path always did.
+        private static void RequireSimulationNetwork(JObject marker, IInstance instance, string softbusMessage)
+        {
+            string required = SimulationTicket.Interface(marker);
+            string code = SimulationNetworkAdmission.Refusal(SimulationRuntimeManager.NetworkMode.ToString(),
+                instance == null ? required : instance.CommunicationInterface.ToString(), required);
+            if (code == "SoftbusRequired") throw new BridgeException(code, softbusMessage);
+            if (code != null) throw new BridgeException(code, "This owned instance was created for TCP/IP; PLCSIM must still be in its existing TCP/IP single-adapter mode. Network settings are never changed.");
         }
 
         private static void SimulationDownloadMessages(IEnumerable<DownloadResultMessage> source, JArray output, ScanBudget budget, int depth)

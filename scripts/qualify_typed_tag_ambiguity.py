@@ -6,11 +6,8 @@ never a typed ambiguity pass; no failed operation is replayed.
 """
 import argparse
 import hashlib
-import json
 import pathlib
-import subprocess
 
-from block_test_runtime import canonical
 from qualification_owned_scratch import require, snapshot
 from qualify_typed_resolution import ResolutionRun, artifact_policy
 from run_conformance import safe_xml
@@ -47,34 +44,9 @@ class TagAmbiguityRun(ResolutionRun):
 
     def setup(self):
         super().setup()
-        executable = self.args.resolution_seeder.resolve()
-        require(executable.is_file(), "Guarded native ResolutionSeeder binary is required.")
         before = snapshot(self.session.call, self.output / "duplicate-setup-before")
-        self.session.guard()
-        authorization = self.native / "duplicate-tag-authorization.json"
-        authorization.write_text(canonical({"processId": self.session.session["processId"], "projectPath": self.session.current_project,
-            "ownsPortalProcess": True, "creationTool": "tia_create_scratch", "operation": "duplicate-tag-diagnostic"}), encoding="utf-8")
-        row = {"path": str(executable), "sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
-            "dispatched": True, "replayPermitted": False, "nativeAmbiguityQualified": False}
-        self.report["nativeDuplicateSetup"] = row
-        self.persist()
-        try:
-            result = subprocess.run([str(executable), str(self.args.artifacts.resolve()), str(authorization)], cwd=ROOT,
-                capture_output=True, text=True, encoding="utf-8", timeout=self.args.timeout)
-        except subprocess.TimeoutExpired as error:
-            decode = lambda value: value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value
-            row.update(outcome="unknown_after_timeout", stdout=decode(error.stdout), stderr=decode(error.stderr))
-            self.persist()
-            raise
-        row.update(exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)
-        self.persist()
-        response = json.loads(result.stdout.strip().splitlines()[-1])
-        row["result"] = response
-        require(result.returncode == 0 and response.get("completed") is True, "Native duplicate fixture dispatch did not complete.")
-        require(response.get("processId") == self.session.session["processId"]
-                and pathlib.Path(response["projectPath"]).resolve() == pathlib.Path(self.session.current_project), "Seeder receipt target differs.")
-        require(hashlib.sha256(executable.read_bytes()).hexdigest() == row["sha256"], "Native seeder binary changed.")
-        self.session.guard()
+        row = self.resolution_seed("duplicate-tag-diagnostic")
+        response = row["result"]
         after = snapshot(self.session.call, self.output / "duplicate-setup-after")
         row["addition"] = verify_native_setup(before, after, self.scope, response.get("duplicateCreated") is True)
         row["fullOriginalXmlPreserved"] = True

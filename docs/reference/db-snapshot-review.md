@@ -60,13 +60,15 @@ replays native work. Unavailable/corrupted inputs or saved source prevent reopen
 
 `db_snapshot_capture(reviewId, objectPath, projectName?)` replaces steps 2–3 for
 the open project: the worker exports the snapshot stored on that exact DB with
-`InterfaceSnapshot.Export` (read-only, no online access) and the Host reviews it as
+`InterfaceSnapshot.Export` (read-only, no online access; `WithReadOnly`, because the snapshot
+values and date are read-only attributes that V21 otherwise omits) and the Host reviews it as
 above. The record and receipt add `inputSource`
 (`nativeInterfaceSnapshotExport` with the export's project path, PLC path and DB
 path), which must match the saved review's DB and `model.project.projectPath`;
 the report's `association` becomes `nativeExportOfSelectedDB`. All verification
 flags stay false: stored snapshot values are not current CPU values. A DB without
-a stored snapshot refuses with `DbSnapshotUnavailable`.
+a stored snapshot (V21 exports empty `SnapshotValues` dated `0001-01-01`) refuses with
+`DbSnapshotUnavailable`.
 
 Two prepared change kinds work only against a ticket-bound owned PLCSIM instance,
 online through the `plc_online_compare` route; without a `downloadTicket` they

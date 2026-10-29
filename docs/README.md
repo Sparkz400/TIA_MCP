@@ -68,6 +68,7 @@ listed as lost. Prose records per run are under [verification](#verification).
 - [MCP surface](reference/mcp-surface.md): `--toolsets` groups, tool titles, output schemas, prompts and progress
 - [Target capabilities](reference/capabilities.md), [object identities and scopes](reference/object-model.md)
 - [Engineering coverage](reference/engineering-coverage.md), [native explorer extraction](reference/project-explorer-native.md)
+- [MCP tool reference](reference/tools.md): every tool with its feature, support class and Host option, generated from the catalog by `scripts/tool_reference.py`
 - [Supplied technology profiles and relationships](reference/technology-profile-review.md)
 - [Supplied safety evidence](reference/safety-evidence-review.md), [full safety/F-I/O plan](plans/expansion-plans/safety-validation-and-fio.md)
 - [HMI capability matrix](reference/hmi-capability-matrix.md), [relationship evidence](reference/hmi-relationship-evidence.md)
@@ -80,6 +81,7 @@ Plans describe intended scope; an unchecked historical item is not automatically
 a current blocker. Use [TODO](TODO.md) for the current order of work.
 
 - [Overall implementation plan](plans/overview.md), [graphical/project roadmap](plans/graphical-project-roadmap.md)
+- [Release ledger](plans/release-obligations-20261015.md), [release acceptance](plans/release-acceptance.md)
 - [Library plan](plans/library-management-plan.md), [library acceptance backlog](plans/library-management-todo.md)
 - [HMI plan](plans/hmi-integration-plan.md), [HMI acceptance backlog](plans/hmi-remaining-work.md)
 - [Typed LAD/FBD plan](plans/typed-lad-fbd-builders-plan.md), [typed acceptance backlog](plans/typed-lad-fbd-todo.md)

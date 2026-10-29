@@ -7,6 +7,45 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Unified text-list import qualified — 29 October 2026:** ([record](../verification/hmi-text-list-import-20261029.md))
+- **Runs:** candidates authored by `hmi_text_list_author` and `hmi_text_list_generate_set` import exactly through V21 `HmiTextListComposition.Import` on MTP700 Unified Comfort (en-US/de-DE) via the independent HmiSeeder (run `q/tl4`, 227 checks, build `47491ab`), with other HMI content unchanged, a byte-identical roundtrip, save/reopen, archive retrieval and checkpoint restore. Curated as `local.hmi.text-list-import.20261029`.
+- **Fix found natively:** V21 reports success but silently changes some content, so both tools now refuse it before publishing: `HmiTextListValueOutOfRange`, `HmiTextListBoolDefaultEntry`, `HmiTextListDefaultEntryValue`, `HmiTextListTextUnsupported`, `HmiTextListNameUnsupported` and `HmiTextListUnresolvedText`. Retained records still reopen.
+- **Catalog 0.4.79:** both text-list tools verified; 418 of 461 features verified; matrix 1,906 bound, 159 open, 31 blocked, 30 deferred. No production import route exists.
+
+**Maintainer decisions — 29 October 2026:** the block-protection credential route is 1.0 work, so its three rows count as open again (5 blocked rows remain, 31 cells); live monitoring and active forcing are 1.0 scope; combined library apply becomes the default for its verified PLC recipe shapes (left to the coordinator); the "Not a 1.0 gate" section is confirmed; VS Code alone closes the Explorer roundtrip. Catalog 0.4.78; matrix 1,896 bound, 169 open, 31 blocked, 30 deferred.
+
+**Release tracking reconciled — 29 October 2026:** [Release acceptance](../plans/release-acceptance.md) defines how the maintainer accepts an obligation; the ledger records the eight blocked rows in `dispositions` and amends `completionCriteria`, and ten obligations were refreshed against catalog `0.4.76`. The TODO now lists the ten deferred rows with their dispositions, the work outside the matrix, capability gaps, release mechanics, one acceptance box per obligation group, open maintainer questions, and a "Not a 1.0 gate" section for the VM and recurring items (maintainer to confirm). Matrix counts are unchanged (151 open cells).
+
+**Hardware families — 29 October 2026:** ([record](../verification/hardware-families-20261029.md))
+- **Runs:** `scripts/qualify_hardware_changes.py` passed 276/276 steps on build `556cee5`: a CPU 1214C DC/DC/DC V4.7 and an ET 200MP IM 155-5 PN ST V4.1 station on a second S7-1500's IO system went through the S7-1500 gates (apply, exact state delta, fresh reopen, checkpoint restore, refusals). Curated as `local.hardware_changes.families.20261029`; no worker or Host change.
+- **Catalog 0.4.77:** evidence references only; no matrix cell changes.
+
+**Station upload qualified — 29 October 2026:**
+- **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.
+- **Native D09:** a first run refused, because the upload's three TLS challenges offered zero certificates ("certificate not matching"). After the decision, `local.online.upload.20261029` passed: one certificate-less challenge was trusted unauthenticated, then one runtime-user login, and the upload succeeded with the downloaded blocks. `plc_online_compare` passed again.
+- **Catalog 0.4.76:** 416 of 461 features verified; matrix 1,896 bound, 151 open, 49 blocked, 30 deferred. D09 has no open cell.
+
+**PLCSIM and engineering gaps — 29 October 2026:** ([record](../verification/plcsim-openness-gaps-20261029.md))
+- **New routes:** `change.simulation_download_online` downloads a changed program online to the same owned PLCSIM instance; `sim_time` (scale factor, virtual system time), `sim_test` `virtualTime`, `sim_event` (OB40/82/83/86/55 injection), `sim_state` `memoryReset` and `sim_storage` (archive/retrieve); `change.hardware_cpu_parameters`, `change.device_compile`, `change.project_compile`, `change.hmi_compile` and `change.tag_table_create`/`_rename`/`_delete`.
+- **Native qualification:** CPU parameters, device and project compile and the tag-table lifecycle (`local.engineering_gaps.20261029`); the online download, virtual time, OB82/OB83/OB86, memory reset and storage (`local.plcsim_gaps.20261029`), with the download's checkpoint recovery in a top-up run (`local.plcsim_gaps.recovery.20261029`). Findings fixed on the way: V21 refuses some coded parameter values in its setter, a zone change switches daylight saving, disabling the minimum cycle time undeclares its value, and PLCSIM needs a tag-list refresh after a program change.
+- **Boundaries:** OB40 (no hardware-interrupt configuration in V21 Openness), the CPU protection level (password required) and `change.hmi_compile` (no compilable HMI fixture through public routes).
+- **Catalog 0.4.75:** 415 of 461 features verified; matrix 1,891 bound, 156 open, 49 blocked, 30 deferred.
+
+**DB snapshots on owned PLCSIM — 29 October 2026:**
+- **Runs:** `scripts/qualify_online_routes.py --skip-upload` passed on build `4963644` with the runtime-user login: `db_snapshot_create` with checkpoint, compile and save, `db_snapshot_capture` reviewing the stored value, `db_snapshot_load_actual` without compile and save read back through PLCSIM, and `change_restore` of the create (`local.online.snapshots.20261029`).
+- **Fixes found natively:** snapshot export needs `ExportOptions.WithReadOnly` (Snapshot and SnapshotDate are read-only attributes); an export without stored values is refused as `DbSnapshotUnavailable`; the load compares snapshot content instead of file hashes; PLCSIM's tag list is refreshed before the readback.
+- **Catalog 0.4.74:** 405 of 450 features verified; matrix 1,838 bound, 150 open. D09 keeps only `plc_station_upload`.
+
+**Typed stale phase and created wave 9 IEC storage — 29 October 2026:** ([record](../verification/typed-stale-and-created-iec-20261029.md))
+- **Stale phase:** V21 keeps fully qualified program element names unique per CPU and refuses every route to a second DB with the root DB's qualified name, so `stale-db-ambiguity` is recorded as that native boundary (`local.typed.resolution-stale.20261029`); the last open lost-evidence item is closed.
+- **Created storage:** the builder's created TONR, R_TRIG and F_TRIG storage passes engineering in 14 cells (`local.typed.wave9-created-storage.engineering.20261029`), and the standard IEC effect profile was recaptured with those members (`local.typed.iec-effect-standard-wave9.20261029`). Their runtime cells stay open.
+- **Catalog 0.4.73:** no count change; matrix 1,822 bound, 166 open.
+
+**Runtime real-server Tasks 4–6 — 29 October 2026:** ([record](../verification/runtime-real-server-20261029.md))
+- **Runs:** in an operator TCP/IP window, `scripts/qualify_runtime_plcsim_tcpip.py` passed all five modes (normal, server restart, Host loss during capture, UA and web write loss) on one frozen build, `1181f33`, each with the independent oracle; login was the scratch's generated runtime user (maintainer decision). Curated as `local.runtime.plcsim-tcpip.20261029`.
+- **Fixes found natively:** TCP/IP provisioning now recognizes the empty CPU by its MAC and TLS certificate series because TIA's discovery never shows its address; PLCSIM's tag list is refreshed after a restart; a TCP/IP `GoOnline` that throws before any callback is retried once; vault users of one Host take turns instead of failing, and a busy vault reports `UaCredentialStoreBusy`.
+- **Catalog 0.4.72:** the 34 `runtime_ua_*`, `runtime_web_*`, `runtime_capture_*` and `runtime_plcsim_bind` features are verified; 402 of 450 features verified; matrix 1,822 bound, 166 open, 49 blocked, 30 deferred. C03 and D12 have no open cell; D16 keeps `runtime.physical_plc`.
+
 **MCP surface — 29 October 2026:** ([reference](../reference/mcp-surface.md))
 - **`--toolsets`:** the Host (and `New-McpConfiguration.ps1`/`Start-TiaMcp.ps1 -Toolsets`) can advertise only named tool groups. The default stays all, about 290 tools.
 - **Titles, prompts, progress:** every tool now has a title. There are four workflow prompts (`safe_change`, `project_health`, `block_test`, `diagnose_fault`). Calls that carry a progress token get a start notification and a heartbeat every 10 s.

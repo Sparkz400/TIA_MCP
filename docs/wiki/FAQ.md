@@ -16,7 +16,7 @@ No, it is pre-1.0. Offline tooling is validated in CI; live TIA Portal and PLCSI
 
 ## How do I find out what a feature supports?
 
-Ask the server: `feature_catalog` lists implementation scope, `target_capabilities` reports what the selected target supports. The [engineering coverage](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/engineering-coverage.md) reference covers native changes.
+Ask the server: `feature_catalog` lists implementation scope, `target_capabilities` reports what the selected target supports. The [tool reference](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tools.md) lists every tool with its support class. The [engineering coverage](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/engineering-coverage.md) reference covers native changes.
 
 ## What if a change fails halfway?
 

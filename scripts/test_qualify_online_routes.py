@@ -41,6 +41,28 @@ class OnlineRoutesRunnerTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             q.online_session(SESSION, "TiaMcpTest_y")
 
+    def test_only_the_upload_pin_may_answer_tls_trusted(self):
+        report = copy.deepcopy(SESSION)
+        report["onlineChallenges"][:0] = [{"type": "TlsVerificationConfiguration", "decision": "Trusted", "pinnedCertificateSha256": "a" * 64,
+                                           "tlsAuthentication": "firstUsePinnedCertificate"}] * 2
+        q.online_session(report, "TiaMcpTest_x", pin="a" * 64)
+        for pin in (None, "b" * 64):
+            with self.assertRaises(AssertionError):
+                q.online_session(report, "TiaMcpTest_x", pin=pin)
+        with self.assertRaises(AssertionError):
+            q.online_session(report, "TiaMcpTest_x", unauthenticated=True)
+
+    def test_certificate_less_tls_is_trusted_only_as_the_upload_unauthenticated_trust(self):
+        report = copy.deepcopy(SESSION)
+        report["onlineChallenges"][:0] = [{"type": "TlsVerificationConfiguration", "decision": "Trusted", "certificates": [],
+                                           "tlsAuthentication": "unauthenticated"}]
+        q.online_session(report, "TiaMcpTest_x", unauthenticated=True)
+        with self.assertRaises(AssertionError):
+            q.online_session(report, "TiaMcpTest_x")
+        report["onlineChallenges"][0]["certificates"] = [{"sha256": "a" * 64}]
+        with self.assertRaises(AssertionError):
+            q.online_session(report, "TiaMcpTest_x", unauthenticated=True)
+
     def test_an_edited_metadata_copy_keeps_its_file_name_and_leaves_the_source(self):
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)

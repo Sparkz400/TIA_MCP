@@ -45,7 +45,7 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 - [x] **Step 3 (operator, TIA UI):** Build a throwaway CPU 1511-1 PN V4.1 project at `192.168.0.1`. Activate the OPC UA server (guest access, runtime license *SIMATIC OPC UA S7-1500 small*, *automatically accept client certificates*) and the web server. Download it to a manually created TCP/IP instance.
 - [x] **Step 4 (agent):** From the Host, `runtime_ua_client_identity`, then `runtime_ua_connect` to `opc.tcp://192.168.0.1:4840/` (the trailing slash is required; see the gate record), pinning the server certificate shown in TIA's certificate manager. Then `runtime_ua_browse` and one `runtime_ua_read`. Also `runtime_web_connect` to `https://192.168.0.1`.
 - [x] **Step 5:** Record the outcome in `docs/verification/runtime-real-server-gate-<date>.md`. If either endpoint is unreachable or refused, stop here and record why. The plan below assumes both answer. Recorded in [the gate record](../verification/runtime-real-server-gate-20261028.md): OPC UA and the Web API both pass; the web login was Anonymous (web authentication disabled).
-- [ ] **Step 6 (operator):** Delete the throwaway instance and switch *Online Access* back to Softbus.
+- [x] **Step 6 (operator):** Delete the throwaway instance and switch *Online Access* back to Softbus. After the 29 October window the operator restored DHCP on the adapter and switched back to Softbus ([record](../verification/runtime-real-server-20261029.md)); the throwaway instance's deletion is not recorded.
 
 **Gate follow-up, endpoint form:**
 
@@ -120,6 +120,12 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 - Guest access cannot be set through V21 Openness (see Task 3). Either log in as the scratch's own runtime user (`TiaMcpTest_*`, generated DPAPI password; its role needs `OPCUAServerAccess`, as the Task 3 runner grants), which puts a generated credential into the Host vault, or use an operator-made seed with guest access. This is the user's call.
 - `autoAcceptClientCertificates` is settable, so the CPU can accept the Host's client certificate without `certificate_assign`.
 
+**Resolved offline (native confirmation in Step 5):**
+
+- `sim_create` writes `communicationInterface: "TCPIP"` into the download ticket (Softbus tickets stay byte-identical). Memory-card generation and credential provisioning admit by it through `SimulationNetworkAdmission`. A TCP/IP provisioning goes online through the sole PN/IE PG/PC interface whose name contains *PLCSIM Virtual Ethernet Adapter*, never another NIC; an empty CPU without an IP there gets the same documented bootstrap address (192.168.0.1/24, the owned instance only). The first TCP/IP window (29 October, run `rs_b8279c5f`) matched the route (*Siemens PLCSIM Virtual Ethernet Adapter* (1), empty before startup) but refused the empty CPU: it shows its MAC as its address (`02-C0-A8-00-0A-00`) and the series `S7-1500 (PLCSIM)`. `SimulationNetworkAdmission.EmptyStartupEndpoint` now accepts exactly that for TCP/IP; Softbus is unchanged. The second window (run `rs_a82cdf40`) assigned 192.168.0.1 and the instance read it back, but for the whole 10 s budget TIA's discovery kept showing the CPU by its MAC. TCP/IP now gets 60 s at the same sampling; if the address never appears, the last sample decides by MAC (`runtimeTargetIdentity.basis: tcpipMacIdentity`): the one `S7-1500 (PLCSIM)` device that appeared only after the owned startup, with the MAC it showed before the bootstrap, while the instance reads back exactly the bootstrap address. Before and after going online it is rechecked by MAC, and the device reached at 192.168.0.1 must present an S7-1500 TLS certificate before the credential is opened. The discovery baseline, `plc_online_compare` and `plc_station_upload` stay Softbus-only; the runner calls none of them.
+- Login: the runner uses the scratch's generated runtime user for OPC UA and the Web API (mode `local`). Its role gets `OPCUAServerAccess`, `WebReadTags`, `WebWriteTags`, `WebAllowDiagnostics` and `WebChangeOperatingMode`; the runner copies its DPAPI password into a run-owned Host vault through the credential CLI's stdin and retires it at the end. This also exercises both credential-binding tools. Guest access and operator seeds stay unused.
+- Engineering half checked natively on 29 October without PLCSIM (setup up to `sim_create`, frozen binaries): every setup change applies, the pin selection is unique (`ScratchPLC/Webserver-2`; `ScratchPLC/OPCUA-1-3` with SAN URI `urn:SIMATIC:ScratchPLC` and IP `192.168.0.1`) and the runtime user's password decrypts. It found two runner errors, fixed: `Counter` is an SCL keyword, and `webServerActive` alone fails its readback because V21 also switches the system web pages on, which the `webserver_page_set` preview does not predict; the runner names both settings.
+
 **Files:**
 - Create: `scripts/qualify_runtime_plcsim_tcpip.py`: reuses `smoke_mcp.Client` and the checks in `scripts/opcua_runtime_checks.py`; writes `verification.json` with `toolCalls` after the whole run passed
 - Create: `scripts/verify_runtime_plcsim_tcpip.py`: an independent file-only oracle over the retained artifacts
@@ -129,18 +135,20 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 - Consumes: Task 1 `communicationInterface: "TCPIP"`, Task 2 bindings, Task 3 kind, plus the existing `webserver_page_set` (`webServerActive`), `certificate_inspect`, simulation provisioning (virtual card) and every `runtime_*` tool.
 - Produces: `--mode normal`, with `--host`, `--worker`, `--sim-worker`, `--root`, `--cpu-ip 192.168.0.1`.
 
-- [ ] **Step 1: Write the failing oracle tests:** a value read through UA that differs from the PLCSIM API read is an issue; a server certificate pin taken before compile is an issue; a missing Host exit proof is an issue.
-- [ ] **Step 2:** Run `python -B scripts/test_verify_runtime_plcsim_tcpip.py`. Expected: they fail.
-- [ ] **Step 3: Implement the runner flow:**
+- [x] **Step 1: Write the failing oracle tests:** a value read through UA that differs from the PLCSIM API read is an issue; a server certificate pin taken before compile is an issue; a missing Host exit proof is an issue.
+- [x] **Step 2:** Run `python -B scripts/test_verify_runtime_plcsim_tcpip.py`. Expected: they fail.
+- [x] **Step 3: Implement the runner flow:**
   1. Owned scratch; set the CPU IP to `--cpu-ip`; turn on the web server and the OPC UA server; compile.
   2. Take the UA and web certificate pins from `certificate_inspect` after compile.
   3. Provision to a TCP/IP instance, power on, RUN, bind.
   4. UA: `client_identity`, `connect`, `browse`, `read` (compared against PLCSIM API reads of the same tags), `write` with `expected`, `status`, `subscription_*`, `capture_*`, `disconnect`.
   5. Web: `connect`, `browse`, `read`, `diagnostics`, `status`, `write`, `operating_mode` STOP→RUN, `runtime_capture_*`, `disconnect`.
   6. Exit proofs for every owned process.
-- [ ] **Step 4:** Implement the oracle; its tests pass.
-- [ ] **Step 5: Native run (TCP/IP window):** run `--mode normal` on a frozen build; the oracle passes. Then the operator switches back to Softbus.
-- [ ] **Step 6:** Commit the runner and oracle; curation follows in Task 6.
+- [x] **Step 4:** Implement the oracle; its tests pass.
+- [x] **Step 5: Native run (TCP/IP window):** run `--mode normal` on a frozen build; the oracle passes. Then the operator switches back to Softbus. Passed on 29 October on `1181f33` ([record](../verification/runtime-real-server-20261029.md)).
+- [x] **Step 6:** Commit the runner and oracle; curation follows in Task 6.
+
+As built: the runner takes `--mode`, `--host`, `--worker`, `--sim-worker`, `--root` (a short run root; the Harness refuses scratch paths over 143 characters), `--cpu-ip` and `--run-native`. The pins are the certificates whose SAN URI is the OPC UA application URI and the new certificate named *Webserver*, both from `certificate_inspect` after provisioning; a certificate a compile replaced is the stale pin, else the other server's certificate stands in, and both stale connects end `notConnected`. Every value read through UA or the Web API is retained beside the PLCSIM API read of the same tag. The oracle (`scripts/verify_runtime_plcsim_tcpip.py`) also checks each Host's and worker's exit proof and that the session stores hold only the attempts the runner opened; `verification.json` is written only after it passes. `scripts/test_qualify_runtime_plcsim_tcpip.py` drives every mode against a fake Host into the oracle.
 
 ### Task 5: Recovery modes
 
@@ -150,25 +158,27 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 - Modify: `scripts/qualify_runtime_plcsim_tcpip.py`: add `--mode host-loss-capture | server-restart | ua-write-loss | web-write-loss`
 - Test: `tests/TiaMcp.PhysicalRuntime.Tests` (the hook parses only with `--component-qualification`; unknown points are refused)
 
-- [ ] **Step 1: Write the failing tests** for the hook's option parsing and refusal.
-- [ ] **Step 2: Implement the hook.** It never fires without the explicit flag.
-- [ ] **Step 3: Implement the modes:**
+- [x] **Step 1: Write the failing tests** for the hook's option parsing and refusal.
+- [x] **Step 2: Implement the hook.** It never fires without the explicit flag.
+- [x] **Step 3: Implement the modes:**
   - `host-loss-capture`: kill the Host during a UA subscription and a web capture. A new Host reopens the committed prefix, reports `hostEndedRemoteUnknown` and refuses implicit resume. `disconnect` with `acknowledgeUnknown` releases the reservation; a fresh connect works.
   - `server-restart`: STOP, power off, power on during a live session. The changed server start time invalidates it, the capture records downtime, and nothing reconnects.
   - `ua-write-loss` and `web-write-loss`: the Host exits after sending. A new Host reports the unknown outcome and refuses a retry; an explicit read decides; the PLCSIM API read confirms.
-- [ ] **Step 4: Native runs:** each mode once on the frozen build (TCP/IP window), each with the oracle.
-- [ ] **Step 5:** Commit: `Runtime recovery modes against an owned TCP/IP PLCSIM server`.
+- [x] **Step 4: Native runs:** each mode once on the frozen build (TCP/IP window), each with the oracle. All four passed on 29 October on `1181f33`, the same build as `normal`.
+- [x] **Step 5:** Commit: `Runtime recovery modes against an owned TCP/IP PLCSIM server`.
+
+As built: `--runtime-qualification` takes one point and only beside `--component-qualification`. At the point the Host writes `runtime-interruption-marker.json` (point, Host process, write intent, `automaticReplay: false`) and exits with 74: for UA after the Write service returned, for the Web API after `PlcProgram.Write` returned, both before the readback. Each recovery mode sets up in one Host, faults in a second and recovers in a third; later Hosts adopt the instance with `sim_select` and its `creationId`. `server-restart` runs in the setup Host; the oracle accepts a gap or failed row, or a capture that ended on the failure instead of its own limit, as recorded downtime.
 
 ### Task 6: Curate, verify and document
 
-- [ ] **Step 1:** `python -B scripts/curate_evidence.py --id local.runtime.plcsim-tcpip.<date>` over every `verification.json`, with binaries for the Host, engineering worker and simulator worker.
-- [ ] **Step 2:** In the catalog, verify `runtime_plcsim_bind` and each `runtime_ua_*`, `runtime_web_*` and `runtime_capture_*` feature whose tools all passed. Leave `runtime_ua_credential_binding` and the authenticated web features unverified unless a credential run happened; see Out of scope. Bump the catalog version.
-- [ ] **Step 3:** Run `python -B scripts/release_matrix.py`, `python -B scripts/api_coverage_bindings.py refresh contracts/api-coverage/implementation-bindings.v1.json` and `python -B -m unittest discover -s scripts -p 'test_*.py'`; all pass.
-- [ ] **Step 4:** Update `docs/TODO.md`, `docs/STATUS.md`, the reference pages for the TCP/IP path, `docs/wiki/Getting-Started.md` (new prerequisites), and a verification record.
-- [ ] **Step 5:** Commit and open a PR.
+- [x] **Step 1:** `python -B scripts/curate_evidence.py --id local.runtime.plcsim-tcpip.<date>` over every `verification.json`, with binaries for the Host, engineering worker and simulator worker.
+- [x] **Step 2:** In the catalog, verify `runtime_plcsim_bind` and each `runtime_ua_*`, `runtime_web_*` and `runtime_capture_*` feature whose tools all passed. Leave `runtime_ua_credential_binding` and the authenticated web features unverified unless a credential run happened; see Out of scope. Bump the catalog version.
+- [x] **Step 3:** Run `python -B scripts/release_matrix.py`, `python -B scripts/api_coverage_bindings.py refresh contracts/api-coverage/implementation-bindings.v1.json` and `python -B -m unittest discover -s scripts -p 'test_*.py'`; all pass.
+- [x] **Step 4:** Update `docs/TODO.md`, `docs/STATUS.md`, the reference pages for the TCP/IP path, `docs/wiki/Getting-Started.md` (new prerequisites), and a verification record.
+- [x] **Step 5:** Commit and open a PR.
 
 ## Out of scope
 
 - Physical CPUs (`runtime.physical_plc`, bench B05) and other CPU or firmware profiles.
-- Authenticated sessions with project users: V21 Openness cannot set UMAC passwords. `runtime_ua_credential_binding` and authenticated web sessions need an operator-made seed archive with one test user, and a credential stored in the Windows vault by the operator. Plan that separately if guest access is not enough.
+- Authenticated sessions with operator-chosen project users. V21 Openness can create a password user: the scratch's runtime user (`TiaMcpTest_*`) gets a generated password that stays DPAPI-protected ([`OpennessSession.ScratchRuntimeUser.cs`](../../src/TiaMcp.Openness.V21/OpennessSession.ScratchRuntimeUser.cs)), and `plc_online_compare` logged in with it on 29 October ([record](../verification/native-reruns-20261029.md#new-qualifications)). What V21 cannot set is guest access (Task 3). Any other user, or a credential the operator owns, needs an operator-made seed archive and a credential the operator stores in the Windows vault. Plan that separately if the generated runtime user is not enough.
 - Trusting a specific client certificate in the CPU (instead of automatic acceptance): `certificate_assign` writes no OPC UA attributes yet.

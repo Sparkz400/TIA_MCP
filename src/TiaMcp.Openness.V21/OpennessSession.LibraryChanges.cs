@@ -44,7 +44,7 @@ namespace TiaMcp.Openness.V21
             result["changeKinds"] = new JArray(LibraryChangeKinds);
             result["supportedPlcVersionFamilies"] = new JArray(typeof(CodeBlockLibraryTypeVersion).FullName, typeof(PlcTypeLibraryTypeVersion).FullName);
             result["sourcePolicy"] = "Global-library file/archive inputs are copied/retrieved into owned working directories. Original sources and externally opened global libraries cannot be changed.";
-            result["updatePolicy"] = "Selected type must be the highest committed source default. Native update scope is the complete explicitly selected PLC. Native cleanup cannot be disabled: every existing linked PLC object requires a proven native reference path from an OB, excluding outgoing references of updated objects. Unproven reachability refuses the update before mutation. Force updates, downgrades and automatic deletion of old library versions are disabled.";
+            result["updatePolicy"] = "Selected type must be the source default and, without forceDefault, its highest committed release. Native update scope is the complete explicitly selected PLC. Native cleanup cannot be disabled: every existing linked PLC object requires a proven native reference path from an OB, excluding outgoing references of updated objects. Unproven reachability refuses the update before mutation. Explicit forceDefault=true applies a selected source default that is lower than the project default or not the highest source release (forced downgrade, per-PLC version assignment) and makes it the project default; other PLCs keep their links. V21 has no instance, block-group or software-unit update scope. Automatic deletion of old library versions is disabled.";
             result["qualification"] = "implementation_present_native_qualification_required";
             result["hmi"] = LibraryHmiCapabilities();
             result["limits"] = new JObject { ["libraries"] = 32, ["metadataEntries"] = 10000, ["pageSize"] = 200, ["dependencyNodes"] = 1000, ["selectedComponents"] = 100 };
@@ -247,18 +247,21 @@ namespace TiaMcp.Openness.V21
                 {
                     if (change.Versions.Count == 0 || change.Masters.Count != 0) throw new BridgeException("InvalidRequest", "Update requires selected type versions.");
                     var plc = SelectPlc(change.Selector);
-                    if (payload.Value<string>("updateScope") != "entireSelectedPlc") throw new BridgeException("NativeScopeTooBroad", "Native update applies to all uses in the selected PLC. Explicit updateScope=entireSelectedPlc is required.");
-                    foreach (var version in change.Versions) if (!version.IsDefault) throw new BridgeException("VersionSelectionUnsupported", "Native project update is enabled only for the selected source default; arbitrary version assignment is not inferred.");
-                    foreach (var version in change.Versions)
+                    // V21 IUpdateProjectScope is implemented only by PlcSoftware, HmiTarget and HmiSoftware.
+                    if (payload.Value<string>("updateScope") != "entireSelectedPlc") throw new BridgeException("NativeScopeTooBroad", "Native update applies to all uses in the selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit updateScope=entireSelectedPlc is required.");
+                    if (payload["forceDefault"] != null && payload["forceDefault"].Type != JTokenType.Boolean) throw new BridgeException("InvalidRequest", "forceDefault must be a boolean.");
+                    bool force = payload.Value<bool?>("forceDefault") == true;
+                    foreach (var version in change.Versions) if (!version.IsDefault) throw new BridgeException("VersionSelectionUnsupported", "Native project update applies the source default. Make the wanted committed version the source default first (library_set_default); arbitrary version assignment is not inferred.");
+                    if (!force) foreach (var version in change.Versions)
                     {
-                        if (version.TypeObject.Versions.Any(x => x.State == LibraryTypeVersionState.Committed && x.VersionNumber > version.VersionNumber)) throw new BridgeException("VersionSelectionUnsupported", "Native UpdateProject uses latest type content. The selected default must also be the highest committed source release.");
+                        if (version.TypeObject.Versions.Any(x => x.State == LibraryTypeVersionState.Committed && x.VersionNumber > version.VersionNumber)) throw new BridgeException("VersionSelectionUnsupported", "The selected source default is not the highest committed source release. Set forceDefault=true to assign this version explicitly.");
                         var installed = change.Project.ProjectLibrary.FindType(version.TypeObject.Guid);
-                        if (installed != null && installed.Versions.Any(x => x.IsDefault && x.VersionNumber > version.VersionNumber)) throw new BridgeException("VersionSelectionUnsupported", "A newer project default already exists; this adapter never silently downgrades or substitutes versions.");
+                        if (installed != null && installed.Versions.Any(x => x.IsDefault && x.VersionNumber > version.VersionNumber)) throw new BridgeException("VersionSelectionUnsupported", "A newer project default already exists; this adapter never silently downgrades. Set forceDefault=true for an explicit forced downgrade.");
                     }
                     change.Preview["updateImpact"] = LibraryProjectUpdateImpact(change, plc);
                     change.Preview["updateBaseline"] = CaptureLibraryUpdateState(change, plc);
                     change.Preview["updateCleanupGuard"] = PrepareLibraryUpdateCleanupGuard(change, plc);
-                    effects.Add(new JObject { ["action"] = "updateAllSelectedTypeUses", ["plcPath"] = plc.Path, ["forceDefault"] = false, ["deleteUnusedVersions"] = false });
+                    effects.Add(new JObject { ["action"] = "updateAllSelectedTypeUses", ["plcPath"] = plc.Path, ["forceDefault"] = force, ["deleteUnusedVersions"] = false });
                     break;
                 }
                 case "library_edit_version": case "library_release_version": case "library_discard_version": case "library_set_default": case "library_type_policy":
@@ -428,6 +431,17 @@ namespace TiaMcp.Openness.V21
         {
             if (change.Versions.Count + change.Masters.Count == 0) throw new BridgeException("InvalidRequest", "Select at least one exact type version or master copy.");
             var scope = LibraryPlcScope(change, out var plc); var budget = new ScanBudget(50000);
+            if (change.Payload["namespace"] != null)
+            {
+                // TIA does not apply a unit's namespace preset to library instances; an explicit namespace is set after creation.
+                string nameSpace = ChangeText(change.Payload, "namespace", 128);
+                if (scope.Unit == null) throw new BridgeException("TargetIncompatible", "An explicit instance namespace requires a software-unit scopePath; the PLC root has no namespaces.");
+                if (change.Masters.Count != 0 || change.Versions.Count == 0) throw new BridgeException("InvalidRequest", "An explicit namespace applies to selected type versions only, not to master copies.");
+                if (!System.Text.RegularExpressions.Regex.IsMatch(nameSpace, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$")) throw new BridgeException("InvalidRequest", "namespace must be dot-separated identifiers.");
+                change.Preview["instanceNamespace"] = new JObject { ["namespace"] = nameSpace, ["unitNamespacePreset"] = scope.Unit.NamespacePreset,
+                    ["objects"] = new JArray(change.Versions.Select(x => new JObject { ["typeName"] = x.TypeObject.Name, ["typeNamespace"] = x.TypeObject.Namespace ?? "" })),
+                    ["scope"] = "Selected roots only; created dependencies keep their type namespace and reused ones are unchanged." };
+            }
             var names = ScopeBlocks(scope, budget).Select(x => x.Item.Name).Concat(ScopeTypes(scope, budget).Select(x => x.Item.Name)).ToHashSet(StringComparer.OrdinalIgnoreCase);
             if (budget.Truncated) throw new BridgeException("DependencyUnresolved", "Target inventory exceeded its completeness budget.");
             var selectedNames = change.Versions.Select(x => x.TypeObject.Name).Concat(change.Masters.SelectMany(x => x.ContentDescriptions.Select(y => y.ContentName))).ToList();
@@ -504,6 +518,7 @@ namespace TiaMcp.Openness.V21
                 foreach (var type in ScopeTypes(scope, budget)) paths[type.Item] = type.Path;
             }
             if (budget.Truncated) throw new BridgeException("DependencyUnresolved", "Current update-use paths exceeded the complete inventory budget.");
+            bool force = change.Payload.Value<bool?>("forceDefault") == true;
             var requested = new Dictionary<Guid, LibraryTypeVersion>();
             var queue = new Queue<LibraryTypeVersion>(change.Versions);
             while (queue.Count != 0)
@@ -515,7 +530,9 @@ namespace TiaMcp.Openness.V21
                     continue;
                 }
                 if (requested.Count >= 1000) throw new BridgeException("DependencyUnresolved", "Update impact exceeds 1000 native dependency types.");
-                if (!version.IsDefault || version.TypeObject.Versions.Any(x => x.State == LibraryTypeVersionState.Committed && x.VersionNumber > version.VersionNumber))
+                // forceDefault relaxes "highest release" and "newer project default" for the selected roots only.
+                bool forcedRoot = force && change.Versions.Any(x => x.Guid == version.Guid);
+                if (!version.IsDefault || !forcedRoot && version.TypeObject.Versions.Any(x => x.State == LibraryTypeVersionState.Committed && x.VersionNumber > version.VersionNumber))
                     throw new BridgeException("VersionSelectionUnsupported", "Every updated dependency must be its highest committed source default; native exact-version substitution is forbidden.");
                 requested.Add(version.TypeObject.Guid, version);
                 foreach (var dependency in LibraryDependencyCapture.Read(version).Versions) queue.Enqueue(dependency);
@@ -524,7 +541,9 @@ namespace TiaMcp.Openness.V21
             foreach (var selected in requested.Values)
             {
                 var installed = change.Project.ProjectLibrary.FindType(selected.TypeObject.Guid);
-                if (installed != null && installed.Versions.Any(x => x.IsDefault && x.VersionNumber > selected.VersionNumber)) throw new BridgeException("VersionSelectionUnsupported", "An affected dependency already has a newer project default; native update would not satisfy the exact selection.");
+                var projectDefault = installed?.Versions.FirstOrDefault(x => x.IsDefault);
+                bool forced = force && change.Versions.Any(x => x.Guid == selected.Guid);
+                if (!forced && projectDefault != null && projectDefault.VersionNumber > selected.VersionNumber) throw new BridgeException("VersionSelectionUnsupported", "An affected dependency already has a newer project default; native update would not satisfy the exact selection.");
                 var comparisons = new JArray(); int localUses = 0;
                 if (installed != null)
                     foreach (var current in installed.Versions)
@@ -549,9 +568,11 @@ namespace TiaMcp.Openness.V21
                         catch (Exception error) { completeComparisons = false; comparisons.Add(new JObject { ["beforeVersionGuid"] = current.Guid.ToString("D"), ["comparisonAvailable"] = false, ["reason"] = error.Message }); }
                     }
                 if (localUses == 0 && change.Versions.Any(x => x.TypeObject.Guid == selected.TypeObject.Guid)) throw new BridgeException("NoMatchingUses", "A selected root type has no native uses in this PLC. Use library_copy_elements to synchronize only the library, or library_instantiate to create a new use.");
-                types.Add(new JObject { ["requested"] = LibraryVersionInfo(selected), ["affectedUseCount"] = localUses, ["scope"] = localUses == 0 ? "librarySynchronizationOnly_NoNewEngineeringInstance" : "allNativeUsesInSelectedPlc", ["nativeComparisons"] = comparisons, ["libraryVersionsEligibleForCopy"] = new JArray(selected.TypeObject.Versions.Select(LibraryVersionInfo)) });
+                types.Add(new JObject { ["requested"] = LibraryVersionInfo(selected), ["projectDefaultBefore"] = projectDefault == null ? null : LibraryVersionInfo(projectDefault),
+                    ["forceDefault"] = forced, ["defaultEffect"] = projectDefault?.Guid == selected.Guid ? "preserveDefault" : !forced ? "promoteIfHigher" : projectDefault != null && projectDefault.VersionNumber > selected.VersionNumber ? "forcedDowngrade" : "forcedDefault", ["affectedUseCount"] = localUses, ["scope"] = localUses == 0 ? "librarySynchronizationOnly_NoNewEngineeringInstance" : "allNativeUsesInSelectedPlc", ["nativeComparisons"] = comparisons, ["libraryVersionsEligibleForCopy"] = new JArray(selected.TypeObject.Versions.Select(LibraryVersionInfo)) });
             }
-            return new JObject { ["plcPath"] = plc.Path, ["affectedUses"] = uses, ["usesScopeComplete"] = true, ["types"] = types, ["noOp"] = uses.Count != 0 && uses.All(x => x.Value<string>("action") == "keepExactVersion"), ["nativeComparisonsComplete"] = completeComparisons, ["libraryScope"] = "Selected types and required native dependency types; native synchronization can copy their other committed library releases. It does not create new engineering instances when no uses exist.", ["runtimeCompatibilityVerified"] = false };
+            bool defaultsKept = types.All(x => !x.Value<bool>("forceDefault") || x.Value<string>("defaultEffect") == "preserveDefault");
+            return new JObject { ["plcPath"] = plc.Path, ["affectedUses"] = uses, ["usesScopeComplete"] = true, ["types"] = types, ["forceDefault"] = force, ["noOp"] = uses.Count != 0 && defaultsKept && uses.All(x => x.Value<string>("action") == "keepExactVersion"), ["nativeComparisonsComplete"] = completeComparisons, ["libraryScope"] = "Selected types and required native dependency types; native synchronization can copy their other committed library releases. It does not create new engineering instances when no uses exist.", ["runtimeCompatibilityVerified"] = false };
         }
 
         private static LibraryTypeFolder ResolveLibraryTypeFolder(ManagedLibrary library, string path)
@@ -678,7 +699,21 @@ namespace TiaMcp.Openness.V21
                 }
             if (uses.Select(x => x.Value<string>("objectPath")).Distinct(StringComparer.Ordinal).Count() != uses.Count)
                 throw new BridgeException("PreservationCoverageIncomplete", "The native library-use inventory contains ambiguous object links.");
-            return new JObject { ["plcPath"] = plc.Path, ["objectPaths"] = new JArray(paths.Values.OrderBy(x => x, StringComparer.Ordinal)), ["uses"] = new JArray(uses.OrderBy(x => x.Value<string>("objectPath"), StringComparer.Ordinal)), ["scopeComplete"] = true };
+            // Other PLCs share the project library, whose default a forced update changes; their links must not move.
+            var peers = new List<JObject>();
+            foreach (var entry in DeviceItems(change.Project, budget))
+            {
+                var software = entry.Item.GetService<SoftwareContainer>()?.Software as PlcSoftware;
+                if (software == null || software.Equals(plc.Software)) continue;
+                foreach (var version in versions)
+                {
+                    int count = version.FindInstances(software).Count;
+                    if (count != 0) peers.Add(new JObject { ["plcPath"] = entry.Path + "/plc/" + Segment(software.Name), ["typeGuid"] = version.TypeObject.Guid.ToString("D"), ["versionGuid"] = version.Guid.ToString("D"), ["uses"] = count });
+                }
+            }
+            if (budget.Truncated) throw new BridgeException("PreservationCoverageIncomplete", "Peer PLC library-use inventory exceeded the update-preservation budget.");
+            return new JObject { ["plcPath"] = plc.Path, ["objectPaths"] = new JArray(paths.Values.OrderBy(x => x, StringComparer.Ordinal)), ["uses"] = new JArray(uses.OrderBy(x => x.Value<string>("objectPath"), StringComparer.Ordinal)), ["scopeComplete"] = true,
+                ["peerPlcUses"] = new JArray(peers.OrderBy(x => x.Value<string>("plcPath"), StringComparer.Ordinal).ThenBy(x => x.Value<string>("versionGuid"), StringComparer.Ordinal)) };
         }
 
         private static JObject PrepareLibraryUpdateCleanupGuard(LibraryChange change, PlcSelection plc)
@@ -774,7 +809,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind != "library_update_project") return;
             var actual = CaptureLibraryUpdateState(change, SelectPlc(change.Selector));
             var baseline = (JObject)change.Preview["updateBaseline"];
-            var record = new JObject { ["phase"] = phase, ["observedUtc"] = DateTime.UtcNow, ["state"] = actual, ["verified"] = false, ["verificationScope"] = "All baseline PLC object paths remain present, with exact requested affected and unchanged unrelated native library type/version links. Arbitrary engineering content preservation is not asserted." };
+            var record = new JObject { ["phase"] = phase, ["observedUtc"] = DateTime.UtcNow, ["state"] = actual, ["verified"] = false, ["verificationScope"] = "All baseline PLC object paths remain present, with exact requested affected and unchanged unrelated native library type/version links; other PLCs keep their exact per-version use counts; a forced update makes each selected version the project default. Arbitrary engineering content preservation is not asserted." };
             if (!(change.Journal["updateReadbacks"] is JArray)) change.Journal["updateReadbacks"] = new JArray();
             ((JArray)change.Journal["updateReadbacks"]).Add(record);
             LibraryJournal(change, "verify_update_" + phase, "dispatching");
@@ -793,6 +828,12 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("PreservationMismatch", "An affected or unrelated native PLC library use differs from its approved path/type/version after phase " + phase + ".", new JObject { ["phase"] = phase, ["objectPath"] = path, ["expectedVersionGuid"] = expectedVersion, ["actual"] = observed });
             }
             if (observedUses.Count != expectedUses.Count) throw new BridgeException("PreservationMismatch", "Native update created unpreviewed PLC library uses during phase " + phase + ".");
+            if (!JToken.DeepEquals(baseline["peerPlcUses"], actual["peerPlcUses"]))
+                throw new BridgeException("PreservationMismatch", "Native update changed library uses of another PLC during phase " + phase + ".", new JObject { ["phase"] = phase, ["expected"] = baseline["peerPlcUses"].DeepClone(), ["actual"] = actual["peerPlcUses"].DeepClone() });
+            if (updated && change.Payload.Value<bool?>("forceDefault") == true)
+                foreach (var version in change.Versions)
+                    if (change.Project.ProjectLibrary.FindVersion(version.Guid)?.IsDefault != true)
+                        throw new BridgeException("PreservationMismatch", "Forced native update did not make the selected version the project default after phase " + phase + ".", new JObject { ["phase"] = phase, ["versionGuid"] = version.Guid.ToString("D") });
             record["verified"] = true;
             LibraryJournal(change, "verify_update_" + phase, "completed");
         }
@@ -1054,14 +1095,17 @@ namespace TiaMcp.Openness.V21
                 case "library_instantiate": case "library_integrate":
                     if (IsHmiLibraryTarget(payload)) return ApplyLibraryHmiAction(change.Project, payload, change.Versions.FirstOrDefault(), change.Masters.FirstOrDefault());
                     var scope = LibraryPlcScope(change, out var plc);
+                    string nameSpace = change.Preview["instanceNamespace"]?.Value<string>("namespace");
                     foreach (var version in change.Versions)
                     {
                         LibraryJournal(change, "instantiate_" + version.Guid, "dispatching"); object created;
                         if (version is CodeBlockLibraryTypeVersion block) created = scope.Blocks.Blocks.CreateFrom(block, UpdatePathsMode.ThrowIfPathsConflict);
                         else created = scope.Types.Types.CreateFrom((PlcTypeLibraryTypeVersion)version, UpdatePathsMode.ThrowIfPathsConflict);
+                        if (nameSpace != null) { if (created is PlcBlock createdBlock) createdBlock.Namespace = nameSpace; else ((PlcType)created).Namespace = nameSpace; }
                         var installed = change.Project.ProjectLibrary.FindVersion(version.Guid) ?? throw new BridgeException("VersionSelectionUnsupported", "Selected version GUID was not copied into the project library.");
                         var uses = installed.FindInstances(plc.Software).ToList();
                         if (!uses.Any(x => x.LibraryTypeInstance.Equals(created))) throw new BridgeException("VersionSelectionUnsupported", "Native result does not carry the exact requested version link.");
+                        if (nameSpace != null && (created is PlcBlock b ? b.Namespace : ((PlcType)created).Namespace) != nameSpace) throw new BridgeException("PreservationMismatch", "The created library instance does not carry the requested namespace.");
                         rows.Add(new JObject { ["object"] = LibraryObjectDescription(created), ["version"] = LibraryVersionInfo(installed), ["linkVerified"] = true });
                         LibraryJournal(change, "instantiate_" + version.Guid, "completed");
                     }
@@ -1084,10 +1128,11 @@ namespace TiaMcp.Openness.V21
                 case "library_update_project":
                     var selectedPlc = SelectPlc(change.Selector);
                     if (change.Preview["updateImpact"].Value<bool>("noOp")) { result["noOp"] = true; result["reason"] = "All selected native uses already have the exact requested version GUIDs."; break; }
+                    var forceMode = payload.Value<bool?>("forceDefault") == true ? ForceUpdateMode.ForceSetAnyUpdatedVersionAsDefault : ForceUpdateMode.SetOnlyHigherUpdatedVersionAsDefault;
                     foreach (var version in change.Versions)
                     {
                         LibraryJournal(change, "update_type_" + version.TypeObject.Guid, "dispatching");
-                        version.TypeObject.UpdateProject(selectedPlc.Software, DeleteUnusedVersionsMode.DoNotDelete, StructureConflictResolutionMode.CancelIfStructureConflicts, ForceUpdateMode.SetOnlyHigherUpdatedVersionAsDefault);
+                        version.TypeObject.UpdateProject(selectedPlc.Software, DeleteUnusedVersionsMode.DoNotDelete, StructureConflictResolutionMode.CancelIfStructureConflicts, forceMode);
                         var installed = change.Project.ProjectLibrary.FindVersion(version.Guid) ?? throw new BridgeException("VersionSelectionUnsupported", "Selected version was not copied by native update.");
                         foreach (var other in installed.TypeObject.Versions) if (other.Guid != version.Guid && other.FindInstances(selectedPlc.Software).Any()) throw new BridgeException("VersionSelectionUnsupported", "Native update retained uses at another version. Restore or inspect this outcome; no selected-version success is claimed.");
                         rows.Add(LibraryVersionInfo(installed)); LibraryJournal(change, "update_type_" + version.TypeObject.Guid, "completed");
