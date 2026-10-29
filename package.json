@@ -4,7 +4,6 @@
   "license": "Apache-2.0",
   "author": "Nico Schürmann",
   "description": "[Documentation](docs/README.md) · [Current status](docs/STATUS.md) · [Remaining TODO](docs/TODO.md)",
-  "main": "index.js",
   "directories": {
     "doc": "docs",
     "test": "tests"
