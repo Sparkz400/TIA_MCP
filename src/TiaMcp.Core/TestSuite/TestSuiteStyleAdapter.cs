@@ -30,7 +30,8 @@ public interface ITestSuiteStyleAdapter
 /// <summary>
 /// Own the worker's exclusive native access until DisposeAsync. Run invokes exactly once and returns
 /// unmodified UTF-8 NativeTestResult[] JSON. No import, SetScope, simulator, retry or cancellation route.
-/// Checkpoint must include a genuine archive and preservation evidence; Verify observes compile,
+/// Checkpoint returns one artifact per planned resource: a manifest pinning a genuine archive and its
+/// preservation baseline by SHA-256. Verify observes compile,
 /// preservation, a fresh reopened epoch and cleanup. Recovery never overwrites the original.
 /// </summary>
 public interface ITestSuiteStyleSession : IAsyncDisposable

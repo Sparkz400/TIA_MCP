@@ -196,7 +196,14 @@ namespace TiaMcp.Openness.V21
                 var preservation = Save(Path.Combine(directory, "preservation.json"), baseline);
                 string archive = Path.Combine(directory, "checkpoint.zap21");
                 project.Archive(new DirectoryInfo(directory), Path.GetFileName(archive), ProjectArchivationMode.Compressed);
-                return new JArray(Artifact(archive), preservation);
+                // The record holds one checkpoint per planned resource, so one manifest pins the archive and its baseline.
+                return new JArray(Save(Path.Combine(directory, "checkpoint.json"), new JObject { ["archive"] = Artifact(archive), ["preservation"] = preservation }));
+            }
+            private JToken Checkpointed(JToken operation, string name)
+            {
+                var checkpoints = (JArray)operation["checkpoints"];
+                if (checkpoints.Count != 1) throw new BridgeException("CheckpointRequired", "One retained checkpoint manifest is required.");
+                return StyleUiEvidence.Read(Resolve(checkpoints[0]))[name] ?? throw new BridgeException("ArtifactChanged", "The checkpoint manifest lacks its " + name + ".");
             }
             public JObject Run()
             {
@@ -257,9 +264,7 @@ namespace TiaMcp.Openness.V21
             }
             public JObject Restore(JArray destinations)
             {
-                var checkpoints = (JArray)context["operation"]["checkpoints"];
-                var archive = checkpoints.Single(c => c.Value<string>("relativePath").EndsWith(".zap21", StringComparison.Ordinal));
-                string archivePath = Resolve(archive), destination = destinations[0].Value<string>("recoveryLocation");
+                string archivePath = Resolve(Checkpointed(context["operation"], "archive")), destination = destinations[0].Value<string>("recoveryLocation");
                 if (!ProjectPathIsAbsolute(destination) || File.Exists(destination) || Directory.Exists(destination) || owner._portal.Projects.Count != 0)
                     throw new BridgeException("InvalidRecovery", "An exact absent reserved destination and empty owned instance are required.");
                 Directory.CreateDirectory(destination);

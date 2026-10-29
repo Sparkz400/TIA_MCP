@@ -86,9 +86,8 @@ namespace TiaMcp.Openness.V21
             }
             private JObject ReconcileQualification(JObject operation)
             {
-                var preservation = ((JArray)operation["checkpoints"]).SingleOrDefault(c => c.Value<string>("relativePath").EndsWith("/preservation.json", StringComparison.Ordinal));
-                if (preservation == null) throw new BridgeException("ReconciliationIncomplete", "Independent checkpoint preservation evidence is required.");
-                baseline = StyleUiEvidence.Read(Resolve(preservation));
+                if (((JArray)operation["checkpoints"]).Count == 0) throw new BridgeException("ReconciliationIncomplete", "Independent checkpoint preservation evidence is required.");
+                baseline = StyleUiEvidence.Read(Resolve(Checkpointed(operation, "preservation")));
                 string original = context["operation"]["plan"]["target"].Value<string>("projectFilePath");
                 string resource = context["operation"]["plan"]["resources"][0].Value<string>("resourceKey");
                 var originalEvidence = ReconcileProject(original, "original");
