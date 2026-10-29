@@ -39,6 +39,8 @@ VS Code 1.140.0 has passed [desktop rendering and retained-snapshot interaction 
 
 Keep screenshots and the product's MCP log with the record. Browser protocol fixtures (`browser-native.mjs`) do not substitute for this check.
 
+[`scripts/qualify_explorer_desktop.py`](../../scripts/qualify_explorer_desktop.py) runs this check in one desk session. `prepare` creates the owned scratch and a workspace whose `.vscode/mcp.json` starts the frozen Host through the runner's stdio relay, which records every message unchanged. The operator follows the printed steps in the product. `verify` then checks steps 1–3 from the recorded messages, reads the selected block with `block_read` in a fresh owned TIA, runs step 4 with its own client (no MCP Apps), and asks for what only the screen shows.
+
 ## Tools and selection
 
 Every operation is available through `project_model` with `request.action`; additive named tools expose capture, children, search, details, relationships, verify, release and export. There is no mutation action. Any future edit entry point must call the existing `change_prepare`/`change_apply` workflow and its content freshness/recovery checks.

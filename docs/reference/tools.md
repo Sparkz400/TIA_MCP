@@ -158,8 +158,8 @@ option registers or admits the tool only on a qualification Host.
 | `hmi_component_review_page` | Read retained component/HMI review evidence | shipped | hmi |  |  |
 | `hmi_inspect` | Bounded Classic and Unified HMI inspection | limited | hmi |  |  |
 | `hmi_references` | Evidence-backed HMI and PLC relationships | limited | hmi |  |  |
-| `hmi_text_list_author` | Author plain Unified text-list candidates | unqualified | hmi |  |  |
-| `hmi_text_list_generate_set` | Generate coordinated Unified text-list output sets | unqualified | hmi |  |  |
+| `hmi_text_list_author` | Author plain Unified text-list candidates | shipped | hmi |  |  |
+| `hmi_text_list_generate_set` | Generate coordinated Unified text-list output sets | limited | hmi |  |  |
 
 ## inspection
 

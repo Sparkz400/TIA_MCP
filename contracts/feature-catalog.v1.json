@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.76",
+  "catalogVersion": "0.4.79",
   "targetTiaVersions": [
     21
   ],
@@ -2986,6 +2986,48 @@
         "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1; other CPUs, firmware and TCP/IP instances are not qualified.",
         "The online download is a CPU write: change_restore recovers only the project, and the recovered copy can no longer download to the instance whose card came from the original project.",
         "OB40 stays a V21 boundary (no hardware-interrupt configuration through V21 Openness; PLCSIM answers NotSupportedByModule)."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.families.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0",
+        "firmware": "V4.1; V4.7; V4.1",
+        "sourceCommit": "556cee52b14c386ce48b846b14b08c4cc469b344",
+        "passedScope": "scripts/qualify_hardware_changes.py on a frozen Debug build of 556cee5 (artifacts/x4), 276/276 steps: the S7-1500 gates of local.hardware_changes.20261028 plus a CPU 1214C DC/DC/DC V4.7 with two SM 1221 DI16x24VDC (successor-article replacement 6ES7 221-1BH30 V1.0 to -1BH32 V2.0 and back, port link to the scratch CPU, last-module delete) and an ET 200MP IM 155-5 PN ST V4.1 station assigned to a new IO system of the added CPU 1511-1 PN (two DI 16x24VDC HF, firmware replacement V1.0/V2.0, port link to that CPU, last-module delete); every change with asserted preview, checkpoint, device compile and save (the unassigned station's add and node change deferred to the assignment), exact state deltas, fresh-Portal reopen and per-family checkpoint restore; typed refusals change nothing."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.families.20261029.json"
+      ],
+      "limitations": [
+        "Families: CPU 1511-1 PN V4.1, CPU 1214C DC/DC/DC V4.7 and one ET 200MP IM 155-5 PN ST V4.1 station on one IO controller; ET 200SP on a second controller, shared devices, HMI, drive and GSD devices are not exercised.",
+        "The ET 200MP station's hardware_add and network_configure apply without compile and save, because an unassigned IO device fails the device compile; network_io_assign compiles and saves them.",
+        "hardware_replace only to versions or successor articles that keep the addresses; acceptLoss and address-changing replacements are not exercised.",
+        "CalculatedBandwidthForCyclicIoData of the IO controller interface is computed at the device compile and not saved, so it is not compared.",
+        "Engineering only; nothing is downloaded and no physical topology is observed."
+      ]
+    },
+    {
+      "id": "local.hmi.text-list-import.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "47491ab44d6cbbf14bd4dbda83f572487f5985fa",
+        "passedScope": "Native import of Unified text-list candidates authored by hmi_text_list_author and hmi_text_list_generate_set (frozen artifacts/tl4, run q/tl4) on the build that refuses content V21 changes. The production Host (no native workers) authored the three v1 oracle variants and three boundary requests, refused every content class V21 imports but changes with its typed code (HmiTextListValueOutOfRange, HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue, HmiTextListTextUnsupported, HmiTextListNameUnsupported, HmiTextListUnresolvedText), and reopened the retained v1-v3 author and v1 set records. HmiSeeder textlist-import imported ten candidate pairs (v1, v2 Bool initial/regenerated, v3 integer initial/regenerated, both outputs of an initial and an evolved v1 set, and the v1 base that replaces an identical list) into a new owned MTP700 Unified Comfort V21.0.1.0 fixture with en-US/de-DE, screens, items, a tag, an alarm, a screen script and a documented peer list, through V21 HmiTextListComposition.Import. Every import reads back exactly through Export with the other lists unchanged; a no-change re-import of the whole export re-exports byte-identical files; the independent walk of every other HMI section is unchanged; compiler errors and warnings are unchanged by the imports and after reopen; a fresh Portal process reads equal text lists and walks after save/reopen and from the final archive, and the pre-import checkpoint restores the baseline twice without replaying an import. Five boundary candidates at the edge of what the tools accept import exactly: To/Range/From entries, signed 32-bit bounds, SingleValue 0 defaults, quotes, tab, LF, emoji, empty, U+2028/2029, soft hyphen, ZWSP, ZWJ, BOM, RLO, WJ, a 16384-character text, list names of 128 characters, Latin, umlaut, CJK, Cyrillic, Greek, Arabic, Hebrew, Hangul, Arabic-Indic digits and every allowed punctuation. Fresh Hosts reopen every author and set record with exact receipts and bytes (also through the actual-prior author and set-evolution runners)."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.20261029.json"
+      ],
+      "limitations": [
+        "The fixture's HMI compile keeps its two encrypted-transfer password errors (V21 has no public setter for that password); the gate is that imports add, remove or change no compiler error or warning, not a clean HMI compile.",
+        "Imported through the independent HmiSeeder, not a production route: no MCP tool imports or restores Unified text lists, and hmi_engineering stays behind the closed preservation gate.",
+        "The refusals cover what runs q/tl2 and q/tl3 showed V21 changes; list names use an allowlist (letters, digits, inner spaces, !&'()+,-;<=>@\\^_{|}, at most 128 characters), while text characters outside the control characters are refused only where observed. Records published before the refusals keep their meaning and still reopen, and their content is not re-qualified.",
+        "V21 export renames entries, pools all texts in one library with renumbered IDs, omits default fields, writes CRLF and leaves texts such as Off, On and Null unquoted (YAML 1.1 reads them as bool/null). Candidate library names, entry and text IDs and DefaultLanguage are not retained, so a native export never equals a candidate byte for byte.",
+        "One profile and language pair (MTP700 Unified Comfort, en-US/de-DE); no screen item consumes an imported list, and Unified PC, other devices and languages, runtime and visual behavior are not covered."
       ]
     }
   ],
@@ -6599,9 +6641,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
         ]
       },
       "prerequisites": [
@@ -6651,9 +6693,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
         ]
       },
       "prerequisites": [
@@ -6704,9 +6746,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
         ]
       },
       "prerequisites": [
@@ -6794,7 +6836,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. A CPU 1214C DC/DC/DC V4.7 with configureScratchSecurity and an ET 200MP IM 155-5 PN ST V4.1 head (applied without compile until its IO assignment, because an unassigned IO device fails the device compile) passed the same gates (local.hardware_changes.families.20261029); HMI, drive and GSD devices are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -6804,7 +6846,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6858,7 +6901,8 @@
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
           "local.remote-io.full-route.rerun.20261028",
-          "local.remote-io.lifecycle.rerun.20261028"
+          "local.remote-io.lifecycle.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6909,7 +6953,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6962,7 +7007,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -7016,7 +7062,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12743,7 +12790,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12795,7 +12843,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12838,6 +12887,7 @@
         "status": "partial",
         "limitations": [
           "One pluggable module in an existing rack; built-in and software-bearing items are refused. typeIdentifier must be an exact installed catalog identifier different from the current one.",
+          "SM 1221 DI16x24VDC 6ES7 221-1BH30-0XB0 V1.0 replaced by its successor article 6ES7 221-1BH32-0XB0 V2.0 and back in a CPU 1214C rack, and DI 16x24VDC HF firmware V1.0/V2.0 in an ET 200MP rack (local.hardware_changes.families.20261029).",
           "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
           "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
           "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
@@ -12847,7 +12897,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12994,6 +13045,7 @@
         "status": "partial",
         "limitations": [
           "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract; shared-device and multi-controller assignments remain excluded.",
+          "A second S7-1500 CPU (not the scratch CPU, selected by its plcPath) assigning an ET 200MP IM 155-5 PN ST V4.1 to a new IO system passed with exact state deltas, reopen and restore (local.hardware_changes.families.20261029); the assignment sets SharedDeviceAccessType PLC on the head's items and adds the IO-system and station system constants to the controller's PLC.",
           "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation. Shared-device/multi-controller configurations remain excluded.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
@@ -13005,7 +13057,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.remote-io.full-route.rerun.20261028",
-          "local.remote-io.lifecycle.rerun.20261028"
+          "local.remote-io.lifecycle.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -22682,12 +22735,14 @@
           "4 MiB request, 128 lists, 4096 total entries/texts, 32 languages, conservative 8 MiB per candidate and shared 512 MiB retention. Nonoverlapping ranges and unambiguous ASCII text identifiers only.",
           "Explicit v2 Bool binding generation uses exact v7 saved component/output evidence, declared translations and a retained previous candidate pair. Manual drift or relevant conflicts suppress candidates; selected retained peers stay unchanged. Original reviews and predecessor chains are revalidated; 16 predecessor and 128 MiB lineage-input limits. This does not establish native preservation or complete C01 generation.",
           "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification.",
-          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22903,12 +22958,14 @@
           "Exact predecessor/current/proposed comparisons, captured lineage, manual edits and cross-output collisions are checked before candidate publication. Conflicts suppress the whole proposed set; old records retain their semantics.",
           "Established plain TextLists/TextLibrary YAML only. Removal/rename effects are previews, not source deletion or native writes. No implicit type conversion, general SiVArc template engine, complete project coverage or native preservation qualification.",
           "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified.",
-          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

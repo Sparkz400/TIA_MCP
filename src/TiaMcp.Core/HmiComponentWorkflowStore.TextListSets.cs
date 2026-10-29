@@ -95,6 +95,7 @@ public sealed partial class HmiComponentWorkflowStore
             foreach (var conflict in child["conflicts"]!.AsArray()) Conflict(outputId + ": " + (string)conflict!);
             foreach (var gap in child["gaps"]!.AsArray()) gaps.Add(outputId + ": " + (string)gap!);
             var intent = Object(child["intent"]);
+            if (retained is null) UnifiedTextListAuthoring.RequireNativeImportable(intent);
             if (!libraries.Add((string)intent["textLibrary"]!)) Conflict("Text-library identities collide across outputs, including case variants.");
             if (!lists.Add((string)intent["lists"]![0]!["name"]!)) Conflict("Text-list identities collide across outputs, including case variants.");
             if (languages is null) { languages = intent["languages"]; defaultLanguage = (string)intent["defaultLanguage"]!; }
