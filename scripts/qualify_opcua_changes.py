@@ -35,8 +35,9 @@ EXCLUDED = {"opcua_reference_namespace_import": _CRASH, "opcua_reference_namespa
                                       "but SetPermission leaves every namespace permission unchanged and the permission attributes are read-only; "
                                       "Create of a custom role in the interface's namespace fails natively without a message."}
 V1, V2 = ROOT / "fixtures/opcua/server-interface-v1.xml", ROOT / "fixtures/opcua/server-interface-v2.xml"
+OTHER = ROOT / "fixtures/opcua/server-interface-other.xml"  # A second interface in its own namespace, deleted before the reopen.
 NAME, ROLE, UA = "TiaMcpQ", "TiaMcpRole", "http://opcfoundation.org/UA/"
-NAMESPACE = "urn:tiamcp:interface:1"  # The fixtures' namespace.
+NAMESPACE, OTHER_NAMESPACE = "urn:tiamcp:interface:1", "urn:tiamcp:interface:2"  # The fixtures' namespaces.
 SMALL = "SimaticOpcUaS71500Small"
 PERMISSIONS = ("Browse", "Read", "Write", "Call", "ReceiveEvents", "ReadRolePermissions")
 CRITERIA = {
@@ -73,7 +74,7 @@ def opcua_state(h, plc):
     require(not inspected["completeness"].get("truncated") and not warnings, "OPC UA inspection is truncated or warned: %s" % warnings)
     # TIA derives the interface namespace's rows from the interface itself: they appear on import, vanish on delete and are
     # missing from a checkpoint copy until TIA rebuilds them (29 October 2026), so they are left out of the compared state.
-    derived = lambda rows: [row for row in rows if row.get("namespaceUri") != NAMESPACE]
+    derived = lambda rows: [row for row in rows if row.get("namespaceUri") not in (NAMESPACE, OTHER_NAMESPACE)]
     state = {"opcua:namespaceAccess": derived(inspected["namespaceAccessRestrictions"])}
     for row in inspected["serverSettings"]:
         state["opcua:settings:" + row["hardwarePath"]] = {a["name"]: a.get("value") for a in row["attributes"]}
@@ -121,12 +122,12 @@ def import_payload(path, mode, name=NAME):
     return {"interfaceName": name, "mode": mode, "path": str(path.resolve()), "expectedSha256": hashlib.sha256(path.read_bytes()).hexdigest()}
 
 
-def import_(run, label, path, mode, restore=False):
-    payload = import_payload(path, mode)
-    effect = {"action": "opcua_server_interface_import", "name": NAME, "mode": mode, "sourceSha256": payload["expectedSha256"]}
-    key = interface(NAME)
+def import_(run, label, path, mode, restore=False, name=NAME):
+    payload = import_payload(path, mode, name)
+    effect = {"action": "opcua_server_interface_import", "name": name, "mode": mode, "sourceSha256": payload["expectedSha256"]}
+    key = interface(name)
     if mode == "create":
-        return run.apply(label, "opcua_server_interface_import", payload, effect, added=[key], rows={key: {"name": NAME, "enabled": True}}, restore=restore)
+        return run.apply(label, "opcua_server_interface_import", payload, effect, added=[key], rows={key: {"name": name, "enabled": True}}, restore=restore)
     before = run.current["view"][key]["exportSha256"]
     return run.apply(label, "opcua_server_interface_import", payload, effect, changed=[key], restore=restore,
                      check=lambda applied, state: require(state[key]["exportSha256"] != before, "Replacing did not change the interface content"))
@@ -138,9 +139,9 @@ def enable(run, enabled, restore=False):
                      {"action": "opcua_server_interface_enable", "name": NAME, "enabled": enabled}, changed=[key], rows={key: {"enabled": enabled}}, restore=restore)
 
 
-def delete(run, restore=False):
-    return run.apply("delete the interface", "opcua_server_interface_delete", {"interfaceName": NAME},
-                     {"action": "opcua_server_interface_delete", "name": NAME}, removed=[interface(NAME)], restore=restore)
+def delete(run, restore=False, name=NAME):
+    return run.apply("delete the interface " + name, "opcua_server_interface_delete", {"interfaceName": name},
+                     {"action": "opcua_server_interface_delete", "name": name}, removed=[interface(name)], restore=restore)
 
 
 def role_payload(run):
@@ -167,7 +168,7 @@ def setup(run):
     anonymous = next(r for r in h.tool("opcua_engineering_inspect", {"plcPath": run.plc})["roleMappings"] if r["name"] == "Anonymous")
     run.plc_namespace = next(p["namespaceUri"] for p in anonymous["namespacePermissions"] if p["namespaceUri"].startswith("urn:SIMATIC:"))
     h.report["fixture"] = {"plc": run.plc, "runtimeRole": run.runtime_role, "plcNamespace": run.plc_namespace, "opcUaServerAccessRight": rights[0],
-                           "interfaces": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (V1, V2)}}
+                           "interfaces": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (V1, V2, OTHER)}}
 
 
 def refusals(run):
@@ -240,6 +241,8 @@ def body(h):
     run.refuse_apply("opcua_server_interface_enable", "a preview made stale by a later change", stale, "StaleRevision")
     run.refuse_apply("opcua_server_interface_enable", "a wrong previewHash", {**run.prepare("disable the interface", "opcua_server_interface_enable", {"interfaceName": NAME, "enabled": False}), "previewHash": "0" * 64}, "PreviewMismatch")
     enable(run, False)
+    import_(run, "import a second interface", OTHER, "create", name="TiaMcpQ2")
+    delete(run, name="TiaMcpQ2")
     export(run)
     reopen(run)
     # Phase B: one more change per kind from the reopened state, each restored from its checkpoint.
@@ -261,4 +264,4 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "oq_", "D04 OPC UA server interfaces, role mappings and export in one owned scratch CPU 1511-1 PN V4.1", LIMITATIONS, [V1, V2]).run(body)
+    Harness(args, "oq_", "D04 OPC UA server interfaces, role mappings and export in one owned scratch CPU 1511-1 PN V4.1", LIMITATIONS, [V1, V2, OTHER]).run(body)
