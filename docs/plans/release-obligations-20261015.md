@@ -1,6 +1,6 @@
 # TIA MCP release obligations and execution order
 
-**Subsequent execution update:** This document and its JSON retain the pre-wave release audit. The user has since confirmed the old coordinator stopped; this session owns integration. Prompts 02/01/03/06 and the first AC-01 implementation slice are now delivered. Use [current handoffs](active-handoffs-20261015.md) and [wave results](../verification/ac01-planning-wave-20261015.md) for those newer states.
+**Subsequent execution update:** This document and its JSON retain the pre-wave release audit. The user has since confirmed the old coordinator stopped; this session owns integration. Prompts 02/01/03/06 and the first AC-01 implementation slice are now delivered. Use [current handoffs](../history/active-handoffs-20261015.md) and [wave results](../verification/ac01-planning-wave-20261015.md) for those newer states.
 
 **27 October 2026 update:** Host-only runs now verify 65 offline features: VCI (D01), translation review (D03), OPC UA NodeSet (D04), AutomationML (D05), GRAPH (X06), the offline diagnostic/trace/experiment/UA-diagnostic tools (D17) and the upload tools. Their native parts remain open. Each affected obligation has an `executionNotes` entry in the JSON. The [sweep record](../verification/host-only-qualification-20261027.md) also ranks the remaining offline-reachable work.
 

@@ -2,7 +2,7 @@
 
 **Later result:** The next parallel implementation wave is now recorded in [current implementation results](expansion-implementation-wave-20261015.md). The evidence and work order below describe the earlier planning checkpoint.
 
-The user confirmed the former coordinator stopped and assigned this session integration responsibility. The [current handoff](../plans/active-handoffs-20261015.md) records exact file boundaries and preserves the native TIA queue, exclusive simulator window and paused UI. No native admission was issued or exercised by this wave.
+The user confirmed the former coordinator stopped and assigned this session integration responsibility. The [current handoff](../history/active-handoffs-20261015.md) records exact file boundaries and preserves the native TIA queue, exclusive simulator window and paused UI. No native admission was issued or exercised by this wave.
 
 All feasible capabilities remain 1.0 obligations. This wave supplies four implementation-ready plans and the first functioning offline registry slice. It does **not** accept AC-01 as fully complete or promote a planned feature to implemented/qualified.
 

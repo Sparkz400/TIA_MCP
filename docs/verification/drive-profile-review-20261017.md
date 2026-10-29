@@ -87,7 +87,7 @@ read separately after push.
 
 [Workflow](../reference/drive-profile-review.md),
 [full D10 plan](../plans/expansion-plans/startdrive.md), and
-[execution queue](../plans/offline-execution-20261016.md) retain genuine captures,
+[execution queue](../history/offline-execution-20261016.md) retain genuine captures,
 installed SDK compilation, native drive identity, typed/unit/range constraints,
 engineering, telegram/TO integration, transfers, activation, device persistence,
 security, safety and runtime acceptance as open work. No native write route is

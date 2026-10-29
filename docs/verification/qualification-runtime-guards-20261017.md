@@ -89,7 +89,7 @@ remain native-handoff audit work. Current endpoint references retain project con
 do not strip it to make cross-copy comparisons pass without independent mapping proof.
 The broader script corpus still contains assertions and requires its own scope audits.
 
-Continue TO-03–12 and the [full offline queue](../plans/offline-execution-20261016.md).
+Continue TO-03–12 and the [full offline queue](../history/offline-execution-20261016.md).
 SDK compilation, genuine fixture execution, recovery/reopen and physical/runtime
 acceptance remain unverified. Historical evidence and its unavailable file bindings
 are preserved; no native qualification or release readiness is claimed.

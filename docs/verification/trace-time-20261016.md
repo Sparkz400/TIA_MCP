@@ -82,4 +82,4 @@ Hashes prove retained byte consistency, not source authenticity or native accept
 Native acquisition, clock/sample-task accuracy, original export authenticity,
 source-program freshness and physical event capture remain unverified. Historic
 reports are not rewritten or retroactively promoted. Full D17/C04 scope and the
-[44-workstream queue](../plans/offline-execution-20261016.md) remain open.
+[44-workstream queue](../history/offline-execution-20261016.md) remain open.

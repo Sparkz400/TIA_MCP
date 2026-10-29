@@ -72,7 +72,9 @@ so its record shows 0.
 - **Native path limit.** The library harness caps the scratch path at 143 characters, and TIA
   refused to archive a 167-character checkpoint path (the first combined-apply attempt). Runs
   whose artifacts sat under the main checkout's `artifacts/` failed for that reason, so native
-  runs use `D:\wp\rr`; curation still copies every report into the main store.
+  runs use `D:\wp\rr`; curation still copies every report into the main store. On 29 October
+  the working folders moved into the project as `artifacts/wp-20261028/rr`; later runs use a
+  short junction into `artifacts/` instead ([evidence README](../../evidence/README.md)).
 - **Component runner.** `qualify_plc_component.py` requires `<frozen source>/artifacts` to exist,
   and its `--output` is a directory holding `result.json`.
 - **Access run.** As in the original, the reopen comparison differs only on

@@ -524,10 +524,10 @@
     },
     {
       "rule": "generic-api-key",
-      "path": "docs/plans/completion-recheck-20261016.json",
+      "path": "docs/history/completion-recheck-20261016.json",
       "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
       "line": 1104,
-      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:docs/plans/completion-recheck-20261016.json:generic-api-key:1104",
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:docs/history/completion-recheck-20261016.json:generic-api-key:1104",
       "classification": "prose-or-assertion",
       "disposition": "non-credential-match",
       "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."
@@ -724,10 +724,10 @@
     },
     {
       "rule": "generic-api-key",
-      "path": "docs/plans/completion-audit-20261016.json",
+      "path": "docs/history/completion-audit-20261016.json",
       "commit": "29567e78a0626c5f46c0aa09221f6acb3117730e",
       "line": 1064,
-      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:docs/plans/completion-audit-20261016.json:generic-api-key:1064",
+      "fingerprint": "29567e78a0626c5f46c0aa09221f6acb3117730e:docs/history/completion-audit-20261016.json:generic-api-key:1064",
       "classification": "prose-or-assertion",
       "disposition": "non-credential-match",
       "reason": "Reviewed natural-language capability text or the missing/duplicate row-key assertion; no credential assignment."

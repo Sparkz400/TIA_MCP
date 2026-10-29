@@ -2,7 +2,7 @@
 
 This workstation has no Siemens products, SDKs or PLC simulator. None of the
 checks below establishes native engineering, runtime or release acceptance.
-The [full execution queue](../plans/offline-execution-20261016.md) remains open.
+The [full execution queue](../history/offline-execution-20261016.md) remains open.
 
 ## Changes
 

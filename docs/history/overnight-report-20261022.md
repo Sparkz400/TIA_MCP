@@ -42,7 +42,7 @@ Final focused qualification passed 54 binding checks, all 45 diagnostic groups,
 475 UA runtime checks, 93 Host/loopback checks and 43 focused Python tests.
 The rebuilt Host has zero build warnings/errors; the embedded feature catalog
 and source binding registry pass. See
-[verification](verification/diagnostic-ua-binding-20261022.md) and
+[verification](../verification/diagnostic-ua-binding-20261022.md) and
 `artifacts/overnight-20261022/` for the final receipts.
 
 The observation increment additionally passes all 46 diagnostic groups (35 report
@@ -52,51 +52,51 @@ checks), 902 real Host/loopback checks, 112 actual prior-producer replay checks 
 package passes all 53 stages. The final viewer rebuild has separate focused
 qualification: its packaged Host additionally passes 912 checks
 and its exact relocated viewer passes 129 browser/model checks, including refusal
-when diagnostic binding evidence is missing. See [observation verification](verification/diagnostic-ua-observations-20261022.md).
+when diagnostic binding evidence is missing. See [observation verification](../verification/diagnostic-ua-observations-20261022.md).
 
 The subsequent typed increment passes all 243 general managed checks (including
 156 new boundary checks), 138 typed Python tests, six UA contract tests and 64
 ECMAScript pattern checks. The Host catalog remains at 261 tools/56 mutation kinds/
 335 features. These focused checks apply to the current tree; the earlier package
 receipts apply to their recorded frozen sources. See
-[typed verification](verification/typed-text-boundaries-20261022.md).
+[typed verification](../verification/typed-text-boundaries-20261022.md).
 
 The component follow-up passes all 213 managed integration groups, 43 related
 Python tests and 50 JavaScript pattern checks. The original five planner failures
 and ten schema failures are retained. See
-[component verification](verification/component-text-boundaries-20261022.md).
+[component verification](../verification/component-text-boundaries-20261022.md).
 
 The artifact-read follow-up passes 227 component integration groups, 43 related
 Python tests and 15 exact-source .NET Framework checks. A filesystem race reproduces
 the original wrong-byte read; the same probe observes no mismatch in 20,000 fixed
-attempts. See [artifact verification](verification/component-artifact-read-20261022.md).
+attempts. See [artifact verification](../verification/component-artifact-read-20261022.md).
 
 The producer follow-up passes 245 component groups and 43 related Python tests.
 The full worker also compiles against the installed SDK with zero warnings/errors;
 it was not launched. Exact source/binary/reference hashes and verification limits
-are in [producer verification](verification/component-plan-artifacts-20261023.md).
+are in [producer verification](../verification/component-plan-artifacts-20261023.md).
 
 The Classic screen inventory increment passes 99 inspection checks, 33 model
 checks and 76 Python/contract tests. Full SDK worker and Host builds have zero
 warnings/errors; the actual Host probe uses `--no-native-workers` and exits cleanly.
 Native acceptance for added roles remains open. See
-[screen inventory verification](verification/classic-screen-inventory-20261023.md).
+[screen inventory verification](../verification/classic-screen-inventory-20261023.md).
 
 The next combined aggregate exposed a Windows Git path failure after 1,662
 Python tests (one skip), 25 Explorer checks and eight managed suites passed.
 The repair passes 123 broad Git checks, 80 actual workflow checks and focused
 long-path/repository-selection controls. The original failed aggregate and all
-probe failures remain retained. [Git path verification](verification/git-paths-20261023.md).
+probe failures remain retained. [Git path verification](../verification/git-paths-20261023.md).
 
 The library contract follow-up adds external identity/lock schemas and a bounded
 original-byte validator. Fourteen tests, 16 historical native lock receipts and
 15 extracted identity views pass. These additions postdate the repaired frozen
-runtime snapshot and have separate [verification](verification/library-observation-contracts-20261023.md).
+runtime snapshot and have separate [verification](../verification/library-observation-contracts-20261023.md).
 The next contract increment adds preview and live/recovered response envelopes,
 with 16 more tests, the 14 existing compatibility tests and 32 retained native
 response/preview pairs passing. Cross-field and recovered-state consistency are
 checked without replay or embedded-file access. Operation-specific plan/result
-payloads and inspection contracts remain open. See [change-observation verification](verification/library-change-observations-20261023.md).
+payloads and inspection contracts remain open. See [change-observation verification](../verification/library-change-observations-20261023.md).
 
 ## Next work
 

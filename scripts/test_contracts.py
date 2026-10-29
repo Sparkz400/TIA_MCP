@@ -114,6 +114,15 @@ def check_contracts():
             assert {"AC-preview", "AC-native", "AC-recovery", "AC-preserve"} <= set(feature["acceptanceCriteria"])
     errors = claim_errors(features, evidence)
     assert not errors, "Catalog claim exceeds retained evidence: " + "; ".join(errors)
+    cited = {proof for feature in features.values() for proof in feature["qualification"]["evidenceIds"]}
+    assert evidence.keys() <= cited, "Catalog evidence cited by no feature; retire it to docs/history: " + ", ".join(sorted(evidence.keys() - cited))
+    # Every curated summary stays traceable: a catalog record, or listed in a retired-records history file.
+    retired = {row["id"] for path in (ROOT / "docs/history").glob("catalog-evidence-retired-*.json")
+               for key in ("records", "summariesNeverCataloged") for row in json.loads(path.read_text(encoding="utf-8")).get(key, [])}
+    for path in (ROOT / "evidence").glob("*.json"):
+        summary = json.loads(path.read_text(encoding="utf-8"))
+        if summary.get("schema") == "tia-mcp.evidence-summary.v1":
+            assert summary["evidenceId"] in evidence.keys() | retired, "Summary in neither the catalog nor a retired list: " + path.name
     for proof in evidence.values():
         assert proof["status"] in {"passed", "failed", "blocked", "skipped"}
         assert proof["profile"] and proof["limitations"], "Evidence requires exact scope and limits"

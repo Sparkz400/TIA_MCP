@@ -10,7 +10,7 @@ compatibility. The drive v2 and technology v4 supplied workflows now retain type
 telegram/encoder observations and exact same-review/phase dependencies. Explicit v3 composite selectors and cross-domain rules are implemented; complete
 native consumers and native handoffs remain open. This contract fixes the
 offline implementation boundary for C02 and C03 in the immutable
-[44-workstream scope](../offline-scope-reconciliation-20261017.md); it does not
+[44-workstream scope](../../history/offline-scope-reconciliation-20261017.md); it does not
 replace their original release obligations or complete either workstream.
 
 ## Existing evidence to reuse

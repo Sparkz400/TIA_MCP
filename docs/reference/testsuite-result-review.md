@@ -144,4 +144,4 @@ transport envelopes are outside that structured-data budget.
 `nativeQualified`, `nativeExecutionAuthorized` and `wholeProjectHealthComplete`
 remain false. Synthetic fixtures prove this workflow's tested behavior only.
 See the [verification record](../verification/testsuite-result-review-20261016.md)
-and [full offline queue](../plans/offline-execution-20261016.md).
+and [full offline queue](../history/offline-execution-20261016.md).

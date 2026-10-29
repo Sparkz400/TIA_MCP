@@ -96,4 +96,4 @@ Hashes establish byte consistency, not publisher authenticity.
 Automatic project-health aggregation, broader alarm/bug context composition,
 supported native providers, independently observed effective scope/license,
 native build/execution/recovery, acquisition and target behavior remain open.
-The [44-workstream queue](../plans/offline-execution-20261016.md) is not complete.
+The [44-workstream queue](../history/offline-execution-20261016.md) is not complete.

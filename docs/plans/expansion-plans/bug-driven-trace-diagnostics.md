@@ -24,7 +24,7 @@ Build a diagnostic workflow that turns a reported symptom into an evidence-backe
 
 The first useful supported deliverable can rank candidates, resolve a bounded class of instances, explain each signal, generate an exact manual setup specification, import a supported exported measurement, and return a diagnostic report. Manual setup and retrieval are **partial fulfillment** of the requested native-creation workflow. A specification, polling demo, or successful creation call must never be presented as complete native trace creation and acquisition.
 
-This is a **priority planning candidate explicitly requested by the user**. The [1.0 checklist](../1.0-release-checklist-20261013.md), [TODO](../../TODO.md) and [expansion index](../expansion-prompts/README.md) do not establish it as an existing 1.0 commitment. Recommend a separately named diagnostic expansion milestone. Admitting it to 1.0 requires an explicit scope decision and its qualification gates. Existing runtime, preservation, recovery, HMI and release commitments remain intact.
+This is a **priority planning candidate explicitly requested by the user**. The [1.0 checklist](../../history/1.0-release-checklist-20261013.md), [TODO](../../TODO.md) and [expansion index](../expansion-prompts/README.md) do not establish it as an existing 1.0 commitment. Recommend a separately named diagnostic expansion milestone. Admitting it to 1.0 requires an explicit scope decision and its qualification gates. Existing runtime, preservation, recovery, HMI and release commitments remain intact.
 
 ### Audit restrictions and provenance
 
@@ -43,7 +43,7 @@ Read-only `state_5.sqlite` metadata for this workspace on 14 October identifies 
 | HMI | Historical `/root/hmi`, Noether; current STATUS/TODO and [remaining work](../hmi-remaining-work.md) | Bilingual inspection/bindings/explorer passed within scope. Clean compile, bridge archive retrieval, production mutation and native visual gates remain open. No resumed UI authorization is inferred. |
 | Libraries/I/O | Historical `/root/library_io`, Curie; retained p17n reports | native07 independent audit (`artifacts/p17n/native07-independent-audit.json`) passes configured-module lifecycle; channel writes remain unqualified. **Component07 is terminal**, contrary to in-progress STATUS/TODO wording: result (`artifacts/p17n/component-native-07/result.json`) ended 13 October 06:18:23 UTC with `tia_start: AccessDenied`, `cleanupFailure: detach, owned_process_exit`, no first-checkpoint recovery qualification. Admission file `nativeDispatched:false` is stale relative to the report. Preserve all outcomes. |
 | Regression/package | combined-validation-02 (`artifacts/p17r/combined-validation-02.json`) | Frozen `4824de5911a3472bb9e30f8264fff9d5`: 654 Python tests, one skip, 657 managed checks, 21 model/client checks, 24 browser checks; 27 simulator selftests without Siemens initialization. Existing evidence only; hosted CI and installed package unchanged. |
-| Runtime | [runtime TODO](../runtime-proof-todo.md), current STATUS/TODO | Latest full corpus remains 48/65 passing cases, 371 assertions, one isolation failure and 16 unattempted. Historical zero-address discovery, card preservation and requested runtime stop gates remain unresolved. Trace tests cannot bypass them. |
+| Runtime | [runtime TODO](../../history/runtime-proof-todo.md), current STATUS/TODO | Latest full corpus remains 48/65 passing cases, 371 assertions, one isolation failure and 16 unattempted. Historical zero-address discovery, card preservation and requested runtime stop gates remain unresolved. Trace tests cannot bypass them. |
 
 A fresh process inventory observed Portal PID 20692, Portal.Server PID 10112 and TiaMcp.Host PIDs 7728/18636/41748. These are point-in-time **unowned process** observations, not proof of available capacity, active session ownership or permission to terminate anything. No process was touched. Old PID observations and slot-release receipts cannot grant a new native window. Before a later native experiment, the coordinator must reconcile cleanup/unknown outcomes and admit an exact bounded run. No redundant VM qualification is proposed; accepted VM/SSH/recovery proof retains its demonstrated scope.
 
@@ -448,7 +448,7 @@ Selected source hashes; no Git revision is available:
 | README.md | `daf1770b564a57044b65cac5decf013306ca6f13660776156eb67edfe87efb93` |
 | docs/STATUS.md | `668455e5b6652fc9dcff78f0f53ac105fb11f52e16978627d02f8bff4c3cf302` |
 | docs/TODO.md | `c992472247e8f627155f26e94849fc6e15f3a5fba4b8bbf0e700e9bad34bafb9` |
-| docs/plans/1.0-release-checklist-20261013.md | `2481b9c8d5a32fcfd2b04be5d2d4c06517105267a0cca9d9db0bf98e8dca3ec4` |
+| docs/history/1.0-release-checklist-20261013.md | `2481b9c8d5a32fcfd2b04be5d2d4c06517105267a0cca9d9db0bf98e8dca3ec4` |
 | contracts/feature-catalog.v1.json | `2d17641027afb9535c5b04a74e072de2e68fe0eb90ec7da0b5f3e13d32dde7ac` |
 | src/TiaMcp.Host/EngineeringTools.cs | `7102b9b9691c8a555517144c77b6e7addba05fd77238af7bdf6cd19877a1f16e` |
 | src/TiaMcp.Host/SimulatorTools.cs | `b2470a51bdbaa6c8677091bff538e45419f78226716e058ea1e70d0e075645b4` |

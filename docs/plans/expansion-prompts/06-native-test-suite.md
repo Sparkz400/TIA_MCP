@@ -35,7 +35,7 @@ Start the targeted investigation with:
 - scripts/run_block_tests.py
 - docs/guides/block-testing.md
 - scripts/Test-Offline.ps1
-- docs/plans/runtime-proof-todo.md
+- docs/history/runtime-proof-todo.md
 
 These are starting points, not an exhaustive API list. Confirm names and applicability against the installed version.
 

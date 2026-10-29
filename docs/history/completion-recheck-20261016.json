@@ -385,7 +385,7 @@
         "evidenceAndSourceRefs": [
           "docs/TODO.md",
           "docs/STATUS.md",
-          "docs/plans/1.0-release-checklist-20261013.md"
+          "docs/history/1.0-release-checklist-20261013.md"
         ],
         "packages": [
           "AC-00"
@@ -707,7 +707,7 @@
           "B02"
         ],
         "evidenceAndSourceRefs": [
-          "docs/plans/runtime-proof-todo.md",
+          "docs/history/runtime-proof-todo.md",
           "artifacts/continuation-20261009/runtime06-final-audit.json",
           "artifacts/p15/programmed-runtime-01/report.json"
         ],
@@ -838,7 +838,7 @@
         ],
         "evidenceAndSourceRefs": [
           "docs/plans/library-management-plan.md",
-          "docs/plans/1.0-release-checklist-20261013.md",
+          "docs/history/1.0-release-checklist-20261013.md",
           "docs/verification/deployment-reliability-status.md"
         ],
         "packages": [

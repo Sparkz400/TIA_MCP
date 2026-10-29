@@ -101,7 +101,7 @@ native alarm relationship capture or close AL-03.
 
 [Workflow](../reference/translation-review.md#supplied-plc-alarm-instance-text-inheritance),
 [full D11 plan](../plans/expansion-plans/plc-alarms-prodiag.md), and
-[execution queue](../plans/offline-execution-20261016.md) keep genuine format and
+[execution queue](../history/offline-execution-20261016.md) keep genuine format and
 placeholder grammar, complete language/identity evidence, atomic inheritance-mode
 transitions, PLC/ProDiag lifecycle, full dependency/HMI integration, native import,
 compile/reopen/recovery and runtime acknowledgement/substitution open. This

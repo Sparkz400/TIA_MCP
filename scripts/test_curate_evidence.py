@@ -3,7 +3,7 @@ import pathlib
 import tempfile
 import unittest
 
-from audit_evidence_store import audit
+from audit_evidence_store import audit, audit_uncurated
 from curate_evidence import SCHEMA, retain, run, stored_path, tree
 
 
@@ -30,6 +30,17 @@ class CurateEvidenceTests(unittest.TestCase):
             report.write_text("changed after hashing", encoding="utf-8")
             with self.assertRaises(ValueError):
                 retain(summary, [report], store)
+
+    def test_uncurated_catalog_artifacts_must_be_in_place_or_listed_lost(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            (root / "artifacts").mkdir()
+            (root / "artifacts/kept.json").write_text("{}", encoding="utf-8")
+            catalog = {"evidence": [{"id": "old", "artifacts": ["artifacts/kept.json", "artifacts/gone.json",
+                                                                 "artifacts/absent.json", "docs/record.md"]}]}
+            result = audit_uncurated(catalog, root, {("old", "artifacts/gone.json")})
+        self.assertEqual((["old/artifacts/kept.json"], ["old/artifacts/gone.json"], ["old/artifacts/absent.json"]),
+                         (result["inPlace"], result["lost"], result["missing"]))
 
     def test_run_keeps_completion_steps_and_tool_outcomes(self):
         with tempfile.TemporaryDirectory() as directory:

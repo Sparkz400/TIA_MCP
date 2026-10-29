@@ -109,7 +109,7 @@ RequiredTechnologyObject currently resolves a case-insensitive name through an
 unbounded item scan; the read views already expose exact paths. This is part of
 TO-03 owner/identity and TO-04 lifecycle work. Continue source-bound metadata/capture
 and exact owner/service/eligibility evidence,
-then TO-04–12 and the full [44-workstream queue](../plans/offline-execution-20261016.md).
+then TO-04–12 and the full [44-workstream queue](../history/offline-execution-20261016.md).
 This repair does not enumerate CPU-supported type/version pairs, capture every service
 or child composition, add path-based mutation selection or qualify connections/motion.
 Reuse the metadata-only public SDK inspector; supplied metadata is not a current-target

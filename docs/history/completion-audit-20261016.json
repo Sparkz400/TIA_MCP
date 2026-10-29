@@ -345,7 +345,7 @@
         "evidenceAndSourceRefs": [
           "docs/TODO.md",
           "docs/STATUS.md",
-          "docs/plans/1.0-release-checklist-20261013.md"
+          "docs/history/1.0-release-checklist-20261013.md"
         ],
         "packages": [
           "AC-00"
@@ -667,7 +667,7 @@
           "B02"
         ],
         "evidenceAndSourceRefs": [
-          "docs/plans/runtime-proof-todo.md",
+          "docs/history/runtime-proof-todo.md",
           "artifacts/continuation-20261009/runtime06-final-audit.json",
           "artifacts/p15/programmed-runtime-01/report.json"
         ],
@@ -798,7 +798,7 @@
         ],
         "evidenceAndSourceRefs": [
           "docs/plans/library-management-plan.md",
-          "docs/plans/1.0-release-checklist-20261013.md",
+          "docs/history/1.0-release-checklist-20261013.md",
           "docs/verification/deployment-reliability-status.md"
         ],
         "packages": [
@@ -13432,7 +13432,7 @@
   ],
   "historicalRequirements": [
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 67,
       "historicalCheckbox": false,
       "requirement": "List every advertised tool/change kind, object family, operation, TIA update, CPU/firmware, language, scope/storage variant and HMI device/runtime profile.",
@@ -13445,14 +13445,14 @@
       "currentEvidenceRefs": [
         "docs/STATUS.md",
         "docs/TODO.md",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
         "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
       ],
       "nextAction": "Use this ledger as scope authority; assign present file/resource owners and decompose remaining operation cells. Implement AC-01-I in new files; review declaring-member versus parameter-type classification and preserve unknowns."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 69,
       "historicalCheckbox": false,
       "requirement": "For each cell, name its owner and required engineering, preservation, persistence, recovery, runtime and visual gates; attach exact evidence hashes.",
@@ -13465,14 +13465,14 @@
       "currentEvidenceRefs": [
         "docs/STATUS.md",
         "docs/TODO.md",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
         "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
       ],
       "nextAction": "Use this ledger as scope authority; assign present file/resource owners and decompose remaining operation cells. Implement AC-01-I in new files; review declaring-member versus parameter-type classification and preserve unknowns."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 71,
       "historicalCheckbox": false,
       "requirement": "Explicitly distinguish shipped support, limited support, unavailable target, unqualified implementation and deferred roadmap work. Resolve whether full library/HMI integration is promised for 1.0 before closing their plans.",
@@ -13485,14 +13485,14 @@
       "currentEvidenceRefs": [
         "docs/STATUS.md",
         "docs/TODO.md",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
         "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
       ],
       "nextAction": "Use this ledger as scope authority; assign present file/resource owners and decompose remaining operation cells. Implement AC-01-I in new files; review declaring-member versus parameter-type classification and preserve unknowns."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 74,
       "historicalCheckbox": false,
       "requirement": "Review all public contracts, including older hardware/TO/safety and inspection routes. Preserve bounded/unresolved/protected behavior and target-specific refusal tests; a selected comment or parameter edit does not qualify a family.",
@@ -13505,14 +13505,14 @@
       "currentEvidenceRefs": [
         "docs/STATUS.md",
         "docs/TODO.md",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
         "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
       ],
       "nextAction": "Use this ledger as scope authority; assign present file/resource owners and decompose remaining operation cells. Implement AC-01-I in new files; review declaring-member versus parameter-type classification and preserve unknowns."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 77,
       "historicalCheckbox": false,
       "requirement": "Reconcile the embedded catalog, support matrix, guides and qualification ledgers with the intended source/build. Candidate profiles and capture evidence must not become active support merely through a status-label change.",
@@ -13525,14 +13525,14 @@
       "currentEvidenceRefs": [
         "docs/STATUS.md",
         "docs/TODO.md",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/expansion-plans/api-coverage-and-roadmap.md",
         "docs/plans/expansion-plans/api-coverage-inventory-20261014.json"
       ],
       "nextAction": "Use this ledger as scope authority; assign present file/resource owners and decompose remaining operation cells. Implement AC-01-I in new files; review declaring-member versus parameter-type classification and preserve unknowns."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 86,
       "historicalCheckbox": false,
       "requirement": "Identify the historical zero-address PLCSIM discovery entry, or establish an independently reviewed resolution that satisfies the isolation contract. Five nonreproducing probes do not close the issue; keep the isolation guard intact.",
@@ -13544,12 +13544,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 89,
       "historicalCheckbox": false,
       "requirement": "Explain the added post-RUN card `.info` inventory and prove complete project, card and PLC preservation. The latest protected RUN diagnostic failed this gate and never reached its final full PLC comparison, despite successful cleanup.",
@@ -13561,12 +13561,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 92,
       "historicalCheckbox": false,
       "requirement": "Qualify an actual requested stop during native runtime, including active-case completion, no next-case admission, remaining-case evidence and exact cleanup. Engineering-suite stop acceptance is already a separate pass.",
@@ -13578,12 +13578,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 95,
       "historicalCheckbox": false,
       "requirement": "After native work closes, run the planned bounded numeric FC diagnostic on exact frozen inputs. Treat it as diagnosis, not a full runtime qualification.",
@@ -13595,12 +13595,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 97,
       "historicalCheckbox": false,
       "requirement": "Complete **one frozen 65-case / 358-step / 478-assertion corpus** and its independent audit. Latest full-attempt evidence is 48 passing cases and 371 assertions, one isolation failure and 16 unattempted cases; do not stitch retries together into a full pass.",
@@ -13612,12 +13612,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 101,
       "historicalCheckbox": false,
       "requirement": "Verify values/quality, identities, runtime program revision, measured timing, card restoration and exact CPU/worker/TIA cleanup; update ledgers from that run.",
@@ -13629,12 +13629,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 109,
       "historicalCheckbox": false,
       "requirement": "Finish and independently audit the already-dispatched 19-input capture, including original-source preservation, save/fresh reopen and exact cleanup.",
@@ -13652,7 +13652,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 111,
       "historicalCheckbox": false,
       "requirement": "Resolve missing captured callee templates and scoped global timer DB source provenance; audit all profile-to-native-source bindings before activation.",
@@ -13670,7 +13670,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 113,
       "historicalCheckbox": false,
       "requirement": "Complete remaining reference routes from the 38-reference packet and review the 80 unqualified route cells. These counts describe capture backlog, not a promise that every cell ships in 1.0.",
@@ -13688,7 +13688,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 116,
       "historicalCheckbox": false,
       "requirement": "Finish native duplicate-tag ambiguity, unqualified nested-UDT namespace propagation, scoped global operand encodings and dependent-DB effect cases.",
@@ -13706,7 +13706,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 118,
       "historicalCheckbox": false,
       "requirement": "For newly admitted profiles, prove real builder apply/compile, exact expected XML and untouched peers, save/fresh reopen, checkpoint recovery and recovered reopen. Keep unprofiled transitive instance-layout changes rejected.",
@@ -13724,7 +13724,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 121,
       "historicalCheckbox": false,
       "requirement": "Complete standard LAD/FBD behavior checks, numeric FC input/output/in-out/ return flow, two independent FB instances, timer cancellation/restart/completion, CTU saturation/reset and CTD/CTUD signed limits for advertised storage variants.",
@@ -13742,7 +13742,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 124,
       "historicalCheckbox": false,
       "requirement": "Resolve existing-caller insertion without changing unrelated native IDs in both languages. The current observed envelope renumbers title IDs and correctly returns `NativeIdPreservationUnsupported`; terminal insertion still needs native acceptance. A relaxation of preservation is a scope decision, not a test fix.",
@@ -13760,7 +13760,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 128,
       "historicalCheckbox": false,
       "requirement": "Bind final typed evidence to shipped profiles and binary lineage, preserving failed/stopped attempts and the distinction between archive retrieval and a successful guarded `change_restore`.",
@@ -13778,7 +13778,7 @@
       "nextAction": "Finish missing authored template/timer DB lineage, then stage exact builder qualification packets; do not recapture the completed 19 inputs."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 136,
       "historicalCheckbox": false,
       "requirement": "Run a fresh consumer installation after the corrected preview review: exact FB/UDT import, standalone FBD FC caller, instance DB, call and bindings. Native05 stopped before typed apply; do not resume its old prepared operation.",
@@ -13796,7 +13796,7 @@
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 139,
       "historicalCheckbox": false,
       "requirement": "Verify source/version GUIDs, dependency content, DB number/initialization, parameter directions and exact signal mappings against independent expectations.",
@@ -13814,7 +13814,7 @@
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 141,
       "historicalCheckbox": false,
       "requirement": "Require full compile, complete unrelated-content preservation, save and fresh-process reopen of the fully installed component.",
@@ -13832,7 +13832,7 @@
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 143,
       "historicalCheckbox": false,
       "requirement": "Recover from the fresh consumer's **first import checkpoint**, compare the complete baseline and reopen the recovered project. Audit native05's separate recovery too; earlier native02/native04 recovery evidence is already retained.",
@@ -13850,7 +13850,7 @@
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 146,
       "historicalCheckbox": false,
       "requirement": "Prove component runtime behavior before enabling production combined apply. Calling the new FC from an OB and preserving an existing caller remain separate operations with separate acceptance.",
@@ -13868,7 +13868,7 @@
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 154,
       "historicalCheckbox": false,
       "requirement": "Qualify an implementation-changing release and a breaking-interface release, including independent behavior, expected compiler errors and exact version links.",
@@ -13884,7 +13884,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 156,
       "historicalCheckbox": false,
       "requirement": "Expand FB-to-UDT dependency closure to nested UDTs, arrays and dependent FBs; test cycles, multiple PLCs/software units and references removed by an update.",
@@ -13900,7 +13900,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 158,
       "historicalCheckbox": false,
       "requirement": "Cover exact dependency reuse/no-op, same-name/different-GUID collisions, divergent content under identical identities, older/newer defaults and unsupported downgrade requests. Keep update scope explicit.",
@@ -13916,7 +13916,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 161,
       "historicalCheckbox": false,
       "requirement": "Qualify cleanup refusal for unrelated unused types, isolated cycles and incomplete reachability proof before any checkpoint or native write.",
@@ -13932,7 +13932,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 163,
       "historicalCheckbox": false,
       "requirement": "Complete edit/discard/default/type-policy, copy/publication, folder/metadata and deletion lifecycle gates, including fresh consumer use and recovery.",
@@ -13948,7 +13948,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 165,
       "historicalCheckbox": false,
       "requirement": "Exercise multiple types/instances, name/number/namespace conflicts, protected objects, pre-existing compiler diagnostics and unsaved project content.",
@@ -13964,7 +13964,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 167,
       "historicalCheckbox": false,
       "requirement": "Complete schemas and external validation for identities, dependency graphs, plans, lock receipts, operation results and integration recipes.",
@@ -13980,7 +13980,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 169,
       "historicalCheckbox": false,
       "requirement": "Close the actual native interruption and multi-resource recovery requirements in section 9; offline response-boundary tests alone are insufficient.",
@@ -13996,7 +13996,7 @@
       "nextAction": "Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 176,
       "historicalCheckbox": false,
       "requirement": "Obtain/configure a clean Classic fixture with a valid start screen and a clean Unified fixture with matching encrypted-transfer credentials. Use a supported configured template or separately resumed native editor work.",
@@ -14014,7 +14014,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 179,
       "historicalCheckbox": false,
       "requirement": "Require complete, internally consistent HMI compiler diagnostics. A success summary or zero count with native Error messages must continue to fail.",
@@ -14032,7 +14032,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 181,
       "historicalCheckbox": false,
       "requirement": "Diagnose the bridge archive-retrieval access denial and prove actual bridge retrieval plus fresh reopen. Copy inspection and independent seeder retrieval are different evidence and cannot close this gate.",
@@ -14050,7 +14050,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 184,
       "historicalCheckbox": false,
       "requirement": "Qualify final-package read/relationship responses for each advertised profile, exact owner/connection/PLC identity, partial metadata and real response contracts.",
@@ -14068,7 +14068,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 186,
       "historicalCheckbox": false,
       "requirement": "Capture a valid Classic binding grammar; add promised template/popup/slide-in/ global-screen coverage and native stale/broken-reference cases.",
@@ -14086,7 +14086,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 188,
       "historicalCheckbox": false,
       "requirement": "Add nonempty scripts with paired native formats, graphic lists/assets, translations, additional alarms and faceplate interface/type fixtures where promised. Bilingual text-list evidence is already scoped and retained.",
@@ -14104,7 +14104,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 191,
       "historicalCheckbox": false,
       "requirement": "Establish complete operation-specific preservation/dependency evidence, then qualify precise scalar/tag/property/placement/binding prepared changes, full HMI compile, save/reopen, archive recovery and recovered equality. Production writes remain unavailable until those gates pass.",
@@ -14122,7 +14122,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 195,
       "historicalCheckbox": false,
       "requirement": "Resolve remaining Classic persistence/order failures with independently justified comparisons; do not normalize arbitrary IDs, ordering or unknown data.",
@@ -14140,7 +14140,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 197,
       "historicalCheckbox": false,
       "requirement": "Qualify Classic and Unified faceplates independently: exact library type/ version GUIDs, UDT/connection/tag mappings, placement, binding and applicable create/edit/test/release/publish/fresh-consumer lifecycle.",
@@ -14158,7 +14158,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 200,
       "historicalCheckbox": false,
       "requirement": "For the full library/HMI scope, complete combined PLC/UDT/HMI install/update, changed-field/broken-binding impact, preservation and advertised runtime checks.",
@@ -14176,7 +14176,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 202,
       "historicalCheckbox": false,
       "requirement": "Exercise protected/license/optional-product/incompatible installations and native interrupted writes for advertised operations. Supply RT Professional only if it is promised; no qualified target is currently available.",
@@ -14194,7 +14194,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 205,
       "historicalCheckbox": false,
       "requirement": "Complete representative native visual and applicable runtime acceptance for advertised editing/integration. The prior native UI stop remains in force; read-only browser previews do not establish native HMI appearance.",
@@ -14212,7 +14212,7 @@
       "nextAction": "Establish clean configured Classic template and bridge recovery before production mutations; retain exact per-family findings. Resolve clean compile and bridge archive retrieval first; preserve 195 original files/76 directories evidence and nonempty resource scope."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 214,
       "historicalCheckbox": false,
       "requirement": "Complete the explicit configured-module lifecycle: assignment, exact generated server relocation, module creation/move/address edits, full two-device compile, independent configured preservation, fresh reopen, checkpoint recovery, disconnect outcome/recovery and recovered fresh reopen with exact cleanup.",
@@ -14228,7 +14228,7 @@
       "nextAction": "Do not rerun native07 by default. Select a genuinely writable reviewed channel and expand independent topology/profile coverage."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 218,
       "historicalCheckbox": false,
       "requirement": "Keep native06's passed edit gates and failed overall outcome separate. The limited lifecycle qualifier still needs native execution and independent audit.",
@@ -14244,7 +14244,7 @@
       "nextAction": "Do not rerun native07 by default. Select a genuinely writable reviewed channel and expand independent topology/profile coverage."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 220,
       "historicalCheckbox": false,
       "requirement": "Select a genuinely eligible channel/profile with an independently observed writable reviewed setting, then qualify its channel mutation and full lifecycle. The current DI's `InputDelay` is read-only; writable `ParameterSettings` is outside the reviewed adapter and cannot substitute for this gate.",
@@ -14260,7 +14260,7 @@
       "nextAction": "Do not rerun native07 by default. Select a genuinely writable reviewed channel and expand independent topology/profile coverage."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 224,
       "historicalCheckbox": false,
       "requirement": "Advertise only the qualified configured topology. A limited lifecycle pass leaves `channelWriteQualified` and `fullRemoteIoRouteQualified` false. Additional families, companion layouts and shared controllers require separate scope/evidence.",
@@ -14276,7 +14276,7 @@
       "nextAction": "Do not rerun native07 by default. Select a genuinely writable reviewed channel and expand independent topology/profile coverage."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 232,
       "historicalCheckbox": false,
       "requirement": "Declare the promised relationship providers, object scopes and traversal budgets; independently prove completeness within those bounds and visible truncation. The 1,000-function metadata pass is already done.",
@@ -14293,7 +14293,7 @@
       "nextAction": "Map each missing provider to its domain owner; retain 1000-function evidence and prepare real desktop acceptance when its host is available."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 235,
       "historicalCheckbox": false,
       "requirement": "Complete actual desktop MCP Apps host acceptance: negotiated resource loading, exact selection/tool roundtrip, stale/disconnected states and artifact fallback. Browser protocol fixtures do not establish real desktop-host compatibility.",
@@ -14310,7 +14310,7 @@
       "nextAction": "Map each missing provider to its domain owner; retain 1000-function evidence and prepare real desktop acceptance when its host is available."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 238,
       "historicalCheckbox": false,
       "requirement": "Reconcile measured native capture/detail, transport/query and rendering performance against the intended scope. Preserve existing 1k/10k/50k tree and 500-node graph measurements; fill missing warm/cold, memory and payload evidence.",
@@ -14327,7 +14327,7 @@
       "nextAction": "Map each missing provider to its domain owner; retain 1000-function evidence and prepare real desktop acceptance when its host is available."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 241,
       "historicalCheckbox": false,
       "requirement": "Verify final-package UI asset hashes, relocation, offline HTML/JSON and graph exports, exact selection and bounded impact/search/health coverage.",
@@ -14344,7 +14344,7 @@
       "nextAction": "Map each missing provider to its domain owner; retain 1000-function evidence and prepare real desktop acceptance when its host is available."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 248,
       "historicalCheckbox": false,
       "requirement": "Exercise real native worker/transport interruption around checkpoint, mutation, compile and save for advertised recoverable mutation families.",
@@ -14360,7 +14360,7 @@
       "nextAction": "Specify resource effects and no-replay semantics; extend existing journal through the coordinator; prepare one independent native interruption packet."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 250,
       "historicalCheckbox": false,
       "requirement": "Prove durable unknown/completed reconciliation after a fresh host starts, no automatic replay and refusal to proceed with unresolved native outcomes.",
@@ -14376,7 +14376,7 @@
       "nextAction": "Specify resource effects and no-replay semantics; extend existing journal through the coordinator; prepare one independent native interruption packet."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 252,
       "historicalCheckbox": false,
       "requirement": "Recover every affected project/global-library resource into verified new copies; test multi-resource consistency and fresh reopen after recovery.",
@@ -14392,7 +14392,7 @@
       "nextAction": "Specify resource effects and no-replay semantics; extend existing journal through the coordinator; prepare one independent native interruption packet."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 254,
       "historicalCheckbox": false,
       "requirement": "Cover stale previews, concurrent target changes, protected/unsupported content, unavailable services and actual cancellation/stop boundaries.",
@@ -14408,7 +14408,7 @@
       "nextAction": "Specify resource effects and no-replay semantics; extend existing journal through the coordinator; prepare one independent native interruption packet."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 256,
       "historicalCheckbox": false,
       "requirement": "Retain independent exact ownership/cleanup evidence. Existing host-fake fault checks and accepted VM SSH-loss evidence remain useful within their recorded scope; neither qualifies every newer native library/HMI operation.",
@@ -14424,7 +14424,7 @@
       "nextAction": "Specify resource effects and no-replay semantics; extend existing journal through the coordinator; prepare one independent native interruption packet."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 268,
       "historicalCheckbox": false,
       "requirement": "Qualify two permitted independent vendor distributions: one PLC package and one supported PLC/HMI package; retain original bytes, provenance and prerequisites.",
@@ -14434,14 +14434,14 @@
       ],
       "currentDisposition": "open_no_complete_acceptance_in_reviewed_current_evidence",
       "currentEvidenceRefs": [
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/verification/deployment-reliability-status.md"
       ],
       "nextAction": "Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 270,
       "historicalCheckbox": false,
       "requirement": "Qualify compatible V14–V20 library upgrades into V21 on copies, newer/ incompatible formats, companion directories, mixed packages and locked/read-only sources. This is library-format compatibility, not additional TIA host adapters.",
@@ -14451,14 +14451,14 @@
       ],
       "currentDisposition": "open_no_complete_acceptance_in_reviewed_current_evidence",
       "currentEvidenceRefs": [
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/verification/deployment-reliability-status.md"
       ],
       "nextAction": "Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 273,
       "historicalCheckbox": false,
       "requirement": "Test final-bundle interrupted/resumed transfer, reconnect, Unicode/space paths, quota/retention behavior and source preservation. Reuse accepted VM evidence where applicable; no redundant general VM rerun is required.",
@@ -14468,14 +14468,14 @@
       ],
       "currentDisposition": "open_no_complete_acceptance_in_reviewed_current_evidence",
       "currentEvidenceRefs": [
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/verification/deployment-reliability-status.md"
       ],
       "nextAction": "Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 276,
       "historicalCheckbox": false,
       "requirement": "Measure the planned 10,000-element library, 1,000-node dependency graph, 100-component plan and large/nested packages: time, memory, bytes, checkpoint cost and visible truncation. Define scoped performance budgets.",
@@ -14485,14 +14485,14 @@
       ],
       "currentDisposition": "open_no_complete_acceptance_in_reviewed_current_evidence",
       "currentEvidenceRefs": [
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/verification/deployment-reliability-status.md"
       ],
       "nextAction": "Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 279,
       "historicalCheckbox": false,
       "requirement": "Publish representative CPU/firmware, hardware/TO and optional-product combinations actually qualified; missing profiles remain visibly unsupported, blocked or unverified instead of inheriting a nearby fixture's pass.",
@@ -14502,14 +14502,14 @@
       ],
       "currentDisposition": "open_no_complete_acceptance_in_reviewed_current_evidence",
       "currentEvidenceRefs": [
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/verification/deployment-reliability-status.md"
       ],
       "nextAction": "Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 287,
       "historicalCheckbox": false,
       "requirement": "Reconcile all terminal workstream reports and independent audits. Update current summaries, including the dispatched typed packet, without rewriting failed/stopped original evidence or reviving completed historical TODOs.",
@@ -14527,7 +14527,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 290,
       "historicalCheckbox": false,
       "requirement": "Freeze the intended combined source and input/output hashes after required changes. This workspace has no Git metadata; retain a canonical source snapshot and identify the repository/ref that will supply hosted CI and release provenance.",
@@ -14545,7 +14545,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 293,
       "historicalCheckbox": false,
       "requirement": "Run required regression on that release candidate: contracts, Python/managed suites, explorer model/client/browser checks, deployment and process-lifetime guards. Existing validated builds are evidence, not a permanent moving-head pass.",
@@ -14563,7 +14563,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 296,
       "historicalCheckbox": false,
       "requirement": "Execute the wired hosted Linux explorer and Windows offline CI jobs and retain results. The workflow exists; hosted execution is currently unverified.",
@@ -14581,7 +14581,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 298,
       "historicalCheckbox": false,
       "requirement": "Build and strictly verify the immutable bundle/ZIP: manifest, resource completeness, relocation, generated external launcher/configuration, actual packaged host and both worker shutdown receipts. Keep vendor DLLs excluded.",
@@ -14599,7 +14599,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 301,
       "historicalCheckbox": false,
       "requirement": "Align product/version metadata and release notes. README/catalog still say v0.4/0.4.0 while npm packages say 1.0.0; npm metadata is not a release acceptance result. Distinguish product, protocol, schema and UI versions deliberately.",
@@ -14617,7 +14617,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 304,
       "historicalCheckbox": false,
       "requirement": "Publish exact supported/unsupported scope, prerequisites, recovery/upgrade instructions, known limitations and evidence locations. Review distribution notices and any project licensing decision if distributing outside this workspace.",
@@ -14635,7 +14635,7 @@
       "nextAction": "Keep integration checks running after real changes; perform final release qualification only when all obligations and feasibility dispositions close."
     },
     {
-      "source": "docs/plans/1.0-release-checklist-20261013.md",
+      "source": "docs/history/1.0-release-checklist-20261013.md",
       "line": 307,
       "historicalCheckbox": false,
       "requirement": "Select the verified bundle for the intended MCP installation, perform the scoped launcher/discovery smoke and record rollback/current-package identity. This audit does not deploy; the installed package is unchanged.",
@@ -15118,7 +15118,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15141,7 +15141,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15164,7 +15164,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15187,7 +15187,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15210,7 +15210,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15233,7 +15233,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15256,7 +15256,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15279,7 +15279,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15302,7 +15302,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15325,7 +15325,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15348,7 +15348,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15371,7 +15371,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15394,7 +15394,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15417,7 +15417,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15440,7 +15440,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15463,7 +15463,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15486,7 +15486,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15509,7 +15509,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15532,7 +15532,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15555,7 +15555,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15578,7 +15578,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15601,7 +15601,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15624,7 +15624,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15647,7 +15647,7 @@
         "artifacts/p17n/component-native-07/result.json",
         "artifacts/p17n/component-recovery-05/result.json",
         "artifacts/p17n/component-recovery-06/result.json",
-        "docs/plans/1.0-release-checklist-20261013.md",
+        "docs/history/1.0-release-checklist-20261013.md",
         "docs/plans/library-management-plan.md",
         "docs/plans/library-management-todo.md",
         "docs/verification/deployment-reliability-status.md"
@@ -15655,7 +15655,7 @@
       "nextAction": "Reconcile component07 exact terminal ownership/startup failure before a fresh admitted installation; retain successful earlier recovery without relabeling installation. Create exact fixture acquisition and scale manifest; reuse accepted VM evidence, scheduling only genuinely missing feature-specific gates. Continue existing library plan; close L02 component acceptance and independent version/dependency fixtures without repeating passed scopes."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 101,
       "historicalCheckbox": true,
       "requirement": "Record a post-run read-only inventory. [PLCSIM status at 16:02:27 Europe/Berlin](../../artifacts/runtime-proof-20261008/residual-sim-status-20261008T1402Z.json) showed no registered instances and host exit 0. The [process observation at 16:02:59](../../artifacts/runtime-proof-20261008/checkpoint-processes-20261008T1403Z.json) found no process with a visible executable path under the proof directory and no former supervisor PID. Its only matched TIA candidate was the Portal server started at boot, with an unavailable executable path. This limited observation does not establish all native child exits or resolve historical unknown outcomes.",
@@ -15667,12 +15667,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 102,
       "historicalCheckbox": false,
       "requirement": "Refresh exact instance/process ownership and state immediately before resuming. Do not terminate or adopt unrelated instances or processes.",
@@ -15684,12 +15684,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 103,
       "historicalCheckbox": false,
       "requirement": "Resolve `runtime-branches/value-10-mode-1`: native `sim_create` timed out without returning an identity. The old caller treated missing identity as no instance and continued. Determine whether registration occurred using durable native evidence; do not infer ownership from an ID, timestamp or matching prefix alone.",
@@ -15701,12 +15701,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 104,
       "historicalCheckbox": false,
       "requirement": "Resolve the three failed protected-card restorations: `value--10-mode-2`, `value-0-mode-2` and `value-9-mode-1`. The original cards remain retained with matching 85-file manifests. Confirm exact ownership, OFF state and handle release before any recovery. Preserve the staging/empty-card backups and helper journals; do not replay credential submission.",
@@ -15718,12 +15718,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 105,
       "historicalCheckbox": false,
       "requirement": "Reconcile the branch report-write failure at `value--10-mode-0`. A `sim_write` audit entry remains `started` without a response. The native outcome remains unproved even though persistence-before-dispatch is a plausible explanation.",
@@ -15735,12 +15735,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 106,
       "historicalCheckbox": false,
       "requirement": "Investigate the [final arrays/UDTs failure](../../artifacts/runtime-proof-20261008/arrays-final-failure-audit-20261008T172131480112Z.json), `fresh-inout-initialization`: provisioning returned `WorkerDisconnected`, and subsequent TIA detach returned `BridgeFaulted`. The helper recorded only `attemptPrepared`; its summary is empty, so later credential submission, card restoration and the exact failure phase remain unknown. Exact simulator unregistration and host exit 0 passed. Establish the interrupted native outcome and preservation evidence before further testing; a later empty registry does not settle that operation.",
@@ -15752,12 +15752,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 107,
       "historicalCheckbox": false,
       "requirement": "Establish why the singleton provisioning guard found other registered instances. Concurrent native clients were observed, but their contribution to any particular failure is not proved. Arrange a suitable exclusive test window before resuming; leave other users' work untouched.",
@@ -15769,12 +15769,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 113,
       "historicalCheckbox": false,
       "requirement": "Integrate and build the guarded filesystem move retry in [OpennessSession.SimulationProvision.cs](../../src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs) into a **new isolated build directory**, preserving the tested baseline-seventeen files. This source change is unbuilt. Seventeen source-extracted pure checks passed; native restoration remains unverified.",
@@ -15786,12 +15786,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 114,
       "historicalCheckbox": false,
       "requirement": "Verify the new process-lifetime, project-open and report-persistence behavior in [run_block_tests.py](../../scripts/run_block_tests.py) and [block_test_process.py](../../scripts/block_test_process.py). The source retains an exact owned process handle, waits for observed process exit, bounds retries to the exact project-lock error before CPU creation, and retries only permitted report-replacement errors. Process exit alone does not establish lock release.",
@@ -15803,12 +15803,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 115,
       "historicalCheckbox": false,
       "requirement": "Verify the new uncertainty gates in [block_test_runtime.py](../../scripts/block_test_runtime.py) and [block_test_executor.py](../../scripts/block_test_executor.py). Unknown creation, transport/native outcomes, failed card restoration and unresolved isolation must stop further cases after independent cleanup attempts. `--continue-on-failure` must not bypass `stopped_due_to_uncertain_runtime`. Focused pure regressions and independent review passed; the current corpus uses the earlier behavior.",
@@ -15820,12 +15820,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 116,
       "historicalCheckbox": false,
       "requirement": "Add durable native creation intent before `RegisterInstance` and an explicit exact-identity reconciliation route for registration timeouts. The new Python gate stops continuation but does not recover an instance whose identity was never returned.",
@@ -15837,12 +15837,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 117,
       "historicalCheckbox": false,
       "requirement": "Qualify native worker exit separately from host exit and connection disposal. Simulator interface disposal/Shutdown does not power off or unregister an instance, and disposing a bridge process handle does not wait for process exit.",
@@ -15854,12 +15854,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 123,
       "historicalCheckbox": false,
       "requirement": "Preserve the [timer assertion failure and independent audit](../../artifacts/runtime-proof-20261008/timers-failure-audit-20261008T135715230644Z.json): `start-elapsed-cancel-restart/elapsed` observed `Elapsed = 239 ms` against `60 ± 50 ms`. Both the output and native timer state returned 239 with good quality. The actual DUT-call separation is only bounded at approximately 90–493 ms by the retained host-call intervals, so this result does not establish a PLC timer defect.",
@@ -15871,12 +15871,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 124,
       "historicalCheckbox": false,
       "requirement": "Replace the assumption that a requested host sleep equals elapsed PLC execution time with a measured, documented timing basis. Account for transport, polling, report persistence and scheduling. Do not merely widen the tolerance until this sample passes.",
@@ -15888,12 +15888,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 125,
       "historicalCheckbox": false,
       "requirement": "Recheck cancellation, restart, completion window and reset. The first case stopped after the failed elapsed assertion; the second case was blocked at project open. These behaviors remain untested in this run. Hash and archive the revised suite as a new test scope.",
@@ -15905,12 +15905,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 129,
       "historicalCheckbox": false,
       "requirement": "Record the new source, runner, suite and binary manifests, including relevant dependencies and installed native versions. Run the required build, feature-contract and worker-lifecycle checks against that exact build. Keep concurrently edited project features in their own evidence scopes.",
@@ -15922,12 +15922,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 130,
       "historicalCheckbox": false,
       "requirement": "Rerun the fresh empty-CPU check, then a new protected baseline (next available attempt number, expected eighteen). Require RUN, typed reads/write/readback, all eight assertions, unchanged protected-card hashes and verified owned cleanup. Reuse the already authorized scoped trust policy; no blanket trust or protection disablement.",
@@ -15939,12 +15939,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 131,
       "historicalCheckbox": false,
       "requirement": "Start a fresh nine-family run only after the resource and cleanup uncertainties above are resolved. Use the corrected runner and new immutable output directory with explicit host, engineering-worker and simulator-worker paths. Do not overwrite corpus01/corpus02 or combine their unresolved histories into a pass.",
@@ -15956,12 +15956,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 132,
       "historicalCheckbox": false,
       "requirement": "Require every family/case/step/assertion in the authored manifest, including retained-state, counter boundaries, timer sequences, FB independence and array/UDT coverage. The current frozen target is 65 cases / 358 steps / 478 assertions; older 477-assertion counts are historical. Record and independently audit any further replacement before launch.",
@@ -15973,12 +15973,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 133,
       "historicalCheckbox": false,
       "requirement": "Independently check recorded native values, quality, exact identities, original/restored revisions, exports, assertions and cleanup; create a new evidence snapshot. Selected-case retries can diagnose a problem but do not qualify the full corpus.",
@@ -15990,12 +15990,12 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },
     {
-      "source": "docs/plans/runtime-proof-todo.md",
+      "source": "docs/history/runtime-proof-todo.md",
       "line": 134,
       "historicalCheckbox": false,
       "requirement": "Update the current verification/deployment documents and catalog with the final exact scope. A local pass does not qualify the deployment VM, arbitrary PLCs, untested instruction profiles or every supported data type.",
@@ -16007,7 +16007,7 @@
       "currentEvidenceRefs": [
         "artifacts/continuation-20261009/runtime06-final-audit.json",
         "artifacts/p15/programmed-runtime-01/report.json",
-        "docs/plans/runtime-proof-todo.md"
+        "docs/history/runtime-proof-todo.md"
       ],
       "nextAction": "Review exact failure evidence and design a resolving experiment; do not repeat an identical nonreproducing probe or combine case retries into a corpus pass."
     },

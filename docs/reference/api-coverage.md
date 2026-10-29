@@ -40,4 +40,4 @@ The collector bounds file count, file size, total bytes, XML nodes and XML depth
 4. Expand per-domain semantic rows and profile/availability requirements; generate human-reviewable catalog/documentation proposals. The current diff reports impacts, not an automatically applicable catalog patch.
 5. Qualify bounded native metadata probes separately. Pure registry tests do not settle licenses, service availability, mutation effects, preservation, recovery, runtime or release acceptance.
 
-See the [current wave results](../verification/ac01-planning-wave-20261015.md), [owner handoffs](../plans/active-handoffs-20261015.md) and [full coverage roadmap](../plans/expansion-plans/api-coverage-and-roadmap.md).
+See the [current wave results](../verification/ac01-planning-wave-20261015.md), [owner handoffs](../history/active-handoffs-20261015.md) and [full coverage roadmap](../plans/expansion-plans/api-coverage-and-roadmap.md).

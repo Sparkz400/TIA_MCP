@@ -109,4 +109,4 @@ unavailable historical evidence files retain their prior hashes and remain
 unverified. Full D12/X03/C03 and the complete release queue remain open.
 
 [Access workflow](../reference/access-review.md), [full D12/X03 plan](../plans/expansion-plans/web-server-access-configuration.md)
-and [execution queue](../plans/offline-execution-20261016.md).
+and [execution queue](../history/offline-execution-20261016.md).

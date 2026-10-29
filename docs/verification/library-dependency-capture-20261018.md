@@ -61,7 +61,7 @@ Compile and exercise every changed caller against the Siemens SDK and real
 library collections, including overflow, failures, stale prepared state and
 project preservation. Continue C01 exact original export/type/version association,
 complete dependency and consumer mapping, and generation/regeneration. The
-[full offline queue](../plans/offline-execution-20261016.md) and all original
+[full offline queue](../history/offline-execution-20261016.md) and all original
 44-workstream obligations remain open; this repair does not close C01.
 
 ## Full frozen verification

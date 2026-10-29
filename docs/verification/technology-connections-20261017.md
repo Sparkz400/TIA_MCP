@@ -87,7 +87,7 @@ pushed commit, hosted CI results and cleanup.
 
 ## Remaining work
 
-The [full queue](../plans/offline-execution-20261016.md) remains active. Next resolve
+The [full queue](../history/offline-execution-20261016.md) remains active. Next resolve
 native endpoint references to exact, bounded hardware/tag/block owner identities
 without promoting name-only projections, then continue TO-03–12. Other service
 families, type/CPU/firmware eligibility, connection mutation recipes, full-effect

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.68",
+  "catalogVersion": "0.4.69",
   "targetTiaVersions": [
     21
   ],
@@ -103,61 +103,6 @@
       ]
     },
     {
-      "id": "local.catalog.v03",
-      "status": "passed",
-      "profile": {
-        "bridgeVersion": "0.3.0",
-        "operation": "MCP catalog pagination, filtering and rejected invalid queries with absent native workers"
-      },
-      "artifacts": [
-        "artifacts/feature-catalog-live.json"
-      ],
-      "limitations": [
-        "Catalog reports recorded profiles only; does not probe target availability."
-      ]
-    },
-    {
-      "id": "local.layers.encoder-connected.20261008",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "CPU1511-1PN",
-        "firmware": "4.1",
-        "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
-        "technology": "TO_ExternalEncoder10.0",
-        "moduleTypeIdentifier": "OrderNumber:6ES7 551-1AB01-0AB0/V2.0",
-        "channel": {
-          "number": 0,
-          "type": "Technology",
-          "ioType": "Complex",
-          "operatingMode": 269,
-          "telegram": 83
-        },
-        "operations": [
-          "Native channel/module/dependency inspection",
-          "Sensor.InverseDirection false to true via to_parameters",
-          "Exact complete parameter-map and requested native XML readback",
-          "Guarded checkpoint recovery and recovered compilation",
-          "Read-only fresh-process reopen of original changed and recovered project copies"
-        ]
-      },
-      "artifacts": [
-        "fixtures/encoder-hardware/cpu1511-fw41-tm-posinput2-v10.json",
-        "artifacts/engineering-gap-encoder-requalified.json",
-        "artifacts/engineering-gap-encoder-native-edit-audit.json",
-        "artifacts/engineering-gap-encoder-preservation.json",
-        "artifacts/engineering-gap-evidence.json",
-        "artifacts/engineering-gap-encoder-preservation-audit.json"
-      ],
-      "limitations": [
-        "The guarded native fixture seeder supplies TM PosInput MotionControl configuration and SensorInterface.Connect(channel). This does not qualify a general MCP connection-write route or standalone connected to_create.",
-        "Setup device compilation passed with zero errors and one CPU-display password-protection warning. Changed and recovered software compilation each passed with zero errors/warnings.",
-        "The original native run remains completed:false after an explicit already-open/stale-lock reopen error. Its SHA-bound read-only continuation verifies the original process exited and both saved copies opened in distinct fresh processes, each on its first attempt; no mutation was replayed.",
-        "All 143 native parameter records, exact channel/module connection, operating mode and full saved/recovered XML were preserved. Independent before/after audit permits only the one selected Bool StartValue insertion.",
-        "Offline CPU1511 firmware4.1 and this exact TM PosInput2/TO profile only; no physical encoder, commissioning, motion, runtime behavior or arbitrary hardware qualification."
-      ]
-    },
-    {
       "id": "typed.builders.advanced-unit.20261012",
       "status": "passed",
       "profile": {
@@ -187,66 +132,6 @@
         "Exact fixtures and frozen binaries only; runtime was not run.",
         "Existing-caller insertion, remaining namespace/ambiguity cases and additional captured profiles remain separate unqualified gates.",
         "This scoped engineering evidence does not complete AC-runtime or qualify the full typed-builder feature."
-      ]
-    },
-    {
-      "id": "explorer.hmi.browser.20261012",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "date": "2026-10-12",
-        "snapshotId": "12574d3b827e474fba9c58020d05fc7f",
-        "renderer": "Current repository source hashes recorded separately from the frozen native host export",
-        "passedScope": "Six browser checks over exact unchanged native snapshot: HMI details, partial coverage, populated both-owner graph endpoints, native HMI filter and 1440/1024 browser layouts"
-      },
-      "artifacts": [
-        "artifacts/p16h/browser-native-01/browser-results.json",
-        "artifacts/p16h/browser-current-01/browser-results.json",
-        "scripts/qualify_hmi_explorer_browser.mjs"
-      ],
-      "limitations": [
-        "Original frozen export browser failure is retained; corrected current renderer was repacked from the identical verified native snapshot.",
-        "Historical read-only explorer rendering is distinct from native HMI screen visual acceptance, live freshness, operation recovery or runtime execution.",
-        "This uses project-local Playwright and the portable offline viewer; actual desktop MCP Apps host rendering remains unqualified."
-      ]
-    },
-    {
-      "id": "local.sim.startup.20261024",
-      "status": "passed",
-      "profile": {
-        "simulatorVersion": 8,
-        "operation": "Fresh empty CPU lifecycle through actual MCP",
-        "cpuType": "CPU1511",
-        "networkMode": "Softbus",
-        "actions": [
-          "powerOn",
-          "powerOff"
-        ],
-        "observedStates": [
-          "Off",
-          "Stop",
-          "Off"
-        ],
-        "programDownloaded": false,
-        "binarySha256": {
-          "TiaMcp.Core.dll": "81263001004b9daf8a8881bbdd5ca282b57ca7d9cf01d5c089923971c031debd",
-          "TiaMcp.Host.dll": "ebddf2ab88d437449a02d305faaa6e1f749a39aff744f1b5aab9897b186e6960",
-          "TiaMcp.Simulator.V8.exe": "b437f5aff4660279775224ba9688382d255b9dcd504ee8b624bc8c3eb89fe52b"
-        },
-        "harnessSha256": "0fb9c1ca394e005c8af0c3a62c3d65e7a971d8f23ea973754a52ae75f18e9992",
-        "resultSha256": "7675016ef79859510879128c2b52b69c9c706bc59a9309c43514ba59c331770f"
-      },
-      "artifacts": [
-        "artifacts/p24-simstate04/request.json",
-        "artifacts/p24-simstate04/startup.json",
-        "artifacts/p24-simstate04/result.json",
-        "artifacts/p24-simstate04/owned-job-terminal.json",
-        "docs/verification/simulator-startup-20261024.md"
-      ],
-      "limitations": [
-        "One fresh empty local CPU only; no TIA project, discovery, download, RUN, program I/O or requested-stop qualification.",
-        "Exact retained n24 binaries; current catalog metadata is embedded separately and is not part of this native run.",
-        "Original non-breakaway job and captured handles exited normally; no brokered/alternate-parent or individual ephemeral-process guarantee."
       ]
     },
     {
@@ -473,23 +358,6 @@
       ]
     },
     {
-      "id": "local.sim.state.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "e7497e5426a11cc4e526fefe6a5be1a10ec25c8d",
-        "passedScope": "scripts/validate_milestones.py with simulation and --trust-owned-empty-cpu-certificate on a new owned TIA V21 scratch project: full engineering phase, discovery baseline, owned CPU1511, download, generated-state save, runtime credential provisioning, power-on (STOP), run (RUN), stimulus test passed, then sim_state stop (STOP) and powerOff (OFF), with OFF confirmed independently by a fresh sim_select through a new interface, owned release and detach."
-      },
-      "artifacts": [
-        "evidence/local.sim.state.20261024.json"
-      ],
-      "limitations": [
-        "One scratch fixture and one stimulus scenario; the frozen 65-case corpus covers broader runtime behavior.",
-        "safety_inspect is unsupported on the non-safety scratch CPU and not covered."
-      ]
-    },
-    {
       "id": "local.explorer.relationship-scope.20261024",
       "status": "passed",
       "profile": {
@@ -561,166 +429,6 @@
       ]
     },
     {
-      "id": "local.plc_component.install.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "1e8ec3d2cea6a38d3cbb800470511b4ee0aa318c",
-        "passedScope": "scripts/qualify_plc_component.py --run-native (author_new_source): fresh owned de-DE scratch authors TiaMcpComponentState UDT and TiaMcpComponentGate FB (simulation-capable), releases 1.0.0, publishes and archives; fresh owned consumer imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 (first available DB2, AutoNumber=false) and standalone FBD FC TiaMcpComponentCaller with call and Enable/Active tag bindings, full compile and save; complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
-      },
-      "artifacts": [
-        "evidence/local.plc_component.install.20261024.json"
-      ],
-      "limitations": [
-        "Qualification-only route; production combined library_integrate apply stays disabled.",
-        "Standalone new FC caller only; existing-caller installation is covered separately by local.plc_component.existing_caller.20261025.",
-        "Storage is the captured component04 profile, bound by complete installed FB/UDT content equality for a freshly authored source; no other FB layouts.",
-        "native04/native05 artifacts are not on this machine; source reuse and the native05 recovery audit were not run."
-      ]
-    },
-    {
-      "id": "local.plc_component.runtime.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "1e8ec3d2cea6a38d3cbb800470511b4ee0aa318c",
-        "passedScope": "scripts/component_runtime.py --run-native on the c09 installation: saved installed project proven equal to its fresh-reopen snapshot, simulation-capable compilation enabled as its own change, OB1 Main call to TiaMcpComponentCaller as a separate reviewed source_upsert changing only OB1, then fresh owned PLCSIM Advanced V8 instance with verified card, generated-state save, scratch credential provisioning (owned empty-CPU trust) and restored-card check; ComponentEnable true/false/true/false drives ComponentActive on every edge. r05 continues r04 and r03 by recorded hash from the exact post-OB snapshot."
-      },
-      "artifacts": [
-        "evidence/local.plc_component.runtime.20261024.json"
-      ],
-      "limitations": [
-        "Wall-clock polling, not scan-accurate; one component (Bool Enable/Active) on CPU1511.",
-        "OB insertion is a separate operation with its own acceptance; it is not part of component installation.",
-        "r03 stopped at the CPU configuration password and r04 at an unloaded simulator tag list; both harness gaps were fixed and r05 continued from the same saved post-OB project."
-      ]
-    },
-    {
-      "id": "local.remote-io.full-route.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "47e295cf86ade4d98a5997014dfbe67bc8e9f238",
-        "passedScope": "scripts/qualify_remote_io.py --scope full --module ai on a new owned TIA V21 scratch project: CPU 1511-1 PN V4.1 plus catalog-selected ET 200SP IM 155-6 PN ST V6.4 and AI 4xU/I 2-wire ST (6ES7 134-6HD01-0BA1 V2.0). All ten gates passed, each with full two-device compile, complete diagnostics and strict configured-hardware preservation: controller assignment with the explicit generated server-module contract, server relocation, AI creation, slot move, input address change, reviewed channel change Smoothing None(0) to Weak(1) on analog input channel 0 (native ReadWrite, V21 enum Siemens.Engineering.HW.Smoothing, exact typed readback), fresh TIA/worker reopen with exact compiled-manifest equality, address checkpoint recovery, disconnect with an actual native CompileFailed outcome and in-session checkpoint recovery, and recovered fresh reopen. channelWriteQualified and fullRemoteIoRouteQualified true. Owned Portal, worker and Host exits verified."
-      },
-      "artifacts": [
-        "evidence/local.remote-io.full-route.20261024.json"
-      ],
-      "limitations": [
-        "Only the Smoothing channel setting is reviewed for channel writes, with the ET 200SP levels None/Weak/Medium/Strong; OperatingType, OperatingRange and InterferenceFrequencySuppression stay outside the allowlist.",
-        "One IM/AI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
-      ]
-    },
-    {
-      "id": "local.remote-io.lifecycle.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "402e38ed45aac7360593a53aec288e7245d4a09b",
-        "passedScope": "scripts/qualify_remote_io.py --scope configured-module-lifecycle --module di on a new owned TIA V21 scratch project: CPU 1511-1 PN V4.1 plus catalog-selected ET 200SP IM 155-6 PN ST V6.4 and DI 8x24VDC ST (6ES7 131-6BF01-0BA0). All nine gates passed, each with full two-device compile, complete diagnostics and strict configured-hardware preservation: controller assignment with the explicit generated server-module contract, explicit server relocation, DI creation, DI slot move, input address change, fresh TIA/worker reopen with exact compiled-manifest equality, address checkpoint recovery, disconnect with an actual native CompileFailed outcome and in-session checkpoint recovery, and recovered fresh reopen. Owned Portal, worker and Host exits verified."
-      },
-      "artifacts": [
-        "evidence/local.remote-io.lifecycle.20261024.json"
-      ],
-      "limitations": [
-        "Limited configured-module lifecycle profile only: channelWriteQualified and fullRemoteIoRouteQualified are false; the DI channels expose InputDelay as native read-only and no channel mutation occurred.",
-        "One IM/DI family, one controller, one connector; no shared-device, multi-controller, other companion layouts, runtime or physical wiring."
-      ]
-    },
-    {
-      "id": "local.library_releases.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
-        "passedScope": "scripts/qualify_library_release_changes.py on build 4687b82 (frozen D:/lcq/b5), owned TIA V21 scratch projects: FB type 1.0.0, implementation-changing 1.1.0 (negated output) and breaking-interface 2.0.0 (output Active renamed Ready) created from documents in one native type identity with distinct version GUIDs; released exports match independently authored expectations; consumer updated 1.0.0 -> 1.1.0 compiles with unrelated native exports unchanged; 2.0.0 update fails compilation at the stale caller Main ('The formal parameter Active is invalid') without saving; its admission is reconciled in a fresh session; the checkpoint is restored into a new location and the unsaved original reopened, both linked to exactly 1.1.0. All 61 retained library observations (19 original-byte lock receipts) validate against the library schemas."
-      },
-      "artifacts": [
-        "evidence/local.library_releases.20261024.json"
-      ],
-      "limitations": [
-        "Behavior is asserted from native exports (body and interface), not executed on a CPU or PLCSIM.",
-        "Caller migration together with a breaking update is not offered; the breaking case is qualified as an expected compile failure plus recovery.",
-        "One PLC, standard groups; no software units, protected/F types or runtime."
-      ]
-    },
-    {
-      "id": "local.library_releases.20261026",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "bc974fce72e7ca769cc39a2e0257792e36a5368f",
-        "passedScope": "scripts/qualify_library_release_changes.py at bc974fc on build da24990 (frozen D:/lrc/b9, package tia-mcp-v21_20261026_183316_d73b436e), owned TIA V21 scratch projects and fresh owned PLCSIM Advanced V8 CPU1511 instances: FB type 1.0.0, implementation-changing 1.1.0 (negated output, same interface) and breaking 2.0.0 (output Active renamed Ready) in one native type identity with distinct version GUIDs, authored with simulation support; released exports and both instance DBs match independently authored expectations at every stage. Consumer at 1.0.0 runs the authored truth table on PLCSIM (probe output, probe instance output, Main's instance output and UDT field); updated to exactly 1.1.0 it compiles, keeps both instance DB interfaces and unrelated native exports, and runs the inverted truth table. The 2.0.0 update fails compilation at exactly the stale callers Main (OB1) and TiaMcpReleaseProbe_Cycle (OB123) ('The formal parameter Active is invalid'), reaches no unrelated block and is not saved; its admission is returned; the checkpoint restores to a new location and the unsaved original reopens, both at exactly 1.1.0 with unrelated content unchanged. A fresh consumer at exactly 2.0.0 with both callers adapted to Ready compiles clean, exposes no stale Active member and runs the 2.0.0 truth table. 105/105 steps; all 67 retained library observations (21 original-byte lock receipts) validate against the library schemas."
-      },
-      "artifacts": [
-        "evidence/local.library_releases.20261026.json"
-      ],
-      "limitations": [
-        "The FB is stateless: the truth table is asserted; instance data retention across an update and re-download is not.",
-        "Caller migration together with a breaking update is not offered (project-library updates require compile=true); adapted callers are qualified in a fresh 2.0.0 consumer, not by migrating the failed project.",
-        "One PLC, standard groups, PLCSIM only; no software units, protected/F types, physical CPU or crash injection."
-      ]
-    },
-    {
-      "id": "local.library_dependencies.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
-        "passedScope": "scripts/qualify_library_dependencies.py on build 4687b82: nested UDT (member and Array[0..2]) <- FB <- FB (multi-instance) closure compared with an independently authored graph for 1.0.0 and for 1.1.0 after the Child reference is removed; publishing the root carries its exact closure; installed exact dependency reused (identical version metadata, preview creates only the missing objects); two instance DBs keep one exact link; exact-version update is a no-op; refusals before mutation for a non-default older version, a removed reference that would strand Child (LibraryUpdateCleanupRisk), a downgrade below a newer project default, a same-name different-GUID dependency and a same-name unlinked dependency; fresh reopen keeps links and default. All 64 retained observations validate."
-      },
-      "artifacts": [
-        "evidence/local.library_dependencies.20261024.json"
-      ],
-      "limitations": [
-        "One PLC with standard groups; multiple PLCs and software units are not exercised.",
-        "Siemens' version comparison covers metadata only; divergent content under an identical version GUID is not constructible through the public API.",
-        "No runtime execution, protected/F types or crash injection."
-      ]
-    },
-    {
-      "id": "local.library_lifecycle.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
-        "passedScope": "scripts/qualify_library_lifecycle.py on build 4687b82: edit then discard restores the released link; discard of a committed version refused; malformed and mixed type-policy flags refused before mutation; DoNotUse blocks publication; read-only SetForUpdate on a PLC data type refused (AttributeNotWritable) instead of half-applying; type folders created, renamed and deleted with duplicate and root refusals; publication into an existing global library; master copy creation and duplicate refusal; deletion refused for default/used and non-default global versions, permitted for an unused non-default project version; fresh consumer instantiates the final generation without block-number collisions; the master-copy deletion checkpoint is restored into a new location. All 77 retained observations validate."
-      },
-      "artifacts": [
-        "evidence/local.library_lifecycle.20261024.json"
-      ],
-      "limitations": [
-        "Releases 1.1.0 and 1.2.0 reuse the original FB document; they are lifecycle generations, not behavior changes.",
-        "Folder moves are not offered; folders are created, renamed and deleted empty.",
-        "Version deletion is qualified only in project libraries."
-      ]
-    },
-    {
-      "id": "local.library_interruption.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "861e7f9916ff3d591e8e534ce08b06c028d055d1",
-        "passedScope": "scripts/qualify_library_interruption.py on build 48d4e38: (1) a multi-resource library_create_master_copy (project checkpoint plus writable global library) has its worker killed while compiling; a fresh host reports outcome_unknown from the durable journal, a fresh owned session refuses replay, the shared admission is reconciled in that fresh session, and change_restore retrieves both resources into new locations: the recovered library holds only the pre-change master copy and the project holds its blocks; a repeated restore is an idempotent readback. (2) library_create_type has its worker killed while archiving its checkpoint; after reconciliation restore is refused because no checkpoint completed, the journal proves the native mutation never dispatched, and the saved original reopens without the type."
-      },
-      "artifacts": [
-        "evidence/local.library_interruption.20261024.json"
-      ],
-      "limitations": [
-        "Two interruption points (compile and checkpoint archive); kills during native mutation and save are not exercised.",
-        "The original project and library after the compile-stage kill are left for inspection; only recovered copies are verified."
-      ]
-    },
-    {
       "id": "local.library_upgrades.20261024",
       "status": "passed",
       "profile": {
@@ -739,58 +447,6 @@
       ]
     },
     {
-      "id": "local.library_vendor.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "d6c06ab73aea443b13c1a3fc9b6723599758b99e",
-        "passedScope": "scripts/qualify_library_vendor.py on build 48d4e38 with receipt-verified downloads: PracticalSeries PAL (practicalseries/PS2001-pal-software at e46b222, 582,837 bytes, MIT) and DMC Siemens Open Library 19.0 (124,287,921 bytes, MIT). Both stage against their receipts and classify (PAL: 55 SimaticML sources; DMC: five V19 global-library archives plus documentation and a nested Windows toolbox that is never run). All five DMC V19 archives (PLC 277, Comfort 334, Professional 332, Unified 343 and full 455 versions) upgrade into V21 on owned copies with every version committed and 22 elements of products absent from this installation listed as unavailable; the upgraded PLC library re-archives, reopens with identical identities, and the dependency-free data type mb_station_block_udt instantiates into a fresh project with an exact native link. TIA V21 refuses PAL's SimaticML ('The engineering version V16 ... is not supported') without changing the PLC."
-      },
-      "artifacts": [
-        "evidence/local.library_vendor.20261024.json"
-      ],
-      "limitations": [
-        "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC; only intake, licence and the V21 refusal are qualified.",
-        "DMC prerequisites (CPU system/clock memory bytes, 'Open Library' tag-table master copy) are outside current MCP routes; complete DMC PLC block compilation is not claimed.",
-        "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
-      ]
-    },
-    {
-      "id": "local.library_formats.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
-        "passedScope": "scripts/qualify_library_formats.py on build 4687b82: read-only .zal21 archive and read-only .al21 directory each open as writable owned working copies, accept a persisted folder change and leave the source bytes and read-only state unchanged; an exclusively locked source is refused without registration or change; newer .zal22 is refused for open (LibraryUpgradeRequired) and upgrade (LibraryVersionUnsupported); a corrupt .zal21 and a lone .al21 marker are refused; a mixed ZIP (archive, complete directory, lone marker, loose SCL, README) classifies four candidates correctly and both complete library candidates open natively. All 12 retained observations validate."
-      },
-      "artifacts": [
-        "evidence/local.library_formats.20261024.json"
-      ],
-      "limitations": [
-        "Inputs are libraries created in the run; V14-V20 upgrades are separate evidence.",
-        "The locked source is simulated by an exclusive Windows handle, not a second TIA instance; its refusal surfaces as a generic EngineeringError."
-      ]
-    },
-    {
-      "id": "local.library_project_state.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "48d4e38ddc901d659a58b27345d130783b8d1e7c",
-        "passedScope": "scripts\\qualify_library_project_state.py on build 4bb2e8f (frozen D;C:\\Program Files\\Git\\lcq\\b4); a failed source change leaves an inconsistent block in the unsaved consumer project; library_instantiate is then refused at preparation (FingerprintUnavailable naming the inherited block) before any checkpoint, compile or save, and the project inventory is unchanged."
-      },
-      "artifacts": [
-        "evidence/local.library_project_state.20261024.json"
-      ],
-      "limitations": [
-        "The unsaved erroneous block comes from a failed source change; arbitrary unsaved user edits are not reproduced.",
-        "Protected (know-how) objects are not exercised: no MCP route applies protection."
-      ]
-    },
-    {
       "id": "local.library_scopes.20261025",
       "status": "passed",
       "profile": {
@@ -805,23 +461,6 @@
       "limitations": [
         "Software units and namespaces are not exercised: creating a unit needs a native fixture tool whose Openness AllowList key requires an elevated grant.",
         "Both PLCs use the scratch CPU type; mixed CPU families are not exercised."
-      ]
-    },
-    {
-      "id": "local.library_interruption.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "824b0ba9a0c6bb43e369f3d2f3e3bdf3394ac2ab",
-        "passedScope": "scripts/qualify_library_interruption.py on build 041b0d8: a multi-resource library_create_master_copy (project plus writable global library) has its worker killed during the native mutation and during compile; each time a fresh host reports outcome_unknown, a fresh owned session refuses replay, the admission is reconciled and both resources restore to the pre-change state with an idempotent repeated restore. Killed during the project save after the global library was already saved, reconciliation holds the admission ('The global library differs from its pre-transaction checkpoint') and restore stays blocked (ResourceBusy) for a human decision. Killed while archiving its checkpoint, library_create_type cannot be restored (no checkpoint), the journal proves no native mutation was dispatched and the saved original reopens without the type in PLC types or the project library."
-      },
-      "artifacts": [
-        "evidence/local.library_interruption.20261025.json"
-      ],
-      "limitations": [
-        "The global-library save itself completes too quickly to interrupt reliably; the project save after it is interrupted instead.",
-        "The held partially saved outcome is not resolved automatically; it needs an explicit human decision."
       ]
     },
     {
@@ -857,23 +496,6 @@
         "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC.",
         "DMC CPU clock-memory prerequisite is outside current MCP routes; complete DMC PLC block compilation is not claimed.",
         "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
-      ]
-    },
-    {
-      "id": "local.library_formats.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "3ab2c78cbc2b14a98abc6054ec992a98556c10a6",
-        "passedScope": "Rerun of scripts/qualify_library_formats.py on build 041b0d8 with full block/type/tag-table refusal checks: read-only archive and directory sources give writable owned working copies and stay unchanged; an exclusively locked source is refused for its lock (the shared admission scope hashes the source first, so the refusal surfaces as an IOException naming the locked file) without registration or change; newer .zal22 open and upgrade, corrupt .zal21 and lone .al21 marker are refused; a mixed package classifies four candidates and both complete libraries open natively."
-      },
-      "artifacts": [
-        "evidence/local.library_formats.20261025.json"
-      ],
-      "limitations": [
-        "The locked source is simulated by an exclusive Windows handle, not a second TIA instance.",
-        "The library adapter's SourceLocked refusal is reached only when admission scoping does not hash the source first."
       ]
     },
     {
@@ -948,23 +570,6 @@
       ]
     },
     {
-      "id": "local.library_dependencies.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "b90742e04be053597e91b41e680d8870d942fc70",
-        "passedScope": "Rerun of scripts/qualify_library_dependencies.py on build a74211b (frozen D:/lcq/b9), which adds the one-instance-per-device preview refusal and full block/type/tag-table refusal checks: nested UDT (member and array) <- FB <- FB closure against the authored graph before and after a removed reference; publishing the root carries its closure; installed exact dependency reused in the same scope; exact no-op update; refusals before mutation for a non-default older version, a reference removed by update, a downgrade below a newer project default, a same-name different-GUID and a same-name unlinked dependency; fresh reopen keeps links and default."
-      },
-      "artifacts": [
-        "evidence/local.library_dependencies.20261025.json"
-      ],
-      "limitations": [
-        "One PLC root scope; the software-unit and multi-PLC cases are separate evidence.",
-        "Siemens' version comparison covers metadata only; divergent content under an identical version GUID is not constructible through the public API."
-      ]
-    },
-    {
       "id": "local.typed.resolution.20261025",
       "status": "passed",
       "profile": {
@@ -1014,24 +619,6 @@
         "Classic PLC declaration mapping fails: the integrated connections exist in hardware but HmiTarget.Connections is empty and positive Classic fixtures carry no PLC-bound tags (no native-accepted Classic binding grammar).",
         "WinCC RT Professional is in the catalog, but the PC rack's CanPlugNew refuses its application item in every slot, so no RT Professional fixture exists.",
         "No production HMI write, interrupted write, runtime or native visual acceptance is covered."
-      ]
-    },
-    {
-      "id": "local.hmi.external-tag-prepare.20261026",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "14ab1177dee87c7edd047ced55bbb1958a1ea594",
-        "passedScope": "Prepare-only native probe of hmi_engineering external_tag_create on a fresh positive Unified MTP700 Comfort HmiSeeder fixture (two HMI owners, two PLCs, integrated connections), through the production Host and V21 worker after project_retrieve: for both owners the valid request reached the closed preservation gate (HmiPreservationUnavailable) carrying native CommunicationManagement owner proof (valid, single partner, exact PLC path), the exact root PLC tag SharedSignal and its Int type; an existing name was refused (HmiNameConflict), a different type (TargetIncompatible) and the other PLC's tag (DependencyUnresolved); the HMI tag inventory was unchanged; owned Portal, host and worker cleanup verified."
-      },
-      "artifacts": [
-        "evidence/local.hmi.external-tag-prepare.20261026.json"
-      ],
-      "limitations": [
-        "No apply, compile, save/reopen, recovery, preservation or PLC communication of an external tag is covered; production apply stays behind the closed Unified preservation gate.",
-        "Native HMI compile fails on this fixture (Unified encrypted-transfer password), as in local.hmi.bridge.20261025.",
-        "Unified Comfort only; Unified PC, DB members, arrays, UDTs, software-unit tags and connection creation are not exercised."
       ]
     },
     {
@@ -1236,26 +823,6 @@
       ]
     },
     {
-      "id": "local.plc_component.existing_caller.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "13b9427b32a0ae7e8d0fc26a0a48c4d02cc622f8",
-        "passedScope": "scripts/qualify_plc_component.py --run-native --caller-mode existing (author_new_source, run b07): fresh owned de-DE scratch authors and releases TiaMcpComponentState UDT and TiaMcpComponentGate FB 1.0.0; a fresh consumer first creates the existing FBD FC TiaMcpComponentCaller (one network, block title after it) and an unrelated peer FC, then imports the exact FB->UDT closure, creates instance DB TiaMcpComponentGate_1 from the captured storage profile and inserts the component call network after caller network 3 (typed insertNetwork). V21 renumbering matched the prediction exactly: inserted network 8, following block-title IDs 8->D and 9->E (+5); the native callerInsertion proof and the qualifier both reverse that one shift and recover the original caller exactly. Full compile and save, complete unrelated-content preservation, fresh reopen with exact instance-DB bytes, first-import-checkpoint retrieval to a new location equal to the baseline and recovered reopen, component window completion. CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, TIA V21 Update 2."
-      },
-      "artifacts": [
-        "evidence/local.plc_component.existing_caller.20261025.json"
-      ],
-      "limitations": [
-        "Qualification-only route; production combined library_integrate apply stays disabled.",
-        "Existing FBD FC caller only, inserting after its last network; LAD, FB and OB callers are not qualified (OB callers are refused).",
-        "Accepted ID change is exactly the following-ID shift of the 25 October 2026 scope decision; any other caller change fails closed.",
-        "Storage is the captured component04 profile; no other FB layouts.",
-        "Runtime not exercised: the caller is not called from an OB in this run."
-      ]
-    },
-    {
       "id": "local.typed.route-profiles.20261025",
       "status": "passed",
       "profile": {
@@ -1457,24 +1024,6 @@
       ]
     },
     {
-      "id": "local.cpu_memory_bytes.20261026",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "65aa27868441d31d8c2efe0ca70e7208323d19b0",
-        "passedScope": "scripts\\qualify_cpu_memory_bytes.py on build 60afdc8 (frozen D;C:\\Program Files\\Git\\cmq\\b2) in an owned scratch; change.hardware_cpu_memory_bytes enables system memory at MB20 and clock memory at MB21 on every S7-1500 CPU of the project (scratch CPU 1511-1 PN and an added CPU 1516-3 PN/DP), each compiled with configured-hardware preservation verified and read back; TIA adds its 14 system/clock tags (FirstScan, Clock_1Hz, ...) to the default tag table and a function reading \"FirstScan\" OR \"Clock_1Hz\" compiles in both PLCs; a fresh Portal reopens identical settings, blocks, types, tag tables and tags; a move to MB1\\MB0 is restored from its checkpoint; clock byte 65535 fails native compilation (range 0..16383) and is restored from its checkpoint; both CPUs return to their original disabled settings. Eight bridge refusals (non-CPU item, same enabled byte, byte above 65535, string flag, unchanged, enable without byte number, byte number of a disabled flag, attribute outside the subset) and an added CPU 1214C DC\\DC\\DC (UnsupportedCapability) change no block, type or tag table."
-      },
-      "artifacts": [
-        "evidence/local.cpu_memory_bytes.20261026.json"
-      ],
-      "limitations": [
-        "S7-1200 (CPU 1214C DC/DC/DC V4.7 exposes no memory byte attributes in V21 Openness), other CPU families, firmware, F-CPUs and software units are not qualified.",
-        "DMC FB compilation itself is not run: the DMC Siemens Open Library archive is no longer on this machine. An authored function reading TIA's memory byte tags compiles instead.",
-        "Disabling the bytes leaves TIA's 14 system/clock tags in the default tag table; runtime behavior of the memory bits is not observed."
-      ]
-    },
-    {
       "id": "local.explorer.native-providers.20261026",
       "status": "passed",
       "profile": {
@@ -1509,148 +1058,6 @@
       ]
     },
     {
-      "id": "local.hostonly.vci.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/test_vci_host_mcp.py on the Release Host with real Git: 72 stdio checks across several Host lifetimes. Every VCI response validates against its JSON contract; exact BOM/CRLF/binary/Unicode bytes, empty files, explicit deletion, parent history, branches, package capture/compare, old-revision materialization, wrong/stale review refusal, an owned Host interruption after the durable dispatch callback, fresh-Host replay refusal and receipt-only reconciliation."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.vci.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
-        "No native VCI workspace, mapping, export/import, project reconstruction or remote Git publication."
-      ]
-    },
-    {
-      "id": "local.hostonly.graph.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/test_graph_host_mcp.py on the Release Host: 43 stdio checks. GRAPH v6 inspect/compare/reopen/report pages/artifact reads/list against the JSON contract, exact source download, tampered-record refusal that survives a Host restart, restored-source revalidation, incomplete-publication visibility and no native engineering operation."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.graph.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
-        "No native GRAPH schema, import, compilation, rendering or runtime behavior."
-      ]
-    },
-    {
-      "id": "local.hostonly.automationml.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/test_automationml_host_mcp.py on the Release Host: 69 stdio checks. CAEX 2.15/3.0 inspect/compare/reopen/report pages/artifact reads/list against pinned XSDs and the JSON contract, exact retained bytes, plain text/CDATA/absent/empty distinctions, ID/name collisions, tamper refusal; nativeQualified, importabilityCertified and impactScopeComplete stay false."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.automationml.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
-        "No native AML import/export, inheritance expansion, device identity, catalog, compile or runtime."
-      ]
-    },
-    {
-      "id": "local.hostonly.opcua.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/test_opcua_host_mcp.py on the Release Host: 53 stdio checks. NodeSet inspect/compare/dependencies/dependency compare/report pages/reopen/list/artifact reads against the JSON contract, stale consumer refusal, bounded pages over 4,000 references, upload retries and no target probe."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.opcua.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
-        "Offline NodeSet documents only; no native OPC UA engineering, endpoint, runtime, security or compatibility certification."
-      ]
-    },
-    {
-      "id": "local.hostonly.translation.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/test_translation_host_mcp.py on the Release Host: offline capture/inspect/prepare/review pages/digest-bound approval/candidate/reconcile/reopen/list/artifact reads, blocked batches, the instance-inheritance alarm-text policy and normal Host exits; native import is not allowed."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.translation.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Synthetic and independently authored fixtures on PCNico only; no customer project, Siemens-exported document corpus, scale limit beyond the runner's bounds or other Host build is qualified.",
-        "Synthetic workbook profiles; no Siemens export/import, language activation, category leakage resolution or translation_native_* route."
-      ]
-    },
-    {
-      "id": "local.hostonly.diagnostics.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/qualify_trace_diagnostics_offline.py on the Release Host with samples from tests/TiaMcp.Diagnostics.Tests (47/47 groups): saved-review import, diagnostic case/watch plans, manual trace handoff, v1/v2 measurement import with quality and clock epochs, analysis, comparison, report export, replanning and offline readback checks, contract validation of every envelope, stale/changed-artifact and tamper refusals with exact restoration."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.diagnostics.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, SIMATIC AX or device is involved and none is qualified.",
-        "Synthetic and independently authored measurements and reviews; no native trace acquisition, device-validated trace settings, live observability, causal diagnosis or fix proof.",
-        "trace_capabilities reports documented routes without a target probe; trace_prepare is a manual handoff and creates no native trace configuration."
-      ]
-    },
-    {
-      "id": "local.hostonly.diagnostic-experiments.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ac25eef2587a38f17f888cefd7f4a73d34726081",
-        "passedScope": "scripts/qualify_diagnostic_experiments_offline.py (57 MCP checks) and scripts/qualify_repeated_diagnostic_experiments_offline.py (78 MCP checks) on the Release Host with samples from tests/TiaMcp.Diagnostics.Tests: experiment planning from exact saved cases, review with original-evidence and replan-lineage revalidation, 2..8 before/after pair comparison with explicit mappings and windows, JSON/Markdown/escaped HTML report export after rederivation, and stale/tampered input refusals."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.diagnostic-experiments.20261027.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM, OPC UA server or device is involved and none is qualified.",
-        "Synthetic measurements only; no native or runtime acquisition (diagnostic_experiment_acquire_runtime and diagnostic_runtime_acquisition_export are not covered), causal diagnosis or fix proof."
-      ]
-    },
-    {
-      "id": "local.hostonly.diagnostic-ua.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ff5a75550925857916b229058c1ecc7ae4a49de8",
-        "passedScope": "scripts/qualify_diagnostic_ua_binding.py (with its observation and comparison qualifiers) on the Release Host against the owned encrypted OPC Foundation loopback fixture server from tests/TiaMcp.OpcUa.Runtime.Tests: 2,102 checks. Prebound diagnostic_ua_binding_plan on polling and subscriptions, diagnostic_ua_observe, diagnostic_ua_compare and diagnostic_ua_report_export, with mapping/session/node refusals, derived-document tamper, exact scalar retention, restart readback and no network replay."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.diagnostic-ua.20261027.json"
-      ],
-      "limitations": [
-        "Host plus a local loopback UA test server only; no TIA Portal, PLCSIM, PLC or physical UA server is involved and none is qualified.",
-        "Synthetic managed-producer fixture; no online PLC address/program association, clock synchronization, behavioral verdict or runtime_ua_* qualification (those carry AC-recovery and need their own evidence)."
-      ]
-    },
-    {
       "id": "local.library_import_scale.20261027",
       "status": "passed",
       "profile": {
@@ -1667,25 +1074,6 @@
         "Real vendor bytes remain open: the vendor ZIPs are no longer on this PC; the package reproduces DMC V17's byte volume and shape around an owned archive.",
         "Flat types without dependencies; PLC library_integrate (call/instance/signal) combined apply stays disabled and is not exercised.",
         "Requires the worker's per-request proxy release; without it one session hit TIA's 500,000-instance cap at change 124."
-      ]
-    },
-    {
-      "id": "local.library_compatibility.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "4b69ad2c379e42b797ba533900124b7478916f7c",
-        "passedScope": "scripts/qualify_library_compatibility.py at 4b69ad2 on build c6486c8 (frozen D:/lco/b2, package tia-mcp-v21_20261027_130141_7a563422), owned TIA V21 scratch projects: a Bool-only FB type and an FB type using LInt/LWord/LTime are authored and released 1.0.0 on a CPU 1511-1 PN and archived in a global library. In a consumer scratch with an added CPU 1214C DC/DC/DC: (1) library_upgrade of TIA's own shipped native V13 library (Predefined-Styles.al13) is refused before any native call (LibraryVersionUnsupported) and the copied source tree stays byte-identical. (2) A compiled, unsaved source change is pending; the library_instantiate preview reports unsavedTargetEdits {present: true, disposition: savedIntoCheckpointBaseline}, the apply saves it into the checkpoint baseline, and a fresh reopen contains both the edit and the instance. (3) A type whose source generation fails is discarded by TIA (EngineeringError, not in memory); a valid PLC data type generated with compile=false is inconsistent (isConsistent false) and library_instantiate is refused before any checkpoint or write (InheritedDiagnostics) with the native inventory unchanged; the reopen proves both types were discarded. (4) Into the S7-1200 the Bool-only type instantiates and compiles with 0 errors; the 64-bit type is checkpointed and instantiated but fails compilation (CompileFailed, 8 errors: LInt/LWord/LTime unknown on the CPU), completes no save, and a fresh reopen equals the saved inventory before the attempt. 41/41 steps."
-      },
-      "artifacts": [
-        "evidence/local.library_compatibility.20261027.json"
-      ],
-      "limitations": [
-        "No V20 library input exists on this PC, so V20 upgrades stay open until one is obtained. V14 SP1-V18 upgrades are covered by local.library_upgrades.20261024 and the five DMC V19 archives by local.library_vendor.20261024/20261025.",
-        "The V13 input is TIA's own shipped HMI style library; it is refused by version before any native call.",
-        "The unsaved edit is a compiled, unsaved source change; arbitrary unsaved user edits in an attached TIA UI are not reproduced. The inherited inconsistency is an uncompiled PLC data type; other inconsistent object kinds are not exercised.",
-        "Only CPU family is varied (S7-1500 to S7-1200, newest catalog firmware); the CPU-family mismatch surfaces as CompileFailed after checkpoint, not as a refusal at preparation. Firmware-version mismatches are not exercised. No runtime execution."
       ]
     },
     {
@@ -1725,24 +1113,6 @@
       ]
     },
     {
-      "id": "local.hmi.plc-hmi-recipe.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "bdb061d60d9df81100d0886d0bf29d482fbffcb5",
-        "passedScope": "Prepare-only native probe of the combined PLC/UDT/HMI library_integrate recipes (plc_hmi_component_plan, plc_hmi_update_plan) on a fresh positive Unified MTP700 Comfort HmiSeeder plchmi fixture (raw-Openness MotorStatus 1.0.0/1.0.1 Real->LReal, MotorDrive 1.0.0, MotorDB, Unified tags MotorSpeed/MotorRunning bound to MotorDB.status.*, rectangle MotorSpeedConsumer with Left dynamized by MotorSpeed; both PLCs compiled without errors), through the production Host and V21 worker after project_retrieve: the install plan into PLC_B/HMI_RT_2 prepared as planned_only with library_instantiate, graphical_typed_edit and hmi_engineering steps, plcSymbol MotorDrive_1.status.speed resolved from the pinned FB export and the HmiMemberMappingUnqualified, HmiScreenItemCreationUnavailable and HmiPreservationGateClosed blockers, and its change_apply was refused (PlcIntegrationNotQualified); the field-changing update of PLC_A to MotorStatus 1.0.1 was refused with HmiBindingWouldBreak and an impact report of exactly one breaking binding (MotorSpeed typeChanged Real->LReal, consumer MotorSpeedConsumer.Left), MotorRunning unchanged and no unresolved bindings; a Classic recipe was refused (HmiFamilyNotQualified); project library and both HMI tag inventories unchanged; owned Portal, host and worker cleanup verified."
-      },
-      "artifacts": [
-        "evidence/local.hmi.plc-hmi-recipe.20261027.json"
-      ],
-      "limitations": [
-        "No apply, compile, save/reopen, recovery or runtime of any combined step; combined apply stays refused and no Unified preservation gate is opened.",
-        "Unified Comfort only; Classic HMIs, Unified PC, HMI-owned UDTs (no V21 API), UDT-typed PLC tag-table tags, nested UDTs and scripts, alarms or faceplate ports as consumers are not exercised.",
-        "Creation of member-bound HMI tags and screen items stays a blocker in the install plan; the overall qualify_hmi run accepts no profile because the existing HMI gates are outside this probe."
-      ]
-    },
-    {
       "id": "local.engineering.interruption-matrix.20261027",
       "status": "passed",
       "profile": {
@@ -1779,61 +1149,6 @@
       ]
     },
     {
-      "id": "local.plc_object_mutations.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "adad6b0b0683b42051db4dbe1ef24f1ccbab321e",
-        "passedScope": "scripts/qualify_plc_object_mutations.py on build 9ff587c (frozen D:\\wp\\b6) in one owned scratch CPU 1511-1 PN (V21), 369/369 steps: tag_set, tag_create, tag_delete, constant_set, constant_create, constant_delete, tag_table_import_xml, type_source_upsert, type_rename, type_delete, plc_type_import_xml, source_upsert (SCL), block_import_xml, block_rename, block_delete, block_number_set, block_attributes_set (HeaderAuthor/HeaderFamily on an FB), group_create, group_rename, group_delete, plc_compile and instance_db_create each applied with exact preview assertions, checkpoint, compile and save; a complete export of every block, type and table plus every tag, constant and group differed from the previous one in exactly the intended keys; unchanged type and DB reimports showed no difference; typed prepare-time refusals per kind left the inventory unchanged and PreviewMismatch, StaleRevision and compile=false were refused at apply; a fresh owned Portal reopened the saved project with the identical verified state; from the reopened state one more change per kind was applied and restored by change_restore into a new directory equal to the pre-change state; a deliberately failing tag address (%M20000.0) ended CompileFailed/recovery_required with its checkpoint retained and change_restore refused FingerprintUnavailable on the inconsistent block."
-      },
-      "artifacts": [
-        "evidence/local.plc_object_mutations.20261028.json"
-      ],
-      "limitations": [
-        "One owned scratch CPU 1511-1 PN at PLC-root scope: no software units, namespaces, safety, know-how protection or generated system-group objects.",
-        "SCL blocks and one global DB only; LAD/FBD/STL targets, OB attributes, HeaderName and HeaderVersion are not written. Renamed and deleted groups were empty or held only a subgroup.",
-        "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
-        "Engineering only; runtime behavior is not observed."
-      ]
-    },
-    {
-      "id": "local.milestones.reopen.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "9f80075ba59d8ef8b4e5884f801512b4f8853f27",
-        "passedScope": "scripts/validate_milestones.py (--skip-simulation) on build 9ff587c (frozen D:\\wp\\b6) in owned scratch projects, 11 changes: graphical_operand_set on a LAD and an FBD block, block_rename, block_delete (after a DependencyExists refusal for the called TiaMcp_IsEnabled), type_source_upsert (UDT), source_upsert (SCL and STL), block_import_xml (LAD and FBD) and network_configure. Each change: preview, apply with checkpoint, compile and save; change_status equals the apply result with its retained checkpoint; a complete timestamp-free readback of every block, type, tag table and network node attribute differs only in the change's own objects; a fresh owned Portal reopens the saved changed project with an identical readback and change_status. Eight changes (both operand edits, rename, delete, UDT, STL source, LAD import, network address) are restored from their own checkpoint in the applying Portal with an exact pre-change readback, and the recovered project is reopened in another fresh Portal."
-      },
-      "artifacts": [
-        "evidence/local.milestones.reopen.20261028.json"
-      ],
-      "limitations": [
-        "One owned scratch CPU 1511-1 PN; no software units, namespaces or safety. Simulation steps were skipped.",
-        "network_configure preservation is checked by the runner over program exports and network node attributes only; the worker's configured-hardware preservation stage does not run for that kind.",
-        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
-      ]
-    },
-    {
-      "id": "local.library_integrate.combined_apply.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "bc020684767dd1907a44a7aad35710d1317dd99e",
-        "passedScope": "scripts/qualify_library_integrate_apply.py on build 9ff587c (frozen D:\\wp\\b6, Host --enable-library-integrate-apply) in owned de-DE-only scratch projects: an authored global library with an FB and its UDT; for a new standalone FBD FC caller and for an existing FBD FC caller, change_apply of the prepared PLC library_integrate plan ran library_instantiate and graphical_typed_edit through the coordinator with readback after each step, reached installation_verified with one initial checkpoint, and an independent export/inventory diff showed exactly the planned FB, UDT, instance DB (first free number, captured storage profile) and caller network with everything else unchanged; compile 0 errors; fresh reopen identical; change_restore in an empty owned Portal retrieved the pre-change inventory and an empty project library. With the flag, an FBD OB caller and a new LAD FC were refused (PlcIntegrationNotQualified) with no change; without the flag library_capabilities reports apply unsupported and change_apply refuses with no change."
-      },
-      "artifacts": [
-        "evidence/local.library_integrate.combined_apply.20261028.json"
-      ],
-      "limitations": [
-        "Verified shapes only: fresh FB/UDT import from a read-only global library, a new global instance DB and a new or existing FBD FC caller (insertion after its last network); OB, LAD, FB callers, reuse, multi-instances, software units, member bindings and HMI targets are refused.",
-        "The instance DB uses the natively captured storage profile, bound by exact installed FB/UDT content; other components need their own captured profile.",
-        "Projects must be de-DE only like the captured profile; a second active language changes the exported content and refuses."
-      ]
-    },
-    {
       "id": "local.typed.wave9.engineering.20261028",
       "status": "passed",
       "profile": {
@@ -1866,49 +1181,6 @@
       "limitations": [
         "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
-      ]
-    },
-    {
-      "id": "local.milestones.network.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "ba861fce777645490974e21be85c3e451b7fca59",
-        "passedScope": "scripts/validate_milestones.py (--skip-simulation) on build ba861fc (frozen D:\\wp\\b7) in owned scratch projects, the same 11 changes as local.milestones.reopen.20261028, now with network_configure as a hardware-rule kind: the offline PROFINET address/subnet-mask change of the scratch CPU's node applied with checkpoint, compile and save and reported configured_hardware_preservation_verified (only the requested node attributes changed in the configured-hardware manifest); change_status equals the apply result; the timestamp-free readback differs only in that node's address; a fresh owned Portal reopens the changed project identically; change_restore in the applying Portal returns the exact pre-change readback and the recovered project reopens identically in another fresh Portal. All other changes pass as in the earlier run."
-      },
-      "artifacts": [
-        "evidence/local.milestones.network.20261028.json"
-      ],
-      "limitations": [
-        "One owned scratch CPU 1511-1 PN; one node's Address and SubnetMask only; subnet connect/disconnect and other attributes are not run natively. Simulation steps were skipped.",
-        "change_restore must run in the Portal that applied the change; restores run before the fresh-Portal reopens."
-      ]
-    },
-    {
-      "id": "local.access.qualify.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "a30465aa2122c35a6eef8cd3b27f54a5cb10ee9f",
-        "passedScope": "scripts/qualify_access_changes.py on build cfd431b+ (frozen D:\\wp\b9) in one owned scratch CPU 1511-1 PN (V21), 209/210 steps: webserver_page_set, certificate_create, certificate_assign, certificate_delete, certificate_import, umac_role_set, vci_workspace_create and vci_workspace_delete each applied with exact preview assertions, checkpoint, compile and save, change_status, and a complete before/after state (every block, type and tag-table export plus certificate_inspect, access_inspect, web_inspect and vci_workspace_inspect) that differs in exactly the intended keys, with recorded web activation side effects (TIA's web server certificate); typed refusals per kind changed nothing; a fresh owned Portal reopened the project with an identical state and every journal applied; one further change per kind was restored by change_restore to the exact pre-change state. Created WebServer certificates were re-issued by the compile with the requested common name and validity end kept."
-      },
-      "artifacts": [
-        "evidence/local.access.qualify.20261028.json"
-      ],
-      "limitations": [
-        "One owned scratch CPU 1511-1 PN with its local certificate store; the global certificate store, other CPUs, HMI devices and UMC servers are not exercised.",
-        "certificate_assign writes only PlcCommunicationCertificate on the store-owning CPU; WebserverCertificate, OPC UA attributes and null unassignment are not written. certificate_inspect renders certificate attributes display-only, so the assigned Id is read back through typed refusals (AssignmentDrift currentCertificateId, CertificateInUse references).",
-        "Certificates are created with usage WebServer and one Dns alternative name. The persisted identity after the device compile is compared with the request and recorded under certificateIdentity; the wave 10 probe saw the compile re-issue a created certificate (CN-only subject, new serial and notBefore, the CPU address as alternative names), and a mismatch lists the kind under notQualified.",
-        "certificate_import imports the public DER of a certificate this run created and deleted; PEM, CA-issued and foreign certificates are not imported natively.",
-        "umac_role_set: one custom role, one device function right taken from the scratch's custom role and one active project user; engineering function rights are never granted or revoked (no read tool lists the available ones), so AdministratorLockout is not exercised; anonymous and UMC principals are untouched.",
-        "webserver_page_set writes webServerActive and systemWebPages; defaultApplication is only refused (stale or missing application), never written.",
-        "Switching web serving on or off is allowed to change the CPU's web- and certificate-named attributes and to add or remove certificates in its store; these side effects are recorded under sideEffects.",
-        "VCI workspaces are created in the root workspace group without mappings, with roots outside the artifact store and the project; change_restore never restores workspace files.",
-        "Not covered here: vci_mapping_add, vci_mapping_remove, vci_synchronize.",
-        "Engineering only; nothing is downloaded and runtime behavior is not observed.",
-        "webserver_user_pages_generate is not qualified by this run: generation also added a system constant to the default tag table, which its preview does not declare."
       ]
     },
     {
@@ -1952,24 +1224,6 @@
       ]
     },
     {
-      "id": "local.hostonly.access-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_access_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.access-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
       "id": "local.hostonly.addin-selection.20261028",
       "status": "passed",
       "profile": {
@@ -1980,96 +1234,6 @@
       },
       "artifacts": [
         "evidence/local.hostonly.addin-selection.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.composite-engineering.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_composite_engineering_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.composite-engineering.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.connection-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_connection_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.connection-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.db-snapshot-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_db_snapshot_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.db-snapshot-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.drive-profile-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_drive_profile_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.drive-profile-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.hmi-component-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_hmi_component_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.hmi-component-review.20261028.json"
       ],
       "limitations": [
         "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
@@ -2096,78 +1260,6 @@
       ]
     },
     {
-      "id": "local.hostonly.public-certificate-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_public_certificate_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.public-certificate-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.runtime-handoff.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_runtime_handoff_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.runtime-handoff.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.safety-evidence-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_safety_evidence_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.safety-evidence-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.software-unit-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_software_unit_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.software-unit-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
       "id": "local.hostonly.teamcenter-review.20261028",
       "status": "passed",
       "profile": {
@@ -2178,60 +1270,6 @@
       },
       "artifacts": [
         "evidence/local.hostonly.teamcenter-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.technology-profile-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_technology_profile_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.technology-profile-review.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.testsuite-result.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_testsuite_result_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.testsuite-result.20261028.json"
-      ],
-      "limitations": [
-        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
-        "Reviews compare supplied or synthetic observations and committed uploads bound to an exact saved review; nothing is read from TIA, and no native compatibility, communication, safety or runtime claim follows.",
-        "Synthetic fixtures generated by the matching managed test suite on PCNico; no customer project, Siemens export corpus, other Host build or scale beyond the runner's bounds is qualified."
-      ]
-    },
-    {
-      "id": "local.hostonly.web-application-review.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "7aee9efbbb202240b2a52cbef23a4e62a92d2aad",
-        "passedScope": "scripts/test_web_application_host.py on the Release Host built by scripts/Test-Offline.ps1 from 7aee9ef with absent native workers: committed uploads, strict request schemas and refusals, exact saved-review binding, bounded paging, Host restart and immutable reopen."
-      },
-      "artifacts": [
-        "evidence/local.hostonly.web-application-review.20261028.json"
       ],
       "limitations": [
         "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
@@ -2802,26 +1840,6 @@
         "safety_fparameter_set changes Failsafe_FDestinationAddress only; Failsafe_FMonitoringtime of this F-DI is not declared writable (AttributeNotWritable).",
         "safety_import_xml was not applied: TIA refuses the F-block import with 'No safety license available' on this machine (trial sf1, build b61).",
         "No safety login, password, F-logic behavior, acceptance, commissioning or download; a printout or signature read does not validate or approve a safety program. Trial sf2 (build b62) failed the reopen comparison on the compile-derived bandwidth attribute; sf1 and sf2 are retained and not cited."
-      ]
-    },
-    {
-      "id": "local.safety_import.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "cpu": "CPU 1511F-1 PN 6ES7 511-1FL03-0AB0",
-        "firmware": "V4.1",
-        "sourceCommit": "80b57a7f9b7ca8b1cfe5429f0961d4c98c0bb014",
-        "passedScope": "scripts/qualify_safety_changes.py (sf4) on a frozen Debug build of a2c2b11 (D:\\wp\\b64, git-archived sources with source-manifest.json) under TIA Portal V21 Update 3 with an activated STEP 7 Safety license, in a fresh owned scratch with a CPU 1511F-1 PN whose generated scratch user holds ProtectionLevelFailsafeAccess (failsafeRuntimeAccess, owned scratch only) and an ET 200SP station with two F-DI 8x24VDC HF: the full sf3 scope (safety reads, PDF printout, safety_fparameter_set) passed again, and safety_import_xml re-imported the generated F-FBD block Main_Safety_RTG1 with one filled comment text, with checkpoint, PLC compile and save, change_status, an exact state diff limited to that block except the recorded F-compiler block DB1_C (System blocks/STEP 7 Safety/Compiler blocks, know-how protected; its payload changes and it reads inconsistent after the import's PLC software compile until the next device compile), the comment in the native export, a wrong previewHash refused (PreviewMismatch), prepare refusals for a missing acknowledgement, a scope mismatch and a standard block (SafetyBoundary), persistence across a fresh Portal reopen and a second import restored from its checkpoint into a new directory equal to the reopened state."
-      },
-      "artifacts": [
-        "evidence/local.safety_import.20261028.json"
-      ],
-      "limitations": [
-        "One generated F-FBD block (Main_Safety_RTG1) re-imported with a comment change; no F-logic behavior, F-I/O commissioning, acceptance, login, password or download.",
-        "After the import's PLC software compile the F-compiler block DB1_C reads inconsistent until the next device compile regenerates it; the kind does not run a device compile.",
-        "One F-CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch; the fail-safe runtime right is granted to the scratch's generated user only."
       ]
     },
     {
@@ -3530,23 +2548,6 @@
         "Accepted ID change is exactly the following-ID shift of the 25 October 2026 scope decision; any other caller change fails closed.",
         "Storage is the captured component04 profile; no other FB layouts.",
         "Runtime not exercised: the caller is not called from an OB in this run."
-      ]
-    },
-    {
-      "id": "local.library_project_state.rerun.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "2d5aa7c9c96bde995404f316fe449fe258dd18c5",
-        "passedScope": "Re-run of local.library_project_state.20261024, whose raw reports were lost: scripts/qualify_library_project_state.py on a frozen Debug build of 2d5aa7c (D:/wp/b65), 18/18 steps; a failed source change leaves an inconsistent block in the unsaved consumer project; library_instantiate is then refused at preparation (FingerprintUnavailable naming the inherited block) before any checkpoint, compile or save, and the project inventory is unchanged."
-      },
-      "artifacts": [
-        "evidence/local.library_project_state.rerun.20261028.json"
-      ],
-      "limitations": [
-        "The unsaved erroneous block comes from a failed source change; arbitrary unsaved user edits are not reproduced.",
-        "Protected (know-how) objects are not exercised: no MCP route applies protection."
       ]
     },
     {

@@ -1,6 +1,13 @@
 # Runtime proof: remaining work
 
-**Release scope update — 15 October 2026:** The user requires every feasible capability before 1.0. Read the [current release ledger](release-obligations-20261015.md) before scheduling work. Older wording that permits optional expansions, selected-only release scope or a reduced 1.0 is superseded. Missing prerequisites and unresolved feasibility remain release blockers; recorded passed/failed evidence and native/UI scheduling boundaries remain intact.
+**History (moved from plans on 29 October 2026):** the open boxes below record 8–12 October
+and are no longer maintained. Several have closed since: the frozen 65-case / 358-step run
+passed with an independent audit on 24 October, the simulator worker journals creation intent
+before `RegisterInstance`, and requested stop and independent worker exit are qualified. What
+is still open (card staging, complete preservation and trusted release, the VM's uncertain
+outcomes) is tracked in the [TODO](../TODO.md#native-admission-and-runtime).
+
+**Release scope update — 15 October 2026:** The user requires every feasible capability before 1.0. Read the [current release ledger](../plans/release-obligations-20261015.md) before scheduling work. Older wording that permits optional expansions, selected-only release scope or a reduced 1.0 is superseded. Missing prerequisites and unresolved feasibility remain release blockers; recorded passed/failed evidence and native/UI scheduling boundaries remain intact.
 
 See the [consolidated TODO](../TODO.md) for the current work order. This page retains detailed acceptance criteria and dated progress.
 
@@ -34,7 +41,7 @@ frozen 65-case / 358-step / 478-assertion pass remain required.
 
 The user resumed implementation and accepted the existing VM proof; no VM rerun is a delivery gate. The 8 October checkpoint below is retained as historical evidence.
 
-**Stopped checkpoint, attempt 06:** Full native run (`artifacts/continuation-20261009/corpus-native-06/index.json`) ended with **48 passing cases, 371 passing assertions, one pre-start isolation failure and 16 unattempted cases** on frozen build `cb6299c72baf44d4b05278d878a536a0`. The 49 nonempty discovery snapshots in `runtime-edges/explicit-pulse` did not clear within the 30-second bound. The independent audit (`artifacts/continuation-20261009/runtime06-final-audit.json`) verifies the 48 cases/317 steps/371 assertions; full-corpus qualification remains false. The resource audit (`artifacts/continuation-20261009/audit-isolation06.json`) verifies the unchanged 85-file card, no provisioning credential access/protected-card staging/startup, exact unregistration and worker/TIA exits, and a fresh empty registry. Discovery origin/absence remains unresolved. The user requested stopping here; no next feature or new native attempt was started. See [resume order and complete checkpoint](../history/continuation-20261009.md#clean-stopping-checkpoint).
+**Stopped checkpoint, attempt 06:** Full native run (`artifacts/continuation-20261009/corpus-native-06/index.json`) ended with **48 passing cases, 371 passing assertions, one pre-start isolation failure and 16 unattempted cases** on frozen build `cb6299c72baf44d4b05278d878a536a0`. The 49 nonempty discovery snapshots in `runtime-edges/explicit-pulse` did not clear within the 30-second bound. The independent audit (`artifacts/continuation-20261009/runtime06-final-audit.json`) verifies the 48 cases/317 steps/371 assertions; full-corpus qualification remains false. The resource audit (`artifacts/continuation-20261009/audit-isolation06.json`) verifies the unchanged 85-file card, no provisioning credential access/protected-card staging/startup, exact unregistration and worker/TIA exits, and a fresh empty registry. Discovery origin/absence remains unresolved. The user requested stopping here; no next feature or new native attempt was started. See [resume order and complete checkpoint](continuation-20261009.md#clean-stopping-checkpoint).
 
 **Attempt 05 startup rejection:** the first `tia_start` returned a terminal Openness security timeout before any project or simulator operation. A later empty startup of the exact same worker succeeded and verified owned TIA/worker exits without registration changes; separate reconciliation (`artifacts/continuation-20261009/startup16-reconciliation.json`). The diagnostic itself retains an invalid status-tool request as a harness error. Attempt 06 retained unchanged vectors and subsequently stopped as recorded above.
 

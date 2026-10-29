@@ -5,7 +5,7 @@ uploaded document bytes in separate Host-owned Git repositories, review and comm
 selected changes, preserve parent history and export an exact old revision. This
 is the local Git part of D01. [Package manifests and three-way comparison](vci-package-workflow.md)
 are also available from explicit supplied mapping evidence. Native VCI workspace
-mappings, export/import into TIA and engineering qualification remain separate obligations in the [execution queue](../plans/offline-execution-20261016.md).
+mappings, export/import into TIA and engineering qualification remain separate obligations in the [execution queue](../history/offline-execution-20261016.md).
 
 Configure one installed Git executable at Host startup:
 

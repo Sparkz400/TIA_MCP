@@ -70,7 +70,7 @@ the saved component observations, preserving prior C01 record compatibility.
 Complete dependency/consumer mapping and authored generation/preservation. A
 matching GUID pair or display name alone is not sufficient evidence for those
 steps. No genuine HMI library-version export was found in the inspected fixtures;
-ordinary screen XML must not be treated as one. The [full offline queue](../plans/offline-execution-20261016.md)
+ordinary screen XML must not be treated as one. The [full offline queue](../history/offline-execution-20261016.md)
 and all original 44-workstream obligations remain open.
 
 ## Full frozen verification

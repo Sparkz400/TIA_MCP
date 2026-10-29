@@ -164772,7 +164772,7 @@
       "sha256": "bf0f7017e94f8d5bd107e2cf8bea6798fb272b0e0a98a4de865133e7e46e6352"
     },
     {
-      "path": "docs/plans/1.0-release-checklist-20261013.md",
+      "path": "docs/history/1.0-release-checklist-20261013.md",
       "bytes": 23432,
       "sha256": "2481b9c8d5a32fcfd2b04be5d2d4c06517105267a0cca9d9db0bf98e8dca3ec4"
     },
@@ -164927,7 +164927,7 @@
       "sha256": "2286db0b81b8031050161fdfa58f8406184c7dbf9fd7badd32157735a4d5230e"
     },
     {
-      "path": "docs/plans/runtime-proof-todo.md",
+      "path": "docs/history/runtime-proof-todo.md",
       "bytes": 25617,
       "sha256": "3d3f35bda90daa84e5c6f600a370ace35a1cad59bdb21b5a0a0db6327e416518"
     },

@@ -73,7 +73,7 @@ shared inventory to documented owner-relative service children and repairs live
 Explorer expansion. This record retains the earlier group-only selection scope.
 
 This closes the identified source-level selection gap, not TO-03/TO-04 or the
-[44-workstream queue](../plans/offline-execution-20261016.md). Next, audit native
+[44-workstream queue](../history/offline-execution-20261016.md). Next, audit native
 service/child and eligibility capture contracts against retained public metadata,
 then implement only supportable offline portions of TO-04–12. Whole-object and
 consumer preservation, durable native identity, runtime and motion acceptance

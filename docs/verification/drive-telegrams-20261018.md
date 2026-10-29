@@ -2,7 +2,7 @@
 
 This increment adds explicit v2 telegram observations to the existing drive
 review and paging tools. It advances D10/C02 without completing either or the
-immutable [44-workstream scope](../plans/offline-scope-reconciliation-20261017.md).
+immutable [44-workstream scope](../history/offline-scope-reconciliation-20261017.md).
 
 ## Implemented behavior
 

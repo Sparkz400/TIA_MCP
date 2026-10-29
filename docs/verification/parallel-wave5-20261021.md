@@ -1,6 +1,6 @@
 # UA polling capture, HMI integer conversion and Explorer scope — 21 October 2026
 
-The fifth parallel increment delivers the three workflows in the [authorized plan](../plans/parallel-wave5-20261021.md). All implementation and final package checks below pass. Consistency of Explorer first-viewport performance across runs, native/physical qualification and full 44-workstream release remain open.
+The fifth parallel increment delivers the three workflows in the [authorized plan](../history/parallel-wave5-20261021.md). All implementation and final package checks below pass. Consistency of Explorer first-viewport performance across runs, native/physical qualification and full 44-workstream release remain open.
 
 ## Delivered workflows
 
