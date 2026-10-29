@@ -538,8 +538,10 @@ namespace TiaMcp.Openness.V21
                 var certificate = certificates.Length == 1 ? certificates[0] : null;
                 Func<string, DateTime> utc = name => DateTime.Parse(certificate.Value<string>(name), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                 string observed = certificate?.Value<string>("sha256");
+                // Like provisioning, no certificate is newly trusted once the login was released; the pinned one may still return.
                 string decision = SimulationTlsPin.Decide(true, CertificatePin, observed, certificates.Length, certificate == null ? default(DateTime) : utc("notBeforeUtc"),
-                    certificate == null ? default(DateTime) : utc("notAfterUtc"), DateTime.UtcNow, true, owned, false, Failure != null || _tlsChallenges > 8);
+                    certificate == null ? default(DateTime) : utc("notAfterUtc"), DateTime.UtcNow, true, owned, _answered && CertificatePin == null,
+                    Failure != null || _tlsChallenges > 8);
                 entry["pinPolicyDecision"] = decision;
                 if (!SimulationTlsPin.Allows(decision)) return false;
                 CertificatePin = CertificatePin ?? observed;
