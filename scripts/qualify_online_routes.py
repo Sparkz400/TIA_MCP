@@ -56,7 +56,7 @@ CRITERIA = {
         "AC-recovery": "The new project and its station-upload.json are saved.",
         "AC-evidence": "This report."},
     "db_snapshot_capture": {
-        "AC-identity": "A DB without a stored snapshot refuses: V21 exports an empty snapshot, which the review refuses as InvalidDbSnapshot; the record names the exact project and DB.",
+        "AC-identity": "A DB without a stored snapshot refuses with DbSnapshotUnavailable (V21 exports empty SnapshotValues dated 0001-01-01); the record names the exact project and DB.",
         "AC-completeness": "The review holds the value db_snapshot_create stored (Count = 42).",
         "AC-preserve": "The complete project state is unchanged.",
         "AC-evidence": "This report."},
@@ -77,7 +77,8 @@ CRITERIA = {
 }
 LIMITATIONS = [
     "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1. Power-on needs the provisioned protection credential, provisioned with "
-    "first-use TLS trust under the owned-empty-CPU policy; the online routes themselves only log in as the generated runtime user and never trust a certificate.",
+    "first-use TLS trust under the owned-empty-CPU policy. The compare and DB-snapshot sessions only log in as the generated runtime user and never trust a certificate; "
+    "the station upload in an empty Portal also trusts the owned CPU's certificate on first use (trustOwnedSimulationCertificate), pinned for that upload attempt.",
     "One global DB with one Int; arrays, structures, instance DBs and retain values are not exercised.",
     "The other-project and other-CPU refusals use edited copies of the runtime user's nonsecret metadata; the encrypted secret is never copied.",
     "Online compare is checked identical right after the download only; no online/offline difference is produced. The fingerprint is recorded, not asserted.",
@@ -260,8 +261,8 @@ def body(h):
             return error
         lab.unchanged("refuse plc_online_compare: no runtime credential", unauthenticated)
         lab.refuse("an open project", "plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login}, "ProjectIsolationRequired")
-        # V21 exports an empty snapshot for a DB without one; the review refuses it (observed 29 October 2026).
-        lab.refuse("a DB without a stored snapshot", "db_snapshot_capture", {"reviewId": review, "objectPath": db}, "InvalidDbSnapshot", "Expected one unqualified Snapshot")
+        # V21 exports empty SnapshotValues for a DB without a stored snapshot (observed 29 October 2026).
+        lab.refuse("a DB without a stored snapshot", "db_snapshot_capture", {"reviewId": review, "objectPath": db}, "DbSnapshotUnavailable", "no stored snapshot")
         lab.refuse("db_snapshot_create without a download ticket", "change_prepare", {"kind": "db_snapshot_create", "payload": {"blockPath": db}, "plcPath": run.plc}, "PhysicalPlcRefused")
 
         def compare():
@@ -274,12 +275,10 @@ def body(h):
             return {**session, "rows": names, "fingerprint": report["fingerprint"], "projectModified": [report["projectModifiedBefore"], report["projectModifiedAfter"]]}
         lab.unchanged("plc_online_compare with the runtime user", compare)
 
-        # --skip-snapshots: V21 exported no snapshot values after db_snapshot_create on 29 October 2026; the compare and upload still run.
         if not h.args.skip_snapshots:
             h.stage("set Count to 42 through PLCSIM", lambda: lab.count(42))
             create = lab.prepare("db_snapshot_create", {"blockPath": db})
-            # V21 exports an empty snapshot for a DB without one, so the preview reports a backed-up previous snapshot (observed 29 October 2026).
-            require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": True}],
+            require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": False}],
                     "Unexpected db_snapshot_create effects: %s" % create["preview"]["effects"])
             readback = [r["artifact"] for r in lab.apply("db_snapshot_create", create)["readbacks"] if r["role"] == "db-snapshot-readback"]
             require(len(readback) == 1, "db_snapshot_create returned no snapshot readback")
@@ -310,7 +309,7 @@ def body(h):
                 after = run.state()
                 require(after == run.current, "The recovered state differs: %s" % diff(run.current, after))
                 error = h.call_error("db_snapshot_capture", {"reviewId": review, "objectPath": db})
-                require(error.get("code") == "InvalidDbSnapshot" and "Expected one unqualified Snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
+                require(error.get("code") == "DbSnapshotUnavailable" and "no stored snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
                 return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
             h.stage("restore db_snapshot_create from its checkpoint", restore)
 

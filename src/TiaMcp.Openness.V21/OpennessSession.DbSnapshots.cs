@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.SW.Blocks;
@@ -43,6 +44,9 @@ namespace TiaMcp.Openness.V21
             try { snapshot.Export(new FileInfo(path), ExportOptions.WithDefaults | ExportOptions.WithReadOnly); }
             catch (EngineeringException ex) { throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no exportable stored snapshot: " + ex.Message); }
             if (!File.Exists(path)) throw new BridgeException("DbSnapshotUnavailable", "InterfaceSnapshot.Export produced no file.");
+            // A DB without a stored snapshot exports an empty SnapshotValues dated 0001-01-01.
+            if (!XDocument.Load(path).Descendants().Any(e => e.Name.LocalName == "Value" && e.Parent?.Name.LocalName == "SnapshotValues"))
+                throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no stored snapshot: InterfaceSnapshot.Export returned no snapshot values.");
         }
 
         private void PrepareDbSnapshotChange(EngineeringChange change, JObject preview)
