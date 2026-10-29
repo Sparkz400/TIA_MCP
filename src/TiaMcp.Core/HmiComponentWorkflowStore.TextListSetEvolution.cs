@@ -160,6 +160,7 @@ public sealed partial class HmiComponentWorkflowStore
             var template = Object(row["template"]);
             var intent = EvolutionIntent(template, listName, numeric);
             var built = UnifiedTextListAuthoring.Build(intent);
+            if (retained is null) UnifiedTextListAuthoring.RequireNativeImportable(intent);
             string expectedType = numeric ? Text(template, "dataType", 16) : "Bool";
             if ((string?)binding["afterDeclaration"]?["status"] != "capturedDeclaration" ||
                 (string?)binding["afterDeclaration"]?["dataType"] != expectedType ||
