@@ -19,7 +19,8 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
         {
             if (!acknowledgeWrite) throw new BridgeException("RuntimeAcknowledgementRequired", "Set the explicit acknowledgement flag; nothing was sent.");
             await targets.Require(bindingSha256, (await sessions.Store.Status(attemptId, cancellationToken)).Selection.Endpoint);
-            return await sessions.Store.Write(attemptId, writes, cancellationToken);
+            return await sessions.Store.Write(attemptId, writes, cancellationToken,
+                RuntimeQualification.AfterSend(options, "ua.write.afterSend", new { attemptId, bindingSha256, writes }));
         });
 
     [McpServerTool(Name = "diagnostic_ua_compare", ReadOnly = true, Destructive = false, OpenWorld = false)]

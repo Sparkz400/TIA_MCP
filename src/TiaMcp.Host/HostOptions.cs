@@ -21,6 +21,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public bool TestSuiteQualification { get; init; }
     public bool TranslationQualification { get; init; }
     public string? WatchQualificationPoint { get; init; }
+    public string? RuntimeQualificationPoint { get; init; }
 
     public static HostOptions Parse(string[] args)
     {
@@ -52,6 +53,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var testSuiteQualification = false;
         var translationQualification = false;
         string? watchQualificationPoint = null;
+        string? runtimeQualificationPoint = null;
         var libraryLimits = new PackageIntakeLimits();
         for (var i = 0; i < args.Length; i++)
         {
@@ -81,6 +83,10 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                         throw new ArgumentException("--ua-client-identity requires one default or 32-lowercase-hex name.");
                     uaClientIdentity = args[i]; break;
                 case "--watch-qualification": watchQualificationPoint = args[i]; break;
+                case "--runtime-qualification":
+                    if (runtimeQualificationPoint is not null || args[i] is not ("ua.write.afterSend" or "web.write.afterSend"))
+                        throw new ArgumentException("--runtime-qualification takes one of ua.write.afterSend or web.write.afterSend.");
+                    runtimeQualificationPoint = args[i]; break;
                 case "--addin-enrollment":
                     if (addInEnrollment is not null) throw new ArgumentException("--addin-enrollment may be given once.");
                     addInEnrollment = TiaMcp.Core.AddIns.AddInEnrollment.Read(args[i]); break;
@@ -102,6 +108,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                 "host.watch_authoring_source_negative"))
                 throw new ArgumentException("Unknown watch qualification interruption point.");
         }
+        if (runtimeQualificationPoint is not null && !componentQualification)
+            throw new ArgumentException("--runtime-qualification requires --component-qualification.");
         if (testSuiteScopeProbe && (componentQualification || watchQualificationPoint is not null))
             throw new ArgumentException("Test Suite scope probing requires its own sequential Host.");
         if (testSuiteQualification && (componentQualification || testSuiteScopeProbe || watchQualificationPoint is not null))
@@ -112,7 +120,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)
