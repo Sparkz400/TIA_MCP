@@ -110,41 +110,43 @@ internal static class Program
         }
     }
 
-    // A same-qualified-name competitor for the root DB: Tgp_ResolutionOne in unit B without a namespace, first by
-    // clearing the generated block's namespace, then by generating under an empty unit namespace preset.
+    // A same-qualified-name competitor for the root DB: Tgp_ResolutionOne in unit B without a namespace.
     private static JObject DuplicateDb(TiaPortal portal, Project project, PlcSoftware plc, string projectPath, int pid, string directory)
     {
         const string name = "Tgp_ResolutionOne", preset = "TiaMcp_UnitB";
         var root = plc.BlockGroup.Blocks.Find(name) as GlobalDB;
         var unit = plc.GetService<PlcUnitProvider>()?.UnitGroup.Units.Find(preset);
-        Func<PlcBlock[]> competitors = () => unit.BlockGroup.Blocks.Where(block => block.Name == name).ToArray();
+        Func<PlcBlock[]> competitors = () => unit.BlockGroup.Blocks.Where(block => block.Name == name || block.Name == name + "_Renamed").ToArray();
         if (root == null || !string.IsNullOrEmpty(root.Namespace) || unit == null || unit.NamespacePreset != preset || competitors().Length != 0)
             throw new InvalidOperationException("Observed root DB, seeded unit B preset or competitor absence differs.");
-        string sourcePath = Path.Combine(directory, "competing-db.scl");
-        File.WriteAllText(sourcePath, "DATA_BLOCK \"" + name + "\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR\n Flag : Bool := FALSE;\n RetainedMarker : Int := 91;\nEND_VAR\nBEGIN\nEND_DATA_BLOCK\n", new UTF8Encoding(true));
+        Func<string, string> db = dbName => "DATA_BLOCK \"" + dbName + "\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR\n Flag : Bool := FALSE;\n RetainedMarker : Int := 91;\nEND_VAR\nBEGIN\nEND_DATA_BLOCK\n";
         using (portal.ExclusiveAccess("TIA MCP owned native duplicate-DB diagnostic"))
         {
             var attempts = new JArray();
             var result = new JObject { ["completed"] = false, ["projectPath"] = projectPath, ["processId"] = pid,
                 ["duplicateCreated"] = false, ["mutationReplayed"] = false, ["attempts"] = attempts };
-            foreach (string route in new[] { "blockNamespace", "unitPreset" })
+            // Every way to reach the root DB's qualified name: generate it, under an empty preset, by namespace edit, by rename.
+            foreach (string route in new[] { "source", "unitPreset", "namespaceEdit", "rename" })
             {
                 var attempt = new JObject { ["route"] = route };
                 attempts.Add(attempt);
                 try
                 {
                     if (route == "unitPreset") { unit.NamespacePreset = ""; attempt["presetCleared"] = unit.NamespacePreset ?? ""; }
+                    string sourcePath = Path.Combine(directory, "competing-db-" + route + ".scl");
+                    File.WriteAllText(sourcePath, route == "namespaceEdit" ? "NAMESPACE " + preset + "\n" + db(name) + "END_NAMESPACE\n" : db(route == "rename" ? name + "_Renamed" : name), new UTF8Encoding(true));
                     var source = unit.ExternalSourceGroup.ExternalSources.CreateFromFile("Tgp_ResolutionCompetitor", sourcePath);
                     try { source.GenerateBlocksFromSource(); } finally { source.Delete(); }
                     var generated = competitors();
-                    attempt["generatedNamespaces"] = new JArray(generated.Select(block => block.Namespace ?? ""));
-                    foreach (var block in generated.Where(block => !string.IsNullOrEmpty(block.Namespace))) block.Namespace = "";
+                    attempt["generated"] = new JArray(generated.Select(block => (block.Namespace ?? "") + "|" + block.Name));
+                    foreach (var block in generated)
+                        if (route == "namespaceEdit") block.Namespace = ""; else if (route == "rename") block.Name = name;
                 }
                 catch (EngineeringException error) { result["nativeRejection"] = attempt["nativeRejection"] = new JObject { ["type"] = error.GetType().FullName, ["message"] = error.Message }; }
                 finally { if (route == "unitPreset") unit.NamespacePreset = preset; }
                 var created = competitors();
-                attempt["namespaces"] = new JArray(created.Select(block => block.Namespace ?? ""));
-                if (created.Length == 1 && string.IsNullOrEmpty(created[0].Namespace)) { result["duplicateCreated"] = true; break; }
+                attempt["observed"] = new JArray(created.Select(block => (block.Namespace ?? "") + "|" + block.Name));
+                if (created.Length == 1 && created[0].Name == name && string.IsNullOrEmpty(created[0].Namespace)) { result["duplicateCreated"] = true; break; }
                 // No partial competitor survives into the next route or the observed project.
                 foreach (var block in created) block.Delete();
                 attempt["partialDeleted"] = created.Length;
