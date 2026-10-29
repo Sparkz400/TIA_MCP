@@ -290,9 +290,11 @@ class Run:
         self.h.stage("refuse apply %s: %s" % (kind, label), check)
         self.mark(kind, "refused", code)
 
-    def restore(self, label, kind, prepared):
+    def restore(self, label, kind, prepared, recovered=None):
+        """recovered: an already returned change_restore result; a second restore is refused by the stale-scope check."""
         h = self.h
-        recovered = h.stage("restore " + label, lambda: h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
+        if recovered is None:
+            recovered = h.stage("restore " + label, lambda: h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
         require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"], "Checkpoint recovery of %s was not verified" % label)
         path = recovered["recoveredProject"]["path"]
         require(Path(path).resolve() != Path(self.project).resolve(), "Recovery reused the changed project's directory")
@@ -421,7 +423,7 @@ def regenerate_existing(run):
     if refused.get("isError"):  # Recorded, never retried; the retained checkpoint stays the recovery input.
         h.report["nativeBound"]["restoreRefusal"] = (refused.get("structuredContent") or {}).get("error")
         return
-    run.restore(label, k, prepared)  # change_restore returns the restored change again; the recovered copy is verified here.
+    run.restore(label, k, prepared, recovered=refused["structuredContent"])  # The recovered copy is verified here.
 
 
 def pages(run):

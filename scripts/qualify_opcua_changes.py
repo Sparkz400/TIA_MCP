@@ -62,7 +62,9 @@ def normalized_hash(path):
 def opcua_state(h, plc):
     """The inspected OPC UA configuration, keyed per object, plus each server interface's normalized export hash."""
     inspected = h.tool("opcua_engineering_inspect", {"plcPath": plc, "maxItems": 2000})
-    require(not inspected["completeness"].get("truncated") and not inspected.get("warnings"), "OPC UA inspection is truncated or warned: %s" % inspected.get("warnings"))
+    # With the server on, TIA renders the server certificate attribute display-only; any other warning is a gap.
+    warnings = [w for w in inspected.get("warnings") or [] if w.get("valueStatus") != "displayOnly"]
+    require(not inspected["completeness"].get("truncated") and not warnings, "OPC UA inspection is truncated or warned: %s" % warnings)
     state = {"opcua:namespaceAccess": inspected["namespaceAccessRestrictions"]}
     for row in inspected["serverSettings"]:
         state["opcua:settings:" + row["hardwarePath"]] = {a["name"]: a.get("value") for a in row["attributes"]}
