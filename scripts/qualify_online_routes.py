@@ -274,43 +274,45 @@ def body(h):
             return {**session, "rows": names, "fingerprint": report["fingerprint"], "projectModified": [report["projectModifiedBefore"], report["projectModifiedAfter"]]}
         lab.unchanged("plc_online_compare with the runtime user", compare)
 
-        h.stage("set Count to 42 through PLCSIM", lambda: lab.count(42))
-        create = lab.prepare("db_snapshot_create", {"blockPath": db})
-        # V21 exports an empty snapshot for a DB without one, so the preview reports a backed-up previous snapshot (observed 29 October 2026).
-        require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": True}],
-                "Unexpected db_snapshot_create effects: %s" % create["preview"]["effects"])
-        readback = [r["artifact"] for r in lab.apply("db_snapshot_create", create)["readbacks"] if r["role"] == "db-snapshot-readback"]
-        require(len(readback) == 1, "db_snapshot_create returned no snapshot readback")
-        def capture():
-            record = h.tool("db_snapshot_capture", {"reviewId": review, "objectPath": db})
-            source = record["inputSource"]
-            require(source["objectPath"] == db and Path(source["projectPath"]).resolve() == Path(run.project).resolve(), "The capture names another DB or project: %s" % source)
-            rows = [r["value"] for r in h.tool("db_snapshot_review_page", {"recordId": record["recordId"], "section": "beforeValues", "count": 200})["rows"]]
-            require([r["text"] for r in rows if r["path"].replace('"', "").split(".")[-1] == "Count"] == ["42"], "The captured snapshot does not hold Count = 42: %s" % rows)
-            return {"recordId": record["recordId"], "snapshotSha256": record["input"]["sha256"], "values": rows,
-                    "equalsCreateReadback": record["input"]["sha256"] == readback[0]["sha256"]}
-        captured = lab.unchanged("db_snapshot_capture of " + DB, capture)
+        # --skip-snapshots: V21 exported no snapshot values after db_snapshot_create on 29 October 2026; the compare and upload still run.
+        if not h.args.skip_snapshots:
+            h.stage("set Count to 42 through PLCSIM", lambda: lab.count(42))
+            create = lab.prepare("db_snapshot_create", {"blockPath": db})
+            # V21 exports an empty snapshot for a DB without one, so the preview reports a backed-up previous snapshot (observed 29 October 2026).
+            require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": True}],
+                    "Unexpected db_snapshot_create effects: %s" % create["preview"]["effects"])
+            readback = [r["artifact"] for r in lab.apply("db_snapshot_create", create)["readbacks"] if r["role"] == "db-snapshot-readback"]
+            require(len(readback) == 1, "db_snapshot_create returned no snapshot readback")
+            def capture():
+                record = h.tool("db_snapshot_capture", {"reviewId": review, "objectPath": db})
+                source = record["inputSource"]
+                require(source["objectPath"] == db and Path(source["projectPath"]).resolve() == Path(run.project).resolve(), "The capture names another DB or project: %s" % source)
+                rows = [r["value"] for r in h.tool("db_snapshot_review_page", {"recordId": record["recordId"], "section": "beforeValues", "count": 200})["rows"]]
+                require([r["text"] for r in rows if r["path"].replace('"', "").split(".")[-1] == "Count"] == ["42"], "The captured snapshot does not hold Count = 42: %s" % rows)
+                return {"recordId": record["recordId"], "snapshotSha256": record["input"]["sha256"], "values": rows,
+                        "equalsCreateReadback": record["input"]["sha256"] == readback[0]["sha256"]}
+            captured = lab.unchanged("db_snapshot_capture of " + DB, capture)
 
-        h.stage("set Count to 7 through PLCSIM", lambda: lab.count(7))
-        lab.refuse("db_snapshot_load_actual without acknowledgeActualValueWrite", "change_prepare", {"kind": "db_snapshot_load_actual", "plcPath": run.plc,
-                   "payload": {"snapshotRecordId": captured["recordId"], "downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login}},
-                   "InvalidRequest", "acknowledgeActualValueWrite")
-        load = lab.prepare("db_snapshot_load_actual", {"snapshotRecordId": captured["recordId"], "acknowledgeActualValueWrite": True})
-        require(load["preview"]["effects"] == [{"action": "loadSnapshotAsActualValues", "blockPath": db, "snapshotRecordId": captured["recordId"],
-                                                "snapshotSha256": captured["snapshotSha256"]}], "Unexpected db_snapshot_load_actual effects: %s" % load["preview"]["effects"])
-        lab.apply("db_snapshot_load_actual", load, compile=False, save=False)
-        h.stage("PLCSIM reads back the loaded snapshot", lambda: require(lab.count() == 42, "Count is not 42 after the load") or 42)
+            h.stage("set Count to 7 through PLCSIM", lambda: lab.count(7))
+            lab.refuse("db_snapshot_load_actual without acknowledgeActualValueWrite", "change_prepare", {"kind": "db_snapshot_load_actual", "plcPath": run.plc,
+                       "payload": {"snapshotRecordId": captured["recordId"], "downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login}},
+                       "InvalidRequest", "acknowledgeActualValueWrite")
+            load = lab.prepare("db_snapshot_load_actual", {"snapshotRecordId": captured["recordId"], "acknowledgeActualValueWrite": True})
+            require(load["preview"]["effects"] == [{"action": "loadSnapshotAsActualValues", "blockPath": db, "snapshotRecordId": captured["recordId"],
+                                                    "snapshotSha256": captured["snapshotSha256"]}], "Unexpected db_snapshot_load_actual effects: %s" % load["preview"]["effects"])
+            lab.apply("db_snapshot_load_actual", load, compile=False, save=False)
+            h.stage("PLCSIM reads back the loaded snapshot", lambda: require(lab.count() == 42, "Count is not 42 after the load") or 42)
 
-        def restore():
-            recovered = h.tool("change_restore", {"changeId": create["changeId"], "previewHash": create["previewHash"]})
-            require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"]
-                    and Path(recovered["recoveredProject"]["path"]).resolve() != Path(run.project).resolve(), "Checkpoint recovery was not verified: %s" % recovered["stages"])
-            after = run.state()
-            require(after == run.current, "The recovered state differs: %s" % diff(run.current, after))
-            error = h.call_error("db_snapshot_capture", {"reviewId": review, "objectPath": db})
-            require(error.get("code") == "InvalidDbSnapshot" and "Expected one unqualified Snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
-            return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
-        h.stage("restore db_snapshot_create from its checkpoint", restore)
+            def restore():
+                recovered = h.tool("change_restore", {"changeId": create["changeId"], "previewHash": create["previewHash"]})
+                require(recovered["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in recovered["stages"]
+                        and Path(recovered["recoveredProject"]["path"]).resolve() != Path(run.project).resolve(), "Checkpoint recovery was not verified: %s" % recovered["stages"])
+                after = run.state()
+                require(after == run.current, "The recovered state differs: %s" % diff(run.current, after))
+                error = h.call_error("db_snapshot_capture", {"reviewId": review, "objectPath": db})
+                require(error.get("code") == "InvalidDbSnapshot" and "Expected one unqualified Snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
+                return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
+            h.stage("restore db_snapshot_create from its checkpoint", restore)
 
         h.stage("close the scratch before the upload", lambda: h.tool("tia_detach"))
         h.owned_portal("for the station upload")
@@ -350,6 +352,7 @@ if __name__ == "__main__":
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
+    parser.add_argument("--skip-snapshots", action="store_true", help="Run the compare and the station upload without the DB-snapshot steps.")
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "or_", "D09 online routes on one owned PLCSIM Advanced V8 instance, logged in as its generated runtime user", LIMITATIONS, []).run(body)
