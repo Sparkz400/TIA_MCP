@@ -1,0 +1,92 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.resolution.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T13:19:17+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.resolution.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen at the short project path x): the standard and namespace phases reproduce, LAD and FBD (20 cases); the stale phase does not (see limitations). Original scope: scripts/qualify_typed_resolution.py on fresh owned TIA V21 scratch projects, LAD and FBD each: standard phase (exact tag-table owner, wrong table, first/second DB owner, wrong kind, missing member, wrong type), namespace phase with UnitSeeder software units (nested UDT resolved through the declaring namespace with fully qualified references, wrong type, missing member) and stale phase (duplicate-tag setup guard, stale tag address and stale DB ambiguity with deliberate-change recovery). Positive cases passed apply/compile, complete native preservation, reopen and checkpoint recovery; negative cases returned their exact diagnostic with the complete original XML unchanged.",
+  "limitations": [
+    "The stale phase is not reproduced. stale-db-ambiguity adds a competing Tgp_ResolutionOne in TiaMcp_UnitB and expects AmbiguousOperand, but since a808569 (26 October 2026) the resolver compares qualified names, and that DB is TiaMcp_UnitB.Tgp_ResolutionOne, so prepare correctly resolves the root DB. Both stale runs stop at that case (artifacts/q/tz/res-stl-lad, res-stl-fbd); their tag-duplicate-setup-guard and stale-tag-address cases passed but are not curated.",
+    "The standard FBD run was repeated (res-sta-fbd2): its first run passed every case but its owned TIA did not exit within the cleanup wait while the machine was at full load.",
+    "Unqualified nested-namespace references and duplicate PLC tag names are rejected by TIA itself; see local.typed.native-boundaries.rerun.20261029.",
+    "Typed operand resolution only; scoped runtime behavior is not covered."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "419314cf6ec803b1bdf57ff3402f1c6ce82fb9dc76288e1b9be47c3b8bbc7b0f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "61e13d0917020b67b90ba149effdec577d68562611cd920b75f167bfd105b223"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "2467eda5b13e121927d3c768fdf15f859b5220f0fe4988327c38ee459cab91a1"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "c9b0dd53d9c8e3759dbecb824f425050a3e9e74e85a28aa2d672e4ff4e7262f2"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-res-reproduced.json",
+      "sha256": "dd14c4f4afa6503540183432fd77421999bf9693059658c44b25085dcaf226a2",
+      "bytes": 141720,
+      "completed": true,
+      "steps": [
+        "res-sta-lad/tag-exact-owner: passed",
+        "res-sta-lad/tag-wrong-table: passed",
+        "res-sta-lad/db-first-owner: passed",
+        "res-sta-lad/db-second-owner: passed",
+        "res-sta-lad/db-wrong-kind: passed",
+        "res-sta-lad/db-missing-member: passed",
+        "res-sta-lad/db-wrong-type: passed",
+        "res-sta-fbd2/tag-exact-owner: passed",
+        "res-sta-fbd2/tag-wrong-table: passed",
+        "res-sta-fbd2/db-first-owner: passed",
+        "res-sta-fbd2/db-second-owner: passed",
+        "res-sta-fbd2/db-wrong-kind: passed",
+        "res-sta-fbd2/db-missing-member: passed",
+        "res-sta-fbd2/db-wrong-type: passed",
+        "res-nam-lad/nested-udt-namespace: passed",
+        "res-nam-lad/nested-udt-wrong-type: passed",
+        "res-nam-lad/nested-udt-missing-member: passed",
+        "res-nam-fbd/nested-udt-namespace: passed",
+        "res-nam-fbd/nested-udt-wrong-type: passed",
+        "res-nam-fbd/nested-udt-missing-member: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

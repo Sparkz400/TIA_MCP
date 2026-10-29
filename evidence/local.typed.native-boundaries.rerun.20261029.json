@@ -1,0 +1,73 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.native-boundaries.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T13:10:07+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.native-boundaries.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen at the short project path x, because the resolution runners need native paths of at most 57 characters): all four boundary observations reproduce, as in the original. Original scope: Native V21 boundary observations on fresh owned scratch projects, LAD and FBD each. Duplicate tag: ResolutionSeeder creating a second PLC tag named Ready in another table is refused by Openness (PlcTagComposition.Create: an object that already exists); the table addition compiles clean and all pre-existing XML is unchanged. Unqualified nested namespace: importing TiaMcp_UnitA.Alternate.Tgp_ResolutionOuter with an unqualified Tgp_ResolutionInner member is refused by TIA (data type is unknown); the change was recovered with the original XML verified.",
+  "limitations": [
+    "These record native platform rejections, not typed ambiguity or propagation passes; the typed resolver's guards for these cases remain defensive."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "419314cf6ec803b1bdf57ff3402f1c6ce82fb9dc76288e1b9be47c3b8bbc7b0f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "61e13d0917020b67b90ba149effdec577d68562611cd920b75f167bfd105b223"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "2467eda5b13e121927d3c768fdf15f859b5220f0fe4988327c38ee459cab91a1"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "c9b0dd53d9c8e3759dbecb824f425050a3e9e74e85a28aa2d672e4ff4e7262f2"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-bound.json",
+      "sha256": "60ed65d5eb4d82055f733bcb4ba0d02517b7d901891626c22c5d77af985a8ef4",
+      "bytes": 24467,
+      "completed": true,
+      "steps": [
+        "tag-lad: native rejection observed, original preserved",
+        "tag-fbd: native rejection observed, original preserved",
+        "nsu-lad: native rejection observed, original preserved",
+        "nsu-fbd: native rejection observed, original preserved"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

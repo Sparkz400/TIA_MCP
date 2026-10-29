@@ -1,0 +1,55 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.route-transitive-capture.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T09:24:45+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.route-transitive-capture.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): the packet's own capture command, then both extractions in the frozen copy; all 24 re-captured native XML exports equal the committed fixtures except their DocumentInfo/Created export time, so the committed effect manifests stand unchanged. Original scope: Native transitive dependent-instance effect in the software-unit (TiaMcp_UnitA) and namespace (TiaMcp_UnitA.Alternate) routes: adding one FB member and one static member of each IEC instance type to TgpUnit_NestEffect and TgpNamespace_NestEffect, each embedded as Inner in its route's NestParent and as Middle.Inner in its NestGrand under the namespace-qualified type name, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py --route softwareUnit|namespace).",
+  "limitations": [
+    "Captured for the software-unit and namespace routes at nesting depths 1 and 2, with every FB of the chain in the same namespace; parents in another namespace or unit are not captured."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1078f9db615efb31fbf9e054a3b7e5b86d137589140ecb355bee5c4edb454cec"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7b544f62ca84c4a827ce485f9b7d1ef6c3ad9eca36ee7b0a4725c90d469d5123"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "24cdafde74e15888915052ef0f309d66ce9d67bca4fce3cefa7d984c9ab62a59",
+      "bytes": 19173625,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

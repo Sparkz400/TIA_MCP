@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.69",
+  "catalogVersion": "0.4.70",
   "targetTiaVersions": [
     21
   ],
@@ -358,77 +358,6 @@
       ]
     },
     {
-      "id": "local.explorer.relationship-scope.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "53a3807aeaa6ee7c25ca56a124982204cc396263",
-        "passedScope": "scripts/qualify_project_explorer.py default profile on a new owned TIA V21 scratch project (73 captured nodes): relationship graph from TiaMcp_EnableGate matches exactly the 7 resolved and 8 unresolved member edges authored from the fixed scratch SCL source; a depth-5/500-node/1,000-edge traversal returns all 21 retained native edges with relationshipScope complete, no stop reasons and every endpoint owned by the four fixture blocks; a 3-edge budget visibly truncates (stopReasons depth+edges). Native performance: cold capture 187 ms, warm 136 ms, details 255/372 ms, relationships 149-541 ms, cached MCP search p95 16 ms; relationship payloads 27.6-99.6 KB, JSON export 134,840 bytes, HTML 286,877 bytes; resident memory TIA Portal 2.62 GB, Host 127 MB, worker 98 MB, unchanged by warm recapture."
-      },
-      "artifacts": [
-        "evidence/local.explorer.relationship-scope.20261024.json"
-      ],
-      "limitations": [
-        "One small fixed fixture with four blocks; no generated large programs, second PLC, HMI or library relationships, configured-I/O positives or protected/indirect references; whole-project relationship completeness remains notEstablished by contract.",
-        "Single-session measurements on one machine; not a contention-independent latency or memory guarantee. Worker memory sums descendants of the Host process, which include the owned TIA process.",
-        "Relationship completeness is proven only within the declared provider scope and budgets on the fixed scratch fixture; projectCompleteness stays notEstablished."
-      ]
-    },
-    {
-      "id": "local.engineering.interruption.rerun.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "5e3b79931e914da8d48aa6e78fbca4ac58d5cae7",
-        "passedScope": "Rerun of the two cases that failed or used the wrong evidence path in local.engineering.interruption.20261024, after the fixes in this commit (qualifier reads journals with full sharing; a global library checkpoint below its admitted directory is matched). change_restore killed after 'restoring' was journaled (pre-recovery save/archive phase) -> released: original project unchanged (fresh fingerprint equals the journal's afterFingerprint), checkpoint archive unchanged, recovery destination without content, journal and input unchanged. library_create_master_copy apply killed while 'applying' (project and global-library checkpoints) -> released: project fingerprint plus project-library revision equal the retrieved project checkpoint, global library revision equals the retrieved library checkpoint. Journals unchanged by reconciliation; no mutation re-dispatched."
-      },
-      "artifacts": [
-        "evidence/local.engineering.interruption.rerun.20261024.json"
-      ],
-      "limitations": [
-        "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
-        "Library revision covers library structure, type versions and master copies, not unexposed object document content."
-      ]
-    },
-    {
-      "id": "local.typed.runtime.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "8605e7f72d7477254a5c54e41582bffd56f4efd1",
-        "passedScope": "scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate, one fresh owned TIA V21 scratch (CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, en-US project) and one owned PLCSIM Advanced V8 instance per case: 34 typed cells, LAD and FBD, standard route. Boolean truth table; Int eq/ne/lt/le/gt/ge at signed boundaries; TON/TOF/TP start-cancel-restart-complete; CTU/CTD/CTUD edges, reset/load and signed limits; FC, global-instance FB and multi-instance FB parameter flow; numeric FC input/in-out/output/return flow. Each case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, checkpoint restore with recovered reopen, and every independent runtime assertion (512 total), under semantic runtime preservation v1 (card verified at download and after provisioning restore, complete PLC XML before cleanup, project changes only from the receipted plc_compile save and provisioning)."
-      },
-      "artifacts": [
-        "evidence/local.typed.runtime.20261024.json"
-      ],
-      "limitations": [
-        "Standard route only; software-unit and namespace routes, scoped operands and storage-creation variants at runtime are not covered.",
-        "Numeric FB (two independent instances) and CTU 32767 saturation/reset did not run here: harness InOut-member defect and a reserved-keyword driver fixture, both fixed separately and pending rerun.",
-        "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
-        "Existing-caller network insertion remains rejected (NativeIdPreservationUnsupported)."
-      ]
-    },
-    {
-      "id": "local.typed.runtime.reruns.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "55c1ccccd1e1edefa188009b4f054120ae5834d9",
-        "passedScope": "scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate on fresh owned TIA V21 scratch projects (CPU 1511-1 PN V4.1) and owned PLCSIM Advanced V8 instances: numeric FB with two independent instances (left/right state, in-out and output flow) and CTU signed Int upper saturation at 32767 with the 32768th attempted edge and reset, LAD and FBD. All four passed import/compile, complete XML with untouched peers, save/reopen, checkpoint recovery and every runtime assertion (434 total), with the in-run semantic runtime preservation verdict."
-      },
-      "artifacts": [
-        "evidence/local.typed.runtime.reruns.20261024.json"
-      ],
-      "limitations": [
-        "Reruns after the shared-harness elementary IN_OUT fix (#30) and the CTU driver keyword fix (#31); complements local.typed.runtime.20261024 on a later build.",
-        "Standard route only; host application-call timing, not exact scan timing; the CTU driver pulses the typed FB at most 512 edges per call."
-      ]
-    },
-    {
       "id": "local.library_upgrades.20261024",
       "status": "passed",
       "profile": {
@@ -444,23 +373,6 @@
         "No V20 library exists; V19 is covered by the vendor evidence.",
         "Content behavior of HMI elements and of unavailable elements is not exercised (lane D owns HMI).",
         "Upgrade identity is checked within V21 (upgrade vs reopened archive); the older-format content cannot be read without the older TIA version."
-      ]
-    },
-    {
-      "id": "local.library_scopes.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "824b0ba9a0c6bb43e369f3d2f3e3bdf3394ac2ab",
-        "passedScope": "scripts\\qualify_library_scopes.py on build 041b0d8 (frozen D;C:\\Program Files\\Git\\lcq\\b8); a second PLC of the scratch CPU type is added with scratch security; FB and UDT 1.0.0 are instantiated into both PLCs and referenced from an OB in each; uses are attributed per PLC; updating the second PLC to FB 1.1.0 (updateScope=entireSelectedPlc) moves only that PLC while the first keeps 1.0.0 and every native block export of the first PLC is unchanged; updating the first PLC then brings both to 1.1.0; a fresh reopen confirms both PLCs at 1.1.0 and the UDT unchanged. All 58 retained observations (19 lock receipts) validate."
-      },
-      "artifacts": [
-        "evidence/local.library_scopes.20261025.json"
-      ],
-      "limitations": [
-        "Software units and namespaces are not exercised: creating a unit needs a native fixture tool whose Openness AllowList key requires an elevated grant.",
-        "Both PLCs use the scratch CPU type; mixed CPU families are not exercised."
       ]
     },
     {
@@ -496,146 +408,6 @@
         "PAL native import needs an intermediate TIA V17-V20 installation that is not on this PC.",
         "DMC CPU clock-memory prerequisite is outside current MCP routes; complete DMC PLC block compilation is not claimed.",
         "DMC HMI faceplates and SiVArc content are upgraded and listed only; their behavior belongs to lane D."
-      ]
-    },
-    {
-      "id": "local.engineering.boundaries.20261024",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "54e4bd6ff5bda932e35a34eaf3b6f4f33f726df5",
-        "passedScope": "scripts/qualify_interruption.py, TIA V21 owned scratch projects, one artifact root per scenario. apply-cancel: MCP notifications/cancelled while change_apply was applying; the next call got BridgeFaulted, the worker finished its call and exited with its TIA; a fresh Host reconciled the outcomeUnknown admission -> released (project verifiedApplied: fresh fingerprint equals journal afterFingerprint). stale-concurrent: a second Host attached to the same TIA applied a change between prepare and apply -> StaleRevision; a stale preview in the same Host after another apply -> StaleRevision; both previews stayed prepared and unclaimed, no admission was left, only the fresh changes are in the project. tia-unavailable: the owned TIA was terminated while idle; change_apply failed (EngineeringError: TIA Portal disposed or stopped) before any admission, the journal stayed prepared and a fresh session showed the project unchanged. library-open-kill: worker and TIA terminated after the open receipt was written -> held (source library unchanged; working copy partial). library-restore-complete: a library_create_master_copy change with project and global-library checkpoints was restored completely into new locations, then a fresh Host reopened both: the recovered project kept its fixture block, the recovered library had no master copies (its pre-change checkpoint) while the original library kept the applied master copy TiaMcp_IsEnabled."
-      },
-      "artifacts": [
-        "evidence/local.engineering.boundaries.20261024.json"
-      ],
-      "limitations": [
-        "Each scenario ran once; interruption is MCP cancellation or process termination, and where it landed inside a phase is timing-dependent.",
-        "Protected/know-how content is not covered: no protected fixture exists and creating one needs a protection password and new fixture code.",
-        "Fresh reopen after recovery compares fixture blocks and library master copies, not full object content."
-      ]
-    },
-    {
-      "id": "local.library_units.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "95cb81ad4bc67482bf12493b3c6e478dae5bd4f1",
-        "passedScope": "scripts/qualify_library_units.py on build a74211b (frozen D:/lcq/b9) with the registered scripts/native/LibraryUnitSeeder fixture tool: a software unit TiaMcp_LibUnit with namespace preset TiaMcp_LibUnit is seeded into an owned scratch PLC; FB and UDT 1.0.0 instantiate into the unit (exactly once, unit scope; TIA does not apply the unit's namespace preset to the library instances); instantiating the FB in the PLC root as well is refused before any write because TIA allows one instance of a library type per device; a second UDT copy in the unit is refused; a PLC-wide update is refused (LibraryUpdateCleanupRisk) because the unit use has no OB-rooted reference, and no newer version is copied; a fresh reopen keeps the unit use. All retained observations validate."
-      },
-      "artifacts": [
-        "evidence/local.library_units.20261025.json"
-      ],
-      "limitations": [
-        "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
-        "The unit is created by a fixture tool, not by an MCP route."
-      ]
-    },
-    {
-      "id": "local.library_protected.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "51d1d9ef09864e492f6a2b6ee7473de07d68a71c",
-        "passedScope": "scripts/qualify_library_protected.py at 51d1d9e on build 51d1d9e (frozen D:/lpr/b1, package tia-mcp-v21_20261027_065357_c5960a43) with the registered scripts/native/LibraryUnitSeeder fixture tool (protect mode, random password never stored), owned TIA V21 scratch projects: a plain FB is know-how protected; block_read refuses it (ProtectedObject); library_create_master_copy copies it into a global library. An FB type's in-work test instance is protected and its release to 1.0.0 applies (the in-work content pin uses the block's native fingerprints because Openness cannot export protected content); library_publish copies the protected type; a metadata-only edit/release of the still-protected test instance gives 1.1.0, published as the new default. Native document export of the protected version is refused by Openness (ExportAsDocuments: 'The block is know-how-protected and cannot be exported', surfaced as EngineeringError). In a fresh consumer the master copy and FB 1.0.0 instantiate and stay protected (block_read refuses the instance), Main calls both, the PLC-wide update to exactly 1.1.0 applies while the cleanup guard reads the cross-references of every block, protected ones included, and proves Main reaches the protected FB, and a fresh reopen keeps both protected. 60/60 steps; all 41 retained library observations (15 original-byte lock receipts) validate."
-      },
-      "artifacts": [
-        "evidence/local.library_protected.20261027.json"
-      ],
-      "limitations": [
-        "V21 Openness has no know-how protection service for PLC data types; protected UDTs are not exercised.",
-        "Protected type versions cannot be exported as documents, so library_edit_version from documents (content changes) is unavailable for them; 1.1.0 is a metadata-only release.",
-        "Protection is applied by a registered fixture tool, not an MCP route. One PLC, standard groups, no runtime execution."
-      ]
-    },
-    {
-      "id": "local.library_unit_relations.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "51d1d9ef09864e492f6a2b6ee7473de07d68a71c",
-        "passedScope": "scripts/qualify_library_unit_relations.py at 51d1d9e on build 51d1d9e (frozen D:/lpr/b1, package tia-mcp-v21_20261027_065357_c5960a43) with the registered scripts/native/LibraryUnitSeeder fixture tool, owned TIA V21 scratch projects: software units TiaMcp_LibProvider and TiaMcp_LibConsumer with one SoftwareUnit relation consumer->provider. Library FB and UDT 1.0.0 instantiate into the provider; instantiating either in the related consumer unit is refused before any write (LibraryConflict, one instance of a library type per device, relations included). The seeder sets the provider instances' Access attribute Unpublished->Published (TIA accepts it on typed instances); a consumer-unit cycle OB, instance DB and UDT DB call them through the relation and compile. The PLC-wide update to exactly FB 1.1.0 applies: the cleanup guard proves the provider uses through native cross-unit references from the consumer OB; the UDT stays at 1.0.0 and every path is unchanged. A fresh reopen keeps the relation, FB 1.1.0 and placement. 58/58 steps; all 49 retained library observations (16 original-byte lock receipts) validate."
-      },
-      "artifacts": [
-        "evidence/local.library_unit_relations.20261027.json"
-      ],
-      "limitations": [
-        "Units, the relation and the Access flag are set by a registered fixture tool, not by MCP routes.",
-        "One SoftwareUnit relation; NonUnitDB and TODB relations, namespaces on library instances and safety units are not exercised.",
-        "One PLC, no runtime execution."
-      ]
-    },
-    {
-      "id": "local.typed.resolution.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "b83202792c33f7152525ad156794920cff471022",
-        "passedScope": "scripts/qualify_typed_resolution.py on fresh owned TIA V21 scratch projects, LAD and FBD each: standard phase (exact tag-table owner, wrong table, first/second DB owner, wrong kind, missing member, wrong type), namespace phase with UnitSeeder software units (nested UDT resolved through the declaring namespace with fully qualified references, wrong type, missing member) and stale phase (duplicate-tag setup guard, stale tag address and stale DB ambiguity with deliberate-change recovery). Positive cases passed apply/compile, complete native preservation, reopen and checkpoint recovery; negative cases returned their exact diagnostic with the complete original XML unchanged."
-      },
-      "artifacts": [
-        "evidence/local.typed.resolution.20261025.json"
-      ],
-      "limitations": [
-        "Typed operand resolution only; scoped runtime behavior is not covered.",
-        "Unqualified nested-namespace references and duplicate PLC tag names are rejected by TIA itself; see local.typed.native-boundaries.20261025."
-      ]
-    },
-    {
-      "id": "local.typed.native-boundaries.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "b83202792c33f7152525ad156794920cff471022",
-        "passedScope": "Native V21 boundary observations on fresh owned scratch projects, LAD and FBD each. Duplicate tag: ResolutionSeeder creating a second PLC tag named Ready in another table is refused by Openness (PlcTagComposition.Create: an object that already exists); the table addition compiles clean and all pre-existing XML is unchanged. Unqualified nested namespace: importing TiaMcp_UnitA.Alternate.Tgp_ResolutionOuter with an unqualified Tgp_ResolutionInner member is refused by TIA (data type is unknown); the change was recovered with the original XML verified."
-      },
-      "artifacts": [
-        "evidence/local.typed.native-boundaries.20261025.json"
-      ],
-      "limitations": [
-        "These record native platform rejections, not typed ambiguity or propagation passes; the typed resolver's guards for these cases remain defensive."
-      ]
-    },
-    {
-      "id": "local.hmi.bridge.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "f685914e2cfb3c3654aac299f7dbdd75e0c4b60d",
-        "passedScope": "Production-bridge archive retrieval (project_retrieve), read-only hmi_inspect/hmi_references/hmi_capabilities and project_model Explorer integration on fresh independent seeder fixtures (two HMI owners each, protected CPUs with project users) for Classic TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, Unified MTP700 Comfort and Unified PC RT: retrieval, inspection accuracy over all six Classic screen roles, duplicate names, wrong-family/stale-target rejection, bounded inspection, save/reopen and archive-recovery equality (Classic screens matched by unique name, exports compared with only DocumentInfo/Created removed), and for Unified the integrated connection, PLC/DB declaration and screen-tag-PLC chains, scripts and alarms; owned Portal, host and worker cleanup verified."
-      },
-      "artifacts": [
-        "evidence/local.hmi.bridge.20261025.json"
-      ],
-      "limitations": [
-        "Native HMI compile fails on every profile: Classic has no configured start screen and Unified lacks the encrypted-transfer password; both need native editor work.",
-        "Classic PLC declaration mapping fails: the integrated connections exist in hardware but HmiTarget.Connections is empty and positive Classic fixtures carry no PLC-bound tags (no native-accepted Classic binding grammar).",
-        "WinCC RT Professional is in the catalog, but the PC rack's CanPlugNew refuses its application item in every slot, so no RT Professional fixture exists.",
-        "No production HMI write, interrupted write, runtime or native visual acceptance is covered."
-      ]
-    },
-    {
-      "id": "local.typed.insertion.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "17a36ff3935051aae63885533e8e1941540803fc",
-        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, typed-insert-lad and typed-insert-fbd on fresh owned TIA V21 scratch projects: a typed Boolean network inserted after the first network of an existing native caller (Tgp_Boolean_LAD/FBD). The builder predicted V21's renumbering (inserted unit IDs 8..C; block title IDs 8->D, 9->E). Each case passed import/compile, complete prepared XML equal to the native readback, the independent insertion contract (only following IDs shifted by exactly the inserted count; removing the unit and undoing the shift recovers the original caller exactly), untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
-      },
-      "artifacts": [
-        "evidence/local.typed.insertion.20261025.json"
-      ],
-      "limitations": [
-        "Under the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md, PR #49): renumbered following document-local IDs count as preserved; nothing else may change.",
-        "Engineering only, standard route, insertion after an existing network. First-network insertion into a network-free caller still refuses; insertion combined with storage creation needs its own composite contract."
       ]
     },
     {
@@ -756,56 +528,6 @@
       ]
     },
     {
-      "id": "local.typed.route-transitive-capture.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "3944707b13a466a9cc5ca8119d219274bbb6b882",
-        "passedScope": "Native transitive dependent-instance effect in the software-unit (TiaMcp_UnitA) and namespace (TiaMcp_UnitA.Alternate) routes: adding one FB member and one static member of each IEC instance type to TgpUnit_NestEffect and TgpNamespace_NestEffect, each embedded as Inner in its route's NestParent and as Middle.Inner in its NestGrand under the namespace-qualified type name, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py --route softwareUnit|namespace)."
-      },
-      "artifacts": [
-        "evidence/local.typed.route-transitive-capture.20261027.json"
-      ],
-      "limitations": [
-        "Captured for the software-unit and namespace routes at nesting depths 1 and 2, with every FB of the chain in the same namespace; parents in another namespace or unit are not captured."
-      ]
-    },
-    {
-      "id": "local.typed.route-transitive-effects.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "fb5fb64ea77a4ded82aef3e7cdd6f074343f0241",
-        "passedScope": "Software-unit and namespace route numeric FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep in its own namespace (<prefix>Host.Inner, <prefix>HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (28 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured route transitive effect (local.typed.route-transitive-capture.20261027); native readback matched every prediction exactly and each cell passed the four engineering gates."
-      },
-      "artifacts": [
-        "evidence/local.typed.route-transitive-effects.20261027.json"
-      ],
-      "limitations": [
-        "Engineering-only; runtime behavior inside the parent chain is not claimed.",
-        "Parent chains share the caller's namespace; parents in another namespace or unit and custom declaration shapes stay refused."
-      ]
-    },
-    {
-      "id": "local.typed.routes.engineering.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "097ec8ee5a2559597371592a07ac52b411e23c12",
-        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, 24 software-unit and alternate-namespace route cases from a SHA-bound baseline archive (fresh UnitSeeder seed of TiaMcp_UnitA/TiaMcp_UnitB with the TiaMcp_UnitA.Alternate namespace, retrieved into a new owned project per case): Boolean network replacement and FC/FB block creation in both routes, unit Int equality, numeric FC and FB calls with local, existing global, created multi and created global instance storage, LAD and FBD. Every case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
-      },
-      "artifacts": [
-        "evidence/local.typed.routes.engineering.20261025.json"
-      ],
-      "limitations": [
-        "Engineering only: no scoped runtime assertions; the runtime harness cannot yet call a software-unit DUT from the root Main OB.",
-        "Baseline archive rebuilt 25 October 2026 (artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21, sha256 39cea56a...); the 13 October archive is no longer on this PC."
-      ]
-    },
-    {
       "id": "local.typed.route-capture.20261025",
       "status": "passed",
       "profile": {
@@ -820,23 +542,6 @@
       "limitations": [
         "Native reference capture only: no typed builder, profile activation, changed-state recovery or runtime is established.",
         "The 80 pending route cells and inactive profile candidates still need extraction, review and builder qualification."
-      ]
-    },
-    {
-      "id": "local.typed.route-profiles.20261025",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "72db207bd5c9ca13b7dc1225850060e1fb5bc9e6",
-        "passedScope": "scripts/qualify_typed_graphical.py, engineering-only, the 40 route builder cases enabled by activating the 28 audited route profiles and 4 namespace storage templates staged from local.typed.route-capture.20261025: software-unit Ne/Lt/Le/Gt/Ge and TON (local and existing global), alternate-namespace Eq/Ne/Lt/Le/Gt/Ge and TON (local and existing global), and namespace numeric FC and FB calls with local, existing global, created multi and created global storage, LAD and FBD. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
-      },
-      "artifacts": [
-        "evidence/local.typed.route-profiles.20261025.json"
-      ],
-      "limitations": [
-        "Engineering only; scoped runtime is not covered.",
-        "TOF/TP/CTU/CTD/CTUD route cells are not covered; their native references are captured separately."
       ]
     },
     {
@@ -1041,23 +746,6 @@
       ]
     },
     {
-      "id": "local.explorer.native-providers.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "97ba3183c266ebe4ab07535dcd8401929ffcc002",
-        "passedScope": "scripts/qualify_project_explorer_relationships.py (source 97ba318) on release tia-mcp-v21_20261027_064910_1e3d1e2a (built from 09b0e30; host and worker sources are identical at 97ba318) with scripts/native/UnitSeeder explorer-relations as the registered fixture tool. Fresh owned TIA V21 scratch (CPU 1511-1PN) with the subnet/IO-system fixture of local.explorer.native-providers.20261026 plus a TM PosInput 2 V2.0 module plugged through prepared hardware_plug; the seeder then created software units ExplorerUnitA and ExplorerUnitB with the SoftwareUnit relation A -> B and a TO_ExternalEncoder V10.0 whose sensor interface is connected to the module's technology channel, and compiled with 0 errors. The explorer's technologyConnection edges from ExplorerEncoder resolve only to the TM PosInput module, matching the hardware paths of technology_read; the unitRelation edge from ExplorerUnitA resolves to unit B and unit B has none, matching software_inspect relations; both providers report complete providerCoverage and are declared in providerScope. The configured-network edges again matched their 4 hardware_inspect associations. The --verify-report rerun reopened the saved fixture with zero prepared changes and reproduced every edge. Capture 398/1,730 ms, relationship queries 470-2,097 ms."
-      },
-      "artifacts": [
-        "evidence/local.explorer.native-providers.20261027.json"
-      ],
-      "limitations": [
-        "One small fixture: one external encoder connected to one TM PosInput channel and one SoftwareUnit relation between two empty units. Axis, measuring-input and output-cam connections, tag/block/address targets, NonUnitDB and TODB relations and unresolved/ambiguous names were not exercised natively (they keep their offline oracle tests).",
-        "Unit relations and the TO connection are authored by the native UnitSeeder fixture tool, not by an MCP route; neither has a prepared change kind. Configured associations only, never cables, ports or physical topology; single-machine timings are not a latency guarantee."
-      ]
-    },
-    {
       "id": "local.library_import_scale.20261027",
       "status": "passed",
       "profile": {
@@ -1128,59 +816,6 @@
         "Interruption is process termination of the worker with its owned TIA, or of the Host, once per case; power loss, disk faults and remote transport are not exercised.",
         "One representative kind per reconciliation route qualifies the route's reconciliation, not every kind's native mutation; library transactions are covered by the library interruption records.",
         "The save-time rule trusts the checkpoint archive's file write time; the archive hash is verified, its timestamp is not."
-      ]
-    },
-    {
-      "id": "local.wave-kinds.probe.20261027",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "559501c2b662f6d3fde8773133d445cc3b69ac31",
-        "passedScope": "Exploratory native probe on one owned scratch CPU 1511-1 PN (V21): certificate_create/assign (PlcCommunicationCertificate, there and back)/delete applied with exact readback; umac_role_set create/grant/assign/unassign/revoke applied; vci_workspace_create/delete applied; instance_lookup found the single-instance DB and both call-site sources; webserver_page_set refused WebServerNotActivated on a CPU with web serving off."
-      },
-      "artifacts": [
-        "evidence/local.wave-kinds.probe.20261027.json"
-      ],
-      "limitations": [
-        "Exploratory probe of one scratch project and one CPU: not feature qualification, no reopen/recovery/interruption gates beyond each apply's own readback.",
-        "Web page settings were only probed for their refusal; no change kind activates web serving.",
-        "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
-      ]
-    },
-    {
-      "id": "local.typed.wave9.engineering.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "b425d0a2228609b048840b7fede7a4fe27e36f08",
-        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only on the standard route of CPU 1511-1 PN V4.1 (V21), each case in a fresh owned scratch, one complete batch (w9q5): 40 wave 9 cases pass all four native engineering gates (engineering, preservation, persistence, recovery): SUB/DIV Int/DInt/Real in LAD and FBD; R_TRIG/F_TRIG multi-instance LAD and FBD; every FBD DInt/Real compare (eq..ge), MOVE/ADD/MUL Int/DInt/Real and TONR; and TONR on the existing global Tgp_GlobalTonr in LAD and FBD. Profiles: local.typed.wave9-capture.20261027."
-      },
-      "artifacts": [
-        "evidence/local.typed.wave9.engineering.20261028.json"
-      ],
-      "limitations": [
-        "The 4 typed-existingglobal-rtrig/ftrig cases are not run: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile, so no global edge storage profile exists. The other 22 wave 9 cases passed in earlier stopped batches (local.typed.wave9.engineering-early.20261028).",
-        "SUB/DIV references are imported without TIA's exported Card=2 template value, which TIA refuses on import (recorded per case as referenceImportAdaptation); the reader treats Card=2 as absent for SUB/DIV only.",
-        "Engineering only: the runtime gate is not run."
-      ]
-    },
-    {
-      "id": "local.typed.crossscope.engineering.20261028",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "6dcbf7e9bd844cd236777791b5afc7160177fc3a",
-        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only: typed LAD and FBD calls from a caller in TiaMcp_UnitA's alternate namespace to TiaMcp_UnitA.TgpUnit_NumericFC (namespaceQualified profile) and from unit TiaMcp_UnitB to the published TiaMcp_UnitA FC through a SoftwareUnit relation (crossUnitQualified profiles v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1), each case in a fresh owned project retrieved from its SHA-bound archive; all 4 pass the four native engineering gates."
-      },
-      "artifacts": [
-        "evidence/local.typed.crossscope.engineering.20261028.json"
-      ],
-      "limitations": [
-        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
-        "Engineering only: the runtime gate is not run."
       ]
     },
     {
@@ -2656,6 +2291,434 @@
         "Two interruption points (compile and checkpoint archive); kills during native mutation and save are not exercised.",
         "The original project and library after the compile-stage kill are left for inspection; only recovered copies are verified."
       ]
+    },
+    {
+      "id": "local.library_units.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+        "passedScope": "Re-run of local.library_units.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner and the LibraryUnitSeeder fixture tool, which its build now registers on the Openness AllowList: a software unit TiaMcp_LibUnit with namespace preset TiaMcp_LibUnit is seeded into an owned scratch PLC; FB and UDT 1.0.0 instantiate into the unit (exactly once, unit scope; TIA does not apply the unit's namespace preset to the library instances); instantiating the FB in the PLC root as well is refused before any write because TIA allows one instance of a library type per device; a second UDT copy in the unit is refused; a PLC-wide update is refused (LibraryUpdateCleanupRisk) because the unit use has no OB-rooted reference, and no newer version is copied; a fresh reopen keeps the unit use. All retained observations validate."
+      },
+      "artifacts": [
+        "evidence/local.library_units.rerun.20261029.json"
+      ],
+      "limitations": [
+        "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
+        "The unit is created by a fixture tool, not by an MCP route."
+      ]
+    },
+    {
+      "id": "local.library_unit_relations.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+        "passedScope": "Re-run of local.library_unit_relations.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner and the LibraryUnitSeeder fixture tool, which its build now registers on the Openness AllowList: software units TiaMcp_LibProvider and TiaMcp_LibConsumer with one SoftwareUnit relation consumer->provider. Library FB and UDT 1.0.0 instantiate into the provider; instantiating either in the related consumer unit is refused before any write (LibraryConflict, one instance of a library type per device, relations included). The seeder sets the provider instances' Access attribute Unpublished->Published (TIA accepts it on typed instances); a consumer-unit cycle OB, instance DB and UDT DB call them through the relation and compile. The PLC-wide update to exactly FB 1.1.0 applies: the cleanup guard proves the provider uses through native cross-unit references from the consumer OB; the UDT stays at 1.0.0 and every path is unchanged. A fresh reopen keeps the relation, FB 1.1.0 and placement. 58/58 steps; all 49 retained library observations (16 original-byte lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_unit_relations.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Units, the relation and the Access flag are set by a registered fixture tool, not by MCP routes.",
+        "One SoftwareUnit relation; NonUnitDB and TODB relations, namespaces on library instances and safety units are not exercised.",
+        "One PLC, no runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_protected.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+        "passedScope": "Re-run of local.library_protected.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner and the LibraryUnitSeeder fixture tool, which its build now registers on the Openness AllowList: a plain FB is know-how protected; block_read refuses it (ProtectedObject); library_create_master_copy copies it into a global library. An FB type's in-work test instance is protected and its release to 1.0.0 applies (the in-work content pin uses the block's native fingerprints because Openness cannot export protected content); library_publish copies the protected type; a metadata-only edit/release of the still-protected test instance gives 1.1.0, published as the new default. Native document export of the protected version is refused by Openness (ExportAsDocuments: 'The block is know-how-protected and cannot be exported', surfaced as EngineeringError). In a fresh consumer the master copy and FB 1.0.0 instantiate and stay protected (block_read refuses the instance), Main calls both, the PLC-wide update to exactly 1.1.0 applies while the cleanup guard reads the cross-references of every block, protected ones included, and proves Main reaches the protected FB, and a fresh reopen keeps both protected. 60/60 steps; all 41 retained library observations (15 original-byte lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_protected.rerun.20261029.json"
+      ],
+      "limitations": [
+        "V21 Openness has no know-how protection service for PLC data types; protected UDTs are not exercised.",
+        "Protected type versions cannot be exported as documents, so library_edit_version from documents (content changes) is unavailable for them; 1.1.0 is a metadata-only release.",
+        "Protection is applied by a registered fixture tool, not an MCP route. One PLC, standard groups, no runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_scopes.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+        "passedScope": "Re-run of local.library_scopes.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner, whose reopen now waits out TIA's project lock: a second PLC of the scratch CPU type is added with scratch security; FB and UDT 1.0.0 are instantiated into both PLCs and referenced from an OB in each; uses are attributed per PLC; updating the second PLC to FB 1.1.0 (updateScope=entireSelectedPlc) moves only that PLC while the first keeps 1.0.0 and every native block export of the first PLC is unchanged; updating the first PLC then brings both to 1.1.0; a fresh reopen confirms both PLCs at 1.1.0 and the UDT unchanged. All 58 retained observations (19 lock receipts) validate."
+      },
+      "artifacts": [
+        "evidence/local.library_scopes.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Software units and namespaces are not exercised: creating a unit needs a native fixture tool whose Openness AllowList key requires an elevated grant.",
+        "Both PLCs use the scratch CPU type; mixed CPU families are not exercised."
+      ]
+    },
+    {
+      "id": "local.engineering.interruption.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.engineering.interruption.rerun.20261024, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/fe in the project) with --base Q:\\i3 (subst for artifacts/q). Original scope: Rerun of the two cases that failed or used the wrong evidence path in local.engineering.interruption.20261024, after the fixes in this commit (qualifier reads journals with full sharing; a global library checkpoint below its admitted directory is matched). change_restore killed after 'restoring' was journaled (pre-recovery save/archive phase) -> released: original project unchanged (fresh fingerprint equals the journal's afterFingerprint), checkpoint archive unchanged, recovery destination without content, journal and input unchanged. library_create_master_copy apply killed while 'applying' (project and global-library checkpoints) -> released: project fingerprint plus project-library revision equal the retrieved project checkpoint, global library revision equals the retrieved library checkpoint. Journals unchanged by reconciliation; no mutation re-dispatched."
+      },
+      "artifacts": [
+        "evidence/local.engineering.interruption.20261029.json"
+      ],
+      "limitations": [
+        "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
+        "Library revision covers library structure, type versions and master copies, not unexposed object document content."
+      ]
+    },
+    {
+      "id": "local.engineering.boundaries.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.engineering.boundaries.20261024, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/fe in the project) with --base Q:\\i4 (subst for artifacts/q). Original scope: scripts/qualify_interruption.py, TIA V21 owned scratch projects, one artifact root per scenario. apply-cancel: MCP notifications/cancelled while change_apply was applying; the next call got BridgeFaulted, the worker finished its call and exited with its TIA; a fresh Host reconciled the outcomeUnknown admission -> released (project verifiedApplied: fresh fingerprint equals journal afterFingerprint). stale-concurrent: a second Host attached to the same TIA applied a change between prepare and apply -> StaleRevision; a stale preview in the same Host after another apply -> StaleRevision; both previews stayed prepared and unclaimed, no admission was left, only the fresh changes are in the project. tia-unavailable: the owned TIA was terminated while idle; change_apply failed (EngineeringError: TIA Portal disposed or stopped) before any admission, the journal stayed prepared and a fresh session showed the project unchanged. library-open-kill: worker and TIA terminated after the open receipt was written -> held (source library unchanged; working copy partial). library-restore-complete: a library_create_master_copy change with project and global-library checkpoints was restored completely into new locations, then a fresh Host reopened both: the recovered project kept its fixture block, the recovered library had no master copies (its pre-change checkpoint) while the original library kept the applied master copy TiaMcp_IsEnabled."
+      },
+      "artifacts": [
+        "evidence/local.engineering.boundaries.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Each scenario ran once; interruption is MCP cancellation or process termination, and where it landed inside a phase is timing-dependent.",
+        "Protected/know-how content is not covered: no protected fixture exists and creating one needs a protection password and new fixture code.",
+        "Fresh reopen after recovery compares fixture blocks and library master copies, not full object content."
+      ]
+    },
+    {
+      "id": "local.explorer.relationship-scope.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.explorer.relationship-scope.20261024, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/fe in the project); the current runner adds the E1 independent-tree and device_inventory checks. Original scope: scripts/qualify_project_explorer.py default profile on a new owned TIA V21 scratch project (73 captured nodes): relationship graph from TiaMcp_EnableGate matches exactly the 7 resolved and 8 unresolved member edges authored from the fixed scratch SCL source; a depth-5/500-node/1,000-edge traversal returns all 21 retained native edges with relationshipScope complete, no stop reasons and every endpoint owned by the four fixture blocks; a 3-edge budget visibly truncates (stopReasons depth+edges). Native performance: cold capture 187 ms, warm 136 ms, details 255/372 ms, relationships 149-541 ms, cached MCP search p95 16 ms; relationship payloads 27.6-99.6 KB, JSON export 134,840 bytes, HTML 286,877 bytes; resident memory TIA Portal 2.62 GB, Host 127 MB, worker 98 MB, unchanged by warm recapture."
+      },
+      "artifacts": [
+        "evidence/local.explorer.relationship-scope.rerun.20261029.json"
+      ],
+      "limitations": [
+        "One small fixed fixture with four blocks; no generated large programs, second PLC, HMI or library relationships, configured-I/O positives or protected/indirect references; whole-project relationship completeness remains notEstablished by contract.",
+        "Single-session measurements on one machine; not a contention-independent latency or memory guarantee. Worker memory sums descendants of the Host process, which include the owned TIA process."
+      ]
+    },
+    {
+      "id": "local.wave-kinds.probe.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.wave-kinds.probe.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/fe in the project); the current probe also applies and reverts web activation. Original scope: Exploratory native probe on one owned scratch CPU 1511-1 PN (V21): certificate_create/assign (PlcCommunicationCertificate, there and back)/delete applied with exact readback; umac_role_set create/grant/assign/unassign/revoke applied; vci_workspace_create/delete applied; instance_lookup found the single-instance DB and both call-site sources; webserver_page_set refused WebServerNotActivated on a CPU with web serving off."
+      },
+      "artifacts": [
+        "evidence/local.wave-kinds.probe.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Exploratory probe of one scratch project and one CPU: not feature qualification, no reopen/recovery/interruption gates beyond each apply's own readback.",
+        "Web page settings were only probed for their refusal; no change kind activates web serving.",
+        "Certificate validity is converted to local wall-clock time for TIA; times inside a DST fall-back hour are ambiguous."
+      ]
+    },
+    {
+      "id": "local.access.qualify.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "scripts/qualify_access_changes.py on build 9774d1a (frozen artifacts/fe), one owned scratch CPU 1511-1 PN V4.1: all 228 steps pass. Besides the certificate, UMAC, web server and VCI workspace kinds, webserver_user_pages_generate now passes every gate: one static HTML page generates its DBs and the system constant, the CPU's WebserverApplicationName, WebserverHTMLDirectory and WebserverDefaultHTMLPage are written explicitly after generation and read back, a fresh owned Portal reopen keeps the identical state, a regeneration with override is restored from its checkpoint, and generating again without override fails natively after the checkpoint (Delete existing blocks) and is restored."
+      },
+      "artifacts": [
+        "evidence/local.access.qualify.20261029.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN; one static HTML page; page content, browsers and downloads are not checked.",
+        "The CPU's user-defined page settings name the caller's original HTML directory and default page; the generation itself runs from the change directory's copy.",
+        "Engineering only; nothing is downloaded and runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.opcua_changes.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1b743bae842587861c6e0972762bd1842998b72c",
+        "passedScope": "scripts/qualify_opcua_changes.py on build 1b743ba (frozen artifacts/fo12), one owned scratch CPU 1511-1 PN V4.1 with the OPC UA server on and the Small runtime license, all 86 steps passed: opcua_server_interface_import (create and replace with fixtures/opcua/server-interface-v1.xml and -v2.xml), _enable and _delete each applied with checkpoint, PLC compile and save, their complete state (program exports, opcua_engineering_inspect configuration, each interface's normalized export hash) differing in exactly the intended keys, persisted by a fresh owned Portal reopen, restored from their checkpoints into new directories equal to the pre-change state, and typed refusals (unknown fields, scopePath, invalid mode, relative or changed files, missing or existing interfaces, missing enabled flag, stale and wrong preview hashes) leaving the state unchanged; opcua_engineering_export exported the whole server (registered as a model, including TIA's empty local namespace URI) and the interface, and refused a missing name with ObjectNotFound. Last, an opcua_reference_namespace_import of fixtures/opcua/machine-v1.xml terminated TIA (Unexpected exception, Portal disposed), as every earlier probe did."
+      },
+      "artifacts": [
+        "evidence/local.opcua_changes.20261029.json"
+      ],
+      "limitations": [
+        "Server interfaces hold authored objects without PLC variable mappings; mapped variables, methods and SiOME exports are not imported.",
+        "Interface lastModified times and TIA's derived rows of the fixtures' namespaces in namespace access restrictions and role mappings are not compared; content is compared by export hash.",
+        "opcua_role_mapping_set is only refused: a standard role takes its project role but V21 leaves its namespace permissions unchanged, and a custom role cannot be created in the interface's namespace.",
+        "Reference namespaces cannot be imported on V21 Update 3: the import terminates TIA.",
+        "Engineering only; nothing is downloaded and no OPC UA client connects."
+      ]
+    },
+    {
+      "id": "local.hmi.bridge.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "697aabeae87ddda3e3119836558612f4b9746493",
+        "passedScope": "Re-run of local.hmi.bridge.20261025, whose raw reports were lost (evidence/raw-reports-lost.json), on build 697aabe (frozen artifacts/fh): fresh HmiSeeder fixtures for Classic TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, Unified MTP700 Comfort and Unified PC RT (WinCC RT Professional is blocked again: its application item cannot be plugged), once positive and once with deliberate invalid references, each retrieved by the production Host with project_retrieve and inspected read-only through hmi_inspect, hmi_references, hmi_capabilities and project_model: retrieval, inspection accuracy over all six Classic screen roles, duplicate names, wrong-family and stale-target rejection, bounded inspection, save/reopen and archive-recovery equality, and for Unified the integrated connection, PLC/DB declaration and screen-tag-PLC chains, scripts and alarms. The positive run's 192 gate outcomes equal the original record's; the negative run adds passed broken- and dynamic-reference gates on both Unified profiles; owned Portal, Host and worker cleanup verified."
+      },
+      "artifacts": [
+        "evidence/local.hmi.bridge.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Native HMI compile fails on every profile: Classic has no configured start screen and Unified lacks the encrypted-transfer password; both need native editor work.",
+        "Classic PLC declaration mapping fails: the integrated connections exist in hardware but HmiTarget.Connections is empty and positive Classic fixtures carry no PLC-bound tags (no native-accepted Classic binding grammar).",
+        "WinCC RT Professional is in the catalog, but the PC rack's CanPlugNew refuses its application item in every slot, so no RT Professional fixture exists.",
+        "No production HMI write, interrupted write, runtime or native visual acceptance is covered."
+      ]
+    },
+    {
+      "id": "local.typed.insertion.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.insertion.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): both cases pass the four engineering gates in one batch. Original scope: scripts/qualify_typed_graphical.py, engineering-only, typed-insert-lad and typed-insert-fbd on fresh owned TIA V21 scratch projects: a typed Boolean network inserted after the first network of an existing native caller (Tgp_Boolean_LAD/FBD). The builder predicted V21's renumbering (inserted unit IDs 8..C; block title IDs 8->D, 9->E). Each case passed import/compile, complete prepared XML equal to the native readback, the independent insertion contract (only following IDs shifted by exactly the inserted count; removing the unit and undoing the shift recovers the original caller exactly), untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.insertion.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Under the 25 October 2026 scope decision (docs/plans/insertion-id-renumbering-decision-20261025.md, PR #49): renumbered following document-local IDs count as preserved; nothing else may change.",
+        "Engineering only, standard route, insertion after an existing network. First-network insertion into a network-free caller still refuses; insertion combined with storage creation needs its own composite contract."
+      ]
+    },
+    {
+      "id": "local.typed.route-transitive-effects.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.route-transitive-effects.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): all 28 cases pass the four engineering gates, as in the original. Original scope: Software-unit and namespace route numeric FB multi-instance, TON, TOF, TP, CTU, CTD and CTUD cells creating a multi-instance member in a caller FB that is embedded two levels deep in its own namespace (<prefix>Host.Inner, <prefix>HostGrand.Middle.Inner) with instance DBs holding explicit start values, LAD and FBD (28 cells). The worker predicted the new member inside every embedded multi-instance of both parent FBs and both parent DBs from the captured route transitive effect (local.typed.route-transitive-capture.20261027); native readback matched every prediction exactly and each cell passed the four engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-transitive-effects.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Engineering-only; runtime behavior inside the parent chain is not claimed.",
+        "Parent chains share the caller's namespace; parents in another namespace or unit and custom declaration shapes stay refused."
+      ]
+    },
+    {
+      "id": "local.typed.crossscope.engineering.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.crossscope.engineering.20261028, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): the cross-unit baseline archive was prepared again (prepare_crossunit_capture_archive.py), so the cross-unit cases ran from artifacts/crossunit-prep/deb56a229ac57a0223bc6276b67d149576e727e2c19821c79dfe7248fd52d796.zap21 instead of 838e0c54...; all four cases pass the four engineering gates. Original scope: scripts/qualify_typed_graphical.py --engineering-only: typed LAD and FBD calls from a caller in TiaMcp_UnitA's alternate namespace to TiaMcp_UnitA.TgpUnit_NumericFC (namespaceQualified profile) and from unit TiaMcp_UnitB to the published TiaMcp_UnitA FC through a SoftwareUnit relation (crossUnitQualified profiles v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1), each case in a fresh owned project retrieved from its SHA-bound archive; all 4 pass the four native engineering gates."
+      },
+      "artifacts": [
+        "evidence/local.typed.crossscope.engineering.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+        "Engineering only: the runtime gate is not run."
+      ]
+    },
+    {
+      "id": "local.typed.route-transitive-capture.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.route-transitive-capture.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): the packet's own capture command, then both extractions in the frozen copy; all 24 re-captured native XML exports equal the committed fixtures except their DocumentInfo/Created export time, so the committed effect manifests stand unchanged. Original scope: Native transitive dependent-instance effect in the software-unit (TiaMcp_UnitA) and namespace (TiaMcp_UnitA.Alternate) routes: adding one FB member and one static member of each IEC instance type to TgpUnit_NestEffect and TgpNamespace_NestEffect, each embedded as Inner in its route's NestParent and as Middle.Inner in its NestGrand under the namespace-qualified type name, appends each member at the end of every embedded multi-instance's nested Static section in both parent FBs and both parent instance DBs, in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility; all other content, start values included, is unchanged (scripts/extract_typed_transitive_effects.py --route softwareUnit|namespace)."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-transitive-capture.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Captured for the software-unit and namespace routes at nesting depths 1 and 2, with every FB of the chain in the same namespace; parents in another namespace or unit are not captured."
+      ]
+    },
+    {
+      "id": "local.addin.companion.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "66d9fc9654dc9b56c0d02f23092601c315a78167",
+        "passedScope": "Operator-assisted native run of the TIA V21 Add-In companion from commit 66d9fc9 (runner) with the Host, worker and Add-In package built from 9b468c1 (src identical). The operator installed the package in a UI TIA Portal V21 Update 3 with a scratch project and sent one project-tree selection (the device item PLC_1). The Host was started with --addin-handoff --addin-enrollment; its worker attached to that TIA and captured a review. The Add-In, running inside TIA's partial-trust Add-In sandbox, read the receiver discovery, verified the Host pipe server process and handed over the selection. The Host bound it to the saved review, and the stored record hashes to its record ID and carries exactly the enrolled assembly and configuration hashes."
+      },
+      "artifacts": [
+        "evidence/local.addin.companion.20261029.json"
+      ],
+      "limitations": [
+        "One selection of one device item from one scratch project; blocks, tags, software units and multi-object selections were not sent natively.",
+        "Enrollment binds declared module-version and configuration hashes and OS lineage, not attestation of the loaded package; producerAuthenticated and liveSelectionVerified stay false. The package is not signed.",
+        "The selection binds saved references, not live content; contentVerified stays false.",
+        "An earlier run of the same package (addin-report-fb.json, same day) also handed the selection over; it is not curated because the runner's own producer-hash check read the wrong page section (fixed in 66d9fc9)."
+      ]
+    },
+    {
+      "id": "local.typed.routes.engineering.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.routes.engineering.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): all 24 cases pass the four engineering gates, as in the original. Original scope: scripts/qualify_typed_graphical.py, engineering-only, 24 software-unit and alternate-namespace route cases from a SHA-bound baseline archive (fresh UnitSeeder seed of TiaMcp_UnitA/TiaMcp_UnitB with the TiaMcp_UnitA.Alternate namespace, retrieved into a new owned project per case): Boolean network replacement and FC/FB block creation in both routes, unit Int equality, numeric FC and FB calls with local, existing global, created multi and created global instance storage, LAD and FBD. Every case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.routes.engineering.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Engineering only: no scoped runtime assertions; the runtime harness cannot yet call a software-unit DUT from the root Main OB.",
+        "Baseline archive rebuilt 25 October 2026 (artifacts/changes/change-12d1d3b9e3a74cd3be6f53b9f2f35cf4/before.zap21, sha256 39cea56a...); the 13 October archive is no longer on this PC."
+      ]
+    },
+    {
+      "id": "local.typed.route-profiles.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.route-profiles.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): all 40 cases pass the four engineering gates, as in the original. Original scope: scripts/qualify_typed_graphical.py, engineering-only, the 40 route builder cases enabled by activating the 28 audited route profiles and 4 namespace storage templates staged from local.typed.route-capture.20261025: software-unit Ne/Lt/Le/Gt/Ge and TON (local and existing global), alternate-namespace Eq/Ne/Lt/Le/Gt/Ge and TON (local and existing global), and namespace numeric FC and FB calls with local, existing global, created multi and created global storage, LAD and FBD. Each case, from the SHA-bound software-unit baseline, passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, and checkpoint restore with recovered reopen."
+      },
+      "artifacts": [
+        "evidence/local.typed.route-profiles.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Engineering only; scoped runtime is not covered.",
+        "TOF/TP/CTU/CTD/CTUD route cells are not covered; their native references are captured separately."
+      ]
+    },
+    {
+      "id": "local.typed.runtime.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.runtime.20261024, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project), one case per batch: all 34 cells pass all five gates. In 7 of them TIA added System/~PEData.1 next to its .info file when the project opened; the semantic preservation rule excuses that open-time file since b30c1f9 (maintainer decision, 29 October 2026). Original scope: scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate, one fresh owned TIA V21 scratch (CPU 1511-1 PN 6ES7 511-1AL03-0AB0 V4.1, en-US project) and one owned PLCSIM Advanced V8 instance per case: 34 typed cells, LAD and FBD, standard route. Boolean truth table; Int eq/ne/lt/le/gt/ge at signed boundaries; TON/TOF/TP start-cancel-restart-complete; CTU/CTD/CTUD edges, reset/load and signed limits; FC, global-instance FB and multi-instance FB parameter flow; numeric FC input/in-out/output/return flow. Each case passed import/compile, complete prepared-vs-native XML with untouched peers, save and fresh reopen, checkpoint restore with recovered reopen, and every independent runtime assertion (512 total), under semantic runtime preservation v1 (card verified at download and after provisioning restore, complete PLC XML before cleanup, project changes only from the receipted plc_compile save and provisioning)."
+      },
+      "artifacts": [
+        "evidence/local.typed.runtime.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Standard route only; software-unit and namespace routes, scoped operands and storage-creation variants at runtime are not covered.",
+        "Numeric FB (two independent instances) and CTU 32767 saturation/reset are not in this batch; local.typed.runtime.reruns.rerun.20261029 covers them.",
+        "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
+        "Existing-caller network insertion remains rejected (NativeIdPreservationUnsupported)."
+      ]
+    },
+    {
+      "id": "local.opcua_changes.roles.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "60efc264b5f6c613fdd80d9e239604513b0c6cfe",
+        "passedScope": "scripts/qualify_opcua_changes.py from commit 60efc26 on one owned scratch CPU 1511-1 PN V4.1 (TIA V21 Update 3): the three server-interface kinds and opcua_role_mapping_set (standard roles Operator with a project role and Observer without one, then removal of Operator), each prepared, applied with checkpoint, compile and save, read back with untouched peers, reopened in a fresh Portal and restored from its checkpoint, plus typed refusals and opcua_engineering_export of the whole server and each interface. Role restores are compared after a fresh Portal opens the recovered copy."
+      },
+      "artifacts": [
+        "evidence/local.opcua_changes.roles.20261029.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 with the OPC UA server on and the Small runtime license; other CPUs and licenses are not exercised.",
+        "Server interfaces hold authored objects without PLC variable mappings (fixtures/opcua/server-interface-v1.xml and -v2.xml); mapped variables, methods and SiOME exports are not imported.",
+        "opcua_role_mapping_set maps the standard roles Operator (with a project role) and Observer (without one). V21 creates custom roles only in the namespace of a SIMATIC server interface, which no change kind creates; a custom role elsewhere is refused before anything is written.",
+        "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
+        "V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried, including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off (29 October 2026); this run reproduces it last with fixtures/opcua/machine-v1.xml.",
+        "Interface lastModified times are not compared: importing one interface moves the others' times; content is compared by export hash.",
+        "TIA derives the interface namespace's row in the namespace access restrictions and in every role mapping from the interface: it appears on import and vanishes on delete, and a copy recovered from a checkpoint lacks it until TIA rebuilds it; those rows are not compared.",
+        "TIA caches OPC UA role mappings per Portal process, keyed by an object id a recovered copy keeps: the Portal that restored a role change shows the mappings from before the restore. Role restores are therefore compared after a fresh Portal opens the recovered copy, and the worker refuses OPC UA changes in the restoring Portal (StaleRevision).",
+        "Engineering only; nothing is downloaded and no OPC UA client connects."
+      ]
+    },
+    {
+      "id": "local.typed.runtime.reruns.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.runtime.reruns.20261024, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project), one case per batch: all four cells pass all five gates, as in the original. Original scope: scripts/qualify_typed_graphical.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate on fresh owned TIA V21 scratch projects (CPU 1511-1 PN V4.1) and owned PLCSIM Advanced V8 instances: numeric FB with two independent instances (left/right state, in-out and output flow) and CTU signed Int upper saturation at 32767 with the 32768th attempted edge and reset, LAD and FBD. All four passed import/compile, complete XML with untouched peers, save/reopen, checkpoint recovery and every runtime assertion (434 total), with the in-run semantic runtime preservation verdict."
+      },
+      "artifacts": [
+        "evidence/local.typed.runtime.reruns.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Reruns after the shared-harness elementary IN_OUT fix (#30) and the CTU driver keyword fix (#31); complements local.typed.runtime.20261024 on a later build.",
+        "Standard route only; host application-call timing, not exact scan timing; the CTU driver pulses the typed FB at most 512 edges per call."
+      ]
+    },
+    {
+      "id": "local.typed.wave9.engineering.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.wave9.engineering.20261028, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): all 40 cases pass the four engineering gates in one batch, as in the original. Original scope: scripts/qualify_typed_graphical.py --engineering-only on the standard route of CPU 1511-1 PN V4.1 (V21), each case in a fresh owned scratch, one complete batch (w9q5): 40 wave 9 cases pass all four native engineering gates (engineering, preservation, persistence, recovery): SUB/DIV Int/DInt/Real in LAD and FBD; R_TRIG/F_TRIG multi-instance LAD and FBD; every FBD DInt/Real compare (eq..ge), MOVE/ADD/MUL Int/DInt/Real and TONR; and TONR on the existing global Tgp_GlobalTonr in LAD and FBD. Profiles: local.typed.wave9-capture.20261027."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9.engineering.rerun.20261029.json"
+      ],
+      "limitations": [
+        "The 4 typed-existingglobal-rtrig/ftrig cases are not run: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile, so no global edge storage profile exists. The other 22 wave 9 cases passed in earlier stopped batches (local.typed.wave9.engineering-early.20261028).",
+        "SUB/DIV references are imported without TIA's exported Card=2 template value, which TIA refuses on import (recorded per case as referenceImportAdaptation); the reader treats Card=2 as absent for SUB/DIV only.",
+        "Engineering only: the runtime gate is not run."
+      ]
+    },
+    {
+      "id": "local.typed.native-boundaries.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.native-boundaries.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen at the short project path x, because the resolution runners need native paths of at most 57 characters): all four boundary observations reproduce, as in the original. Original scope: Native V21 boundary observations on fresh owned scratch projects, LAD and FBD each. Duplicate tag: ResolutionSeeder creating a second PLC tag named Ready in another table is refused by Openness (PlcTagComposition.Create: an object that already exists); the table addition compiles clean and all pre-existing XML is unchanged. Unqualified nested namespace: importing TiaMcp_UnitA.Alternate.Tgp_ResolutionOuter with an unqualified Tgp_ResolutionInner member is refused by TIA (data type is unknown); the change was recovered with the original XML verified."
+      },
+      "artifacts": [
+        "evidence/local.typed.native-boundaries.rerun.20261029.json"
+      ],
+      "limitations": [
+        "These record native platform rejections, not typed ambiguity or propagation passes; the typed resolver's guards for these cases remain defensive."
+      ]
+    },
+    {
+      "id": "local.typed.resolution.rerun.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+        "passedScope": "Re-run of local.typed.resolution.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen at the short project path x): the standard and namespace phases reproduce, LAD and FBD (20 cases); the stale phase does not (see limitations). Original scope: scripts/qualify_typed_resolution.py on fresh owned TIA V21 scratch projects, LAD and FBD each: standard phase (exact tag-table owner, wrong table, first/second DB owner, wrong kind, missing member, wrong type), namespace phase with UnitSeeder software units (nested UDT resolved through the declaring namespace with fully qualified references, wrong type, missing member) and stale phase (duplicate-tag setup guard, stale tag address and stale DB ambiguity with deliberate-change recovery). Positive cases passed apply/compile, complete native preservation, reopen and checkpoint recovery; negative cases returned their exact diagnostic with the complete original XML unchanged."
+      },
+      "artifacts": [
+        "evidence/local.typed.resolution.rerun.20261029.json"
+      ],
+      "limitations": [
+        "Typed operand resolution only; scoped runtime behavior is not covered.",
+        "Unqualified nested-namespace references and duplicate PLC tag names are rejected by TIA itself; see local.typed.native-boundaries.20261025."
+      ]
     }
   ],
   "features": [
@@ -3067,7 +3130,7 @@
         "status": "verified",
         "evidenceIds": [
           "local.reliability.20261024",
-          "local.hmi.bridge.20261025"
+          "local.hmi.bridge.rerun.20261029"
         ]
       },
       "availability": {
@@ -4143,8 +4206,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.wave-kinds.probe.20261027",
-          "local.read_contracts.20261028"
+          "local.read_contracts.20261028",
+          "local.wave-kinds.probe.rerun.20261029"
         ]
       },
       "availability": {
@@ -4739,9 +4802,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.engineering.interruption.rerun.20261024",
-          "local.engineering.boundaries.20261024",
-          "local.engineering.interruption-matrix.20261027"
+          "local.engineering.interruption-matrix.20261027",
+          "local.engineering.interruption.20261029",
+          "local.engineering.boundaries.rerun.20261029"
         ]
       },
       "availability": {
@@ -7262,11 +7325,11 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -8930,12 +8993,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.read_contracts.20261028",
           "local.library_formats.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -8979,12 +9042,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
           "local.read_contracts.20261028",
           "local.library_formats.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -9028,13 +9091,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library.native-traversal.20261027",
           "local.library.native-chain.20261028",
           "local.read_contracts.20261028",
           "local.library_formats.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -9166,11 +9229,11 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.read_contracts.20261028",
           "local.library_formats.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -9691,12 +9754,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -9871,18 +9934,18 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_scopes.20261025",
           "local.library_dmc_prerequisites.20261025",
-          "local.library_units.20261025",
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library_preservation.20261028",
           "local.library_compatibility.rerun.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
           "local.library_releases.rerun.20261028",
-          "local.library_interruption.rerun.20261028"
+          "local.library_interruption.rerun.20261028",
+          "local.library_units.rerun.20261029",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029",
+          "local.library_scopes.rerun.20261029"
         ]
       },
       "availability": {
@@ -9938,15 +10001,15 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_scopes.20261025",
-          "local.library_units.20261025",
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
           "local.library_releases.rerun.20261028",
-          "local.library_interruption.rerun.20261028"
+          "local.library_interruption.rerun.20261028",
+          "local.library_units.rerun.20261029",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029",
+          "local.library_scopes.rerun.20261029"
         ]
       },
       "availability": {
@@ -10112,14 +10175,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
           "local.library_releases.rerun.20261028",
-          "local.library_interruption.rerun.20261028"
+          "local.library_interruption.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -10175,13 +10238,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_scopes.20261025",
-          "local.library_protected.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
           "local.library_releases.rerun.20261028",
-          "local.library_interruption.rerun.20261028"
+          "local.library_interruption.rerun.20261028",
+          "local.library_protected.rerun.20261029",
+          "local.library_scopes.rerun.20261029"
         ]
       },
       "availability": {
@@ -10235,12 +10298,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -10294,14 +10357,14 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library.native-chain.20261028",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -10412,12 +10475,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -10745,13 +10808,13 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_import_scale.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -10860,12 +10923,12 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_protected.20261027",
-          "local.library_unit_relations.20261027",
           "local.library_preservation.20261028",
           "local.library_dependencies.rerun.20261028",
           "local.library_lifecycle.rerun.20261028",
-          "local.library_releases.rerun.20261028"
+          "local.library_releases.rerun.20261028",
+          "local.library_unit_relations.rerun.20261029",
+          "local.library_protected.rerun.20261029"
         ]
       },
       "availability": {
@@ -10920,8 +10983,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.explorer.relationship-scope.20261024",
-          "local.explorer.e1.20261028"
+          "local.explorer.e1.20261028",
+          "local.explorer.relationship-scope.rerun.20261029"
         ]
       },
       "availability": {
@@ -11164,11 +11227,10 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.explorer.relationship-scope.20261024",
           "local.explorer.native-providers.20261026",
-          "local.explorer.native-providers.20261027",
           "local.explorer.e1.20261028",
-          "local.explorer.relationships.20261028"
+          "local.explorer.relationships.20261028",
+          "local.explorer.relationship-scope.rerun.20261029"
         ]
       },
       "availability": {
@@ -11401,7 +11463,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hmi.bridge.20261025"
+          "local.hmi.bridge.rerun.20261029"
         ]
       },
       "availability": {
@@ -11446,7 +11508,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hmi.bridge.20261025"
+          "local.hmi.bridge.rerun.20261029"
         ]
       },
       "availability": {
@@ -11491,7 +11553,7 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hmi.bridge.20261025"
+          "local.hmi.bridge.rerun.20261029"
         ]
       },
       "availability": {
@@ -11601,14 +11663,7 @@
         "evidenceIds": [
           "typed.builders.checkpoint.20261008",
           "typed.builders.advanced-unit.20261012",
-          "local.typed.runtime.20261024",
-          "local.typed.runtime.reruns.20261024",
-          "local.typed.resolution.20261025",
-          "local.typed.native-boundaries.20261025",
-          "local.typed.insertion.20261025",
-          "local.typed.routes.engineering.20261025",
           "local.typed.route-capture.20261025",
-          "local.typed.route-profiles.20261025",
           "local.typed.route-iec-capture.20261026",
           "local.typed.route-iec.20261026",
           "local.typed.route-created-storage.20261026",
@@ -11627,10 +11682,17 @@
           "local.typed.insertion-storage.20261026",
           "local.typed.transitive-capture.20261026",
           "local.typed.transitive-effects.20261026",
-          "local.typed.route-transitive-capture.20261027",
-          "local.typed.route-transitive-effects.20261027",
-          "local.typed.wave9.engineering.20261028",
-          "local.typed.crossscope.engineering.20261028"
+          "local.typed.insertion.rerun.20261029",
+          "local.typed.route-transitive-effects.rerun.20261029",
+          "local.typed.crossscope.engineering.rerun.20261029",
+          "local.typed.route-transitive-capture.rerun.20261029",
+          "local.typed.routes.engineering.rerun.20261029",
+          "local.typed.route-profiles.rerun.20261029",
+          "local.typed.runtime.rerun.20261029",
+          "local.typed.runtime.reruns.rerun.20261029",
+          "local.typed.wave9.engineering.rerun.20261029",
+          "local.typed.native-boundaries.rerun.20261029",
+          "local.typed.resolution.rerun.20261029"
         ]
       },
       "availability": {
@@ -15950,15 +16012,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Exports one category (server, serverInterface, simaticInterface or referenceNamespace), optionally one exact name, at most 32 files, into new files under the Host artifact directory with SHA-256. Per-item export failures are warnings; the remaining files are kept.",
           "Each exported file is read back through the artifact boundary and hash check and registered as an ordinary opcua_inspect model record. Files that are not a valid NodeSet within the 16 MiB/20000-node bounds keep their artifact and report registrationError.",
-          "The whole-server utility identifier OPCUAExportProvider and the NodeSet dialect of each export come from Siemens documentation and are not natively observed. No import, node generation, online export or record provenance beyond the tool response."
+          "Natively observed (local.opcua_changes.20261029): the whole-server export registers as a model; TIA writes the PLC's own namespace as an empty first URI, which the reader names urn:tiamcp:unnamed-local-namespace. A missing name is refused with ObjectNotFound. No import, node generation, online export or record provenance beyond the tool response."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.opcua_changes.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19526,19 +19589,20 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Payload: htmlDirectory (absolute), defaultPage (path relative to it), applicationName and explicit override; overrideBlocks (1-100 existing data block names) only with override=true. The explicit overload does not update the CPU's user-defined page attributes.",
+          "Payload: htmlDirectory (absolute), defaultPage (path relative to it), applicationName and explicit override; overrideBlocks (1-100 existing data block names) only with override=true.",
           "The directory is copied into the change directory at prepare (links refused, 20000 files / 4 GiB bound) and generation runs from that copy; its manifest hash is rechecked before the checkpoint.",
           "Generated DB names and numbers are known only after generation. override=false relies on the native None option to refuse an existing DB; with override=true the overwritten pre-existing blocks must equal overrideBlocks exactly. A mismatch, an empty result or a missing pre-existing block fails after the checkpoint and requires recovery.",
           "The affected set is the returned block identities (name, number, type) in the readback. Generated block internals are never edited; V21 exposes no delete for generated blocks, so none is offered.",
           "Refused unless the CPU's Boolean WebserverActivate attribute is true. Nothing is downloaded or deployed; page content, browser behavior and Siemens package compatibility are not validated.",
           "compile=true is mandatory and compiles the PLC software; generated blocks are covered by the standard block fingerprint.",
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
-          "Native qualification runs (28 October, ac_0165b47c and ac_8d290e2d): generation applied and adds a system constant named after the application to the default tag table (now previewed), but after a fresh-Portal reopen the CPU's WebserverApplicationName and WebserverHTMLDirectory read differently than right after apply, so persistence is not established and the kind stays unqualified."
+          "GenerateBlocks sets the CPU's WebserverApplicationName and WebserverHTMLDirectory in memory only; apply then writes the caller's application name, original HTML directory and default page explicitly and verifies them, so a save and reopen keep them (local.access.qualify.20261029)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.access.qualify.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20940,15 +21004,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified. The Publisher package builds, but no install, menu, selection, sandbox or pipe exchange has run inside TIA Portal.",
+          "Natively qualified for one project-tree selection of a device item (local.addin.companion.20261029); the other mapped object kinds and multi-object selections share the same path code but have not been sent natively.",
           "Project-tree selections of projects, device groups, devices, device items, PLC software, software units, block/type/tag-table groups, blocks, types, tag tables and tags. Other objects, devices-and-networks, library and workflow-hook surfaces are refused. Object paths mirror the worker's project model; a path absent from the newest saved review of the same project copy is refused, never matched by name.",
-          "Declares TIA.ReadOnly, EnvironmentPermission, FileIOPermission and SecurityPermission.UnmanagedCode (pipe-server process check). Whether TIA's Add-In sandbox allows these calls, and whether its loader is a direct child of the TIA process, is unverified.",
+          "Runs inside TIA's partial-trust Add-In sandbox with the declared TIA.ReadOnly, EnvironmentPermission, FileIOPermission and SecurityPermission.UnmanagedCode. That sandbox refuses NamedPipeClientStream, SafeHandle, Marshal.GetLastWin32Error and JavaScriptSerializer, so the companion opens the Host pipe through kernel32 handles and uses its own bounded JSON (scripts/Test-AddInSandbox.ps1 replays both offline).",
           "Host enrollment (--addin-handoff --addin-enrollment) pins the published module-version and configuration hashes and requires the peer to be TIA's Add-In loader below the TIA process the attached worker owns, in the live worker session generation. These are OS lineage and declared-hash checks, not attestation of the loaded package; producerAuthenticated and liveSelectionVerified stay false. Package signing is not configured."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.addin.companion.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23654,12 +23720,14 @@
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified with authored interfaces of objects without PLC variable mappings (local.opcua_changes.20261029); importing or deleting an interface makes TIA add or remove the interface namespace's rows in the namespace access restrictions and every role mapping, and moves the other interfaces' lastModified time."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.opcua_changes.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23707,12 +23775,14 @@
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified with authored interfaces of objects without PLC variable mappings (local.opcua_changes.20261029); importing or deleting an interface makes TIA add or remove the interface namespace's rows in the namespace access restrictions and every role mapping, and moves the other interfaces' lastModified time."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.opcua_changes.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23760,12 +23830,14 @@
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified with authored interfaces of objects without PLC variable mappings (local.opcua_changes.20261029); importing or deleting an interface makes TIA add or remove the interface namespace's rows in the namespace access restrictions and every role mapping, and moves the other interfaces' lastModified time."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.opcua_changes.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23813,18 +23885,19 @@
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
-          "Native observation (28 October 2026): importing the authored minimal NodeSet fixtures/opcua/machine-v1.xml as a reference namespace crashed the owned TIA instance (\"Unexpected exception\", Portal disposed); the change's checkpoint was taken first. A second, companion-style NodeSet (an ObjectType with a typed, modelled variable and a RequiredModel reference) crashed it the same way, so the crash is not specific to the file; the trigger (for example the CPU's OPC UA server or licence state) is not established."
+          "V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried on 28-29 October 2026, including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off; local.opcua_changes.20261029 reproduces it."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.opcua_changes.20261029"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "blocked",
         "reasons": [
-          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+          "V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried on 28-29 October 2026, including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off; local.opcua_changes.20261029 reproduces it."
         ]
       },
       "prerequisites": [
@@ -23867,17 +23940,19 @@
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried on 28-29 October 2026, including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off; local.opcua_changes.20261029 reproduces it."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.opcua_changes.20261029"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "blocked",
         "reasons": [
-          "Requires an S7-1500 PLC whose software or CPU exposes OpcUaProvider; native eligibility is not probed until prepare."
+          "No reference namespace can be imported on V21 Update 3, so none exists to delete. V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried on 28-29 October 2026, including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off; local.opcua_changes.20261029 reproduces it."
         ]
       },
       "prerequisites": [
@@ -23916,17 +23991,18 @@
         "status": "partial",
         "limitations": [
           "action=create needs roleName, definedInNamespace, optional projectRole and 1-64 namespacePermissions entries with namespaceUri and explicit Browse/Read/Write/Call/ReceiveEvents/ReadRolePermissions booleans; action=remove takes roleName only.",
-          "Any other payload field is refused; passwords, certificates, users and certificate trust are never accepted. AddStandardOpcUaRole, role rename and editing an existing mapping are not exposed.",
-          "SetPermission permission-name strings are assumed to equal the NamespacePermission property names; a namespace missing from the new role fails apply after the checkpoint.",
+          "Any other payload field is refused; passwords, certificates, users and certificate trust are never accepted. Role rename and editing an existing mapping are not exposed.",
           "compile=true is mandatory and compiles the PLC software; mapping validity is evidenced only by native import and compile diagnostics (no public mapping-status property).",
           "OpcUaProvider is looked up on the PLC software, then its owning device items; the V21 XML does not name the owner. Missing provider refuses the change.",
           "Change fingerprint adds every PLC's server interface group snapshot (interface names/enabled/modified time, SIMATIC interfaces, reference namespaces, role mappings with namespace permissions); interruption reconciliation compares it. Interface/namespace content is covered only via native modification times.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Native (29 October 2026, local.opcua_changes.roles.20261029): standard roles are added with AddStandardOpcUaRole; V21 creates a custom role only in a SIMATIC server interface's namespace (otherwise refused at prepare with UnsupportedCapability), which no change kind creates, so custom roles are not qualified. SetPermission saves the role on every write and AddStandardOpcUaRole first duplicates the standard namespace rows, so the worker saves the project role first and reads each permission row afresh. After change_restore of a role change, the restoring Portal keeps its cached mappings and refuses further OPC UA changes (StaleRevision)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.opcua_changes.roles.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

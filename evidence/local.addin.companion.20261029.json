@@ -1,0 +1,64 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.addin.companion.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T11:24:12+00:00",
+  "source": {
+    "commit": "66d9fc9654dc9b56c0d02f23092601c315a78167",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Operator-assisted native run of the TIA V21 Add-In companion from commit 66d9fc9 (runner) with the Host, worker and Add-In package built from 9b468c1 (src identical). The operator installed the package in a UI TIA Portal V21 Update 3 with a scratch project and sent one project-tree selection (the device item PLC_1). The Host was started with --addin-handoff --addin-enrollment; its worker attached to that TIA and captured a review. The Add-In, running inside TIA's partial-trust Add-In sandbox, read the receiver discovery, verified the Host pipe server process and handed over the selection. The Host bound it to the saved review, and the stored record hashes to its record ID and carries exactly the enrolled assembly and configuration hashes.",
+  "limitations": [
+    "One selection of one device item from one scratch project; blocks, tags, software units and multi-object selections were not sent natively.",
+    "Enrollment binds declared module-version and configuration hashes and OS lineage, not attestation of the loaded package; producerAuthenticated and liveSelectionVerified stay false. The package is not signed.",
+    "The selection binds saved references, not live content; contentVerified stays false.",
+    "An earlier run of the same package (addin-report-fb.json, same day) also handed the selection over; it is not curated because the runner's own producer-hash check read the wrong page section (fixed in 66d9fc9)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "ec699be64e9b643f2188d896c19c53a180925e78f26252e961c8fe3949ab448f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "ae184192327cf9af451586111e0468919b2dd809da0aa072b625c2f9d096415c"
+    },
+    {
+      "name": "TiaMcp.AddIn.V21.addin",
+      "files": 1,
+      "sha256": "73236bfbb383f327f7908a085ae392bc9936c8d3f3bf7424a5e9f74c0fdaebf1"
+    }
+  ],
+  "runs": [
+    {
+      "report": "addin-report-fc.json",
+      "sha256": "8d890ae06ed5777f3555b8f532821ad142158f63fef31a4e4208e72590655bde",
+      "bytes": 36465,
+      "completed": true,
+      "steps": [
+        "receiver published",
+        "attach the operator's TIA",
+        "save a review",
+        "operator sent a selection",
+        "selection summary",
+        "selections",
+        "stored producer"
+      ],
+      "toolsPassed": [
+        "addin_selection_page",
+        "project_snapshot_capture",
+        "tia_attach",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

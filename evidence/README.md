@@ -33,13 +33,21 @@ reports stay in the store. `scripts/test_contracts.py` fails on an uncited recor
 on a summary that is neither in the catalog nor in a retired list.
 
 Native runs write their reports, snapshots and logs under the main checkout's
-`artifacts/`, never into an outside folder; only the frozen `git archive` build may sit
-outside the project (for example `D:\wp\bNN`). TIA refuses scratch and checkpoint paths
-over 143 characters, which a deep `artifacts/` path can exceed. Then give the runner a
-short directory junction that resolves into `artifacts/` (for example
-`New-Item -ItemType Junction D:\wp\rr -Target <main checkout>\artifacts\rr`), so the path
-TIA sees is short and the files still live in the project. Curate from a checkout whose
-`HEAD` is the commit the frozen binaries were built from, so the summary names that commit.
+`artifacts/`, never into an outside folder. TIA refuses scratch and checkpoint paths over
+143 characters, so keep the folders short:
+
+- Name run folders with a one-letter lane and three letters, as in `artifacts/q/lun`: the
+  library harness allows at most 45 characters for `--artifacts`.
+- Seeders that keep their runs below `<exe>\..\..\..\..\..\..\artifacts` (UnitSeeder,
+  ResolutionSeeder) need the frozen build itself inside the project at a short path, for
+  example `git archive` into `artifacts/f`; that also keeps the frozen build in the project.
+- A runner that needs a base of about 30 characters (`qualify_interruption.py --base`)
+  can use a drive letter: `subst Q: <main checkout>\artifacts\q`, then `--base Q:\i3`.
+- Junctions do not work: the HMI and library seeders refuse reparse points, and Python's
+  `Path.resolve()` turns a junction back into the long path.
+
+Curate from a checkout whose `HEAD` is the commit the frozen binaries were built from, so
+the summary names that commit.
 
 ```powershell
 python -B scripts/curate_evidence.py --id local.smoke.20261024 `

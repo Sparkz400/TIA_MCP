@@ -1,0 +1,63 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.crossscope.engineering.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T09:24:44+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.typed.crossscope.engineering.20261028, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/f in the project): the cross-unit baseline archive was prepared again (prepare_crossunit_capture_archive.py), so the cross-unit cases ran from artifacts/crossunit-prep/deb56a229ac57a0223bc6276b67d149576e727e2c19821c79dfe7248fd52d796.zap21 instead of 838e0c54...; all four cases pass the four engineering gates. Original scope: scripts/qualify_typed_graphical.py --engineering-only: typed LAD and FBD calls from a caller in TiaMcp_UnitA's alternate namespace to TiaMcp_UnitA.TgpUnit_NumericFC (namespaceQualified profile) and from unit TiaMcp_UnitB to the published TiaMcp_UnitA FC through a SoftwareUnit relation (crossUnitQualified profiles v21.fw41.softwareUnit.{lad,fbd}.call.crossUnit.v1), each case in a fresh owned project retrieved from its SHA-bound archive; all 4 pass the four native engineering gates.",
+  "limitations": [
+    "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
+    "Engineering only: the runtime gate is not run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "1078f9db615efb31fbf9e054a3b7e5b86d137589140ecb355bee5c4edb454cec"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7b544f62ca84c4a827ce485f9b7d1ef6c3ad9eca36ee7b0a4725c90d469d5123"
+    }
+  ],
+  "runs": [
+    {
+      "report": "curation-crossscope.json",
+      "sha256": "5af8b489d6dde542ff48d70312033ca17f383a153914f86bcf111767256dc8f1",
+      "bytes": 33716,
+      "completed": true,
+      "steps": [
+        "typed-crossnamespace-numeric-fc-fbd: passed",
+        "typed-crossnamespace-numeric-fc-lad: passed",
+        "typed-crossunit-numeric-fc-fbd: passed",
+        "typed-crossunit-numeric-fc-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

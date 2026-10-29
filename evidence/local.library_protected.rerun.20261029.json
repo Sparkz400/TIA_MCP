@@ -1,0 +1,129 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_protected.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T08:39:11+00:00",
+  "source": {
+    "commit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.library_protected.20261027, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner and the LibraryUnitSeeder fixture tool, which its build now registers on the Openness AllowList: a plain FB is know-how protected; block_read refuses it (ProtectedObject); library_create_master_copy copies it into a global library. An FB type's in-work test instance is protected and its release to 1.0.0 applies (the in-work content pin uses the block's native fingerprints because Openness cannot export protected content); library_publish copies the protected type; a metadata-only edit/release of the still-protected test instance gives 1.1.0, published as the new default. Native document export of the protected version is refused by Openness (ExportAsDocuments: 'The block is know-how-protected and cannot be exported', surfaced as EngineeringError). In a fresh consumer the master copy and FB 1.0.0 instantiate and stay protected (block_read refuses the instance), Main calls both, the PLC-wide update to exactly 1.1.0 applies while the cleanup guard reads the cross-references of every block, protected ones included, and proves Main reaches the protected FB, and a fresh reopen keeps both protected. 60/60 steps; all 41 retained library observations (15 original-byte lock receipts) validate.",
+  "limitations": [
+    "V21 Openness has no know-how protection service for PLC data types; protected UDTs are not exercised.",
+    "Protected type versions cannot be exported as documents, so library_edit_version from documents (content changes) is unavailable for them; 1.1.0 is a metadata-only release.",
+    "Protection is applied by a registered fixture tool, not an MCP route. One PLC, standard groups, no runtime execution."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d94291d335d7d65e3003fe28d285e10760e969c16a0fb90d5bf2ca93a0223946"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d6f5048b4e950222c7caa6e09e772f6afdebb4393bb62493d7b620ec6ad51f6d"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "ef8e3d2ec9d0702b576c7d0ce8d5638927f262bf77da0e0f61859972ca41def7"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "7f225d735adda4fc251412fb29d77b9733808f5dc5cc5526b0107758c21995c4",
+      "bytes": 743893,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "protect plain FB",
+        "plain FB is protected",
+        "block_read refuses the protected FB",
+        "prepare library_create",
+        "apply library_create",
+        "master copy of the protected FB",
+        "apply library_create_master_copy",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "protect the in-work test instance",
+        "test instance is protected",
+        "release the protected in-work version",
+        "apply library_release_version",
+        "probe export of the protected version",
+        "publish protected 1.0.0",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "prepare library_edit_version",
+        "apply library_edit_version",
+        "edited test instance stays protected",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "instantiated master copy stays protected",
+        "block_read refuses the instantiated master copy",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "instantiated type stays protected",
+        "protected FB 1.0.0 used once",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "open staged archive",
+        "update the protected FB to 1.1.0",
+        "apply library_update_project",
+        "FB at the expected version after the update",
+        "updated FB stays protected",
+        "close consumer session",
+        "start owned TIA reopen",
+        "reopen consumer",
+        "reopened: TiaMcpProtectedPlain still protected",
+        "reopened: TiaMcpLibraryGate still protected"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "block_read",
+        "library_query"
+      ]
+    }
+  ]
+}

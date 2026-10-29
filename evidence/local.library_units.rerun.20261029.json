@@ -1,0 +1,116 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_units.rerun.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T08:39:10+00:00",
+  "source": {
+    "commit": "490365c86207d17573ed0d1aa53c34eaf4fe0224",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.library_units.20261025, whose raw report was lost (evidence/raw-reports-lost.json), on build 490365c (frozen D:/wp/b70) with the same runner and the LibraryUnitSeeder fixture tool, which its build now registers on the Openness AllowList: a software unit TiaMcp_LibUnit with namespace preset TiaMcp_LibUnit is seeded into an owned scratch PLC; FB and UDT 1.0.0 instantiate into the unit (exactly once, unit scope; TIA does not apply the unit's namespace preset to the library instances); instantiating the FB in the PLC root as well is refused before any write because TIA allows one instance of a library type per device; a second UDT copy in the unit is refused; a PLC-wide update is refused (LibraryUpdateCleanupRisk) because the unit use has no OB-rooted reference, and no newer version is copied; a fresh reopen keeps the unit use. All retained observations validate.",
+  "limitations": [
+    "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
+    "The unit is created by a fixture tool, not by an MCP route."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d94291d335d7d65e3003fe28d285e10760e969c16a0fb90d5bf2ca93a0223946"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d6f5048b4e950222c7caa6e09e772f6afdebb4393bb62493d7b620ec6ad51f6d"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "ef8e3d2ec9d0702b576c7d0ce8d5638927f262bf77da0e0f61859972ca41def7"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "edf8b16bebcdbab9527c3af2cbb15fce737b32bfecc159bf468dd42c9a94e6cd",
+      "bytes": 507040,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "prepare library_edit_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "seed software unit TiaMcp_LibUnit",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "FB and UDT exist once, in the unit",
+        "FB 1.0.0 used once (in the unit)",
+        "refuse the FB in the PLC root while the unit holds it",
+        "refuse a second UDT copy in the unit",
+        "open staged archive",
+        "refuse an update while unit uses have no OB-rooted reference",
+        "the unit stays at 1.0.0 and no newer version was copied",
+        "close consumer session",
+        "start owned TIA reopen",
+        "reopen consumer",
+        "reopened: unit use intact"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

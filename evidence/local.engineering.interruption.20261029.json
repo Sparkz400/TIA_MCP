@@ -1,0 +1,52 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.engineering.interruption.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T08:39:56+00:00",
+  "source": {
+    "commit": "9774d1a16d8f193ed670ca82774b1f6fc56a3d04",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Re-run of local.engineering.interruption.rerun.20261024, whose raw report was lost (evidence/raw-reports-lost.json), on build 9774d1a (frozen artifacts/fe in the project) with --base Q:\\i3 (subst for artifacts/q). Original scope: Rerun of the two cases that failed or used the wrong evidence path in local.engineering.interruption.20261024, after the fixes in this commit (qualifier reads journals with full sharing; a global library checkpoint below its admitted directory is matched). change_restore killed after 'restoring' was journaled (pre-recovery save/archive phase) -> released: original project unchanged (fresh fingerprint equals the journal's afterFingerprint), checkpoint archive unchanged, recovery destination without content, journal and input unchanged. library_create_master_copy apply killed while 'applying' (project and global-library checkpoints) -> released: project fingerprint plus project-library revision equal the retrieved project checkpoint, global library revision equals the retrieved library checkpoint. Journals unchanged by reconciliation; no mutation re-dispatched.",
+  "limitations": [
+    "Interruption is process termination of the worker and its owned TIA; each case ran once and where the kill landed inside a phase is timing-dependent.",
+    "Library revision covers library structure, type versions and master copies, not unexposed object document content."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "f6f315ad1d089c9e224905b0357f79885b840013d28a7ad37fbef459b7f71b7b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "07b750e9979d73bb5bcad738bacee42e5dd4437261993ab8a9b8835577c34c62"
+    }
+  ],
+  "runs": [
+    {
+      "report": "interruption-b3.json",
+      "sha256": "61e3bc43a80c24f4fb2240f8414e232ba225ffbc9da5d8afa71bec3ae703fa3e",
+      "bytes": 134118,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
