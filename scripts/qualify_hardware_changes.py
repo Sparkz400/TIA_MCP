@@ -123,7 +123,13 @@ class Run(StateRun):
         return [p["path"] for p in self.h.tool("project_inventory", {"maxItems": 1000})["plcs"]]
 
     def domains(self):
-        return {**hardware(self.h.tool("hardware_inspect", {"maxItems": 2000})), **devices(self.h.tool)}
+        inventory, state = devices(self.h.tool), {}
+        # One hardware_inspect per device item: four devices' attributes exceed its 2000-value budget in one call.
+        for path in (key[4:] for key in inventory if "/items/" in key):
+            item = hardware(self.h.tool("hardware_inspect", {"hardwarePath": path, "maxItems": 2000}))
+            require(list(item) == ["hw:" + path], "hardware_inspect of %s returned %s" % (path, list(item)))
+            state.update(item)
+        return {**state, **inventory}
 
     def state(self):
         state = self.domains()
