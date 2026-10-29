@@ -7,10 +7,10 @@ documented in [simulation](../guides/simulation.md) and [engineering workflows](
 
 | Gap | Feature | Disposition | Evidence |
 | --- | --- | --- | --- |
-| 1. Download a changed program to an existing owned PLCSIM instance | `change.simulation_download_online` | Implemented; native run pending | [PLCSIM run](#plcsim-run) |
-| 2. Virtual time and time scaling | `sim_time`, `sim_test` `virtualTime` | Implemented; native run pending | [PLCSIM run](#plcsim-run) |
-| 3. Interrupt and fault injection | `sim_event` | Implemented; native run pending. OB40 cannot be configured through V21 Openness (below) | [PLCSIM run](#plcsim-run) |
-| 4. Memory reset, storage archive/retrieve | `sim_state` `memoryReset`, `sim_storage` | Implemented; native run pending | [PLCSIM run](#plcsim-run) |
+| 1. Download a changed program to an existing owned PLCSIM instance | `change.simulation_download_online` | Natively exercised; unverified until its recovery top-up run | `local.plcsim_gaps.20261029` |
+| 2. Virtual time and time scaling | `sim_time`, `sim_test` `virtualTime` | Verified | `local.plcsim_gaps.20261029` |
+| 3. Interrupt and fault injection | `sim_event` | Verified for OB82, OB83 and OB86; OB40 is a V21 boundary | `local.plcsim_gaps.20261029` |
+| 4. Memory reset, storage archive/retrieve | `sim_state` `memoryReset`, `sim_storage` | Verified | `local.plcsim_gaps.20261029` |
 | 5. Typed CPU parameter edits | `change.hardware_cpu_parameters` | Verified; the protection level is a recorded boundary | `local.engineering_gaps.20261029` |
 | 6. Compile a device, the project or an HMI target | `change.device_compile`, `change.project_compile`, `change.hmi_compile` | Device and project compile verified; HMI compile unverified (no compilable HMI fixture through public routes) | `local.engineering_gaps.20261029` |
 | 7. Tag table create, rename, delete | `change.tag_table_create`, `change.tag_table_rename`, `change.tag_table_delete` | Verified | `local.engineering_gaps.20261029` |
@@ -75,5 +75,43 @@ Recorded boundaries:
 
 ## PLCSIM run
 
-Pending: `scripts/qualify_plcsim_gaps.py` on one owned PLCSIM Advanced V8 instance (frozen
-`artifacts/gs2`), held while the native queue served the TCP/IP real-server window.
+`scripts/qualify_plcsim_gaps.py` on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus, attempt 2
+of two, passed 73 of 73 steps (`local.plcsim_gaps.20261029`, frozen `e38adf2`). Attempt 1 (`e75ae0c`)
+completed its first online download and then read `NotUpToDate` (-47): after a program change PLCSIM
+needs its tag list refreshed with `sim_tags`. The guide now says so and the runner refreshes.
+
+The fixture: a scratch CPU 1511-1 PN V4.1 with a central DI 16x24VDC HF, an ET 200SP IM 155-6 PN ST on
+the CPU's IO system, `GapDb` (one counter per interrupt OB, an IEC TON, a DTL), `Main` and the interrupt
+OBs 40/82/83/86, then card download, credential provisioning, power on and RUN as in the D09 runner.
+
+- **Online download.** A `Main` change downloads with `softwareScope: "changes"` and `keepActualValues`
+  in RUN; TIA asks only `ConsistentBlocksDownload`, the runtime user logs in once, and a counter set to 7
+  survives. A `GapDb` layout change with `keepActualValues` answers TIA's
+  `DataBlockReinitializationOrKeepActualValues` with `KeepActualValues` and keeps the 7. A further layout
+  change with `reinitialize` and `allowStop` answers `StopPlcAndReinitialize`, resets the counter and
+  returns to RUN (TIA asked for no separate stop). `plc_online_compare` afterwards reports
+  `FolderContentsIdentical`. Refusals: no ticket (`PhysicalPlcRefused`), `reinitialize` without
+  `allowStop`, and `compile`/`save` set on apply.
+- **Virtual time.** A 5 s TON scenario passed on the wall clock (5.97 s) and twice with `virtualTime`
+  (13 and 14 `StartProcessing` spans, 5.90 s virtual time, previous mode restored). At scale factor 1 a
+  virtual-time scenario takes wall-clock time; it is repeatable, and the speed-up comes from
+  `sim_time` `scaleFactor`: at 10 the timer finished within 1.25 s of wall time. Setting
+  `systemTimeUtc` to 2031-06-15 made `RD_SYS_T` read year 2031.
+- **Events.** `diagnosticAlarm` on the DI module raised OB82 once, `pullOrPlug` pull and plug raised
+  OB83 twice, and `rackOrStationFault` fault and return on the ET 200SP IO device raised OB86 twice; each
+  changed only its own counter. A malformed event is refused before the runtime call.
+- **Memory reset and storage.** `memoryReset` restarted the instance with start values and the
+  online-downloaded program. `sim_storage` archived the powered-off card (791 737 bytes, receipt with
+  SHA-256), refused a wrong hash, retrieved it with an unchanged ownership marker, and the retrieved card
+  ran the online-downloaded program.
+
+Boundaries:
+
+- **OB40.** V21 Openness exposes neither channels nor a hardware-interrupt attribute on the DI module, so
+  no hardware interrupt is configured: `GetConfiguredProcessEvents` lists nothing and PLCSIM answers
+  `ProcessEvent` with `NotSupportedByModule` (-55); OB40 does not run. `statusEvent` on the central module
+  is answered `NotSupportedByModule` too (OB55 serves distributed modules).
+- **Recovery of the online download.** The run never called `change_status` or `change_restore` on a
+  download, so `change.simulation_download_online` stays unverified. The runner now restores the last
+  download's checkpoint (the CPU keeps its program; the recovered copy cannot download to the instance)
+  and waits, frozen as `ad7096c`, for a native slot.
