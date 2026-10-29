@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.71",
-    "catalogSha256": "f2e7ffd1495ac3b67f86fe1cb2729595a9ab54b8d5fc29c1e3b27a08334fa732",
+    "catalogSha256": "7ede47ee9239c9e070113cde9f795a2f2f7cc09dd1a5faa7ffbe9943ffd1d781",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "42863ba916167b5a4343481facc40d4cbbe1786ee70ab0db80d087b6a1337086"
   },
