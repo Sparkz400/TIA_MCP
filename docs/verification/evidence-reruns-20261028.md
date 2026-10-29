@@ -7,6 +7,8 @@ verified features rest solely on lost reports. Each new record is named
 `<original stem>.rerun.20261028`, keeps its raw reports in the main checkout's evidence store, and
 replaces the lost record in the features that cited it; the lost summaries stay as history.
 
+On 29 October the remaining re-runnable records followed ([29 October re-runs](native-reruns-20261029.md)).
+
 ## How the runs were made
 
 - **Host-only (21 records):** `scripts/Test-Offline.ps1 -Suite Managed -Configuration Release`

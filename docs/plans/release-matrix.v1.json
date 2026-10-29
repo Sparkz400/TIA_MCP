@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.70",
-    "catalogSha256": "8f028e41f721ac620b7b06c1545c63888620bc695c20de5d0f0b756c4ed8cf9f",
+    "catalogSha256": "00bdc32918ad71ad3b0c2a76686a694de4c0040b63c32f838aec83097ef815ed",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "6843b503a8181e2a275fb103c72817b9d05336d5a217a8c4573767df74ba853d"
   },
@@ -14411,35 +14411,35 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         }
       ]
@@ -22294,49 +22294,49 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         }
       ]
@@ -22356,49 +22356,49 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         }
       ]
@@ -22418,49 +22418,49 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         }
       ]
@@ -22480,7 +22480,7 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
@@ -22530,7 +22530,7 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
@@ -22580,49 +22580,49 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua_changes.roles.20261029"
+        "local.opcua_changes.guarded.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.roles.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.roles.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.roles.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.roles.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.roles.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua_changes.roles.20261029"
+            "local.opcua_changes.guarded.20261029"
           ]
         }
       ]
@@ -23815,31 +23815,16 @@
       "notRetained": []
     },
     {
-      "id": "local.opcua_changes.20261029",
+      "id": "local.opcua_changes.guarded.20261029",
       "status": "passed",
       "profile": {
         "tiaVersion": 21
       },
-      "sourceCommit": "1b743bae842587861c6e0972762bd1842998b72c",
+      "sourceCommit": "6f0678f136ef0f3942050177370d3d512deebc2d",
       "retained": [
         {
-          "path": "evidence/local.opcua_changes.20261029.json",
-          "sha256": "8f0b45f41f6a7a9302b63aa2f49b1a274a2b38b6537abc968370a81b5089efe4"
-        }
-      ],
-      "notRetained": []
-    },
-    {
-      "id": "local.opcua_changes.roles.20261029",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21
-      },
-      "sourceCommit": "60efc264b5f6c613fdd80d9e239604513b0c6cfe",
-      "retained": [
-        {
-          "path": "evidence/local.opcua_changes.roles.20261029.json",
-          "sha256": "60014459fb6c50d912981f0c72b98dc7e62b6c4a8d93f5cf9c4a05ee3c947291"
+          "path": "evidence/local.opcua_changes.guarded.20261029.json",
+          "sha256": "13b9ec2d8d47ff6eac8463539647017afad1ae48a907619c913d68b189d6ae00"
         }
       ],
       "notRetained": []

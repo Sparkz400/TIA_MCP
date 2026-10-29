@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8f028e41f721ac620b7b06c1545c63888620bc695c20de5d0f0b756c4ed8cf9f",
-      "bytes": 1288259
+      "sha256": "00bdc32918ad71ad3b0c2a76686a694de4c0040b63c32f838aec83097ef815ed",
+      "bytes": 1286393
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2407,8 +2407,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "95b94badd6a75fc3a0f767daf86b1614cc1410374c1bc68b09919a217481c767",
-      "bytes": 118303
+      "sha256": "dd8548c0dc47d8418c2b7aea050fc7187d4b6614ec591b081d28f8e7bb6889dd",
+      "bytes": 118307
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ComponentScratchLanguage.cs",
@@ -2582,8 +2582,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
-      "sha256": "6797835a7b0d7f77e98d1cc02367b3ce4cc69d2ea221f42e9c5963919f354491",
-      "bytes": 29805
+      "sha256": "e434b10b7e1fc044409a92686da061d7c822a06757960772523012383ca899bb",
+      "bytes": 29940
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaEngineering.cs",
@@ -83287,15 +83287,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaServerSettings",
-              "line": 273,
-              "endLine": 306,
+              "line": 274,
+              "endLine": 307,
               "sha256": "2bca0cf108c4229bfab3cffa10114340b885e898a46aab715d7e0f5ec30079ca"
             },
             {
@@ -83594,15 +83594,15 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaServerSettings",
-              "line": 308,
-              "endLine": 330,
+              "line": 309,
+              "endLine": 331,
               "sha256": "deee0b8e8839771910ea77965fa084acda8e64f8dc5d55819f8b495aa7b741b8"
             },
             {
@@ -86049,9 +86049,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             }
           ]
         },
@@ -86069,8 +86069,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             }
           ]
@@ -86100,9 +86100,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             }
           ]
         },
@@ -86120,8 +86120,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             }
           ]
@@ -86151,9 +86151,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             }
           ]
         },
@@ -86171,8 +86171,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             }
           ]
@@ -86202,9 +86202,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             }
           ]
         },
@@ -86222,8 +86222,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             }
           ]
@@ -86253,9 +86253,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             }
           ]
         },
@@ -86273,8 +86273,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             }
           ]
@@ -86304,9 +86304,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaChange",
-              "line": 78,
-              "endLine": 120,
-              "sha256": "30f59557d50c950547af703592713362709ff33dfc45c0702a13a1ded4d91087"
+              "line": 79,
+              "endLine": 121,
+              "sha256": "0ff1f953659eefb3c0a195cef04761852e4d8bf487c17bfc797f01f9304ed190"
             }
           ]
         },
@@ -86324,8 +86324,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaChange",
-              "line": 181,
-              "endLine": 257,
+              "line": 182,
+              "endLine": 258,
               "sha256": "2e5462a4e90f686a9ebf8ed30afad667b3ec1903bc70119118270f263c83e8dd"
             }
           ]
@@ -86355,8 +86355,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "PrepareOpcUaServerSettings",
-              "line": 273,
-              "endLine": 306,
+              "line": 274,
+              "endLine": 307,
               "sha256": "2bca0cf108c4229bfab3cffa10114340b885e898a46aab715d7e0f5ec30079ca"
             }
           ]
@@ -86375,8 +86375,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.OpcUaChanges.cs",
               "name": "ApplyOpcUaServerSettings",
-              "line": 308,
-              "endLine": 330,
+              "line": 309,
+              "endLine": 331,
               "sha256": "deee0b8e8839771910ea77965fa084acda8e64f8dc5d55819f8b495aa7b741b8"
             }
           ]
@@ -94997,10 +94997,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.20261029",
-          "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -95041,10 +95041,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.20261029",
-          "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -95085,10 +95085,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.roles.20261029",
-          "profileSha256": "688d9ae17d18ce5acba733e2f341eb5542658add4d751f6c7d0273fc6b77364b",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.roles.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -95129,10 +95129,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.20261029",
-          "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -95173,10 +95173,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.20261029",
-          "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -95217,10 +95217,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.20261029",
-          "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -103280,10 +103280,10 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "local.opcua_changes.20261029",
-          "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f",
+          "id": "local.opcua_changes.guarded.20261029",
+          "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b",
           "artifacts": [
-            "evidence/local.opcua_changes.20261029.json"
+            "evidence/local.opcua_changes.guarded.20261029.json"
           ]
         }
       ],
@@ -115942,14 +115942,9 @@
       "sha256": "d29d254cf57615658e722884b1a20073db75aace2de3c98e3f3a67bca3a59850"
     },
     {
-      "path": "evidence/local.opcua_changes.20261029.json",
+      "path": "evidence/local.opcua_changes.guarded.20261029.json",
       "state": "observed",
-      "sha256": "8f0b45f41f6a7a9302b63aa2f49b1a274a2b38b6537abc968370a81b5089efe4"
-    },
-    {
-      "path": "evidence/local.opcua_changes.roles.20261029.json",
-      "state": "observed",
-      "sha256": "60014459fb6c50d912981f0c72b98dc7e62b6c4a8d93f5cf9c4a05ee3c947291"
+      "sha256": "13b9ec2d8d47ff6eac8463539647017afad1ae48a907619c913d68b189d6ae00"
     },
     {
       "path": "evidence/local.operation_status.20261028.json",
@@ -116586,12 +116581,8 @@
       "profileSha256": "1aa05da5c8af66dd4218cd24516e0222ffcd16623c4a0e9ed009f9b7c489c910"
     },
     {
-      "id": "local.opcua_changes.20261029",
-      "profileSha256": "34fd2f2cbf50575dfad7a2ad148946a5f93d701edbc2492b8e01d03a804bd84f"
-    },
-    {
-      "id": "local.opcua_changes.roles.20261029",
-      "profileSha256": "688d9ae17d18ce5acba733e2f341eb5542658add4d751f6c7d0273fc6b77364b"
+      "id": "local.opcua_changes.guarded.20261029",
+      "profileSha256": "0f6f859e718a08010abcd8af729b96210d563bdb868f9de73bcfcf9f35bc4e4b"
     },
     {
       "id": "local.operation_status.20261028",

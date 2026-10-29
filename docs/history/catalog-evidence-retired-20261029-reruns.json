@@ -1,5 +1,5 @@
 {
-  "description": "Catalog evidence records retired from contracts/feature-catalog.v1.json in catalog 0.4.70 (29 October 2026) because no feature cited them: 20 were replaced by the re-runs of 29 October (replacedBy names each replacement), and local.explorer.native-providers.20261027, whose raw report was lost and which could not be re-run here, was dropped from project_model_relationships, which local.explorer.relationships.20261028 covers. Kept verbatim; their curated summaries stay in evidence/.",
+  "description": "Catalog evidence records retired from contracts/feature-catalog.v1.json in catalog 0.4.70 (29 October 2026) because no feature cited them: 20 were replaced by the re-runs of 29 October (replacedBy names each replacement), and local.explorer.native-providers.20261027, whose raw report was lost and which could not be re-run here, was dropped from project_model_relationships, which local.explorer.relationships.20261028 covers. Kept verbatim; their curated summaries stay in evidence/. local.opcua_changes.20261029 and local.opcua_changes.roles.20261029 ran the same day on builds without the OPC UA restore guard; local.opcua_changes.guarded.20261029 re-ran every kind on the guarded build and replaces both.",
   "retiredFromCatalog": "0.4.69",
   "replacedBy": {
     "local.explorer.relationship-scope.20261024": "local.explorer.relationship-scope.rerun.20261029",
@@ -22,7 +22,9 @@
     "local.explorer.native-providers.20261027": null,
     "local.wave-kinds.probe.20261027": "local.wave-kinds.probe.rerun.20261029",
     "local.typed.wave9.engineering.20261028": "local.typed.wave9.engineering.rerun.20261029",
-    "local.typed.crossscope.engineering.20261028": "local.typed.crossscope.engineering.rerun.20261029"
+    "local.typed.crossscope.engineering.20261028": "local.typed.crossscope.engineering.rerun.20261029",
+    "local.opcua_changes.20261029": "local.opcua_changes.guarded.20261029",
+    "local.opcua_changes.roles.20261029": "local.opcua_changes.guarded.20261029"
   },
   "records": [
     {
@@ -388,6 +390,50 @@
       "limitations": [
         "Cross-unit cases start from the prepared archive artifacts/crossunit-prep/838e0c54….zap21 (relation and publication applied by scripts/prepare_crossunit_capture_archive.py); FB callees, instance storage across units and refusal paths are not run natively.",
         "Engineering only: the runtime gate is not run."
+      ]
+    },
+    {
+      "id": "local.opcua_changes.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1b743bae842587861c6e0972762bd1842998b72c",
+        "passedScope": "scripts/qualify_opcua_changes.py on build 1b743ba (frozen artifacts/fo12), one owned scratch CPU 1511-1 PN V4.1 with the OPC UA server on and the Small runtime license, all 86 steps passed: opcua_server_interface_import (create and replace with fixtures/opcua/server-interface-v1.xml and -v2.xml), _enable and _delete each applied with checkpoint, PLC compile and save, their complete state (program exports, opcua_engineering_inspect configuration, each interface's normalized export hash) differing in exactly the intended keys, persisted by a fresh owned Portal reopen, restored from their checkpoints into new directories equal to the pre-change state, and typed refusals (unknown fields, scopePath, invalid mode, relative or changed files, missing or existing interfaces, missing enabled flag, stale and wrong preview hashes) leaving the state unchanged; opcua_engineering_export exported the whole server (registered as a model, including TIA's empty local namespace URI) and the interface, and refused a missing name with ObjectNotFound. Last, an opcua_reference_namespace_import of fixtures/opcua/machine-v1.xml terminated TIA (Unexpected exception, Portal disposed), as every earlier probe did."
+      },
+      "artifacts": [
+        "evidence/local.opcua_changes.20261029.json"
+      ],
+      "limitations": [
+        "Server interfaces hold authored objects without PLC variable mappings; mapped variables, methods and SiOME exports are not imported.",
+        "Interface lastModified times and TIA's derived rows of the fixtures' namespaces in namespace access restrictions and role mappings are not compared; content is compared by export hash.",
+        "opcua_role_mapping_set is only refused: a standard role takes its project role but V21 leaves its namespace permissions unchanged, and a custom role cannot be created in the interface's namespace.",
+        "Reference namespaces cannot be imported on V21 Update 3: the import terminates TIA.",
+        "Engineering only; nothing is downloaded and no OPC UA client connects."
+      ]
+    },
+    {
+      "id": "local.opcua_changes.roles.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "60efc264b5f6c613fdd80d9e239604513b0c6cfe",
+        "passedScope": "scripts/qualify_opcua_changes.py from commit 60efc26 on one owned scratch CPU 1511-1 PN V4.1 (TIA V21 Update 3): the three server-interface kinds and opcua_role_mapping_set (standard roles Operator with a project role and Observer without one, then removal of Operator), each prepared, applied with checkpoint, compile and save, read back with untouched peers, reopened in a fresh Portal and restored from its checkpoint, plus typed refusals and opcua_engineering_export of the whole server and each interface. Role restores are compared after a fresh Portal opens the recovered copy."
+      },
+      "artifacts": [
+        "evidence/local.opcua_changes.roles.20261029.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 with the OPC UA server on and the Small runtime license; other CPUs and licenses are not exercised.",
+        "Server interfaces hold authored objects without PLC variable mappings (fixtures/opcua/server-interface-v1.xml and -v2.xml); mapped variables, methods and SiOME exports are not imported.",
+        "opcua_role_mapping_set maps the standard roles Operator (with a project role) and Observer (without one). V21 creates custom roles only in the namespace of a SIMATIC server interface, which no change kind creates; a custom role elsewhere is refused before anything is written.",
+        "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
+        "V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried, including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off (29 October 2026); this run reproduces it last with fixtures/opcua/machine-v1.xml.",
+        "Interface lastModified times are not compared: importing one interface moves the others' times; content is compared by export hash.",
+        "TIA derives the interface namespace's row in the namespace access restrictions and in every role mapping from the interface: it appears on import and vanishes on delete, and a copy recovered from a checkpoint lacks it until TIA rebuilds it; those rows are not compared.",
+        "TIA caches OPC UA role mappings per Portal process, keyed by an object id a recovered copy keeps: the Portal that restored a role change shows the mappings from before the restore. Role restores are therefore compared after a fresh Portal opens the recovered copy, and the worker refuses OPC UA changes in the restoring Portal (StaleRevision).",
+        "Engineering only; nothing is downloaded and no OPC UA client connects."
       ]
     }
   ]
