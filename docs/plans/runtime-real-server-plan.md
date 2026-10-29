@@ -145,7 +145,7 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
   5. Web: `connect`, `browse`, `read`, `diagnostics`, `status`, `write`, `operating_mode` STOP→RUN, `runtime_capture_*`, `disconnect`.
   6. Exit proofs for every owned process.
 - [x] **Step 4:** Implement the oracle; its tests pass.
-- [ ] **Step 5: Native run (TCP/IP window):** run `--mode normal` on a frozen build; the oracle passes. Then the operator switches back to Softbus.
+- [x] **Step 5: Native run (TCP/IP window):** run `--mode normal` on a frozen build; the oracle passes. Then the operator switches back to Softbus. Passed on 29 October on `1181f33` ([record](../verification/runtime-real-server-20261029.md)).
 - [x] **Step 6:** Commit the runner and oracle; curation follows in Task 6.
 
 As built: the runner takes `--mode`, `--host`, `--worker`, `--sim-worker`, `--root` (a short run root; the Harness refuses scratch paths over 143 characters), `--cpu-ip` and `--run-native`. The pins are the certificates whose SAN URI is the OPC UA application URI and the new certificate named *Webserver*, both from `certificate_inspect` after provisioning; a certificate a compile replaced is the stale pin, else the other server's certificate stands in, and both stale connects end `notConnected`. Every value read through UA or the Web API is retained beside the PLCSIM API read of the same tag. The oracle (`scripts/verify_runtime_plcsim_tcpip.py`) also checks each Host's and worker's exit proof and that the session stores hold only the attempts the runner opened; `verification.json` is written only after it passes. `scripts/test_qualify_runtime_plcsim_tcpip.py` drives every mode against a fake Host into the oracle.
@@ -164,18 +164,18 @@ As built: the runner takes `--mode`, `--host`, `--worker`, `--sim-worker`, `--ro
   - `host-loss-capture`: kill the Host during a UA subscription and a web capture. A new Host reopens the committed prefix, reports `hostEndedRemoteUnknown` and refuses implicit resume. `disconnect` with `acknowledgeUnknown` releases the reservation; a fresh connect works.
   - `server-restart`: STOP, power off, power on during a live session. The changed server start time invalidates it, the capture records downtime, and nothing reconnects.
   - `ua-write-loss` and `web-write-loss`: the Host exits after sending. A new Host reports the unknown outcome and refuses a retry; an explicit read decides; the PLCSIM API read confirms.
-- [ ] **Step 4: Native runs:** each mode once on the frozen build (TCP/IP window), each with the oracle.
+- [x] **Step 4: Native runs:** each mode once on the frozen build (TCP/IP window), each with the oracle. All four passed on 29 October on `1181f33`, the same build as `normal`.
 - [x] **Step 5:** Commit: `Runtime recovery modes against an owned TCP/IP PLCSIM server`.
 
 As built: `--runtime-qualification` takes one point and only beside `--component-qualification`. At the point the Host writes `runtime-interruption-marker.json` (point, Host process, write intent, `automaticReplay: false`) and exits with 74: for UA after the Write service returned, for the Web API after `PlcProgram.Write` returned, both before the readback. Each recovery mode sets up in one Host, faults in a second and recovers in a third; later Hosts adopt the instance with `sim_select` and its `creationId`. `server-restart` runs in the setup Host; the oracle accepts a gap or failed row, or a capture that ended on the failure instead of its own limit, as recorded downtime.
 
 ### Task 6: Curate, verify and document
 
-- [ ] **Step 1:** `python -B scripts/curate_evidence.py --id local.runtime.plcsim-tcpip.<date>` over every `verification.json`, with binaries for the Host, engineering worker and simulator worker.
-- [ ] **Step 2:** In the catalog, verify `runtime_plcsim_bind` and each `runtime_ua_*`, `runtime_web_*` and `runtime_capture_*` feature whose tools all passed. Leave `runtime_ua_credential_binding` and the authenticated web features unverified unless a credential run happened; see Out of scope. Bump the catalog version.
-- [ ] **Step 3:** Run `python -B scripts/release_matrix.py`, `python -B scripts/api_coverage_bindings.py refresh contracts/api-coverage/implementation-bindings.v1.json` and `python -B -m unittest discover -s scripts -p 'test_*.py'`; all pass.
-- [ ] **Step 4:** Update `docs/TODO.md`, `docs/STATUS.md`, the reference pages for the TCP/IP path, `docs/wiki/Getting-Started.md` (new prerequisites), and a verification record.
-- [ ] **Step 5:** Commit and open a PR.
+- [x] **Step 1:** `python -B scripts/curate_evidence.py --id local.runtime.plcsim-tcpip.<date>` over every `verification.json`, with binaries for the Host, engineering worker and simulator worker.
+- [x] **Step 2:** In the catalog, verify `runtime_plcsim_bind` and each `runtime_ua_*`, `runtime_web_*` and `runtime_capture_*` feature whose tools all passed. Leave `runtime_ua_credential_binding` and the authenticated web features unverified unless a credential run happened; see Out of scope. Bump the catalog version.
+- [x] **Step 3:** Run `python -B scripts/release_matrix.py`, `python -B scripts/api_coverage_bindings.py refresh contracts/api-coverage/implementation-bindings.v1.json` and `python -B -m unittest discover -s scripts -p 'test_*.py'`; all pass.
+- [x] **Step 4:** Update `docs/TODO.md`, `docs/STATUS.md`, the reference pages for the TCP/IP path, `docs/wiki/Getting-Started.md` (new prerequisites), and a verification record.
+- [x] **Step 5:** Commit and open a PR.
 
 ## Out of scope
 

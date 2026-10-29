@@ -22,6 +22,8 @@ Requirements:
 
 - Windows with **TIA Portal V21** and **Openness**, configured for your user ([Openness registration](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md))
 - **PLCSIM Advanced V8** with a usable license and a supported CPU/firmware, for simulation
+- For the runtime OPC UA and web tools against PLCSIM: PLCSIM *Online Access* set to the PLCSIM
+  Virtual Ethernet Adapter, with a static address on that adapter only ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md))
 - .NET 10 SDK and .NET Framework 4.8 reference assemblies
 - PowerShell 7, Python 3.13 and Node.js 24 for the development checks
 
