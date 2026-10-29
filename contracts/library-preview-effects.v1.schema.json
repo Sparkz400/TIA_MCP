@@ -92,7 +92,7 @@
                 "minLength": 1
               },
               "forceDefault": {
-                "const": false
+                "type": "boolean"
               },
               "deleteUnusedVersions": {
                 "const": false
