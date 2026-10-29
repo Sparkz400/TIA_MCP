@@ -59,7 +59,7 @@ Only relevant if work resumes on that machine; its guard registry and evidence a
 
 ### Open matrix rows by owner
 
-Catalog `0.4.73`, 172 open cells, each row under its first owner (the matrix summary counts a shared row once per owner); deferred and blocked rows are not listed. The blocker named is the one the catalog records. The 29 October runs are in the [verification record](verification/native-reruns-20261029.md).
+Catalog `0.4.74`, 172 open cells, each row under its first owner (the matrix summary counts a shared row once per owner); deferred and blocked rows are not listed. The blocker named is the one the catalog records. The 29 October runs are in the [verification record](verification/native-reruns-20261029.md).
 
 - **D06 Test Suite (97 cells, 15 rows):** the nine `testsuite_style_*` job and plan tools, `qualification_testsuite_prepare`/`_execute`/`_recover`/`_reconcile`, and `testsuite_application_plan_prepare`/`testsuite_system_plan_prepare`. TS-Q01 ran natively on 29 October: the operator observations were accepted and the style rule ran (clean 0/3, violating 3/3), and the checkpoint, English-result and typed-error defects it found are fixed (`d4ee5e8`, `1c272fc`). The six cases need one more desk session on the fixed build. Application/system execution has no qualification mode ([record](verification/testsuite-native-20261028.md)).
 - **D09 online diagnostics (21 cells, 4 rows):** `plc_station_upload`, `db_snapshot_capture` and the `db_snapshot_create`/`_load_actual` kinds. `plc_online_compare` passed with the runtime-user login on 29 October. In an empty Portal the upload meets TLS verification for the owned CPU, which these routes never trust (see the decision below); after an online `db_snapshot_create`, `InterfaceSnapshot.Export` returned no snapshot values, which needs investigation.
@@ -74,7 +74,6 @@ Catalog `0.4.73`, 172 open cells, each row under its first owner (the matrix sum
 
 All re-runnable lost records were re-run on 28 and 29 October ([28 October](verification/evidence-reruns-20261028.md), [29 October](verification/native-reruns-20261029.md)); the replaced records are retired. Open:
 
-- [ ] **Typed resolution, stale phase:** `stale-db-ambiguity` no longer produces an ambiguity, because the resolver compares qualified names since `a808569`. Give it a competitor with the same qualified name, or record that V21 cannot create one.
 - Not re-runnable here: `local.library_upgrades.20261024`, `local.library_vendor.20261025` and `local.library_dmc_prerequisites.20261025` need vendor and DMC inputs that are no longer on this PC.
 
 ## Decisions for the maintainer

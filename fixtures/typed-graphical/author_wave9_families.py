@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 
 from author_cases import CPU, authored_case
+from author_extended_cases import binding, transitive_hosts
 from author_iec_effect_sources import ARCHIVE, ARCHIVE_SHA256
 from author_reference_sources import source
 
@@ -133,6 +134,23 @@ def cases():
                     dependencyXmls=[{"path": "fixtures/typed-graphical/native/" + storage + ".xml", "names": [storage]}])
         case["payload"]["instances"] = [{"key": "storage", "kind": "existingGlobal", "blockPath": "$block:" + storage}]
         result.append(case)
+    # Created storage, engineering only like the standard created cells: a new multi-instance member, also with the caller two
+    # parent levels deep, and a new global DB for TONR (no R_TRIG/F_TRIG global storage document is captured).
+    for original in [case for case in result if case["family"] in ("tonr", "rtrig", "ftrig")]:
+        name = "Fresh_" + original["family"] + "_" + original["language"]
+        global_storage = original["payload"]["instances"][0]["kind"] == "existingGlobal"
+        if global_storage and original["family"] != "tonr":
+            continue
+        case = copy.deepcopy(original)
+        case.update(fixtureId="typed-" + ("createglobal-" if global_storage else "createmulti-") + original["family"] + "-" + original["language"].lower(),
+                    engineeringOnly=True, referenceBindings=[binding("Instance", STORAGE["TONR"][0], name, "GlobalVariable") if global_storage
+                                                             else binding("Instance", "Storage", name)])
+        case["payload"]["instances"] = [{"key": "storage", "kind": "createGlobal" if global_storage else "createMulti", "name": name}]
+        result.append(case)
+        if not global_storage:
+            nested = copy.deepcopy(case)
+            nested.update(fixtureId="typed-transitive-" + case["fixtureId"][len("typed-"):], dependentSources=transitive_hosts(case["blockName"]))
+            result.append(nested)
     return result
 
 

@@ -15,6 +15,9 @@ VAR
  Counter_CTU : CTU_INT;
  Counter_CTD : CTD_INT;
  Counter_CTUD : CTUD_INT;
+ Timer_TONR : TONR_TIME;
+ Edge_RTRIG : R_TRIG;
+ Edge_FTRIG : F_TRIG;
 END_VAR
 BEGIN
  #Active := #Enable;

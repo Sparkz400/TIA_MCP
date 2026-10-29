@@ -13,8 +13,8 @@ def rejection(report):
     """Native failure text retained by the resolution and tag-ambiguity qualifiers."""
     setup = report.get("nativeDuplicateSetup") or {}
     probe = report.get("namespaceReferenceProbe") or {}
-    texts = [json.dumps(setup.get("result", {}).get("nativeRejection")), json.dumps(report.get("failureRestore"))]
-    preserved = (setup.get("fullOriginalXmlPreserved") is True and setup.get("outcome") == "native-rejected"
+    texts = [json.dumps(setup.get("result", {}).get(key)) for key in ("nativeRejection", "compileMessages")] + [json.dumps(report.get("failureRestore"))]
+    preserved = (setup.get("fullOriginalXmlPreserved") is True and setup.get("outcome") in {"native-rejected", "compile-rejected"}
                  or probe.get("status") == "native-attempt-failed" and report.get("failureOriginalXmlVerified") is True)
     return " ".join(texts), preserved
 
