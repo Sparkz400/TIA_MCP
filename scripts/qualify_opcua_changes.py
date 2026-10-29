@@ -7,8 +7,9 @@ with checkpoint, PLC compile and save; each preview is asserted against the requ
 type and tag-table export plus the opcua_engineering_inspect configuration and a content hash of every server interface's
 native export) must differ from the previous one in exactly the intended keys. A fresh Portal then reopens the saved
 project, which must show the identical state. Phase B applies one more change per kind and restores its checkpoint; the
-recovered copy must equal the pre-change state. Typed refusals must change nothing. Phase C exports the whole server and
-each interface with opcua_engineering_export.
+restoring Portal must refuse further OPC UA changes, and the recovered copy, opened in a fresh Portal, must equal the
+pre-change state. Typed refusals must change nothing. Phase C exports the whole server and each interface with
+opcua_engineering_export.
 """
 from __future__ import annotations
 
@@ -42,7 +43,7 @@ CRITERIA = {
     "AC-preview": "Every preview is asserted against the request before apply; a preview made stale by a later change refuses at apply.",
     "AC-preserve": "applied: every program export, the inspected OPC UA configuration and each interface's export hash differ in exactly the intended keys.",
     "AC-native": "applied + persisted: checkpoint, PLC compile and save stages, change_status and a fresh owned Portal reopen with identical state and applied journals.",
-    "AC-recovery": "restored: change_restore in the applying Portal into a new directory equals the pre-change state.",
+    "AC-recovery": "restored: change_restore into a new directory; the restoring Portal refuses OPC UA changes (StaleRevision) and a fresh owned Portal shows the recovered copy equal to the pre-change state.",
     "AC-evidence": "This report: binaries, tool calls, step results, snapshots with state.json, fixture and limitations.",
 }
 LIMITATIONS = [
@@ -53,11 +54,12 @@ LIMITATIONS = [
     "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
     _CRASH,
     "Interface lastModified times are not compared: importing one interface moves the others' times; content is compared by export hash.",
-    "TIA derives the interface namespace's row in the namespace access restrictions and in every role mapping from the interface: it appears on "
-    "import and vanishes on delete, and a copy recovered from a checkpoint lacks it until TIA rebuilds it; those rows are not compared.",
-    "TIA caches OPC UA role mappings per Portal process, keyed by an object id a recovered copy keeps: the Portal that restored a role "
-    "change shows the mappings from before the restore. Role restores are therefore compared after a fresh Portal opens the recovered "
-    "copy, and the worker refuses OPC UA changes in the restoring Portal (StaleRevision).",
+    "TIA derives interface namespace rows in the namespace access restrictions and the role mappings: an import adds its namespace and a "
+    "delete removes it, by rules this run does not model; those rows are not compared.",
+    "TIA caches OPC UA role mappings and namespace access rows per Portal process, keyed by an object id a recovered copy keeps: the Portal "
+    "that restored an OPC UA change shows them as before the restore, and its next OPC UA change saves them into the copy (after restoring "
+    "an interface import, the required role mappings kept the removed interface's namespace). Restores are therefore compared after a "
+    "fresh Portal opens the recovered copy, and the worker refuses OPC UA changes in the restoring Portal (StaleRevision).",
     "Engineering only; nothing is downloaded and no OPC UA client connects.",
 ]
 
@@ -74,8 +76,8 @@ def opcua_state(h, plc):
     # With the server on, TIA renders the server certificate attribute display-only; any other warning is a gap.
     warnings = [w for w in inspected.get("warnings") or [] if w.get("valueStatus") != "displayOnly"]
     require(not inspected["completeness"].get("truncated") and not warnings, "OPC UA inspection is truncated or warned: %s" % warnings)
-    # TIA derives the interface namespace's rows from the interface itself: they appear on import, vanish on delete and are
-    # missing from a checkpoint copy until TIA rebuilds them (29 October 2026), so they are left out of the compared state.
+    # TIA derives the interface namespaces' rows from the interfaces: they appear on import and vanish on delete by rules not
+    # modelled here, so they are left out of the compared state.
     derived = lambda rows: [row for row in rows if row.get("namespaceUri") not in (NAMESPACE, OTHER_NAMESPACE)]
     state = {"opcua:namespaceAccess": derived(inspected["namespaceAccessRestrictions"])}
     for row in inspected["serverSettings"]:
@@ -118,13 +120,11 @@ class Run(StateRun):
         return prepared
 
     def restore(self, label, kind, prepared, recovered=None):
-        """The restoring Portal keeps showing the role mappings from before the restore (TIA caches them per process), so a role
-        restore is compared after a fresh Portal opens the recovered copy; until then OPC UA changes are refused."""
-        if kind != "opcua_role_mapping_set":
-            return super().restore(label, kind, prepared, recovered)
+        """The restoring Portal keeps showing the role mappings and derived namespace rows from before the restore (TIA caches
+        them per process), so a restore is compared after a fresh Portal opens the recovered copy; until then OPC UA changes are refused."""
         h = self.h
         recovered = h.stage("restore " + label, lambda: h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
-        self.refuse(kind, "a change in the Portal that restored " + label, role_payload(self, "Engineer"), "StaleRevision")
+        self.refuse("opcua_role_mapping_set", "a change in the Portal that restored " + label, role_payload(self, "Engineer"), "StaleRevision")
         h.stage("close the restoring Portal", lambda: h.tool("tia_detach"))
         h.owned_portal("restored " + label)
         h.stage("open the recovered copy of " + label, lambda: h.reopen_project(recovered["recoveredProject"]["path"]))
