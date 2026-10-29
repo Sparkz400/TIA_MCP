@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.wave9-created-storage.engineering.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T18:18:17+00:00",
+  "source": {
+    "commit": "297c404512c57ce31bf3192e5e8ba3d3e6e68f7f",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_typed_graphical.py --engineering-only on build 297c404 (frozen at the short project path y), each case in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1, standard route), one batch: 14 wave 9 created-storage cells pass the four engineering gates (engineering, preservation, persistence, recovery): typed-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (a new TONR_TIME, R_TRIG or F_TRIG multi-instance member), typed-transitive-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (the same with the caller embedded two parent levels deep, so the parent FBs and DBs follow the captured transitive rule with the recaptured IEC member shapes) and typed-createglobal-tonr-{lad,fbd} (a new IEC_TIMER global DB from the captured TONR storage document). Profiles: local.typed.wave9-capture.20261027; IEC dependent-instance effect: local.typed.iec-effect-standard-wave9.20261029.",
+  "limitations": [
+    "Engineering only: the runtime gate is not run. The non-transitive cells need PLCSIM runtime (qualify_typed_graphical.py --live --runtime).",
+    "R_TRIG/F_TRIG global storage, existing or created, has no captured global storage document and stays refused (TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile).",
+    "Standard route only; the software-unit and namespace routes have no wave 9 profiles."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "61277dc82eb75be5738050d217654ce30faee004648de3a97e1c26d510b0ea52"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "86ed88b78e5f2c6f223ff90042168f3b0f38377238ab7a2f395c722f8607d6ba"
+    }
+  ],
+  "runs": [
+    {
+      "report": "eng.json",
+      "sha256": "582d010ec8c7d1aff7c147dc1cf63683d61eb60687b29c3b7bfa012dad947a67",
+      "bytes": 82009,
+      "completed": true,
+      "steps": [
+        "typed-createglobal-tonr-fbd: passed",
+        "typed-createglobal-tonr-lad: passed",
+        "typed-createmulti-ftrig-fbd: passed",
+        "typed-createmulti-ftrig-lad: passed",
+        "typed-createmulti-rtrig-fbd: passed",
+        "typed-createmulti-rtrig-lad: passed",
+        "typed-createmulti-tonr-fbd: passed",
+        "typed-createmulti-tonr-lad: passed",
+        "typed-transitive-createmulti-ftrig-fbd: passed",
+        "typed-transitive-createmulti-ftrig-lad: passed",
+        "typed-transitive-createmulti-rtrig-fbd: passed",
+        "typed-transitive-createmulti-rtrig-lad: passed",
+        "typed-transitive-createmulti-tonr-fbd: passed",
+        "typed-transitive-createmulti-tonr-lad: passed"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "engineering_read",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

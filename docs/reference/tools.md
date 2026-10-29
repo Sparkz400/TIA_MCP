@@ -304,40 +304,40 @@ option registers or admits the tool only on a qualification Host.
 
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
-| `runtime_capture_analyze` | Analyze retained sequential polling observations | unqualified | runtime |  |  |
-| `runtime_capture_export` | Export retained capture as JSON and CSV | unqualified | runtime |  |  |
-| `runtime_capture_page` | Page exact retained polling records | unqualified | runtime |  |  |
-| `runtime_capture_start` | Start bounded Web or owned PLCSIM polling capture | unqualified | runtime |  |  |
-| `runtime_capture_status` | Reopen retained polling capture | unqualified | runtime |  |  |
-| `runtime_capture_stop` | Stop owned polling capture | unqualified | runtime |  |  |
-| `runtime_plcsim_bind` | Bind runtime endpoints to an owned PLCSIM instance | unqualified | runtime |  |  |
-| `runtime_ua_browse` | Browse bounded OPC UA references | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_capture_export` | Export exact retained OPC UA captures | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_capture_page` | Read a bounded OPC UA capture page | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_capture_start` | Start bounded OPC UA polling capture | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_capture_status` | Inspect retained OPC UA capture status | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_capture_stop` | Stop an owned OPC UA polling capture | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_client_identity` | Inspect the owned OPC UA client application identity | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_connect` | Connect an owned secure OPC UA session | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_credential_binding` | Build an OPC UA protected credential binding | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_disconnect` | Disconnect an owned OPC UA session | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_read` | Read selected OPC UA typed values | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_status` | Inspect retained OPC UA session state | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_export` | Export retained OPC UA subscription acquisition | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_page` | Read a bounded OPC UA subscription page | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_start` | Start bounded OPC UA subscription acquisition | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_status` | Inspect retained OPC UA subscription status | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_stop` | Stop an owned OPC UA subscription | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_write` | Write scalar values to an owned PLCSIM instance through OPC UA | unqualified | runtime |  |  |
-| `runtime_web_browse` | Browse bounded runtime symbols | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_connect` | Connect an owned pinned Web API session | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_credential_binding` | Build public runtime credential binding | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_diagnostics` | Read CPU diagnostics through an owned Web API session | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_disconnect` | Close owned session or acknowledge unresolved cleanup | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_operating_mode` | Request RUN or STOP on an owned PLCSIM instance through the Web API | unqualified | runtime |  |  |
-| `runtime_web_read` | Read one selected runtime symbol | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_status` | Inspect retained runtime session state | unqualified | runtime |  | `runtime.physical_plc` |
-| `runtime_web_write` | Write values to an owned PLCSIM instance through the Web API | unqualified | runtime |  |  |
+| `runtime_capture_analyze` | Analyze retained sequential polling observations | limited | runtime |  |  |
+| `runtime_capture_export` | Export retained capture as JSON and CSV | limited | runtime |  |  |
+| `runtime_capture_page` | Page exact retained polling records | limited | runtime |  |  |
+| `runtime_capture_start` | Start bounded Web or owned PLCSIM polling capture | limited | runtime |  |  |
+| `runtime_capture_status` | Reopen retained polling capture | limited | runtime |  |  |
+| `runtime_capture_stop` | Stop owned polling capture | limited | runtime |  |  |
+| `runtime_plcsim_bind` | Bind runtime endpoints to an owned PLCSIM instance | limited | runtime |  |  |
+| `runtime_ua_browse` | Browse bounded OPC UA references | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_export` | Export exact retained OPC UA captures | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_page` | Read a bounded OPC UA capture page | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_start` | Start bounded OPC UA polling capture | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_status` | Inspect retained OPC UA capture status | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_stop` | Stop an owned OPC UA polling capture | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_client_identity` | Inspect the owned OPC UA client application identity | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_connect` | Connect an owned secure OPC UA session | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_credential_binding` | Build an OPC UA protected credential binding | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_disconnect` | Disconnect an owned OPC UA session | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_read` | Read selected OPC UA typed values | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_status` | Inspect retained OPC UA session state | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_export` | Export retained OPC UA subscription acquisition | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_page` | Read a bounded OPC UA subscription page | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_start` | Start bounded OPC UA subscription acquisition | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_status` | Inspect retained OPC UA subscription status | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_stop` | Stop an owned OPC UA subscription | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_write` | Write scalar values to an owned PLCSIM instance through OPC UA | limited | runtime |  |  |
+| `runtime_web_browse` | Browse bounded runtime symbols | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_connect` | Connect an owned pinned Web API session | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_credential_binding` | Build public runtime credential binding | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_diagnostics` | Read CPU diagnostics through an owned Web API session | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_disconnect` | Close owned session or acknowledge unresolved cleanup | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_operating_mode` | Request RUN or STOP on an owned PLCSIM instance through the Web API | limited | runtime |  |  |
+| `runtime_web_read` | Read one selected runtime symbol | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_status` | Inspect retained runtime session state | limited | runtime |  | `runtime.physical_plc` |
+| `runtime_web_write` | Write values to an owned PLCSIM instance through the Web API | limited | runtime |  |  |
 
 ## safety
 

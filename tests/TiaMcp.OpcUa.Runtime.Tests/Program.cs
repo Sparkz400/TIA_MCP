@@ -212,6 +212,22 @@ try
             await Refused(() => store.Read(id, [FixtureServer.Node(echoNode)]), "UaSecretEchoRejected", "Server value cannot echo credential: " + echoNode);
             server.Mode = "normal"; await store.Disconnect(id);
         }
+        {
+            // A vault busy past its bounded wait is not a missing credential, and it leaves the session as it was.
+            bool busy = false;
+            await using var store = new OpcUaRuntimeSessionStore(Path.Combine(output, "vault-busy"), (_, consume) => {
+                if (busy) throw new BridgeException("CredentialStoreBusy", "Fixture vault is busy.");
+                var bytes = JsonSerializer.SerializeToUtf8Bytes("fixture-only-secret");
+                try { consume(bytes); } finally { CryptographicOperations.ZeroMemory(bytes); } });
+            string id = Id();
+            Check((await store.Connect(id, User(server.Selection))).State == "connected", "Busy-vault fixture connects");
+            busy = true;
+            await Refused(() => store.Read(id, [FixtureServer.Node("bool")]), "UaCredentialStoreBusy", "A busy vault is reported busy, never as a missing credential");
+            Check((await store.Status(id)).State == "connected", "A busy vault leaves the session connected");
+            busy = false;
+            Check((await store.Read(id, [FixtureServer.Node("bool")])).Items[0].Outcome == "value", "The session reads again once the vault is free");
+            Check((await store.Disconnect(id)).State == "closed", "Busy-vault fixture closes");
+        }
         await using (var store = Store("browse-cancel"))
         {
             string id = Id(); await store.Connect(id, server.Selection); server.NextDelayMs = 1500;

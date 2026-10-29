@@ -187,9 +187,23 @@ internal sealed partial class CredentialVault
         return header;
     }
     private byte[] Entropy(VaultHeader header, string id, string binding) => Encoding.UTF8.GetBytes("TiaMcp.ProtectedCredential.v1\n" + root.ToUpperInvariant() + "\n" + header.UserSid + "\n" + header.VaultId + "\n" + id + "\n" + binding);
-    private FileStream Lock()
+    // Concurrent users of one vault (a UA subscription and a web capture in one Host) wait their turn instead of failing at once;
+    // only a holder past the bounded wait refuses, as CredentialStoreBusy (runs rs_abde1bb3 and rs_db5b4b21, 29 October 2026).
+    internal static TimeSpan LockWait = TimeSpan.FromSeconds(5);
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, SemaphoreSlim> Turns = new(StringComparer.OrdinalIgnoreCase);
+
+    private sealed class Held(FileStream file, SemaphoreSlim turn) : IDisposable
+    {
+        public void Dispose() { try { file.Dispose(); } finally { turn.Release(); } }
+    }
+
+    private IDisposable Lock()
     {
         CheckDirectory(); string path = Path.Combine(root, ".lock");
+        var deadline = System.Diagnostics.Stopwatch.StartNew();
+        var turn = Turns.GetOrAdd(Path.GetFullPath(root), _ => new SemaphoreSlim(1, 1));
+        // Asynchronous waiters are served first come, first served, so a holder that re-locks at once cannot starve the others.
+        if (!turn.WaitAsync(LockWait).GetAwaiter().GetResult()) throw Error("CredentialStoreBusy");
         try
         {
             if (!File.Exists(path))
@@ -198,9 +212,14 @@ internal sealed partial class CredentialVault
                 catch (IOException) when (File.Exists(path)) { }
             }
             CheckFile(path);
-            return new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            while (true)  // Another process (the credential CLI, another Host) can hold the file lock.
+            {
+                try { return new Held(new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None), turn); }
+                catch (IOException) when (deadline.Elapsed < LockWait) { Thread.Sleep(25); }
+            }
         }
-        catch (IOException) { throw Error("CredentialStoreBusy"); }
+        catch (IOException) { turn.Release(); throw Error("CredentialStoreBusy"); }
+        catch { turn.Release(); throw; }
     }
     private void Publish<T>(string name, T value, bool replace = false)
     {

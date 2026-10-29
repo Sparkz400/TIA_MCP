@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.72",
+  "catalogVersion": "0.4.74",
   "targetTiaVersions": [
     21
   ],
@@ -2802,6 +2802,60 @@
       ]
     },
     {
+      "id": "local.typed.resolution-stale.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "dff2201826c4e96c8a1080bb81cce8b846887c2c",
+        "passedScope": "scripts/qualify_typed_resolution.py --phase stale on build dff2201 (frozen at the short project path y), each run in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1) with the UnitSeeder units, LAD and FBD. tag-duplicate-setup-guard (the production collision guard refuses a second Ready tag table with TagScopeMismatch, original unchanged) and stale-tag-address (a deliberate address change makes the prepared change fail at apply with StaleRevision/StaleDeclaration, then checkpoint recovery and a fresh reopen match the original) pass in both languages. stale-db-ambiguity now asks TIA itself for a competitor of the root DB Tgp_ResolutionOne with the same qualified name: ResolutionSeeder duplicate-db-diagnostic tries four routes in unit TiaMcp_UnitB and V21 refuses each one. A namespace-free source, generated under the unit's namespace preset or under an empty preset, fails with 'The block cannot be overwritten because it is already contained in another software unit'. Clearing the namespace of a generated TiaMcp_UnitB.Tgp_ResolutionOne, or renaming a namespace-free Tgp_ResolutionOne_Renamed to Tgp_ResolutionOne, fails with 'A program element with this fully qualified name already exists in this CPU'. Each refused route was removed again, the complete original project XML stayed unchanged and the project compiled clean."
+      },
+      "artifacts": [
+        "evidence/local.typed.resolution-stale.20261029.json"
+      ],
+      "limitations": [
+        "V21 keeps fully qualified program element names unique per CPU, so two DBs with one qualified name cannot exist. A native AmbiguousOperand for a DB operand, and a StaleDeclaration from a new same-name DB at apply, therefore cannot occur on V21; the dbSymbol uniqueness checks stay as a defensive guard with offline tests only. The stale-db-ambiguity runs end blocked by design and count only as this native boundary.",
+        "Duplicate PLC tag names are likewise refused by TIA itself (local.typed.native-boundaries.rerun.20261029).",
+        "A first probe on 84114ff (artifacts/q/yz/probe-db-lad) tried only the namespace-free source routes; it is not curated.",
+        "Owned local engineering only; runtime not run."
+      ]
+    },
+    {
+      "id": "local.typed.iec-effect-standard-wave9.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b4abe48803874ea53344082ab2eefa1c16fc20f5",
+        "passedScope": "scripts/capture_typed_routes_owned.py --unit '' (standard PLC program scope) on build b4abe48 (frozen at the short project path y): the 2 inputs of route-capture-iec-effect-standard-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound baseline (CPU 1511-1 PN V4.1): an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type, now including TONR_TIME, R_TRIG and F_TRIG, while the dependent DB was observed. Both inputs compiled clean and saved; only the declared redeclaration and its observed DB changed (the R_TRIG/F_TRIG system FBs TIA copies into System blocks are generated, not authored); the saved state matched a fresh-process reopen. scripts/extract_typed_instance_effects.py --iec --route standard rewrote instance-effects-iec.v1.json: the DB keeps its full payload and appends exactly the nine members, and the six members of the replaced capture (local.typed.iec-effect-standard.20261026) are structurally identical in caller and DB."
+      },
+      "artifacts": [
+        "evidence/local.typed.iec-effect-standard-wave9.20261029.json"
+      ],
+      "limitations": [
+        "Native reference capture only; the builder's created TONR/R_TRIG/F_TRIG storage cells are qualified separately (local.typed.wave9-created-storage.engineering.20261029); runtime is not run.",
+        "Standard route only: the software-unit and namespace IEC effect profiles keep their six timer/counter members, and those routes have no wave 9 profiles."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-created-storage.engineering.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "297c404512c57ce31bf3192e5e8ba3d3e6e68f7f",
+        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only on build 297c404 (frozen at the short project path y), each case in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1, standard route), one batch: 14 wave 9 created-storage cells pass the four engineering gates (engineering, preservation, persistence, recovery): typed-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (a new TONR_TIME, R_TRIG or F_TRIG multi-instance member), typed-transitive-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (the same with the caller embedded two parent levels deep, so the parent FBs and DBs follow the captured transitive rule with the recaptured IEC member shapes) and typed-createglobal-tonr-{lad,fbd} (a new IEC_TIMER global DB from the captured TONR storage document). Profiles: local.typed.wave9-capture.20261027; IEC dependent-instance effect: local.typed.iec-effect-standard-wave9.20261029."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-created-storage.engineering.20261029.json"
+      ],
+      "limitations": [
+        "Engineering only: the runtime gate is not run. The non-transitive cells need PLCSIM runtime (qualify_typed_graphical.py --live --runtime).",
+        "R_TRIG/F_TRIG global storage, existing or created, has no captured global storage document and stays refused (TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile).",
+        "Standard route only; the software-unit and namespace routes have no wave 9 profiles."
+      ]
+    },
+    {
       "id": "local.library_scopes.forced.20261029",
       "status": "passed",
       "profile": {
@@ -2837,6 +2891,26 @@
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
         "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
         "No runtime execution."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1181f33df9f3ffcddc7d25630cf6cc5a17ecae45",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py on build 1181f33, modes normal, server-restart, host-loss-capture, ua-write-loss and web-write-loss, each in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1 at 192.168.0.1) provisioned over TCP/IP to a fresh owned PLCSIM Advanced V8 instance (Online Access: PLCSIM Virtual Ethernet Adapter at 192.168.0.10/24), logged in to OPC UA and the Web API as the scratch's generated runtime user from a run-owned Host vault. Server certificate pins from certificate_inspect after the last compile; stale-pin connects end notConnected. normal: runtime_plcsim_bind, every runtime_ua_*, runtime_web_* and runtime_capture_* tool, each value read through UA or the Web API beside the PLCSIM API read of the same tag, UA write with expected (a stale expected refused), web write whose effect PLCSIM reads, runtime_web_operating_mode RUN to STOP to RUN confirmed by PLCSIM. server-restart: STOP, power off and power on during live sessions invalidate them, captures record the downtime, nothing reconnects. host-loss-capture: the Host is killed during a UA subscription and a web capture; a new Host adopts the instance, reports the sessions unknown, pages and exports the committed prefix, refuses implicit resume and a new session before acknowledgement, then a fresh session reads. ua-write-loss and web-write-loss: the Host exits right after sending (--runtime-qualification ua.write.afterSend / web.write.afterSend); a new Host reports the unknown outcome, refuses a retry, an explicit read decides and PLCSIM confirms. The independent oracle scripts/verify_runtime_plcsim_tcpip.py found no issue in any mode; every Host and worker has a verified exit proof and the owned instance was stopped, powered off and released."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.20261029.json"
+      ],
+      "limitations": [
+        "Owned PLCSIM Advanced V8 on this machine only; runtime.physical_plc and other machines or networks stay unqualified.",
+        "One CPU (1511-1 PN V4.1), one generated runtime user and the documented bootstrap address 192.168.0.1; TIA's TCP/IP discovery never showed that address, so provisioning identified the empty CPU by its MAC and TLS certificate series (tcpipMacIdentity).",
+        "Guest access and operator seeds were not used; guest access is not settable through V21 Openness.",
+        "plc_online_compare, plc_station_upload and the discovery baseline stay Softbus-only.",
+        "Earlier runs of the same window on 6c6701d and 029c347 found the defects fixed up to 1181f33 (vault contention between a UA subscription and a web capture); they are not curated."
       ]
     }
   ],
@@ -11778,10 +11852,10 @@
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
-          "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
+          "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. Created TONR/R_TRIG/F_TRIG storage additionally needs a captured IEC dependent-instance effect member. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
         ]
       },
       "qualification": {
@@ -11819,7 +11893,10 @@
           "local.typed.wave9.engineering.rerun.20261029",
           "local.typed.native-boundaries.rerun.20261029",
           "local.typed.resolution.rerun.20261029",
-          "local.typed.wave9.runtime.20261029"
+          "local.typed.wave9.runtime.20261029",
+          "local.typed.resolution-stale.20261029",
+          "local.typed.iec-effect-standard-wave9.20261029",
+          "local.typed.wave9-created-storage.engineering.20261029"
         ]
       },
       "availability": {
@@ -20377,8 +20454,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20419,8 +20498,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20461,8 +20542,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20503,8 +20586,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20545,8 +20630,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20588,8 +20675,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20629,8 +20718,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20672,8 +20763,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20714,8 +20807,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20756,8 +20851,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20804,8 +20901,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20846,8 +20945,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20888,8 +20989,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20929,8 +21032,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20971,8 +21076,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -21013,8 +21120,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22396,8 +22505,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22439,8 +22550,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22482,8 +22595,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22525,8 +22640,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22568,8 +22685,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22612,8 +22731,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22654,8 +22775,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22697,8 +22820,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22740,8 +22865,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22782,8 +22909,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22823,8 +22952,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22864,8 +22995,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22905,8 +23038,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22946,8 +23081,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22988,8 +23125,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23029,8 +23168,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23070,8 +23211,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23111,8 +23254,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

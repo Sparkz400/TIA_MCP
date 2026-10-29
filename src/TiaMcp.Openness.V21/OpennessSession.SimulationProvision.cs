@@ -39,6 +39,7 @@ namespace TiaMcp.Openness.V21
             JObject marker;
             try { marker = SimulationTicket.Decode(args.Value<string>("downloadTicket")); }
             catch { throw new BridgeException("InvalidSimulationTicket", "A current owned simulator ticket is required for scratch credential provisioning."); }
+            string network = SimulationTicket.Interface(marker);
             var plc = SelectPlc(args);
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(plc.Project, budget).Where(entry =>
@@ -102,7 +103,8 @@ namespace TiaMcp.Openness.V21
             var report = Envelope();
             report["recoveryBaseline"] = recoveryBaseline;
             report["origin"] = "TIA Portal V21 Openness / owned PLCSIM Advanced V8 credential provisioning";
-            report["route"] = "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
+            report["route"] = network == "TCPIP" ? "OnlineProvider.SetPlcMasterSecret via PN/IE / the sole PLCSIM Virtual Ethernet Adapter, existing TCP/IP single-adapter mode only"
+                : "OnlineProvider.SetPlcMasterSecret via PN/IE / PLCSIM (1), local Softbus only";
             report["project"] = ProjectInfo(plc.Project);
             report["plcPath"] = plc.Path;
             report["instanceId"] = marker["instanceId"].DeepClone();
@@ -217,8 +219,7 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionRegistration(marker);
                     instance = VerifySimulationInstance(marker); // Requires exact identity and OFF.
                     VerifySimulationProvisionIdentity(instance, marker, true);
-                    if (instance.CommunicationInterface != ECommunicationInterface.Softbus)
-                        throw new BridgeException("SoftbusRequired", "The owned simulator must already use local Softbus; shared network settings are not changed.");
+                    RequireSimulationNetwork(marker, instance, "The owned simulator must already use local Softbus; shared network settings are not changed.");
                     provider = hardware[0].Item.GetService<OnlineProvider>();
                     if (provider == null)
                         throw new BridgeException("UnsupportedCapability", "The selected scratch CPU has no OnlineProvider service.");
@@ -246,7 +247,7 @@ namespace TiaMcp.Openness.V21
                                 throw new BridgeException("OfflineRequired", "The scratch CPU must remain offline during pre-start discovery.");
                         },
                         () => {
-                            var beforePc = provider.Configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
+                            var beforePc = SimulationPcInterface(provider.Configuration, network);
                             var beforeDevices = beforePc == null ? null : beforePc.GetAccessibleDevices().Take(65).ToArray();
                             var unexplained = beforeDevices == null ? null : WithoutSimulationPlaceholder(beforeDevices, AcceptedSimulationPlaceholder(discoveryBaseline), beforeDevices.Length > 64);
                             bool empty = beforeDevices == null || unexplained.Length == 0;
@@ -338,7 +339,7 @@ namespace TiaMcp.Openness.V21
                     provisionConfiguration = provider.Configuration;
                     var configuration = provisionConfiguration;
                     var mode = configuration.Modes.Find("PN/IE");
-                    var pc = mode?.PcInterfaces.Find("PLCSIM", 1);
+                    var pc = SimulationPcInterface(configuration, network);
                     report["routeLookupOperatingState"] = instance.OperatingState.ToString();
                     if (pc == null)
                     {
@@ -349,6 +350,7 @@ namespace TiaMcp.Openness.V21
                     var ips = originalAddresses.Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
                     report["originalControllerAddresses"] = new JArray(originalAddresses);
                     report["controllerName"] = instance.ControllerName;
+                    string bootstrapped = null, startupMac = null; // Set only when this attempt assigned the bootstrap address.
                     if (ips.Length == 0)
                     {
                         // SetIPSuite addresses the already-verified IInstance,
@@ -356,17 +358,17 @@ namespace TiaMcp.Openness.V21
                         // Siemens documents this operation for Softbus; it ignores
                         // the subnet/gateway and remanence flag in that mode.
                         const string documentedStartupAddress = "192.168.0.1";
-                        var observedBefore = observer.Read(65);
+                        var observedBefore = observer.Read(65, network);
                         var before = WithoutSimulationPlaceholder(observedBefore, AcceptedSimulationPlaceholder(discoveryBaseline), observedBefore.Length > 64);
                         report["postStartupDiscovery"] = new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
                             ["accessibleDevices"] = new JArray(observedBefore.Take(64).Select(device => new JObject {
                                 ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries })),
                             ["baselinePlaceholderExcluded"] = observedBefore.Length - before.Length,
                             ["truncated"] = observedBefore.Length > 64, ["causalTargetVerified"] = false };
-                        if (before.Length != 1 || before[0].Address != documentedStartupAddress ||
-                            (before[0].DeviceSeries != "S7-1500" && before[0].DeviceSeries != "S7-1500 CPU"))
+                        // An empty TCP/IP CPU has no IP yet; it then gets the same documented default (/24, on the operator's subnet).
+                        if (before.Length != 1 || !SimulationNetworkAdmission.EmptyStartupEndpoint(network, before[0].Address, before[0].MACAddress, before[0].DeviceSeries, documentedStartupAddress))
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "Owned startup did not produce exactly one new S7-1500 endpoint at the documented PLCSIM startup address. No address or credential was submitted.");
-                        string bootstrapAddress = before[0].Address;
+                        string bootstrapAddress = documentedStartupAddress;
                         report["postStartupDiscovery"]["causalTargetVerified"] = true;
                         report["targetIdentityBasis"] = "PLCSIM route absent or successfully queried empty (apart from only the exact pre-registration Runtime Manager placeholder, if recorded) before sole owned OFF-to-STOP startup; one new S7-1500 default endpoint observed by a fresh owned discovery-only Portal; exact IInstance address assignment and readback; fresh exact discovery match.";
                         var originalSuites = instance.ControllerIPSuite4 ?? new SIPSuite4[0];
@@ -379,7 +381,7 @@ namespace TiaMcp.Openness.V21
                                 ["defaultGateway"] = suite.DefaultGateway.IPString })),
                             ["assignedAddress"] = bootstrapAddress, ["requestedSubnetMask"] = "255.255.255.0",
                             ["requestedDefaultGateway"] = "0.0.0.0", ["requestedRemanent"] = false,
-                            ["softbusIgnoresSubnetGatewayAndRemanence"] = true, ["readbackVerified"] = false,
+                            ["softbusIgnoresSubnetGatewayAndRemanence"] = network != "TCPIP", ["observedStartupAddress"] = before[0].Address, ["readbackVerified"] = false,
                             ["scope"] = "Owned simulator runtime only; owned instance is powered off on every exit and its storage is retained." };
                         VerifySimulationProvisionIdentity(instance, marker, false);
                         if (instance.OperatingState != EOperatingState.Stop || (instance.ControllerIP ?? new string[0]).Any(SimulationProvisionUsableIPv4))
@@ -397,6 +399,7 @@ namespace TiaMcp.Openness.V21
                         if (instance.OperatingState != EOperatingState.Stop || ips.Length != 1 || ips[0] != bootstrapAddress)
                             throw new BridgeException("SimulationProvisionAddressUnavailable", "The exact owned simulator did not read back the requested bootstrap address in STOP. No credential was submitted.");
                         report["addressBootstrap"]["readbackVerified"] = true;
+                        bootstrapped = bootstrapAddress; startupMac = before[0].MACAddress;
                     }
                     report["stage"] = "discoverExactRuntimeAddress";
                     report["controllerAddresses"] = new JArray(ips);
@@ -409,13 +412,17 @@ namespace TiaMcp.Openness.V21
                     // A newly powered-on empty CPU can already report its IP
                     // before TIA discovery becomes visible. Bound read-only polling
                     // for both existing and newly assigned addresses.
-                    int discoveryBudgetMs = 10000;
+                    // TIA's TCP/IP discovery can lag the PLCSIM address; it gets 60 s at the same sampling (29 October 2026).
+                    int discoveryBudgetMs = network == "TCPIP" ? 60000 : 10000;
                     report["addressDiscoveryBudgetMs"] = discoveryBudgetMs;
                     var discoveryClock = Stopwatch.StartNew();
                     ConfigurationAccessibleDevice[] accessible;
+                    string runtimeTargetBasis;
                     while (true)
                     {
-                        if (discoverySamples.Count > 0 && discoveryClock.ElapsedMilliseconds >= discoveryBudgetMs)
+                        // TCP/IP takes one last sample at the end of its budget, where the MAC identity basis may decide.
+                        bool budgetSpent = discoverySamples.Count > 0 && discoveryClock.ElapsedMilliseconds >= discoveryBudgetMs;
+                        if (budgetSpent && network != "TCPIP")
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "The bounded read-only PLCSIM discovery interval expired without an exact runtime address match. No credential was submitted.");
                         VerifySimulationProvisionIdentity(instance, marker, false);
                         var currentIps = (instance.ControllerIP ?? new string[0]).Where(SimulationProvisionUsableIPv4).Distinct(StringComparer.Ordinal).ToArray();
@@ -425,13 +432,13 @@ namespace TiaMcp.Openness.V21
                         provisionConfiguration = provider.Configuration;
                         configuration = provisionConfiguration;
                         mode = configuration.Modes.Find("PN/IE");
-                        pc = mode?.PcInterfaces.Find("PLCSIM", 1);
+                        pc = SimulationPcInterface(configuration, network);
                         if (pc == null)
                         {
                             report["connectionInventory"] = SimulationProvisionConnectionInventory(configuration);
                             throw new BridgeException("SimulationProvisionRouteUnavailable", "The exact PLCSIM (1) route disappeared during read-only address discovery.");
                         }
-                        var observedAccessible = observer.Read(65);
+                        var observedAccessible = observer.Read(65, network);
                         accessible = WithoutSimulationPlaceholder(observedAccessible, AcceptedSimulationPlaceholder(discoveryBaseline), observedAccessible.Length > 64);
                         var visible = new JArray(observedAccessible.Take(64).Select(device => new JObject {
                             ["name"] = device.Name, ["address"] = device.Address, ["macAddress"] = device.MACAddress, ["deviceSeries"] = device.DeviceSeries }));
@@ -440,13 +447,24 @@ namespace TiaMcp.Openness.V21
                         discoverySamples.Add(new JObject { ["observedAtUtc"] = DateTime.UtcNow.ToString("O"),
                             ["elapsedMs"] = discoveryClock.ElapsedMilliseconds, ["runtimeAddresses"] = new JArray(currentIps),
                             ["accessibleDevices"] = visible.DeepClone(), ["baselinePlaceholderExcluded"] = observedAccessible.Length - accessible.Length });
-                        if (accessible.Length == 1 && ips.Contains(accessible[0].Address, StringComparer.Ordinal)) break;
-                        int discoveryDelay = SimulationProvisionDiscoveryDelayMilliseconds(accessible.Length, discoveryClock.ElapsedMilliseconds);
-                        if (discoveryDelay == 0)
+                        var sampled = accessible.Length == 1 ? accessible[0] : null;
+                        runtimeTargetBasis = SimulationNetworkAdmission.RuntimeTargetBasis(network, budgetSpent, accessible.Length, sampled?.Address, sampled?.MACAddress,
+                            sampled?.DeviceSeries, ips, bootstrapped, startupMac);
+                        if (runtimeTargetBasis != null) break;
+                        if (budgetSpent)
+                            throw new BridgeException("SimulationProvisionTargetAmbiguous", "The bounded read-only PLCSIM discovery interval expired without an exact runtime address match or the same PLCSIM device by MAC. No credential was submitted.");
+                        int discoveryDelay = SimulationProvisionDiscoveryDelayMilliseconds(accessible.Length, discoveryClock.ElapsedMilliseconds, discoveryBudgetMs);
+                        // A TCP/IP read that outlasts the budget still gets its last sample; more than one device never does.
+                        if (discoveryDelay == 0 && !(network == "TCPIP" && accessible.Length <= 1))
                             throw new BridgeException("SimulationProvisionTargetAmbiguous", "Fresh PLCSIM discovery did not establish one unique device whose address matches the owned runtime CPU within the bounded read-only check. No credential was submitted.");
                         Thread.Sleep(discoveryDelay);
                     }
-                    string address = accessible[0].Address;
+                    string address = runtimeTargetBasis == "tcpipMacIdentity" ? ips[0] : accessible[0].Address;
+                    if (network == "TCPIP")
+                        report["runtimeTargetIdentity"] = new JObject { ["basis"] = runtimeTargetBasis, ["address"] = address, ["macAddress"] = startupMac,
+                            ["description"] = runtimeTargetBasis == "tcpipMacIdentity"
+                                ? "TIA's TCP/IP discovery kept naming the CPU by its MAC: the one PLCSIM S7-1500 that appeared only after this owned startup, with the MAC it showed before the bootstrap, while the instance reads back exactly the bootstrap address. Rechecked by MAC before and after going online; the device reached there must present an S7-1500 certificate."
+                                : "The one discovered device shows a controller address of the owned instance." };
                     report["stage"] = "configureOnlineAuthenticationHandler";
                     report["routeSelection"] = new JObject { ["mode"] = mode.Name, ["pcInterface"] = pc.Name,
                         ["pcInterfaceNumber"] = pc.Number, ["address"] = address,
@@ -487,6 +505,7 @@ namespace TiaMcp.Openness.V21
                             DateTime certificateNotBefore = DateTime.MinValue;
                             DateTime certificateNotAfter = DateTime.MinValue;
                             bool metadataComplete = false;
+                            string certificateSubject = null;
                             try
                             {
                                 string plcName = tls.PlcName;
@@ -503,6 +522,7 @@ namespace TiaMcp.Openness.V21
                                 if (certificates.Length == 1)
                                 {
                                     observedSha256 = certificateEvidence[0].Value<string>("sha256");
+                                    certificateSubject = certificateEvidence[0].Value<string>("subject");
                                     certificateNotBefore = DateTime.Parse(certificateEvidence[0].Value<string>("notBeforeUtc"), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                                     certificateNotAfter = DateTime.Parse(certificateEvidence[0].Value<string>("notAfterUtc"), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                                 }
@@ -523,6 +543,13 @@ namespace TiaMcp.Openness.V21
                                     ownedTargetVerified = explicitRouteApplied && report.Value<string>("stage") == "goOnline" &&
                                         report.Value<bool>("emptyStartupVerified") && !report.Value<bool>("originalProgramCardRestored") &&
                                         instance.OperatingState == EOperatingState.Stop && callbackIps.Length == 1 && callbackIps[0] == address;
+                                    // Without an address from discovery, the device reached at the bootstrap address must present an S7-1500 certificate.
+                                    if (runtimeTargetBasis == "tcpipMacIdentity")
+                                    {
+                                        bool series = (certificateSubject ?? "").IndexOf("S7-1500", StringComparison.Ordinal) >= 0;
+                                        tlsEvidence["tcpipMacIdentityCertificateSeriesMatched"] = series;
+                                        ownedTargetVerified = ownedTargetVerified && series;
+                                    }
                                 }
                                 catch (Exception ex) { tlsEvidence["targetRevalidationExceptionType"] = ex.GetType().FullName; }
                             }
@@ -604,9 +631,9 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed before credential submission.");
-                    var read = observer.Read(3);
+                    var read = observer.Read(3, network);
                     var rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
-                    if (rechecked.Length != 1 || rechecked[0].Address != address)
+                    if (rechecked.Length != 1 || !SimulationNetworkAdmission.SameRuntimeTarget(runtimeTargetBasis, rechecked[0].Address, rechecked[0].MACAddress, rechecked[0].DeviceSeries, address, startupMac))
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before credential submission.");
                     // ApplyConfiguration chooses a session route; it does not
                     // establish the connection. Exercise the documented explicit
@@ -618,7 +645,33 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("OfflineRequired", "The worker-owned scratch connection changed before its explicit GoOnline call.");
                     report["goOnlineAttempted"] = true;
                     checkpoint("beforeGoOnline");
-                    var online = provider.GoOnline();
+                    OnlineState online;
+                    try { online = provider.GoOnline(); }
+                    catch (Exception first) when (network == "TCPIP") // Softbus never enters this handler.
+                    {
+                        string stateAfter;
+                        try { stateAfter = provider.State.ToString(); } catch { stateAfter = null; }
+                        var challenge = report["onlineChallengeType"];
+                        if (!SimulationNetworkAdmission.GoOnlineRetryAllowed(network, 0, challenge != null && challenge.Type != JTokenType.Null || tlsCallbackCount > 0 || callbackFailure != null,
+                            report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed") || failure != null, stateAfter))
+                            throw;
+                        const int retryDelayMs = 15000;
+                        report["goOnlineRetry"] = new JObject { ["delayMs"] = retryDelayMs, ["onlineStateAfterFirstAttempt"] = stateAfter,
+                            ["firstAttempt"] = SimulationProvisionExceptionDiagnostics(first, true), ["returned"] = false,
+                            ["policy"] = "TCP/IP only, once: the first GoOnline threw before any online callback, with no credential opened or submitted; the owned target is rechecked before the second call." };
+                        checkpoint("goOnlineRetryScheduled");
+                        Thread.Sleep(retryDelayMs);
+                        VerifySimulationProvisionIdentity(instance, marker, false);
+                        if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                            throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state, connection or controller address changed before the GoOnline retry.");
+                        var retryRead = observer.Read(3, network);
+                        var retryChecked = WithoutSimulationPlaceholder(retryRead, AcceptedSimulationPlaceholder(discoveryBaseline), retryRead.Length > 2);
+                        if (retryChecked.Length != 1 || !SimulationNetworkAdmission.SameRuntimeTarget(runtimeTargetBasis, retryChecked[0].Address, retryChecked[0].MACAddress, retryChecked[0].DeviceSeries, address, startupMac))
+                            throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before the GoOnline retry.");
+                        checkpoint("beforeGoOnlineRetry");
+                        online = provider.GoOnline();
+                        report["goOnlineRetry"]["returned"] = true;
+                    }
                     report["goOnlineCallReturned"] = true;
                     checkpoint("afterGoOnline");
                     report["goOnlineReturnedState"] = online.ToString();
@@ -632,9 +685,9 @@ namespace TiaMcp.Openness.V21
                     VerifySimulationProvisionIdentity(instance, marker, false);
                     if (instance.OperatingState != EOperatingState.Stop || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
                         throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state or controller address changed while establishing the scratch connection.");
-                    read = observer.Read(3);
+                    read = observer.Read(3, network);
                     rechecked = WithoutSimulationPlaceholder(read, AcceptedSimulationPlaceholder(discoveryBaseline), read.Length > 2);
-                    if (rechecked.Length != 1 || rechecked[0].Address != address)
+                    if (rechecked.Length != 1 || !SimulationNetworkAdmission.SameRuntimeTarget(runtimeTargetBasis, rechecked[0].Address, rechecked[0].MACAddress, rechecked[0].DeviceSeries, address, startupMac))
                         throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact unique PLCSIM endpoint changed while establishing the scratch connection.");
                     if (callbackFailure != null) throw callbackFailure;
                     if (failure != null) throw failure;
@@ -1156,8 +1209,7 @@ namespace TiaMcp.Openness.V21
             var registered = SimulationRuntimeManager.RegisteredInstanceInfo.Take(2).ToArray();
             if (registered.Length != 1 || registered[0].ID != marker.Value<int>("instanceId") || registered[0].Name != marker.Value<string>("instanceName"))
                 throw new BridgeException("SimulationProvisionIsolationRequired", "Credential provisioning requires the exact owned simulator to be the only registered local instance. Other instances are never stopped or selected.");
-            if (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus)
-                throw new BridgeException("SoftbusRequired", "Credential provisioning requires existing local Softbus mode.");
+            RequireSimulationNetwork(marker, null, "Credential provisioning requires existing local Softbus mode.");
         }
 
         private static void VerifySimulationProvisionIdentity(IInstance instance, JObject marker, bool requireOff, bool requireExclusive = true)
@@ -1171,8 +1223,7 @@ namespace TiaMcp.Openness.V21
             var markerFile = SimulationCredentialFile(Path.Combine(instance.StoragePath, SimulationTicket.MarkerName), 16384);
             if (!JToken.DeepEquals(marker, JObject.Parse(File.ReadAllText(markerFile.FullName))))
                 throw new BridgeException("SimulationProvisionTargetMismatch", "The simulator ownership marker changed.");
-            if (requireExclusive && (SimulationRuntimeManager.NetworkMode != ENetworkMode.Softbus || instance.CommunicationInterface != ECommunicationInterface.Softbus))
-                throw new BridgeException("SoftbusRequired", "The exact owned simulator is no longer isolated through local Softbus.");
+            if (requireExclusive) RequireSimulationNetwork(marker, instance, "The exact owned simulator is no longer isolated through local Softbus.");
             if (requireOff && instance.OperatingState != EOperatingState.Off)
                 throw new BridgeException("SimulationMustBeOff", "The owned simulator must be OFF before credential recovery starts.");
         }
@@ -1183,10 +1234,10 @@ namespace TiaMcp.Openness.V21
                 return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(files.ToString(Formatting.None)))).Replace("-", "").ToLowerInvariant();
         }
 
-        private static int SimulationProvisionDiscoveryDelayMilliseconds(int accessibleCount, long elapsedMilliseconds)
+        private static int SimulationProvisionDiscoveryDelayMilliseconds(int accessibleCount, long elapsedMilliseconds, long budgetMilliseconds = 10000)
         {
-            if (accessibleCount < 0 || accessibleCount > 1 || elapsedMilliseconds < 0 || elapsedMilliseconds >= 10000) return 0;
-            return (int)Math.Min(250L, 10000L - elapsedMilliseconds);
+            if (accessibleCount < 0 || accessibleCount > 1 || elapsedMilliseconds < 0 || elapsedMilliseconds >= budgetMilliseconds) return 0;
+            return (int)Math.Min(250L, budgetMilliseconds - elapsedMilliseconds);
         }
 
         private static bool SimulationProvisionUsableIPv4(string value)
@@ -1194,6 +1245,15 @@ namespace TiaMcp.Openness.V21
             IPAddress address;
             return IPAddress.TryParse(value, out address) && address.AddressFamily == AddressFamily.InterNetwork &&
                 address.ToString() == value && !IPAddress.Any.Equals(address) && !IPAddress.Broadcast.Equals(address) && !IPAddress.IsLoopback(address);
+        }
+
+        // Softbus instances answer on PN/IE / PLCSIM (1); TCP/IP ones on the operator's sole PLCSIM virtual Ethernet adapter, never another NIC.
+        internal static ConfigurationPcInterface SimulationPcInterface(ConnectionConfiguration configuration, string network)
+        {
+            var mode = configuration.Modes.Find("PN/IE");
+            if (mode == null || network != "TCPIP") return mode?.PcInterfaces.Find("PLCSIM", 1);
+            var adapters = mode.PcInterfaces.Where(pc => (pc.Name ?? "").IndexOf("PLCSIM Virtual Ethernet Adapter", StringComparison.OrdinalIgnoreCase) >= 0).Take(2).ToArray();
+            return adapters.Length == 1 ? adapters[0] : null;
         }
 
         private static JArray SimulationProvisionConnectionInventory(ConnectionConfiguration configuration)
