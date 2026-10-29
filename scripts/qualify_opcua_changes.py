@@ -1,5 +1,5 @@
 """Qualify the D04 OPC UA engineering kinds natively in one owned scratch CPU 1511-1 PN V4.1: server interface import
-(create and replace), enable and delete, OPC UA role mappings, and the opcua_engineering_export read tool.
+(create and replace), enable and delete, standard OPC UA role mappings, and the opcua_engineering_export read tool.
 
 Setup grants the scratch's runtime role the OPC UA server access right and switches the server on with the Small runtime
 license (opcua_server_settings_set, qualified by scripts/qualify_opcua_server_settings.py). Phase A applies every kind
@@ -24,19 +24,16 @@ from qualify_plc_object_mutations import coverage_gaps, view
 from qualification_owned_scratch import complete_inventory
 
 ROOT = Path(__file__).resolve().parents[1]
-KINDS = ("opcua_server_interface_import", "opcua_server_interface_enable", "opcua_server_interface_delete")
+KINDS = ("opcua_server_interface_import", "opcua_server_interface_enable", "opcua_server_interface_delete", "opcua_role_mapping_set")
 _CRASH = ("V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected exception\", Portal disposed) for every NodeSet tried, "
           "including the OPC Foundation DI 1.05.0 NodeSet, headless and with TIA's user interface, with the OPC UA server on or off "
           "(29 October 2026); this run reproduces it last with fixtures/opcua/machine-v1.xml.")
 # D04 kinds this run does not qualify; scripts/test_qualify_opcua_changes.py keeps KINDS plus these equal to the catalog's opcua_* change kinds.
 EXCLUDED = {"opcua_reference_namespace_import": _CRASH, "opcua_reference_namespace_delete": "Needs an imported reference namespace. " + _CRASH,
-            "opcua_server_settings_set": "Qualified by scripts/qualify_opcua_server_settings.py (local.opcua.server-settings.20261028).",
-            "opcua_role_mapping_set": "Native runs on 29 October: a standard role (Operator) is added with AddStandardOpcUaRole and takes its project role, "
-                                      "but SetPermission leaves every namespace permission unchanged and the permission attributes are read-only; "
-                                      "Create of a custom role in the interface's namespace fails natively without a message."}
+            "opcua_server_settings_set": "Qualified by scripts/qualify_opcua_server_settings.py (local.opcua.server-settings.20261028)."}
 V1, V2 = ROOT / "fixtures/opcua/server-interface-v1.xml", ROOT / "fixtures/opcua/server-interface-v2.xml"
 OTHER = ROOT / "fixtures/opcua/server-interface-other.xml"  # A second interface in its own namespace, deleted before the reopen.
-NAME, ROLE, UA = "TiaMcpQ", "TiaMcpRole", "http://opcfoundation.org/UA/"
+NAME, ROLE, UA = "TiaMcpQ", "Operator", "http://opcfoundation.org/UA/"  # V21 creates custom roles only in a SIMATIC interface's namespace.
 NAMESPACE, OTHER_NAMESPACE = "urn:tiamcp:interface:1", "urn:tiamcp:interface:2"  # The fixtures' namespaces.
 SMALL = "SimaticOpcUaS71500Small"
 PERMISSIONS = ("Browse", "Read", "Write", "Call", "ReceiveEvents", "ReadRolePermissions")
@@ -51,7 +48,8 @@ CRITERIA = {
 LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1 with the OPC UA server on and the Small runtime license; other CPUs and licenses are not exercised.",
     "Server interfaces hold authored objects without PLC variable mappings (fixtures/opcua/server-interface-v1.xml and -v2.xml); mapped variables, methods and SiOME exports are not imported.",
-    "opcua_role_mapping_set is only refused here (prepare-time checks); see EXCLUDED for its native findings.",
+    "opcua_role_mapping_set maps the standard roles Operator (with a project role) and Observer (without one). V21 creates custom roles only in "
+    "the namespace of a SIMATIC server interface, which no change kind creates; a custom role elsewhere is refused before anything is written.",
     "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
     _CRASH,
     "Interface lastModified times are not compared: importing one interface moves the others' times; content is compared by export hash.",
@@ -147,10 +145,25 @@ def delete(run, restore=False, name=NAME):
                      {"action": "opcua_server_interface_delete", "name": name}, removed=[interface(name)], restore=restore)
 
 
-def role_payload(run):
-    """A custom role defined in the interface's namespace, mapped to the scratch's runtime role."""
-    rows = [{"namespaceUri": uri, **{p: p in ("Browse", "Read") for p in PERMISSIONS}} for uri in (NAMESPACE, run.plc_namespace)]
-    return {"action": "create", "roleName": ROLE, "definedInNamespace": NAMESPACE, "projectRole": run.runtime_role, "namespacePermissions": rows}
+def role_payload(run, name=ROLE, project_role=True):
+    """A standard role with Browse and Read in the OPC UA and the PLC namespace, mapped to the scratch's runtime role if project_role."""
+    rows = [{"namespaceUri": uri, **{p: p in ("Browse", "Read") for p in PERMISSIONS}} for uri in (UA, run.plc_namespace)]
+    return {"action": "create", "roleName": name, "definedInNamespace": UA, **({"projectRole": run.runtime_role} if project_role else {}), "namespacePermissions": rows}
+
+
+def role_create(run, name=ROLE, project_role=True, restore=False):
+    payload, key = role_payload(run, name, project_role), "opcua:roleMapping:" + name
+    def granted(applied, state):
+        row = state[key]
+        require(row["definedInNamespace"] == UA and row["projectRole"] == (run.runtime_role if project_role else ""), "Role mapping differs: %s" % row)
+        rights = {p["namespaceUri"]: tuple(p[k] for k in ("browse", "read", "write", "call", "receiveEvents", "readRolePermissions")) for p in row["namespacePermissions"]}
+        require(all(rights.get(uri) == (True, True, False, False, False, False) for uri in (UA, run.plc_namespace)), "Namespace permissions differ: %s" % rights)
+    return run.apply("map the %s role" % name, "opcua_role_mapping_set", payload, dict(payload), added=[key], check=granted, restore=restore)
+
+
+def role_remove(run, name=ROLE, restore=False):
+    return run.apply("remove the %s role mapping" % name, "opcua_role_mapping_set", {"action": "remove", "roleName": name},
+                     {"action": "remove", "roleName": name}, removed=["opcua:roleMapping:" + name], restore=restore)
 
 
 def setup(run):
@@ -188,6 +201,8 @@ def refusals(run):
     k = "opcua_role_mapping_set"
     run.refuse(k, "creating the existing Anonymous mapping", {**role_payload(run), "roleName": "Anonymous"}, "ObjectExists")
     run.refuse(k, "removing a missing mapping", {"action": "remove", "roleName": ROLE}, "ObjectNotFound")
+    run.refuse(k, "removing the required Anonymous mapping", {"action": "remove", "roleName": "Anonymous"}, "ProtectedObject")
+    run.refuse(k, "an unknown standard role", role_payload(run, "TiaMcpRole"), "InvalidRequest")
     run.refuse(k, "a permission row without explicit booleans", {**role_payload(run), "namespacePermissions": [{"namespaceUri": UA, "Browse": True}]}, "InvalidRequest")
     run.refuse(k, "an unknown action", {"action": "rename", "roleName": ROLE}, "InvalidRequest")
 
@@ -237,6 +252,7 @@ def body(h):
     refusals(run)
     # Phase A: applied, then persisted by a fresh Portal reopen.
     import_(run, "import the interface", V1, "create")
+    run.refuse("opcua_role_mapping_set", "a custom role in the imported interface's namespace", {**role_payload(run, "TiaMcpRole"), "definedInNamespace": NAMESPACE}, "UnsupportedCapability")
     run.refuse("opcua_server_interface_import", "creating an existing interface", import_payload(V1, "create"), "ObjectExists")
     run.refuse("opcua_server_interface_enable", "no explicit enabled flag", {"interfaceName": NAME}, "InvalidRequest")
     stale = run.prepare("disable the interface (made stale below)", "opcua_server_interface_enable", {"interfaceName": NAME, "enabled": False})
@@ -246,11 +262,14 @@ def body(h):
     enable(run, False)
     import_(run, "import a second interface", OTHER, "create", name="TiaMcpQ2")
     delete(run, name="TiaMcpQ2")
+    role_create(run)
     export(run)
     reopen(run)
     # Phase B: one more change per kind from the reopened state, each restored from its checkpoint.
     enable(run, True, restore=True)
     import_(run, "replace the interface again", V1, "replace", restore=True)
+    role_create(run, "Observer", project_role=False, restore=True)
+    role_remove(run, restore=True)
     delete(run, restore=True)
     gaps = coverage_gaps(run.coverage, KINDS)
     h.report["qualified"] = [kind for kind in KINDS if kind not in gaps]
