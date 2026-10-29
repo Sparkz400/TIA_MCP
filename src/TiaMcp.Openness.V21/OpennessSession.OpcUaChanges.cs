@@ -156,6 +156,7 @@ namespace TiaMcp.Openness.V21
             string name = change.ObjectNames[0];
             var missing = new BridgeException("ObjectNotFound", "The prepared OPC UA object no longer exists.");
             JObject readback;
+            if (change.Kind == "opcua_role_mapping_set" && name.StartsWith("TiaMcpProbe", StringComparison.Ordinal)) { change.Readbacks.Add(OpcUaRoleProbe(change, group, name)); return; }
             if (change.Kind == "opcua_role_mapping_set")
             {
                 if (payload.Value<string>("action") == "remove")
@@ -223,6 +224,71 @@ namespace TiaMcp.Openness.V21
             }
             readback["role"] = "opcua-readback";
             change.Readbacks.Add(readback);
+        }
+
+        // PROBE (not for release): records what V21 does for each role-mapping route instead of failing on the first.
+        private static JObject OpcUaRoleProbe(EngineeringChange change, ServerInterfaceGroup group, string name)
+        {
+            var log = new JArray();
+            Action<string, Func<JToken>> step = (label, action) =>
+            {
+                var row = new JObject { ["step"] = label };
+                try { row["result"] = action(); } catch (Exception ex) { row["error"] = NativeFailureText.Chain(ex); }
+                log.Add(row);
+            };
+            Func<JToken> namespaces = () => new JArray(group.AccessControl.NamespaceAccessRestrictions.Select(n => n.NamespaceIndex + " " + n.NamespaceUri));
+            Func<string, JToken> role = roleName => { var r = OpcUaRole(group, roleName); return r == null ? (JToken)"missing" : OpcUaRoleInfo(r); };
+            Func<string, string, bool> fresh = (roleName, uri) => OpcUaRole(group, roleName).NamespacePermissions.First(p => p.NamespaceUri == uri).Browse;
+            var before = group.AccessControl.NamespaceAccessRestrictions.Select(n => n.NamespaceUri).ToList();
+            step("namespaces before", namespaces);
+            step("roles before", () => new JArray(OpcUaRoles(group).Select(OpcUaRoleInfo)));
+            step("simatic interfaces before", () => new JArray(group.SimaticInterfaces.Select(s => s.Name)));
+            step("server interfaces before", () => new JArray(group.ServerInterfaces.Select(s => s.Name)));
+            step("create SIMATIC interface TiaMcpSim", () => group.SimaticInterfaces.Create("TiaMcpSim").Name);
+            step("namespaces after SIMATIC interface", namespaces);
+            step("export TiaMcpSim", () =>
+            {
+                string file = Path.Combine(change.Directory, "probe-sim.xml");
+                group.SimaticInterfaces.First(s => s.Name == "TiaMcpSim").Export(new FileInfo(file));
+                string text = File.ReadAllText(file);
+                return text.Length > 4000 ? text.Substring(0, 4000) : text;
+            });
+            var added = group.AccessControl.NamespaceAccessRestrictions.Select(n => n.NamespaceUri).Where(u => !before.Contains(u)).ToList();
+            var candidates = added.Concat(before.Where(u => u.StartsWith("urn:tiamcp:", StringComparison.Ordinal))).Concat(new[] { OpcUaStandardNamespace }).ToList();
+            log.Add(new JObject { ["step"] = "candidates", ["result"] = new JArray(candidates) });
+            string created = null;
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                string uri = candidates[i], roleName = name + i;
+                step("Create(" + roleName + ", " + uri + ")", () => { OpcUaRoles(group).Create(roleName, uri); created = created ?? (uri == OpcUaStandardNamespace ? null : roleName); return role(roleName); });
+            }
+            foreach (string roleName in new[] { created, "Operator" }.Where(n => n != null))
+            {
+                if (roleName == "Operator") step("AddStandardOpcUaRole(Operator)", () => { OpcUaRoles(group).AddStandardOpcUaRole("Operator"); return role("Operator"); });
+                foreach (string uri in OpcUaRole(group, roleName)?.NamespacePermissions.Select(p => p.NamespaceUri).ToList() ?? new List<string>())
+                {
+                    step(roleName + " " + uri + " SetPermission(Bogus)", () => { OpcUaRole(group, roleName).NamespacePermissions.First(p => p.NamespaceUri == uri).SetPermission("Bogus", true); return "no exception"; });
+                    step(roleName + " " + uri + " SetPermission(Browse, true)", () =>
+                    {
+                        var permission = OpcUaRole(group, roleName).NamespacePermissions.First(p => p.NamespaceUri == uri);
+                        permission.SetPermission("Browse", true);
+                        return new JObject { ["sameProxy"] = permission.Browse, ["getAttribute"] = JToken.FromObject(permission.GetAttribute("Browse")), ["fresh"] = fresh(roleName, uri) };
+                    });
+                }
+                step(roleName + " after", () => role(roleName));
+            }
+            // The morning's order: one role proxy for SetProjectRole and then the permissions.
+            step("Observer: add, SetProjectRole, SetPermission on the same role proxy", () =>
+            {
+                OpcUaRoles(group).AddStandardOpcUaRole("Observer");
+                var r = OpcUaRole(group, "Observer");
+                r.SetProjectRole(change.Payload.Value<string>("projectRole"));
+                var permission = r.NamespacePermissions.First();
+                permission.SetPermission("Browse", true);
+                return new JObject { ["uri"] = permission.NamespaceUri, ["sameProxy"] = permission.Browse, ["fresh"] = fresh("Observer", permission.NamespaceUri), ["role"] = role("Observer") };
+            });
+            step("roles after", () => new JArray(OpcUaRoles(group).Select(OpcUaRoleInfo)));
+            return new JObject { ["role"] = "opcua-role-probe", ["log"] = log };
         }
 
         // [0] is the CPU device item owning the PLC software, [1] its single sub-item exposing OpcUaServer (natively "OPC UA_1").
