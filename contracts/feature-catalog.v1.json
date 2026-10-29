@@ -2778,6 +2778,25 @@
         "No successful HMI compilation: panels created through Openness have no start screen (the Unified panel also lacks its runtime password), and screen creation stays behind the closed HMI preservation gate; hmi_compile is not qualified by this run.",
         "Runtime effects of the CPU parameters are not observed; tag tables are exercised at PLC-root scope only."
       ]
+    },
+    {
+      "id": "local.plcsim_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e38adf24e90bcc83a00a369481a64912910b5dd8",
+        "passedScope": "scripts/qualify_plcsim_gaps.py on a frozen Debug build of e38adf2 (artifacts/gs3), 73/73 steps, on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1 with a central DI 16x24VDC HF, an ET 200SP IM 155-6 PN ST station on the CPU's IO system, GapDb (counters, IEC TON, DTL), Main and interrupt OBs 40/82/83/86 imported with their event classes; card download, credential provisioning, power on and RUN as in the D09 runner. change.simulation_download_online (compile=false, save=false, runtime-user login, TLS never trusted): a Main change downloads with softwareScope changes and keepActualValues in RUN (ConsistentBlocksDownload answered, a kept counter 7, ProgramVersion 2); a GapDb layout change with keepActualValues answers TIA's DataBlockReinitializationOrKeepActualValues with KeepActualValues and keeps 7; a further layout change with reinitialize and allowStop answers StopPlcAndReinitialize, resets the counter to 0 and returns to RUN; plc_online_compare afterwards reports FolderContentsIdentical; refusals without a ticket, reinitialize without allowStop and compile/save=true. sim_test runs a 5 s TON scenario on the wall clock (5.97 s) and twice with virtualTime (TimespanSynchronized_C, 13 and 14 StartProcessing spans, 5.90 s virtual, previous mode restored); sim_time scaleFactor 10 completes the timer within 1.25 s of wall time and is restored to 1; systemTimeUtc 2031-06-15 is read by RD_SYS_T as year 2031. sim_event raises OB82 (diagnosticAlarm, +1), OB83 (pull and plug, +2) on the DI module and OB86 (station fault and return, +2) on the ET 200SP IO device, each changing only its own counter; a malformed event refuses before the runtime call. sim_state memoryReset restarts with start values and the downloaded program. sim_storage archives the powered-off card (791 737-byte zip with receipt), refuses a wrong hash, retrieves it with an unchanged ownership marker, and the retrieved card runs the online-downloaded program. The instance is released with deleteOwned."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.20261029.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1, provisioned with first-use TLS trust under the owned-empty-CPU policy; other CPUs, firmware and TCP/IP instances are not qualified.",
+        "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt is configured and PLCSIM answers ProcessEvent with NotSupportedByModule (-55); OB40 does not run. statusEvent on the central DI module is answered NotSupportedByModule as well (OB55 is for distributed modules).",
+        "Virtual-time scenarios at scale factor 1 run at wall-clock speed in deterministic StartProcessing spans; the speed-up comes from scaleFactor, and the combination of both is not exercised. Scan-exact timing is not claimed.",
+        "Each online download must start within the 15-minute ticket from sim_create; after a program change PLCSIM answers NotUpToDate until its tag list is refreshed with sim_tags. Archive and retrieve restore the same state that was archived; a cross-state restore is not exercised."
+      ]
     }
   ],
   "features": [
@@ -5078,13 +5097,14 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "memoryReset (owned instances only) restarts the virtual controller with its loaded program through IInstance.MemoryReset; not natively qualified."
+          "memoryReset (owned instances only) restarts the virtual controller through IInstance.MemoryReset; natively it returned the instance with start values and the online-downloaded program (local.plcsim_gaps.20261029)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.state.rerun.20261028"
+          "local.sim.state.rerun.20261028",
+          "local.plcsim_gaps.20261029"
         ]
       },
       "availability": {
@@ -5251,14 +5271,15 @@
         "limitations": [
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "virtualTime=true (owned instances only) runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode; not natively qualified."
+          "virtualTime=true (owned instances only) runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.sim.provision.20261024",
-          "local.sim.state.rerun.20261028"
+          "local.sim.state.rerun.20261028",
+          "local.plcsim_gaps.20261029"
         ]
       },
       "availability": {
@@ -5337,15 +5358,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "scaleFactor 10 completed a 5 s IEC TON within 1.25 s of wall time and was restored to 1; systemTimeUtc 2031-06-15 was read by RD_SYS_T as year 2031. The virtual system time is reported without a time-zone kind.",
           "Reads any selected instance; writes need an instance this worker created or adopted, in its admitted network mode, and no active cycle-synchronous capture.",
           "scaleFactor is greater than 0 and at most 1000 and acts in the default operating mode from the next cycle control point; systemTimeUtc is an explicit UTC instant from 1970 to 2200. Both are read back.",
           "Virtual-time stepping itself is a sim_test option (virtualTime); sim_time never changes the operating mode."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5380,14 +5404,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "OB82 (diagnosticAlarm), OB83 (pull and plug) on a central DI 16x24VDC HF and OB86 (station fault and return) on an ET 200SP IO device each raised only their own counter. Hardware IDs come from the PLC's system constants.",
+          "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt can be configured; PLCSIM answers ProcessEvent with NotSupportedByModule (-55) and OB40 does not run. statusEvent on the central module is answered NotSupportedByModule as well (OB55 serves distributed modules).",
           "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
           "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5422,14 +5450,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "A powered-off card archived (791 737-byte zip with receipt), a wrong hash was refused, and the retrieved card powered on and ran the online-downloaded program with an unchanged ownership marker. Only a restore of the archived state itself is exercised.",
           "Owned instances in OFF only. Archive writes a new .zip and a receipt (path, size, SHA-256) to the Host's simulation-archives directory.",
           "Retrieve accepts only an unchanged archive written there from the same owned instance (expectedSha256 required); the instance's storage path and ownership marker must be unchanged afterwards."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19433,7 +19464,8 @@
           "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
           "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
           "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
-          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
+          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence.",
+          "Natively exercised (local.plcsim_gaps.20261029): a code change downloaded in RUN keeping values, a layout change answered DataBlockReinitializationOrKeepActualValues with KeepActualValues, a reinitialized layout download returned to RUN, and plc_online_compare reported FolderContentsIdentical. After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Recovery (change_status, change_restore) is not exercised yet, so the feature stays unverified."
         ]
       },
       "qualification": {

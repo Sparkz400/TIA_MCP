@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "feecd7caa08f074373de4094e70d7d25aa87fa76df3085ed088dbba9d71fd545",
-      "bytes": 1317438
+      "sha256": "546f549ba832d6e5b7ef7fc16579910bbed3489fc821b6dc826818aa567dae01",
+      "bytes": 1323406
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -112410,7 +112410,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plcsim_gaps.20261029",
+          "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -112550,6 +112558,13 @@
           "artifacts": [
             "evidence/local.sim.state.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.plcsim_gaps.20261029",
+          "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -112605,7 +112620,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plcsim_gaps.20261029",
+          "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -112683,6 +112706,13 @@
           "artifacts": [
             "evidence/local.sim.state.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.plcsim_gaps.20261029",
+          "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -112707,7 +112737,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.plcsim_gaps.20261029",
+          "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d",
+          "artifacts": [
+            "evidence/local.plcsim_gaps.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -117993,6 +118031,11 @@
       "sha256": "fe47f019ee1c5f640b4f36da8b82d14b836ab636950a093dc9881259fa2ef21b"
     },
     {
+      "path": "evidence/local.plcsim_gaps.20261029.json",
+      "state": "observed",
+      "sha256": "58f288ed0debc5a29522c25d338f569e9273db4cd00d7175034b44054c2d6d4c"
+    },
+    {
       "path": "evidence/local.project_index.20261028.json",
       "state": "observed",
       "sha256": "4d67417f23fd66146f0395efd16d2daa3d3b063d5789b821ec8d01c00233cb81"
@@ -118641,6 +118684,10 @@
     {
       "id": "local.plcsim_diagnostics.20261028",
       "profileSha256": "8c10eedb3f02dedf224a913fb3b78d7aaa654026a85a5e38811fc80562b34e9b"
+    },
+    {
+      "id": "local.plcsim_gaps.20261029",
+      "profileSha256": "ac749f145207ae4168c021852ba2e2d10c0414bf95c6d3eba44cc5a80d49b82d"
     },
     {
       "id": "local.project_index.20261028",

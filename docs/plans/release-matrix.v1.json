@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.71",
-    "catalogSha256": "feecd7caa08f074373de4094e70d7d25aa87fa76df3085ed088dbba9d71fd545",
+    "catalogSha256": "546f549ba832d6e5b7ef7fc16579910bbed3489fc821b6dc826818aa567dae01",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "42863ba916167b5a4343481facc40d4cbbe1786ee70ab0db80d087b6a1337086"
   },
@@ -15,16 +15,16 @@
     "features": 461,
     "support": {
       "deferred": 10,
-      "limited": 252,
+      "limited": 255,
       "shipped": 122,
       "unavailable_target": 8,
-      "unqualified": 69
+      "unqualified": 66
     },
     "cells": {
       "blocked": 49,
-      "bound": 1724,
+      "bound": 1734,
       "deferred": 30,
-      "open": 323
+      "open": 313
     },
     "openCellsByOwner": {
       "C03": {
@@ -57,7 +57,7 @@
       },
       "L03": {
         "role": "Runtime",
-        "open": 31
+        "open": 21
       },
       "L05": {
         "role": "Qualification and libraries",
@@ -2106,35 +2106,40 @@
         "L03"
       ],
       "evidenceIds": [
-        "local.sim.state.rerun.20261028"
+        "local.sim.state.rerun.20261028",
+        "local.plcsim_gaps.20261029"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         },
         {
           "gate": "AC-simulator-lifecycle",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         }
       ]
@@ -2273,7 +2278,8 @@
       ],
       "evidenceIds": [
         "local.sim.provision.20261024",
-        "local.sim.state.rerun.20261028"
+        "local.sim.state.rerun.20261028",
+        "local.plcsim_gaps.20261029"
       ],
       "cells": [
         {
@@ -2281,7 +2287,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.provision.20261024",
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         },
         {
@@ -2289,7 +2296,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.provision.20261024",
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         },
         {
@@ -2297,7 +2305,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.sim.provision.20261024",
-            "local.sim.state.rerun.20261028"
+            "local.sim.state.rerun.20261028",
+            "local.plcsim_gaps.20261029"
           ]
         }
       ]
@@ -2354,26 +2363,34 @@
         "sim_time"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "L03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.plcsim_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-runtime",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         }
       ]
     },
@@ -2384,26 +2401,34 @@
         "sim_event"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "L03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.plcsim_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-runtime",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         }
       ]
     },
@@ -2414,31 +2439,41 @@
         "sim_storage"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "L03"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.plcsim_gaps.20261029"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.plcsim_gaps.20261029"
+          ]
         }
       ]
     },
@@ -24543,6 +24578,21 @@
         {
           "path": "evidence/local.plcsim_diagnostics.20261028.json",
           "sha256": "fe47f019ee1c5f640b4f36da8b82d14b836ab636950a093dc9881259fa2ef21b"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.plcsim_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "e38adf24e90bcc83a00a369481a64912910b5dd8",
+      "retained": [
+        {
+          "path": "evidence/local.plcsim_gaps.20261029.json",
+          "sha256": "58f288ed0debc5a29522c25d338f569e9273db4cd00d7175034b44054c2d6d4c"
         }
       ],
       "notRetained": []
