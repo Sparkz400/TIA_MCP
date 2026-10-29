@@ -258,7 +258,14 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         else:
             require(result["values"] == {"ProgramVersion": 2, "Ob82": 7}, "A kept-values layout download must keep the counter: %s" % result)
         return result
+    # Each further online session needs the ticket; one that would start too late is recorded as skipped.
+    if time.monotonic() >= lab.deadline:
+        h.report["layoutChangeKeepValues"] = h.report["onlineLayoutChange"] = "skipped: the download ticket expires before another online session"
+        return
     h.report["layoutChangeKeepValues"] = h.stage("layout change downloaded with keepActualValues", keep_layout)
+    if time.monotonic() >= lab.deadline:
+        h.report["onlineLayoutChange"] = "skipped: the download ticket expires before another online session"
+        return
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE % "\n      Added : Int;\n      Again : Int;", "expectedBlockNames": [DB]})
     _, _, report = download("layout change, reinitialized", {"softwareScope": "changes", "dataBlockValues": "reinitialize", "allowStop": True})
     h.report["onlineLayoutChange"] = report
