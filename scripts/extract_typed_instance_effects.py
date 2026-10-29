@@ -10,11 +10,27 @@ from smoke_mcp import ROOT
 
 # IEC effect pairs append one static member of each IEC instance type (author_iec_effect_sources.py).
 IEC_MEMBERS = ("Timer_TON", "Timer_TOF", "Timer_TP", "Counter_CTU", "Counter_CTD", "Counter_CTUD")
+STANDARD_IEC_MEMBERS = IEC_MEMBERS + ("Timer_TONR", "Edge_RTRIG", "Edge_FTRIG")
+
+
+def structural(node):
+    return (node.tag, sorted(node.attrib.items()), (node.text or "").strip(), [structural(e) for e in node if e.tag != "DocumentInfo"])
+
+
+def member_shapes(document, names):
+    return {name: structural(next(e for e in document.iter() if e.attrib.get("Name") == name)) for name in names}
 
 
 def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace="", iec=False):
     suffix = "" if route == "standard" else "-" + route
-    stem, effect, appended = (("instance-effects-iec", "IecEffect", IEC_MEMBERS) if iec else ("instance-effects", "InstanceEffect", ("Child",)))
+    stem, effect, appended = (("instance-effects-iec", "IecEffect", STANDARD_IEC_MEMBERS if route == "standard" else IEC_MEMBERS) if iec
+                              else ("instance-effects", "InstanceEffect", ("Child",)))
+    target = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
+    # A recapture that adds members must reproduce every deployed member exactly, so qualified types keep their effect.
+    deployed = json.loads(target.read_text()) if iec and target.exists() else None
+    if deployed:
+        deployed = {kind: (ET.fromstring((ROOT / deployed["artifacts"]["after" + kind]["path"]).read_bytes()), list(deployed["members"].values()))
+                    for kind in ("Caller", "Instance")}
     directory = ROOT / ("fixtures/typed-graphical/native/" + stem + suffix)
     directory.mkdir(exist_ok=True)
     result = {"schemaVersion": 1, "builderUsed": False, "nativeImportCompileVerified": True,
@@ -52,6 +68,9 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
             documents[(phase, kind)] = ET.fromstring(raw)
             result["artifacts"][phase + kind.title()] = {"path": target.relative_to(ROOT).as_posix(),
                 "sha256": hashlib.sha256(raw).hexdigest(), "captureReport": report_path.relative_to(ROOT).as_posix()}
+    for kind, (document, names) in (deployed or {}).items():
+        assert member_shapes(document, names) == member_shapes(documents[("after", kind.lower())], names), \
+            "Recaptured " + kind.lower() + " members differ from the deployed IEC effect."
     # Independent acceptance expectation: adding the new members keeps all existing native
     # DB contents intact, including the explicitly assigned 42 start value.
     after = documents[("after", "instance")]
@@ -64,9 +83,6 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
         assert not any(e.attrib.get("Name") == name for e in before.iter())
         parent = next(e for e in after.iter() if child in list(e))
         parent.remove(child)
-    def structural(node):
-        return (node.tag, sorted(node.attrib.items()), (node.text or "").strip(),
-                [structural(e) for e in node if e.tag != "DocumentInfo"])
     assert structural(before) == structural(after), "Native DB effects include more than the observed appended members."
     result["nativeObservedEffect"] = {**({"appendedStaticMembers": list(appended)} if iec else {"appendedStaticMember": "Child"}),
         "existingFullDbPayloadPreserved": True, "explicitStartValuePreserved": {"RetainedMarker": "42"}}
@@ -78,7 +94,6 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
     else:
         callee = ROOT / ("fixtures/typed-graphical/native/" + prefix + "TemplateFB_LAD.xml")
         result["referenceCallee"] = {"path": callee.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(callee.read_bytes()).hexdigest()}
-    target = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
     target.write_text(json.dumps(result, indent=2) + "\n")
     return result
 
