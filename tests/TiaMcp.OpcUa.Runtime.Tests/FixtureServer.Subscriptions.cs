@@ -12,7 +12,7 @@ internal sealed partial class FixtureServer
         double interval,uint lifetime,uint keepAlive,uint maximum,bool enabled,byte priority,CancellationToken ct)
     {
         publishOrdinal=0;firstMessage=null;subscriptionHandles.Clear();
-        var response=await base.CreateSubscriptionAsync(channel,header,Math.Max(200,interval),Math.Max(60,lifetime),Math.Max(2,keepAlive),maximum,enabled,priority,ct);
+        var response=await base.CreateSubscriptionAsync(channel,header,Mode=="subscriptionLongKeepAlive"?1000:Math.Max(200,interval),Math.Max(60,lifetime),Math.Max(2,keepAlive),maximum,enabled,priority,ct);
         Audit.Enqueue(new {operation="SubscriptionCreated",requestedInterval=interval,requestedLifetime=lifetime,requestedKeepAlive=keepAlive,
             maximumNotifications=maximum,subscriptionId=response.SubscriptionId,revisedInterval=response.RevisedPublishingInterval,
             revisedLifetime=response.RevisedLifetimeCount,revisedKeepAlive=response.RevisedMaxKeepAliveCount});

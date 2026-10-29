@@ -92,6 +92,34 @@ internal static partial class Program
         return Task.CompletedTask;
     }
 
+    private static Task ArtifactDigestReuse()
+    {
+        var root = Path.Combine(Path.GetTempPath(), "tia-artifact-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var path = Path.Combine(root, "export.xml");
+            byte[] first = new byte[70000], second = new byte[70000], third = new byte[70000];
+            Array.Fill(first, (byte)1); Array.Fill(second, (byte)2); Array.Fill(third, (byte)3);
+            string Sha(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
+            string Read(long offset) => JsonSerializer.SerializeToElement(new ArtifactStore(root).Read("export.xml", offset)).GetProperty("sha256").GetString()!;
+            File.WriteAllBytes(path, first);
+            Check.Equal(Sha(first), Read(0));
+            // Same length and restored write time: the continuation chunk reuses the sequence digest instead of rehashing.
+            var written = File.GetLastWriteTimeUtc(path);
+            File.WriteAllBytes(path, second); File.SetLastWriteTimeUtc(path, written);
+            Check.Equal(Sha(first), Read(65536));
+            // A new sequence always hashes, and any change of length or write time rehashes a continuation.
+            Check.Equal(Sha(second), Read(0));
+            File.WriteAllBytes(path, third); File.SetLastWriteTimeUtc(path, written.AddSeconds(1));
+            Check.Equal(Sha(third), Read(65536));
+            File.WriteAllBytes(path, first[..69999]); File.SetLastWriteTimeUtc(path, written.AddSeconds(1));
+            Check.Equal(Sha(first[..69999]), Read(65536));
+        }
+        finally { Directory.Delete(root, true); }
+        return Task.CompletedTask;
+    }
+
     private static async Task ArtifactBoundaries()
     {
         var root = Path.Combine(Path.GetTempPath(), "tia-artifact-test-" + Guid.NewGuid().ToString("N"));
