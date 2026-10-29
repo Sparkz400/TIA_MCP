@@ -392,12 +392,12 @@
         "docs/plans/expansion-plans/vci-and-git.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "partial",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: change.vci_workspace_create calls only the (String, DirectoryInfo, CultureInfo) overload (OpennessSession.VciWorkspace.cs); the other two overloads are not called. Qualification and availability are not promoted here."
     },
     {
       "id": "D01.mapping.connect",
@@ -410,12 +410,12 @@
         "docs/plans/expansion-plans/vci-and-git.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: change.vci_mapping_add mode connect calls Workspace.ConnectObject (OpennessSession.VciWorkspace.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D01.object.export",
@@ -428,12 +428,12 @@
         "docs/plans/expansion-plans/vci-and-git.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: change.vci_mapping_add mode export calls Workspace.ExportObject (OpennessSession.VciWorkspace.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D01.formats.discover",
@@ -446,12 +446,12 @@
         "docs/plans/expansion-plans/vci-and-git.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: vci_workspace_inspect and change.vci_mapping_add call Workspace.GetSupportedFileFormats (OpennessSession.VciWorkspace.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D02.watch.create",
@@ -464,12 +464,12 @@
         "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: a watch_table_prepare_create plan is applied through PlcWatchTableComposition.Create (OpennessSession.WatchLifecycle.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D02.watch.import",
@@ -482,12 +482,12 @@
         "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: the watch-table document route imports through PlcWatchTableComposition.Import (OpennessSession.WatchTables.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D02.force.import",
@@ -500,12 +500,12 @@
         "docs/plans/expansion-plans/watch-and-force-table-engineering.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: force-table document edits import through PlcForceTableComposition.Import (OpennessSession.WatchTables.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D03.texts.export",
@@ -519,12 +519,12 @@
         "docs/plans/expansion-plans/project-translations.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: project_text_export calls both ExportProjectTexts overloads (OpennessSession.ProjectTexts.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D03.texts.import",
@@ -537,12 +537,12 @@
         "docs/plans/expansion-plans/project-translations.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: translation_native_apply calls ImportProjectTexts(FileInfo, Boolean) (OpennessSession.TranslationImport.cs). Qualification and availability are not promoted here."
     },
     {
       "id": "D06.style.scope",
@@ -555,12 +555,12 @@
         "docs/plans/expansion-plans/native-test-suite.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "partial",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: RuleSet.SetScope is called only by the qualification fixture and scope probe (StyleQualificationFixture.cs, StyleScopeEditorProbe.cs); no product route sets style scope. Qualification and availability are not promoted here."
     },
     {
       "id": "D06.style.run",
@@ -575,12 +575,12 @@
         "docs/plans/expansion-plans/native-test-suite.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "partial",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: testsuite_style_job_execute_next calls only the RuleSetExecutor.Run(RuleSet) overload (StylePublicApi.cs), behind the TestSuiteProfileUnqualified gate. Qualification and availability are not promoted here."
     },
     {
       "id": "D06.application.run",
@@ -597,12 +597,12 @@
         "docs/plans/expansion-plans/native-test-suite.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: application reviews dispatch all five TestCaseExecutor.Run overloads (StylePublicApi.cs), behind the TestSuiteProfileUnqualified gate. Qualification and availability are not promoted here."
     },
     {
       "id": "D06.system.run",
@@ -617,12 +617,12 @@
         "docs/plans/expansion-plans/native-test-suite.md"
       ],
       "api": "documented_installed_xml",
-      "implementation": "not_implemented",
+      "implementation": "implemented",
       "qualification": "not_run",
       "availability": "unobserved",
       "releaseObligation": true,
       "releaseAccepted": false,
-      "review": "Method-level seed review; all overload/profile semantics remain qualification obligations"
+      "review": "Source review 2026-10-29: system reviews dispatch all three SystemTestCaseExecutor.Run overloads (StylePublicApi.cs), behind the TestSuiteProfileUnqualified gate. Qualification and availability are not promoted here."
     }
   ],
   "featureObligations": [
@@ -3857,6 +3857,6 @@
   ],
   "limitations": [
     "This is the first AC-01 implementation slice, not full semantic coverage.",
-    "No implementation or qualification promotion is permitted from this seed."
+    "Implementation status comes from source review, named in each operation's review, never from metadata. No qualification, availability or release promotion is permitted from this seed."
   ]
 }

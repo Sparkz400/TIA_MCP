@@ -211,7 +211,7 @@ def qualify_case(mode, host, worker, run_root):
                     report["error"] = require_error(client.receive(request_id), expected[mode])
                     require_error(client.raw_tool("tia_capabilities"), "BridgeFaulted")
                 require_error(client.raw_tool("change_apply", arguments), "BridgeFaulted")
-            report["durableOutcome"] = json.loads((case_dir / "fake-journal.json").read_text())
+            report["durableOutcome"] = json.loads((case_dir / "fake-journal.json").read_text(encoding="utf-8"))
             require(report["durableOutcome"]["mutationCount"] == 1, "Wrong mutation count")
         client.close()
         if mode != "kill-worker":

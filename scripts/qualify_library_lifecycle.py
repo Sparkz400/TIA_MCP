@@ -83,7 +83,7 @@ def body(h):
 
     # Deletion constraints, then a permitted deletion of an unused non-default version.
     h.refuse("refuse deleting the default used version", "library_delete", h.selected(library, [fb]), "DependencyConflict")
-    source_text = (documents / (FB + ".scl")).read_text()
+    source_text = (documents / (FB + ".scl")).read_text(encoding="utf-8")
     unused = h.release(library, h.edit_source(library, plc, fb, FB, source_text), "1.1.0")
     second = h.release(library, h.edit_source(library, plc, unused, FB, source_text), "1.2.0")
     h.apply("library_set_default", h.selected(library, [second]))

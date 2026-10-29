@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Scripts read UTF-8 JSON and text; never fall back to the runner's ANSI code page.
+  PYTHONUTF8: '1'
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -52,6 +56,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
+        with:
+          # test_contracts.py requires each cited evidence commit to be an ancestor of HEAD.
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'

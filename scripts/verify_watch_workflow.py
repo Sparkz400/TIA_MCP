@@ -318,7 +318,7 @@ def verify(run_root):
     def approved():
         approval = load(root / "independent-review.json")
         need(approval["approved"] is True and approval["noOnlineAction"] is True and approval["operationId"] == operation["id"] == plan_record["id"], "Exact reviewed operation approval missing.")
-        need(approval["reviewedPlanSha256"] == operation["digest"] == plan_record["planSha256"] == (root / "approved-digest").read_text().strip(), "Approved plan digest differs.")
+        need(approval["reviewedPlanSha256"] == operation["digest"] == plan_record["planSha256"] == (root / "approved-digest").read_text(encoding="utf-8").strip(), "Approved plan digest differs.")
         need(records is not None and records[0] == plan_record, "Durable journal is not the exact approved prepared record.")
         artifact(root, review_outer["reviewArtifact"])
         need(load(artifact(root, plan_record["plan"]["inputs"][0])) == review, "Retained review differs from plan.")
