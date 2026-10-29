@@ -1,0 +1,68 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.runtime.timers.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T18:27:50+00:00",
+  "source": {
+    "commit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate --fixture runtime-timers from commit 4963644: the updated runtime runner end to end on Softbus, both timer cases each on a fresh Host, owned TIA session and owned CPU1511, with download, the explicit checkpoint/compile/save of the generated scratch state (generatedProjectSave), credential provisioning through the discovery observer with card staging and restoration (every card move succeeded on its first attempt), RUN, the stimulus and assertion sequences, owned release and verified exits.",
+  "limitations": [
+    "Two timer cases only; the full 65-case corpus last passed on 24 October (local.runtime.frozen.20261024).",
+    "The card-staging access denial of 23 October did not recur; the new lock-holder record stayed empty because no move was refused.",
+    "Certificate trust is the authorized first-use pin of each owned empty CPU, not independent CA verification; timing covers host-observed windows only.",
+    "PLCSIM Advanced V8 on local Softbus with the generated scratch fixture; never a physical PLC."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "22f93b184a47f7d46c338a49d3658bc42cf629b604e4c73fc972bac3b1420f3a"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f588f4364afc3fe881014e5493012f169d718da897052a632c70d2087e6e7031"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "4d95e8cf23d52c645c732b6820a2fcf7539100fb7631fc3706730c25e6caf668"
+    }
+  ],
+  "runs": [
+    {
+      "report": "live-result.json",
+      "sha256": "17abe1466ebc63c0dcb06a6074ac2f26e1297d002ea47e1ef33cbce376b599ae",
+      "bytes": 1462977,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "block_interface",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "project_open",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "index.json",
+      "sha256": "97f27908ab9ffea76cc5eafd41ff00c4f15c112bf7aaefd4eccd8b9392d7cf3a",
+      "bytes": 10300,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [],
+      "toolsRejected": []
+    }
+  ]
+}

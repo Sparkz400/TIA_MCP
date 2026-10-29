@@ -5,10 +5,10 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.74`: 461 features, 412 verified, 49 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 122 shipped, 290 limited, 31 unqualified, 8 unavailable on V21, 10 deferred |
-| Matrix cells | 1,875 bound, **172 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06, D09 and X04 on 29 October against `0.4.70`, and C03, D12 and D16 against `0.4.72` |
+| Feature catalog | `0.4.75`: 461 features, 415 verified, 46 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 122 shipped, 293 limited, 28 unqualified, 8 unavailable on V21, 10 deferred |
+| Matrix cells | 1,891 bound, **156 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09 against `0.4.74` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -22,8 +22,7 @@ names every row with an open cell.
   (TS-Q01), the VMware guest, a V20 library input, RT Professional and other HMI targets, and a
   physical PLC.
 - **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
-  station upload meets TLS verification it never trusts and the snapshot export carries no
-  values after an online snapshot create, an OPC UA reference-namespace import crashes TIA,
+  station upload meets TLS verification it never trusts, an OPC UA reference-namespace import crashes TIA,
   Unified text lists have no import route, force-table rows can only be authored in the
   TIA editor, V21 Openness cannot configure a DI module's hardware interrupt (OB40), and the
   CPU protection level needs a full-access password no route accepts.

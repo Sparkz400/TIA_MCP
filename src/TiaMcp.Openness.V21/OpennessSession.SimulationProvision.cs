@@ -973,7 +973,18 @@ namespace TiaMcp.Openness.V21
                     ["retryAdmissionBudgetMs"] = SimulationCardMoveRetry.RetryAdmissionBudgetMs, ["maxMoveCalls"] = SimulationCardMoveRetry.MaximumMoveCalls,
                     ["exceptionType"] = exception?.GetType().FullName,
                     ["hresult"] = exception == null ? (int?)null : exception.HResult,
+                    // An open file anywhere below refuses a directory move with 0x80070005; name its holders at the first refusal and at expiry.
+                    ["lockHolders"] = outcome == "moveThrew" && attempt == 1 || outcome == "retryAdmissionExpired" ? SimulationCardHolders(source) : null,
                     ["opaqueContentsRead"] = false }), () => timer.ElapsedMilliseconds, Thread.Sleep);
+        }
+
+        private static JObject SimulationCardHolders(string directory)
+        {
+            string error;
+            var holders = SimulationCardLockHolders.Find(directory, out error);
+            return new JObject { ["holders"] = new JArray(holders.Select(holder => new JObject { ["processId"] = holder.ProcessId, ["appName"] = holder.AppName,
+                ["serviceName"] = holder.ServiceName, ["applicationType"] = holder.ApplicationType })), ["error"] = error,
+                ["basis"] = "Windows Restart Manager holders of files below the move source; file names only, contents not read." };
         }
 
         private static JArray SimulationProvisionTreeMetadata(string path)
