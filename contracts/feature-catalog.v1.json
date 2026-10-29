@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.80",
+  "catalogVersion": "0.4.81",
   "targetTiaVersions": [
     21
   ],
@@ -3048,6 +3048,25 @@
         "The refusals cover what runs q/tl2 and q/tl3 showed V21 changes; list names use an allowlist (letters, digits, inner spaces, !&'()+,-;<=>@\\^_{|}, at most 128 characters), while text characters outside the control characters are refused only where observed. Records published before the refusals keep their meaning and still reopen, and their content is not re-qualified.",
         "V21 export renames entries, pools all texts in one library with renumbered IDs, omits default fields, writes CRLF and leaves texts such as Off, On and Null unquoted (YAML 1.1 reads them as bool/null). Candidate library names, entry and text IDs and DefaultLanguage are not retained, so a native export never equals a candidate byte for byte.",
         "One profile and language pair (MTP700 Unified Comfort, en-US/de-DE); no screen item consumes an imported list, and Unified PC, other devices and languages, runtime and visual behavior are not covered."
+      ]
+    },
+    {
+      "id": "local.block_protection.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b5fecd88c2b4a65d07e7a29508c871b3411f7bf1",
+        "passedScope": "scripts/qualify_block_protection.py on a frozen Debug build of b5fecd88 (artifacts/bp2, git archive), 38/38 steps, in an owned scratch CPU 1511-1 PN with an isolated named vault created through the Host credential CLI over stdin. Know-how: FC TiaMcp_IsEnabled protected and unprotected through the Host credential route with IsKnowHowProtected readback; a correctly bound wrong password fails in Unprotect (recovery_required, block still protected); the unprotect checkpoint restored holds the protected block, which the same credential reference unprotects again; the protect checkpoint restored holds the unprotected block. Write protection: FB TiaMcp_EnableGate define (does not enable), enable, change to a second credential, disable with the replaced password fails, disable with the new one passes, and the disable checkpoint restored holds enabled write protection. Refusals before admission and checkpoint, block unchanged and change still prepared: CredentialContextMismatch (with the expected binding), CredentialUnavailable, CredentialRetired, CredentialFormatInvalid, CredentialStoreBusy. TIA password policy refusal typed CredentialPolicyViolation after the checkpoint. All 6 generated passwords absent from every run file, tool response, report and Host log."
+      },
+      "artifacts": [
+        "evidence/local.block_protection.20261030.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with one SCL FC and one SCL FB; software units, namespaces, LAD/FBD, OBs and safety blocks are not exercised.",
+        "Generated ASCII passwords; non-ASCII passwords and the 120-character bound are not probed. TIA checks its password policy and a wrong password only in the native call, after the checkpoint; the wrong password is reported as EngineeringError.",
+        "The vault lives in the current Windows profile; another user, a roamed profile and packaged-context redirection are not exercised. CredentialAdmissionRequired (pinned reference) and worker-side CredentialRequired are covered offline only.",
+        "Persistence is read back after save in the same Portal; a fresh Portal reopen is not part of this run. Engineering only; a protected block is not downloaded or run."
       ]
     }
   ],
@@ -6651,24 +6670,26 @@
         "status": "partial",
         "limitations": [
           "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
-          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "At apply the Host checks each reference against its credential store and the public binding the worker derives from the exact block (provider siemensTiaPortalV21, authority plcPath, ownerId block path, resourceKind blockProtection, resourceId knowHow, purpose blockProtection) and seals the secret with DPAPI CurrentUser to that one admitted apply; only that lease's dispatch carries it. Mismatched, missing, retired, pinned, non-UTF-8 and busy credentials refuse before admission and the checkpoint (docs/reference/protected-credentials.md#change-apply-credential-route).",
           "Exact standard unprotected block with a before-XML backup; F-blocks, safety-unit objects and generated system-group blocks are refused.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope with an SCL FC and FB (local.block_protection.20261030); software units, namespaces, LAD/FBD blocks and non-ASCII passwords are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.block_protection.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "Protected credential reference from the Host credential store bound to the exact block and protection",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
       ],
@@ -6702,25 +6723,27 @@
         "status": "partial",
         "limitations": [
           "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
-          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "At apply the Host checks each reference against its credential store and the public binding the worker derives from the exact block (provider siemensTiaPortalV21, authority plcPath, ownerId block path, resourceKind blockProtection, resourceId knowHow, purpose blockProtection) and seals the secret with DPAPI CurrentUser to that one admitted apply; only that lease's dispatch carries it. Mismatched, missing, retired, pinned, non-UTF-8 and busy credentials refuse before admission and the checkpoint (docs/reference/protected-credentials.md#change-apply-credential-route).",
           "Exact standard know-how protected block; F-blocks, safety-unit objects and generated system-group blocks are refused.",
           "Protected content has no before-XML backup; the whole-project checkpoint archive is the recovery source.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope with an SCL FC and FB (local.block_protection.20261030); software units, namespaces, LAD/FBD blocks and non-ASCII passwords are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.block_protection.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "Protected credential reference from the Host credential store bound to the exact block and protection",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
       ],
@@ -6754,26 +6777,28 @@
         "status": "partial",
         "limitations": [
           "The payload carries only protected-credential-reference.v1 objects plus optional vaultName; unknown payload fields, including plaintext passwords, are refused at prepare. Preview, journal and responses contain only the reference.",
-          "Apply refuses with CredentialRouteUnavailable before the checkpoint save: no route yet hands a Host credential-store secret to a worker change apply. The native call and readback code is compiled but unreachable until that route exists.",
+          "At apply the Host checks each reference against its credential store and the public binding the worker derives from the exact block (provider siemensTiaPortalV21, authority plcPath, ownerId block path, resourceKind blockProtection, resourceId write, purpose blockProtection) and seals the secret with DPAPI CurrentUser to that one admitted apply; only that lease's dispatch carries it. Mismatched, missing, retired, pinned, non-UTF-8 and busy credentials refuse before admission and the checkpoint (docs/reference/protected-credentials.md#change-apply-credential-route).",
           "Exact standard unprotected block with a before-XML backup; F-blocks, safety-unit objects and generated system-group blocks are refused.",
           "V21 exposes no call that removes a defined write-protection password; action disable only turns protection off.",
           "Whether Define also enables protection is undocumented, so define reads back only IsDefined. A password change is not observable; only the native call returning is evidence.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope with an SCL FC and FB (local.block_protection.20261030); software units, namespaces, LAD/FBD blocks and non-ASCII passwords are not qualified."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.block_protection.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
+          "Catalog entry is not a current-target authorization or availability result; probe native eligibility independently."
         ]
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Protected credential reference from the Host credential store; a Host-to-worker credential route (not yet implemented)",
+        "Protected credential reference from the Host credential store bound to the exact block and protection",
         "compile=true and a verified recovery checkpoint",
         "Exact standard or software-unit scope; safety and generated objects are excluded"
       ],

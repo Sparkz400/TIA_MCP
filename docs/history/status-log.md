@@ -5,6 +5,13 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 30 October 2026
+
+**Block-protection credential route — 30 October 2026:** ([record](../verification/block-protection-20261030.md))
+- **Route:** at admission the Host checks a block-protection credential slot (purpose, binding hash, active record, vault turn), decrypts the secret under the vault lock and re-seals it with DPAPI to that one apply's lease, change, preview hash, slot and binding; only that lease's dispatch carries it, the worker opens it into a read-only SecureString and clears it after the call. Checkpoints hold TIA's own archive, never a secret.
+- **Native:** 38/38 steps on build `b5fecd88` (`local.block_protection.20261030`): protect, unprotect, write protection define/enable/change/disable, three checkpoint restores, five pre-admission refusals with the block unchanged, a wrong password refused by TIA; none of the generated passwords appears in any run file, response or log. TIA's password policy is checked only in the native call and is now typed `CredentialPolicyViolation`.
+- **Catalog 0.4.81:** the three block-protection kinds are verified; 421 of 461 features verified; matrix 1,924 bound, 141 open, 31 blocked, 30 deferred.
+
 ## 29 October 2026
 
 **Typed created-storage runtime — 29 October 2026:** the 8 harnessed wave 9 created-storage cells (`createMulti` of TONR, R_TRIG and F_TRIG and `createGlobal` of TONR, LAD and FBD) passed all five gates, runtime behavior included, on owned PLCSIM (build `7db882c`; `local.typed.wave9-created-storage.runtime.20261029`). `change.graphical_typed_edit` stays unverified until the rest of the typed backlog closes; no matrix count change.

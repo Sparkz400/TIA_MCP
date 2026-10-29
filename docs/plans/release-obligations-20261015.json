@@ -1896,9 +1896,9 @@
       "implementation": "partial_move_protection_nvt_loadable_missing",
       "qualification": "native_mutations_graphical_reads_verified_protection_blocked",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.78): 68 release-matrix rows (15 shipped, 46 limited, 4 unqualified, 1 unavailable on V21, 2 deferred); 285 cells bound, 26 open and 6 blocked. 22 PLC object mutations, the graphical network and call edits, 34 read contracts, PLC/project compile and the tag-table lifecycle are verified natively (28-29 October). The block-protection kinds and change.call_connection_set are blocked (dispositions).",
-      "remainingWork": "change.graphical_typed_edit (8 cells, shared with L01); the deferred rows block.move and block.software_unit.create; NVT and loadable breadth. The block-protection kinds need a Host-to-worker protected credential route, a repository gap rather than a V21 limit (maintainer question, docs/TODO.md).",
-      "nextAction": "Design and build the reviewed protected-credential route from the Host vault to a worker change (1.0 work, maintainer decision 29 October), then qualify the three block-protection kinds natively on an owned scratch.",
+      "currentResult": "30 October 2026 (catalog 0.4.81): 68 release-matrix rows (15 shipped, 49 limited, 1 unqualified, 1 unavailable on V21, 2 deferred); 303 cells bound, 8 open and 6 blocked. 22 PLC object mutations, the graphical network and call edits, 34 read contracts, PLC/project compile and the tag-table lifecycle are verified natively (28-29 October). The block-protection kinds are verified through the new Host-to-worker credential route (local.block_protection.20261030). change.call_connection_set is blocked (dispositions).",
+      "remainingWork": "change.graphical_typed_edit (8 cells, shared with L01); the deferred rows block.move and block.software_unit.create; NVT and loadable breadth; the CPU full-access password over the same credential route.",
+      "nextAction": "Reuse the credential route for the CPU protection level's full-access password; close the typed backlog.",
       "ownerRole": "PLC and typed",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [

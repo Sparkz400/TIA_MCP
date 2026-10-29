@@ -163,9 +163,9 @@ namespace TiaMcp.Openness.V21
                 var knowHowApi = ProbeCapabilityService<PlcBlockProtectionProvider>(block, "block", probes);
                 var writeProtectionApi = ProbeCapabilityService<PlcBlockWriteProtectionProvider>(block, "block", probes);
                 foreach (string feature in BlockProtectionKinds)
-                    AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext. Exact standard block, checkpoint, compile and protection readback. Apply refuses with CredentialRouteUnavailable until the Host can hand a protected credential to the worker.",
-                        applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: true,
-                        blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : generated ? "Generated system-group objects are excluded from direct mutations." : "No Host-to-worker protected credential route exists yet.");
+                    AddTargetFeature(features, "change." + feature, feature == "block_write_protection_set" ? writeProtectionApi : knowHowApi, "partial", "Protected credential references only, never plaintext; the Host seals each vault secret to the one admitted apply. Exact standard block, checkpoint, compile and protection readback.",
+                        applicable: feature == "block_unprotect" ? protectedBlock : !protectedBlock, blocked: safetyBlock || safetyScope || generated,
+                        blocker: safetyBlock || safetyScope ? "F-blocks and safety-unit objects are excluded." : "Generated system-group objects are excluded from direct mutations.");
                 AddTargetFeature(features, "db_snapshot_capture", directApi, "partial", "Exports the snapshot stored on this DB (InterfaceSnapshot.Export) into a db_snapshot_review record bound to its project/PLC/DB identity; a DB without a stored snapshot refuses. Not a current CPU read.",
                     applicable: block is DataBlock, blocked: protectedBlock, blocker: "The selected block is know-how protected.");
                 foreach (string feature in new[] { "db_snapshot_create", "db_snapshot_load_actual" })

@@ -198,9 +198,91 @@ provider is enabled by the portable tests.
 `CredentialVault.Use` is an internal synchronous trusted-consumer seam. It validates
 an independently expected binding, refuses pinned/retired/unavailable state and clears
 borrowed bytes even when a consumer fails. Consumer failures are sanitized. It is
-not a public MCP method, and no native adapter currently consumes general references.
+not a public MCP method. The only native consumer is the
+[change apply credential route](#change-apply-credential-route) below; the runtime
+Web API and OPC UA logins use the seam inside the Host.
 Existing generated scratch CPU credentials keep their separate native format and
 restrictions. Do not pass these references as scratch simulation metadata.
+
+## Change apply credential route
+
+Block protection changes (`block_protect`, `block_unprotect` and
+`block_write_protection_set`, see [engineering workflows](../guides/engineering-workflows.md))
+take a vault secret through this route. No other path hands a vault secret to a worker.
+
+**Create one credential per block and protection.** The worker derives the expected
+binding from the exact target; copy `plcPath` and the block `path` from `project_inventory`:
+
+```json
+{
+  "resource": {
+    "provider": "siemensTiaPortalV21",
+    "authority": "/projects/P/devices/PLC_1/items/PLC_1/plc/PLC_1",
+    "ownerId": "/projects/P/devices/PLC_1/items/PLC_1/plc/PLC_1/blocks/FB_Motor",
+    "resourceKind": "blockProtection",
+    "resourceId": "knowHow"
+  },
+  "purpose": "blockProtection",
+  "subjectId": "blockPassword"
+}
+```
+
+`resourceId` is `knowHow` for know-how protection and `write` for write protection.
+Enter the password itself, without quotes: 1 to 4,096 bytes of UTF-8, stored exactly.
+Protect and unprotect of one block use the same credential. A write-protection
+password change needs a second credential with the same binding (`newCredential`).
+A renamed or moved block, or a project copied under another name, needs a new
+credential, because the binding names the paths.
+
+**Prepare** names the slots. The preview lists each slot with its `vaultName`,
+reference and expected binding; no secret is read.
+
+**Apply.** The worker returns the same public slots when it opens the shared mutation
+lease. Before admission, the Host checks each slot: the purpose is one it routes, the
+reference's `bindingSha256` matches the binding, the record exists, is active and not
+pinned to an engineering operation, the store is free, and the secret is UTF-8. Under
+the vault lock it decrypts the secret and immediately seals it again with DPAPI
+CurrentUser. The entropy binds the lease token, change ID, preview hash, slot,
+credential ID and binding hash. The plaintext buffer is cleared at once. Only the
+`mutation_dispatch` of that lease carries the sealed envelopes, over the Host-created
+current-user pipe whose peer process is verified. The worker opens each envelope into a
+read-only `SecureString` before the checkpoint and once more for the native call, and
+clears the envelopes when the dispatch returns. A new lease cannot open an old envelope.
+
+| Refusal | When | State |
+| --- | --- | --- |
+| `CredentialContextMismatch` | The reference is bound to another target, purpose or protection; `details.expectedBinding` names the binding. Also when an envelope does not open for this apply. | Before admission (worker case: before the checkpoint) |
+| `CredentialUnavailable` | Record missing, unreadable or not decryptable | Before admission |
+| `CredentialRetired` | Reference retired | Before admission |
+| `CredentialAdmissionRequired` | Reference pinned by an engineering operation | Before admission |
+| `CredentialStoreBusy` | Another holder keeps the vault lock past the bounded wait | Before admission |
+| `CredentialFormatInvalid` | Secret is not 1 to 4,096 bytes of strict UTF-8 | Before admission |
+| `CredentialRouteInvalid` | Malformed or duplicate slots, slots in more than one vault, a purpose the Host does not route, or slots on an operation other than `change_apply` | Before admission |
+| `CredentialRequired` | The worker received no envelope for a slot | Before the checkpoint |
+| `CredentialPolicyViolation` | TIA's password policy refuses the password (V21: 8 to 120 characters with a digit, a special character, upper and lower case) | In the native call, after the checkpoint; the change is `recovery_required` and the block unchanged |
+
+A refusal before admission leaves no admission record, and the change stays `prepared`.
+TIA checks its password policy only in the native call, so create credentials that meet it.
+A correctly bound credential holding the wrong password also fails only there, as
+`EngineeringError` ("The password used was rejected"), with the block unchanged.
+Natively qualified on an owned scratch CPU (`local.block_protection.20261030`,
+[record](../verification/block-protection-20261030.md)).
+
+**What is retained.** Preview, change journal, admission record and responses hold only
+the reference and its public binding. The checkpoint archive is TIA's own archive of
+the project before the change. After `block_protect` it holds the unprotected block.
+After `block_unprotect` it holds the block still protected with the same password.
+TIA keeps its own protection data in the project; no Host secret or envelope is in
+it. `change_restore` needs no credential. The restored project keeps its name and
+paths, so unprotecting the restored block again takes the same credential reference.
+An interrupted apply is reconciled without the secret, and the single-use lease means
+a lost reply cannot replay the native call.
+
+**Limits.** Like the vault, the route does not defend against the Windows account owner
+or an administrator. Retiring a credential after the lease opened does not recall the
+envelope already sealed for that one apply. The CPU protection level's full-access
+password can use the same route: the worker names a `cpuProtection` slot for the
+exact CPU and the Host adds that purpose to the ones it routes. That is not implemented.
 
 The Host uses Microsoft's
 [System.Security.Cryptography.ProtectedData 10.0.13](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/10.0.13).

@@ -20,6 +20,7 @@
     <Compile Include="../TiaMcp.Core/WatchTables/WatchGroupManifest.cs" Link="WatchGroupManifest.cs" />
     <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="WorkerPipeWriter.cs" />
     <Compile Include="../TiaMcp.Core/JournalFileReplacement.cs" Link="JournalFileReplacement.cs" />
+    <Compile Include="../TiaMcp.Host/Security/CredentialRouteEnvelope.cs" Link="CredentialRouteEnvelope.cs" />
     <Compile Include="../../scripts/native/ExpansionEvidence/TranslationCategoryWorkbook.cs" Link="TranslationCategoryWorkbook.cs" />
     <Compile Include="../../scripts/native/ExpansionEvidence/TranslationCategoryProbe.cs" Link="TranslationCategoryProbe.cs" />
     <Compile Include="../../scripts/native/ExpansionEvidence/TranslationPopulatedCategoryProbe.cs" Link="TranslationPopulatedCategoryProbe.cs" />
