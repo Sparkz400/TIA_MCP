@@ -85,11 +85,16 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("UnsupportedAttribute", "Attribute is outside the reviewed CPU parameter subset: " + property.Name);
                 if (!(property.Value is JValue) || property.Value.Type == JTokenType.Null)
                     throw new BridgeException("InvalidRequest", property.Name + " must be a non-null scalar.");
-                // Like scratch security, this route never removes existing CPU access protection.
-                if (property.Name == "PlcAccessControlConfiguration" && (property.Value.ToString() == "Disabled" || property.Value.ToString() == "0"))
-                    throw new BridgeException("ProtectionDowngradeRefused", "Disabling CPU access control is not offered by this route.");
+                // Like scratch security, this route never removes CPU access protection: only the exact names of the enabled
+                // V21 modes are admitted, never Disabled, a number or another spelling the native conversion might accept.
+                if (property.Name == "PlcAccessControlConfiguration" && (property.Value.Type != JTokenType.String || Array.IndexOf(EnabledAccessControl, property.Value.Value<string>()) < 0))
+                    throw new BridgeException("ProtectionDowngradeRefused", "PlcAccessControlConfiguration accepts only an enabled access-control mode by its exact name: " + string.Join(", ", EnabledAccessControl) + ".");
             }
         }
+
+        private static readonly string[] EnabledAccessControl = { "EnabledWithAccessControl", "EnabledWithAccessControlViaAccessLevel",
+            "EnabledWithAccessControlAndCentralUser", "EnabledWithAccessControlViaAccessLevelAndCentralUsers",
+            "EnabledWithAccessControlAndLocalWithCentralUsers", "EnabledWithAccessControlViaAccessLevelAndLocalWithCentralUsers" };
 
         // Compares the native-normalized request with the CPU's current values; Siemens validates ranges during the write and compile.
         internal static void RequireCpuParametersChanged(JObject current, JObject normalized)

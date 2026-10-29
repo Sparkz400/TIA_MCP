@@ -28,6 +28,9 @@ internal static class RuntimeRouteChecks
         Pass("cpu parameter object refused", Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { [parameter] = new JObject() })) == "InvalidRequest");
         Pass("disabling access control refused", Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = "Disabled" })) == "ProtectionDowngradeRefused"
             && Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = 0 })) == "ProtectionDowngradeRefused"
+            && Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = 2 })) == "ProtectionDowngradeRefused"
+            && Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = "disabled" })) == "ProtectionDowngradeRefused"
+            && Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = " EnabledWithAccessControl" })) == "ProtectionDowngradeRefused"
             && Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = "EnabledWithAccessControlViaAccessLevel" })) == null);
         Pass("cpu parameter scalar admitted", Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { [parameter] = 150 })) == null);
         Pass("unchanged cpu parameters refused", Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(new JObject { [parameter] = 150L }, new JObject { [parameter] = 150 })) == "InvalidRequest");
