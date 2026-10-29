@@ -7,6 +7,16 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Typed stale phase and created wave 9 IEC storage — 29 October 2026:** ([record](../verification/typed-stale-and-created-iec-20261029.md))
+- **Stale phase:** V21 keeps fully qualified program element names unique per CPU and refuses every route to a second DB with the root DB's qualified name, so `stale-db-ambiguity` is recorded as that native boundary (`local.typed.resolution-stale.20261029`); the last open lost-evidence item is closed.
+- **Created storage:** the builder's created TONR, R_TRIG and F_TRIG storage passes engineering in 14 cells (`local.typed.wave9-created-storage.engineering.20261029`), and the standard IEC effect profile was recaptured with those members (`local.typed.iec-effect-standard-wave9.20261029`). Their runtime cells stay open.
+- **Catalog 0.4.73:** no count change; matrix 1,822 bound, 166 open.
+
+**Runtime real-server Tasks 4–6 — 29 October 2026:** ([record](../verification/runtime-real-server-20261029.md))
+- **Runs:** in an operator TCP/IP window, `scripts/qualify_runtime_plcsim_tcpip.py` passed all five modes (normal, server restart, Host loss during capture, UA and web write loss) on one frozen build, `1181f33`, each with the independent oracle; login was the scratch's generated runtime user (maintainer decision). Curated as `local.runtime.plcsim-tcpip.20261029`.
+- **Fixes found natively:** TCP/IP provisioning now recognizes the empty CPU by its MAC and TLS certificate series because TIA's discovery never shows its address; PLCSIM's tag list is refreshed after a restart; a TCP/IP `GoOnline` that throws before any callback is retried once; vault users of one Host take turns instead of failing, and a busy vault reports `UaCredentialStoreBusy`.
+- **Catalog 0.4.72:** the 34 `runtime_ua_*`, `runtime_web_*`, `runtime_capture_*` and `runtime_plcsim_bind` features are verified; 402 of 450 features verified; matrix 1,822 bound, 166 open, 49 blocked, 30 deferred. C03 and D12 have no open cell; D16 keeps `runtime.physical_plc`.
+
 **MCP surface — 29 October 2026:** ([reference](../reference/mcp-surface.md))
 - **`--toolsets`:** the Host (and `New-McpConfiguration.ps1`/`Start-TiaMcp.ps1 -Toolsets`) can advertise only named tool groups. The default stays all, about 290 tools.
 - **Titles, prompts, progress:** every tool now has a title. There are four workflow prompts (`safe_change`, `project_health`, `block_test`, `diagnose_fault`). Calls that carry a progress token get a start notification and a heartbeat every 10 s.

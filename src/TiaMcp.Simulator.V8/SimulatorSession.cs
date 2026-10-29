@@ -93,7 +93,7 @@ namespace TiaMcp.Simulator.V8
                 instance.StoragePath = storage;
                 var selected = new Selection { Instance = instance, Id = instance.ID, Name = name, Owned = true, Storage = storage,
                     CreationRoot = root, CreationReceipt = receipt };
-                var marker = SimulationTicket.Create(selected.Id, name, storage);
+                var marker = SimulationTicket.Create(selected.Id, name, storage, communication);
                 receipt["markerSha256"] = SimulationCreationJournal.MarkerHash(storage);
                 receipt["stage"] = "ready";
                 SimulationCreationJournal.Save(root, receipt);

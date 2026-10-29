@@ -160,7 +160,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
     }
 
     /// <summary>Owned-PLCSIM writes after the caller verified the binding: every exact precondition holds before the first write; each write is read back.</summary>
-    public async Task<object> Write(string attemptId, WebRuntimeWriteItem[] writes, CancellationToken cancellationToken)
+    public async Task<object> Write(string attemptId, WebRuntimeWriteItem[] writes, CancellationToken cancellationToken, Action? afterSend = null)
     {
         if (writes is not { Length: >= 1 and <= 16 } || writes.Any(w => w is null) || writes.Select(w => w.SelectionId).Distinct(StringComparer.Ordinal).Count() != writes.Length)
             throw Error("RuntimeWriteLimit");
@@ -184,6 +184,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                     try
                     {
                         (dispatch, code) = entry.Client.MutateAsync(WebRuntimeProtocol.Write(Guid.NewGuid().ToString("N"), before[i].Selection, writes[i].Value), cancellationToken).GetAwaiter().GetResult();
+                        afterSend?.Invoke(); // Qualification fault point only: the Host exits before the outcome is read back.
                         if (dispatch == "accepted") after = Current(entry, selections[i], "simple", cancellationToken);
                     }
                     // A lost response leaves the outcome unknown and a failed readback unobserved; both are reported, never retried.
