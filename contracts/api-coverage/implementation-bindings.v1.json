@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "00bdc32918ad71ad3b0c2a76686a694de4c0040b63c32f838aec83097ef815ed",
-      "bytes": 1286393
+      "sha256": "583dbdf1bae3207b09d5fa6dc36501e1373405c24b7ac00617a34dc4f94fb4af",
+      "bytes": 1288304
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1687,8 +1687,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
-      "sha256": "bc8c5babfa4d0528cd6755652aad8aa9c5eaa06bd503451b9dac8e88e85133e1",
-      "bytes": 38351
+      "sha256": "d6dc4deb63833f06aa6db0b5d4e7725c5d02c3f4646f28cabfcb28e40819799f",
+      "bytes": 38718
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDocument.cs",
@@ -14279,7 +14279,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -16249,7 +16249,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -24234,7 +24234,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -32855,7 +32855,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -36503,7 +36503,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -37454,7 +37454,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -38752,7 +38752,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -38819,7 +38819,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -39018,7 +39018,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -39509,7 +39509,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -39983,7 +39983,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -40661,7 +40661,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -40723,7 +40723,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -42805,7 +42805,7 @@
           "name": "CallAsync",
           "line": 14,
           "endLine": 43,
-          "sha256": "f4b953d97dd2d31f03a5b09b0dbfd5886de80bbed47ef0c0ac45b0d4442a3722"
+          "sha256": "9172762007b4110f81b448d7c0a72c24d324762f45f7985553dbb5c8c1281836"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
@@ -114848,7 +114848,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.watch.force-edits.20261029",
+          "profileSha256": "bc2f4f708298e804e224f90568c615a96b2391acd4a6301c9d7ddf7bcc9315f6",
+          "artifacts": [
+            "evidence/local.watch.force-edits.20261029.json"
+          ]
+        },
+        {
+          "id": "local.watch.native.20261028",
+          "profileSha256": "f718b7904a1356b0f6e241900fd7530127ba750a31f14ef4ee956166fc0ce42a",
+          "artifacts": [
+            "evidence/local.watch.native.20261028.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -116257,6 +116272,11 @@
       "sha256": "57f57789ee55465421c50e41b7a92668aa717683081b037e72b648399759fc28"
     },
     {
+      "path": "evidence/local.watch.force-edits.20261029.json",
+      "state": "observed",
+      "sha256": "c410de56c6606a827f7024ab9db1c4dc7cd51e7f0092baffa845461d323e54e1"
+    },
+    {
       "path": "evidence/local.watch.lifecycle.20261028.json",
       "state": "observed",
       "sha256": "38c0a2015cd771a2cb73872e4e7d4bf3eccb8a6e9b6015c7e5d992e9c70ef260"
@@ -116831,6 +116851,10 @@
     {
       "id": "local.watch.creation_loss.20261028",
       "profileSha256": "a2e753c055400d74b37ecd7890ed0151db1f46c2d51dc161ab30d36a42dc3ae6"
+    },
+    {
+      "id": "local.watch.force-edits.20261029",
+      "profileSha256": "bc2f4f708298e804e224f90568c615a96b2391acd4a6301c9d7ddf7bcc9315f6"
     },
     {
       "id": "local.watch.lifecycle.20261028",

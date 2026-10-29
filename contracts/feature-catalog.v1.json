@@ -2700,6 +2700,26 @@
         "Engineering only; nothing is downloaded and no OPC UA client connects.",
         "Only OPC UA changes were tried in a Portal that restored an OPC UA change; whether another kind of save there writes the stale rows is not tested."
       ]
+    },
+    {
+      "id": "local.watch.force-edits.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5eca54504cf5c7d8a874259c32ff80118d775873",
+        "passedScope": "scripts/qualify_watch_force_edits.py from commit 5eca545, operator-assisted, on an owned scratch CPU 1511-1 PN (TIA V21 Update 3): the operator authored three force rows (%I0.0:P Bool TRUE, %Q0.1:P Bool FALSE, %IW2:P Hex) and a comment line in the TIA editor, unticked, offline; the runner captured them independently, then ran each force edit through watch_table_prepare/apply with checkpoint and save, readback with unchanged peers, a fresh reopen and a checkpoint restore to a new location: ForceValue, Address and DisplayFormat field edits, comment, comment-line clone, delete of the last row and signal-row clone verified; ten typed refusals."
+      },
+      "artifacts": [
+        "evidence/local.watch.force-edits.20261029.json"
+      ],
+      "limitations": [
+        "Reorder is refused at readback (VerificationFailed) and recovered: TIA renumbers the force rows' document IDs on export, and force rows have no ID reindex; only the IDs differed.",
+        "The Name field is not edited: the fixture has no tags, since a symbolic row could refuse every edit at prepare.",
+        "watch_table_reconcile_interrupted is not exercised: it needs a Host or worker loss on a second authored scratch.",
+        "Production Hosts still refuse force-table edits with UnsupportedProfile; only the qualification harness (--component-qualification --watch-qualification) dispatches them.",
+        "Offline engineering only: nothing is forced, monitored or written online; every F checkbox stayed unticked."
+      ]
     }
   ],
   "features": [
@@ -12950,13 +12970,15 @@
           "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
           "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
           "Worker-owned saved offline scratch only; prepare and apply are refused outside the isolated qualification harness, like the other expanded document edits, until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
-          "Native observation (28 October 2026): a fresh scratch holds only the PLC's default force table, with no rows, and V21 has no API that creates force rows; the field, comment, clone, delete and reorder edits all need an existing row. Qualifying this feature needs a force table with rows authored in the TIA Portal editor (the force-fixture capture route), which no unattended runner can do."
+          "Native (29 October 2026, local.watch.force-edits.20261029): on rows an operator authored in the TIA editor, the ForceValue, Address and DisplayFormat field edits, comment, clone and delete pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore. Reorder is refused at readback, because TIA renumbers the rows' document IDs, and is recovered. The Name field is not exercised. watch_table_reconcile_interrupted is qualified on watch tables (local.watch.native.20261028), not on a force table."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.force-edits.20261029",
+          "local.watch.native.20261028"
+        ]
       },
       "availability": {
         "status": "conditional",

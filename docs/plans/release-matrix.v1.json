@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.70",
-    "catalogSha256": "00bdc32918ad71ad3b0c2a76686a694de4c0040b63c32f838aec83097ef815ed",
+    "catalogSha256": "583dbdf1bae3207b09d5fa6dc36501e1373405c24b7ac00617a34dc4f94fb4af",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "6843b503a8181e2a275fb103c72817b9d05336d5a217a8c4573767df74ba853d"
   },
@@ -15,25 +15,21 @@
     "features": 450,
     "support": {
       "deferred": 10,
-      "limited": 244,
+      "limited": 245,
       "shipped": 122,
       "unavailable_target": 8,
-      "unqualified": 66
+      "unqualified": 65
     },
     "cells": {
       "blocked": 49,
-      "bound": 1677,
+      "bound": 1684,
       "deferred": 30,
-      "open": 311
+      "open": 304
     },
     "openCellsByOwner": {
       "C03": {
         "role": "UA security and runtime integration",
         "open": 78
-      },
-      "D02": {
-        "role": "Diagnostics and watch tables",
-        "open": 7
       },
       "D06": {
         "role": "Test Suite",
@@ -11071,46 +11067,70 @@
         "watch_table_reconcile_interrupted"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D02"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.watch.force-edits.20261029",
+        "local.watch.native.20261028"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.watch.force-edits.20261029",
+            "local.watch.native.20261028"
+          ]
         }
       ]
     },
@@ -24795,6 +24815,21 @@
         {
           "path": "evidence/local.watch.creation_loss.20261028.json",
           "sha256": "57f57789ee55465421c50e41b7a92668aa717683081b037e72b648399759fc28"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.watch.force-edits.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "5eca54504cf5c7d8a874259c32ff80118d775873",
+      "retained": [
+        {
+          "path": "evidence/local.watch.force-edits.20261029.json",
+          "sha256": "c410de56c6606a827f7024ab9db1c4dc7cd51e7f0092baffa845461d323e54e1"
         }
       ],
       "notRetained": []
