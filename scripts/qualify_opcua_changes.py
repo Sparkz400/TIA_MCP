@@ -30,7 +30,7 @@ _CRASH = ("V21 Update 3: ReferenceNamespaces.Create terminates TIA (\"Unexpected
           "(29 October 2026); this run reproduces it last with fixtures/opcua/machine-v1.xml.")
 # D04 kinds this run does not qualify; scripts/test_qualify_opcua_changes.py keeps KINDS plus these equal to the catalog's opcua_* change kinds.
 EXCLUDED = {"opcua_reference_namespace_import": _CRASH, "opcua_reference_namespace_delete": "Needs an imported reference namespace. " + _CRASH,
-            "opcua_server_settings_set": "Qualified by scripts/qualify_opcua_server_settings.py (local.opcua_server_settings.20261028).",
+            "opcua_server_settings_set": "Qualified by scripts/qualify_opcua_server_settings.py (local.opcua.server-settings.20261028).",
             "opcua_role_mapping_set": "Native runs on 29 October: a standard role (Operator) is added with AddStandardOpcUaRole and takes its project role, "
                                       "but SetPermission leaves every namespace permission unchanged and the permission attributes are read-only; "
                                       "Create of a custom role in the interface's namespace fails natively without a message."}

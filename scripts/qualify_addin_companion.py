@@ -60,8 +60,11 @@ def main():
     try:
         client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "addin-companion-qualification", "version": "1"}})
         client.notify("notifications/initialized")
-        receiver = json.loads((artifacts / "addin-handoffs" / "receiver.json").read_text(encoding="utf-8"))
-        step("receiver published", receiver)
+        discovery = artifacts / "addin-handoffs" / "receiver.json"
+        deadline = time.monotonic() + 30  # The Host publishes its receiver asynchronously after startup.
+        while not discovery.is_file() and time.monotonic() < deadline:
+            time.sleep(0.5)
+        step("receiver published", json.loads(discovery.read_text(encoding="utf-8")))
         running = [p for p in client.tool("tia_discover")["processes"] if p.get("projectPath") and str(p.get("mode")) == "WithUserInterface"]
         require(len(running) == 1, "Expected exactly one running TIA with its UI and an open project: %s" % running)
         step("attach the operator's TIA", client.tool("tia_attach", {"processId": running[0]["processId"]}))
