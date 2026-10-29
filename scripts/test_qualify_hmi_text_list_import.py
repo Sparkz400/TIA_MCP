@@ -1,3 +1,4 @@
+import unicodedata
 import unittest
 from pathlib import Path
 
@@ -35,6 +36,10 @@ class TextListImportOracleTests(unittest.TestCase):
         ready['Text'] = self.peer['QualificationStates']['Entries'][1]['Text']
         self.assertEqual(native, self.peer)
         self.assertIs(native['QualificationStates']['Entries'][0]['IsDefaultEntry'], True)
+
+    def test_tab_inside_a_plain_native_text_is_text(self):
+        native = resolve(NATIVE[0].encode(), NATIVE[1].replace('- Null', '- a\tb').encode())
+        self.assertEqual(native['QualificationStates']['Entries'][1]['Text']['de-DE'], 'a\tb')
 
     def test_unresolved_reference_stays_visible(self):
         self.assertEqual(self.probe['ProbeBroken']['Entries'][0]['Text']['unresolved'], 'ProbeTexts.Missing')
@@ -82,14 +87,15 @@ class TextListImportOracleTests(unittest.TestCase):
         for request in requests.values():
             self.assertLessEqual(len(request['lists']), 128)
             for row in request['lists']:
-                self.assertFalse(set(row['name']) & set('.:#"['), row['name'])
-                self.assertLessEqual(len(row['name']), 256)
+                name = row['name']
+                self.assertTrue(len(name) <= 128 and name.strip() == name and all(c.isalnum() or c in " !&'()+,-;<=>@\\^_{|}" for c in name), name)
                 for entry in row['entries']:
                     self.assertTrue(all(v is None or -2**31 <= v < 2**31 for v in (entry['fromValue'], entry['toValue'])))
-                    self.assertFalse(row['rangeType'] == 'Bool' and entry['isDefault'])
+                    if entry['isDefault']:
+                        self.assertTrue(row['rangeType'] != 'Bool' and entry['type'] == 'SingleValue' and entry['fromValue'] == 0, entry)
             for text in request['texts']:
                 for value in text['translations'].values():
-                    self.assertFalse(set(value) & {'\0', '\r', chr(0x85)})
+                    self.assertFalse(any(unicodedata.category(c) == 'Cc' and c not in '\t\n' for c in value))
                     self.assertLessEqual(len(value), 16384)
 
 

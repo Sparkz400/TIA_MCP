@@ -102,8 +102,13 @@ internal static class TextListAuthoringTests
             ("HmiTextListTextUnsupported", "entry StateOff", p => p["texts"]![0]!["translations"]!["en-US"] = "a\0b"),
             ("HmiTextListTextUnsupported", "entry StateOff", p => p["texts"]![0]!["translations"]!["de-DE"] = "line\r\nbreak"),
             ("HmiTextListTextUnsupported", "entry StateReady", p => p["texts"]![1]!["translations"]!["en-US"] = "next\u0085line"),
+            ("HmiTextListTextUnsupported", "entry StateOff", p => p["texts"]![0]!["translations"]!["en-US"] = "bell\u0007"),
+            ("HmiTextListTextUnsupported", "entry StateReady", p => p["texts"]![1]!["translations"]!["de-DE"] = "del\u007fc1\u009f"),
+            ("HmiTextListDefaultEntryValue", "entry StateReady", p => { Entry(p)["isDefault"] = false; p["lists"]![0]!["entries"]![1]!["isDefault"] = true; }),
+            ("HmiTextListDefaultEntryValue", "entry StateOff", p => { Entry(p)["type"] = "To"; Entry(p)["fromValue"] = null; Entry(p)["toValue"] = -1; }),
             ("HmiTextListUnresolvedText", "entry StateOff", p => { Entry(p)["textId"] = "Missing"; p["texts"]!.AsArray().RemoveAt(0); }) }
-            .Concat(new[] { ".", ":", "#", "\"", "[" }.Select(c => ("HmiTextListNameUnsupported", "List Qualification" + c, (Action<JsonObject>)(p => p["lists"]![0]!["name"] = "Qualification" + c + "States"))));
+            .Concat(new[] { ".", ":", "#", "\"", "[", "$", "%", "*", "/", "?", "]", "`", "~", "😀", " " }.Select(c => ("HmiTextListNameUnsupported", "List Qualification" + c, (Action<JsonObject>)(p => p["lists"]![0]!["name"] = "Qualification" + c + "States"))))
+            .Concat(new[] { " Leading", "Trailing ", new string('N', UnifiedTextListAuthoring.MaxNativeListName + 1) }.Select(n => ("HmiTextListNameUnsupported", "List " + n + ":", (Action<JsonObject>)(p => p["lists"]![0]!["name"] = n))));
         string reviewsDirectory = Path.Combine(root, "hmi-component-reviews");
         foreach (var (code, where, edit) in unfaithful)
         {

@@ -34,6 +34,20 @@ class TextLibraryLoader(yaml.SafeLoader):
 TextLibraryLoader.yaml_implicit_resolvers = {}
 
 
+def load_library(raw):
+    """V21 writes a tab inside a plain scalar (run q/tl3), which PyYAML cannot scan. YAML never uses tabs for structure,
+    so every tab is text: it travels as a private-use placeholder and is restored in the parsed strings."""
+    text = raw.decode('utf-8')
+    assert PLACEHOLDER not in text
+    def restore(value):
+        if isinstance(value, str): return value.replace(PLACEHOLDER, '\t')
+        if isinstance(value, list): return [restore(v) for v in value]
+        if isinstance(value, dict): return {restore(k): restore(v) for k, v in value.items()}
+        return value
+    return restore(yaml.load(text.replace('\t', PLACEHOLDER), Loader=TextLibraryLoader) or {})
+PLACEHOLDER = chr(0xE000)
+
+
 def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
@@ -53,22 +67,24 @@ def boundary_requests():
         return dict(id=identity, type=kind, fromValue=low, toValue=high, isDefault=default, textId=text)
     def plain(name, *entries, kind='Decimal'):
         return dict(name=name, rangeType=kind, entries=list(entries))
-    # Every C0/C1 control and DEL the tool still accepts (not NUL, CR or NEL), one list each.
-    controls = [code for code in [*range(1, 32), *range(127, 160)] if code not in (10, 13, 133)]
     texts = {'Quote': '"quoted" \\ backslash', 'Whitespace': 'tab\there\nLF', 'Unicode': 'Über 日本語 😀', 'Empty': '',
              'Yaml': '---\n!tag &anchor #hash: colon', 'Separators': 'x' + chr(0x2028) + 'y' + chr(0x2029) + 'z', 'Long': 'L' * 16381}
-    # Every printable ASCII punctuation the tool still accepts in a list name, plus spacing and the 256-character bound.
-    names = ['Plain_Name1', 'Name with space', 'Umlaut_Ä', 'Unicode_日本語', ' Leading', 'Trailing ', 'N' * 256] + \
-            ['P' + chr(code) + 'Name' for code in range(33, 127) if not chr(code).isalnum() and chr(code) not in '.:#"[_']
+    # Unicode format characters the tool accepts in texts (soft hyphen, ZWSP, ZWJ, BOM, RLO, WJ), one list each.
+    formats = [0x00AD, 0x200B, 0x200D, 0xFEFF, 0x202E, 0x2060]
+    # Every list-name class the tool accepts: letters of several scripts, digits, inner spaces, the allowed
+    # punctuation, and the 128-character bound.
+    names = ['Plain_Name1', 'Name with space', 'Umlaut_Ä', 'Unicode_日本語', 'Имя Ελληνικά', 'اسم שם 이름', 'Digits 0123 ٣', 'N' * 127, 'M' * 128] + \
+            ['P' + c + 'Name' for c in "!&'()+,-;<=>@\\^{|}"]
     return {
         'boundary-values': request('ProbeValues', {'T': 'Value'}, [
             plain('EntryTypes', entry('Low', 'T', 'To', None, -1), entry('Middle', 'T', 'Range', 0, 10), entry('High', 'T', 'From', 11, None)),
             plain('Int32Bounds', entry('Min', 'T', low=-2**31, high=-2**31), entry('Max', 'T', low=2**31 - 1, high=2**31 - 1)),
+            plain('DefaultZero', entry('Default', 'T', default=True), entry('One', 'T', low=1, high=1)),
             plain('BoolNoDefault', entry('False', 'T'), entry('True', 'T', low=1, high=1), kind='Bool'),
             plain('BitDefault', entry('Bit0', 'T', default=True), entry('Bit31', 'T', low=31, high=31), kind='BitNumber')]),
-        'boundary-texts': request('ProbeTexts', {**texts, **{f'C{code:02X}': 'a' + chr(code) + 'b' for code in controls}}, [
+        'boundary-texts': request('ProbeTexts', {**texts, **{f'F{code:04X}': 'a' + chr(code) + 'b' for code in formats}}, [
             plain('TextChars', *(entry(key, key, low=index, high=index) for index, key in enumerate(texts))),
-            *(plain(f'Control_{code:02X}', entry('Zero', f'C{code:02X}')) for code in controls)]),
+            *(plain(f'Format_{code:04X}', entry('Zero', f'F{code:04X}')) for code in formats)]),
         'boundary-names': request('ProbeNames', {'T': 'Name'}, [plain(name, entry('Zero', 'T')) for name in names])}
 
 
@@ -76,7 +92,7 @@ def resolve(config_raw, library_raw):
     """Text lists by name as V21 reads them. V21 renames entries and pools all texts in one library on export and omits
     default fields, so entries become a sorted multiset with defaults applied and each Text reference replaced by
     {language: text}. Every stated value stays significant."""
-    config, library = yaml.safe_load(config_raw) or {}, yaml.load(library_raw, Loader=TextLibraryLoader) or {}
+    config, library = yaml.safe_load(config_raw) or {}, load_library(library_raw)
     libraries = library.get('TextLibraries') or {}
     result = {}
     for container in (config.get('TextListContainers') or {}).values():
@@ -97,7 +113,7 @@ def resolve(config_raw, library_raw):
 
 def orphan_texts(library_raw, config_raw):
     """Library entries no list references; reported, never excused."""
-    config, library = yaml.safe_load(config_raw) or {}, yaml.safe_load(library_raw) or {}
+    config, library = yaml.safe_load(config_raw) or {}, load_library(library_raw)
     used = {entry.get('Text') for container in (config.get('TextListContainers') or {}).values()
             for row in (container.get('ResourceLists') or {}).values() for entry in (row.get('Entries') or {}).values()}
     return sorted(f'{lib}.{key}' for lib, row in (library.get('TextLibraries') or {}).items()

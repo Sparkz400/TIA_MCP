@@ -67,7 +67,7 @@ def run(client, upload, read, check, refuse, output):
     expanded['texts'][0]['translations']['de-DE'] = ''
     expanded['languages'].reverse(); expanded['defaultLanguage'] = 'de-DE'
     expanded['lists'][0]['name'] = 'Unicode 日本語 quoted-name'
-    expanded['lists'][0]['entries'] = [dict(id='Low', type='To', fromValue=None, toValue=-1, isDefault=True, textId='Text_Off'),
+    expanded['lists'][0]['entries'] = [dict(id='Low', type='To', fromValue=None, toValue=-1, isDefault=False, textId='Text_Off'),
         dict(id='Middle', type='Range', fromValue=0, toValue=10, isDefault=False, textId='Text_Ready'),
         dict(id='High', type='From', fromValue=11, toValue=None, isDefault=False, textId='Text_Ready')]
     for kind in ('Bool', 'BitNumber'):
@@ -76,7 +76,7 @@ def run(client, upload, read, check, refuse, output):
         expanded['lists'].append(row)
     variants.append(expanded)
     extremes = copy.deepcopy(request)
-    extremes['lists'][0]['entries'][0].update(fromValue=-2147483648, toValue=-2147483648)
+    extremes['lists'][0]['entries'][0].update(fromValue=-2147483648, toValue=-2147483648, isDefault=False)
     extremes['lists'][0]['entries'][1].update(fromValue=2147483647, toValue=2147483647)
     variants.append(extremes)
     records = []
@@ -132,7 +132,12 @@ def run(client, upload, read, check, refuse, output):
                        ('HmiTextListTextUnsupported', lambda p: p['texts'][0]['translations'].update({'en-US': 'a\0b'})),
                        ('HmiTextListTextUnsupported', lambda p: p['texts'][0]['translations'].update({'de-DE': 'CR\r\nLF'})),
                        ('HmiTextListTextUnsupported', lambda p: p['texts'][1]['translations'].update({'en-US': 'next\x85line'})),
-                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Colon: "quoted" # []'))):
+                       ('HmiTextListTextUnsupported', lambda p: p['texts'][1]['translations'].update({'de-DE': 'form\x0cfeed'})),
+                       ('HmiTextListDefaultEntryValue', lambda p: p['lists'][0]['entries'][0].update(type='To', fromValue=None, toValue=-1)),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Colon: "quoted" # []')),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Slash/Name')),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Trailing ')),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='N' * 129))):
         unfaithful = copy.deepcopy(request); edit(unfaithful)
         refuse(client, 'hmi_text_list_author', dict(uploadRef=upload(client, json.dumps(unfaithful, ensure_ascii=False).encode('utf-8'))), code)
     return records

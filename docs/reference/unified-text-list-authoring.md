@@ -148,13 +148,15 @@ reports as imported but changes. Each refusal names the list and entry:
 | --- | --- | --- |
 | `HmiTextListValueOutOfRange` | a bound outside signed 32-bit | import it as 0 |
 | `HmiTextListBoolDefaultEntry` | a default entry in a `Bool` list | drop the entry |
-| `HmiTextListTextUnsupported` | a translation containing NUL, CR or NEL (U+0085) | empty the text, or read CR/NEL back as LF |
-| `HmiTextListNameUnsupported` | a list name containing `.`, `:`, `#`, `"` or `[` | not create the list |
+| `HmiTextListDefaultEntryValue` | a default entry that is not `SingleValue` 0 | import it as `SingleValue` 0 |
+| `HmiTextListTextUnsupported` | a translation containing a control character other than tab and LF | empty the text, replace the character with `?`, or read CR/NEL back as LF |
+| `HmiTextListNameUnsupported` | a list name with a character other than a letter, a digit, an inner space or `!&'()+,-;<=>@\^_{\|}`, a leading or trailing space, or more than 128 characters | trim the name, rename the list `Text_list_N` or not create it |
 | `HmiTextListUnresolvedText` | an entry whose text ID is not declared | import empty texts |
 
 The same refusals apply to v2/v3 generation and to `hmi_text_list_generate_set`.
-Records published before them keep their meaning and still reopen. Overlapping intervals refuse instead of inventing a
-precedence policy. Unsupported fields, formatted/system-list intent and unknown
+Records published before them keep their meaning and still reopen.
+
+Overlapping intervals refuse instead of inventing a precedence policy. Unsupported fields, formatted/system-list intent and unknown
 entry/range types refuse. Output construction uses a conservative character budget
 to keep each candidate below 8 MiB; requests are limited to 4 MiB and share the
 existing 512 MiB HMI retention store, including incomplete files.

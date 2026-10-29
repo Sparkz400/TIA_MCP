@@ -83,28 +83,37 @@ internal static class UnifiedTextListAuthoring
         return [(fileBase + ".hmi.yml", Utf8.GetBytes(configuration.ToString())), (fileBase + ".TextLibrary.hmi.yml", Utf8.GetBytes(translation.ToString()))];
     }
 
+    // List-name punctuation V21 imported unchanged (runs q/tl2, q/tl3); letters, digits and inner spaces are also kept.
+    private const string NamePunctuation = "!&'()+,-;<=>@\\^_{|}";
+    internal const int MaxNativeListName = 128;
+
     /// <summary>Refuse new candidates whose content V21's Import reports as imported but changes
-    /// (local.hmi.text-list-import.20261029). Call after Build and only before publishing new records; retained records keep their semantics.</summary>
+    /// (local.hmi.text-list-import.20261029). Call after Build and only before publishing new records; retained records keep their semantics.
+    /// Names follow an allowlist because untested characters may also be dropped.</summary>
     internal static void RequireNativeImportable(JsonObject intent)
     {
         var texts = intent["texts"]!.AsArray().ToDictionary(t => (string)t!["id"]!, t => t!["translations"]!.AsObject(), StringComparer.Ordinal);
         foreach (var node in intent["lists"]!.AsArray())
         {
             var list = node!.AsObject(); string name = (string)list["name"]!;
-            if (name.IndexOfAny(['.', ':', '#', '"', '[']) >= 0)
-                throw new BridgeException("HmiTextListNameUnsupported", $"List {name}: V21 does not create a text list whose name contains . : # \" or [.");
+            if (name.Length > MaxNativeListName || name.Trim() != name || !name.All(c => char.IsLetterOrDigit(c) || c == ' ' || NamePunctuation.Contains(c)))
+                throw new BridgeException("HmiTextListNameUnsupported", $"List {name}: V21 imports only names of at most {MaxNativeListName} letters, digits, inner spaces and {NamePunctuation}; it trims, renames or drops others.");
             foreach (var row in list["entries"]!.AsArray())
             {
                 var entry = row!.AsObject(); string where = $"List {name}, entry {(string)entry["id"]!}";
                 foreach (string bound in new[] { "fromValue", "toValue" })
                     if (Number(entry, bound) is long value && value is < int.MinValue or > int.MaxValue)
                         throw new BridgeException("HmiTextListValueOutOfRange", $"{where}: {bound} {value} is outside signed 32-bit; V21 imports it as 0.");
-                if ((string?)list["rangeType"] == "Bool" && Boolean(entry, "isDefault"))
-                    throw new BridgeException("HmiTextListBoolDefaultEntry", $"{where}: V21 drops a default entry from a Bool list.");
+                if (Boolean(entry, "isDefault"))
+                {
+                    if ((string?)list["rangeType"] == "Bool") throw new BridgeException("HmiTextListBoolDefaultEntry", $"{where}: V21 drops a default entry from a Bool list.");
+                    if ((string?)entry["type"] != "SingleValue" || Number(entry, "fromValue") != 0)
+                        throw new BridgeException("HmiTextListDefaultEntryValue", $"{where}: V21 imports a default entry as SingleValue 0; author it that way.");
+                }
                 string textId = (string)entry["textId"]!;
                 foreach (var (language, translation) in texts[textId])
-                    if (((string)translation!).IndexOfAny(['\0', '\r', '\u0085']) >= 0)
-                        throw new BridgeException("HmiTextListTextUnsupported", $"{where}: text {textId} ({language}) contains NUL, CR or NEL, which V21 empties or turns into LF.");
+                    if (((string)translation!).Any(c => char.IsControl(c) && c is not ('\t' or '\n')))
+                        throw new BridgeException("HmiTextListTextUnsupported", $"{where}: text {textId} ({language}) contains a control character other than tab or LF, which V21 empties, replaces or turns into LF.");
             }
         }
     }
