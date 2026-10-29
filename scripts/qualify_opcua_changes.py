@@ -53,8 +53,8 @@ LIMITATIONS = [
     "opcua_role_mapping_set is only refused here (prepare-time checks); see EXCLUDED for its native findings.",
     "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
     _CRASH,
-    "Importing or deleting an interface makes TIA add or remove its namespace row in the namespace access restrictions and in every role mapping; "
-    "these are recorded under sideEffects and checked to differ only by that namespace.",
+    "TIA derives the interface namespace's row in the namespace access restrictions and in every role mapping from the interface: it appears on "
+    "import and vanishes on delete, and a copy recovered from a checkpoint lacks it until TIA rebuilds it; those rows are not compared.",
     "Engineering only; nothing is downloaded and no OPC UA client connects.",
 ]
 
@@ -71,12 +71,15 @@ def opcua_state(h, plc):
     # With the server on, TIA renders the server certificate attribute display-only; any other warning is a gap.
     warnings = [w for w in inspected.get("warnings") or [] if w.get("valueStatus") != "displayOnly"]
     require(not inspected["completeness"].get("truncated") and not warnings, "OPC UA inspection is truncated or warned: %s" % warnings)
-    state = {"opcua:namespaceAccess": inspected["namespaceAccessRestrictions"]}
+    # TIA derives the interface namespace's rows from the interface itself: they appear on import, vanish on delete and are
+    # missing from a checkpoint copy until TIA rebuilds them (29 October 2026), so they are left out of the compared state.
+    derived = lambda rows: [row for row in rows if row.get("namespaceUri") != NAMESPACE]
+    state = {"opcua:namespaceAccess": derived(inspected["namespaceAccessRestrictions"])}
     for row in inspected["serverSettings"]:
         state["opcua:settings:" + row["hardwarePath"]] = {a["name"]: a.get("value") for a in row["attributes"]}
     for key, rows in (("serverInterface", "serverInterfaces"), ("simaticInterface", "simaticInterfaces"), ("referenceNamespace", "referenceNamespaces"), ("roleMapping", "roleMappings")):
         for row in inspected[rows] or []:
-            state["opcua:%s:%s" % (key, row["name"])] = dict(row)
+            state["opcua:%s:%s" % (key, row["name"])] = {**row, **({"namespacePermissions": derived(row["namespacePermissions"])} if key == "roleMapping" else {})}
     if inspected["serverInterfaces"]:
         exported = h.tool("opcua_engineering_export", {"plcPath": plc, "category": "serverInterface", "maxItems": 32})
         require(not exported["warnings"] and len(exported["files"]) == len(inspected["serverInterfaces"]), "Server interface export is incomplete: %s" % exported["warnings"])
@@ -110,22 +113,6 @@ class Run(StateRun):
         return prepared
 
 
-def namespace_rows(category, key):
-    """Adding or deleting an interface adds or removes its namespace in the access restrictions and in every role mapping."""
-    return category == "changed" and (key == "opcua:namespaceAccess" or key.startswith("opcua:roleMapping:"))
-
-
-def only_namespace_rows(before, state):
-    """Those keys may differ only by rows of the fixtures' namespace."""
-    def strip(value):
-        if isinstance(value, list):
-            return [row for row in value if row.get("namespaceUri") != NAMESPACE]
-        return {**value, "namespacePermissions": strip(value["namespacePermissions"])}
-    for key in before.keys() & state.keys():
-        if namespace_rows("changed", key) and before[key] != state[key]:
-            require(strip(before[key]) == strip(state[key]), "%s changed beyond the %s rows" % (key, NAMESPACE))
-
-
 def interface(name):
     return "opcua:serverInterface:" + name
 
@@ -137,10 +124,9 @@ def import_payload(path, mode, name=NAME):
 def import_(run, label, path, mode, restore=False):
     payload = import_payload(path, mode)
     effect = {"action": "opcua_server_interface_import", "name": NAME, "mode": mode, "sourceSha256": payload["expectedSha256"]}
-    key, previous = interface(NAME), run.current["view"]
+    key = interface(NAME)
     if mode == "create":
-        return run.apply(label, "opcua_server_interface_import", payload, effect, added=[key], rows={key: {"name": NAME, "enabled": True}}, restore=restore,
-                         tolerated=namespace_rows, check=lambda applied, state: only_namespace_rows(previous, state))
+        return run.apply(label, "opcua_server_interface_import", payload, effect, added=[key], rows={key: {"name": NAME, "enabled": True}}, restore=restore)
     before = run.current["view"][key]["exportSha256"]
     return run.apply(label, "opcua_server_interface_import", payload, effect, changed=[key], restore=restore,
                      check=lambda applied, state: require(state[key]["exportSha256"] != before, "Replacing did not change the interface content"))
@@ -153,10 +139,8 @@ def enable(run, enabled, restore=False):
 
 
 def delete(run, restore=False):
-    previous = run.current["view"]
     return run.apply("delete the interface", "opcua_server_interface_delete", {"interfaceName": NAME},
-                     {"action": "opcua_server_interface_delete", "name": NAME}, removed=[interface(NAME)], restore=restore,
-                     tolerated=namespace_rows, check=lambda applied, state: only_namespace_rows(previous, state))
+                     {"action": "opcua_server_interface_delete", "name": NAME}, removed=[interface(NAME)], restore=restore)
 
 
 def role_payload(run):
