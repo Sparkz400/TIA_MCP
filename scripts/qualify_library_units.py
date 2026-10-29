@@ -1,12 +1,12 @@
 """Qualify library consumption in a software unit with a namespace preset, the one-instance-per-device rule, the unit-aware
-cleanup refusal and whether Openness can give a library instance an explicit namespace."""
+cleanup refusal and an explicit namespace on a library instance."""
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 import shutil
 
-from library_native_harness import Harness, require
+from library_native_harness import Harness, identity, require
 
 ROOT = Path(__file__).resolve().parents[1]
 FB, UDT, UNIT = "TiaMcpLibraryGate", "TiaMcpLibraryState", "TiaMcp_LibUnit"
@@ -46,16 +46,38 @@ def body(h):
 
     source = h.open_archive(generation_one)
     in_unit = {"plcPath": plc, "scopePath": unit}
-    for version in (udt, fb):
-        h.apply("library_instantiate", h.selected(source, [version], target=in_unit))
+    # TIA does not apply the unit's namespace preset to library instances: the UDT keeps its type's empty namespace.
+    h.apply("library_instantiate", h.selected(source, [udt], target=in_unit))
+    # An explicit namespace is reviewed in the preview and set on the created FB.
+    h.refuse("refuse an explicit namespace in the PLC root", "library_instantiate",
+             h.selected(source, [fb], target={"plcPath": plc}, namespace=UNIT), "TargetIncompatible", "software-unit")
+    h.refuse("refuse a malformed namespace", "library_instantiate",
+             h.selected(source, [fb], target=in_unit, namespace="1 bad"), "InvalidRequest", "identifiers")
+    prepared = h.prepare("library_instantiate", h.selected(source, [fb], target=in_unit, namespace=UNIT))
+
+    def namespace_preview():
+        row = prepared["preview"].get("instanceNamespace") or {}
+        require(row.get("namespace") == UNIT and row.get("unitNamespacePreset") == UNIT and row.get("objects") == [{"typeName": FB, "typeNamespace": ""}],
+                "Preview does not declare the explicit namespace: %s" % row)
+        return row
+    h.stage("preview declares namespace %s for the FB" % UNIT, namespace_preview)
+    applied = h.apply_prepared("library_instantiate", prepared)
+
+    def created():
+        rows = applied["journal"]["result"]["objects"]
+        require(len(rows) == 1 and rows[0]["object"].get("Namespace") == UNIT and rows[0]["linkVerified"] is True
+                and identity(rows[0]["version"]) == identity(fb), "Created FB differs: %s" % rows)
+        return rows[0]
+    h.stage("the created FB carries the namespace and its exact link", created)
 
     def placement():
         software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
         rows = [x for key in ("blocks", "types") for x in software[key] if x["path"].rsplit("/", 1)[-1] in (FB, UDT)]
-        in_scope = [x["path"] for x in rows if x.get("scopePath") == unit]
-        require(len(in_scope) == 2 and len(rows) == 2, "Expected the FB and UDT exactly once, in the unit: %s" % rows)
-        return {"unit": in_scope, "unitNamespaced": all("/namespaces/" + UNIT + "/" in p for p in in_scope)}
-    h.report["placement"] = h.stage("FB and UDT exist once, in the unit", placement)
+        paths = {x["path"].rsplit("/", 1)[-1]: x["path"] for x in rows if x.get("scopePath") == unit}
+        require(len(rows) == 2 and len(paths) == 2, "Expected the FB and UDT exactly once, in the unit: %s" % rows)
+        require("/namespaces/" + UNIT + "/" in paths[FB] and "/namespaces/" not in paths[UDT], "Instance namespaces differ: %s" % paths)
+        return paths
+    h.report["placement"] = h.stage("FB in namespace %s and UDT without, both in the unit" % UNIT, placement)
     consumer = h.project_library()
     h.stage("FB 1.0.0 used once (in the unit)", lambda: h.verify_use(consumer, fb, 1))
     # TIA allows one instance of a library type per device; a second scope is refused before any write.
@@ -72,26 +94,30 @@ def body(h):
         require([x["version"] for x in h.versions(consumer, FB)] == ["1.0.0"], "The refused update copied a version into the project")
         return h.verify_use(consumer, fb, 1)
     h.stage("the unit stays at 1.0.0 and no newer version was copied", unchanged)
-
-    # The unit's namespace preset is not applied to library instances; probe an explicit namespace on each instance.
-    def namespace_kept(probe):
-        before, after = probe.get("before") or {}, probe.get("after") or {}
-        require(before.get("linked") is True and before.get("namespace") == before.get("typeNamespace"),
-                "Expected a linked instance carrying its type's namespace: %s" % probe)
-        require(after == before, "TIA changed the library instance's namespace or link: %s" % probe)
-        return {"setAccepted": probe.get("setAccepted"), "setError": probe.get("setError"), "namespace": after["namespace"]}
-    probes = h.report["namespaceProbes"] = {}
-    for name in (FB, UDT):
-        probe = h.seed("probe namespace %s on the %s instance" % (UNIT, name), "namespace", name, UNIT, required=False)
-        probes[name] = h.stage("TIA keeps the %s instance's type namespace" % name, lambda p=probe: namespace_kept(p))
-    h.stage("links and placement unchanged after the namespace probes", lambda: h.verify_use(consumer, fb, 1) and placement())
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
+    # The namespaced instantiation's checkpoint restores the project as it was before the FB.
+    h.owned_portal("restore")
+    def restore():
+        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        rows = restored["resources"]
+        require(restored["state"] == "restored_to_new_locations" and [r["kind"] for r in rows] == ["project"] and rows[0]["state"] == "completed",
+                "Checkpoint recovery differs: %s" % restored)
+        return restored
+    h.stage("restore the namespaced instantiation's checkpoint", restore)
+    def restored_state():
+        software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
+        names = sorted(x["path"].rsplit("/", 1)[-1] for key in ("blocks", "types") for x in software[key] if x["path"].rsplit("/", 1)[-1] in (FB, UDT))
+        require(names == [UDT], "Restored project differs: %s" % names)
+        return h.verify_use(h.project_library(), udt, 1)
+    h.stage("restored: the UDT only, no FB", restored_state)
+    h.stage("close restore session", lambda: h.tool("tia_detach"))
+
     h.owned_portal("reopen")
     h.stage("reopen consumer", lambda: h.reopen_project(project_path))
-    h.stage("reopened: unit use intact", lambda: h.verify_use(h.project_library(), fb, 1) and placement())
+    h.stage("reopened: namespaced FB and UDT intact", lambda: h.verify_use(h.project_library(), fb, 1) and placement())
 
 
 if __name__ == "__main__":
@@ -107,5 +133,5 @@ if __name__ == "__main__":
     Harness(args, "un_", "V21 library consumption in a software unit with a namespace preset beside the PLC root", [
         "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
-        "The namespace probe sets PlcBlock/PlcType.Namespace on the instances through that fixture tool; the types themselves have no namespace.",
+        "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
         "No runtime execution."], [args.unit_seeder]).run(body)
