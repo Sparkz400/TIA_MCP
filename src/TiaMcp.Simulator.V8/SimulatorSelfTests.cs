@@ -73,6 +73,13 @@ namespace TiaMcp.Simulator.V8
                 var marker = SimulationTicket.Create(1, "TiaMcp_selftest", storage);
                 var actual = SimulationTicket.Decode(SimulationTicket.Encode(marker));
                 Require(actual.Value<int>("instanceId") == 1 && actual.Value<string>("storagePath") == storage);
+                Require(actual["communicationInterface"] == null && SimulationTicket.Interface(actual) == "Softbus");
+            });
+            Check(checks, "TCP/IP ticket names its interface", () =>
+            {
+                string storage = Path.Combine(directory, "tcpip"); Directory.CreateDirectory(storage);
+                var actual = SimulationTicket.Decode(SimulationTicket.Encode(SimulationTicket.Create(5, "TiaMcp_selftest", storage, "TCPIP")));
+                Require(SimulationTicket.Interface(actual) == "TCPIP");
             });
             Check(checks, "ownership marker mismatch rejected", () =>
             {

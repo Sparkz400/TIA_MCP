@@ -65,6 +65,37 @@ string Probe()
 }
 Check(Probe() == "readable", "Separate process same user opens exact protected reference");
 using (var held = new FileStream(Path.Combine(root, ".lock"), FileMode.Open, FileAccess.ReadWrite, FileShare.None)) Check(Probe() == "CredentialStoreBusy", "Separate process cannot bypass an active vault lock");
+{
+    // One vault, two concurrent users, as a UA subscription and a web capture in one Host: a long holder that locks again at once
+    // (a UA publish) and a short periodic one (a web read). They take turns; neither is refused.
+    string shared = Path.Combine(output, "shared-vault");
+    var ua = new CredentialVault(shared).Create(binding, secret); var web = new CredentialVault(shared).Create(binding with { Purpose = "concurrent-web" }, secret);
+    int longUses = 0, shortUses = 0; long longestWait = 0; var stopAt = DateTime.UtcNow.AddSeconds(4);
+    var subscription = Task.Run(() => { while (DateTime.UtcNow < stopAt) { new CredentialVault(shared).Use(ua.Reference, binding, _ => Thread.Sleep(150)); longUses++; } });
+    var capture = Task.Run(() => { while (DateTime.UtcNow < stopAt)
+    {
+        var clock = Stopwatch.StartNew();
+        new CredentialVault(shared).Use(web.Reference, web.Binding, _ => Thread.Sleep(5));
+        longestWait = Math.Max(longestWait, clock.ElapsedMilliseconds); shortUses++; Thread.Sleep(50);
+    } });
+    Task.WaitAll(subscription, capture);
+    Check(longUses > 5 && shortUses > 5 && longestWait < 1000, "Concurrent users of one vault take turns without CredentialStoreBusy");
+
+    // A holder past the bounded wait: the waiter is refused as CredentialStoreBusy, and only after the wait.
+    var saved = CredentialVault.LockWait; CredentialVault.LockWait = TimeSpan.FromMilliseconds(300);
+    try
+    {
+        using var entered = new ManualResetEventSlim(); using var release = new ManualResetEventSlim();
+        var holder = Task.Run(() => new CredentialVault(shared).Use(ua.Reference, binding, _ => { entered.Set(); release.Wait(); }));
+        entered.Wait();
+        var clock = Stopwatch.StartNew();
+        Reject(() => new CredentialVault(shared).Use(web.Reference, web.Binding, _ => throw new Exception("consumer called")), "CredentialStoreBusy", "A holder past the bounded wait refuses as CredentialStoreBusy");
+        Check(clock.ElapsedMilliseconds >= 250, "The busy refusal comes only after the bounded wait");
+        release.Set(); holder.Wait();
+        new CredentialVault(shared).Use(web.Reference, web.Binding, _ => { });
+    }
+    finally { CredentialVault.LockWait = saved; }
+}
 string recordPath = Path.Combine(root, first.Reference.CredentialId + ".credential.json"); byte[] original = File.ReadAllBytes(recordPath);
 void Tamper(Action<JsonObject> edit, CredentialReference reference, CredentialBinding expected, string code, string label)
 {

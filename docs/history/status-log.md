@@ -10,7 +10,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 **Station upload qualified — 29 October 2026:**
 - **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.
 - **Native D09:** a first run refused, because the upload's three TLS challenges offered zero certificates ("certificate not matching"). After the decision, `local.online.upload.20261029` passed: one certificate-less challenge was trusted unauthenticated, then one runtime-user login, and the upload succeeded with the downloaded blocks. `plc_online_compare` passed again.
-- **Catalog 0.4.72:** 369 of 450 features verified; matrix 1,693 bound, 295 open, 49 blocked, 30 deferred.
+- **Catalog 0.4.73:** 403 of 450 features verified; matrix 1,827 bound, 161 open, 49 blocked, 30 deferred. D09 keeps 16 open cells, all in the DB-snapshot routes.
+
+**Runtime real-server Tasks 4–6 — 29 October 2026:** ([record](../verification/runtime-real-server-20261029.md))
+- **Runs:** in an operator TCP/IP window, `scripts/qualify_runtime_plcsim_tcpip.py` passed all five modes (normal, server restart, Host loss during capture, UA and web write loss) on one frozen build, `1181f33`, each with the independent oracle; login was the scratch's generated runtime user (maintainer decision). Curated as `local.runtime.plcsim-tcpip.20261029`.
+- **Fixes found natively:** TCP/IP provisioning now recognizes the empty CPU by its MAC and TLS certificate series because TIA's discovery never shows its address; PLCSIM's tag list is refreshed after a restart; a TCP/IP `GoOnline` that throws before any callback is retried once; vault users of one Host take turns instead of failing, and a busy vault reports `UaCredentialStoreBusy`.
+- **Catalog 0.4.72:** the 34 `runtime_ua_*`, `runtime_web_*`, `runtime_capture_*` and `runtime_plcsim_bind` features are verified; 402 of 450 features verified; matrix 1,822 bound, 166 open, 49 blocked, 30 deferred. C03 and D12 have no open cell; D16 keeps `runtime.physical_plc`.
 
 **MCP surface — 29 October 2026:** ([reference](../reference/mcp-surface.md))
 - **`--toolsets`:** the Host (and `New-McpConfiguration.ps1`/`Start-TiaMcp.ps1 -Toolsets`) can advertise only named tool groups. The default stays all, about 290 tools.
