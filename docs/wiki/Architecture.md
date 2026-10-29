@@ -21,13 +21,14 @@ Siemens assemblies are loaded from your installed products and are never redistr
 
 ## Changes are recoverable, not transactional
 
-Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances and does not expose physical PLC download, force or CPU control.
+Native changes follow **prepare → preview → checkpoint → apply → verify**. A change can partially fail across Siemens calls; recovery uses its checkpoint and journal. The public simulation workflow works only on adapter-owned simulator instances: it can download a changed program online, set virtual time and inject interrupts there, but it does not expose physical PLC download, force or CPU control.
 
 ## Support claims
 
 The diagram shows component boundaries, not support for every operation, target or environment. Offline tests, native compilation and runtime qualification are separate claims. Check:
 
 - [Current status](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/STATUS.md)
+- [Tool reference](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tools.md)
 - [Engineering coverage](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/engineering-coverage.md)
 - `feature_catalog` and `target_capabilities` from the running server
 

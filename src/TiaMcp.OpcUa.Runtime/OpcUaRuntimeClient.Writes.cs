@@ -8,7 +8,7 @@ namespace TiaMcp.OpcUa.Runtime;
 internal sealed partial class OpcUaRuntimeClient
 {
     /// <summary>Gated owned-PLCSIM write: every exact precondition holds before one Write service call, then an independent readback.</summary>
-    internal async Task<object> Write(string attemptId, IReadOnlyList<OpcUaRuntimeWriteItem> writes, CancellationToken ct)
+    internal async Task<object> Write(string attemptId, IReadOnlyList<OpcUaRuntimeWriteItem> writes, CancellationToken ct, Action? afterSend = null)
     {
         var nodes = writes.Select(w => w.Node).ToArray();
         static bool Holds(OpcUaRuntimeValue read, string encoding, JsonElement wanted) => read.Outcome == "value" && read.Encoding == encoding &&
@@ -21,6 +21,7 @@ internal sealed partial class OpcUaRuntimeClient
             Value = new DataValue(WriteVariant(before.Items[i].BuiltInType, w.Encoding, w.Value)) }).ToList());
         var response = await Session.WriteAsync(null, values, ct);
         if (response.Results.Count != writes.Count) throw Error("UaResponseInvalid");
+        afterSend?.Invoke(); // Qualification fault point only: the Host exits before the outcome is read back.
         var after = await Read(attemptId, nodes, ct);
         var matches = writes.Select((w, i) => Holds(after.Items[i], w.Encoding, w.Value)).ToArray();
         var result = new { attemptId, state = response.Results.All(s => StatusCode.IsGood(s)) && matches.All(m => m) ? "written" : "incomplete", dispatched = true,

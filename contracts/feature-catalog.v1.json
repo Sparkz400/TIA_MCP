@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.70",
+  "catalogVersion": "0.4.77",
   "targetTiaVersions": [
     21
   ],
@@ -2759,6 +2759,256 @@
         "TIA reuses an online login within the same Portal without a new challenge; later online sessions in that Portal answer none.",
         "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
       ]
+    },
+    {
+      "id": "local.online.upload.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b78ace00df288fc6c2646908cd8226165f04032b",
+        "passedScope": "scripts/qualify_online_routes.py --run-native --skip-snapshots from frozen commit 0f3a44e (curated at b78ace0, which only refreshes source bindings; src identical) on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb, downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN: plc_online_compare with the generated runtime user passed again with every typed refusal; then plc_station_upload in an empty owned Portal with trustOwnedSimulationCertificate true met one TlsVerificationConfiguration challenge (initial selection NonVerified, verification text 'certificate not matching', zero offered certificates), answered Trusted as unauthenticated TLS for the revalidated owned instance (allowOwnedSimulationWithoutCertificate), and exactly one ProjectUser login as the runtime user; UploadResult Success with 0 errors and 0 warnings, one uploaded S7-1500 station whose blocks equal the downloaded ones, the new project saved; then stop, power off, owned release, detach and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.upload.20261029.json"
+      ],
+      "limitations": [
+        "The upload's TLS is unauthenticated: V21 offered no certificate, so identity rests on the ticket, ownership and observer-endpoint checks, not on a certificate (maintainer decision of 29 October 2026, 'Allow, owned PLCSIM only').",
+        "Uploaded hardware/software completeness beyond the block list, compile and reopen of the uploaded project are not verified.",
+        "The DB-snapshot routes were skipped (--skip-snapshots); they are not part of this record.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.online.snapshots.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+        "passedScope": "scripts/qualify_online_routes.py --skip-upload from commit 4963644 on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb (Count : Int := 5), downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN, logged in only as the instance's generated scratch runtime user: typed refusals that change nothing (unknown ticket, the CPU's protection credential, runtime-user metadata naming another project or CPU, a copy outside scratch-credentials, no credential, an upload into an open project, db_snapshot_capture of a DB without a stored snapshot with DbSnapshotUnavailable, db_snapshot_create without a ticket with PhysicalPlcRefused, db_snapshot_load_actual without acknowledgement); plc_online_compare identical in every row; Count set to 42 through PLCSIM, db_snapshot_create applied with checkpoint, compile and save (preview without a previous snapshot), db_snapshot_capture reviews Count = 42; Count set to 7, db_snapshot_load_actual applied without compile and save, and PLCSIM reads Count back as 42 after a tag-list refresh; each online session completed its cleanup in RUN with at most one project-user login and the project state stayed unchanged; change_restore of the create gives the pre-change state, whose DB again has no stored snapshot; then stop, power off, owned release and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.snapshots.20261029.json"
+      ],
+      "limitations": [
+        "plc_station_upload ran only as its ProjectIsolationRequired refusal (--skip-upload); its TLS trust in an empty Portal is implemented on another branch.",
+        "One global DB with one Int; arrays, structures, instance DBs, retain values and a DB that already had a snapshot are not exercised.",
+        "InterfaceSnapshot.Export needs ExportOptions.WithReadOnly: Snapshot and SnapshotDate are read-only attributes. A DB without a stored snapshot exports empty SnapshotValues dated 0001-01-01, which the worker refuses as DbSnapshotUnavailable.",
+        "Each export carries a new DocumentInfo/Created, so the capture's file hash never equals a fresh export; the load compares the InterfaceSnapshot element of a fresh export with the reviewed capture's retained file, bound by its hash.",
+        "After LoadSnapshotAsActualValues PLCSIM reports its old tag list NotUpToDate (-47); the readback refreshes it through sim_tags. No public V21 API reads actual values back; PLCSIM is the independent reader.",
+        "Provisioning the protection credential trusts the owned, empty CPU's certificate on first use (trustOwnedEmptyCpuCertificate); the online sessions answer TLS NonTrusted and TIA asked them none. TIA reuses an online login within the same Portal.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.runtime.timers.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+        "passedScope": "scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate --fixture runtime-timers from commit 4963644: the updated runtime runner end to end on Softbus, both timer cases each on a fresh Host, owned TIA session and owned CPU1511, with download, the explicit checkpoint/compile/save of the generated scratch state (generatedProjectSave), credential provisioning through the discovery observer with card staging and restoration (every card move succeeded on its first attempt), RUN, the stimulus and assertion sequences, owned release and verified exits."
+      },
+      "artifacts": [
+        "evidence/local.runtime.timers.20261029.json"
+      ],
+      "limitations": [
+        "Two timer cases only; the full 65-case corpus last passed on 24 October (local.runtime.frozen.20261024).",
+        "The card-staging access denial of 23 October did not recur; the new lock-holder record stayed empty because no move was refused.",
+        "Certificate trust is the authorized first-use pin of each owned empty CPU, not independent CA verification; timing covers host-observed windows only.",
+        "PLCSIM Advanced V8 on local Softbus with the generated scratch fixture; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.typed.resolution-stale.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "dff2201826c4e96c8a1080bb81cce8b846887c2c",
+        "passedScope": "scripts/qualify_typed_resolution.py --phase stale on build dff2201 (frozen at the short project path y), each run in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1) with the UnitSeeder units, LAD and FBD. tag-duplicate-setup-guard (the production collision guard refuses a second Ready tag table with TagScopeMismatch, original unchanged) and stale-tag-address (a deliberate address change makes the prepared change fail at apply with StaleRevision/StaleDeclaration, then checkpoint recovery and a fresh reopen match the original) pass in both languages. stale-db-ambiguity now asks TIA itself for a competitor of the root DB Tgp_ResolutionOne with the same qualified name: ResolutionSeeder duplicate-db-diagnostic tries four routes in unit TiaMcp_UnitB and V21 refuses each one. A namespace-free source, generated under the unit's namespace preset or under an empty preset, fails with 'The block cannot be overwritten because it is already contained in another software unit'. Clearing the namespace of a generated TiaMcp_UnitB.Tgp_ResolutionOne, or renaming a namespace-free Tgp_ResolutionOne_Renamed to Tgp_ResolutionOne, fails with 'A program element with this fully qualified name already exists in this CPU'. Each refused route was removed again, the complete original project XML stayed unchanged and the project compiled clean."
+      },
+      "artifacts": [
+        "evidence/local.typed.resolution-stale.20261029.json"
+      ],
+      "limitations": [
+        "V21 keeps fully qualified program element names unique per CPU, so two DBs with one qualified name cannot exist. A native AmbiguousOperand for a DB operand, and a StaleDeclaration from a new same-name DB at apply, therefore cannot occur on V21; the dbSymbol uniqueness checks stay as a defensive guard with offline tests only. The stale-db-ambiguity runs end blocked by design and count only as this native boundary.",
+        "Duplicate PLC tag names are likewise refused by TIA itself (local.typed.native-boundaries.rerun.20261029).",
+        "A first probe on 84114ff (artifacts/q/yz/probe-db-lad) tried only the namespace-free source routes; it is not curated.",
+        "Owned local engineering only; runtime not run."
+      ]
+    },
+    {
+      "id": "local.typed.iec-effect-standard-wave9.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b4abe48803874ea53344082ab2eefa1c16fc20f5",
+        "passedScope": "scripts/capture_typed_routes_owned.py --unit '' (standard PLC program scope) on build b4abe48 (frozen at the short project path y): the 2 inputs of route-capture-iec-effect-standard-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound baseline (CPU 1511-1 PN V4.1): an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type, now including TONR_TIME, R_TRIG and F_TRIG, while the dependent DB was observed. Both inputs compiled clean and saved; only the declared redeclaration and its observed DB changed (the R_TRIG/F_TRIG system FBs TIA copies into System blocks are generated, not authored); the saved state matched a fresh-process reopen. scripts/extract_typed_instance_effects.py --iec --route standard rewrote instance-effects-iec.v1.json: the DB keeps its full payload and appends exactly the nine members, and the six members of the replaced capture (local.typed.iec-effect-standard.20261026) are structurally identical in caller and DB."
+      },
+      "artifacts": [
+        "evidence/local.typed.iec-effect-standard-wave9.20261029.json"
+      ],
+      "limitations": [
+        "Native reference capture only; the builder's created TONR/R_TRIG/F_TRIG storage cells are qualified separately (local.typed.wave9-created-storage.engineering.20261029); runtime is not run.",
+        "Standard route only: the software-unit and namespace IEC effect profiles keep their six timer/counter members, and those routes have no wave 9 profiles."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-created-storage.engineering.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "297c404512c57ce31bf3192e5e8ba3d3e6e68f7f",
+        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only on build 297c404 (frozen at the short project path y), each case in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1, standard route), one batch: 14 wave 9 created-storage cells pass the four engineering gates (engineering, preservation, persistence, recovery): typed-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (a new TONR_TIME, R_TRIG or F_TRIG multi-instance member), typed-transitive-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (the same with the caller embedded two parent levels deep, so the parent FBs and DBs follow the captured transitive rule with the recaptured IEC member shapes) and typed-createglobal-tonr-{lad,fbd} (a new IEC_TIMER global DB from the captured TONR storage document). Profiles: local.typed.wave9-capture.20261027; IEC dependent-instance effect: local.typed.iec-effect-standard-wave9.20261029."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-created-storage.engineering.20261029.json"
+      ],
+      "limitations": [
+        "Engineering only: the runtime gate is not run. The non-transitive cells need PLCSIM runtime (qualify_typed_graphical.py --live --runtime).",
+        "R_TRIG/F_TRIG global storage, existing or created, has no captured global storage document and stays refused (TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile).",
+        "Standard route only; the software-unit and namespace routes have no wave 9 profiles."
+      ]
+    },
+    {
+      "id": "local.library_scopes.forced.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "49fc2069d07895f2665c26cdb69ec9bbd825becc",
+        "passedScope": "Forced per-PLC library version assignment and explicit update scope across two PLCs (qualify_library_scopes.py at 49fc206, build 49fc206 frozen at artifacts/lx2, 89/89 steps): FB and UDT 1.0.0 are instantiated into the scratch PLC and an added PLC of the same CPU type and referenced from an OB in each; non-forced updates move the second, then the first PLC to FB 1.1.0. A pinned source archive keeps 1.0.0 and 1.1.0 with default 1.0.0. Without forceDefault the update is refused (VersionSelectionUnsupported), a non-boolean forceDefault is refused (InvalidRequest), a non-default 1.1.0 is refused even when forced, and updateScope selectedInstances/selectedFolder/softwareUnit are refused (NativeScopeTooBroad), each without a native change. With forceDefault=true the preview declares defaultEffect forcedDowngrade from project default 1.1.0, exactly one use moving 1.1.0 to 1.0.0 and the first PLC's FB 1.1.0 and UDT 1.0.0 uses as peer baseline; apply verifies all four readback phases. Only the second PLC moves to FB 1.0.0, the first keeps 1.1.0, the UDT stays 1.0.0 in both, FB 1.0.0 is the project default and every native block export of the first PLC is unchanged. The checkpoint restores the pre-update project (both PLCs at 1.1.0, default 1.1.0) into a fresh owned TIA; a fresh reopen of the saved project shows the forced state."
+      },
+      "artifacts": [
+        "evidence/local.library_scopes.forced.20261029.json"
+      ],
+      "limitations": [
+        "Both PLCs use the scratch CPU type; mixed CPU families are not exercised.",
+        "The forced assignment is a downgrade of a root FB whose UDT dependency is unchanged; forced dependency defaults are refused, not exercised.",
+        "Software units and namespaces are covered by local.library_units.namespace.20261029.",
+        "No runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_units.namespace.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "49fc2069d07895f2665c26cdb69ec9bbd825becc",
+        "passedScope": "Library consumption in a software unit with an explicit instance namespace (qualify_library_units.py at 49fc206, build 49fc206 frozen at artifacts/lx2, 57/57 steps): LibraryUnitSeeder creates unit TiaMcp_LibUnit with namespace preset TiaMcp_LibUnit. The UDT 1.0.0 instantiated into the unit without a namespace keeps its type's empty namespace (the preset is not applied). library_instantiate with namespace in the PLC root is refused (TargetIncompatible) and a malformed namespace is refused (InvalidRequest), both without a native change. With namespace=TiaMcp_LibUnit the preview declares instanceNamespace for the FB (type namespace empty, unit preset TiaMcp_LibUnit); apply creates FB 1.0.0 in the unit under /namespaces/TiaMcp_LibUnit/ with its exact version link while the UDT stays outside a namespace. The FB in the PLC root and a second UDT copy are refused (LibraryConflict), a PLC-wide update is refused while unit uses have no OB-rooted reference (LibraryUpdateCleanupRisk) and copies no version. The instantiation's checkpoint restores the project with the UDT only into a fresh owned TIA; a fresh reopen of the saved project shows the namespaced FB and the UDT with one exact FB use."
+      },
+      "artifacts": [
+        "evidence/local.library_units.namespace.20261029.json"
+      ],
+      "limitations": [
+        "One software unit without unit relations; unit uses are conservatively unreachable for updates.",
+        "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
+        "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
+        "No runtime execution."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1181f33df9f3ffcddc7d25630cf6cc5a17ecae45",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py on build 1181f33, modes normal, server-restart, host-loss-capture, ua-write-loss and web-write-loss, each in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1 at 192.168.0.1) provisioned over TCP/IP to a fresh owned PLCSIM Advanced V8 instance (Online Access: PLCSIM Virtual Ethernet Adapter at 192.168.0.10/24), logged in to OPC UA and the Web API as the scratch's generated runtime user from a run-owned Host vault. Server certificate pins from certificate_inspect after the last compile; stale-pin connects end notConnected. normal: runtime_plcsim_bind, every runtime_ua_*, runtime_web_* and runtime_capture_* tool, each value read through UA or the Web API beside the PLCSIM API read of the same tag, UA write with expected (a stale expected refused), web write whose effect PLCSIM reads, runtime_web_operating_mode RUN to STOP to RUN confirmed by PLCSIM. server-restart: STOP, power off and power on during live sessions invalidate them, captures record the downtime, nothing reconnects. host-loss-capture: the Host is killed during a UA subscription and a web capture; a new Host adopts the instance, reports the sessions unknown, pages and exports the committed prefix, refuses implicit resume and a new session before acknowledgement, then a fresh session reads. ua-write-loss and web-write-loss: the Host exits right after sending (--runtime-qualification ua.write.afterSend / web.write.afterSend); a new Host reports the unknown outcome, refuses a retry, an explicit read decides and PLCSIM confirms. The independent oracle scripts/verify_runtime_plcsim_tcpip.py found no issue in any mode; every Host and worker has a verified exit proof and the owned instance was stopped, powered off and released."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.20261029.json"
+      ],
+      "limitations": [
+        "Owned PLCSIM Advanced V8 on this machine only; runtime.physical_plc and other machines or networks stay unqualified.",
+        "One CPU (1511-1 PN V4.1), one generated runtime user and the documented bootstrap address 192.168.0.1; TIA's TCP/IP discovery never showed that address, so provisioning identified the empty CPU by its MAC and TLS certificate series (tcpipMacIdentity).",
+        "Guest access and operator seeds were not used; guest access is not settable through V21 Openness.",
+        "plc_online_compare, plc_station_upload and the discovery baseline stay Softbus-only.",
+        "Earlier runs of the same window on 6c6701d and 029c347 found the defects fixed up to 1181f33 (vault contention between a UA subscription and a web capture); they are not curated."
+      ]
+    },
+    {
+      "id": "local.engineering_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ec90975f0e89959ad0ebf29e8894f62334f998d6",
+        "passedScope": "scripts/qualify_engineering_gaps.py on a frozen Debug build of ec90975 (artifacts/gx4), 80/80 steps, in an owned scratch CPU 1511-1 PN V4.1. Tag tables: tag_table_create of an empty table, tag_table_rename and tag_table_delete of the emptied table, with refusals (default-table name in other case, case-only duplicate, rename onto the default table, missing table, non-empty TagTableNotEmpty, DefaultTagTable) and a created table restored from its checkpoint. Compile-only: device_compile and project_compile of the station with zero errors, no mutation stage and unchanged blocks, types and tag tables; refusals for a payload, a missing device and compile=false. CPU parameters: hardware_cpu_parameters sets CycleMaximumCycleTime 200, CycleMinimumCycleTime 5, CycleCommunicationLoad 30, CycleEnableMinimumCycleTime false (V21 then undeclares CycleMinimumCycleTime), StartupActionAfterPowerOn 1, StartupComparisonPresetToActualModule 1, StartupConfigurationTimeout 30000, TimeOfDayActivateDaylightSavingTime false, TimeOfDayLocalTimeZone 23 and TimeSynchronizationNtpV2 1, each device-compiled with configured-hardware preservation and native readback; refusals for an attribute outside the subset, an unchanged value, null, the rack, Disabled access control, a minimum cycle time while disabled and enabling it without a value; a fresh Portal reopens identical parameters, blocks, types and tag tables; one parameter change is restored from its checkpoint and the original values return in one combined change. Recorded native outcomes: PlcAccessControlConfiguration EnabledWithAccessControlViaAccessLevel fails compilation (full-access password required) and is restored; hmi_compile of a TP700 Comfort and an MTP700 Unified Basic created by hardware_add returns TIA's compile errors (no start screen; the Unified panel also its runtime password) as CompileFailed, and both restore from their checkpoints."
+      },
+      "artifacts": [
+        "evidence/local.engineering_gaps.20261029.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21; other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "The CPU protection level cannot be changed through this route: V21 compiles access-level modes only with a full-access password, and the route never accepts passwords.",
+        "No successful HMI compilation: panels created through Openness have no start screen (the Unified panel also lacks its runtime password), and screen creation stays behind the closed HMI preservation gate; hmi_compile is not qualified by this run.",
+        "Runtime effects of the CPU parameters are not observed; tag tables are exercised at PLC-root scope only."
+      ]
+    },
+    {
+      "id": "local.plcsim_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e38adf24e90bcc83a00a369481a64912910b5dd8",
+        "passedScope": "scripts/qualify_plcsim_gaps.py on a frozen Debug build of e38adf2 (artifacts/gs3), 73/73 steps, on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1 with a central DI 16x24VDC HF, an ET 200SP IM 155-6 PN ST station on the CPU's IO system, GapDb (counters, IEC TON, DTL), Main and interrupt OBs 40/82/83/86 imported with their event classes; card download, credential provisioning, power on and RUN as in the D09 runner. change.simulation_download_online (compile=false, save=false, runtime-user login, TLS never trusted): a Main change downloads with softwareScope changes and keepActualValues in RUN (ConsistentBlocksDownload answered, a kept counter 7, ProgramVersion 2); a GapDb layout change with keepActualValues answers TIA's DataBlockReinitializationOrKeepActualValues with KeepActualValues and keeps 7; a further layout change with reinitialize and allowStop answers StopPlcAndReinitialize, resets the counter to 0 and returns to RUN; plc_online_compare afterwards reports FolderContentsIdentical; refusals without a ticket, reinitialize without allowStop and compile/save=true. sim_test runs a 5 s TON scenario on the wall clock (5.97 s) and twice with virtualTime (TimespanSynchronized_C, 13 and 14 StartProcessing spans, 5.90 s virtual, previous mode restored); sim_time scaleFactor 10 completes the timer within 1.25 s of wall time and is restored to 1; systemTimeUtc 2031-06-15 is read by RD_SYS_T as year 2031. sim_event raises OB82 (diagnosticAlarm, +1), OB83 (pull and plug, +2) on the DI module and OB86 (station fault and return, +2) on the ET 200SP IO device, each changing only its own counter; a malformed event refuses before the runtime call. sim_state memoryReset restarts with start values and the downloaded program. sim_storage archives the powered-off card (791 737-byte zip with receipt), refuses a wrong hash, retrieves it with an unchanged ownership marker, and the retrieved card runs the online-downloaded program. The instance is released with deleteOwned."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.20261029.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1, provisioned with first-use TLS trust under the owned-empty-CPU policy; other CPUs, firmware and TCP/IP instances are not qualified.",
+        "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt is configured and PLCSIM answers ProcessEvent with NotSupportedByModule (-55); OB40 does not run. statusEvent on the central DI module is answered NotSupportedByModule as well (OB55 is for distributed modules).",
+        "Virtual-time scenarios at scale factor 1 run at wall-clock speed in deterministic StartProcessing spans; the speed-up comes from scaleFactor, and the combination of both is not exercised. Scan-exact timing is not claimed.",
+        "Each online download must start within the 15-minute ticket from sim_create; after a program change PLCSIM answers NotUpToDate until its tag list is refreshed with sim_tags. Archive and retrieve restore the same state that was archived; a cross-state restore is not exercised."
+      ]
+    },
+    {
+      "id": "local.plcsim_gaps.recovery.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ad7096c5e3b43c067b11177d277c50576fa6e642",
+        "passedScope": "Recovery top-up of local.plcsim_gaps.20261029: scripts/qualify_plcsim_gaps.py on a frozen Debug build of ad7096c (artifacts/gs4), 74/74 steps, same fixture and checks on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus. Added after the reinitialized online download: change_status keeps its applied state and checkpoint archive; change_restore retrieves the checkpoint into a new directory while the CPU keeps the downloaded program (ProgramVersion 2, reinitialized counter 0); a simulation_download_online prepared from the recovered copy refuses with SimulationTargetMismatch, because that copy is not the project that produced the instance's card; plc_online_compare of the recovered project reports FolderContentsIdentical (the checkpoint was taken after the layout change and before its download). Every other step of the 29 October run (code change keeping values, kept and reinitialized layout changes, virtual time, OB82/OB83/OB86, memory reset, storage archive and retrieve) passed again."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.recovery.20261029.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1; other CPUs, firmware and TCP/IP instances are not qualified.",
+        "The online download is a CPU write: change_restore recovers only the project, and the recovered copy can no longer download to the instance whose card came from the original project.",
+        "OB40 stays a V21 boundary (no hardware-interrupt configuration through V21 Openness; PLCSIM answers NotSupportedByModule)."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.families.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0; CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0; ET 200MP IM 155-5 PN ST 6ES7 155-5AA01-0AB0",
+        "firmware": "V4.1; V4.7; V4.1",
+        "sourceCommit": "556cee52b14c386ce48b846b14b08c4cc469b344",
+        "passedScope": "scripts/qualify_hardware_changes.py on a frozen Debug build of 556cee5 (artifacts/x4), 276/276 steps: the S7-1500 gates of local.hardware_changes.20261028 plus a CPU 1214C DC/DC/DC V4.7 with two SM 1221 DI16x24VDC (successor-article replacement 6ES7 221-1BH30 V1.0 to -1BH32 V2.0 and back, port link to the scratch CPU, last-module delete) and an ET 200MP IM 155-5 PN ST V4.1 station assigned to a new IO system of the added CPU 1511-1 PN (two DI 16x24VDC HF, firmware replacement V1.0/V2.0, port link to that CPU, last-module delete); every change with asserted preview, checkpoint, device compile and save (the unassigned station's add and node change deferred to the assignment), exact state deltas, fresh-Portal reopen and per-family checkpoint restore; typed refusals change nothing."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.families.20261029.json"
+      ],
+      "limitations": [
+        "Families: CPU 1511-1 PN V4.1, CPU 1214C DC/DC/DC V4.7 and one ET 200MP IM 155-5 PN ST V4.1 station on one IO controller; ET 200SP on a second controller, shared devices, HMI, drive and GSD devices are not exercised.",
+        "The ET 200MP station's hardware_add and network_configure apply without compile and save, because an unassigned IO device fails the device compile; network_io_assign compiles and saves them.",
+        "hardware_replace only to versions or successor articles that keep the addresses; acceptLoss and address-changing replacements are not exercised.",
+        "CalculatedBandwidthForCyclicIoData of the IO controller interface is computed at the device compile and not saved, so it is not compared.",
+        "Engineering only; nothing is downloaded and no physical topology is observed."
+      ]
     }
   ],
   "features": [
@@ -4605,7 +4855,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.provision.20261024"
+          "local.sim.provision.20261024",
+          "local.runtime.timers.20261029"
         ]
       },
       "availability": {
@@ -4703,7 +4954,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.online.compare.20261029"
+          "local.online.compare.20261029",
+          "local.online.snapshots.20261029"
         ]
       },
       "availability": {
@@ -4742,17 +4994,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Requires an empty worker-owned Portal; creates a new project under the artifact root and never opens or changes an existing project. Goes through shared mutation admission; a structured failure is a returned outcome, while a lost worker leaves the admission unknown with no reconciliation adapter.",
-          "Same owned-instance, observer-endpoint and fail-closed TLS/login rules as plc_online_compare. Missing products are answered NoAction and make the result partial; any other upload request (passwords included) fails the upload.",
+          "Same owned-instance, observer-endpoint and fail-closed TLS/login rules as plc_online_compare, except the opt-in trustOwnedSimulationCertificate (explicit user authorization, default false): after the owned instance and its address are revalidated, exactly one offered certificate within its validity interval is trusted and pinned for this upload attempt, later challenges must present it; a challenge offering no certificate is trusted as unauthenticated TLS for that owned instance only (maintainer decision of 29 October 2026, \"Allow, owned PLCSIM only\"); more than one certificate refuses, and no trust starts after the login was answered. Missing products are answered NoAction and make the result partial; any other upload request (passwords included) fails the upload.",
           "Every upload message is kept (bounded at 10000 with explicit truncation) in the response and station-upload.json; the partial destination project is saved and retained on failure.",
           "Uploaded hardware/software completeness, compile and reopen of the new project are not verified.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does.",
+          "Native (29 October 2026, local.online.upload.20261029): in an empty owned Portal the one TlsVerificationConfiguration challenge offered no certificate ('certificate not matching') and was trusted as unauthenticated TLS for the revalidated owned instance; after one runtime-user login the upload succeeded with no errors or warnings and the uploaded blocks equal the downloaded ones. An earlier run the same day without certificate-less trust refused at that challenge."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.upload.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -5058,13 +5312,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "memoryReset (owned instances only) restarts the virtual controller through IInstance.MemoryReset; natively it returned the instance with start values and the online-downloaded program (local.plcsim_gaps.20261029)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.state.rerun.20261028"
+          "local.sim.state.rerun.20261028",
+          "local.plcsim_gaps.20261029"
         ]
       },
       "availability": {
@@ -5230,14 +5486,16 @@
         "status": "implemented",
         "limitations": [
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "virtualTime=true (owned instances only) runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.sim.provision.20261024",
-          "local.sim.state.rerun.20261028"
+          "local.sim.state.rerun.20261028",
+          "local.plcsim_gaps.20261029"
         ]
       },
       "availability": {
@@ -5296,6 +5554,144 @@
         "AC-identity",
         "AC-completeness",
         "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_time",
+      "domain": "simulation",
+      "title": "Read and set the virtual clock of an owned simulated CPU",
+      "mcpTools": [
+        "sim_time"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ScaleFactor and IInstance.SystemTime; virtual-time scenarios use OperatingMode TimespanSynchronized_C, StartProcessing and the sync-point event."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "scaleFactor 10 completed a 5 s IEC TON within 1.25 s of wall time and was restored to 1; systemTimeUtc 2031-06-15 was read by RD_SYS_T as year 2031. The virtual system time is reported without a time-zone kind.",
+          "Reads any selected instance; writes need an instance this worker created or adopted, in its admitted network mode, and no active cycle-synchronous capture.",
+          "scaleFactor is greater than 0 and at most 1000 and acts in the default operating mode from the next cycle control point; systemTimeUtc is an explicit UTC instant from 1970 to 2200. Both are read back.",
+          "Virtual-time stepping itself is a sim_test option (virtualTime); sim_time never changes the operating mode."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_event",
+      "domain": "simulation",
+      "title": "Inject interrupts and faults into an owned running simulated CPU",
+      "mcpTools": [
+        "sim_event"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ProcessEvent, PullOrPlugEvent, RackOrStationFaultEvent, AlarmNotification, StatusEvent and GetConfiguredProcessEvents."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "OB82 (diagnosticAlarm), OB83 (pull and plug) on a central DI 16x24VDC HF and OB86 (station fault and return) on an ET 200SP IO device each raised only their own counter. Hardware IDs come from the PLC's system constants.",
+          "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt can be configured; PLCSIM answers ProcessEvent with NotSupportedByModule (-55) and OB40 does not run. statusEvent on the central module is answered NotSupportedByModule as well (OB55 serves distributed modules).",
+          "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
+          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_storage",
+      "domain": "simulation",
+      "title": "Archive and retrieve the virtual memory card of an owned simulated CPU",
+      "mcpTools": [
+        "sim_storage"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ArchiveStorage and RetrieveStorage (instance powered off)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "A powered-off card archived (791 737-byte zip with receipt), a wrong hash was refused, and the retrieved card powered on and ran the online-downloaded program with an unchanged ownership marker. Only a restore of the archived state itself is exercised.",
+          "Owned instances in OFF only. Archive writes a new .zip and a receipt (path, size, SHA-256) to the Host's simulation-archives directory.",
+          "Retrieve accepts only an unchanged archive written there from the same owned instance (expectedSha256 required); the instance's storage path and ownership marker must be unchanged afterwards."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
@@ -5763,6 +6159,153 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_create",
+      "domain": "data",
+      "title": "Create an empty PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTableComposition.Create."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope, with refusals for a case-only duplicate and the default table's name; checkpoint recovery restores the project without the created table.",
+          "Payload tagTableName and optional scopePath/groupPath; the name must be free in the software scope across every tag-table group (case-insensitive). compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_rename",
+      "domain": "data",
+      "title": "Rename a PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_rename",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTable.Name setter."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope, with refusals for a missing table and a rename onto the default table.",
+          "Payload tagTableName or tagTablePath and newName; the table keeps its members and newName must be free in the software scope. compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_delete",
+      "domain": "data",
+      "title": "Delete an empty PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTable.Delete."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope on an emptied table, with refusals for a non-empty table (TagTableNotEmpty) and the default tag table (DefaultTagTable).",
+          "Payload tagTableName or tagTablePath; only an empty user table (no tags, no user constants) is deleted and the default tag table never. compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
         ]
       },
       "availability": {
@@ -6273,7 +6816,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. An unassigned IO device (ET 200SP head) does not compile on its own; other device families are not exercised.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. A CPU 1214C DC/DC/DC V4.7 with configureScratchSecurity and an ET 200MP IM 155-5 PN ST V4.1 head (applied without compile until its IO assignment, because an unassigned IO device fails the device compile) passed the same gates (local.hardware_changes.families.20261029); HMI, drive and GSD devices are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -6283,7 +6826,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6337,7 +6881,8 @@
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
           "local.remote-io.full-route.rerun.20261028",
-          "local.remote-io.lifecycle.rerun.20261028"
+          "local.remote-io.lifecycle.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6388,7 +6933,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6441,7 +6987,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -6495,7 +7042,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.milestones.rerun.20261028"
+          "local.milestones.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -9787,7 +10335,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
@@ -9847,7 +10395,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "Native V13 libraries are refused before any native call (LibraryVersionUnsupported, local.library_compatibility.20261027). V14 SP1-V18 (local.library_upgrades.20261024) and V19 (local.library_vendor.20261025) upgrades are qualified; V20 upgrades stay open because no V20 library input is available."
@@ -9906,7 +10454,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."
@@ -9961,11 +10509,11 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 project with a second CPU and an owned user global library (local.library_preservation.20261028): exact independent PLC and library snapshot diffs around each change, stale-identity and wrong-previewHash refusals, fresh reopen and checkpoint restore of one change of this kind.",
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029).",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -9987,7 +10535,8 @@
           "local.library_units.rerun.20261029",
           "local.library_unit_relations.rerun.20261029",
           "local.library_protected.rerun.20261029",
-          "local.library_scopes.rerun.20261029"
+          "local.library_scopes.rerun.20261029",
+          "local.library_units.namespace.20261029"
         ]
       },
       "availability": {
@@ -10034,7 +10583,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."
@@ -10051,7 +10600,9 @@
           "local.library_units.rerun.20261029",
           "local.library_unit_relations.rerun.20261029",
           "local.library_protected.rerun.20261029",
-          "local.library_scopes.rerun.20261029"
+          "local.library_scopes.rerun.20261029",
+          "local.library_scopes.forced.20261029",
+          "local.library_units.namespace.20261029"
         ]
       },
       "availability": {
@@ -10097,7 +10648,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs only on a Host started with --enable-library-integrate-apply and only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
           "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentRecoveryAnchorUnavailable, ComponentMultiInstanceUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
@@ -10209,7 +10760,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10270,7 +10821,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -10332,7 +10883,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10391,7 +10942,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10452,7 +11003,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10509,7 +11060,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10568,7 +11119,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10625,7 +11176,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10682,7 +11233,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10841,7 +11392,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged."
@@ -10902,7 +11453,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
         ]
@@ -10956,7 +11507,7 @@
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
-          "PLC update is limited to the selected source default and entire selected PLC; forced downgrades and automatic old-version deletion are not exposed.",
+          "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only."
@@ -11694,10 +12245,10 @@
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
-          "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
+          "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. Created TONR/R_TRIG/F_TRIG storage additionally needs a captured IEC dependent-instance effect member. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
         ]
       },
       "qualification": {
@@ -11735,7 +12286,10 @@
           "local.typed.wave9.engineering.rerun.20261029",
           "local.typed.native-boundaries.rerun.20261029",
           "local.typed.resolution.rerun.20261029",
-          "local.typed.wave9.runtime.20261029"
+          "local.typed.wave9.runtime.20261029",
+          "local.typed.resolution-stale.20261029",
+          "local.typed.iec-effect-standard-wave9.20261029",
+          "local.typed.wave9-created-storage.engineering.20261029"
         ]
       },
       "availability": {
@@ -12135,6 +12689,58 @@
       ]
     },
     {
+      "featureId": "change.hardware_cpu_parameters",
+      "domain": "hardware",
+      "title": "Set reviewed CPU parameters",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hardware_cpu_parameters",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base typed attribute API on CPU device items."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Reviewed subset: CycleMaximumCycleTime, CycleMinimumCycleTime, CycleEnableMinimumCycleTime, CycleCommunicationLoad, StartupActionAfterPowerOn, StartupComparisonPresetToActualModule, StartupConfigurationTimeout, TimeSynchronizationNtpV2, TimeOfDayLocalTimeZone, TimeOfDayActivateDaylightSavingTime and PlcAccessControlConfiguration, each only where the selected item declares it. Coded values are V21's own numbers; V21 refused StartupActionAfterPowerOn = 2 in its setter (29 October 2026).",
+          "CycleMinimumCycleTime exists only while CycleEnableMinimumCycleTime is true: disabling drops it, a value for a disabled flag is refused, and enabling needs an explicit value (the flag is written first). A zone without daylight saving makes TIA switch TimeOfDayActivateDaylightSavingTime off, so request both together; any other dependent change fails preservation and needs checkpoint recovery.",
+          "PlcAccessControlConfiguration accepts only the exact names of the enabled access-control modes, never Disabled or a number. Changing the protection level is a recorded boundary: V21 compiles the access-level modes only with a full-access password, and this route never accepts passwords (the change fails compilation and is restored from its checkpoint).",
+          "Device compilation and configured-hardware preservation are mandatory; the runtime effect of the parameters is not observed.",
+          "Device compilation and configured-hardware preservation (identities, slots, reviewed attributes including the parameter subset, addresses and network associations) are mandatory; the runtime effect is not observed by this kind."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "change.hardware_port_connect",
       "domain": "hardware",
       "title": "Connect two exact network ports",
@@ -12164,7 +12770,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12216,7 +12823,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12259,6 +12867,7 @@
         "status": "partial",
         "limitations": [
           "One pluggable module in an existing rack; built-in and software-bearing items are refused. typeIdentifier must be an exact installed catalog identifier different from the current one.",
+          "SM 1221 DI16x24VDC 6ES7 221-1BH30-0XB0 V1.0 replaced by its successor article 6ES7 221-1BH32-0XB0 V2.0 and back in a CPU 1214C rack, and DI 16x24VDC HF firmware V1.0/V2.0 in an ET 200MP rack (local.hardware_changes.families.20261029).",
           "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
           "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
           "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
@@ -12268,7 +12877,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.hardware_changes.20261028"
+          "local.hardware_changes.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -12415,6 +13025,7 @@
         "status": "partial",
         "limitations": [
           "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract; shared-device and multi-controller assignments remain excluded.",
+          "A second S7-1500 CPU (not the scratch CPU, selected by its plcPath) assigning an ET 200MP IM 155-5 PN ST V4.1 to a new IO system passed with exact state deltas, reopen and restore (local.hardware_changes.families.20261029); the assignment sets SharedDeviceAccessType PLC on the head's items and adds the IO-system and station system constants to the controller's PLC.",
           "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation. Shared-device/multi-controller configurations remain excluded.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
@@ -12426,7 +13037,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.remote-io.full-route.rerun.20261028",
-          "local.remote-io.lifecycle.rerun.20261028"
+          "local.remote-io.lifecycle.rerun.20261028",
+          "local.hardware_changes.families.20261029"
         ]
       },
       "availability": {
@@ -18924,16 +19536,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Exports the snapshot stored on the offline DB (taken in TIA or by change kind db_snapshot_create); it is not a current CPU read, never goes online and leaves the project unchanged. A DB without a stored snapshot refuses with DbSnapshotUnavailable.",
           "The record binds the export's project path, PLC path and DB path to the selected saved review DB. It proves neither CPU/program identity nor freshness, structural compatibility or XSD conformance; all verification flags stay false.",
-          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Exported with WithDefaults and WithReadOnly (the snapshot values and date are read-only attributes); exports differ in DocumentInfo/Created, so loads compare the InterfaceSnapshot element. A DB without a stored snapshot (empty SnapshotValues dated 0001-01-01) refuses with DbSnapshotUnavailable.",
+          "Native (29 October 2026, local.online.snapshots.20261029): the capture of a DB on an owned PLCSIM scratch reviewed Count = 42 after db_snapshot_create; arrays, structures and a DB that already held a snapshot are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18973,17 +19586,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Payload: exact blockPath of a standard GlobalDB/InstanceDB/ArrayDB and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
-          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS trust and logins rejected, always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
-          "CreateSnapshot replaces the snapshot stored in the project. The previous snapshot export is kept as a backup; the readback export must differ from it. Recovery is the project checkpoint archive.",
+          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS answered NonTrusted, and the one project-user login answered with the owned instance's generated runtime user (runtimeCredentialMetadataPath), always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
+          "CreateSnapshot replaces the snapshot stored in the project. A previous snapshot is backed up only if one exists (previousSnapshotExported false otherwise); the readback export must differ from it. Recovery is the project checkpoint archive.",
           "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Native (29 October 2026, local.online.snapshots.20261029): logged in as the runtime user, the create stored Count = 42 with checkpoint, compile and save, and the checkpoint restore left the DB without a snapshot. Replacing an existing snapshot is not exercised natively."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19027,17 +19641,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Writes CPU values. Payload: snapshotRecordId of a db_snapshot_capture review, acknowledgeActualValueWrite=true and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
           "The Host reopens the review and binds blockPath, project path and snapshot SHA-256 from it; supplied-upload reviews refuse with DbSnapshotSourceRequired and another DB with DbSnapshotIdentityMismatch. Prepare and apply re-export the stored snapshot and refuse with DbSnapshotChanged unless its hash equals the reviewed capture.",
-          "No public V21 API reads actual values back, so the write is reported, not verified. The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false, so the applied PLCSIM route is never saved.",
+          "No public V21 API reads actual values back, so the write is reported by TIA; PLCSIM read the loaded value back natively (its tag list is NotUpToDate (-47) after the load until sim_tags refreshes it). The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false.",
           "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "The Host binds the reviewed snapshot's SHA-256 and retained file; prepare and apply refuse with DbSnapshotChanged unless that file keeps its hash and its InterfaceSnapshot element equals a fresh export's.",
+          "Native (29 October 2026, local.online.snapshots.20261029): with Count set to 7 in PLCSIM, loading the captured snapshot (Count = 42) as actual values read back 42."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19059,6 +19675,63 @@
         "AC-native",
         "AC-recovery",
         "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.simulation_download_online",
+      "domain": "simulation",
+      "title": "Download a changed program online to an existing owned PLCSIM instance",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "simulation_download_online",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DownloadProvider.Download(IConfiguration, pre, post, DownloadOptions) on the PLC's PN/IE / PLCSIM (1) target interface, with the typed download configurations."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029, local.plcsim_gaps.recovery.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "Native outcomes: a code change downloads in RUN keeping actual values (TIA asks only ConsistentBlocksDownload); a layout change answers DataBlockReinitializationOrKeepActualValues with KeepActualValues or, with reinitialize and allowStop, StopPlcAndReinitialize and returns to RUN; plc_online_compare reports FolderContentsIdentical. change_restore recovers only the project into a new directory: the CPU keeps the downloaded program, and the recovered copy refuses further online downloads with SimulationTargetMismatch.",
+          "After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Softbus only, like plc_online_compare.",
+          "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
+          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
+          "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
+          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029",
+          "local.plcsim_gaps.recovery.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "PLCSIM Advanced V8 API and authorized Windows user"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence",
+        "AC-runtime"
       ]
     },
     {
@@ -20164,6 +20837,153 @@
       ]
     },
     {
+      "featureId": "change.device_compile",
+      "domain": "engineering",
+      "title": "Checkpoint and compile one device (station hardware and software)",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "device_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Uses Device.GetService<ICompilable>() for the exact device of the device compiler inventory."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified on the scratch station (CPU 1511-1 PN): zero errors, no mutation stage, unchanged blocks, types and tag tables, and refusals for a missing device and compile=false.",
+          "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_compile",
+      "domain": "engineering",
+      "title": "Checkpoint and compile every device of the project",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "project_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Uses Device.GetService<ICompilable>() for every device of the device compiler inventory, in order."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified on a one-station project. A project whose devices do not all compile (for example an HMI panel without a start screen) fails with CompileFailed and needs checkpoint recovery.",
+          "Empty payload; compile=true. Every device needs a compiler service and the inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hmi_compile",
+      "domain": "hmi",
+      "title": "Checkpoint and compile one HMI target",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hmi_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Classic HMI software ICompilable or, for Unified, the owning device's ICompilable (the documented hardware-and-software route)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified.",
+          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile is not qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "The HMI family's optional engineering product installed"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "hmi_component_review",
       "domain": "hmi",
       "title": "Review component/interface-to-HMI proposals",
@@ -20289,8 +21109,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20331,8 +21153,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20373,8 +21197,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20415,8 +21241,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20457,8 +21285,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20500,8 +21330,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20541,8 +21373,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20584,8 +21418,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20626,8 +21462,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20668,8 +21506,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20716,8 +21556,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20758,8 +21600,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20800,8 +21644,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20841,8 +21687,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20883,8 +21731,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20925,8 +21775,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22308,8 +23160,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22351,8 +23205,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22394,8 +23250,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22437,8 +23295,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22480,8 +23340,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22524,8 +23386,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22566,8 +23430,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22609,8 +23475,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22652,8 +23520,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22694,8 +23564,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22735,8 +23607,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22776,8 +23650,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22817,8 +23693,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22858,8 +23736,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22900,8 +23780,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22941,8 +23823,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22982,8 +23866,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23023,8 +23909,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

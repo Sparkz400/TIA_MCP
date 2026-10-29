@@ -1,0 +1,127 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_units.namespace.20261029",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T17:45:16+00:00",
+  "source": {
+    "commit": "49fc2069d07895f2665c26cdb69ec9bbd825becc",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Library consumption in a software unit with an explicit instance namespace (qualify_library_units.py at 49fc206, build 49fc206 frozen at artifacts/lx2, 57/57 steps): LibraryUnitSeeder creates unit TiaMcp_LibUnit with namespace preset TiaMcp_LibUnit. The UDT 1.0.0 instantiated into the unit without a namespace keeps its type's empty namespace (the preset is not applied). library_instantiate with namespace in the PLC root is refused (TargetIncompatible) and a malformed namespace is refused (InvalidRequest), both without a native change. With namespace=TiaMcp_LibUnit the preview declares instanceNamespace for the FB (type namespace empty, unit preset TiaMcp_LibUnit); apply creates FB 1.0.0 in the unit under /namespaces/TiaMcp_LibUnit/ with its exact version link while the UDT stays outside a namespace. The FB in the PLC root and a second UDT copy are refused (LibraryConflict), a PLC-wide update is refused while unit uses have no OB-rooted reference (LibraryUpdateCleanupRisk) and copies no version. The instantiation's checkpoint restores the project with the UDT only into a fresh owned TIA; a fresh reopen of the saved project shows the namespaced FB and the UDT with one exact FB use.",
+  "limitations": [
+    "One software unit without unit relations; unit uses are conservatively unreachable for updates.",
+    "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
+    "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
+    "No runtime execution."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3c1ab3a66d711bef7f09c03e565571614cf1cd8166dc3e3806a13b1bc3b8f7bd"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "80afc0b2b16d97164b3cdffc8924a28d0493abb702ff55eea6e12665a136bfbc"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "3aded0affbacadcc44d9ccb12cce7609d0aebfdcbc6785736d037c463919bacd"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "15b78a1fa8642d89f9acf3693d95ae5f8dfa9e516cda8b9ea49774e80941563f",
+      "bytes": 541466,
+      "completed": true,
+      "steps": [
+        "start owned TIA authoring",
+        "create owned scratch authoring",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create_type",
+        "apply library_create_type",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_create",
+        "apply library_create",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_archive",
+        "apply library_archive",
+        "prepare library_edit_version",
+        "prepare library_release_version",
+        "apply library_release_version",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_publish",
+        "apply library_publish",
+        "prepare library_set_default",
+        "apply library_set_default",
+        "prepare library_archive",
+        "apply library_archive",
+        "close authoring session",
+        "start owned TIA consumer",
+        "create owned scratch consumer",
+        "seed software unit TiaMcp_LibUnit",
+        "open staged archive",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "refuse an explicit namespace in the PLC root",
+        "refuse a malformed namespace",
+        "prepare library_instantiate",
+        "preview declares namespace TiaMcp_LibUnit for the FB",
+        "apply library_instantiate",
+        "the created FB carries the namespace and its exact link",
+        "FB in namespace TiaMcp_LibUnit and UDT without, both in the unit",
+        "FB 1.0.0 used once (in the unit)",
+        "refuse the FB in the PLC root while the unit holds it",
+        "refuse a second UDT copy in the unit",
+        "open staged archive",
+        "refuse an update while unit uses have no OB-rooted reference",
+        "the unit stays at 1.0.0 and no newer version was copied",
+        "close consumer session",
+        "start owned TIA restore",
+        "restore the namespaced instantiation's checkpoint",
+        "restored: the UDT only, no FB",
+        "close restore session",
+        "start owned TIA reopen",
+        "reopen consumer",
+        "reopened: namespaced FB and UDT intact"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_package_inspect",
+        "library_package_stage",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}

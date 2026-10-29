@@ -9,6 +9,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OfflineEvidence.cs" Link="OfflineEvidence.cs" />
+    <Compile Include="../../src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs" Link="SimulationRuntimeControl.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/AlarmWorkbook.cs" Link="AlarmWorkbook.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/DependencyRules.cs" Link="DependencyRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryJournalStore.cs" Link="LibraryJournalStore.cs" />
@@ -41,6 +42,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringPaths.cs" Link="EngineeringPaths.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.SimulationCheckpoint.cs" Link="OpennessSession.SimulationCheckpoint.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/SimulationOnlineLogin.cs" Link="SimulationOnlineLogin.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/SimulationTlsPin.cs" Link="SimulationTlsPin.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/NativeRuntimeLifetime.cs" Link="NativeRuntimeLifetime.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/CapturedProcessIdentity.cs" Link="CapturedProcessIdentity.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.AddInOwner.cs" Link="OpennessSession.AddInOwner.cs" />

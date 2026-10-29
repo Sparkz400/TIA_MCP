@@ -58,7 +58,10 @@ sections: `updateImpact`, `updateBaseline` and `updateCleanupGuard`. Explicit
 `update-plan` and `update-change` modes add operation validation, dependency/use
 binding and graph traversal of recorded reference edges. Changed callers cannot
 supply proof edges; all baseline library uses must be reachable from the reported
-OB roots. Missing native comparisons retain an incomplete result. These modes
+OB roots. Missing native comparisons retain an incomplete result. A `forceDefault`
+type must be a selected root of a forced payload; its `defaultEffect` must match the
+recorded project default before, and only forced roots may skip the newest-release and
+newer-project-default rules. Peer PLC uses are checked for distinct non-selected PLCs. These modes
 do not execute compiler checks, independently identify native OBs/references,
 validate post-update readback or prove arbitrary content preservation. Use the
 separate compiler modes when checking compiler evidence.

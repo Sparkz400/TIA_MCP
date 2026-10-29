@@ -13,15 +13,19 @@ namespace TiaMcp.Simulation
         internal const string MarkerName = ".tiamcp-instance.json";
         private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("TiaMcp.Simulation.V8.MemoryCard.v1");
 
-        internal static JObject Create(int id, string name, string storagePath)
+        internal static JObject Create(int id, string name, string storagePath, string communicationInterface = "Softbus")
         {
             var marker = new JObject { ["schemaVersion"] = 1, ["instanceId"] = id, ["instanceName"] = name,
                 ["storagePath"] = Path.GetFullPath(storagePath), ["nonce"] = Guid.NewGuid().ToString("N"),
                 ["issuedAtUtc"] = DateTime.UtcNow.ToString("O"), ["expiresAtUtc"] = DateTime.UtcNow.AddMinutes(15).ToString("O") };
+            // Softbus markers stay byte-compatible; only a TCP/IP creation names its interface for the engineering worker.
+            if (communicationInterface != "Softbus") marker["communicationInterface"] = communicationInterface;
             using (var output = new StreamWriter(new FileStream(Path.Combine(storagePath, MarkerName), FileMode.CreateNew, FileAccess.Write, FileShare.Read), new UTF8Encoding(false)))
                 output.Write(marker.ToString(Newtonsoft.Json.Formatting.None));
             return marker;
         }
+
+        internal static string Interface(JObject marker) => marker.Value<string>("communicationInterface") ?? "Softbus";
 
         internal static string Encode(JObject marker) => Convert.ToBase64String(ProtectedData.Protect(
             Encoding.UTF8.GetBytes(marker.ToString(Newtonsoft.Json.Formatting.None)), Entropy, DataProtectionScope.CurrentUser));

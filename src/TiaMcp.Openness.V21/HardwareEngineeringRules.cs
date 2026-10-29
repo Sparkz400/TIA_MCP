@@ -9,7 +9,7 @@ namespace TiaMcp.Openness.V21
     // This deliberately makes no claim about unexposed vendor payloads or wiring.
     internal static class HardwareEngineeringRules
     {
-        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
+        internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes", "hardware_cpu_parameters",
             "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
             "hardware_transfer_area_create", "hardware_transfer_area_delete" }.Contains(kind);
 
@@ -66,6 +66,60 @@ namespace TiaMcp.Openness.V21
             if (effective["SystemMemoryByteAddress"] != null && effective["ClockMemoryByteAddress"] != null &&
                 effective.Value<long>("SystemMemoryByteAddress") == effective.Value<long>("ClockMemoryByteAddress"))
                 throw new BridgeException("AddressConflict", "System memory and clock memory must use different bit-memory bytes.");
+        }
+
+        // Reviewed V21 CPU parameter attributes: cycle monitoring, minimum cycle time, startup, time synchronization and
+        // access protection. The names are the native ones declared on S7-1500 CPU device items (observed 29 October 2026).
+        internal static readonly string[] CpuParameterAttributes = {
+            "CycleMaximumCycleTime", "CycleMinimumCycleTime", "CycleEnableMinimumCycleTime", "CycleCommunicationLoad",
+            "StartupActionAfterPowerOn", "StartupComparisonPresetToActualModule", "StartupConfigurationTimeout",
+            "TimeSynchronizationNtpV2", "TimeOfDayLocalTimeZone", "TimeOfDayActivateDaylightSavingTime",
+            "PlcAccessControlConfiguration" };
+
+        internal static void RequireCpuParameterRequest(JObject requested)
+        {
+            if (requested == null || requested.Count == 0) throw new BridgeException("InvalidRequest", "At least one CPU parameter is required.");
+            foreach (var property in requested.Properties())
+            {
+                if (Array.IndexOf(CpuParameterAttributes, property.Name) < 0)
+                    throw new BridgeException("UnsupportedAttribute", "Attribute is outside the reviewed CPU parameter subset: " + property.Name);
+                if (!(property.Value is JValue) || property.Value.Type == JTokenType.Null)
+                    throw new BridgeException("InvalidRequest", property.Name + " must be a non-null scalar.");
+                // Like scratch security, this route never removes CPU access protection: only the exact names of the enabled
+                // V21 modes are admitted, never Disabled, a number or another spelling the native conversion might accept.
+                if (property.Name == "PlcAccessControlConfiguration" && (property.Value.Type != JTokenType.String || Array.IndexOf(EnabledAccessControl, property.Value.Value<string>()) < 0))
+                    throw new BridgeException("ProtectionDowngradeRefused", "PlcAccessControlConfiguration accepts only an enabled access-control mode by its exact name: " + string.Join(", ", EnabledAccessControl) + ".");
+            }
+        }
+
+        private static readonly string[] EnabledAccessControl = { "EnabledWithAccessControl", "EnabledWithAccessControlViaAccessLevel",
+            "EnabledWithAccessControlAndCentralUser", "EnabledWithAccessControlViaAccessLevelAndCentralUsers",
+            "EnabledWithAccessControlAndLocalWithCentralUsers", "EnabledWithAccessControlViaAccessLevelAndLocalWithCentralUsers" };
+
+        // V21 declares CycleMinimumCycleTime only while CycleEnableMinimumCycleTime is true (observed 29 October 2026).
+        internal const string MinimumCycleFlag = "CycleEnableMinimumCycleTime", MinimumCycleTime = "CycleMinimumCycleTime";
+
+        // The parameters after the request; a disabled minimum cycle time has no value.
+        internal static JObject CpuParametersAfter(JObject current, JObject requested)
+        {
+            var effective = (JObject)current.DeepClone();
+            foreach (var property in requested.Properties()) effective[property.Name] = property.Value.DeepClone();
+            if (effective[MinimumCycleFlag]?.Type == JTokenType.Boolean && !effective.Value<bool>(MinimumCycleFlag)) effective.Remove(MinimumCycleTime);
+            return effective;
+        }
+
+        // Compares the native-normalized request with the CPU's current declared values (including the minimum cycle flag);
+        // Siemens validates ranges during the write and compile.
+        internal static void RequireCpuParametersChanged(JObject current, JObject normalized)
+        {
+            var flag = normalized[MinimumCycleFlag] ?? current[MinimumCycleFlag];
+            bool enabled = flag?.Type == JTokenType.Boolean && flag.Value<bool>();
+            if (normalized[MinimumCycleTime] != null && flag != null && !enabled)
+                throw new BridgeException("InvalidRequest", MinimumCycleTime + " requires " + MinimumCycleFlag + " to be enabled.");
+            if (enabled && current.Value<bool?>(MinimumCycleFlag) == false && normalized[MinimumCycleTime] == null)
+                throw new BridgeException("InvalidRequest", "Enabling " + MinimumCycleFlag + " requires an explicit " + MinimumCycleTime + ".");
+            if (JToken.DeepEquals(CpuParametersAfter(current, normalized), CpuParametersAfter(current, new JObject())))
+                throw new BridgeException("InvalidRequest", "The requested CPU parameters are unchanged.");
         }
 
         // Newtonsoft's implicit string conversion keeps a String token for a
@@ -130,6 +184,13 @@ namespace TiaMcp.Openness.V21
                 var memory = CpuMemoryBytesAfter(new JObject(((JObject)selected["attributes"]).Properties().Where(p => Array.IndexOf(CpuMemoryByteAttributes, p.Name) >= 0)), (JObject)payload["attributes"]);
                 foreach (string name in CpuMemoryByteAttributes) ((JObject)selected["attributes"]).Remove(name);
                 foreach (var property in memory.Properties()) selected["attributes"][property.Name] = property.Value.DeepClone();
+            }
+            else if (kind == "hardware_cpu_parameters")
+            {
+                var attributes = (JObject)selected["attributes"];
+                var parameters = CpuParametersAfter(new JObject(attributes.Properties().Where(p => Array.IndexOf(CpuParameterAttributes, p.Name) >= 0)), (JObject)payload["attributes"]);
+                foreach (string name in CpuParameterAttributes) attributes.Remove(name);
+                foreach (var property in parameters.Properties()) attributes[property.Name] = property.Value.DeepClone();
             }
             else if (kind == "hardware_address_set")
             {

@@ -1,4 +1,5 @@
-"""Qualify library consumption and update scope across two PLCs of one owned scratch project."""
+"""Qualify library consumption and update scope across two PLCs of one owned scratch project, including the forced
+per-PLC version assignment (a downgrade below the project default) and its checkpoint restore."""
 from __future__ import annotations
 
 import argparse
@@ -32,6 +33,9 @@ def body(h):
     h.apply("library_publish", h.selected(library, [second], destinationLibraryId=global_library))
     h.apply("library_set_default", h.selected(global_library, [second]))
     generation_two = h.archive(global_library)
+    # Pinned: both releases, default 1.0.0 below the highest release.
+    h.apply("library_set_default", h.selected(global_library, [fb]))
+    pinned = h.archive(global_library)
     h.tool("library_close", {"libraryId": global_library})
     h.stage("close authoring session", lambda: h.tool("tia_detach"))
 
@@ -87,14 +91,74 @@ def body(h):
     h.apply("library_update_project", h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": first_plc}))
     h.stage("both PLCs at 1.1.0", lambda: uses_by_plc(second, {first_plc: 1, second_plc: 1}))
     h.tool("library_close", {"libraryId": source})
+
+    def project_default(version):
+        rows = h.versions(consumer, FB)
+        require([x["versionGuid"] for x in rows if x.get("isDefault")] == [version["versionGuid"]], "Project default differs: %s" % rows)
+        return sorted((x["version"], x.get("isDefault")) for x in rows)
+    h.stage("project default FB 1.1.0", lambda: project_default(second))
+
+    # Forced per-PLC version assignment: the pinned source default 1.0.0 is below its own 1.1.0 release and the project default.
+    source = h.open_archive(pinned)
+    def assign(version=fb, scope="entireSelectedPlc", **extra):
+        return h.selected(source, [version], updateScope=scope, target={"plcPath": second_plc}, **extra)
+    h.refuse("refuse the lower source default without forceDefault", "library_update_project", assign(), "VersionSelectionUnsupported", "forceDefault")
+    h.refuse("refuse a non-boolean forceDefault", "library_update_project", assign(forceDefault="true"), "InvalidRequest", "boolean")
+    h.refuse("refuse a non-default version even when forced", "library_update_project", assign(second, forceDefault=True), "VersionSelectionUnsupported", "library_set_default")
+    for scope in ("selectedInstances", "selectedFolder", "softwareUnit"):
+        h.refuse("refuse updateScope " + scope, "library_update_project", assign(scope=scope, forceDefault=True), "NativeScopeTooBroad", "no instance")
+    before = h.stage("capture the first PLC before the forced update", first_plc_snapshot)
+    prepared = h.prepare("library_update_project", assign(forceDefault=True))
+
+    def forced_preview():
+        preview, impact = prepared["preview"], prepared["preview"]["updateImpact"]
+        rows = [t for t in impact["types"] if t["requested"]["typeGuid"] == fb["typeGuid"]]
+        require(impact["forceDefault"] is True and len(rows) == 1 and rows[0]["forceDefault"] is True and rows[0]["defaultEffect"] == "forcedDowngrade"
+                and rows[0]["projectDefaultBefore"]["versionGuid"] == second["versionGuid"] and rows[0]["requested"]["versionGuid"] == fb["versionGuid"],
+                "Preview does not declare the forced downgrade of the project default: %s" % rows)
+        moved = [(u["beforeVersionGuid"], u["requestedVersionGuid"]) for u in impact["affectedUses"] if u["action"] == "update"]
+        require(moved == [(second["versionGuid"], fb["versionGuid"])] and impact["noOp"] is False, "Preview moves other uses: %s" % moved)
+        require([e["forceDefault"] for e in preview["effects"] if e["action"] == "updateAllSelectedTypeUses"] == [True], "Effect lacks forceDefault")
+        peers = preview["updateBaseline"]["peerPlcUses"]
+        require({p["plcPath"] for p in peers} == {first_plc} and {p["versionGuid"] for p in peers} == {second["versionGuid"], udt["versionGuid"]},
+                "Peer PLC baseline differs: %s" % peers)
+        return {"type": rows[0], "peerPlcUses": peers}
+    h.stage("preview declares the forced downgrade and the peer PLC baseline", forced_preview)
+    applied = h.apply_prepared("library_update_project", prepared)
+    readbacks = applied["journal"]["updateReadbacks"]
+    h.stage("every readback phase verified", lambda: require([r["phase"] for r in readbacks if r["verified"]] == ["checkpoint", "native_action", "compile", "save"],
+                                                             "Readbacks: %s" % [(r["phase"], r["verified"]) for r in readbacks]) or len(readbacks))
+    h.stage("only the second PLC moved to 1.0.0", lambda: uses_by_plc(fb, {first_plc: 0, second_plc: 1}))
+    h.stage("the first PLC kept 1.1.0", lambda: uses_by_plc(second, {first_plc: 1, second_plc: 0}))
+    h.stage("the UDT stayed at 1.0.0 in both PLCs", lambda: uses_by_plc(udt, {first_plc: 1, second_plc: 1}))
+    h.stage("project default is the assigned FB 1.0.0", lambda: project_default(fb))
+    after = h.stage("capture the first PLC after the forced update", first_plc_snapshot)
+    require(before == after, "The forced update of the second PLC changed native content of the first PLC")
+    h.report["firstPlcPreservedForced"] = True
+    h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
+
+    # The forced update's checkpoint restores the pre-update project to a new location.
+    h.owned_portal("restore")
+    def restore():
+        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        rows = restored["resources"]
+        require(restored["state"] == "restored_to_new_locations" and [r["kind"] for r in rows] == ["project"] and rows[0]["state"] == "completed",
+                "Checkpoint recovery differs: %s" % restored)
+        return restored
+    h.stage("restore the forced update's checkpoint", restore)
+    consumer = h.project_library()
+    h.stage("restored: both PLCs at 1.1.0, project default 1.1.0", lambda: {"fb": uses_by_plc(second, {first_plc: 1, second_plc: 1}),
+                                                                          "default": project_default(second)})
+    h.stage("close restore session", lambda: h.tool("tia_detach"))
 
     h.owned_portal("reopen")
     h.stage("reopen consumer", lambda: h.reopen_project(project_path))
     consumer = h.project_library()
-    h.stage("reopened: both PLCs at 1.1.0, UDT unchanged", lambda: {"fb": uses_by_plc(second, {first_plc: 1, second_plc: 1}),
-                                                                    "udt": uses_by_plc(udt, {first_plc: 1, second_plc: 1})})
+    h.stage("reopened: second PLC at FB 1.0.0, first at 1.1.0, UDT unchanged, default 1.0.0", lambda: {
+        "assigned": uses_by_plc(fb, {first_plc: 0, second_plc: 1}), "kept": uses_by_plc(second, {first_plc: 1, second_plc: 0}),
+        "udt": uses_by_plc(udt, {first_plc: 1, second_plc: 1}), "default": project_default(fb)})
 
 
 if __name__ == "__main__":
@@ -106,7 +170,8 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "sq_", "V21 library consumption and explicit update scope across two PLCs", [
-        "Software units and namespaces are not exercised: creating a unit needs a native fixture tool whose Openness AllowList key requires an elevated grant.",
+    Harness(args, "sq_", "V21 library consumption, explicit update scope and forced per-PLC version assignment across two PLCs", [
+        "Software units and namespaces are not exercised here (qualify_library_units.py covers them).",
         "Both PLCs use the scratch CPU type; mixed CPU families are not exercised.",
+        "The forced assignment is a downgrade of a root FB whose UDT dependency is unchanged; forced dependency defaults are refused, not exercised.",
         "No runtime execution."], [p for p in (ROOT / "fixtures/libraries/scopes").iterdir()]).run(body)

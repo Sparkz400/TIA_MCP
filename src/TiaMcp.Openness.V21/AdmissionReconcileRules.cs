@@ -12,7 +12,7 @@ namespace TiaMcp.Openness.V21
         private static readonly HashSet<string> TargetKinds = new HashSet<string>(new[] {
             "hmi_engineering", "hardware_attributes", "tag_set", "constant_set",
             "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
-            "db_snapshot_create", "db_snapshot_load_actual", "testsuite_application_import", "testsuite_system_import",
+            "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
             "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize",
             "webserver_page_set", "umac_role_set", "opcua_server_settings_set" }, StringComparer.Ordinal);
 

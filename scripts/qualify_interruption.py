@@ -56,10 +56,10 @@ SCENARIOS = {
 # Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
 TARGET_KINDS = {"hmi_engineering", "hardware_attributes", "tag_set", "constant_set",
                 "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
-                "db_snapshot_create", "db_snapshot_load_actual", "testsuite_application_import", "testsuite_system_import",
+                "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
                 "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize",
                 "webserver_page_set", "umac_role_set", "opcua_server_settings_set"}
-HARDWARE_RULE_KINDS = {"hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes",
+HARDWARE_RULE_KINDS = {"hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes", "hardware_cpu_parameters",
                        "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
                        "hardware_transfer_area_create", "hardware_transfer_area_delete"}
 PROBE, HW_NAME, TO_NAME = "LaneEProbe", "TiaMcp_DI_Fixture", "TiaMcp_PID_Fixture"

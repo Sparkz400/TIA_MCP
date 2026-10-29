@@ -127,7 +127,7 @@ namespace TiaMcp.Openness.V21
             RequireChangeBool(args, "checkpointSave");
             bool compile = ExplicitChangeBool(args, "compile");
             bool save = ExplicitChangeBool(args, "save");
-            if (!compile && change.Kind == "plc_compile") throw new BridgeException("InvalidRequest", "PLC compilation requires compile=true.");
+            if (!compile && IsCompileOnlyKind(change.Kind)) throw new BridgeException("InvalidRequest", "Compilation changes require compile=true.");
             if (!compile && change.Kind == "graphical_typed_edit") throw new BridgeException("InvalidRequest", "Typed graphical edits always require native compilation.");
             if (!compile && change.Kind == "source_upsert" && change.Payload.Value<string>("language")?.ToUpperInvariant() == "SIMATIC_SD") throw new BridgeException("InvalidRequest", "Native graphical document imports require compilation.");
             if (save && !compile) throw new BridgeException("InvalidRequest", "Saving applied changes requires compile=true.");
@@ -135,12 +135,14 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (change.Kind == "db_snapshot_load_actual" && (compile || save))
                 throw new BridgeException("InvalidRequest", "Actual-value loads change no project content; use compile=false and save=false so the applied PLCSIM route is never saved.");
+            if (change.Kind == "simulation_download_online" && (compile || save))
+                throw new BridgeException("InvalidRequest", "The online download compiles the PLC itself before downloading; use compile=false and save=false so the applied PLCSIM route is never saved.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
             if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             // network_configure kept its optional compile when it joined the hardware rules; remote-I/O fixtures defer it.
-            if (!compile && ((HardwareEngineeringRules.Applies(change.Kind) && change.Kind != "network_configure") || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
+            if (!compile && ((HardwareEngineeringRules.Applies(change.Kind) && change.Kind != "network_configure") || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "tag_table_create", "tag_table_rename", "tag_table_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
                 "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "webserver_page_set", "webserver_user_pages_generate", "umac_role_set" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
@@ -152,6 +154,7 @@ namespace TiaMcp.Openness.V21
                     throw new BridgeException("StaleRevision", "Project or affected objects changed since preparation. Prepare a new preview; no write was applied.");
                 var compileOnlyPlc = change.Kind == "plc_compile" ? SelectPlc(change.Selector) : null;
                 if (compileOnlyPlc != null) PlcCompilation.Prepare(change.Payload, change.Selector.Value<string>("plcPath"), compileOnlyPlc.Path, compileOnlyPlc.Software.GetService<ICompilable>());
+                else if (IsCompileOnlyKind(change.Kind)) CompileOnlyScope(change, project);
                 ValidatePreparedFiles(change);
                 ValidateTypedDependencies(change);
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) VciRequireUnchangedFiles(change, project);
@@ -174,7 +177,7 @@ namespace TiaMcp.Openness.V21
                     change.Stages.Add("recovery_archive_created");
                     change.State = "applying";
                     WriteChangeJournal(change);
-                    if (compileOnlyPlc == null)
+                    if (!IsCompileOnlyKind(change.Kind))
                     {
                         ApplyEngineeringMutation(change, project);
                         change.Stages.Add("mutation_applied");
@@ -330,6 +333,11 @@ namespace TiaMcp.Openness.V21
                     ((JArray)preview["warnings"]).Add("Compilation may change generated state. Apply saves the current project and creates a recovery archive before dispatch.");
                     break;
                 }
+                case "device_compile":
+                case "project_compile":
+                case "hmi_compile":
+                    PrepareCompileOnly(change, project, preview);
+                    break;
                 case "graphical_typed_edit":
                     PrepareTypedGraphical(change, preview);
                     break;
@@ -490,6 +498,11 @@ namespace TiaMcp.Openness.V21
                 case "group_delete":
                     PrepareGroupEdit(change, preview);
                     break;
+                case "tag_table_create":
+                case "tag_table_rename":
+                case "tag_table_delete":
+                    PrepareTagTableLifecycle(change, preview);
+                    break;
                 case "software_unit_create":
                 case "software_unit_relation_set":
                 case "software_unit_publication_set":
@@ -639,6 +652,9 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_memory_bytes":
                     PrepareCpuMemoryBytes(change, project, preview);
                     break;
+                case "hardware_cpu_parameters":
+                    PrepareCpuParameters(change, project, preview);
+                    break;
                 case "safety_fparameter_set":
                 {
                     var plc = SelectPlc(change.Selector);
@@ -761,6 +777,9 @@ namespace TiaMcp.Openness.V21
                 case "db_snapshot_create":
                 case "db_snapshot_load_actual":
                     PrepareDbSnapshotChange(change, preview);
+                    break;
+                case "simulation_download_online":
+                    PrepareSimulationDownloadOnline(change, preview);
                     break;
                 case "vci_workspace_create":
                 case "vci_workspace_delete":
@@ -887,6 +906,11 @@ namespace TiaMcp.Openness.V21
                 case "group_delete":
                     GroupEdit(change, SelectPlc(change.Selector), true);
                     break;
+                case "tag_table_create":
+                case "tag_table_rename":
+                case "tag_table_delete":
+                    ApplyTagTableLifecycle(change);
+                    break;
                 case "software_unit_create":
                 case "software_unit_relation_set":
                 case "software_unit_publication_set":
@@ -1000,6 +1024,9 @@ namespace TiaMcp.Openness.V21
                 case "hardware_cpu_memory_bytes":
                     ApplyCpuMemoryBytes(change, project);
                     break;
+                case "hardware_cpu_parameters":
+                    ApplyCpuParameters(change, project);
+                    break;
                 case "safety_fparameter_set":
                     change.Readbacks.Add(new JObject { ["role"] = "f-parameter-readback", ["parameters"] = FParameterSet(change, project, true) });
                     break;
@@ -1084,6 +1111,9 @@ namespace TiaMcp.Openness.V21
                 case "db_snapshot_load_actual":
                     ApplyDbSnapshotChange(change);
                     break;
+                case "simulation_download_online":
+                    ApplySimulationDownloadOnline(change);
+                    break;
                 case "vci_workspace_create":
                 case "vci_workspace_delete":
                 case "vci_mapping_add":
@@ -1130,6 +1160,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
+            if (IsCompileOnlyKind(change.Kind) && change.Kind != "plc_compile") return CompileOnly(change, project);
             if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);

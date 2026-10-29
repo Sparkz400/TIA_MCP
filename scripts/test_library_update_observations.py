@@ -56,6 +56,26 @@ class LibraryUpdateObservations(unittest.TestCase):
             lambda p: p['updateImpact']['types'][0].update(scope='librarySynchronizationOnly_NoNewEngineeringInstance')):
             self.reject(mutate)
 
+    def test_forced_default_is_bound_to_payload_roots_and_project_default(self):
+        plan = copy.deepcopy(self.plan); row = plan['updateImpact']['types'][0]
+        newer = dict(copy.deepcopy(row['requested']), version='2.0.0', versionGuid='11111111-1111-1111-1111-111111111111')
+        plan['payload']['forceDefault'] = True; plan['effects'][0]['forceDefault'] = True; plan['updateImpact']['forceDefault'] = True
+        row.update(forceDefault=True, projectDefaultBefore=newer, defaultEffect='forcedDowngrade')
+        self.validate(plan)
+        for mutate in (lambda p: p['payload'].pop('forceDefault'),
+                       lambda p: p['updateImpact']['types'][0].update(defaultEffect='forcedDefault'),
+                       lambda p: p['updateImpact']['types'][0].update(forceDefault=False, defaultEffect='promoteIfHigher')):
+            p = copy.deepcopy(plan); mutate(p)
+            with self.assertRaises(ValueError): self.validate(p)
+
+    def test_peer_plc_uses_exclude_the_selected_plc(self):
+        plc = self.plan['updateImpact']['plcPath']; version = self.plan['updateImpact']['types'][0]['requested']
+        peer = dict(typeGuid=version['typeGuid'], versionGuid=version['versionGuid'], uses=1)
+        self.plan['updateBaseline']['peerPlcUses'] = [dict(peer, plcPath=plc + '2')]
+        self.validate()
+        self.reject(lambda p: p['updateBaseline']['peerPlcUses'][0].update(plcPath=plc))
+        self.reject(lambda p: p['updateBaseline']['peerPlcUses'].append(copy.deepcopy(p['updateBaseline']['peerPlcUses'][0])))
+
     def test_duplicate_observations_refuse(self):
         for parent, field in (('updateBaseline', 'uses'), ('updateBaseline', 'objectPaths'),
                               ('updateImpact', 'affectedUses'), ('updateImpact', 'types'),

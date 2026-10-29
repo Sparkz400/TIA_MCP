@@ -36,6 +36,8 @@ PREFIX_OWNERS = {
     "runtime_plcsim_bind": ["D16", "C03", "L03"], "runtime_web_write": ["D16", "L03"], "runtime_web_operating_mode": ["D16", "L03"], "runtime_ua_write": ["D16", "C03", "L03"],
     "library_update_check": ["X02", "L02"], "change.library_cleanup": ["X02", "L02"], "change.library_harmonize": ["X02", "L02"], "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"], "safety_printout": ["D14"], "change.safety_fparameter_set": ["D14"], "library.integrate_combined_apply": ["X02", "L02"],
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
+    "sim_time": ["L03"], "sim_event": ["L03"], "sim_storage": ["L03"], "change.simulation_download_online": ["L03", "D09"],
+    "change.hardware_cpu_parameters": ["X10"], "change.device_compile": ["X10", "X11"], "change.project_compile": ["X11", "X10"], "change.hmi_compile": ["X07"], "change.tag_table_": ["X11"],
     "technology_profile": ["D13"], "testsuite_": ["D06"], "translation_": ["D03"],
     "vci_": ["D01"], "watch_table": ["D02"], "web_application": ["D12"],
     "change.vci_workspace_create": ["D01"], "change.vci_workspace_delete": ["D01"], "change.vci_mapping_add": ["D01"], "change.vci_mapping_remove": ["D01"], "change.vci_synchronize": ["D01"],
