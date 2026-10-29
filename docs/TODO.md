@@ -74,7 +74,7 @@ Catalog `0.4.70`, 300 open cells, each row under its first owner (the matrix sum
 
 All re-runnable lost records were re-run on 28 and 29 October ([28 October](verification/evidence-reruns-20261028.md), [29 October](verification/native-reruns-20261029.md)); the replaced records are retired. Open:
 
-- [ ] **Typed resolution, stale phase:** `stale-db-ambiguity` no longer produces an ambiguity, because the resolver compares qualified names since `a808569`. Give it a competitor with the same qualified name, or record that V21 cannot create one.
+- [x] **Typed resolution, stale phase:** V21 refuses a second DB with an existing qualified name on every route, so the DB ambiguity guard is defensive; the case now records that boundary, and the stale tag address and duplicate-tag guard pass natively (`local.typed.resolution-stale.20261029`, [record](verification/typed-stale-and-created-iec-20261029.md)).
 - Not re-runnable here: `local.library_upgrades.20261024`, `local.library_vendor.20261025` and `local.library_dmc_prerequisites.20261025` need vendor and DMC inputs that are no longer on this PC.
 
 ## Decisions for the maintainer

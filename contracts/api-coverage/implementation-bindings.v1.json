@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5596183d9932cac0aba54ed2ceceaaed33173a6c62b3563daa0c1775ea756d8b",
-      "bytes": 1292422
+      "sha256": "2213051a3a825c6f030fd1002bb524549eec5898a509992aeeda6245d716beb6",
+      "bytes": 1299168
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -93325,6 +93325,27 @@
           "artifacts": [
             "evidence/local.typed.wave9.runtime.20261029.json"
           ]
+        },
+        {
+          "id": "local.typed.resolution-stale.20261029",
+          "profileSha256": "80100ee2dbb02c3a0b973494d168d22d2f95ecebfd0eb736fd665a35cc34cb71",
+          "artifacts": [
+            "evidence/local.typed.resolution-stale.20261029.json"
+          ]
+        },
+        {
+          "id": "local.typed.iec-effect-standard-wave9.20261029",
+          "profileSha256": "22f8389b579bd114b06955e46067f2801e185b9a53874d9dcde8742ff9e302d9",
+          "artifacts": [
+            "evidence/local.typed.iec-effect-standard-wave9.20261029.json"
+          ]
+        },
+        {
+          "id": "local.typed.wave9-created-storage.engineering.20261029",
+          "profileSha256": "0d47c80c08b8e95b95d39b0d11b902a8f98f9d954f1c1b43ce598a75a4896448",
+          "artifacts": [
+            "evidence/local.typed.wave9-created-storage.engineering.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -117044,6 +117065,11 @@
       "sha256": "373113012810fd63565a8d7c6d8a50d472db9dc956463e1e07df3bcd735430b8"
     },
     {
+      "path": "evidence/local.typed.iec-effect-standard-wave9.20261029.json",
+      "state": "observed",
+      "sha256": "ccbe6b3e0c5a2ba9a0a318c2cedcb9e6661927c8130543dc9a85f471f100ef26"
+    },
+    {
       "path": "evidence/local.typed.iec-effect-standard.20261026.json",
       "state": "observed",
       "sha256": "adf64bbd709074b3c47750d051789e8213385e55c8c966046d14218d7526a025"
@@ -117067,6 +117093,11 @@
       "path": "evidence/local.typed.native-boundaries.rerun.20261029.json",
       "state": "observed",
       "sha256": "184b50f675105097fdda6457e2f2ba89f20e9f6a32a63af19c07b222522255a8"
+    },
+    {
+      "path": "evidence/local.typed.resolution-stale.20261029.json",
+      "state": "observed",
+      "sha256": "435484f3c326b47b1291f05303953d907616498b4306a911b043137a58eeadd4"
     },
     {
       "path": "evidence/local.typed.resolution.rerun.20261029.json",
@@ -117172,6 +117203,11 @@
       "path": "evidence/local.typed.transitive-effects.20261026.json",
       "state": "observed",
       "sha256": "f244be0c7407e1d57a267ae59f5af561f1ebc17c214e3dff449815765d338934"
+    },
+    {
+      "path": "evidence/local.typed.wave9-created-storage.engineering.20261029.json",
+      "state": "observed",
+      "sha256": "aa087995694e8b9a0a045cba5fe5893b113b3ad964dc29609af979fb10bfbc92"
     },
     {
       "path": "evidence/local.typed.wave9.engineering.rerun.20261029.json",
@@ -117664,6 +117700,10 @@
       "profileSha256": "dd3ebdd3146d0a06595926c2eedc18accb9906adf3ed247c5566c26a03eab3ff"
     },
     {
+      "id": "local.typed.iec-effect-standard-wave9.20261029",
+      "profileSha256": "22f8389b579bd114b06955e46067f2801e185b9a53874d9dcde8742ff9e302d9"
+    },
+    {
       "id": "local.typed.iec-effect-standard.20261026",
       "profileSha256": "5c21adf92e1c44f54fe4c31f697c7a45a27b37ad98b778e99ba535496058e696"
     },
@@ -117682,6 +117722,10 @@
     {
       "id": "local.typed.native-boundaries.rerun.20261029",
       "profileSha256": "dd3999fc9c58f69c9883f8e730fc0dfa94336170bae5978839226d74f03033c5"
+    },
+    {
+      "id": "local.typed.resolution-stale.20261029",
+      "profileSha256": "80100ee2dbb02c3a0b973494d168d22d2f95ecebfd0eb736fd665a35cc34cb71"
     },
     {
       "id": "local.typed.resolution.rerun.20261029",
@@ -117766,6 +117810,10 @@
     {
       "id": "local.typed.transitive-effects.20261026",
       "profileSha256": "3e5922a96eae1c98004d5cfdde5dd70935531249cd952f0ac1f518bc369fa693"
+    },
+    {
+      "id": "local.typed.wave9-created-storage.engineering.20261029",
+      "profileSha256": "0d47c80c08b8e95b95d39b0d11b902a8f98f9d954f1c1b43ce598a75a4896448"
     },
     {
       "id": "local.typed.wave9.engineering.rerun.20261029",

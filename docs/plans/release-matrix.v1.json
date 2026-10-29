@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.70",
-    "catalogSha256": "5596183d9932cac0aba54ed2ceceaaed33173a6c62b3563daa0c1775ea756d8b",
+    "catalogSha256": "2213051a3a825c6f030fd1002bb524549eec5898a509992aeeda6245d716beb6",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "42863ba916167b5a4343481facc40d4cbbe1786ee70ab0db80d087b6a1337086"
   },
@@ -9729,7 +9729,10 @@
         "local.typed.wave9.engineering.rerun.20261029",
         "local.typed.native-boundaries.rerun.20261029",
         "local.typed.resolution.rerun.20261029",
-        "local.typed.wave9.runtime.20261029"
+        "local.typed.wave9.runtime.20261029",
+        "local.typed.resolution-stale.20261029",
+        "local.typed.iec-effect-standard-wave9.20261029",
+        "local.typed.wave9-created-storage.engineering.20261029"
       ],
       "cells": [
         {
@@ -24390,6 +24393,21 @@
       "notRetained": []
     },
     {
+      "id": "local.typed.iec-effect-standard-wave9.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "b4abe48803874ea53344082ab2eefa1c16fc20f5",
+      "retained": [
+        {
+          "path": "evidence/local.typed.iec-effect-standard-wave9.20261029.json",
+          "sha256": "ccbe6b3e0c5a2ba9a0a318c2cedcb9e6661927c8130543dc9a85f471f100ef26"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.typed.iec-effect-standard.20261026",
       "status": "passed",
       "profile": {
@@ -24460,6 +24478,21 @@
         {
           "path": "evidence/local.typed.native-boundaries.rerun.20261029.json",
           "sha256": "184b50f675105097fdda6457e2f2ba89f20e9f6a32a63af19c07b222522255a8"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.typed.resolution-stale.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "dff2201826c4e96c8a1080bb81cce8b846887c2c",
+      "retained": [
+        {
+          "path": "evidence/local.typed.resolution-stale.20261029.json",
+          "sha256": "435484f3c326b47b1291f05303953d907616498b4306a911b043137a58eeadd4"
         }
       ],
       "notRetained": []
@@ -24775,6 +24808,21 @@
         {
           "path": "evidence/local.typed.transitive-effects.20261026.json",
           "sha256": "f244be0c7407e1d57a267ae59f5af561f1ebc17c214e3dff449815765d338934"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.typed.wave9-created-storage.engineering.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "297c404512c57ce31bf3192e5e8ba3d3e6e68f7f",
+      "retained": [
+        {
+          "path": "evidence/local.typed.wave9-created-storage.engineering.20261029.json",
+          "sha256": "aa087995694e8b9a0a045cba5fe5893b113b3ad964dc29609af979fb10bfbc92"
         }
       ],
       "notRetained": []
