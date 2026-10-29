@@ -66,6 +66,7 @@ internal static partial class Program
         if (args.Length == 3 && args[0] == "visual") return Visual(args[1], args[2]);
         if (args.Length == 2 && args[0] == "repair-ui") return RepairUi(args[1]);
         if (args.Length == 2 && args[0] == "verify-configured") return VerifyConfigured(args[1]);
+        if (args.Length == 3 && args[0] == "textlist-import") return ImportTextLists(args[1], args[2]);
         if (args.Length < 2 || args.Length > 5 || args[0] != "qualify") throw new ArgumentException("HmiSeeder.exe qualify <NEW-output-directory> [comma-separated-profile-ids] [positive|negative] [textlists|plchmi]");
         string mode = args.Length >= 4 ? args[3] : "negative";
         if (mode != "positive" && mode != "negative") throw new ArgumentException("Fixture mode must be positive or negative.");
