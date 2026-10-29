@@ -263,6 +263,10 @@ clears the envelopes when the dispatch returns. A new lease cannot open an old e
 
 A refusal before admission leaves no admission record, and the change stays `prepared`.
 TIA checks its password policy only in the native call, so create credentials that meet it.
+A correctly bound credential holding the wrong password also fails only there, as
+`EngineeringError` ("The password used was rejected"), with the block unchanged.
+Natively qualified on an owned scratch CPU (`local.block_protection.20261030`,
+[record](../verification/block-protection-20261030.md)).
 
 **What is retained.** Preview, change journal, admission record and responses hold only
 the reference and its public binding. The checkpoint archive is TIA's own archive of
