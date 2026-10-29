@@ -96,11 +96,13 @@ def differences(tree):
     return [{k: node[k] for k in ("left", "right", "state")} for node in nodes(tree) if node["state"] not in SAME]
 
 
-def online_session(report, username):
+def online_session(report, username, reused=False):
     """An online report that answered exactly one challenge, the project-user login as username, kept the instance in RUN
-    and completed every cleanup."""
+    and completed every cleanup. reused: the same Portal logged in before, and TIA reuses that login without a challenge
+    (observed 29 October 2026), so no answered challenge is also accepted."""
     answered = [(c["type"], c["decision"], c.get("username")) for c in report["onlineChallenges"] if c["decision"] != "unanswered"]
-    require(answered == [("OnlineAuthenticationConfiguration", "ProjectUser", username)], "Expected one project-user login as %s: %s" % (username, report["onlineChallenges"]))
+    require(answered == [("OnlineAuthenticationConfiguration", "ProjectUser", username)] or reused and answered == [],
+            "Expected one project-user login as %s: %s" % (username, report["onlineChallenges"]))
     require(report.get("completed") is True and "failure" not in report and report["login"]["username"] == username and report["login"]["secretReturned"] is False,
             "The online session did not complete with the runtime-user login: %s" % {k: report.get(k) for k in ("completed", "failure", "login")})
     require(report["operatingStateBefore"] == report["operatingStateAfter"] == "Run", "The instance left RUN: %s" % [report["operatingStateBefore"], report["operatingStateAfter"]])
@@ -178,7 +180,7 @@ class Lab:
             row["state"] = "applied"
             online = [r["report"] for r in applied["readbacks"] if r["role"] == "owned-simulation-online"]
             require(len(online) == 1, "Expected one owned-simulation-online readback: %s" % applied["readbacks"])
-            online_session(online[0], self.username)
+            online_session(online[0], self.username, reused=True)  # The compare logged this Portal in before.
             status = h.tool("change_status", {"changeId": prepared["changeId"]})
             require(status["state"] == "applied" and status["recoveryArchiveSha256"] == applied["recoveryArchiveSha256"], "change_status differs from the apply result")
             return applied
