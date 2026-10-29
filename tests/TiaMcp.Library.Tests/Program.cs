@@ -448,6 +448,30 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         throw new Exception("Native-disabled CLI accepted " + flag);
     }
 });
+Test("CLI toolsets select named groups and refuse unknown, empty or repeated values", work =>
+{
+    Equal(null, HostOptions.Parse([]).Toolsets);
+    Equal(null, HostOptions.Parse(["--toolsets", "all"]).Toolsets);
+    var selected = HostOptions.Parse(["--toolsets", "core, opcua"]).Toolsets!;
+    Equal(2, selected.Count); Equal(true, selected.Contains("core") && selected.Contains("opcua"));
+    foreach (var (value, message) in new[] { ("nope", "Unknown --toolsets group nope"), ("core,,opcua", "without empty entries"),
+        ("all,core", "cannot be combined"), ("base", "Unknown --toolsets group base"), ("qualification", "Unknown --toolsets group qualification") })
+    {
+        try { HostOptions.Parse(["--toolsets", value]); }
+        catch (ArgumentException error) when (error.Message.Contains(message)) { continue; }
+        throw new Exception("--toolsets accepted " + value);
+    }
+    try { HostOptions.Parse(["--toolsets", "core", "--toolsets", "hmi"]); throw new Exception("Repeated --toolsets accepted."); }
+    catch (ArgumentException error) when (error.Message.Contains("given once")) { }
+    // Longer prefixes win over the groups they would otherwise fall under.
+    Equal("explorer", ToolGroups.Of("project_model_search")); Equal("core", ToolGroups.Of("project_open"));
+    Equal("simulation", ToolGroups.Of("plc_station_upload")); Equal("core", ToolGroups.Of("plc_compare"));
+    Equal("reviews", ToolGroups.Of("software_unit_review")); Equal("core", ToolGroups.Of("software_inspect"));
+    Equal(true, ToolGroups.Advertised("artifact_read", selected)); Equal(true, ToolGroups.Advertised("qualification_watch_compete", selected));
+    Equal(false, ToolGroups.Advertised("hmi_inspect", selected)); Equal(true, ToolGroups.Advertised("hmi_inspect", null));
+    try { ToolGroups.Advertised("unmapped_tool", null); throw new Exception("An unmapped tool was advertised."); }
+    catch (InvalidOperationException error) when (error.Message.Contains("belongs to no --toolsets group")) { }
+});
 Test("CLI combined library_integrate apply is opt-in", work =>
 {
     Equal(false, HostOptions.Parse([]).LibraryIntegrateApply);

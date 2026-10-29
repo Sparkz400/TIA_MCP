@@ -13052,7 +13052,7 @@
           "Typed/XML readback compares a field the export omits as empty, so rows with omitted fields (for example an Undef display format) are refused until a native profile settles the omission rules. Document ID reindexing is not offered for force rows.",
           "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
           "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
-          "Worker-owned saved offline scratch only; prepare and apply are refused outside the isolated qualification harness, like the other expanded document edits, until the profile has native lifecycle evidence (exact delta, unchanged peers, saved fresh reopen, checkpoint recovery).",
+          "Worker-owned saved offline scratch only. Production Hosts dispatch the natively qualified force edits; reorder and the Name field stay with the isolated qualification harness, like the other expanded document edits.",
           "Native (29 October 2026, local.watch.force-edits.20261029): on rows an operator authored in the TIA editor, the ForceValue, Address and DisplayFormat field edits, comment, clone and delete pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore. Reorder is refused at readback, because TIA renumbers the rows' document IDs, and is recovered. The Name field is not exercised. watch_table_reconcile_interrupted is qualified on watch tables (local.watch.native.20261028), not on a force table."
         ]
       },
@@ -13066,7 +13066,7 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires --component-qualification and --watch-qualification (allowUnqualifiedDocumentEdits); production Hosts refuse force-table edits with UnsupportedProfile until native lifecycle evidence exists."
+          "Production Hosts dispatch the natively qualified force edits (ForceValue, Address and DisplayFormat fields, comment, clone, delete; maintainer decision of 29 October 2026). Reorder and the Name field require --component-qualification and --watch-qualification."
         ]
       },
       "prerequisites": [

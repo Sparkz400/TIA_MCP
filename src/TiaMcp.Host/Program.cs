@@ -49,9 +49,11 @@ try
                 allowUnqualifiedDocumentEdits: options.WatchQualificationPoint is not null, allowComponentQualification: options.ComponentQualification));
             builder.Services.AddSingleton(simulator);
             builder.Services.AddSingleton<PlcsimTargets>();
+            builder.Services.PostConfigure<ModelContextProtocol.Server.McpServerOptions>(server => ToolSurface.Apply(server, options));
             var mcp = builder.Services.AddMcpServer(server => server.ServerInstructions = AuthenticationInstructions.Text +
-                (options.NoNativeWorkers ? "\nThis Host has native workers disabled. Use supplied-document workflows; native engineering and simulator calls return NativeWorkersDisabled without launching a worker. Network inventory, runtime Web API and OPC UA tools remain separate and require an explicitly selected endpoint and authentication/trust prerequisites." : ""))
-                .WithStdioServerTransport().WithTools<TiaTools>().WithTools<ArtifactTools>().WithTools<LibraryPackageTools>().WithTools<SimulatorTools>()
+                (options.NoNativeWorkers ? "\nThis Host has native workers disabled. Use supplied-document workflows; native engineering and simulator calls return NativeWorkersDisabled without launching a worker. Network inventory, runtime Web API and OPC UA tools remain separate and require an explicitly selected endpoint and authentication/trust prerequisites." : "") +
+                (options.Toolsets is { } toolsets ? "\nThis Host advertises only the base tools and the toolsets " + string.Join(", ", toolsets.Order(StringComparer.Ordinal)) + ". Other tools are hidden; a user restarts the Host with a wider --toolsets value to use them." : ""))
+                .WithStdioServerTransport().WithPrompts<TiaPrompts>().WithRequestFilters(ToolSurface.Configure).WithTools<TiaTools>().WithTools<ArtifactTools>().WithTools<LibraryPackageTools>().WithTools<SimulatorTools>()
                 .WithTools<TranslationTools>()
                 .WithTools<TranslationNativeTools>()
                 .WithTools<OpcUaTools>()
