@@ -2,7 +2,7 @@
 operator's existing TCP/IP single-adapter mode (runtime real-server plan, Tasks 4 and 5).
 
 Setup, every mode: an owned scratch CPU 1511-1 PN V4.1 at --cpu-ip with simulation support; an FB DiagGate (Active :=
-Enable) with its instance DB, a global DB RealServer (Marker := 4711, Counter counted up every cycle, UaValue) and a Main
+Enable) with its instance DB, a global DB RealServer (Marker := 4711, Cycles counted up every scan, UaValue) and a Main
 calling both; the scratch's runtime role gets OPC UA server access and the web rights to read and write process data,
 read diagnostics and change the operating mode; the web server and the OPC UA server (Small license, automatic
 client-certificate acceptance) are switched on; a saved review and a diagnostic case on DiagGate. A TCP/IP instance gets
@@ -65,7 +65,7 @@ VERSION : 0.1
 NON_RETAIN
    VAR
       Marker : DInt := 4711;
-      Counter : DInt;
+      Cycles : DInt;
       UaValue : Int;
    END_VAR
 
@@ -79,7 +79,7 @@ MAIN = '''ORGANIZATION_BLOCK "Main"
 VERSION : 0.1
 BEGIN
     "DiagGate_DB"();
-    "RealServer".Counter := "RealServer".Counter + 1;
+    "RealServer".Cycles := "RealServer".Cycles + 1;
 END_ORGANIZATION_BLOCK
 
 '''
@@ -98,7 +98,7 @@ UA_NS = "http://opcfoundation.org/UA/"
 OBJECTS = {"namespaceUri": UA_NS, "identifierType": "numeric", "identifier": "85"}
 START_TIME = {"namespaceUri": UA_NS, "identifierType": "numeric", "identifier": "2257"}
 # member: (owning DB, PLCSIM API type); the UA nodes and web symbols name the same tags.
-SIGNALS = {"Marker": ("RealServer", "int32"), "Counter": ("RealServer", "int32"), "UaValue": ("RealServer", "int16"),
+SIGNALS = {"Marker": ("RealServer", "int32"), "Cycles": ("RealServer", "int32"), "UaValue": ("RealServer", "int16"),
            "Enable": ("DiagGate_DB", "bool"), "Active": ("DiagGate_DB", "bool")}
 ENTROPY = b"TiaMcp.V21.ScratchRuntimeUser.v1"
 LIMITATIONS = [
@@ -298,7 +298,8 @@ def setup(r):
     change(r, "umac_role_set", {"action": "grant", "roleName": roles[0], "deviceRights": [{"device": scopes[0], "identifier": i} for i in RIGHTS]}, plc=False)
 
     r.before_servers = certificates(r, "certificate_inspect before the servers")
-    change(r, "webserver_page_set", {"webServerActive": {"expected": False, "value": True}})
+    # V21 turns the system pages on with the server (29 October 2026); activation alone fails its readback, so both are named.
+    change(r, "webserver_page_set", {"webServerActive": {"expected": False, "value": True}, "systemWebPages": {"expected": False, "value": True}})
     change(r, "opcua_server_settings_set", ENABLE)
     change(r, "opcua_server_settings_set", AUTO_ACCEPT)
 
@@ -495,7 +496,7 @@ def normal(r):
     r.stage("runtime_ua_browse ObjectsFolder", lambda: t("runtime_ua_browse", {"attemptId": ua, "node": OBJECTS})["references"])
     def members():
         names = {n for ref in t("runtime_ua_browse", {"attemptId": ua, "node": ua_node()})["references"] for n in (ref.get("browseName"), ref.get("displayName"))}
-        require({"Marker", "Counter", "UaValue"} <= names, "RealServer lacks its members: %s" % names)
+        require({"Marker", "Cycles", "UaValue"} <= names, "RealServer lacks its members: %s" % names)
         return sorted(n for n in names if n)
     r.stage("runtime_ua_browse RealServer", members)
     compare(r, "ua", "Marker read through UA", ua, "Marker")
@@ -509,7 +510,7 @@ def normal(r):
     require(stale["state"] == "preconditionMismatch" and stale["dispatched"] is False, "A stale expected value was written: %s" % stale)
     compare(r, "ua", "UaValue after the refused write", ua, "UaValue")
     require(r.stage("runtime_ua_status", lambda: t("runtime_ua_status", {"attemptId": ua}))["state"] == "connected", "The UA session is not connected")
-    nodes = [ua_node("Counter"), ua_node("UaValue")]
+    nodes = [ua_node("Cycles"), ua_node("UaValue")]
     subscribed = acquire(r, "runtime_ua_subscription to its duration", "subscription", {"attemptId": ua, "nodes": nodes, "publishingIntervalMilliseconds": 200,
                          "samplingIntervalMilliseconds": 100, "durationSeconds": 4, "maximumNotifications": 1000})
     require(subscribed["recordedProgress"]["remoteCleanupConfirmed"], "DeleteSubscriptions was not confirmed")
@@ -602,9 +603,9 @@ def host_loss_capture(r):
     ua = connect(r, "ua", "runtime_ua_connect before the Host loss", ua_selection(r))
     web = connect(r, "web", "runtime_web_connect before the Host loss", web_login(r))
     select(r, web)
-    subscription = acquire(r, "runtime_ua_subscription during the Host loss", "subscription", {"attemptId": ua, "nodes": [ua_node("Counter")],
+    subscription = acquire(r, "runtime_ua_subscription during the Host loss", "subscription", {"attemptId": ua, "nodes": [ua_node("Cycles")],
                            "publishingIntervalMilliseconds": 200, "samplingIntervalMilliseconds": 100, "durationSeconds": 120}, wait=False)
-    capture = acquire(r, "runtime_capture during the Host loss", "web", {"attemptId": web, "selectionIds": [r.selections["Counter"]],
+    capture = acquire(r, "runtime_capture during the Host loss", "web", {"attemptId": web, "selectionIds": [r.selections["Cycles"]],
                       "intervalMilliseconds": 200, "durationSeconds": 120}, wait=False)
     r.watch()
     r.stage("terminate the Host", lambda: r.close_host(expected=1, kill=True))
@@ -628,9 +629,9 @@ def server_restart(r):
     r.stage(oracle.START_BEFORE, lambda: r.tool("runtime_ua_read", {"attemptId": ua, "nodes": [START_TIME]}))
     web = connect(r, "web", "runtime_web_connect before the restart", web_login(r))
     select(r, web)
-    polled = acquire(r, "runtime_ua_capture across the restart", "ua", {"attemptId": ua, "nodes": [ua_node("Counter")], "intervalMilliseconds": 500,
+    polled = acquire(r, "runtime_ua_capture across the restart", "ua", {"attemptId": ua, "nodes": [ua_node("Cycles")], "intervalMilliseconds": 500,
                      "durationSeconds": 60, "maximumReconnectAttempts": 2}, wait=False)
-    captured = acquire(r, "runtime_capture across the restart", "web", {"attemptId": web, "selectionIds": [r.selections["Counter"]],
+    captured = acquire(r, "runtime_capture across the restart", "web", {"attemptId": web, "selectionIds": [r.selections["Cycles"]],
                        "intervalMilliseconds": 500, "durationSeconds": 60}, wait=False)
     for action, state in (("stop", "Stop"), ("powerOff", "Off"), ("powerOn", None), ("run", "Run")):
         result = r.stage("sim_state %s during the captures" % action, lambda a=action: r.tool("sim_state", {"instanceId": r.instance["id"], "action": a, "timeoutMs": 60000}))

@@ -34,7 +34,7 @@ class Plc:
 
     def __init__(self, root):
         self.root, self.state, self.started = root, "Off", 0
-        self.memory = {"Marker": 4711, "Counter": 0, "UaValue": 0, "Enable": False, "Active": False}
+        self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "Enable": False, "Active": False}
         self.inspections, self.sessions, self.captures, self.host = 0, {}, {}, None
 
     def cert(self, channel, argument):
@@ -107,7 +107,7 @@ class Plc:
                 path = self.root / ("export-" + capture["id"] + ".json")
                 path.write_text("{}", encoding="utf-8")
                 return {"artifacts": [{"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}]}
-            read = {"items": [self.ua_item(runner.ua_node("Counter"))]} if capture["ua"] else {"status": "read", "value": 1}
+            read = {"items": [self.ua_item(runner.ua_node("Cycles"))]} if capture["ua"] else {"status": "read", "value": 1}
             rows = [{"kind": "read", "errorCode": None, "readResultJson": json.dumps(read)}] * capture["rows"]
             if capture.get("downtime"):
                 rows[-1] = {"kind": "gap", "errorCode": None}
@@ -215,7 +215,7 @@ class Host:
         if tool in ("runtime_ua_write", "runtime_web_write"):
             return p.write(self, tool.split("_")[1], a)
         if tool == "runtime_ua_browse":
-            return {"references": [{"browseName": m, "displayName": m} for m in ("Marker", "Counter", "UaValue")]}
+            return {"references": [{"browseName": m, "displayName": m} for m in ("Marker", "Cycles", "UaValue")]}
         if tool == "runtime_web_browse":
             p.live(a["attemptId"])
             return {"selectionId": a["symbol"], "metadata": []} if a.get("children") is False else {"metadata": []}
