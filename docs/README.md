@@ -65,6 +65,7 @@ listed as lost. Prose records per run are under [verification](#verification).
 
 ## Reference
 
+- [MCP surface](reference/mcp-surface.md): `--toolsets` groups, tool titles, output schemas, prompts and progress
 - [Target capabilities](reference/capabilities.md), [object identities and scopes](reference/object-model.md)
 - [Engineering coverage](reference/engineering-coverage.md), [native explorer extraction](reference/project-explorer-native.md)
 - [Supplied technology profiles and relationships](reference/technology-profile-review.md)

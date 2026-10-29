@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/TiaMcp.Core/TiaMcp.Core.csproj" />
     <Compile Include="../../src/TiaMcp.Host/HostOptions.cs" Link="HostOptions.cs" />
+    <Compile Include="../../src/TiaMcp.Host/ToolGroups.cs" Link="ToolGroups.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/LibraryReferenceReachability.cs" Link="LibraryReferenceReachability.cs" />
   </ItemGroup>
 </Project>

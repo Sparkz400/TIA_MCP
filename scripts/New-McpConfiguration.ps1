@@ -6,6 +6,7 @@ param(
     [string]$SimulatorApiDirectory,
     [string]$GitExecutable,
     [string]$UaClientIdentity,
+    [ValidatePattern('^[a-z]+(,[a-z]+)*$')][string]$Toolsets,
     [ValidateSet('Direct','InteractiveUser')][string]$SessionMode = 'Direct',
     [ValidateRange(5,900)][int]$TimeoutSeconds = 300,
     [ValidateRange(1,120)][int]$ConnectTimeoutSeconds = 15,
@@ -31,6 +32,7 @@ foreach ($override in @(@{value=$ArtifactsDirectory; name='ArtifactsDirectory'},
 }
 if ($StrictBundle) { $launcherArguments += '-StrictBundle' }
 if ($UaClientIdentity) { $launcherArguments += @('-UaClientIdentity', $UaClientIdentity) }
+if ($Toolsets) { $launcherArguments += @('-Toolsets', $Toolsets) }
 if ($SessionMode -eq 'InteractiveUser') { $launcherArguments += '-InteractiveSession' }
 if ($SshHost) {
     if ($SshHost -notmatch '^(?:[a-zA-Z0-9_][a-zA-Z0-9_.-]*@)?[a-zA-Z0-9_][a-zA-Z0-9_.-]*$') {

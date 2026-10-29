@@ -77,7 +77,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
         if (force) ValidateTypedRows(bytes, before); // refuses typed ForceIntention=true even when the export omits it
         string kind = args["editKind"]?.GetValue<string>() ?? "modifyValue";
         bool reindexDocumentIds = args["reindexDocumentIds"]?.GetValue<bool>() ?? false;
-        if (kind != "modifyValue" && !allowUnqualifiedDocumentEdits)
+        if (kind != "modifyValue" && !allowUnqualifiedDocumentEdits && !QualifiedForceEdit(force, kind, args["field"]?.GetValue<string>()))
             throw new BridgeException("UnsupportedProfile", "Expanded watch edits require the isolated qualification harness until native lifecycle evidence is accepted.");
         if (reindexDocumentIds && (!allowUnqualifiedDocumentEdits || kind is not ("reorder" or "delete")))
             throw new BridgeException("UnsupportedProfile", "Explicit document ID reindex is isolated to the reviewed reorder/delete qualification profile.");
@@ -128,10 +128,11 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
     {
         var record = store.Read(Text(args, "operationId"));
         if (!IsWatchPlan(record) || record.PlanSha256 != Text(args, "reviewedPlanSha256")) throw new BridgeException("ReviewMismatch", "Exact reviewed watch plan digest required.");
-        if (record.Plan.Operation == "watchDocumentEdit" && !allowUnqualifiedDocumentEdits)
+        var review = LoadReview(record); string directory = DirectoryOf(record);
+        if (record.Plan.Operation == "watchDocumentEdit" && !allowUnqualifiedDocumentEdits &&
+            !QualifiedForceEdit(review["selector"]?["targetKind"]?.GetValue<string>() == "forceTable", review["edit"]?["kind"]?.GetValue<string>() ?? "", review["edit"]?["field"]?.GetValue<string>()))
             throw new BridgeException("UnsupportedProfile", "This document-edit plan has no accepted native qualification for production apply.");
         if (record.State != "prepared") throw new BridgeException("RecoveryRequired", "A prior attempt cannot be dispatched again; inspect and reconcile it.");
-        var review = LoadReview(record); string directory = DirectoryOf(record);
         if (record.Plan.Operation is "watchAuthoring" or "watchLifecycle") WatchMutationProfiles.RequireVerified(review["edit"]!["requiredProfiles"]!.AsArray(), allowUnqualifiedDocumentEdits);
         record = store.Acquire(record.Id, record.Revision);
         string? lease = null; bool stopAfterRelease = false; Exception? primaryError = null;
@@ -432,6 +433,10 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
     private static NativeTargetObservation Observation(JsonObject snapshot) => snapshot["observation"]!.Deserialize<NativeTargetObservation>(BridgeProtocol.Json)!;
     private static JsonObject Node(JsonElement value) => JsonNode.Parse(value.GetRawText())!.AsObject();
     private static JsonElement Element(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
+    // Force-table edits qualified natively on operator-authored rows (local.watch.force-edits.20261029) and admitted on production Hosts
+    // by maintainer decision (29 October 2026). Reorder (TIA renumbers force rows' document IDs) and the unexercised Name field stay isolated.
+    private static bool QualifiedForceEdit(bool force, string kind, string? field) =>
+        force && (kind is "comment" or "clone" or "delete" || (kind == "field" && field is "ForceValue" or "Address" or "DisplayFormat"));
     // Editor refusals (absent field, ForceIntention, ordinal, opaque capture) reach clients typed like every other refusal.
     private static async Task<object> TypedEdit(Task<object> prepare)
     {
