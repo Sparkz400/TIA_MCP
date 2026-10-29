@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.HW;
@@ -16,6 +17,8 @@ namespace TiaMcp.Openness.V21
     {
         private static readonly string[] OpcUaPermissionNames = { "Browse", "Read", "Write", "Call", "ReceiveEvents", "ReadRolePermissions" };
         private const string OpcUaStandardNamespace = "http://opcfoundation.org/UA/";
+        private static readonly string[] OpcUaStandardRoles = { "Observer", "Operator", "Engineer", "Supervisor", "ConfigureAdmin", "SecurityAdmin" };
+        private static readonly string[] OpcUaRequiredRoles = { "Anonymous", "AuthenticatedUser", "SecurityAdmin", "SimaticInternalUser" };
         // Exact payload fields per prepared OPC UA kind; anything else (passwords, certificates, users) is refused.
         private static readonly Dictionary<string, string[]> OpcUaPayloadFields = new Dictionary<string, string[]>(StringComparer.Ordinal)
         {
@@ -26,6 +29,10 @@ namespace TiaMcp.Openness.V21
             ["opcua_reference_namespace_delete"] = new[] { "namespaceName" },
             ["opcua_role_mapping_set"] = new[] { "action", "roleName", "definedInNamespace", "projectRole", "namespacePermissions" }
         };
+
+        // TIA caches OPC UA role mappings per Portal process, keyed by an object id a recovered copy keeps. After change_restore of a
+        // role change that Portal shows the mappings from before the restore, and its next OPC UA change saves them into the copy.
+        private int? _opcUaRoleCacheProcess;
 
         // The V21 XML does not name the service owner: try the PLC software, then its owning device items.
         private static OpcUaProvider OpcUaProviderFor(PlcSoftware software)
@@ -74,6 +81,8 @@ namespace TiaMcp.Openness.V21
             var unsupported = payload.Properties().Select(p => p.Name).Except(OpcUaPayloadFields[change.Kind], StringComparer.Ordinal).ToArray();
             if (unsupported.Length != 0) throw new BridgeException("InvalidRequest", "Unsupported OPC UA payload fields: " + string.Join(", ", unsupported) + ". Passwords, certificates and user credentials are never accepted.");
             if (change.Selector["scopePath"]?.Type == JTokenType.String) throw new BridgeException("InvalidRequest", "OPC UA changes target one PLC; scopePath is not supported.");
+            if (_opcUaRoleCacheProcess != null && _opcUaRoleCacheProcess == _processId)
+                throw new BridgeException("StaleRevision", "This TIA process still holds the OPC UA role mappings from before a restored role change. Close it (tia_detach), start a new one and open the recovered project first.");
             var group = OpcUaGroup(SelectPlc(change.Selector));
             var budget = new ScanBudget(5000);
             preview["opcUaBefore"] = OpcUaSnapshot(group, budget);
@@ -120,17 +129,37 @@ namespace TiaMcp.Openness.V21
             {
                 if (payload.Count != 2) throw new BridgeException("InvalidRequest", "action=remove takes only roleName.");
                 if (!exists) throw new BridgeException("ObjectNotFound", "No OPC UA role mapping has this name.");
+                if (OpcUaRequiredRoles.Contains(name, StringComparer.OrdinalIgnoreCase)) throw new BridgeException("ProtectedObject", "V21 keeps the Anonymous, AuthenticatedUser, SecurityAdmin and SimaticInternalUser role mappings.");
             }
             else if (action == "create")
             {
                 if (exists) throw new BridgeException("ObjectExists", "An OPC UA role mapping with this name already exists; remove it first.");
-                ChangeText(payload, "definedInNamespace", 1024);
+                string definedIn = ChangeText(payload, "definedInNamespace", 1024);
+                if (definedIn == OpcUaStandardNamespace && !OpcUaStandardRoles.Contains(name, StringComparer.Ordinal))
+                    throw new BridgeException("InvalidRequest", "Standard OPC UA roles are " + string.Join(", ", OpcUaStandardRoles) + ".");
+                if (definedIn != OpcUaStandardNamespace && !OpcUaSimaticNamespace(change, group, definedIn))
+                    throw new BridgeException("UnsupportedCapability", "V21 creates custom OPC UA roles only in the namespace of a SIMATIC server interface; nothing was written.");
                 if (payload["projectRole"] != null) ChangeText(payload, "projectRole", 128);
                 OpcUaRequestedPermissions(payload);
             }
             else throw new BridgeException("InvalidRequest", "action must be create or remove.");
             effects.Add(new JObject { ["action"] = action, ["roleName"] = name, ["definedInNamespace"] = payload["definedInNamespace"]?.DeepClone(),
                 ["projectRole"] = payload["projectRole"]?.DeepClone(), ["namespacePermissions"] = payload["namespacePermissions"]?.DeepClone() });
+        }
+
+        // V21 rejects Create in any namespace but a SIMATIC server interface's own one, and says nothing (the standard ones keep index 0-3).
+        // The public API names that namespace only in the interface's export.
+        private static bool OpcUaSimaticNamespace(EngineeringChange change, ServerInterfaceGroup group, string uri)
+        {
+            if (group.AccessControl.NamespaceAccessRestrictions.Any(item => item.NamespaceUri == uri && item.NamespaceIndex <= 3)) return false;
+            int index = 0;
+            foreach (var simatic in group.SimaticInterfaces)
+            {
+                var file = new FileInfo(Path.Combine(change.Directory, "simatic-interface-" + index++ + ".xml"));
+                simatic.Export(file);
+                if (XDocument.Load(file.FullName).Descendants().Any(e => e.Name.LocalName == "Uri" && e.Parent?.Name.LocalName == "NamespaceUris" && e.Value == uri)) return true;
+            }
+            return false;
         }
 
         private static JObject[] OpcUaRequestedPermissions(JObject payload)
@@ -167,18 +196,20 @@ namespace TiaMcp.Openness.V21
                 else
                 {
                     // V21 refuses Create for an OPC UA standard role (Operator, Observer, ...); those are added by name.
-                    string definedIn = payload.Value<string>("definedInNamespace");
-                    RoleMapping role;
-                    if (definedIn == OpcUaStandardNamespace) { OpcUaRoles(group).AddStandardOpcUaRole(name); role = OpcUaRole(group, name) ?? throw new BridgeException("MutationVerificationFailed", "The added standard OPC UA role mapping was not found."); }
-                    else role = OpcUaRoles(group).Create(name, definedIn);
-                    if (payload["projectRole"] != null) role.SetProjectRole(payload.Value<string>("projectRole"));
+                    if (payload.Value<string>("definedInNamespace") == OpcUaStandardNamespace) OpcUaRoles(group).AddStandardOpcUaRole(name);
+                    else OpcUaRoles(group).Create(name, payload.Value<string>("definedInNamespace"));
+                    // Saving the project role (empty when none is requested) merges the duplicate namespace rows AddStandardOpcUaRole leaves;
+                    // a permission written to such a duplicate is lost.
+                    (OpcUaRole(group, name) ?? throw new BridgeException("MutationVerificationFailed", "The new OPC UA role mapping was not found.")).SetProjectRole(payload.Value<string>("projectRole") ?? "");
                     var wanted = OpcUaRequestedPermissions(payload);
                     foreach (var row in wanted)
                     {
                         string uri = row.Value<string>("namespaceUri");
-                        var permission = role.NamespacePermissions.FirstOrDefault(item => item.NamespaceUri == uri) ?? throw new BridgeException("MutationVerificationFailed", "The new role exposes no permissions for namespace " + uri + ".");
-                        // The permission attributes are read-only (V21 refuses set_Browse); SetPermission is the only write route.
-                        foreach (string permissionName in OpcUaPermissionNames) permission.SetPermission(permissionName, row.Value<bool>(permissionName));
+                        // SetPermission is the only write route (the attributes are read-only). Each write saves the role and leaves
+                        // earlier role and permission objects stale, so the row is read afresh for every write.
+                        foreach (string permissionName in OpcUaPermissionNames)
+                            (OpcUaRole(group, name).NamespacePermissions.FirstOrDefault(item => item.NamespaceUri == uri) ?? throw new BridgeException("MutationVerificationFailed", "The new role exposes no permissions for namespace " + uri + "."))
+                                .SetPermission(permissionName, row.Value<bool>(permissionName));
                     }
                     readback = OpcUaRoleInfo(OpcUaRole(group, name) ?? throw new BridgeException("MutationVerificationFailed", "Created OPC UA role mapping was not found."));
                     var actual = (JArray)readback["namespacePermissions"];
