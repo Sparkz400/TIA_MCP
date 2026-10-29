@@ -259,8 +259,10 @@ clears the envelopes when the dispatch returns. A new lease cannot open an old e
 | `CredentialFormatInvalid` | Secret is not 1 to 4,096 bytes of strict UTF-8 | Before admission |
 | `CredentialRouteInvalid` | Malformed or duplicate slots, slots in more than one vault, a purpose the Host does not route, or slots on an operation other than `change_apply` | Before admission |
 | `CredentialRequired` | The worker received no envelope for a slot | Before the checkpoint |
+| `CredentialPolicyViolation` | TIA's password policy refuses the password (V21: 8 to 120 characters with a digit, a special character, upper and lower case) | In the native call, after the checkpoint; the change is `recovery_required` and the block unchanged |
 
 A refusal before admission leaves no admission record, and the change stays `prepared`.
+TIA checks its password policy only in the native call, so create credentials that meet it.
 
 **What is retained.** Preview, change journal, admission record and responses hold only
 the reference and its public binding. The checkpoint archive is TIA's own archive of

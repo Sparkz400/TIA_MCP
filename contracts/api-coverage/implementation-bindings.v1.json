@@ -2427,8 +2427,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
-      "sha256": "caf1298d55cddcbef5740d0649d65176c92c31a4b98ae862868ba5e6977e4a10",
-      "bytes": 10518
+      "sha256": "02bb0ac7e6b1ecc9aead31969cb3612f46cdc0d2aae3ffd7d51a1fd4d12ede0c",
+      "bytes": 11009
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Capabilities.cs",
@@ -81215,8 +81215,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "PrepareBlockProtection",
-              "line": 13,
-              "endLine": 63,
+              "line": 14,
+              "endLine": 64,
               "sha256": "d4652d0f55f0af8031575febd74738dbb1f0121011bb24ccb866bad48467366b"
             }
           ]
@@ -81235,9 +81235,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "ApplyBlockProtection",
-              "line": 65,
-              "endLine": 84,
-              "sha256": "dffd3a09b94d84b71c8b68a41349de9d3b5a65986c7528537826ee3f4a85c39f"
+              "line": 66,
+              "endLine": 93,
+              "sha256": "19ec069d1dac44f989a98a24279daaa222076cf8c8b0d0060c09bbdd5758aa01"
             }
           ]
         }
@@ -81394,8 +81394,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "PrepareBlockProtection",
-              "line": 13,
-              "endLine": 63,
+              "line": 14,
+              "endLine": 64,
               "sha256": "d4652d0f55f0af8031575febd74738dbb1f0121011bb24ccb866bad48467366b"
             }
           ]
@@ -81414,9 +81414,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "ApplyBlockProtection",
-              "line": 65,
-              "endLine": 84,
-              "sha256": "dffd3a09b94d84b71c8b68a41349de9d3b5a65986c7528537826ee3f4a85c39f"
+              "line": 66,
+              "endLine": 93,
+              "sha256": "19ec069d1dac44f989a98a24279daaa222076cf8c8b0d0060c09bbdd5758aa01"
             }
           ]
         }
@@ -81445,8 +81445,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "PrepareBlockProtection",
-              "line": 13,
-              "endLine": 63,
+              "line": 14,
+              "endLine": 64,
               "sha256": "d4652d0f55f0af8031575febd74738dbb1f0121011bb24ccb866bad48467366b"
             }
           ]
@@ -81465,9 +81465,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "ApplyBlockProtection",
-              "line": 65,
-              "endLine": 84,
-              "sha256": "dffd3a09b94d84b71c8b68a41349de9d3b5a65986c7528537826ee3f4a85c39f"
+              "line": 66,
+              "endLine": 93,
+              "sha256": "19ec069d1dac44f989a98a24279daaa222076cf8c8b0d0060c09bbdd5758aa01"
             }
           ]
         }
@@ -84560,8 +84560,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "PrepareBlockProtection",
-              "line": 13,
-              "endLine": 63,
+              "line": 14,
+              "endLine": 64,
               "sha256": "d4652d0f55f0af8031575febd74738dbb1f0121011bb24ccb866bad48467366b"
             },
             {
@@ -84937,9 +84937,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs",
               "name": "ApplyBlockProtection",
-              "line": 65,
-              "endLine": 84,
-              "sha256": "dffd3a09b94d84b71c8b68a41349de9d3b5a65986c7528537826ee3f4a85c39f"
+              "line": 66,
+              "endLine": 93,
+              "sha256": "19ec069d1dac44f989a98a24279daaa222076cf8c8b0d0060c09bbdd5758aa01"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.Cax.cs",

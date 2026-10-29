@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Siemens.Engineering;
 using Siemens.Engineering.SW.Blocks;
 
 namespace TiaMcp.Openness.V21
@@ -69,12 +70,20 @@ namespace TiaMcp.Openness.V21
             string action = change.Payload.Value<string>("action");
             using (var password = OpenRoutedCredential(change, "credential"))
             {
-                if (change.Kind == "block_protect") BlockProtectionProvider(block).Protect(password);
-                else if (change.Kind == "block_unprotect") BlockProtectionProvider(block).Unprotect(password);
-                else if (action == "define") WriteProtectionProvider(block).Define(password);
-                else if (action == "enable") WriteProtectionProvider(block).Protect(password);
-                else if (action == "disable") WriteProtectionProvider(block).Unprotect(password);
-                else using (var next = OpenRoutedCredential(change, "newCredential")) WriteProtectionProvider(block).Change(password, next);
+                // TIA checks its password policy only in the native call, after the checkpoint (native run 30 October 2026).
+                try
+                {
+                    if (change.Kind == "block_protect") BlockProtectionProvider(block).Protect(password);
+                    else if (change.Kind == "block_unprotect") BlockProtectionProvider(block).Unprotect(password);
+                    else if (action == "define") WriteProtectionProvider(block).Define(password);
+                    else if (action == "enable") WriteProtectionProvider(block).Protect(password);
+                    else if (action == "disable") WriteProtectionProvider(block).Unprotect(password);
+                    else using (var next = OpenRoutedCredential(change, "newCredential")) WriteProtectionProvider(block).Change(password, next);
+                }
+                catch (EngineeringPasswordPolicyViolationException error)
+                {
+                    throw new BridgeException("CredentialPolicyViolation", "TIA refused the password under its password policy: " + error.Message);
+                }
             }
             var readback = BlockProtectionState(FindBlockByName(plc, change.BlockNames[0], true, change).Item, action != null);
             change.Readbacks.Add(new JObject { ["role"] = "protection-readback", ["state"] = readback });

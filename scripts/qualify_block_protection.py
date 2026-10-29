@@ -53,7 +53,8 @@ class Vault:
     def create(self, label, public_binding, secret=None):
         """Store a generated password (or exact bytes) under a public binding; returns the public reference."""
         if secret is None:
-            password = "Bp" + secrets.token_urlsafe(18)
+            # TIA V21's policy: 8 to 120 characters with a digit, a special character, upper and lower case.
+            password = "Bp7!" + secrets.token_urlsafe(18)
             self.passwords.append(password)
             secret = password.encode("utf-8")
         (self.folder / (label + ".binding.json")).write_text(json.dumps(public_binding), encoding="utf-8")
@@ -123,6 +124,16 @@ def body(h):
     with open(lock, "rb"):  # Any open handle defeats the Host's exclusive vault lock until its bounded wait expires.
         refused("refuse while the vault is busy", "block_protect", FC, know, "CredentialStoreBusy")
 
+    def weak():
+        password = "bp" + secrets.token_hex(8)  # Only lower case and digits: violates TIA's password policy.
+        vault.passwords.append(password)
+        prepared = prepare("block_protect", FC, vault.create("weak", binding(plc, fc, "knowHow"), secret=password.encode("utf-8")))
+        error = h.call_error("change_apply", h.apply_args(prepared))
+        require(error.get("code") == "CredentialPolicyViolation" and not protected(FC), "Expected CredentialPolicyViolation and an unprotected block: %s" % error)
+        require(not h.unresolved_admissions() and not leaks(json.dumps(error).encode("utf-8"), vault.passwords), "Policy refusal left an admission or leaked")
+        return {"error": {"code": error["code"], "message": error["message"]}, "state": error["details"]["state"], "stages": error["details"]["stages"]}
+    policy = h.stage("TIA refuses a password that violates its policy", weak)
+
     # Know-how protection with readback, a wrong secret, unprotect, and a checkpoint restore after each direction.
     protect = applied("block_protect", prepare("block_protect", FC, know), lambda: protected(FC))
 
@@ -188,7 +199,7 @@ def body(h):
         return {"passwords": len(vault.passwords), "filesScanned": sum(1 for p in h.directory.rglob("*") if p.is_file()),
                 "hostRetained": host, "tiaProjectFilesContaining": native, "toolResponsesOrReport": report_hit, "hostLog": log_hit}
     h.report["secretScan"] = h.stage("scan every run file, response and Host log for the passwords", scan)
-    h.report["observed"] = {"wrongSecretUnprotect": wrong_result, "replacedSecretDisable": old_result,
+    h.report["observed"] = {"policyViolation": policy, "wrongSecretUnprotect": wrong_result, "replacedSecretDisable": old_result,
                             "applied": [protect, unprotect, again, define, enable, change, disable]}
 
 
