@@ -47,8 +47,8 @@
     },
     {
       "path": "contracts/api-coverage-registry.v1.schema.json",
-      "sha256": "f3b4d7b285dd82099e5b1f907b64373a3089cee2124f281c2a94420670f121c5",
-      "bytes": 2245
+      "sha256": "b931d0852c684f5c0a34728e624041afa85614a775622258ab8b4a1ad01cc086",
+      "bytes": 2272
     },
     {
       "path": "contracts/api-coverage-snapshot.v1.schema.json",
@@ -57,8 +57,8 @@
     },
     {
       "path": "contracts/api-coverage/registry.v1.json",
-      "sha256": "e1602c9ab03eaa15d35712e252f5763b05bf281762fbdeeba05cfafc53590828",
-      "bytes": 83818
+      "sha256": "2e9c7a768963a44f58eb258011e32fa59283c315b98b2699a48b75cbe5f96ad6",
+      "bytes": 85362
     },
     {
       "path": "contracts/automationml-workflow.v1.schema.json",
@@ -787,8 +787,8 @@
     },
     {
       "path": "scripts/api_coverage.py",
-      "sha256": "1d0c1587e86aea3f276472f50e54326b48bef715dbe0db70c39b5e2dfd9af43f",
-      "bytes": 27694
+      "sha256": "15a4e089683659f441cbafc0080e0c5d8994997179f36858f97a6560a1607a56",
+      "bytes": 27841
     },
     {
       "path": "scripts/api_coverage_bindings.py",
@@ -807,8 +807,8 @@
     },
     {
       "path": "scripts/test_api_coverage.py",
-      "sha256": "1e7a08552e38b744e20f2f8d8504b016e00dc84682b3da4b6147b789a1d32b56",
-      "bytes": 22437
+      "sha256": "4b00415ca437753b7aefb7e9096b611c64b1bbe996cd6cc79dddb06d20d59661",
+      "bytes": 22644
     },
     {
       "path": "scripts/test_api_coverage_bindings.py",
