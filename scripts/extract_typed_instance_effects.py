@@ -32,7 +32,7 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
                               else ("instance-effects", "InstanceEffect", ("Child",)))
     manifest = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
     # A recapture that adds members must reproduce every deployed member exactly, so qualified types keep their effect.
-    deployed = json.loads(manifest.read_text()) if iec and manifest.exists() else None
+    deployed = json.loads(manifest.read_text(encoding="utf-8")) if iec and manifest.exists() else None
     if deployed:
         deployed = {kind: (ET.fromstring((ROOT / deployed["artifacts"]["after" + kind]["path"]).read_bytes()), list(deployed["members"].values()))
                     for kind in ("Caller", "Instance")}
@@ -46,7 +46,7 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
         result["namespace"] = namespace
     documents = {}
     for phase, report_path in (("before", before_path), ("after", after_path)):
-        report = json.loads(report_path.read_text())
+        report = json.loads(report_path.read_text(encoding="utf-8"))
         assert report["completed"] and report["builderUsed"] is False
         # One owned capture may hold both phases: the before source first, the redeclaring after source last.
         entries = [e for e in report["fixtures"] if prefix + effect in e["names"]]
@@ -100,7 +100,7 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
     else:
         callee = ROOT / ("fixtures/typed-graphical/native/" + prefix + "TemplateFB_LAD.xml")
         result["referenceCallee"] = {"path": callee.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(callee.read_bytes()).hexdigest()}
-    manifest.write_text(json.dumps(result, indent=2) + "\n")
+    manifest.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     return result
 
 

@@ -8,9 +8,9 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 
 | Exact fixture | E | X | P | R | B | Executed passing assertions | Selected report |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `typed-crossnamespace-numeric-fc-fbd` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/xsqo/typed-crossnamespace-numeric-fc-fbd/result.json>) |
-| `typed-crossnamespace-numeric-fc-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/xsqo/typed-crossnamespace-numeric-fc-lad/result.json>) |
-| `typed-crossunit-numeric-fc-fbd` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/xsqo/typed-crossunit-numeric-fc-fbd/result.json>) |
-| `typed-crossunit-numeric-fc-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/xsqo/typed-crossunit-numeric-fc-lad/result.json>) |
+| `typed-crossnamespace-numeric-fc-fbd` | pass | pass | pass | pass | — | 0 | `artifacts/xsqo/typed-crossnamespace-numeric-fc-fbd/result.json` |
+| `typed-crossnamespace-numeric-fc-lad` | pass | pass | pass | pass | — | 0 | `artifacts/xsqo/typed-crossnamespace-numeric-fc-lad/result.json` |
+| `typed-crossunit-numeric-fc-fbd` | pass | pass | pass | pass | — | 0 | `artifacts/xsqo/typed-crossunit-numeric-fc-fbd/result.json` |
+| `typed-crossunit-numeric-fc-lad` | pass | pass | pass | pass | — | 0 | `artifacts/xsqo/typed-crossunit-numeric-fc-lad/result.json` |
 
 The report path and its SHA-256, native target, profile IDs, operation, binary hashes, diagnostics, failed-change recovery and assertion counts are recorded in `fixtures/typed-graphical/qualification.v1.json`. A newly built binary needs its own acceptance evidence; earlier results are retained as development evidence.

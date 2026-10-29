@@ -21,7 +21,7 @@ def require(condition, name):
 
 
 def verify_values(packet):
-    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/opcua-runtime.v1.schema.json").read_text())
+    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/opcua-runtime.v1.schema.json").read_text(encoding="utf-8"))
     Draft202012Validator({**schema, "$ref": "#/$defs/read"}).validate(packet)
     items = {x["node"]["identifier"]: x for x in packet["items"]}
     require(len(items) == len(packet["items"]), "duplicate item identity")
@@ -113,17 +113,17 @@ def controls(packet, audit):
 
 def audit_managed(directory):
     root = Path(directory)
-    packet = json.loads((root / "values.json").read_text())
-    audit = json.loads((root / "server-audit-0.json").read_text())
-    result = json.loads((root / "result.json").read_text())
+    packet = json.loads((root / "values.json").read_text(encoding="utf-8"))
+    audit = json.loads((root / "server-audit-0.json").read_text(encoding="utf-8"))
+    result = json.loads((root / "result.json").read_text(encoding="utf-8"))
     require(result["status"] == "passed", "managed suite passed")
     verify_values(packet); verify_audit(audit, healthy=True)
     for path in root.glob("server-audit-*.json"):
-        verify_audit(json.loads(path.read_text()))
-    crash = json.loads((root / "crash-process.json").read_text())
+        verify_audit(json.loads(path.read_text(encoding="utf-8")))
+    crash = json.loads((root / "crash-process.json").read_text(encoding="utf-8"))
     require(crash["exitCode"] == 73 and crash["originalHandleWaited"] and not crash["forcedTermination"], "original owned crash lifetime")
-    cases = {x["name"]: x for x in json.loads((root / "scenarios.json").read_text())}
-    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/opcua-runtime.v1.schema.json").read_text())
+    cases = {x["name"]: x for x in json.loads((root / "scenarios.json").read_text(encoding="utf-8"))}
+    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/opcua-runtime.v1.schema.json").read_text(encoding="utf-8"))
     for case in cases.values():
         if "status" in case:
             Draft202012Validator(schema).validate(case["status"])

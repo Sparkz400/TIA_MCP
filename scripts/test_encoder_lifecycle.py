@@ -466,7 +466,7 @@ class EncoderLifecycleTests(unittest.TestCase):
                  '--evidence-sha256', hashlib.sha256(self.report_path.read_bytes()).hexdigest(),
                  '--host', str(self.binary), '--worker', str(self.binary), '--report', str(result_path)]):
             verifier.main()
-        return json.loads(result_path.read_text())
+        return json.loads(result_path.read_text(encoding="utf-8"))
 
     def audit_companion(self, result):
         source = json.loads(self.report_path.read_text())
@@ -646,7 +646,7 @@ class EncoderLifecycleTests(unittest.TestCase):
             if result_path.exists(): result_path.unlink()
             self.calls.clear(); self.fault = fault
             with self.subTest(fault=fault), self.assertRaises(Exception): self.run_companion()
-            result = json.loads(result_path.read_text()); self.assertFalse(result['completed'])
+            result = json.loads(result_path.read_text(encoding="utf-8")); self.assertFalse(result['completed'])
             self.assertEqual(1, sum(name == 'project_open' for _, name, _ in self.calls))
 
     def test_helper_constructor_retains_partial_process_and_holds_unknown_start(self):

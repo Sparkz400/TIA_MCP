@@ -28,7 +28,7 @@ class Run(workflow.Run):
             target = self.root / 'controller-source' / name
             shutil.copyfile(source, target)
             self.sources.append({'path': str(source.resolve()), 'sha256': workflow.digest(source)})
-        for row in json.loads((self.root / 'controller-source-manifest.json').read_text()):
+        for row in json.loads((self.root / 'controller-source-manifest.json').read_text(encoding="utf-8")):
             self.sources.append({'path': str(Path(__file__).with_name(Path(row['path']).name).resolve()),
                                  'sha256': row['sha256']})
         self.save('frozen-inputs', {'packages': self.packages, 'sources': self.sources})
@@ -78,7 +78,7 @@ class Run(workflow.Run):
         # The original native handle is retained independently throughout.
         if self.args.mode in oracle.NATIVE_POINTS:
             tree.await_capture_complete()
-            marker = json.loads((self.root / 'interruption-marker.json').read_text())
+            marker = json.loads((self.root / 'interruption-marker.json').read_text(encoding="utf-8"))
             native = tree.one('native', marker['processId'])
             identities = [r['identity'] for r in tree.snapshot() if r['role'] != 'host']
             self.save(f'host-{index:02}-processes', identities)
@@ -132,7 +132,7 @@ class Run(workflow.Run):
                 'Exact startup or cleanup inventory incomplete')
         expected_host = 74 if expected_loss and self.args.mode in oracle.HOST_POINTS else 1 if expected_loss else 0
         expected_worker = 73 if expected_loss and self.args.mode in oracle.NATIVE_POINTS else 0
-        marker = json.loads((self.root / 'interruption-marker.json').read_text()) if expected_loss else {}
+        marker = json.loads((self.root / 'interruption-marker.json').read_text(encoding="utf-8")) if expected_loss else {}
         for row in proof['exits']:
             p = row['proof']
             expected = expected_host if row['role'] == 'host' else expected_worker if row['role'] == 'worker' else (
@@ -150,7 +150,7 @@ class Run(workflow.Run):
         self.reopen(restored)
         self.call('watch_table_reconcile_recovery', {'operationId': oid, 'role': 'restored'}, 'restored-verified')
         if self.args.mode != 'bool':
-            operation = json.loads((self.root / 'operation.json').read_text())
+            operation = json.loads((self.root / 'operation.json').read_text(encoding="utf-8"))
             self.refuse('watch_table_apply', {'operationId': oid, 'reviewedPlanSha256': operation['digest']},
                         'replay-refusal-before-original-readback', operationId=oid, nativeDispatchInvoked=False)
             self.call('qualification_watch_compete', {'operationId': oid}, 'owner-held-before-original-readback')

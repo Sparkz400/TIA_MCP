@@ -2,10 +2,11 @@
 
 These checks complement JSON Schema documents; they are not a general JSON Schema implementation.
 """
+import functools
 import json
 import pathlib
 import re
-import shutil
+import subprocess
 import tempfile
 import unittest
 
@@ -18,10 +19,23 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 # Evidence IDs containing HOST_ONLY ran the Host with native workers deliberately absent.
 HOST_ONLY = ".hostonly."
 NATIVE_GATES = {"AC-native", "AC-recovery", "AC-runtime", "AC-simulator-lifecycle", "AC-simulation-download"}
+# Catalog records from before scripts/curate_evidence.py: no summary, so no source commit to check.
+# claim_errors refuses them for any verified feature; every newer record must cite a curated summary.
+LEGACY_UNCURATED = {
+    "typed.builders.checkpoint.20261008": "blocked LAD/FBD checkpoint ledger kept in fixtures/ and docs/",
+    "typed.builders.advanced-unit.20261012": "raw batch audits under artifacts/p16t only",
+    "vm.ssh.recovery.20261008": "VM recovery reports under artifacts/ only",
+}
 
 
 def claim_errors(features, evidence, root=ROOT):
     """Return catalog claims that outrun the evidence retained in this checkout."""
+    @functools.cache
+    def on_history(commit):
+        # Evidence PRs are merged, never squashed, so the frozen build commit stays reachable from HEAD.
+        return bool(re.fullmatch(r"[0-9a-f]{40}", commit)) and subprocess.run(
+            ["git", "merge-base", "--is-ancestor", commit, "HEAD"], cwd=root, capture_output=True).returncode == 0
+
     def retained(artifact):
         # Ignored output trees are never part of a published checkout.
         return not artifact.startswith(("artifacts/", "output/")) and (root / artifact).is_file()
@@ -43,12 +57,22 @@ def claim_errors(features, evidence, root=ROOT):
             passed = [summaries(proof) for proof in proofs]
             if not all(passed):
                 errors.append(f"{identifier}: verified without a passed evidence summary for every cited record")
+            for proof, rows in zip(proofs, passed):
+                for source in (r.get("source") or {} for r in rows):
+                    if source.get("dirty") is not False:
+                        errors.append(f"{identifier}: {proof} was not curated from a clean worktree")
+                    if not on_history(str(source.get("commit", ""))):
+                        errors.append(f"{identifier}: {proof} source commit {source.get('commit')} is not an ancestor of HEAD")
             exercised = {tool for rows in passed for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
             if set(feature["mcpTools"]) - exercised:
                 errors.append(f"{identifier}: verified tools not exercised {sorted(set(feature['mcpTools']) - exercised)}")
             native_gates = NATIVE_GATES & set(feature.get("acceptanceCriteria", []))
-            if proofs and all(HOST_ONLY in proof for proof in proofs) and native_gates:
-                errors.append(f"{identifier}: Host-only evidence cannot close {sorted(native_gates)}")
+            # Native gates need every bound tool exercised by native proofs; a Host-only record cannot stand in.
+            native = {tool for proof, rows in zip(proofs, passed) if HOST_ONLY not in proof
+                      for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
+            if native_gates and (all(HOST_ONLY in proof for proof in proofs) or set(feature["mcpTools"]) - native):
+                errors.append(f"{identifier}: Host-only evidence cannot close {sorted(native_gates)}; "
+                              f"tools without native proof {sorted(set(feature['mcpTools']) - native)}")
         if feature["availability"]["status"] == "available" and status != "verified":
             errors.append(f"{identifier}: available without verified qualification")
     return errors
@@ -123,6 +147,11 @@ def check_contracts():
         summary = json.loads(path.read_text(encoding="utf-8"))
         if summary.get("schema") == "tia-mcp.evidence-summary.v1":
             assert summary["evidenceId"] in evidence.keys() | retired, "Summary in neither the catalog nor a retired list: " + path.name
+    uncurated = {proof for proof, record in evidence.items()
+                 if not any(a.startswith("evidence/") and (ROOT / a).is_file()
+                            and (json.loads((ROOT / a).read_text(encoding="utf-8")).get("source") or {}).get("commit")
+                            for a in record["artifacts"])}
+    assert uncurated == LEGACY_UNCURATED.keys(), "Catalog records without a committed summary differ from LEGACY_UNCURATED: " + ", ".join(sorted(uncurated ^ LEGACY_UNCURATED.keys()))
     for proof in evidence.values():
         assert proof["status"] in {"passed", "failed", "blocked", "skipped"}
         assert proof["profile"] and proof["limitations"], "Evidence requires exact scope and limits"
@@ -141,20 +170,32 @@ def check_contracts():
 
 class ClaimErrorTests(unittest.TestCase):
     def setUp(self):
-        self.root = pathlib.Path(tempfile.mkdtemp())
-        self.addCleanup(shutil.rmtree, self.root)
+        # TemporaryDirectory also removes Git's read-only object files on Windows.
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.root = pathlib.Path(directory.name)
+        self.git("init", "-q")
+        self.git("commit", "-q", "--allow-empty", "-m", "base")
+        self.source = {"commit": self.git("rev-parse", "HEAD"), "dirty": False}
         (self.root / "evidence").mkdir()
         (self.root / "docs").mkdir()
         (self.root / "docs/note.md").write_text("note", encoding="utf-8")
-        for name, outcome in (("kept", "passed"), ("failing", "failed")):
-            (self.root / f"evidence/{name}.json").write_text(json.dumps({
-                "schema": "tia-mcp.evidence-summary.v1", "evidenceId": name, "outcome": outcome,
-                "runs": [{"completed": outcome == "passed", "toolsPassed": ["block_read"]}]}), encoding="utf-8")
-        self.evidence = {"kept": {"artifacts": ["evidence/kept.json"]},
-                         "failing": {"artifacts": ["evidence/failing.json"]},
-                         "prose": {"artifacts": ["docs/note.md"]},
+        self.evidence = {"prose": {"artifacts": ["docs/note.md"]},
                          "ignored": {"artifacts": ["evidence/kept.json", "artifacts/run.json"]},
                          "absent": {"artifacts": ["evidence/not-present.json"]}}
+        for name, outcome in (("kept", "passed"), ("failing", "failed")):
+            self.summary(name, name, outcome=outcome)
+
+    def git(self, *arguments):
+        identity = ["-c", "user.name=test", "-c", "user.email=test@example.invalid"]
+        return subprocess.run(["git", *identity, *arguments], cwd=self.root, check=True, capture_output=True, text=True).stdout.strip()
+
+    def summary(self, name, proof, tools=("block_read",), outcome="passed", source=None):
+        (self.root / f"evidence/{name}.json").write_text(json.dumps({
+            "schema": "tia-mcp.evidence-summary.v1", "evidenceId": proof, "outcome": outcome,
+            "source": self.source if source is None else source,
+            "runs": [{"completed": outcome == "passed", "toolsPassed": list(tools)}]}), encoding="utf-8")
+        self.evidence[proof] = {"artifacts": [f"evidence/{name}.json"]}
 
     def feature(self, status, proofs, availability="conditional", tools=("block_read",)):
         return {"x": {"mcpTools": list(tools), "qualification": {"status": status, "evidenceIds": proofs},
@@ -173,15 +214,30 @@ class ClaimErrorTests(unittest.TestCase):
         self.assertEqual(len(self.errors("verified", ["kept"], tools=("block_read", "xref_query"))), 1)
 
     def test_host_only_evidence_cannot_close_native_gates(self):
-        (self.root / "evidence/hostonly.json").write_text(json.dumps({
-            "schema": "tia-mcp.evidence-summary.v1", "evidenceId": "local.hostonly.x", "outcome": "passed",
-            "runs": [{"completed": True, "toolsPassed": ["block_read"]}]}), encoding="utf-8")
-        self.evidence["local.hostonly.x"] = {"artifacts": ["evidence/hostonly.json"]}
+        self.summary("hostonly", "local.hostonly.x")
         hosted = self.feature("verified", ["local.hostonly.x"])
         hosted["x"]["acceptanceCriteria"] = ["AC-identity", "AC-recovery"]
         self.assertEqual(len(claim_errors(hosted, self.evidence, self.root)), 1)
         hosted["x"]["acceptanceCriteria"] = ["AC-identity", "AC-preserve"]
         self.assertEqual(claim_errors(hosted, self.evidence, self.root), [])
+
+    def test_native_gates_need_every_tool_from_a_native_proof(self):
+        self.summary("hostonly", "local.hostonly.y", tools=("xref_query",))
+        self.summary("native", "local.native.y", tools=("block_read", "xref_query"))
+        mixed = self.feature("verified", ["kept", "local.hostonly.y"], tools=("block_read", "xref_query"))
+        mixed["x"]["acceptanceCriteria"] = ["AC-identity", "AC-native"]
+        self.assertEqual(len(claim_errors(mixed, self.evidence, self.root)), 1)
+        mixed["x"]["qualification"]["evidenceIds"] = ["local.native.y", "local.hostonly.y"]
+        self.assertEqual(claim_errors(mixed, self.evidence, self.root), [])
+
+    def test_cited_summary_must_be_clean_and_on_head_history(self):
+        orphan = self.git("commit-tree", "HEAD^{tree}", "-m", "unmerged")
+        for case, source in (("dirty", dict(self.source, dirty=True)), ("unrecorded", {"commit": self.source["commit"]}),
+                             ("orphan", dict(self.source, commit=orphan)), ("unknown", dict(self.source, commit="0" * 40)),
+                             ("option", dict(self.source, commit="--all")), ("missing", {"dirty": False})):
+            with self.subTest(case=case):
+                self.summary("kept", "kept", source=source)
+                self.assertEqual(len(self.errors("verified", ["kept"])), 1)
 
     def test_unverified_may_keep_historical_evidence_but_not_claim_available(self):
         self.assertEqual(self.errors("unverified", ["ignored"]), [])

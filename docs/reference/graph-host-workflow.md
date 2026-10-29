@@ -39,8 +39,8 @@ The standalone HTML escapes source and uses a no-script content security policy.
 
 ## Native export and import
 
-These steps need the V21 worker and an attached offline project. They are compiled
-against the V21 PublicAPI only and are **not natively qualified**.
+These steps need the V21 worker and an attached offline project. They are verified
+on one GRAPH FB with one step and one transition (`local.graph_changes.20261028`).
 
 - `graph_export` takes an exact `blockPath` (or unambiguous `blockName`) and reuses
   the `block_read` export (`PlcBlock.Export`, `ExportOptions.WithDefaults`). Blocks
@@ -124,7 +124,7 @@ with a comparison record of the two. The response carries both summaries. Page t
 comparison's `/changes`, then import the new document's handle with `graph_import`.
 In the offline tests an edited native chart validates against the installed V21
 `SW.PlcBlocks.Graph_v6.xsd`; results are not schema-validated at run time.
-Native import is not qualified. TIA V21 generates the FB members of added elements
+Native import is verified for a step rename only. TIA V21 generates the FB members of added elements
 and re-exports empty modules without `FlgNet`, so `graph_import`'s exact readback can
 report `NativePreservationMismatch` (`recovery_required`) for added elements.
 
@@ -168,10 +168,10 @@ while a file import is pending rejects the import instead of remapping by name.
   must be reviewed through paged results or standalone HTML.
 - Transfers recheck retained inputs on each call. This favors integrity; maximum
   size transfer throughput and memory are not performance-qualified.
-- `graph_export` and `graph_import` are implemented but not natively qualified.
-  `graph_edit` is Host-only and offline-tested; native import of its results,
-  schema acceptance, native layout and runtime remain separate unexecuted gates on
-  this workstation. Typed edits: 1–32 operations, 1–16 contacts, names up to 128 and
+- `graph_export`, `graph_edit` and `graph_import` are verified for one step rename
+  (`local.graph_changes.20261028`). The other `graph_edit` operations are
+  offline-tested only; their native import, native layout and runtime remain
+  unexecuted. Typed edits: 1–32 operations, 1–16 contacts, names up to 128 and
   texts up to 4,096 characters, 256 KiB of operation JSON.
   CFC, DCC and other language products are separate X06 work, not GRAPH support.
 

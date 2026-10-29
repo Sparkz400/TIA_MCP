@@ -8,9 +8,9 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 
 | Exact fixture | E | X | P | R | B | Executed passing assertions | Selected report |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `typed-namespace-numeric-fb-fbd` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/rs7/typed-namespace-numeric-fb-fbd/typed-namespace-numeric-fb-fbd/result.json>) |
-| `typed-namespace-numeric-fb-lad` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/rs7/typed-namespace-numeric-fb-lad/typed-namespace-numeric-fb-lad/result.json>) |
-| `typed-unit-numeric-fb-fbd` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/rs7/typed-unit-numeric-fb-fbd/typed-unit-numeric-fb-fbd/result.json>) |
-| `typed-unit-numeric-fb-lad` | pass | pass | pass | pass | pass | 16 | [report](<../../artifacts/rs7/typed-unit-numeric-fb-lad/typed-unit-numeric-fb-lad/result.json>) |
+| `typed-namespace-numeric-fb-fbd` | pass | pass | pass | pass | pass | 16 | `artifacts/rs7/typed-namespace-numeric-fb-fbd/typed-namespace-numeric-fb-fbd/result.json` |
+| `typed-namespace-numeric-fb-lad` | pass | pass | pass | pass | pass | 16 | `artifacts/rs7/typed-namespace-numeric-fb-lad/typed-namespace-numeric-fb-lad/result.json` |
+| `typed-unit-numeric-fb-fbd` | pass | pass | pass | pass | pass | 16 | `artifacts/rs7/typed-unit-numeric-fb-fbd/typed-unit-numeric-fb-fbd/result.json` |
+| `typed-unit-numeric-fb-lad` | pass | pass | pass | pass | pass | 16 | `artifacts/rs7/typed-unit-numeric-fb-lad/typed-unit-numeric-fb-lad/result.json` |
 
 The report path and its SHA-256, native target, profile IDs, operation, binary hashes, diagnostics, failed-change recovery and assertion counts are recorded in `fixtures/typed-graphical/qualification.v1.json`. A newly built binary needs its own acceptance evidence; earlier results are retained as development evidence.

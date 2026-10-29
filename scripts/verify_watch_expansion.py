@@ -556,7 +556,7 @@ def verify(run_root):
     def approval():
         approved = load(root / "independent-review.json")
         need(approved["approved"] is True and approved["noOnlineAction"] is True and approved["operationId"] == operation["id"] == reviewed["operationId"], "Exact independent approval missing.")
-        need(approved["reviewedPlanSha256"] == reviewed["reviewedPlanSha256"] == operation["digest"] == (root / "approved-digest").read_text().strip(), "Approved plan digest differs.")
+        need(approved["reviewedPlanSha256"] == reviewed["reviewedPlanSha256"] == operation["digest"] == (root / "approved-digest").read_text(encoding="utf-8").strip(), "Approved plan digest differs.")
         need(base.reviewed_input_digest(approved) == reviewed["reviewedInputSha256"] and records[0] == outer["operation"], "Approved candidate or prepared journal differs.")
         need(operation["projectPath"] == before["project"]["path"], "Approved original project differs.")
         return ref(root / "independent-review.json")

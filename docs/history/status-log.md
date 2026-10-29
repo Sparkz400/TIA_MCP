@@ -14,6 +14,8 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Typed created-storage runtime — 29 October 2026:** the 8 harnessed wave 9 created-storage cells (`createMulti` of TONR, R_TRIG and F_TRIG and `createGlobal` of TONR, LAD and FBD) passed all five gates, runtime behavior included, on owned PLCSIM (build `7db882c`; `local.typed.wave9-created-storage.runtime.20261029`). `change.graphical_typed_edit` stays unverified until the rest of the typed backlog closes; no matrix count change.
+
 **Unified text-list import qualified — 29 October 2026:** ([record](../verification/hmi-text-list-import-20261029.md))
 - **Runs:** candidates authored by `hmi_text_list_author` and `hmi_text_list_generate_set` import exactly through V21 `HmiTextListComposition.Import` on MTP700 Unified Comfort (en-US/de-DE) via the independent HmiSeeder (run `q/tl4`, 227 checks, build `47491ab`), with other HMI content unchanged, a byte-identical roundtrip, save/reopen, archive retrieval and checkpoint restore. Curated as `local.hmi.text-list-import.20261029`.
 - **Fix found natively:** V21 reports success but silently changes some content, so both tools now refuse it before publishing: `HmiTextListValueOutOfRange`, `HmiTextListBoolDefaultEntry`, `HmiTextListDefaultEntryValue`, `HmiTextListTextUnsupported`, `HmiTextListNameUnsupported` and `HmiTextListUnresolvedText`. Retained records still reopen.

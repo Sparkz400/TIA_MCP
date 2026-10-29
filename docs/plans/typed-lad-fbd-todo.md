@@ -20,7 +20,8 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   pass runtime on the standard route (`local.typed.wave9.runtime.20261029`), and the IEC effect
   members (`local.typed.iec-effect-standard-wave9.20261029`) let the 14 created-storage cells pass
   engineering (`local.typed.wave9-created-storage.engineering.20261029`).
-  - [ ] Runtime of the 14 created-storage cells (in progress).
+  - [x] Runtime of the 8 harnessed created-storage cells passed all five gates, runtime behavior included
+    (`local.typed.wave9-created-storage.runtime.20261029`); the 6 transitive cells have no runtime harness.
   - [ ] The four existing-global R_TRIG/F_TRIG cases: no profile, because TIA deletes an
     unreferenced R_TRIG/F_TRIG instance DB at compile. Capture one or record the boundary.
 - [ ] A second CPU: profiles, creation/instance templates and dependent-effect manifests are keyed by

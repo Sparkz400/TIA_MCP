@@ -16,7 +16,7 @@
         "title": {"type": "string", "minLength": 1},
         "symbols": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[TMPFE]:.+"}},
         "sources": {"type": "array", "minItems": 1, "items": {"type": "string"}},
-        "api": {"const": "documented_installed_xml"}, "implementation": {"const": "not_implemented"},
+        "api": {"const": "documented_installed_xml"}, "implementation": {"enum": ["not_implemented", "partial", "implemented"]},
         "qualification": {"const": "not_run"}, "availability": {"const": "unobserved"},
         "releaseObligation": {"const": true}, "releaseAccepted": {"const": false}, "review": {"type": "string"}
       }

@@ -28,7 +28,7 @@ def unit_scopes(scopes):
 def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
-    change = (ROOT / "fixtures/libraries/release-changes/TiaMcpLibraryGate.implementation.scl").read_text()
+    change = (ROOT / "fixtures/libraries/release-changes/TiaMcpLibraryGate.implementation.scl").read_text(encoding="utf-8")
 
     # Authoring: generation 1 (UDT and FB 1.0.0) and generation 2 (FB 1.1.0).
     plc = h.owned_scratch("authoring")
@@ -66,7 +66,7 @@ def body(h):
 
     # A related unit reaches only published objects of the provider unit.
     h.report["publishSeed"] = h.seed("publish the provider's library instances", "publish", PROVIDER, FB, UDT)
-    h.apply("source_upsert", {"scopePath": consumer, "language": "SCL", "source": SOURCE.read_text(), "expectedBlockNames": CALLERS})
+    h.apply("source_upsert", {"scopePath": consumer, "language": "SCL", "source": SOURCE.read_text(encoding="utf-8"), "expectedBlockNames": CALLERS})
 
     def placement():
         software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})

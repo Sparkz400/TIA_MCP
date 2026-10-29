@@ -41,7 +41,7 @@ def verify(root):
         review, before = outer['review'], outer['review']['before']
         reviewed = authoring.reviewed_candidate(root)
         need(load(root/'independent-review.json') == dict(reviewed, approved=True)
-             and operation['digest'] == reviewed['reviewedPlanSha256'] == (root/'approved-digest').read_text().strip(), 'Exact independent approval differs')
+             and operation['digest'] == reviewed['reviewedPlanSha256'] == (root/'approved-digest').read_text(encoding="utf-8").strip(), 'Exact independent approval differs')
         need(review['exactProfileCandidate']['scopeMatched'] is True and admission['mode'] == POINT, 'Wrong creation scope or loss case')
         records = expansion.journal(root, operation['id'])
         need(records[0] == outer['operation'], 'Original prepared journal differs')

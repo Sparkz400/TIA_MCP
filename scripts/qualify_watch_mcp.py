@@ -153,7 +153,7 @@ class Run:
         entry = self.clients[-1]
         cleanup_error = None
         if expected_loss and self.args.mode in oracle.NATIVE_POINTS and self.native_cleanup_helper:
-            marker = json.loads((self.root / "interruption-marker.json").read_text())
+            marker = json.loads((self.root / "interruption-marker.json").read_text(encoding="utf-8"))
             candidates = [(info, watcher) for info, watcher in self.monitor[2].values() if info["pid"] == marker["processId"]]
             assert len(candidates) == 1, "Interrupted native identity is not captured"
             info, watcher = candidates[0]
@@ -253,7 +253,7 @@ class Run:
 
     def execute(self):
         pid = self.start_host(self.args.mode if self.args.mode in oracle.NATIVE_POINTS | oracle.HOST_POINTS else "none")
-        admission = json.loads((self.root / "admission.json").read_text())
+        admission = json.loads((self.root / "admission.json").read_text(encoding="utf-8"))
         admission["hostProcessId"] = pid
         # Admission is finalized before the first native request.
         (self.root / "admission.json").write_text(json.dumps(admission, indent=2), encoding="utf-8")

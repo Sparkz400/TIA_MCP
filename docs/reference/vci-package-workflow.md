@@ -56,7 +56,7 @@ There is no native export tool. V21 `Workspace.ExportObject` creates a mapping
 in the project and writes below the workspace root, and `MappedObject.Synchronize`
 writes the user's workspace; neither is a project-neutral export into a
 Host-owned directory. Those writes are the prepared change kinds below. The tool
-is compiled against the V21 Public API only and is not natively qualified.
+is verified (`local.read_contracts.20261028`).
 
 ## Native workspace changes
 
@@ -106,7 +106,9 @@ undocumented status initialization. Package completeness (for example SIMATIC
 SD `.s7res` companions) is not checked. The directory is passed to V21 as the
 absolute path below the root, because the
 [15 October probe](vci-native-profiles-20261015.md) saw the native route reject
-a relative `DirectoryInfo`. None of these kinds is natively qualified.
+a relative `DirectoryInfo`. All five kinds are verified: workspace create/delete by
+`local.access.qualify.rerun.20261028`, mapping add/remove and synchronize by
+`local.vci_mappings.20261028` (export mode, one workspace in the root group).
 
 ## Conflict and preservation rules
 
@@ -140,9 +142,9 @@ share the 128-record / 2 GiB store limits with Git records. No partial/truncated
 report is published as complete. Summaries contain counts; exact large rows remain
 available in the complete report artifact.
 
-This delivery exposes the existing portable comparison model. Native mapping
-lifecycle, export/import, directed synchronization, native companion/language
-preservation, compilation, reopening and checkpoint recovery remain unexecuted.
+This delivery exposes the existing portable comparison model. The native mapping
+lifecycle is verified as described under [native workspace changes](#native-workspace-changes);
+connect mode, native companion/language preservation and library policies remain unexecuted.
 Host branch operations, remote publishing and larger measured performance also
 remain separate work; this increment does not complete all of D01 or the release.
 See [verification](../verification/vci-package-workflow-20261016.md).

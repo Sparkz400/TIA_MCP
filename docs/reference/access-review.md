@@ -67,7 +67,7 @@ expose no activation state, so `enabled` is `null` and the review reports
 rights; there is no separate `cpuRuntime`, SIWAREX or OPC UA capture. Snapshots stay
 within this review's limits and mark truncation as incomplete. Passwords, hashes,
 secrets and private keys are never read; attributes with sensitive names are excluded.
-The capture is compiled against the V21 API and not yet natively qualified.
+The capture is verified (`local.read_contracts.20261028`).
 
 Use **public metadata only**. Passwords, private keys, tokens and arbitrary settings
 are not accepted fields. Unknown-field errors do not echo supplied values, but

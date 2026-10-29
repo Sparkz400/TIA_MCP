@@ -290,13 +290,17 @@ class SnapshotTests(unittest.TestCase):
             self.f.collect()
 
     def test_seed_operation_cannot_be_promoted_by_metadata(self):
-        for field, value in (("implementation", "implemented"), ("qualification", "verified"),
+        for field, value in (("implementation", "verified"), ("qualification", "verified"),
                              ("availability", "available"), ("releaseAccepted", True), ("releaseObligation", False)):
             with self.subTest(field=field):
                 registry = deepcopy(self.f.registry)
                 registry["operations"][0][field] = value
                 with self.assertRaises(ValueError):
                     coverage.decision_index(registry)
+        for status in ("partial", "implemented"):
+            registry = deepcopy(self.f.registry)
+            registry["operations"][0]["implementation"] = status
+            coverage.decision_index(registry)
 
     def test_seed_registry_requires_exact_thirty_unique_domains(self):
         for replacement in ("D00", "D02"):

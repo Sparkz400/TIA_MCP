@@ -156,7 +156,7 @@ def body(h):
         return observed
 
     def edit_and_release(library, plc, previous, source_name, number):
-        released = h.release(library, h.edit_source(library, plc, previous, FB, (changes / source_name).read_text()), number)
+        released = h.release(library, h.edit_source(library, plc, previous, FB, (changes / source_name).read_text(encoding="utf-8")), number)
         h.stage("export released " + number, lambda: require_shape(exported_version_shape(library, released), number, "Released export"))
         return released
 
@@ -228,9 +228,9 @@ def body(h):
         source = h.open_archive(archive)
         for version in (initial[UDT], fb_version):
             h.apply("library_instantiate", h.selected(source, [version], target={"plcPath": plc}))
-        h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": references.read_text(),
+        h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": references.read_text(encoding="utf-8"),
                 "expectedBlockNames": ["TiaMcpLibraryGate_DB", "TiaMcpLibraryState_DB", "Main"]})
-        h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": probe.read_text(),
+        h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": probe.read_text(encoding="utf-8"),
                 "expectedBlockNames": ["TiaMcpReleaseProbe", "TiaMcpReleaseProbe_Gate", "TiaMcpReleaseProbe_Cycle"]})
         return plc, source
 

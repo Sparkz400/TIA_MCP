@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.80",
+  "catalogVersion": "0.4.81",
   "targetTiaVersions": [
     21
   ],
@@ -3008,6 +3008,26 @@
         "hardware_replace only to versions or successor articles that keep the addresses; acceptLoss and address-changing replacements are not exercised.",
         "CalculatedBandwidthForCyclicIoData of the IO controller interface is computed at the device compile and not saved, so it is not compared.",
         "Engineering only; nothing is downloaded and no physical topology is observed."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-created-storage.runtime.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "7db882ca489ffd39a85f8e929e8cd84264804d15",
+        "passedScope": "scripts/qualify_typed_graphical.py --cases fixtures/typed-graphical/wave9-cases.v1.json --live --runtime --provision-runtime-credential --trust-owned-empty-cpu-certificate on build 7db882c (frozen artifacts/t9), one invocation per case, each in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1, standard route) with its own owned PLCSIM Advanced V8 instance on Softbus: the 8 wave 9 created-storage cells that have a runtime harness, typed-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (a new TONR_TIME, R_TRIG or F_TRIG multi-instance member) and typed-createglobal-tonr-{lad,fbd} (a new IEC_TIMER global DB), each passing all five gates: engineering, preservation, persistence, recovery and runtime behavior with the independent suites (TONR accumulate-pause-resume-hold-reset, R_TRIG one pulse per rising edge, F_TRIG one pulse per falling edge), semantic runtime preservation with only receipted project changes, owned cleanup verified, no physical PLC access."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-created-storage.runtime.20261029.json"
+      ],
+      "limitations": [
+        "Standard route only; the software-unit and namespace routes have no wave 9 profiles.",
+        "The six transitive createMulti cells (typed-transitive-createmulti-*) are engineering-only (local.typed.wave9-created-storage.engineering.20261029); they have no runtime harness.",
+        "R_TRIG/F_TRIG global storage, existing or created, stays refused: it has no captured global storage document and TIA deletes an unreferenced edge instance DB at compile.",
+        "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
+        "Each case trusts its owned, empty PLCSIM CPU's certificate on first use (--trust-owned-empty-cpu-certificate) to provision the runtime credential."
       ]
     },
     {
@@ -12304,7 +12324,8 @@
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests.",
+          "Created wave 9 storage at runtime (29 October 2026, local.typed.wave9-created-storage.runtime.20261029): a new TONR_TIME, R_TRIG or F_TRIG multi-instance member and a new IEC_TIMER global DB pass all five gates, runtime behavior included, in LAD and FBD on the standard route; created R_TRIG/F_TRIG global storage stays refused."
         ]
       },
       "qualification": {
@@ -12345,7 +12366,8 @@
           "local.typed.wave9.runtime.20261029",
           "local.typed.resolution-stale.20261029",
           "local.typed.iec-effect-standard-wave9.20261029",
-          "local.typed.wave9-created-storage.engineering.20261029"
+          "local.typed.wave9-created-storage.engineering.20261029",
+          "local.typed.wave9-created-storage.runtime.20261029"
         ]
       },
       "availability": {
