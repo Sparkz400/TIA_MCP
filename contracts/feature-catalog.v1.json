@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.79",
+  "catalogVersion": "0.4.80",
   "targetTiaVersions": [
     21
   ],
@@ -3028,6 +3028,26 @@
         "R_TRIG/F_TRIG global storage, existing or created, stays refused: it has no captured global storage document and TIA deletes an unreferenced edge instance DB at compile.",
         "Host application-call timing; not exact PLC scan timing. Post-RUN card files are inventoried runtime state, not preservation.",
         "Each case trusts its owned, empty PLCSIM CPU's certificate on first use (--trust-owned-empty-cpu-certificate) to provision the runtime credential."
+      ]
+    },
+    {
+      "id": "local.hmi.text-list-import.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "47491ab44d6cbbf14bd4dbda83f572487f5985fa",
+        "passedScope": "Native import of Unified text-list candidates authored by hmi_text_list_author and hmi_text_list_generate_set (frozen artifacts/tl4, run q/tl4) on the build that refuses content V21 changes. The production Host (no native workers) authored the three v1 oracle variants and three boundary requests, refused every content class V21 imports but changes with its typed code (HmiTextListValueOutOfRange, HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue, HmiTextListTextUnsupported, HmiTextListNameUnsupported, HmiTextListUnresolvedText), and reopened the retained v1-v3 author and v1 set records. HmiSeeder textlist-import imported ten candidate pairs (v1, v2 Bool initial/regenerated, v3 integer initial/regenerated, both outputs of an initial and an evolved v1 set, and the v1 base that replaces an identical list) into a new owned MTP700 Unified Comfort V21.0.1.0 fixture with en-US/de-DE, screens, items, a tag, an alarm, a screen script and a documented peer list, through V21 HmiTextListComposition.Import. Every import reads back exactly through Export with the other lists unchanged; a no-change re-import of the whole export re-exports byte-identical files; the independent walk of every other HMI section is unchanged; compiler errors and warnings are unchanged by the imports and after reopen; a fresh Portal process reads equal text lists and walks after save/reopen and from the final archive, and the pre-import checkpoint restores the baseline twice without replaying an import. Five boundary candidates at the edge of what the tools accept import exactly: To/Range/From entries, signed 32-bit bounds, SingleValue 0 defaults, quotes, tab, LF, emoji, empty, U+2028/2029, soft hyphen, ZWSP, ZWJ, BOM, RLO, WJ, a 16384-character text, list names of 128 characters, Latin, umlaut, CJK, Cyrillic, Greek, Arabic, Hebrew, Hangul, Arabic-Indic digits and every allowed punctuation. Fresh Hosts reopen every author and set record with exact receipts and bytes (also through the actual-prior author and set-evolution runners)."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.20261029.json"
+      ],
+      "limitations": [
+        "The fixture's HMI compile keeps its two encrypted-transfer password errors (V21 has no public setter for that password); the gate is that imports add, remove or change no compiler error or warning, not a clean HMI compile.",
+        "Imported through the independent HmiSeeder, not a production route: no MCP tool imports or restores Unified text lists, and hmi_engineering stays behind the closed preservation gate.",
+        "The refusals cover what runs q/tl2 and q/tl3 showed V21 changes; list names use an allowlist (letters, digits, inner spaces, !&'()+,-;<=>@\\^_{|}, at most 128 characters), while text characters outside the control characters are refused only where observed. Records published before the refusals keep their meaning and still reopen, and their content is not re-qualified.",
+        "V21 export renames entries, pools all texts in one library with renumbered IDs, omits default fields, writes CRLF and leaves texts such as Off, On and Null unquoted (YAML 1.1 reads them as bool/null). Candidate library names, entry and text IDs and DefaultLanguage are not retained, so a native export never equals a candidate byte for byte.",
+        "One profile and language pair (MTP700 Unified Comfort, en-US/de-DE); no screen item consumes an imported list, and Unified PC, other devices and languages, runtime and visual behavior are not covered."
       ]
     }
   ],
@@ -22737,12 +22757,14 @@
           "4 MiB request, 128 lists, 4096 total entries/texts, 32 languages, conservative 8 MiB per candidate and shared 512 MiB retention. Nonoverlapping ranges and unambiguous ASCII text identifiers only.",
           "Explicit v2 Bool binding generation uses exact v7 saved component/output evidence, declared translations and a retained previous candidate pair. Manual drift or relevant conflicts suppress candidates; selected retained peers stay unchanged. Original reviews and predecessor chains are revalidated; 16 predecessor and 128 MiB lineage-input limits. This does not establish native preservation or complete C01 generation.",
           "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification.",
-          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22958,12 +22980,14 @@
           "Exact predecessor/current/proposed comparisons, captured lineage, manual edits and cross-output collisions are checked before candidate publication. Conflicts suppress the whole proposed set; old records retain their semantics.",
           "Established plain TextLists/TextLibrary YAML only. Removal/rename effects are previews, not source deletion or native writes. No implicit type conversion, general SiVArc template engine, complete project coverage or native preservation qualification.",
           "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified.",
-          "Native observation (28 October 2026): AC-native needs the candidates imported natively, but no worker route imports Unified text-list YAML: V21 offers HmiTextListComposition.Import, while the worker only exports Unified text lists and imports Classic text-list XML. The Host-side gates are not curated separately, because a matrix cell binds only when the whole feature is verified."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

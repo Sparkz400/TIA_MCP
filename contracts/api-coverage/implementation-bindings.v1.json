@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "4132ae4f120ac660f6f4abe78d88f9574412101cd1ba9ea20ad3a41a848df592",
-      "bytes": 1362583
+      "sha256": "1176972987b775aa2bb8a73f7dd05d8a8edc65a0232f2644852c3564326b4b49",
+      "bytes": 1367945
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1207,23 +1207,23 @@
     },
     {
       "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.TextListSetEvolution.cs",
-      "sha256": "2245f808fcb67c617b19b1b42db57b00b67879693a118e4febf6f74f40bff6a6",
-      "bytes": 32781
+      "sha256": "5158b8a773842a099c5fd444119915801a66578dbf0313409b94f4e8dff88f4e",
+      "bytes": 32873
     },
     {
       "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.TextListSets.cs",
-      "sha256": "88e44d6b608e4037e3b5bff27fb82dcecf90b224f5de444d8d3c7af88dd32faa",
-      "bytes": 25092
+      "sha256": "9c446d4cca2f3de1f1d310c4d6bf23a85da2d83bd56cd31d7ef57449758b8a15",
+      "bytes": 25184
     },
     {
       "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.TextLists.cs",
-      "sha256": "d9e1b249ddae51ef2978cf9b29d357fd91a06ef13b5f1aefb5124da3ceab4600",
-      "bytes": 18330
+      "sha256": "8f2a837b5140a0d673f9319f5dad3d22aff3d2c3d5e89f64858e3a9e7efbc510",
+      "bytes": 18529
     },
     {
       "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
-      "sha256": "a7b8dc1f07cc880a9236b9252589bebf900878e1572e594d5d6213041cd906ca",
-      "bytes": 15804
+      "sha256": "f4f441e8f649e9b843326c6c76b3438911ab65500fa294c76937fbc96c5d978d",
+      "bytes": 15893
     },
     {
       "path": "src/TiaMcp.Core/HmiComponents/HmiComponentConsumers.cs",
@@ -1277,8 +1277,8 @@
     },
     {
       "path": "src/TiaMcp.Core/HmiComponents/UnifiedTextListAuthoring.cs",
-      "sha256": "0187d10479263c5c8cabfcf553a73cbd500799c362b918baff8d1e15e9723b4d",
-      "bytes": 9051
+      "sha256": "e41f0c357b543064910f96a2515e20839a298f9fd6e348f22faecc3051f7c179",
+      "bytes": 12138
     },
     {
       "path": "src/TiaMcp.Core/Inventory/InventoryExport.cs",
@@ -3496,8 +3496,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -3955,8 +3955,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -4449,8 +4449,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -4950,8 +4950,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -11755,8 +11755,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -12859,8 +12859,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -13430,8 +13430,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -13889,8 +13889,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -14892,8 +14892,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -15351,8 +15351,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -16572,8 +16572,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -18511,8 +18511,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -21939,8 +21939,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -22398,8 +22398,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -26360,8 +26360,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -26819,8 +26819,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -30778,8 +30778,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -31279,8 +31279,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -37539,8 +37539,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Build",
-          "line": 127,
-          "endLine": 147,
+          "line": 128,
+          "endLine": 148,
           "sha256": "f47a65aa68196b30cd4d566dd66450dfbb3a83cc4246efc4f4563791afcf5660"
         },
         {
@@ -38013,8 +38013,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -38472,8 +38472,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -39457,8 +39457,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -40400,8 +40400,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "new",
-          "line": 160,
-          "endLine": 160,
+          "line": 161,
+          "endLine": 161,
           "sha256": "a492327ae8b81bc4a2e67de757beca5ca213eb224289aa3f070f13e9777f276b"
         },
         {
@@ -42104,8 +42104,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "new",
-          "line": 160,
-          "endLine": 160,
+          "line": 161,
+          "endLine": 161,
           "sha256": "a492327ae8b81bc4a2e67de757beca5ca213eb224289aa3f070f13e9777f276b"
         },
         {
@@ -44314,8 +44314,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -46582,8 +46582,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -47409,8 +47409,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -48848,8 +48848,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -52825,8 +52825,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -58209,8 +58209,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -58867,8 +58867,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -61413,8 +61413,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -61872,8 +61872,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -62652,8 +62652,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -63153,8 +63153,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -63612,8 +63612,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -64113,8 +64113,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -64830,8 +64830,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -65626,8 +65626,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "new",
-          "line": 160,
-          "endLine": 160,
+          "line": 161,
+          "endLine": 161,
           "sha256": "a492327ae8b81bc4a2e67de757beca5ca213eb224289aa3f070f13e9777f276b"
         },
         {
@@ -66504,8 +66504,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -66902,8 +66902,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "new",
-          "line": 160,
-          "endLine": 160,
+          "line": 161,
+          "endLine": 161,
           "sha256": "a492327ae8b81bc4a2e67de757beca5ca213eb224289aa3f070f13e9777f276b"
         },
         {
@@ -67262,8 +67262,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -72185,8 +72185,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "new",
-          "line": 160,
-          "endLine": 160,
+          "line": 161,
+          "endLine": 161,
           "sha256": "a492327ae8b81bc4a2e67de757beca5ca213eb224289aa3f070f13e9777f276b"
         },
         {
@@ -79573,8 +79573,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Review",
-          "line": 72,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 93,
           "sha256": "d743600055207751fbd6692d0f720f7cd29dfa435ce062e2be2c92480a4a9543"
         },
         {
@@ -80032,8 +80032,8 @@
         {
           "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
           "name": "Page",
-          "line": 93,
-          "endLine": 124,
+          "line": 94,
+          "endLine": 125,
           "sha256": "1301e0bb258bf04034f2fac4fc6eb52c8f19571c7f8a9fcb903ce1c1aadfdb74"
         },
         {
@@ -103891,7 +103891,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.text-list-import.20261029",
+          "profileSha256": "87410f19140d4e7f4ee513f744db565fc82eb41b59ef48682e34cc8b6ccd998a",
+          "artifacts": [
+            "evidence/local.hmi.text-list-import.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -103940,7 +103948,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.text-list-import.20261029",
+          "profileSha256": "87410f19140d4e7f4ee513f744db565fc82eb41b59ef48682e34cc8b6ccd998a",
+          "artifacts": [
+            "evidence/local.hmi.text-list-import.20261029.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -118239,6 +118255,11 @@
       "sha256": "4a682db29aa6102a3a16b03c490d69811d01eb6a1303f4da4aaee86bedec3d9c"
     },
     {
+      "path": "evidence/local.hmi.text-list-import.20261029.json",
+      "state": "observed",
+      "sha256": "7c7042792dab344a28bf1ebc1f31d4393545d39c9d96d1043e4f3a9dac2e2e9e"
+    },
+    {
       "path": "evidence/local.hostonly.access-review.rerun.20261028.json",
       "state": "observed",
       "sha256": "e4b0e34bc46b1f11aa18429146143e4ca1c911a8fcf7cde900c5c45276539212"
@@ -119006,6 +119027,10 @@
     {
       "id": "local.hmi.bridge.rerun.20261029",
       "profileSha256": "1253b6d80b70ba490ec2dc05f2fb706d492b763d4fd6fc5e0baa38077b599886"
+    },
+    {
+      "id": "local.hmi.text-list-import.20261029",
+      "profileSha256": "87410f19140d4e7f4ee513f744db565fc82eb41b59ef48682e34cc8b6ccd998a"
     },
     {
       "id": "local.hostonly.access-review.rerun.20261028",

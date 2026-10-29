@@ -63,19 +63,21 @@ def run(client, upload, read, check, refuse, output):
     request = json.loads((ROOT / 'fixtures/hmi/unified-text-list/author-request.json').read_text(encoding='utf-8'))
     variants = [request]
     expanded = copy.deepcopy(request)
-    expanded['texts'][0]['translations']['en-US'] = '"\\\r\n\t\0\x85\u2028\u2029Über 日本語 😀\n---\n!tag &anchor'
+    expanded['texts'][0]['translations']['en-US'] = '"\\\n\t\u2028\u2029Über 日本語 😀\n---\n!tag &anchor'
     expanded['texts'][0]['translations']['de-DE'] = ''
     expanded['languages'].reverse(); expanded['defaultLanguage'] = 'de-DE'
-    expanded['lists'][0]['name'] = 'Unicode 日本語: "quoted" # []'
-    expanded['lists'][0]['entries'] = [dict(id='Low', type='To', fromValue=None, toValue=-1, isDefault=True, textId='Text_Off'),
+    expanded['lists'][0]['name'] = 'Unicode 日本語 quoted-name'
+    expanded['lists'][0]['entries'] = [dict(id='Low', type='To', fromValue=None, toValue=-1, isDefault=False, textId='Text_Off'),
         dict(id='Middle', type='Range', fromValue=0, toValue=10, isDefault=False, textId='Text_Ready'),
         dict(id='High', type='From', fromValue=11, toValue=None, isDefault=False, textId='Text_Ready')]
     for kind in ('Bool', 'BitNumber'):
-        row = copy.deepcopy(request['lists'][0]); row.update(name=kind, rangeType=kind); expanded['lists'].append(row)
+        row = copy.deepcopy(request['lists'][0]); row.update(name=kind, rangeType=kind)
+        row['entries'][0]['isDefault'] = kind != 'Bool'
+        expanded['lists'].append(row)
     variants.append(expanded)
     extremes = copy.deepcopy(request)
-    extremes['lists'][0]['entries'][0].update(fromValue=-9223372036854775808, toValue=-9223372036854775808)
-    extremes['lists'][0]['entries'][1].update(fromValue=9223372036854775807, toValue=9223372036854775807)
+    extremes['lists'][0]['entries'][0].update(fromValue=-2147483648, toValue=-2147483648, isDefault=False)
+    extremes['lists'][0]['entries'][1].update(fromValue=2147483647, toValue=2147483647)
     variants.append(extremes)
     records = []
     for index, value in enumerate(variants):
@@ -122,7 +124,22 @@ def run(client, upload, read, check, refuse, output):
         elif defect == 'path': invalid['fileBase'] = '../outside'
         elif defect == 'unknownReference': invalid['lists'][0]['entries'][0]['textId'] = 'missing'
         else: invalid['lists'][0]['entries'][0]['fromValue'] = 0.1
-        refuse(client, 'hmi_text_list_author', dict(uploadRef=upload(client, json.dumps(invalid).encode())), 'PackageInvalid' if defect == 'path' else 'InvalidHmiComponentReview')
+        refuse(client, 'hmi_text_list_author', dict(uploadRef=upload(client, json.dumps(invalid).encode())),
+               {'path': 'PackageInvalid', 'unknownReference': 'HmiTextListUnresolvedText'}.get(defect, 'InvalidHmiComponentReview'))
+    # Content V21 reports as imported but changes is refused before publication (local.hmi.text-list-import.20261029).
+    for code, edit in (('HmiTextListValueOutOfRange', lambda p: p['lists'][0]['entries'][1].update(fromValue=2147483648, toValue=2147483648)),
+                       ('HmiTextListBoolDefaultEntry', lambda p: p['lists'][0].update(rangeType='Bool')),
+                       ('HmiTextListTextUnsupported', lambda p: p['texts'][0]['translations'].update({'en-US': 'a\0b'})),
+                       ('HmiTextListTextUnsupported', lambda p: p['texts'][0]['translations'].update({'de-DE': 'CR\r\nLF'})),
+                       ('HmiTextListTextUnsupported', lambda p: p['texts'][1]['translations'].update({'en-US': 'next\x85line'})),
+                       ('HmiTextListTextUnsupported', lambda p: p['texts'][1]['translations'].update({'de-DE': 'form\x0cfeed'})),
+                       ('HmiTextListDefaultEntryValue', lambda p: p['lists'][0]['entries'][0].update(type='To', fromValue=None, toValue=-1)),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Colon: "quoted" # []')),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Slash/Name')),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='Trailing ')),
+                       ('HmiTextListNameUnsupported', lambda p: p['lists'][0].update(name='N' * 129))):
+        unfaithful = copy.deepcopy(request); edit(unfaithful)
+        refuse(client, 'hmi_text_list_author', dict(uploadRef=upload(client, json.dumps(unfaithful, ensure_ascii=False).encode('utf-8'))), code)
     return records
 
 

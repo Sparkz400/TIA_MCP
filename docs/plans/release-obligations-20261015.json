@@ -1707,9 +1707,9 @@
       "implementation": "partial_inspection_backcolor_write_families_missing",
       "qualification": "native_readonly_passed_text_list_route_missing",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.76): 10 release-matrix rows (3 shipped, 2 limited, 4 unqualified, 1 unavailable on V21); 19 cells bound, 19 open and 7 blocked. Unified text lists have no worker import route yet (V21 has HmiTextListComposition.Import; in progress). change.hmi_compile cannot pass: panels created through Openness have no start screen (29 October). change.hmi_engineering is blocked behind the closed preservation gate (dispositions).",
-      "remainingWork": "hmi.engineering, hmi_text_list_author/_generate_set (worker import route in progress) and change.hmi_compile (a compilable HMI fixture with a start screen); Classic families beyond the qualified profiles; an RT Professional target.",
-      "nextAction": "Finish the Unified text-list import route; build a compilable HMI fixture; obtain an RT Professional target.",
+      "currentResult": "29 October 2026 (catalog 0.4.79): 10 release-matrix rows (4 shipped, 3 limited, 2 unqualified, 1 unavailable on V21); 29 cells bound, 9 open and 7 blocked. hmi_text_list_author and hmi_text_list_generate_set are verified: their candidates import exactly through V21 HmiTextListComposition.Import via the independent seeder, and both refuse the content V21 would silently change (local.hmi.text-list-import.20261029). change.hmi_compile cannot pass: panels created through Openness have no start screen (29 October). change.hmi_engineering is blocked behind the closed preservation gate (dispositions).",
+      "remainingWork": "hmi.engineering and change.hmi_compile (a compilable HMI fixture with a start screen); a production Unified text-list import route (maintainer question); Classic families beyond the qualified profiles; an RT Professional target.",
+      "nextAction": "Build a compilable HMI fixture; get the maintainer's decision on a production text-list import route; obtain an RT Professional target.",
       "ownerRole": "HMI",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
