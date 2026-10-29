@@ -218,7 +218,8 @@ def qualify_case(mode, host, worker, run_root):
             wait_for(lambda: any(e["kind"] == "stopped" for e in read_events(event_path)), "Worker did not release the connection")
         events = read_events(event_path)
         count = 0 if mode in {"early-exit", "operation-error", "graceful-eof"} else 1
-        verify_no_replay(events, token, mutations=count)
+        # Early exit faults nothing, so each of its two calls starts a worker.
+        verify_no_replay(events, token, mutations=count, starts=2 if mode == "early-exit" else 1)
         report["requestCount"] = sum(e["kind"] == "request" for e in events)
         if count:
             # Explicitly new host and worker; inspect disk, never replay change_apply.
