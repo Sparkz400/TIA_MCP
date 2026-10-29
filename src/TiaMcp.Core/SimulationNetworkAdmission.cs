@@ -24,5 +24,24 @@ namespace TiaMcp.Simulation
                 string.Equals(address, macAddress, System.StringComparison.OrdinalIgnoreCase) ||
                 System.Text.RegularExpressions.Regex.IsMatch(address, "^[0-9A-Fa-f]{2}([-:][0-9A-Fa-f]{2}){5}$"));
         }
+
+        // One address-discovery sample decides the provisioning target: the one device shows a controller address of the
+        // instance. TCP/IP only, once its budget is spent: TIA's TCP/IP discovery kept naming the CPU by its MAC after the
+        // bootstrap (29 October 2026), so the same PLCSIM device as before the bootstrap is accepted while the instance reads
+        // back exactly the bootstrap address. startupMac and bootstrapAddress are null when no bootstrap ran.
+        public static string RuntimeTargetBasis(string network, bool budgetSpent, int deviceCount, string address, string macAddress, string deviceSeries,
+            string[] runtimeAddresses, string bootstrapAddress, string startupMac)
+        {
+            if (deviceCount != 1) return null;
+            if (System.Array.IndexOf(runtimeAddresses, address) >= 0) return "runtimeAddressMatch";
+            return network == "TCPIP" && budgetSpent && bootstrapAddress != null && runtimeAddresses.Length == 1 && runtimeAddresses[0] == bootstrapAddress &&
+                SameRuntimeTarget("tcpipMacIdentity", address, macAddress, deviceSeries, null, startupMac) ? "tcpipMacIdentity" : null;
+        }
+
+        // Every later recheck of the decided target: the same address, or for tcpipMacIdentity the same MAC and PLCSIM series.
+        public static bool SameRuntimeTarget(string basis, string address, string macAddress, string deviceSeries, string targetAddress, string startupMac) =>
+            basis == "tcpipMacIdentity"
+                ? !string.IsNullOrEmpty(startupMac) && string.Equals(macAddress, startupMac, System.StringComparison.OrdinalIgnoreCase) && deviceSeries == "S7-1500 (PLCSIM)"
+                : address == targetAddress;
     }
 }

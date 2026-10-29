@@ -50,6 +50,43 @@ internal static class SimulationNetworkAdmissionTests
         return Task.CompletedTask;
     }
 
+    internal static Task RuntimeTargetFromDiscoverySamples()
+    {
+        const string boot = "192.168.0.1", mac = "02-C0-A8-00-0A-00", plcsim = "S7-1500 (PLCSIM)";
+        string[] runtime = { boot };
+        string Basis(string network, bool spent, int count = 1, string address = mac, string deviceMac = mac, string series = plcsim, string[] addresses = null,
+            string bootstrap = boot, string startup = mac) =>
+            SimulationNetworkAdmission.RuntimeTargetBasis(network, spent, count, address, deviceMac, series, addresses ?? runtime, bootstrap, startup);
+        // Every sample of run rs_a82cdf40 (29 October 2026): the instance read back 192.168.0.1, TIA kept showing the CPU by its MAC.
+        foreach (long elapsed in new long[] { 60, 380, 704, 1029, 1355, 1682, 2014, 2329, 2642, 2949, 3291, 3627, 3966, 4272, 4587, 4899, 5207, 5534,
+            6431, 6880, 7214, 7544, 7864, 8192, 8500, 8835, 9185, 9526, 9867 })
+        {
+            Check.Equal(null, Basis("TCPIP", elapsed >= 60000));
+            Check.Equal(null, Basis("Softbus", elapsed >= 10000));
+        }
+        // The same sample at the end of the TCP/IP budget decides by MAC; Softbus never does.
+        Check.Equal("tcpipMacIdentity", Basis("TCPIP", true));
+        Check.Equal(null, Basis("Softbus", true));
+        // A late address update or a Softbus address match decides by address on either network, at any time.
+        Check.Equal("runtimeAddressMatch", Basis("TCPIP", false, address: boot));
+        Check.Equal("runtimeAddressMatch", Basis("Softbus", false, address: boot, series: "S7-1500"));
+        // Never: two devices, another MAC or series, other or extra runtime addresses, or no bootstrap by this attempt.
+        Check.Equal(null, Basis("TCPIP", true, count: 2));
+        Check.Equal(null, Basis("TCPIP", true, deviceMac: "02-C0-A8-00-0A-01"));
+        Check.Equal(null, Basis("TCPIP", true, series: "S7-1500"));
+        Check.Equal(null, Basis("TCPIP", true, addresses: new[] { boot, "192.168.0.2" }));
+        Check.Equal(null, Basis("TCPIP", true, addresses: new[] { "192.168.0.5" }));
+        Check.Equal(null, Basis("TCPIP", true, bootstrap: null, startup: null));
+        Check.Equal(null, Basis("TCPIP", true, startup: null));
+        // Later rechecks: by MAC and series for the MAC basis, by exact address otherwise.
+        Check.Equal(true, SimulationNetworkAdmission.SameRuntimeTarget("tcpipMacIdentity", mac, "02-c0-a8-00-0a-00", plcsim, boot, mac));
+        Check.Equal(false, SimulationNetworkAdmission.SameRuntimeTarget("tcpipMacIdentity", mac, "02-C0-A8-00-0A-01", plcsim, boot, mac));
+        Check.Equal(false, SimulationNetworkAdmission.SameRuntimeTarget("tcpipMacIdentity", mac, mac, "S7-1500", boot, mac));
+        Check.Equal(true, SimulationNetworkAdmission.SameRuntimeTarget("runtimeAddressMatch", boot, mac, "S7-1500", boot, null));
+        Check.Equal(false, SimulationNetworkAdmission.SameRuntimeTarget("runtimeAddressMatch", mac, mac, plcsim, boot, mac));
+        return Task.CompletedTask;
+    }
+
     // The machine-wide network mode is an operator setting; the simulator worker only reads it.
     internal static Task WorkerNeverAssignsNetworkMode()
     {
