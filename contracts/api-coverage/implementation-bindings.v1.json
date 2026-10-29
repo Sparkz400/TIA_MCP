@@ -2282,8 +2282,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/DeviceCompilation.cs",
-      "sha256": "7080e746c54be5e4b06e9bb4843eeb2c71bc6b6be40fadfa0200302c737aa774",
-      "bytes": 8403
+      "sha256": "4007250737c084ea1487c38cca67fb29ce406321d4c4fc771af61ed19c89d226",
+      "bytes": 9066
     },
     {
       "path": "src/TiaMcp.Openness.V21/EngineeringFingerprintRules.cs",
@@ -2302,8 +2302,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
-      "sha256": "37ae3ab5a73f5b330937cb5b8d326d6ae0220d52b6bc7bacee499258de991497",
-      "bytes": 29548
+      "sha256": "9fccc3cc147d919d613e4dc163486cbab894bc9e2661abf2ab9e4865fc936c4f",
+      "bytes": 30583
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs",
@@ -2422,8 +2422,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Capabilities.cs",
-      "sha256": "9ef63187b3dfbddf622650376e102c8545a0b12ff8c34ab5d200212388285c6b",
-      "bytes": 58180
+      "sha256": "31c899d765834c551e304dbb5c9a4aa19d7b2c6524c8314b9d07ab8278474a33",
+      "bytes": 58290
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CapturedStorage.cs",
@@ -2442,13 +2442,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "2e63157b2b322ae602bae711d645a1300deaac67bb1d32c72969628c6b349780",
-      "bytes": 120060
+      "sha256": "a5a3938a38be6146703266acd1e15e60de8f2677909a89652681e230e58acf64",
+      "bytes": 119981
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CompileChanges.cs",
-      "sha256": "4b1edbe1010dfe60cd626777630b0653457a53d90f43c1a4a36af700d3711d24",
-      "bytes": 4809
+      "sha256": "75642b1498c0351e56fdb47a8607b3201dd6fa37ed4f4f83e941a46e59332585",
+      "bytes": 4868
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ComponentScratchLanguage.cs",
@@ -2702,8 +2702,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
-      "sha256": "74a75042ca31f438bea646a69ae7beac78dcbaf0c32b9ed7692f4b18709943b3",
-      "bytes": 24940
+      "sha256": "2e66a3e0e03b799892a47b7b05e7694506180dd7c720c5f24d935d0d580d03c9",
+      "bytes": 29403
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SafetyValidation.cs",
@@ -80689,7 +80689,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -80709,7 +80709,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -80740,7 +80740,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -80823,7 +80823,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -80875,7 +80875,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -80965,7 +80965,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81031,7 +81031,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81051,7 +81051,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81082,7 +81082,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81102,7 +81102,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81133,7 +81133,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81216,7 +81216,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81261,7 +81261,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81281,7 +81281,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81312,7 +81312,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81332,7 +81332,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81363,7 +81363,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81439,7 +81439,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81505,7 +81505,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81581,7 +81581,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81647,7 +81647,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81667,7 +81667,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81698,7 +81698,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81711,8 +81711,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwarePreservation",
-              "line": 251,
-              "endLine": 264,
+              "line": 299,
+              "endLine": 312,
               "sha256": "3d5d1ebf54a1d98c7523658cadd37dfe421a0ecde8c743cfe8b4fc1af4bbc81c"
             }
           ]
@@ -81725,7 +81725,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81756,7 +81756,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81769,8 +81769,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwarePreservation",
-              "line": 251,
-              "endLine": 264,
+              "line": 299,
+              "endLine": 312,
               "sha256": "3d5d1ebf54a1d98c7523658cadd37dfe421a0ecde8c743cfe8b4fc1af4bbc81c"
             }
           ]
@@ -81783,7 +81783,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81814,7 +81814,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81827,8 +81827,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwarePreservation",
-              "line": 251,
-              "endLine": 264,
+              "line": 299,
+              "endLine": 312,
               "sha256": "3d5d1ebf54a1d98c7523658cadd37dfe421a0ecde8c743cfe8b4fc1af4bbc81c"
             }
           ]
@@ -81841,7 +81841,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81872,7 +81872,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81885,8 +81885,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwarePreservation",
-              "line": 251,
-              "endLine": 264,
+              "line": 299,
+              "endLine": 312,
               "sha256": "3d5d1ebf54a1d98c7523658cadd37dfe421a0ecde8c743cfe8b4fc1af4bbc81c"
             }
           ]
@@ -81899,7 +81899,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81930,7 +81930,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -81950,7 +81950,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -81981,7 +81981,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82001,7 +82001,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82032,7 +82032,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82052,7 +82052,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82083,7 +82083,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82103,7 +82103,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82148,7 +82148,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82168,7 +82168,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82199,7 +82199,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82219,7 +82219,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82250,7 +82250,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82270,7 +82270,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82301,7 +82301,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82321,7 +82321,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82352,7 +82352,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82383,7 +82383,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82417,7 +82417,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82462,7 +82462,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82496,7 +82496,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82527,7 +82527,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82617,7 +82617,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82683,7 +82683,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82759,7 +82759,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82825,7 +82825,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -82901,7 +82901,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -82967,7 +82967,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83043,7 +83043,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83109,7 +83109,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83129,7 +83129,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83160,7 +83160,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83180,7 +83180,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83218,7 +83218,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83238,7 +83238,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83276,7 +83276,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83296,7 +83296,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83334,7 +83334,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83389,7 +83389,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83420,7 +83420,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83440,7 +83440,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83471,7 +83471,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83526,7 +83526,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83564,15 +83564,15 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwareChannel",
-              "line": 69,
-              "endLine": 81,
-              "sha256": "d4cd3dce25299dc01ca3ef9b9c93d035aea2dac2e44581e9ff94c36385177152"
+              "line": 79,
+              "endLine": 93,
+              "sha256": "5ac2c8a8489d0b76cbc05df9bb8cf1ff9fc6af02c03496ddc55f7a144ed745b2"
             }
           ]
         },
@@ -83584,29 +83584,15 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
-              "path": "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
-              "name": "ApplyAttributes",
-              "line": 56,
-              "endLine": 75,
-              "sha256": "4f44230ae906f9bd6110fbc45b86acaf2d9f2f7a973fa34b950fe34bc6d9669c"
-            },
-            {
-              "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-              "name": "ChangeObject",
-              "line": 1581,
-              "endLine": 1581,
-              "sha256": "242f1aaf80af1813827c5c91c3a00ea87e1abd34ed1df055ca7353050ed92bad"
-            },
-            {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
-              "name": "PrepareHardwareChannel",
-              "line": 69,
-              "endLine": 81,
-              "sha256": "d4cd3dce25299dc01ca3ef9b9c93d035aea2dac2e44581e9ff94c36385177152"
+              "name": "ApplyHardwareChannel",
+              "line": 120,
+              "endLine": 129,
+              "sha256": "f75f65b546e29c398b1eda0e7f7af854377c016e1c6093695aa5d10a39c8a3b2"
             }
           ]
         }
@@ -83629,7 +83615,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83649,7 +83635,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83680,7 +83666,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83700,7 +83686,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83731,7 +83717,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83772,7 +83758,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83810,14 +83796,14 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwareMove",
-              "line": 47,
-              "endLine": 57,
+              "line": 55,
+              "endLine": 65,
               "sha256": "0681fd2dcfbd0694c908c15f057a95f5bea5627ae3cef00a252d6cf8ba37c0c7"
             }
           ]
@@ -83830,21 +83816,21 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "HardwareIndex",
-              "line": 40,
-              "endLine": 45,
+              "line": 48,
+              "endLine": 53,
               "sha256": "8214e479e899b0fb53965c6d372713a1e503253a280b1464a86c52c64dd23d2d"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwareMove",
-              "line": 47,
-              "endLine": 57,
+              "line": 55,
+              "endLine": 65,
               "sha256": "0681fd2dcfbd0694c908c15f057a95f5bea5627ae3cef00a252d6cf8ba37c0c7"
             }
           ]
@@ -83868,7 +83854,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -83916,7 +83902,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83947,7 +83933,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": []
         },
@@ -83959,7 +83945,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -83990,7 +83976,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": []
         },
@@ -84002,7 +83988,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -84033,7 +84019,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -84053,7 +84039,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -84084,7 +84070,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -84104,7 +84090,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -84135,7 +84121,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -84155,7 +84141,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -84186,7 +84172,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -84217,7 +84203,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -84503,22 +84489,22 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwareChannel",
-              "line": 69,
-              "endLine": 81,
-              "sha256": "d4cd3dce25299dc01ca3ef9b9c93d035aea2dac2e44581e9ff94c36385177152"
+              "line": 79,
+              "endLine": 93,
+              "sha256": "5ac2c8a8489d0b76cbc05df9bb8cf1ff9fc6af02c03496ddc55f7a144ed745b2"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwareMove",
-              "line": 47,
-              "endLine": 57,
+              "line": 55,
+              "endLine": 65,
               "sha256": "0681fd2dcfbd0694c908c15f057a95f5bea5627ae3cef00a252d6cf8ba37c0c7"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwarePreservation",
-              "line": 251,
-              "endLine": 264,
+              "line": 299,
+              "endLine": 312,
               "sha256": "3d5d1ebf54a1d98c7523658cadd37dfe421a0ecde8c743cfe8b4fc1af4bbc81c"
             },
             {
@@ -84545,8 +84531,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareIoAssignment",
-              "line": 83,
-              "endLine": 142,
+              "line": 131,
+              "endLine": 190,
               "sha256": "92702e159866c4d5a04c4088351a023fa20cb0fd07717265b833514e2d92416c"
             },
             {
@@ -84776,7 +84762,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -84857,6 +84843,13 @@
               "sha256": "67e461f45527af59c1e86804dbab04b3f64c592031193b68288414f53ff23c60"
             },
             {
+              "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
+              "name": "ApplyHardwareChannel",
+              "line": 120,
+              "endLine": 129,
+              "sha256": "f75f65b546e29c398b1eda0e7f7af854377c016e1c6093695aa5d10a39c8a3b2"
+            },
+            {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
               "line": 53,
@@ -84880,8 +84873,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "ApplyIoAssignment",
-              "line": 168,
-              "endLine": 187,
+              "line": 216,
+              "endLine": 235,
               "sha256": "ac6cc96e0cc91098106428601ef789d118b6d578552264424c3e5975013f2573"
             },
             {
@@ -85139,8 +85132,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "HardwareIndex",
-              "line": 40,
-              "endLine": 45,
+              "line": 48,
+              "endLine": 53,
               "sha256": "8214e479e899b0fb53965c6d372713a1e503253a280b1464a86c52c64dd23d2d"
             },
             {
@@ -85194,16 +85187,9 @@
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
-              "name": "PrepareHardwareChannel",
-              "line": 69,
-              "endLine": 81,
-              "sha256": "d4cd3dce25299dc01ca3ef9b9c93d035aea2dac2e44581e9ff94c36385177152"
-            },
-            {
-              "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareHardwareMove",
-              "line": 47,
-              "endLine": 57,
+              "line": 55,
+              "endLine": 65,
               "sha256": "0681fd2dcfbd0694c908c15f057a95f5bea5627ae3cef00a252d6cf8ba37c0c7"
             },
             {
@@ -85283,7 +85269,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -85303,7 +85289,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87192,7 +87178,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87247,7 +87233,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87299,14 +87285,14 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "PrepareIoAssignment",
-              "line": 83,
-              "endLine": 142,
+              "line": 131,
+              "endLine": 190,
               "sha256": "92702e159866c4d5a04c4088351a023fa20cb0fd07717265b833514e2d92416c"
             }
           ]
@@ -87319,14 +87305,14 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs",
               "name": "ApplyIoAssignment",
-              "line": 168,
-              "endLine": 187,
+              "line": 216,
+              "endLine": 235,
               "sha256": "ac6cc96e0cc91098106428601ef789d118b6d578552264424c3e5975013f2573"
             }
           ]
@@ -87350,7 +87336,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87370,7 +87356,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87401,7 +87387,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87421,7 +87407,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87452,7 +87438,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87472,7 +87458,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87503,7 +87489,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87523,7 +87509,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87554,7 +87540,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87574,7 +87560,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87605,7 +87591,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87625,7 +87611,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87656,7 +87642,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87676,7 +87662,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87707,7 +87693,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87727,7 +87713,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87758,7 +87744,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87778,7 +87764,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87809,7 +87795,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87829,7 +87815,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87860,7 +87846,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87912,7 +87898,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87932,7 +87918,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -87963,7 +87949,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -87983,7 +87969,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88014,7 +88000,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88111,7 +88097,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88156,7 +88142,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88204,7 +88190,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88263,7 +88249,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88294,7 +88280,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88335,7 +88321,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88366,7 +88352,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88400,7 +88386,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": []
         }
@@ -88423,7 +88409,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88471,7 +88457,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88516,7 +88502,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88606,7 +88592,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88672,7 +88658,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88692,7 +88678,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88723,7 +88709,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88743,7 +88729,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88774,7 +88760,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88794,7 +88780,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88825,7 +88811,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88845,7 +88831,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88876,7 +88862,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88896,7 +88882,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -88927,7 +88913,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -88982,7 +88968,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89055,7 +89041,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89075,7 +89061,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89120,7 +89106,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89140,7 +89126,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89171,7 +89157,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89191,7 +89177,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89222,7 +89208,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89242,7 +89228,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89273,7 +89259,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89293,7 +89279,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89324,7 +89310,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89421,7 +89407,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89459,7 +89445,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89479,7 +89465,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89510,7 +89496,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89530,7 +89516,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89561,7 +89547,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89581,7 +89567,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89612,7 +89598,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89632,7 +89618,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89663,7 +89649,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89739,7 +89725,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89770,7 +89756,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89832,7 +89818,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89884,7 +89870,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -89960,7 +89946,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -89998,7 +89984,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90074,7 +90060,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90105,7 +90091,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90181,7 +90167,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90233,7 +90219,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90253,7 +90239,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90284,7 +90270,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90304,7 +90290,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90335,7 +90321,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90383,7 +90369,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90435,7 +90421,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90455,7 +90441,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90486,7 +90472,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90506,7 +90492,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90537,7 +90523,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90557,7 +90543,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90588,7 +90574,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90608,7 +90594,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90639,7 +90625,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90659,7 +90645,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90690,7 +90676,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90710,7 +90696,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90741,7 +90727,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90761,7 +90747,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -90792,7 +90778,7 @@
             "name": "PrepareEngineeringMutation",
             "line": 319,
             "endLine": 812,
-            "sha256": "005c1b05fcb1068d940554b60cabb989b5dccd6290efbea6ae9aba633f01cd9c"
+            "sha256": "9699d0e849eb36a03f5d793468692027da2a839b2bb9eb69afac332266c6cd28"
           },
           "handlers": [
             {
@@ -90812,7 +90798,7 @@
             "name": "ApplyEngineeringMutation",
             "line": 814,
             "endLine": 1131,
-            "sha256": "dd5e1a434325402bd393b4c4d8bd157bd305bb3d2eb3bde2e64efbf7beda495c"
+            "sha256": "09005a2ae187b7baddf5fc8cc2865c7f6347557844450201cc3add76bb5e4ed4"
           },
           "handlers": [
             {
@@ -94419,7 +94405,6 @@
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
         "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
-        "src/TiaMcp.Openness.V21/OpennessSession.Attributes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
         "src/TiaMcp.Openness.V21/OpennessSession.RemoteIoEditing.cs"
       ],
