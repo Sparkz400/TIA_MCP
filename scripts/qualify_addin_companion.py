@@ -36,6 +36,13 @@ def wait_for_handoff(artifacts, before):
     raise AssertionError("No Add-In selection arrived within %d s" % SELECT_TIMEOUT)
 
 
+def stored_producer(artifacts, summary, record):
+    """The producer block of the stored record; the page tool does not show it, and the file must hash to the record ID."""
+    stored = (artifacts / summary["reportArtifact"]["path"]).read_bytes()
+    require(hashlib.sha256(stored).hexdigest() == record == summary["recordId"], "The stored record does not hash to its record ID")
+    return json.loads(stored)["report"]["producer"]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", type=Path, required=True)
@@ -76,9 +83,10 @@ def main():
         record = receipt.get("selectionRecordId") or receipt.get("SelectionRecordId")
         summary = step("selection summary", client.tool("addin_selection_page", {"recordId": record, "section": "summary"}))
         rows = step("selections", client.tool("addin_selection_page", {"recordId": record, "section": "selections", "count": 64}))
-        text = json.dumps(summary)
-        require(enrollment["assemblySha256"] in text and enrollment["configurationSha256"] in text, "The record does not carry the enrolled producer hashes")
-        require(review["reviewId"] in text, "The record is not bound to the saved review")
+        producer = step("stored producer", stored_producer(artifacts, summary, record))
+        require(producer.get("assemblySha256") == enrollment["assemblySha256"] and producer.get("configurationSha256") == enrollment["configurationSha256"],
+                "The record does not carry the enrolled producer hashes")
+        require(summary["reviewId"] == review["reviewId"], "The record is not bound to the saved review")
         report["selectionRecordId"], report["completed"] = record, True
     except Exception as error:
         report["failure"] = str(error)
