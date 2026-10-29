@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.70",
+  "catalogVersion": "0.4.71",
   "targetTiaVersions": [
     21
   ],
@@ -5058,7 +5058,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "memoryReset (owned instances only) restarts the virtual controller with its loaded program through IInstance.MemoryReset; not natively qualified."
         ]
       },
       "qualification": {
@@ -5230,7 +5231,8 @@
         "status": "implemented",
         "limitations": [
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "virtualTime=true (owned instances only) runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode; not natively qualified."
         ]
       },
       "qualification": {
@@ -5296,6 +5298,134 @@
         "AC-identity",
         "AC-completeness",
         "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_time",
+      "domain": "simulation",
+      "title": "Read and set the virtual clock of an owned simulated CPU",
+      "mcpTools": [
+        "sim_time"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ScaleFactor and IInstance.SystemTime; virtual-time scenarios use OperatingMode TimespanSynchronized_C, StartProcessing and the sync-point event."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Reads any selected instance; writes need an instance this worker created or adopted, in its admitted network mode, and no active cycle-synchronous capture.",
+          "scaleFactor is greater than 0 and at most 1000 and acts in the default operating mode from the next cycle control point; systemTimeUtc is an explicit UTC instant from 1970 to 2200. Both are read back.",
+          "Virtual-time stepping itself is a sim_test option (virtualTime); sim_time never changes the operating mode."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_event",
+      "domain": "simulation",
+      "title": "Inject interrupts and faults into an owned running simulated CPU",
+      "mcpTools": [
+        "sim_event"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ProcessEvent, PullOrPlugEvent, RackOrStationFaultEvent, AlarmNotification, StatusEvent and GetConfiguredProcessEvents."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
+          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_storage",
+      "domain": "simulation",
+      "title": "Archive and retrieve the virtual memory card of an owned simulated CPU",
+      "mcpTools": [
+        "sim_storage"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ArchiveStorage and RetrieveStorage (instance powered off)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Owned instances in OFF only. Archive writes a new .zip and a receipt (path, size, SHA-256) to the Host's simulation-archives directory.",
+          "Retrieve accepts only an unchanged archive written there from the same owned instance (expectedSha256 required); the instance's storage path and ownership marker must be unchanged afterwards."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
@@ -5764,6 +5894,147 @@
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_create",
+      "domain": "data",
+      "title": "Create an empty PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTableComposition.Create."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload tagTableName and optional scopePath/groupPath; the name must be free in the software scope across every tag-table group (case-insensitive). compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_rename",
+      "domain": "data",
+      "title": "Rename a PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_rename",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTable.Name setter."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload tagTableName or tagTablePath and newName; the table keeps its members and newName must be free in the software scope. compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_delete",
+      "domain": "data",
+      "title": "Delete an empty PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTable.Delete."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload tagTableName or tagTablePath; only an empty user table (no tags, no user constants) is deleted and the default tag table never. compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",
@@ -12114,6 +12385,54 @@
         "evidenceIds": [
           "local.cpu_memory_bytes.rerun.20261028"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_cpu_parameters",
+      "domain": "hardware",
+      "title": "Set reviewed CPU parameters",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_cpu_parameters",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base typed attribute API on CPU device items."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Only the reviewed CPU parameter attributes declared by the selected hardware item; every value is converted to its native type, written, read back and compared. Unchanged requests and undeclared attributes refuse.",
+          "Device compilation and configured-hardware preservation (identities, slots, reviewed attributes including the parameter subset, addresses and network associations) are mandatory; the runtime effect is not observed by this kind."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",
@@ -19062,6 +19381,58 @@
       ]
     },
     {
+      "featureId": "change.simulation_download_online",
+      "domain": "simulation",
+      "title": "Download a changed program online to an existing owned PLCSIM instance",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "simulation_download_online",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DownloadProvider.Download(IConfiguration, pre, post, DownloadOptions) on the PLC's PN/IE / PLCSIM (1) target interface, with the typed download configurations."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
+          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
+          "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
+          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "PLCSIM Advanced V8 API and authorized Windows user"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence",
+        "AC-runtime"
+      ]
+    },
+    {
       "featureId": "drive_profile_review",
       "domain": "drive-profiles",
       "title": "Compare supplied drive parameters and typed telegrams",
@@ -20153,6 +20524,148 @@
         "TIA Portal V21 with the required engineering products and Openness access",
         "An explicitly selected offline project and PLC software compiler",
         "Writable checkpoint artifact directory; native qualification before production admission"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.device_compile",
+      "domain": "engineering",
+      "title": "Checkpoint and compile one device (station hardware and software)",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "device_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Uses Device.GetService<ICompilable>() for the exact device of the device compiler inventory."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_compile",
+      "domain": "engineering",
+      "title": "Checkpoint and compile every device of the project",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "project_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Uses Device.GetService<ICompilable>() for every device of the device compiler inventory, in order."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Empty payload; compile=true. Every device needs a compiler service and the inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hmi_compile",
+      "domain": "hmi",
+      "title": "Checkpoint and compile one HMI target",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hmi_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Classic HMI software ICompilable or, for Unified, the owning device's ICompilable (the documented hardware-and-software route)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "The HMI family's optional engineering product installed"
       ],
       "acceptanceCriteria": [
         "AC-identity",
