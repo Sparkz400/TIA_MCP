@@ -14,7 +14,8 @@ public sealed class OpcUaReconnectHistory(int maximumAttempts)
     public bool Pending { get; private set; }
     public bool Healthy { get; private set; } = true;
     private string? previousError;
-    public static bool Retryable(string? code) => code is "UaTransportInterrupted" or "UaTimeout";
+    // A busy shared vault (another Host user's turn, up to 5 s) is transient too; the attempt budget still bounds it.
+    public static bool Retryable(string? code) => code is "UaTransportInterrupted" or "UaTimeout" or "UaCredentialStoreBusy";
     public static void Validate(OpcUaReconnectEvent e, int maximumAttempts)
     {
         Require(e.Attempt >= 1 && e.Attempt <= maximumAttempts && maximumAttempts <= 3);

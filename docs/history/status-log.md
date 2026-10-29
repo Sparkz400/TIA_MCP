@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Typed created-storage runtime — 29 October 2026:** the 8 harnessed wave 9 created-storage cells (`createMulti` of TONR, R_TRIG and F_TRIG and `createGlobal` of TONR, LAD and FBD) passed all five gates, runtime behavior included, on owned PLCSIM (build `7db882c`; `local.typed.wave9-created-storage.runtime.20261029`). `change.graphical_typed_edit` stays unverified until the rest of the typed backlog closes; no matrix count change.
+
+**Maintainer decisions — 29 October 2026:** the block-protection credential route is 1.0 work, so its three rows count as open again (5 blocked rows remain, 31 cells); live monitoring and active forcing are 1.0 scope; combined library apply becomes the default for its verified PLC recipe shapes (left to the coordinator); the "Not a 1.0 gate" section is confirmed; VS Code alone closes the Explorer roundtrip. Catalog 0.4.78; matrix 1,896 bound, 169 open, 31 blocked, 30 deferred.
+
+**Release tracking reconciled — 29 October 2026:** [Release acceptance](../plans/release-acceptance.md) defines how the maintainer accepts an obligation; the ledger records the eight blocked rows in `dispositions` and amends `completionCriteria`, and ten obligations were refreshed against catalog `0.4.76`. The TODO now lists the ten deferred rows with their dispositions, the work outside the matrix, capability gaps, release mechanics, one acceptance box per obligation group, open maintainer questions, and a "Not a 1.0 gate" section for the VM and recurring items (maintainer to confirm). Matrix counts are unchanged (151 open cells).
+
 **Hardware families — 29 October 2026:** ([record](../verification/hardware-families-20261029.md))
 - **Runs:** `scripts/qualify_hardware_changes.py` passed 276/276 steps on build `556cee5`: a CPU 1214C DC/DC/DC V4.7 and an ET 200MP IM 155-5 PN ST V4.1 station on a second S7-1500's IO system went through the S7-1500 gates (apply, exact state delta, fresh reopen, checkpoint restore, refusals). Curated as `local.hardware_changes.families.20261029`; no worker or Host change.
 - **Catalog 0.4.77:** evidence references only; no matrix cell changes.

@@ -922,7 +922,8 @@
               "errorCode": {
                 "enum": [
                   "UaTransportInterrupted",
-                  "UaTimeout"
+                  "UaTimeout",
+                  "UaCredentialStoreBusy"
                 ]
               }
             }

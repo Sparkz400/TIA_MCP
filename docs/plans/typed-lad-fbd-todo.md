@@ -11,15 +11,19 @@ See the [consolidated TODO](../TODO.md) for the current work order. This page re
   with exact operand/pin/overload types and explicit refusals. Offline tests use unit-test-only
   profiles. Their 60 generated networks were checked once against the installed V21
   `SW.PlcBlocks.LADFBD_v5.xsd` (outside the repository, so not a committed test).
-- [ ] Capture the families: author SIMATIC SD sources (the repository records no SIMATIC SD syntax
+- [x] Capture the families: author SIMATIC SD sources (the repository records no SIMATIC SD syntax
   for MOVE, arithmetic or R_TRIG/F_TRIG), run `capture_typed_graphical_profiles.py`, add their pin
-  contracts to `extract_typed_graphical_profiles.py`, then qualify the cells. Until then every request
-  returns `GraphicalProfileUnavailable`. Created TONR/R_TRIG/F_TRIG storage also needs captured global
-  IEC storage documents and IEC dependent-instance effect members.
-  - Prepared, not executed: 69 handwritten standard-route sources (LAD/FBD, local and global IEC
-    storage), extractor pin contracts checked against the wired native pins, 66 cases and runtime
-    expectations. The [wave 9 runbook](../verification/typed-wave9-families-runbook.md) lists the
-    native steps from capture to qualification. IEC effect members for created storage remain open.
+  contracts to `extract_typed_graphical_profiles.py`, then qualify the cells. Created TONR/R_TRIG/F_TRIG
+  storage also needs captured global IEC storage documents and IEC dependent-instance effect members.
+  Done: 60 profiles captured (`local.typed.wave9-capture.20261027`), 62 of 66 cases pass the four
+  engineering gates (`local.typed.wave9.engineering.20261028`), all 60 cells with a runtime harness
+  pass runtime on the standard route (`local.typed.wave9.runtime.20261029`), and the IEC effect
+  members (`local.typed.iec-effect-standard-wave9.20261029`) let the 14 created-storage cells pass
+  engineering (`local.typed.wave9-created-storage.engineering.20261029`).
+  - [x] Runtime of the 8 harnessed created-storage cells passed all five gates, runtime behavior included
+    (`local.typed.wave9-created-storage.runtime.20261029`); the 6 transitive cells have no runtime harness.
+  - [ ] The four existing-global R_TRIG/F_TRIG cases: no profile, because TIA deletes an
+    unreferenced R_TRIG/F_TRIG instance DB at compile. Capture one or record the boundary.
 - [ ] A second CPU: profiles, creation/instance templates and dependent-effect manifests are keyed by
   the exact CPU TypeIdentifier, and every capture is CPU 1511-1 PN `OrderNumber:6ES7 511-1AL03-0AB0/V4.1`.
   No typed capture exists for any other CPU. Missing: a capture on that CPU
