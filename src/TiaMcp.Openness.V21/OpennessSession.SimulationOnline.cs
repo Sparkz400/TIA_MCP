@@ -44,6 +44,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "expectedFingerprintSha256 must be 64 lowercase hexadecimal characters.");
             string observerDirectory = SimulationDiscoveryObserverDirectory(args);
             SimulationDiscoveryObserver.VerifyDestination(observerDirectory);
+            var login = OwnedSimulationLogin(args, marker);
             var report = OwnedSimulationReport(marker, "online compare");
             report["project"] = ProjectInfo(plc.Project);
             report["plcPath"] = plc.Path;
@@ -60,7 +61,7 @@ namespace TiaMcp.Openness.V21
                     report["compare"] = OnlineCompareElement(compared.RootElement, budget, 0);
                     report["compareTruncated"] = budget.Truncated;
                     report["compareBasis"] = "PlcSoftware.CompareToOnline LeftName/RightName, CompareResultState and DetailedInformation as returned by Siemens; names alone do not establish object identity.";
-                });
+                }, login);
             if (failure != null) throw new BridgeException(failure.Code, failure.Message, report);
             report["completed"] = true;
             return report;
@@ -70,9 +71,10 @@ namespace TiaMcp.Openness.V21
         // the optional pre-route step, apply the PLC's sole PN/IE / PLCSIM (1) target interface, go online, run the online
         // step, then always go offline, detach and release. Returns the first failure; the report records every stage.
         private BridgeException OwnedSimulationOnline(JObject marker, PlcSelection plc, DeviceItem hardware, string observerDirectory, JObject report, string failureCode,
-            Action<string, OwnedSimulationChallenges> identified, Action<OwnedSimulationChallenges> online)
+            Action<string, OwnedSimulationChallenges> identified, Action<OwnedSimulationChallenges> online, SimulationCredential login = null)
         {
-            var challenges = new OwnedSimulationChallenges();
+            var challenges = new OwnedSimulationChallenges(login);
+            if (login != null) report["login"] = login.Evidence;
             report["onlineChallenges"] = challenges.Observed;
             var cleanup = (JArray)report["cleanup"];
             IInstance instance = null; SimulationDiscoveryObserver observer = null;
@@ -88,6 +90,7 @@ namespace TiaMcp.Openness.V21
                 observer = SimulationDiscoveryObserver.Start(observerDirectory, _processId);
                 report["discoveryObserver"] = observer.Evidence.DeepClone();
                 string address = OwnedSimulationEndpoint(ips, observer, report);
+                challenges.Reverify = () => VerifyOwnedPoweredSimulation(instance, marker, address);
                 provider = hardware.GetService<OnlineProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected PLC has no OnlineProvider service.");
                 if (provider.State != OnlineState.Offline)
                     throw new BridgeException("OfflineRequired", "The selected PLC must be offline before the owned PLCSIM route is configured.");
@@ -159,10 +162,12 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("ArtifactExists", "The upload destination already exists; nothing is overwritten.");
             string observerDirectory = SimulationDiscoveryObserverDirectory(args);
             SimulationDiscoveryObserver.VerifyDestination(observerDirectory);
+            var login = OwnedSimulationLogin(args, marker);
             var report = OwnedSimulationReport(marker, "station upload");
+            if (login != null) report["login"] = login.Evidence;
             report["destination"] = destination;
             report["reportPath"] = Path.Combine(destination, "station-upload.json");
-            var challenges = new OwnedSimulationChallenges();
+            var challenges = new OwnedSimulationChallenges(login);
             report["onlineChallenges"] = challenges.Observed;
             var decisions = new JArray();
             report["uploadConfigurations"] = decisions;
@@ -180,6 +185,7 @@ namespace TiaMcp.Openness.V21
                 observer = SimulationDiscoveryObserver.Start(observerDirectory, _processId);
                 report["discoveryObserver"] = observer.Evidence.DeepClone();
                 string address = OwnedSimulationEndpoint(ips, observer, report);
+                challenges.Reverify = () => VerifyOwnedPoweredSimulation(instance, marker, address);
                 report["stage"] = "createDestinationProject";
                 Directory.CreateDirectory(destination);
                 project = _portal.Projects.Create(new DirectoryInfo(destination), StationUploadProjectName);
@@ -455,12 +461,18 @@ namespace TiaMcp.Openness.V21
             return failure;
         }
 
-        // Fails closed like credential provisioning without its first-use trust: TLS is answered NonTrusted,
-        // logins and passwords are never answered, and the first challenge is latched for the caller to throw.
+        // Fails closed like credential provisioning without its first-use trust: TLS is answered NonTrusted, passwords are
+        // never answered, and the first unanswered challenge is latched for the caller to throw. With a login, the one
+        // project-user login challenge is answered with the instance's generated runtime user (SimulationOnlineLogin).
         private sealed class OwnedSimulationChallenges
         {
             internal BridgeException Failure;
             internal readonly JArray Observed = new JArray();
+            private readonly SimulationCredential _login;
+            private bool _answered;
+            internal Action Reverify; // Re-checks the owned powered instance and endpoint before the login is sent.
+
+            internal OwnedSimulationChallenges(SimulationCredential login = null) { _login = login; }
 
             internal void Reject(OnlineConfiguration request)
             {
@@ -469,6 +481,20 @@ namespace TiaMcp.Openness.V21
                 if (Observed.Count < 16) Observed.Add(entry);
                 try
                 {
+                    var authentication = request as OnlineAuthenticationConfiguration;
+                    var offered = authentication?.GetSupportedAuthenticationTypes().Take(8).Select(item => item.CurrentUserType).ToArray() ?? new UserType[0];
+                    if (authentication != null) entry["offered"] = new JArray(offered.Select(item => item.ToString()));
+                    if (SimulationOnlineLogin.Decide(type, _login != null, _answered, offered.Contains(UserType.ProjectUser)) == SimulationOnlineLogin.ProjectUser)
+                    {
+                        _answered = true;
+                        (Reverify ?? throw new BridgeException("SimulationOnlineRequired", "The owned instance was not verified before the login."))();
+                        authentication.OnlineCredentials.Type = UserType.ProjectUser;
+                        authentication.OnlineCredentials.Name = _login.Username;
+                        using (var password = OpenSimulationCredential(_login)) authentication.OnlineCredentials.SetPassword(password);
+                        entry["decision"] = SimulationOnlineLogin.ProjectUser;
+                        entry["username"] = _login.Username;
+                        return;
+                    }
                     if (request is TlsVerificationConfiguration tls)
                     {
                         tls.CurrentSelection = TlsVerificationConfigurationSelection.NonTrusted;
