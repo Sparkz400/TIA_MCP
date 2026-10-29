@@ -314,20 +314,22 @@ def body(h):
                 return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
             h.stage("restore db_snapshot_create from its checkpoint", restore)
 
-        h.stage("close the scratch before the upload", lambda: h.tool("tia_detach"))
-        h.owned_portal("for the station upload")
-        def upload():
-            report = h.tool("plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login})
-            session = online_session(report, lab.username)
-            require(report["saved"] is True and report["uploadedStation"] and Path(report["project"]["path"]).is_file() and Path(report["reportPath"]).is_file(),
-                    "The upload saved no station: %s" % {k: report.get(k) for k in ("saved", "uploadedStation", "project", "reportPath")})
-            plcs = h.tool("project_inventory", {"maxItems": 1000})["plcs"]
-            require(len(plcs) == 1, "Expected one uploaded PLC: %s" % plcs)
-            uploaded = program(h.tool("software_inspect", {"plcPath": plcs[0]["path"], "maxItems": 2000}))
-            require(uploaded == lab.downloaded, "The uploaded blocks differ: downloaded %s, uploaded %s" % (lab.downloaded, uploaded))
-            return {**session, "project": report["project"], "uploadedStation": report["uploadedStation"], "devices": report["devices"],
-                    "upload": {k: report["upload"][k] for k in ("state", "errors", "warnings")}, "blocks": uploaded}
-        h.stage("plc_station_upload with the runtime user", upload)
+        # --skip-upload: in an empty Portal the upload meets TLS verification, which these routes never trust (29 October 2026).
+        if not h.args.skip_upload:
+            h.stage("close the scratch before the upload", lambda: h.tool("tia_detach"))
+            h.owned_portal("for the station upload")
+            def upload():
+                report = h.tool("plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login})
+                session = online_session(report, lab.username)
+                require(report["saved"] is True and report["uploadedStation"] and Path(report["project"]["path"]).is_file() and Path(report["reportPath"]).is_file(),
+                        "The upload saved no station: %s" % {k: report.get(k) for k in ("saved", "uploadedStation", "project", "reportPath")})
+                plcs = h.tool("project_inventory", {"maxItems": 1000})["plcs"]
+                require(len(plcs) == 1, "Expected one uploaded PLC: %s" % plcs)
+                uploaded = program(h.tool("software_inspect", {"plcPath": plcs[0]["path"], "maxItems": 2000}))
+                require(uploaded == lab.downloaded, "The uploaded blocks differ: downloaded %s, uploaded %s" % (lab.downloaded, uploaded))
+                return {**session, "project": report["project"], "uploadedStation": report["uploadedStation"], "devices": report["devices"],
+                        "upload": {k: report["upload"][k] for k in ("state", "errors", "warnings")}, "blocks": uploaded}
+            h.stage("plc_station_upload with the runtime user", upload)
 
         stopped = h.stage("stop", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "stop", "timeoutMs": 30000}))
         require(stopped["instance"]["operatingState"] == "Stop", "The instance did not stop")
@@ -353,6 +355,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--skip-snapshots", action="store_true", help="Run the compare and the station upload without the DB-snapshot steps.")
+    parser.add_argument("--skip-upload", action="store_true", help="Leave out the station upload.")
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "or_", "D09 online routes on one owned PLCSIM Advanced V8 instance, logged in as its generated runtime user", LIMITATIONS, []).run(body)
