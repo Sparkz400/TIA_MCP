@@ -182,7 +182,7 @@ namespace TiaMcp.Openness.V21
                     readback = OpcUaRoleInfo(OpcUaRole(group, name) ?? throw new BridgeException("MutationVerificationFailed", "Created OPC UA role mapping was not found."));
                     var actual = (JArray)readback["namespacePermissions"];
                     if (payload["projectRole"] != null && readback.Value<string>("projectRole") != payload.Value<string>("projectRole") || wanted.Any(row => !actual.Any(item => JToken.DeepEquals(item, row))))
-                        throw new BridgeException("MutationVerificationFailed", "OPC UA role mapping read-back differs from the requested project role or namespace permissions.");
+                        throw new BridgeException("MutationVerificationFailed", "OPC UA role mapping read-back differs from the requested project role or namespace permissions: " + readback.ToString(Newtonsoft.Json.Formatting.None));
                 }
             }
             else if (change.Kind.StartsWith("opcua_server_interface_", StringComparison.Ordinal))
