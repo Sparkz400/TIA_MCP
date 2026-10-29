@@ -40,7 +40,7 @@ namespace TiaMcp.Openness.V21
                 throw new PlcComponentException("InvalidRequest", "An explicit caller idempotencyKey is required for the review request.");
         }
 
-        // Production combined apply (--enable-library-integrate-apply) runs only the shapes the component route
+        // Production combined apply (on by default since 29 October 2026) runs only the shapes the component route
         // verified natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport)
         {

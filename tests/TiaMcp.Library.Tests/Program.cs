@@ -472,9 +472,9 @@ Test("CLI toolsets select named groups and refuse unknown, empty or repeated val
     try { ToolGroups.Advertised("unmapped_tool", null); throw new Exception("An unmapped tool was advertised."); }
     catch (InvalidOperationException error) when (error.Message.Contains("belongs to no --toolsets group")) { }
 });
-Test("CLI combined library_integrate apply is opt-in", work =>
+Test("CLI combined library_integrate apply is on by default and the old flag is a no-op", work =>
 {
-    Equal(false, HostOptions.Parse([]).LibraryIntegrateApply);
+    Equal(true, HostOptions.Parse([]).LibraryIntegrateApply);
     Equal(true, HostOptions.Parse(["--enable-library-integrate-apply"]).LibraryIntegrateApply);
 });
 Test("CLI Add-In receiver is explicit and does not imply native admission", work =>

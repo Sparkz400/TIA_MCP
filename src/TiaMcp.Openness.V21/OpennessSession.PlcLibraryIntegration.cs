@@ -145,7 +145,7 @@ namespace TiaMcp.Openness.V21
                     ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
         }
 
-        // Only an enabled Host changes the preview, so the reviewed hash always states whether change_apply installs.
+        // Every production Host enables this (Host default since 29 October 2026); the preview, and so the reviewed hash, states whether change_apply installs.
         private void PreparePlcCombinedApply(LibraryChange change)
         {
             if (!_libraryIntegrateApplyEnabled) return;
@@ -154,10 +154,10 @@ namespace TiaMcp.Openness.V21
             change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal,
                 ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate, then graphical_typed_edit. Not atomic.",
                 ["checkpoint"] = "The import step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
-                ["qualification"] = "Compiled against the V21 PublicAPI only; not natively qualified as a production route." };
+                ["qualification"] = "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
-            coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Host-gated combined change_apply; not natively qualified as a production route.";
+            coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";
             ((JArray)change.Preview["effects"]).Add(new JObject { ["action"] = "applyPlcComponentSteps", ["nativeMutation"] = true, ["steps"] = ((JArray)change.Preview["integrationPlan"]["steps"]).Count });
             var warnings = (JArray)change.Preview["warnings"];
             warnings.Where(w => ((string)w).StartsWith("Planning only.", StringComparison.Ordinal)).ToList().ForEach(w => w.Remove());

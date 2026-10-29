@@ -12,7 +12,7 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         // The explicitly launched qualification route reaches this factory; production
-        // library_integrate uses CreatePlcComponentProductionCoordinator behind its own Host flag.
+        // library_integrate uses CreatePlcComponentProductionCoordinator for the verified shapes.
         private PlcComponentCoordinator CreatePlcComponentQualificationCoordinator(string planChangeId, string previewHash, string root)
         {
             EnsureAttached();
@@ -27,7 +27,7 @@ namespace TiaMcp.Openness.V21
             return PlcComponentCoordinator.Create(root, LibraryChangeView(plan), operations, _componentWindowManifest.Value<string>("componentId"), workspace);
         }
 
-        // Host-gated production route: the same coordinator and adapters on the plan's own (not owned-scratch) project.
+        // Production route: the same coordinator and adapters on the plan's own (not owned-scratch) project.
         private PlcComponentCoordinator CreatePlcComponentProductionCoordinator(LibraryChange plan, string workspace) =>
             PlcComponentCoordinator.Create(workspace, LibraryChangeView(plan), new NativePlcComponentOperations(this, plan, workspace, true));
 

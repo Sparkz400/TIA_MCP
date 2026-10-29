@@ -37,7 +37,7 @@ From the repository root:
 
 If the probe reports missing prerequisites, follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md).
 
-Optional combined library install: start the Host with `--enable-library-integrate-apply` to let `change_apply` install a prepared PLC `library_integrate` plan in one step. It is off by default, runs only the natively qualified shapes and refuses OB insertion. See [combined apply](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply-opt-in).
+Combined library install: on every Host, `change_apply` installs a prepared PLC `library_integrate` plan in one step for the natively qualified shapes only and refuses OB insertion and every other shape. The former opt-in flag `--enable-library-integrate-apply` is still accepted and changes nothing. See [combined apply](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply).
 
 Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll). It is not natively qualified.
 
