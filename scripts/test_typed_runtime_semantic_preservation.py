@@ -36,6 +36,16 @@ class SemanticRuntimePreservationTests(unittest.TestCase):
         self.assertEqual([], verdict["failures"])
         self.assertEqual(["RData/retain_user"], list(verdict["postRunCardInventories"][0]["files"]))
 
+    def test_only_the_open_time_pedata_file_is_excused(self):
+        def late_pedata(added_at_open):
+            report = passing()
+            report["runtimePreservation"]["closedToActiveTransition"]["added"] = added_at_open
+            report["runtimePreservation"]["observations"][-1]["difference"]["added"].append("System/~PEData.1")
+            return evaluate(report)["failures"]
+        self.assertEqual([], late_pedata(["System/~PEData.1", "P.info"]))
+        self.assertTrue(late_pedata([]))  # Added later, not when the project opened.
+        self.assertTrue(late_pedata(["System/~PEData.1x"]))
+
     def test_each_condition_fails_closed(self):
         def broken(change):
             report = passing(); change(report); return evaluate(report)["failures"]

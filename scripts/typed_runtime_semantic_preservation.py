@@ -8,7 +8,9 @@
 4. Post-RUN card files are runtime state: inventoried, never compared.
 
 Applies to retained reports without rerunning them; byte-level observations stay in the report.
+Files TIA adds when it opens the project (its .info file, intermittently System/~PEData.<n>) are excused.
 """
+import re
 
 # Calls that cannot change project files; simulation_download writes only the card.
 READ_OR_SIMULATOR = frozenset({"simulation_discovery_baseline", "sim_create", "simulation_download", "sim_state",
@@ -65,7 +67,9 @@ def evaluate(report):
     require(not other, "other mutating calls in runtime window: " + ", ".join(other))
     during = _observation(preservation, "beforeOwnedRuntimeCleanup", "activeProjectAndAllCompanions") or {}
     after = (_observation(preservation, "afterVerifiedOwnedTiaCleanup", "projectAndAllCompanions") or {})
-    opened = (preservation.get("closedToActiveTransition") or {}).get("addedInfoFiles", [])
+    transition = preservation.get("closedToActiveTransition") or {}
+    # Opening the project adds TIA's .info file and, intermittently, a System/~PEData.<n> file (maintainer decision, 29 October 2026).
+    opened = transition.get("addedInfoFiles", []) + [p for p in transition.get("added", []) if re.fullmatch(r"System/~PEData\.\d+", p)]
     require(during.get("inventory", {}).get("complete") is True and after.get("inventory", {}).get("complete") is True, "incomplete project inventories")
     attributable = set(during.get("difference", {}).get("changed", [])) | set(during.get("difference", {}).get("added", []))
     late = after.get("difference", {})
