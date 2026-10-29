@@ -15,7 +15,7 @@ import hashlib
 from pathlib import Path
 import uuid
 
-from block_test_runtime import save_generated_scratch_project, verify_download, verify_owned_instance
+from block_test_runtime import save_generated_scratch_project, verify_credential_provisioning, verify_download, verify_owned_instance
 from library_native_harness import Harness, require
 
 SEED = Path(__file__).resolve().parents[1] / "fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml"
@@ -77,10 +77,14 @@ def body(h):
         require(instance.get("operatingState") == "Off", "A fresh owned OFF instance is required")
         cpus = h.scratch["scratchSecurity"]["cpus"]
         require(len(cpus) == 1, "Exactly one generated scratch credential is required")
-        download = h.stage("simulation_download", lambda: h.tool("simulation_download",
-                           {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": cpus[0]["credentialMetadataPath"]}))
+        ticket = {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": cpus[0]["credentialMetadataPath"]}
+        download = h.stage("simulation_download", lambda: h.tool("simulation_download", ticket))
         verify_download(download, instance)
         h.report["generatedProjectSave"] = save_generated_scratch_project(h.tool, download)
+        # The scratch CPU's card is configuration-protected; power-on needs its credential provisioned first.
+        provisioned = h.stage("simulation_provision_scratch_credential",
+                              lambda: h.tool("simulation_provision_scratch_credential", {**ticket, "trustOwnedEmptyCpuCertificate": True}))
+        h.report["credentialProvisioning"] = verify_credential_provisioning(provisioned, download, trust_owned_empty_cpu_certificate=True)
         h.stage("power on", lambda: h.tool("sim_state", {"instanceId": instance["id"], "action": "powerOn", "timeoutMs": 60000}))
         running = h.stage("run", lambda: h.tool("sim_state", {"instanceId": instance["id"], "action": "run", "timeoutMs": 30000}))
         require(running["instance"]["operatingState"] == "Run", "The instance did not enter RUN")
