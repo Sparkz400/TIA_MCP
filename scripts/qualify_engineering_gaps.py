@@ -14,10 +14,12 @@ import time
 
 from library_native_harness import Harness, require
 
-# Reviewed parameter -> new value on the scratch CPU 1511-1 PN; the names are HardwareEngineeringRules.CpuParameterAttributes.
-PARAMETERS = {"CycleMaximumCycleTime": 200, "CycleMinimumCycleTime": 5, "CycleCommunicationLoad": 30,
-              "StartupActionAfterPowerOn": 2, "StartupComparisonPresetToActualModule": 1, "StartupConfigurationTimeout": 30000,
-              "TimeOfDayLocalTimeZone": 23, "TimeOfDayActivateDaylightSavingTime": False}
+# Reviewed parameter -> candidate new values on the scratch CPU 1511-1 PN, tried in order; the names are
+# HardwareEngineeringRules.CpuParameterAttributes. V21 rejects StartupActionAfterPowerOn = 2 in its setter (29 October 2026),
+# so coded values are found by trial and every refused value is recorded.
+PARAMETERS = {"CycleMaximumCycleTime": [200], "CycleMinimumCycleTime": [5], "CycleCommunicationLoad": [30],
+              "StartupActionAfterPowerOn": [1, 4, 0, 2], "StartupComparisonPresetToActualModule": [1, 3, 0, 4], "StartupConfigurationTimeout": [30000],
+              "TimeOfDayLocalTimeZone": [23, 21, 1], "TimeOfDayActivateDaylightSavingTime": [False]}
 # Applied one at a time after the reviewed set; V21 may reject them at compile (they need NTP servers or access-level passwords).
 OBSERVED = {"CycleEnableMinimumCycleTime": False, "TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
 TABLE, RENAMED, RESTORED_TABLE = "TiaMcpGapTable", "TiaMcpGapRenamed", "TiaMcpGapRestore"
@@ -124,17 +126,14 @@ def body(h):
     # Typed CPU parameters.
     original = h.stage("discover CPU parameters", lambda: cpu_values(h, cpu))
     require(all(original[name] is not None for name in original), "The CPU does not expose every reviewed parameter: %s" % original)
-    require(all(original[name] != value for name, value in {**PARAMETERS, **OBSERVED}.items()), "A planned value equals the scratch default: %s" % original)
+    require(all(original[name] != value for name, value in OBSERVED.items()), "A planned value equals the scratch default: %s" % original)
     h.refuse("refuse disabling access control", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {"PlcAccessControlConfiguration": "Disabled"}}, "ProtectionDowngradeRefused")
     h.refuse("refuse an attribute outside the subset", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {"Comment": "x"}}, "UnsupportedAttribute")
     first = next(iter(PARAMETERS))
     h.refuse("refuse an unchanged parameter", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {first: original[first]}}, "InvalidRequest")
     h.refuse("refuse a null parameter", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {first: None}}, "InvalidRequest")
-    h.refuse("refuse a parameter on the device's rack", "hardware_cpu_parameters", {"hardwarePath": rack(h, device), "attributes": {first: PARAMETERS[first]}}, "UnsupportedCapability")
-    for name, value in PARAMETERS.items():
-        applied = h.apply("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: value}})
-        require("configured_hardware_preservation_verified" in applied["stages"], "Hardware preservation was not verified for " + name)
-        h.stage("read back " + name, lambda name=name, value=value: require(cpu_values(h, cpu)[name] == value, "Native readback differs for " + name) or cpu_values(h, cpu))
+    h.refuse("refuse a parameter on the device's rack", "hardware_cpu_parameters", {"hardwarePath": rack(h, device), "attributes": {first: PARAMETERS[first][0]}}, "UnsupportedCapability")
+    h.report["parameterValues"] = {name: set_first(h, cpu, name, [v for v in candidates if v != original[name]]) for name, candidates in PARAMETERS.items()}
     for name, value in OBSERVED.items():
         h.report.setdefault("observedParameters", {})[name] = observe(h, cpu, name, value)
     configured = cpu_values(h, cpu)
@@ -167,6 +166,27 @@ def body(h):
         hmi = add_hmi(h, panel)
         if hmi:
             h.report.setdefault("hmiCompile", {})[panel] = hmi_compile(h, hmi)
+
+
+def set_first(h, cpu, name, candidates):
+    """Apply the first candidate the native setter accepts; each refused value is recorded. The setter throws before any
+    project change, so a refused attempt leaves the project as its checkpoint saved it."""
+    def run():
+        refused = []
+        for value in candidates:
+            prepared = h.prepare("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: value}})
+            outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
+            content = outcome.get("structuredContent") or {}
+            if not outcome.get("isError"):
+                require("configured_hardware_preservation_verified" in content["stages"], "Hardware preservation was not verified for " + name)
+                require(cpu_values(h, cpu)[name] == value, "Native readback differs for " + name)
+                return {"value": value, "refused": refused}
+            error = content.get("error") or {}
+            require("set_" + name in (error.get("message") or "") and "mutation_applied" not in (error.get("details") or {}).get("stages", []),
+                    "Unexpected failure for %s = %s: %s" % (name, value, error.get("message")))
+            refused.append({"value": value, "code": error.get("code"), "message": error.get("message")})
+        raise AssertionError("The native setter refused every candidate for %s: %s" % (name, refused))
+    return h.stage("set " + name, run)
 
 
 def observe(h, cpu, name, value):

@@ -166,12 +166,12 @@ def body(h):
     di = latest(h.tool("hardware_catalog_search", {"filter": DI_FILTER, "maxItems": 200})["entries"], DI_ARTICLE)
     h.apply("hardware_plug", {"hardwarePath": rack(h, device), "typeIdentifier": di["typeIdentifier"], "name": "GapDI", "positionNumber": 2})
     module = next(r["path"] for r in h.tool("project_inventory", {"maxItems": 1000})["hardware"] if r["path"].endswith("/items/GapDI"))
-    obs, boundaries = [82, 83], {}
+    # OB40 is always planted: without a configurable hardware interrupt, its injection records the runtime's answer.
+    obs, boundaries = [40, 82, 83], {}
     if HARDWARE_INTERRUPT:
         h.apply("hardware_channel_attributes", {"hardwarePath": module, "ioType": "Input", "channelNumber": 0, "attributes": HARDWARE_INTERRUPT})
-        obs.append(40)
     else:
-        boundaries["OB40"] = "V21 Openness exposes no writable hardware-interrupt attribute on the DI channel (see the discovery record)."
+        boundaries["OB40"] = "V21 Openness exposes no channels and no hardware-interrupt attribute on the DI 16x24VDC HF module (discovery of 29 October 2026)."
     station = remote_station(h, plc, cpu)
     if station:
         obs.append(86)
@@ -336,10 +336,20 @@ def events(h, lab, ids, module, station, obs):
                              "channels": [{"channel": 0, "errorType": 1, "severity": "failure", "direction": "appear"}]}, "Ob82", 1)
     results["OB83"] = [inject("pull raises OB83", {"type": "pullOrPlug", "hardwareId": di, "action": "pull"}, "Ob83", 1),
                        inject("plug raises OB83", {"type": "pullOrPlug", "hardwareId": di, "action": "plug"}, "Ob83", 1)]
-    if 40 in obs:
+    if HARDWARE_INTERRUPT:
         process = next((row for row in configured if row["hardwareId"] == di or row["channel"] == 0), None)
         require(process, "The configured hardware interrupt is not listed: %s" % configured)
         results["OB40"] = inject("hardware interrupt raises OB40", {"type": "hardwareInterrupt", "hardwareId": process["hardwareId"], "channel": process["channel"], "edge": "risingEdge"}, "Ob40", 1)
+    else:
+        def unconfigured():
+            before = lab.counters()
+            outcome = h.client.request("tools/call", {"name": "sim_event", "arguments": {"instanceId": lab.instance["id"],
+                                       "event": {"type": "hardwareInterrupt", "hardwareId": di, "channel": 0, "edge": "risingEdge"}}})
+            time.sleep(2)
+            after = lab.counters()
+            require(after == before, "OB40 ran without a configured hardware interrupt: %s -> %s" % (before, after))
+            return {"configuredProcessEvents": configured, "isError": outcome.get("isError"), "content": outcome.get("structuredContent"), "counters": after}
+        results["OB40"] = h.stage("an unconfigured hardware interrupt does not raise OB40", unconfigured)
     if 86 in obs:
         results["OB86"] = [inject("station failure raises OB86", {"type": "rackOrStationFault", "hardwareId": station, "action": "fault"}, "Ob86", 1),
                            inject("station return raises OB86", {"type": "rackOrStationFault", "hardwareId": station, "action": "return"}, "Ob86", 1)]
