@@ -185,9 +185,27 @@ class Runner(Harness):
         self.persist()
         return row["exit"]
 
+    def refresh_tags(self):
+        """Refresh PLCSIM's tag list through sim_tags and resolve every symbol. After a restart or power cycle PLCSIM reads the
+        old list as NotUpToDate (-47) until it is refreshed (observed 29 October 2026)."""
+        self.symbols = {}
+        for member, (block, _) in SIGNALS.items():
+            tags = self.tool("sim_tags", {"instanceId": self.instance["id"], "filter": block, "maxItems": 2000})["tags"]
+            found = [tag["symbol"] for tag in tags if tag["symbol"].replace('"', "") == block + "." + member]
+            require(len(found) == 1, "PLCSIM symbol %s.%s is missing or ambiguous" % (block, member))
+            self.symbols[member] = found[0]
+        return self.symbols
+
     def plcsim(self, member):
-        row = self.tool("sim_read", {"instanceId": self.instance["id"], "signals": [{"symbol": self.symbols[member], "type": SIGNALS[member][1]}]})["values"][0]
-        return {k: row.get(k) for k in ("symbol", "quality", "value")}
+        """One PLCSIM API read. A bad quality is a failure only after one tag-list refresh; the first read is kept beside it."""
+        def read():
+            row = self.tool("sim_read", {"instanceId": self.instance["id"], "signals": [{"symbol": self.symbols[member], "type": SIGNALS[member][1]}]})["values"][0]
+            return {k: row.get(k) for k in ("symbol", "quality", "value")}
+        row = read()
+        if row["quality"] != "good":
+            self.refresh_tags()
+            row = {**read(), "beforeTagRefresh": row}
+        return row
 
     def credential(self, label, binding):
         """Store the runtime user's password under one public binding in this run's own vault, through the Host's credential CLI."""
@@ -367,12 +385,7 @@ def setup(r):
     require(running["instance"]["operatingState"] == "Run", "The instance did not enter RUN")
 
     def resolve():
-        r.symbols = {}
-        for member, (block, _) in SIGNALS.items():
-            tags = t("sim_tags", {"instanceId": r.instance["id"], "filter": block, "maxItems": 2000})["tags"]
-            found = [tag["symbol"] for tag in tags if tag["symbol"].replace('"', "") == block + "." + member]
-            require(len(found) == 1, "PLCSIM symbol %s.%s is missing or ambiguous" % (block, member))
-            r.symbols[member] = found[0]
+        r.refresh_tags()
         require(r.plcsim("Marker")["value"] == 4711, "Marker does not start at 4711")
         return r.symbols
     r.stage("resolve the PLCSIM symbols", resolve)
@@ -636,6 +649,7 @@ def server_restart(r):
     for action, state in (("stop", "Stop"), ("powerOff", "Off"), ("powerOn", None), ("run", "Run")):
         result = r.stage("sim_state %s during the captures" % action, lambda a=action: r.tool("sim_state", {"instanceId": r.instance["id"], "action": a, "timeoutMs": 60000}))
         require(state in (None, result["instance"]["operatingState"]), "%s left the CPU in %s" % (action, result["instance"]["operatingState"]))
+    r.stage("refresh the PLCSIM tag list after the restart", r.refresh_tags)
     for channel, started in (("ua", polled), ("web", captured)):
         prefix = ACQUIRE[channel]
         def finish(p=prefix, s=started):

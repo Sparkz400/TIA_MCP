@@ -35,7 +35,7 @@ class Plc:
     def __init__(self, root):
         self.root, self.state, self.started = root, "Off", 0
         self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "Enable": False, "Active": False}
-        self.inspections, self.sessions, self.captures, self.host = 0, {}, {}, None
+        self.inspections, self.sessions, self.captures, self.host, self.stale = 0, {}, {}, None, False
 
     def cert(self, channel, argument):
         return argument["certificateSha256" if channel == "ua" else "peerCertificateSha256"]
@@ -73,6 +73,7 @@ class Plc:
 
     def power(self, action):
         self.state = {"powerOn": "Stop", "run": "Run", "stop": "Stop", "powerOff": "Off"}[action]
+        self.stale = self.stale or action == "powerOn"  # PLCSIM reads the old tag list as NotUpToDate until sim_tags refreshes it.
         if action == "powerOff":
             for s in self.sessions.values():
                 s["alive"] = False
@@ -194,9 +195,11 @@ class Host:
                 p.power(a["action"])
             return {"instance": {"id": 7, "name": "TiaMcp_fake", "owned": True, "operatingState": p.state}, "downloadTicket": "ticket"}
         if tool == "sim_tags":
+            p.stale = False
             return {"tags": [{"symbol": '"%s".%s' % (block, member)} for member, (block, _) in runner.SIGNALS.items() if block == a["filter"]]}
         if tool == "sim_read":
-            return {"values": [{"symbol": s["symbol"], "quality": "good", "value": p.memory[s["symbol"].split(".")[-1]]} for s in a["signals"]]}
+            return {"values": [{"symbol": s["symbol"], "quality": "bad" if p.stale else "good", "value": None if p.stale else p.memory[s["symbol"].split(".")[-1]]}
+                               for s in a["signals"]]}
         if tool in ("runtime_ua_connect", "runtime_web_connect"):
             channel = tool.split("_")[1]
             return p.connect(channel, a["attemptId"], a["selection" if channel == "ua" else "login"])
@@ -250,6 +253,39 @@ class Fake(runner.Runner):
 
     def retire(self):
         self.report["credentialRetirement"] = [{"credential": c, "exitCode": 0} for c in self.credentials]
+
+
+class TagRefresh(unittest.TestCase):
+    """A bad PLCSIM read is retried once after a sim_tags refresh; it fails only when the refreshed read is bad too."""
+
+    def reader(self, qualities):
+        class Stub:
+            instance, symbols, calls = {"id": 7}, {"Marker": '"RealServer".Marker'}, []
+            def tool(self, name, arguments=None):
+                self.calls.append(name)
+                if name == "sim_tags":
+                    return {"tags": [{"symbol": '"%s".%s' % (block, member)} for member, (block, _) in runner.SIGNALS.items() if block == arguments["filter"]]}
+                quality = qualities.pop(0)
+                return {"values": [{"symbol": self.symbols["Marker"], "quality": quality, "value": 4711 if quality == "good" else None}]}
+        stub = Stub()
+        stub.calls = []
+        stub.refresh_tags = lambda: runner.Runner.refresh_tags(stub)
+        return stub
+
+    def test_one_refresh_after_a_stale_read(self):
+        stub = self.reader(["bad", "good"])
+        row = runner.Runner.plcsim(stub, "Marker")
+        self.assertEqual((row["quality"], row["value"], row["beforeTagRefresh"]["quality"]), ("good", 4711, "bad"))
+        self.assertEqual(stub.calls, ["sim_read"] + ["sim_tags"] * len(runner.SIGNALS) + ["sim_read"])
+
+    def test_good_read_needs_no_refresh_and_a_bad_refreshed_read_stays_bad(self):
+        stub = self.reader(["good"])
+        self.assertNotIn("beforeTagRefresh", runner.Runner.plcsim(stub, "Marker"))
+        self.assertNotIn("sim_tags", stub.calls)
+        stub = self.reader(["bad", "bad"])
+        row = runner.Runner.plcsim(stub, "Marker")
+        self.assertEqual(row["quality"], "bad")
+        self.assertFalse(oracle.same(oracle.channel_value("ua", {"outcome": "value", "quality": "Good", "encoding": "decimalInteger", "value": "4711"}), row["value"]))
 
 
 class Modes(unittest.TestCase):
