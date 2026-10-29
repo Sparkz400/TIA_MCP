@@ -19,7 +19,8 @@ from library_native_harness import Harness, require
 # so coded values are found by trial and every refused value is recorded.
 PARAMETERS = {"CycleMaximumCycleTime": [200], "CycleMinimumCycleTime": [5], "CycleCommunicationLoad": [30],
               "StartupActionAfterPowerOn": [1, 4, 0, 2], "StartupComparisonPresetToActualModule": [1, 3, 0, 4], "StartupConfigurationTimeout": [30000],
-              "TimeOfDayLocalTimeZone": [23, 21, 1], "TimeOfDayActivateDaylightSavingTime": [False]}
+              # TIA switches daylight saving off with a zone that has none (29 October 2026), so DST changes first.
+              "TimeOfDayActivateDaylightSavingTime": [False], "TimeOfDayLocalTimeZone": [23, 21, 1]}
 # Applied one at a time after the reviewed set; V21 may reject them at compile (they need NTP servers or access-level passwords).
 OBSERVED = {"CycleEnableMinimumCycleTime": False, "TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
 TABLE, RENAMED, RESTORED_TABLE = "TiaMcpGapTable", "TiaMcpGapRenamed", "TiaMcpGapRestore"
@@ -157,8 +158,9 @@ def body(h):
     prepared = h.prepare("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: original[name]}})
     h.apply_prepared("hardware_cpu_parameters", prepared)
     restore(h, prepared, "hardware_cpu_parameters", lambda: require(cpu_values(h, cpu) == configured, "The restored CPU parameters differ from the checkpoint"))
-    for name in reversed([n for n in (*PARAMETERS, *OBSERVED) if cpu_values(h, cpu)[n] != original[n]]):
-        h.apply("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: original[name]}})
+    # One combined change, so TIA's dependent settings (daylight saving follows the zone) are part of the reviewed request.
+    current = cpu_values(h, cpu)
+    h.apply("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {n: original[n] for n in reversed((*PARAMETERS, *OBSERVED)) if current[n] != original[n]}})
     h.stage("original CPU parameters restored", lambda: require(cpu_values(h, cpu) == original, "Original CPU parameters not restored") or original)
 
     # Last: every later device compile would include these panels, which TIA cannot compile without a start screen.
