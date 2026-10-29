@@ -7,6 +7,13 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Native re-runs and new qualifications — 29 October 2026:** ([record](../verification/native-reruns-20261029.md))
+- **Re-runs:** 20 records re-ran the remaining re-runnable lost records (HMI bridge, four library, four engineering/explorer/probe and eleven typed records); 21 uncited records, including the same day's two superseded OPC UA records, moved to [`catalog-evidence-retired-20261029-reruns.json`](catalog-evidence-retired-20261029-reruns.json). The typed resolution stale phase no longer reproduces, since the resolver compares qualified names.
+- **New native qualifications:** web user pages (D12), the OPC UA server-interface kinds, role mappings and export (D04), the Add-In companion inside TIA (X04), force-table document edits on operator-authored rows (D02), `plc_online_compare` with the runtime-user login (D09), and the 60-cell wave 9 typed runtime run.
+- **Fixes found natively:** the Add-In's pipe and JSON for TIA's partial-trust sandbox; the OPC UA role-mapping write route and a restore guard against TIA's per-Portal cache; the Test Suite checkpoint manifest, English result texts and typed qualification errors; the typed runtime rule now excuses TIA's open-time `System/~PEData` file (maintainer decision).
+- **Blocked or open:** OPC UA reference namespaces crash TIA (now `unavailable_target`); the station upload needs a TLS-trust decision; the DB-snapshot export has no values after an online create; TS-Q01 needs one more desk session.
+- **Catalog 0.4.70:** 368 of 450 features verified; matrix 1,688 bound, 300 open, 49 blocked, 30 deferred.
+
 **Evidence records, history and local folders cleaned up — 29 October 2026:**
 - **Catalog 0.4.69:** the 53 catalog evidence records no feature cited moved verbatim to [`catalog-evidence-retired-20261029.json`](catalog-evidence-retired-20261029.json). 42 of them were replaced by the 28 October re-runs; the rest were superseded or only backed docs. The same file lists the six curated summaries that were never in the catalog. `scripts/test_contracts.py` now fails on an uncited catalog record, and on a summary that is in neither the catalog nor a retired list.
 - **Bindings check:** retiring `local.catalog.v03` also fixed the local API-coverage bindings check, which had failed in the main checkout on a rewritten `artifacts/feature-catalog-live.json`.

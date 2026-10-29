@@ -94,7 +94,7 @@ so its record shows 0.
 Only `hmi_inspect`, `hmi_references` and `hmi_capabilities` rest solely on a lost record
 (`local.hmi.bridge.20261025`); re-running it needs `HmiSeeder.exe qualify` fixtures per HMI
 profile followed by `scripts/qualify_hmi.py`. The other 23 lost records still cited are listed
-in the [TODO](../TODO.md#lost-evidence-still-to-re-run); every feature citing them also cites
+in the [TODO](../TODO.md#lost-evidence); every feature citing them also cites
 retained evidence.
 
 Not attempted: library upgrades, vendor packages and DMC prerequisites (their inputs are no

@@ -74,6 +74,9 @@ Not reproduced:
 | [`local.access.qualify.20261029`](../../evidence/local.access.qualify.20261029.json) | `9774d1a` | `webserver_user_pages_generate` (D12): the CPU's application name, HTML directory and default page now persist after a reopen. Generating the web DBs does not write them; the worker sets `WebserverApplicationName`, `WebserverHTMLDirectory` and `WebserverDefaultHTMLPage` afterwards (`5224ed0`). |
 | [`local.opcua_changes.guarded.20261029`](../../evidence/local.opcua_changes.guarded.20261029.json) | `6f0678f` | OPC UA server-interface import, enable and delete, `opcua_role_mapping_set` with standard roles, and `opcua_engineering_export` (D04), on the build with the restore guard; see the findings. It replaces the same day's [`local.opcua_changes.20261029`](../../evidence/local.opcua_changes.20261029.json) (`1b743ba`, interface kinds) and [`local.opcua_changes.roles.20261029`](../../evidence/local.opcua_changes.roles.20261029.json) (`60efc26`, role mappings), which ran without it. |
 | [`local.addin.companion.20261029`](../../evidence/local.addin.companion.20261029.json) | `66d9fc9` | The Add-In companion (X04): installed in TIA, it sent a project-tree selection from inside TIA's Add-In sandbox, and the Host bound it to the saved review with the enrolled hashes. |
+| [`local.watch.force-edits.20261029`](../../evidence/local.watch.force-edits.20261029.json) | `5eca545` | `watch_table_force_document_edit` (D02): on force rows the operator authored in the TIA editor, the field, comment, clone and delete edits pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore; reorder is refused at readback because TIA renumbers the rows' document IDs, and is recovered. |
+| [`local.online.compare.20261029`](../../evidence/local.online.compare.20261029.json) | `94d7c49` | `plc_online_compare` (D09): logged in once as the owned instance's runtime user, the compare of the downloaded scratch found every row identical; every credential refusal is typed and changes nothing. |
+| [`local.typed.wave9.runtime.20261029`](../../evidence/local.typed.wave9.runtime.20261029.json) | `9774d1a` | The 60 wave 9 cells with a runtime harness pass all five gates, runtime behavior included. The row `change.graphical_typed_edit` stays open for the typed workstream's other criteria. |
 
 ## Findings
 
@@ -105,13 +108,28 @@ Not reproduced:
 - **Typed runtime and `~PEData`.** In 7 of 34 typed runtime cases TIA added `System/~PEData.1`
   next to its `.info` file when the project opened, before any runtime step. Maintainer decision:
   the semantic preservation rule excuses that open-time file like the `.info` file (`b30c1f9`).
-- **Test Suite TS-Q01.** The first native dispatch of a style job showed that the worker returned
-  two checkpoint files (archive and baseline) for one planned resource, which the operation store
-  refuses. The worker now returns one manifest that pins both by SHA-256 (`d4ee5e8`). The
-  operator's scope observation itself was accepted.
-- **Online login (D09).** The online compare, station upload and DB-snapshot routes now answer
-  TIA's login challenge once with the owned instance's generated scratch runtime user, and only
-  when the CPU offers project-user authentication (`f95f448`); TLS stays untrusted.
-  `scripts/qualify_online_routes.py` (`768f7c7`) runs them against an owned PLCSIM instance.
+- **Test Suite TS-Q01 (two desk sessions, not yet complete).** The first native dispatch of a
+  style job showed that the worker returned two checkpoint files (archive and baseline) for one
+  planned resource, which the operation store refuses; the worker now returns one manifest that
+  pins both by SHA-256 (`d4ee5e8`). In the second session the operator's prepare and reopen
+  observations were accepted and the style rule ran natively: the clean fixture reported 0/3
+  violations and the violating fixture 3/3, as designed. Two Host defects stopped the cases, both
+  fixed in `1c272fc`: the casing result profile knew only TIA's German result texts, so the clean
+  run's English tree was classified inconclusive, and the four `qualification_testsuite_*` tools
+  let a `BridgeException` (such as the injected `QualificationResponseLost`) reach the client as
+  the SDK's generic message. The six cases need one more desk session on the fixed build.
+- **Online routes (D09).** The online compare, station upload and DB-snapshot routes answer TIA's
+  login challenge once with the owned instance's generated scratch runtime user, and only when
+  the CPU offers project-user authentication (`f95f448`); TLS stays untrusted. TIA reuses the login
+  for later online sessions in the same Portal. The compare passes (above). The station upload, run
+  in an empty Portal, meets three TLS verification challenges for the owned CPU, which these routes
+  never trust, and refuses with `SimulationOnlineAuthenticationRequired`; trusting the owned CPU's
+  certificate on first use, as provisioning does, is a maintainer decision. For the DB snapshots,
+  V21 exports an empty snapshot for a DB without one (the review refuses it as `InvalidDbSnapshot`),
+  and after an online `db_snapshot_create` `InterfaceSnapshot.Export` returned the same value-less
+  document, so the snapshot routes stay open.
+- **OPC UA restores and force tables.** See the records above; the force-table runner
+  (`scripts/qualify_watch_force_edits.py`) waits for an operator to author the rows in the TIA
+  editor, because V21 has no API that creates force rows.
 - **Curation.** The curator now reads HMI bridge reports (profile gates) and Host shutdown tool
   calls (`697aabe`).
