@@ -12,23 +12,23 @@
   "artifacts": {
     "beforeCaller": {
       "path": "fixtures/typed-graphical/native/instance-effects-iec/before-caller.xml",
-      "sha256": "b6675eb38f073f1d8942a4df9d8dea199928a0a4f4f8228b6989938d2ec3f265",
-      "captureReport": "artifacts/cis/capture.json"
+      "sha256": "0a7742e774e33eb27a42555f16a8ef1186f74005ddd770d2e397d824cbc3b29e",
+      "captureReport": "artifacts/q/c9/capture.json"
     },
     "beforeInstance": {
       "path": "fixtures/typed-graphical/native/instance-effects-iec/before-instance.xml",
-      "sha256": "20357a4fdf8b78d5862869357d86618b078e13969f25d3752f96c70f766aefe0",
-      "captureReport": "artifacts/cis/capture.json"
+      "sha256": "50bf702e30b63b8e33ad25c3bb7184ae5532a9957cf127d1d1f2d47540c9d2af",
+      "captureReport": "artifacts/q/c9/capture.json"
     },
     "afterCaller": {
       "path": "fixtures/typed-graphical/native/instance-effects-iec/after-caller.xml",
-      "sha256": "73668534e66f415e4d60314a8cb9811fc4fa9bf282d7f035f096a2b5efb3a050",
-      "captureReport": "artifacts/cis/capture.json"
+      "sha256": "2446d5bf8afabdb32c69e0147a248e984f37e6c8ac8762e6db4d59564b42dcd6",
+      "captureReport": "artifacts/q/c9/capture.json"
     },
     "afterInstance": {
       "path": "fixtures/typed-graphical/native/instance-effects-iec/after-instance.xml",
-      "sha256": "6fb420caf951f524438d569455ada3c613d870ec1636fcf8a035f04dad8ba10b",
-      "captureReport": "artifacts/cis/capture.json"
+      "sha256": "c88849a74faede5929c63a323d16d008e2043f6c337e7eed6a5e07bb6983247f",
+      "captureReport": "artifacts/q/c9/capture.json"
     }
   },
   "sources": {
@@ -36,13 +36,13 @@
       "path": "fixtures/typed-graphical/sources/iec-effect-before.scl",
       "sha256": "6ac7ba89402df3fd17c35a776315ebf1b74295d200ee026e66a46e217822a489",
       "transportSha256": "6ac7ba89402df3fd17c35a776315ebf1b74295d200ee026e66a46e217822a489",
-      "changeId": "e24bbdcaaada48a6b0a078807c325a3a"
+      "changeId": "f03320ed7c4f4a3aa0a1b00110aff5f4"
     },
     "after": {
       "path": "fixtures/typed-graphical/sources/iec-effect-after.scl",
-      "sha256": "496197aa156e97372aa06f735b4d25b9105cec599df59a1996d7087fd8c25347",
-      "transportSha256": "496197aa156e97372aa06f735b4d25b9105cec599df59a1996d7087fd8c25347",
-      "changeId": "badb25ab8cff4e10b47cd84b8151c421"
+      "sha256": "405e0bac8a7466e50aeaa5d00eb1b45fc4cdd54d2202b19663c60e101c4c1a20",
+      "transportSha256": "405e0bac8a7466e50aeaa5d00eb1b45fc4cdd54d2202b19663c60e101c4c1a20",
+      "changeId": "e1ad50651e5941e896210019c7de310a"
     }
   },
   "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
@@ -53,7 +53,10 @@
       "Timer_TP",
       "Counter_CTU",
       "Counter_CTD",
-      "Counter_CTUD"
+      "Counter_CTUD",
+      "Timer_TONR",
+      "Edge_RTRIG",
+      "Edge_FTRIG"
     ],
     "existingFullDbPayloadPreserved": true,
     "explicitStartValuePreserved": {
@@ -66,6 +69,9 @@
     "TP_TIME": "Timer_TP",
     "CTU_INT": "Counter_CTU",
     "CTD_INT": "Counter_CTD",
-    "CTUD_INT": "Counter_CTUD"
+    "CTUD_INT": "Counter_CTUD",
+    "TONR_TIME": "Timer_TONR",
+    "R_TRIG": "Edge_RTRIG",
+    "F_TRIG": "Edge_FTRIG"
   }
 }

@@ -13,6 +13,11 @@ IEC_MEMBERS = ("Timer_TON", "Timer_TOF", "Timer_TP", "Counter_CTU", "Counter_CTD
 STANDARD_IEC_MEMBERS = IEC_MEMBERS + ("Timer_TONR", "Edge_RTRIG", "Edge_FTRIG")
 
 
+def checkout_relative(path):
+    """The path inside the checkout that holds it: this one, a frozen build, or the main checkout's artifacts."""
+    return path.relative_to(next(p for p in path.parents if (p / "TiaMcp.slnx").exists())).as_posix()
+
+
 def structural(node):
     return (node.tag, sorted(node.attrib.items()), (node.text or "").strip(), [structural(e) for e in node if e.tag != "DocumentInfo"])
 
@@ -25,9 +30,9 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
     suffix = "" if route == "standard" else "-" + route
     stem, effect, appended = (("instance-effects-iec", "IecEffect", STANDARD_IEC_MEMBERS if route == "standard" else IEC_MEMBERS) if iec
                               else ("instance-effects", "InstanceEffect", ("Child",)))
-    target = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
+    manifest = ROOT / ("fixtures/typed-graphical/" + stem + suffix + ".v1.json")
     # A recapture that adds members must reproduce every deployed member exactly, so qualified types keep their effect.
-    deployed = json.loads(target.read_text()) if iec and target.exists() else None
+    deployed = json.loads(manifest.read_text()) if iec and manifest.exists() else None
     if deployed:
         deployed = {kind: (ET.fromstring((ROOT / deployed["artifacts"]["after" + kind]["path"]).read_bytes()), list(deployed["members"].values()))
                     for kind in ("Caller", "Instance")}
@@ -47,7 +52,8 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
         entries = [e for e in report["fixtures"] if prefix + effect in e["names"]]
         assert len(entries) == (2 if before_path == after_path else 1), "Ambiguous instance-effect phases in one report."
         reference = entries[0] if phase == "before" else entries[-1]
-        authored_path = Path(reference["sourcePath"])
+        # A capture may run from a frozen build of this commit; its source is the same committed file here.
+        authored_path = ROOT / checkout_relative(Path(reference["sourcePath"]))
         assert hashlib.sha256(authored_path.read_text(encoding="utf-8-sig").encode()).hexdigest() == reference["sha256"]
         result["sources"][phase] = {"path": authored_path.relative_to(ROOT).as_posix(),
             "sha256": hashlib.sha256(authored_path.read_bytes()).hexdigest(),
@@ -67,7 +73,7 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
             target.write_bytes(raw)
             documents[(phase, kind)] = ET.fromstring(raw)
             result["artifacts"][phase + kind.title()] = {"path": target.relative_to(ROOT).as_posix(),
-                "sha256": hashlib.sha256(raw).hexdigest(), "captureReport": report_path.relative_to(ROOT).as_posix()}
+                "sha256": hashlib.sha256(raw).hexdigest(), "captureReport": checkout_relative(report_path)}
     for kind, (document, names) in (deployed or {}).items():
         assert member_shapes(document, names) == member_shapes(documents[("after", kind.lower())], names), \
             "Recaptured " + kind.lower() + " members differ from the deployed IEC effect."
@@ -94,7 +100,7 @@ def extract(before_path, after_path, route="standard", prefix="Tgp_", namespace=
     else:
         callee = ROOT / ("fixtures/typed-graphical/native/" + prefix + "TemplateFB_LAD.xml")
         result["referenceCallee"] = {"path": callee.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(callee.read_bytes()).hexdigest()}
-    target.write_text(json.dumps(result, indent=2) + "\n")
+    manifest.write_text(json.dumps(result, indent=2) + "\n")
     return result
 
 
