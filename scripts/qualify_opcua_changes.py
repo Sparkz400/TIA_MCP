@@ -186,7 +186,6 @@ def refusals(run):
     run.refuse(k, "a changed file", {**good, "expectedSha256": "0" * 64}, "ArtifactChanged")
     run.refuse(k, "replacing a missing interface", import_payload(V1, "replace"), "ObjectNotFound")
     run.refuse("opcua_server_interface_enable", "a missing interface", {"interfaceName": NAME, "enabled": False}, "ObjectNotFound")
-    run.refuse("opcua_server_interface_enable", "no explicit enabled flag", {"interfaceName": NAME}, "InvalidRequest")
     run.refuse("opcua_server_interface_delete", "a missing interface", {"interfaceName": NAME}, "ObjectNotFound")
     k = "opcua_role_mapping_set"
     run.refuse(k, "creating the existing Anonymous mapping", {**role_payload(run), "roleName": "Anonymous"}, "ObjectExists")
@@ -241,6 +240,7 @@ def body(h):
     # Phase A: applied, then persisted by a fresh Portal reopen.
     import_(run, "import the interface", V1, "create")
     run.refuse("opcua_server_interface_import", "creating an existing interface", import_payload(V1, "create"), "ObjectExists")
+    run.refuse("opcua_server_interface_enable", "no explicit enabled flag", {"interfaceName": NAME}, "InvalidRequest")
     stale = run.prepare("disable the interface (made stale below)", "opcua_server_interface_enable", {"interfaceName": NAME, "enabled": False})
     import_(run, "replace the interface", V2, "replace")
     run.refuse_apply("opcua_server_interface_enable", "a preview made stale by a later change", stale, "StaleRevision")
