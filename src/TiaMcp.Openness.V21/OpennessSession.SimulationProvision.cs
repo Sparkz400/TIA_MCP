@@ -530,7 +530,7 @@ namespace TiaMcp.Openness.V21
                             string decision = SimulationTlsPin.Decide(trustOwnedEmptyCpuCertificate, attemptTlsPin, observedSha256, certificateCount,
                                 certificateNotBefore, certificateNotAfter, policyTime, metadataComplete, ownedTargetVerified,
                                 report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed"),
-                                callbackFailure != null || failure != null || tlsCallbackCount > 8);
+                                callbackFailure != null || failure != null || tlsCallbackCount > 8, false);
                             tlsEvidence["observedCertificateSha256"] = observedSha256;
                             tlsEvidence["certificateValidityVerified"] = metadataComplete && certificateCount == 1 && certificateNotBefore <= policyTime && policyTime <= certificateNotAfter;
                             tlsEvidence["certificateValidityBasis"] = "Public certificate UTC validity interval; independent CA or device identity authentication is not claimed.";

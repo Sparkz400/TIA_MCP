@@ -106,10 +106,13 @@ power state is reported before and after.
   trusts it on first use like provisioning's `trustOwnedEmptyCpuCertificate`: only after the owned
   instance and its address are revalidated, only for exactly one certificate within its validity
   interval, pinned for this upload attempt, and every later challenge must present the same one;
-  no certificate is newly trusted after the login was answered. A challenge that offers no
-  certificate is refused. In the native run of 29 October with this opt-in, all three upload
-  challenges offered none (initial selection `NonVerified`, "certificate not matching"), so the
-  upload still refuses; trusting such a challenge needs a maintainer decision.
+  no trust is newly established after the login was answered. A challenge that offers no
+  certificate, as all three did natively on 29 October (initial selection `NonVerified`,
+  "certificate not matching"), is accepted under the same opt-in for the revalidated owned
+  instance only and recorded as unauthenticated TLS (`tlsAuthentication: "unauthenticated"`,
+  `tlsUnauthenticated: true`): its identity rests on the ticket and ownership checks, not on a
+  certificate (maintainer decision of 29 October, "Allow, owned PLCSIM only"). More than one
+  certificate, no opt-in, or any other target still refuses.
   The compare and DB-snapshot routes never trust TLS: they run in the scratch project's Portal,
   which downloaded the CPU's certificate configuration, and TIA asked them no TLS question in the
   native runs. Every message is kept in the response and in

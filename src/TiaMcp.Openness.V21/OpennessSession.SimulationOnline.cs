@@ -278,6 +278,7 @@ namespace TiaMcp.Openness.V21
                 }
                 failure = OwnedSimulationRelease(observer, instance, report, failure);
                 report["tlsPinnedCertificateSha256"] = challenges.CertificatePin;
+                report["tlsUnauthenticated"] = challenges.UnauthenticatedTls;
                 report["completed"] = failure == null;
                 if (Directory.Exists(destination))
                 {
@@ -472,15 +473,17 @@ namespace TiaMcp.Openness.V21
         // for the caller to throw. With a login, the one project-user login challenge is answered with the instance's generated
         // runtime user (SimulationOnlineLogin). Only the station upload may pass trustCertificate, the caller's explicit
         // first-use authorization: like credential provisioning, the revalidated owned instance's first certificate is pinned
-        // for this attempt and each later challenge must present it (SimulationTlsPin).
+        // for this attempt and each later challenge must present it; a challenge offering no certificate is trusted as
+        // unauthenticated TLS for the revalidated owned instance (SimulationTlsPin).
         private sealed class OwnedSimulationChallenges
         {
             internal BridgeException Failure;
             internal readonly JArray Observed = new JArray();
             internal string CertificatePin;
+            internal bool UnauthenticatedTls;
             private readonly SimulationCredential _login;
             private readonly bool _trustCertificate;
-            private bool _answered;
+            private bool _answered, _trusted;
             private int _tlsChallenges;
             internal Action Reverify; // Re-checks the owned powered instance and endpoint before the login is sent or a certificate trusted.
 
@@ -527,7 +530,7 @@ namespace TiaMcp.Openness.V21
                 }
                 catch (Exception ex) { entry["exceptionType"] = ex.GetType().FullName; }
                 Failure = Failure ?? new BridgeException("SimulationOnlineAuthenticationRequired", "The owned PLCSIM connection requested " + type +
-                    "; it was not answered. TLS trust needs the station upload's explicit first-use authorization and its pinned certificate; no other login, password or credential is supplied.");
+                    "; it was not answered. TLS trust needs the station upload's explicit authorization for its revalidated owned instance; no other login, password or credential is supplied.");
             }
 
             private bool TrustCertificate(JObject entry, JObject[] certificates)
@@ -538,14 +541,22 @@ namespace TiaMcp.Openness.V21
                 var certificate = certificates.Length == 1 ? certificates[0] : null;
                 Func<string, DateTime> utc = name => DateTime.Parse(certificate.Value<string>(name), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                 string observed = certificate?.Value<string>("sha256");
-                // Like provisioning, no certificate is newly trusted once the login was released; the pinned one may still return.
+                // Like provisioning, no trust is newly established once the login was released; trust granted before it may recur.
                 string decision = SimulationTlsPin.Decide(true, CertificatePin, observed, certificates.Length, certificate == null ? default(DateTime) : utc("notBeforeUtc"),
-                    certificate == null ? default(DateTime) : utc("notAfterUtc"), DateTime.UtcNow, true, owned, _answered && CertificatePin == null,
-                    Failure != null || _tlsChallenges > 8);
+                    certificate == null ? default(DateTime) : utc("notAfterUtc"), DateTime.UtcNow, true, owned, _answered && !_trusted,
+                    Failure != null || _tlsChallenges > 8, true);
                 entry["pinPolicyDecision"] = decision;
                 if (!SimulationTlsPin.Allows(decision)) return false;
+                _trusted = true;
+                if (decision == SimulationTlsPin.WithoutCertificate)
+                {
+                    UnauthenticatedTls = true;
+                    entry["tlsAuthentication"] = "unauthenticated";
+                    return true;
+                }
                 CertificatePin = CertificatePin ?? observed;
                 entry["pinnedCertificateSha256"] = CertificatePin;
+                entry["tlsAuthentication"] = "firstUsePinnedCertificate";
                 return true;
             }
         }
