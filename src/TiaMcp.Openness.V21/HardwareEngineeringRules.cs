@@ -96,10 +96,29 @@ namespace TiaMcp.Openness.V21
             "EnabledWithAccessControlAndCentralUser", "EnabledWithAccessControlViaAccessLevelAndCentralUsers",
             "EnabledWithAccessControlAndLocalWithCentralUsers", "EnabledWithAccessControlViaAccessLevelAndLocalWithCentralUsers" };
 
-        // Compares the native-normalized request with the CPU's current values; Siemens validates ranges during the write and compile.
+        // V21 declares CycleMinimumCycleTime only while CycleEnableMinimumCycleTime is true (observed 29 October 2026).
+        internal const string MinimumCycleFlag = "CycleEnableMinimumCycleTime", MinimumCycleTime = "CycleMinimumCycleTime";
+
+        // The parameters after the request; a disabled minimum cycle time has no value.
+        internal static JObject CpuParametersAfter(JObject current, JObject requested)
+        {
+            var effective = (JObject)current.DeepClone();
+            foreach (var property in requested.Properties()) effective[property.Name] = property.Value.DeepClone();
+            if (effective[MinimumCycleFlag]?.Type == JTokenType.Boolean && !effective.Value<bool>(MinimumCycleFlag)) effective.Remove(MinimumCycleTime);
+            return effective;
+        }
+
+        // Compares the native-normalized request with the CPU's current declared values (including the minimum cycle flag);
+        // Siemens validates ranges during the write and compile.
         internal static void RequireCpuParametersChanged(JObject current, JObject normalized)
         {
-            if (normalized.Properties().All(property => current[property.Name] != null && JToken.DeepEquals(current[property.Name], property.Value)))
+            var flag = normalized[MinimumCycleFlag] ?? current[MinimumCycleFlag];
+            bool enabled = flag?.Type == JTokenType.Boolean && flag.Value<bool>();
+            if (normalized[MinimumCycleTime] != null && flag != null && !enabled)
+                throw new BridgeException("InvalidRequest", MinimumCycleTime + " requires " + MinimumCycleFlag + " to be enabled.");
+            if (enabled && current.Value<bool?>(MinimumCycleFlag) == false && normalized[MinimumCycleTime] == null)
+                throw new BridgeException("InvalidRequest", "Enabling " + MinimumCycleFlag + " requires an explicit " + MinimumCycleTime + ".");
+            if (JToken.DeepEquals(CpuParametersAfter(current, normalized), CpuParametersAfter(current, new JObject())))
                 throw new BridgeException("InvalidRequest", "The requested CPU parameters are unchanged.");
         }
 
@@ -168,7 +187,10 @@ namespace TiaMcp.Openness.V21
             }
             else if (kind == "hardware_cpu_parameters")
             {
-                foreach (var property in ((JObject)payload["attributes"]).Properties()) selected["attributes"][property.Name] = property.Value.DeepClone();
+                var attributes = (JObject)selected["attributes"];
+                var parameters = CpuParametersAfter(new JObject(attributes.Properties().Where(p => Array.IndexOf(CpuParameterAttributes, p.Name) >= 0)), (JObject)payload["attributes"]);
+                foreach (string name in CpuParameterAttributes) attributes.Remove(name);
+                foreach (var property in parameters.Properties()) attributes[property.Name] = property.Value.DeepClone();
             }
             else if (kind == "hardware_address_set")
             {

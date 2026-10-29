@@ -182,6 +182,10 @@ void CpuParameterRows(JArray rows) => rows[2]["attributes"][cpuParameter] = 100L
 Check("cpu parameter set on the exact item", "hardware_cpu_parameters", cpuParameters, rows => rows[2]["attributes"][cpuParameter] = 150L, true, CpuParameterRows);
 Check("cpu parameter request not applied rejected", "hardware_cpu_parameters", cpuParameters, _ => { }, false, CpuParameterRows);
 Check("cpu parameter collateral comment rejected", "hardware_cpu_parameters", cpuParameters, rows => { rows[2]["attributes"][cpuParameter] = 150L; rows[2]["attributes"]["Comment"] = "lost"; }, false, CpuParameterRows);
+var minimumOff = new JObject { ["hardwarePath"] = controller, ["attributes"] = new JObject { ["CycleEnableMinimumCycleTime"] = false } };
+void MinimumRows(JArray rows) { rows[2]["attributes"]["CycleEnableMinimumCycleTime"] = true; rows[2]["attributes"]["CycleMinimumCycleTime"] = 5UL; }
+Check("cpu minimum cycle time off drops its value", "hardware_cpu_parameters", minimumOff, rows => { rows[2]["attributes"]["CycleEnableMinimumCycleTime"] = false; ((JObject)rows[2]["attributes"]).Remove("CycleMinimumCycleTime"); }, true, MinimumRows);
+Check("cpu minimum cycle time off keeping its value rejected", "hardware_cpu_parameters", minimumOff, rows => rows[2]["attributes"]["CycleEnableMinimumCycleTime"] = false, false, MinimumRows);
 Check("cpu parameter on another item rejected", "hardware_cpu_parameters", cpuParameters, rows => { rows[2]["attributes"][cpuParameter] = 150L; rows[0]["attributes"]["Comment"] = "lost"; }, false, CpuParameterRows);
 var fParameters = new JObject { ["safetyAcknowledged"] = true, ["parameters"] = new JArray(new JObject { ["hardwarePath"] = module, ["name"] = "Failsafe_FDestinationAddress", ["expected"] = 100, ["value"] = 120 }) };
 void FRows(JArray rows) { rows[1]["attributes"]["Failsafe_FDestinationAddress"] = 100; rows[1]["attributes"]["Failsafe_FMonitoringtime"] = 150; rows[3]["attributes"]["Failsafe_FDestinationAddress"] = 101; }

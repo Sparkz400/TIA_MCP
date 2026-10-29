@@ -22,23 +22,35 @@ namespace TiaMcp.Openness.V21
             var attributes = ChangeObject(change.Payload, "attributes");
             HardwareEngineeringRules.RequireCpuParameterRequest(attributes);
             var declared = new HashSet<string>(item.Item.GetAttributeInfos().Select(info => info.Name), StringComparer.Ordinal);
-            var missing = attributes.Properties().Select(p => p.Name).Where(name => !declared.Contains(name)).ToArray();
+            // The minimum cycle time is declared only after the same request has enabled it; it is converted then.
+            bool pending = attributes[HardwareEngineeringRules.MinimumCycleTime] != null && !declared.Contains(HardwareEngineeringRules.MinimumCycleTime)
+                && declared.Contains(HardwareEngineeringRules.MinimumCycleFlag) && attributes.Value<bool?>(HardwareEngineeringRules.MinimumCycleFlag) == true;
+            var missing = attributes.Properties().Select(p => p.Name).Where(name => !declared.Contains(name) && !(name == HardwareEngineeringRules.MinimumCycleTime && declared.Contains(HardwareEngineeringRules.MinimumCycleFlag))).ToArray();
             if (missing.Length != 0) throw new BridgeException("UnsupportedCapability", "The selected hardware item does not declare " + string.Join(", ", missing) + "; select the CPU item (or its interface) that declares the parameter.");
-            var current = new JObject(attributes.Properties().Select(p => new JProperty(p.Name, ChangeScalar(ReadAttributeValue(item.Item, p.Name, CpuParameterAttributeSet, false, out _)))));
-            var changes = PrepareAttributes(item.Item, attributes, CpuParameterAttributeSet, out var converted);
+            var observed = attributes.Properties().Select(p => p.Name).Append(HardwareEngineeringRules.MinimumCycleFlag).Where(declared.Contains).Distinct(StringComparer.Ordinal);
+            var current = new JObject(observed.Select(name => new JProperty(name, ChangeScalar(ReadAttributeValue(item.Item, name, CpuParameterAttributeSet, false, out _)))));
+            var changes = PrepareAttributes(item.Item, new JObject(attributes.Properties().Where(p => declared.Contains(p.Name))), CpuParameterAttributeSet, out var converted);
             // Preservation and the unchanged check compare native scalars, not the JSON input spelling.
             foreach (var name in converted.Keys) attributes[name] = ChangeScalar(converted[name]);
             HardwareEngineeringRules.RequireCpuParametersChanged(current, attributes);
             if (preview != null)
             {
+                if (pending) changes.Add(new JObject { ["name"] = HardwareEngineeringRules.MinimumCycleTime, ["type"] = null, ["before"] = null, ["after"] = attributes[HardwareEngineeringRules.MinimumCycleTime].DeepClone() });
                 preview["attributeChanges"] = changes;
-                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["cpuParametersBefore"] = current, ["cpuParametersAfter"] = attributes.DeepClone() });
+                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["cpuParametersBefore"] = current,
+                    ["cpuParametersAfter"] = HardwareEngineeringRules.CpuParametersAfter(current, attributes) });
                 ((JArray)preview["warnings"]).Add("Device compilation validates the parameter combination; the runtime effect is observed only after a download.");
             }
             return item.Item;
         }
 
-        private void ApplyCpuParameters(EngineeringChange change, Project project) =>
-            ApplyAttributes(PrepareCpuParameters(change, project, null), ChangeObject(change.Payload, "attributes"), CpuParameterAttributeSet);
+        private void ApplyCpuParameters(EngineeringChange change, Project project)
+        {
+            var target = PrepareCpuParameters(change, project, null);
+            var attributes = ChangeObject(change.Payload, "attributes");
+            // The flag first: enabling it makes Openness declare the minimum cycle time.
+            ApplyAttributes(target, new JObject(attributes.Properties().Where(p => p.Name == HardwareEngineeringRules.MinimumCycleFlag)), CpuParameterAttributeSet);
+            ApplyAttributes(target, new JObject(attributes.Properties().Where(p => p.Name != HardwareEngineeringRules.MinimumCycleFlag)), CpuParameterAttributeSet);
+        }
     }
 }

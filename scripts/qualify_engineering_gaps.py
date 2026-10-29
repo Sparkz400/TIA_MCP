@@ -17,12 +17,12 @@ from library_native_harness import Harness, require
 # Reviewed parameter -> candidate new values on the scratch CPU 1511-1 PN, tried in order; the names are
 # HardwareEngineeringRules.CpuParameterAttributes. V21 rejects StartupActionAfterPowerOn = 2 in its setter (29 October 2026),
 # so coded values are found by trial and every refused value is recorded.
-PARAMETERS = {"CycleMaximumCycleTime": [200], "CycleMinimumCycleTime": [5], "CycleCommunicationLoad": [30],
+PARAMETERS = {"CycleMaximumCycleTime": [200], "CycleMinimumCycleTime": [5], "CycleCommunicationLoad": [30], "CycleEnableMinimumCycleTime": [False],
               "StartupActionAfterPowerOn": [1, 4, 0, 2], "StartupComparisonPresetToActualModule": [1, 3, 0, 4], "StartupConfigurationTimeout": [30000],
               # TIA switches daylight saving off with a zone that has none (29 October 2026), so DST changes first.
               "TimeOfDayActivateDaylightSavingTime": [False], "TimeOfDayLocalTimeZone": [23, 21, 1]}
 # Applied one at a time after the reviewed set; V21 may reject them at compile (they need NTP servers or access-level passwords).
-OBSERVED = {"CycleEnableMinimumCycleTime": False, "TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
+OBSERVED = {"TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
 TABLE, RENAMED, RESTORED_TABLE = "TiaMcpGapTable", "TiaMcpGapRenamed", "TiaMcpGapRestore"
 POLICY = {"dependencyPolicy": "rejectReferenced"}
 # A Classic and a Unified panel, each created through hardware_add without a start screen.
@@ -139,7 +139,11 @@ def body(h):
         h.report.setdefault("observedParameters", {})[name] = observe(h, cpu, name, value)
     configured = cpu_values(h, cpu)
 
-    # Persistence: a fresh Portal reopens the saved project.
+    # The minimum cycle time exists only while enabled: setting it then is refused, and enabling needs its value.
+    h.refuse("refuse a minimum cycle time while disabled", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {"CycleMinimumCycleTime": 3}}, "InvalidRequest")
+    h.refuse("refuse enabling the minimum cycle time without its value", "hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {"CycleEnableMinimumCycleTime": True}}, "InvalidRequest")
+    # Persistence: a fresh Portal reopens the saved project; after a checkpoint restore the session works in the recovered copy.
+    project_path = h.tool("tia_session_status")["projects"][0]["path"]
     software = h.inventory()
     h.stage("close changed session", lambda: h.tool("tia_detach"))
     h.owned_portal("reopen")

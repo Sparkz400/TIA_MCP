@@ -34,6 +34,14 @@ internal static class RuntimeRouteChecks
             && Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { ["PlcAccessControlConfiguration"] = "EnabledWithAccessControlViaAccessLevel" })) == null);
         Pass("cpu parameter scalar admitted", Code(() => HardwareEngineeringRules.RequireCpuParameterRequest(new JObject { [parameter] = 150 })) == null);
         Pass("unchanged cpu parameters refused", Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(new JObject { [parameter] = 150L }, new JObject { [parameter] = 150 })) == "InvalidRequest");
+        var enabledMinimum = new JObject { ["CycleEnableMinimumCycleTime"] = true, ["CycleMinimumCycleTime"] = 5L };
+        var disabledMinimum = new JObject { ["CycleEnableMinimumCycleTime"] = false };
+        Pass("disabling the minimum cycle time drops its value", JToken.DeepEquals(HardwareEngineeringRules.CpuParametersAfter(enabledMinimum, new JObject { ["CycleEnableMinimumCycleTime"] = false }), disabledMinimum)
+            && Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(enabledMinimum, new JObject { ["CycleEnableMinimumCycleTime"] = false })) == null);
+        Pass("a minimum cycle time of a disabled flag refused", Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(disabledMinimum, new JObject { ["CycleMinimumCycleTime"] = 3 })) == "InvalidRequest"
+            && Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(enabledMinimum, new JObject { ["CycleEnableMinimumCycleTime"] = false, ["CycleMinimumCycleTime"] = 3 })) == "InvalidRequest");
+        Pass("enabling the minimum cycle time needs its value", Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(disabledMinimum, new JObject { ["CycleEnableMinimumCycleTime"] = true })) == "InvalidRequest"
+            && Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(disabledMinimum, new JObject { ["CycleEnableMinimumCycleTime"] = true, ["CycleMinimumCycleTime"] = 1 })) == null);
         Pass("changed cpu parameter admitted", Code(() => HardwareEngineeringRules.RequireCpuParametersChanged(new JObject { [parameter] = 150L }, new JObject { [parameter] = 200 })) == null);
 
         Pass("project compile needs an empty payload", CompileOnlyRules.PayloadRefusal("project_compile", new JObject()) == null && CompileOnlyRules.PayloadRefusal("project_compile", new JObject { ["x"] = 1 }) != null);
