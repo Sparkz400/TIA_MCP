@@ -75,6 +75,14 @@ class DesktopRoundtripTests(unittest.TestCase):
         records.insert(0, {"session": 0, "dir": "c2s", "message": {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}})
         self.assertEqual(1, q.review(records)["session"])
 
+    def test_instructions_name_every_path(self):
+        args = type("Args", (), {"host": q.Path("h/TiaMcp.Host.exe"), "worker": q.Path("w/W.exe")})()
+        root = q.Path("D:/r").resolve()
+        text = q.instructions(root, "D:/p/P.ap21", args)
+        self.assertNotRegex(text, "<root>|<project>|<script>|<host>|<worker>")
+        self.assertIn(str(root / "workspace"), text)
+        self.assertIn('verify --root "%s" --host "%s"' % (root, args.host.resolve()), text)
+
     def test_block_identity_and_offline_html(self):
         direct = {"path": REF["objectPath"], "name": "TiaMcp_EnableGate", "number": 1, "kind": "FB"}
         self.assertEqual({"path": REF["objectPath"], "name": "TiaMcp_EnableGate"},

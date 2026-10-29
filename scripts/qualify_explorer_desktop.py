@@ -161,6 +161,13 @@ def binaries(args):
     return {name: {"path": str(p.resolve()), "sha256": sha256(p)} for name, p in (("host", args.host.with_suffix(".dll")), ("worker", args.worker), ("runner", Path(__file__)))}
 
 
+def instructions(root, project, args):
+    verify = '"%s" verify --root "%s" --host "%s" --worker "%s"' % (Path(__file__).resolve(), root, args.host.resolve(), args.worker.resolve())
+    text = INSTRUCTIONS.replace("<script> verify --root <root> --host <host> --worker <worker>", verify)
+    text = re.sub(r"<root>/([\w.-]+)", lambda match: str(root / match.group(1)), text)
+    return text.replace("<root>", str(root)).replace("<project>", project)
+
+
 def prepare(args):
     root = args.root.resolve()
     require(not root.exists(), "Choose a new --root")
@@ -182,12 +189,10 @@ def prepare(args):
     (root / "screenshots").mkdir()
     serve = [str(Path(__file__).resolve()), "serve", "--root", str(root), "--host", str(args.host.resolve()), "--worker", str(args.worker.resolve())]
     (workspace / "mcp.json").write_text(json.dumps({"servers": {"tia-mcp-desk": {"type": "stdio", "command": sys.executable, "args": serve}}}, indent=2), encoding="utf-8")
-    verify = '"%s" verify --root "%s" --host "%s" --worker "%s"' % (Path(__file__).resolve(), root, args.host.resolve(), args.worker.resolve())
-    text = INSTRUCTIONS.replace("<root>", str(root)).replace("<project>", project).replace("<script> verify --root <root> --host <host> --worker <worker>", verify)
-    (root / "operator-instructions.txt").write_text(text, encoding="utf-8")
+    (root / "operator-instructions.txt").write_text(instructions(root, project, args), encoding="utf-8")
     report["completedAtUtc"] = now()
     (root / "prepare.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(text, flush=True)
+    print((root / "operator-instructions.txt").read_text(encoding="utf-8"), flush=True)
 
 
 def serve(args):
