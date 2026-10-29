@@ -14,7 +14,7 @@ internal sealed record UaClientIdentityStatus(string SchemaVersion, string Appli
     public bool PhysicalQualified => false;
 }
 
-internal sealed class UaClientIdentityLease(X509Certificate2 certificate, FileStream owner) : IDisposable
+internal sealed class UaClientIdentityLease(X509Certificate2 certificate, IDisposable owner) : IDisposable
 {
     internal X509Certificate2 Certificate { get; } = certificate;
     internal UaClientIdentityStatus Status => CredentialVault.UaStatus(Certificate);

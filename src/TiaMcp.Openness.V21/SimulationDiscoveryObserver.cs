@@ -72,11 +72,11 @@ namespace TiaMcp.Openness.V21
             }
         }
 
-        internal ConfigurationAccessibleDevice[] Read(int take)
+        internal ConfigurationAccessibleDevice[] Read(int take, string network = "Softbus")
         {
-            var pc = _discovery.Configuration.Modes.Find("PN/IE")?.PcInterfaces.Find("PLCSIM", 1);
+            var pc = OpennessSession.SimulationPcInterface(_discovery.Configuration, network);
             if (pc == null)
-                throw new BridgeException("SimulationProvisionRouteUnavailable", "The discovery observer has no PN/IE / PLCSIM (1) route.");
+                throw new BridgeException("SimulationProvisionRouteUnavailable", "The discovery observer has no PN/IE route for the owned instance's " + network + " interface.");
             return pc.GetAccessibleDevices().Take(take).ToArray();
         }
 

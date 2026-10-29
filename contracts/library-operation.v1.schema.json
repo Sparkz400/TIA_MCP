@@ -1226,6 +1226,11 @@
                     "types",
                     "tagTables"
                   ]
+                },
+                "namespace": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$",
+                  "maxLength": 128
                 }
               },
               "required": [
@@ -1335,6 +1340,9 @@
               },
               "updateScope": {
                 "const": "entireSelectedPlc"
+              },
+              "forceDefault": {
+                "type": "boolean"
               }
             },
             "required": [
