@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.77`: 461 features, 416 verified, 45 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 122 shipped, 294 limited, 27 unqualified, 8 unavailable on V21, 10 deferred |
-| Matrix cells | 1,896 bound, **151 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.78`: 461 features, 416 verified, 45 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 122 shipped, 294 limited, 30 unqualified, 5 unavailable on V21, 10 deferred |
+| Matrix cells | 1,896 bound, **169 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -32,12 +32,11 @@ names every row with an open cell.
 - **In progress:** a worker route for the Unified text-list import (V21 has
   `HmiTextListComposition.Import`; no worker route yet), typed created-storage runtime cells,
   and the OB40 and Startdrive device-compile probes.
-- **Rows blocked by decision:** eight `unavailable_target` rows (49 cells:
-  `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`,
-  the three block-protection kinds and the two OPC UA reference-namespace kinds) are blocked
-  and do not count toward 1.0 (decision of 29 October; each row's disposition is in the
-  ledger). The block-protection kinds lack a repository route, not a V21 one; whether to build
-  it is an [open question](TODO.md#decisions-for-the-maintainer).
+- **Rows blocked by decision:** five `unavailable_target` rows (31 cells:
+  `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
+  the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision
+  of 29 October; each row's disposition is in the ledger). The three block-protection kinds
+  lacked only a repository route; building it is 1.0 work (decision of 29 October).
 - **Deferred rows:** ten `not_implemented` rows (30 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
 - **Release mechanics:** one version source, a CHANGELOG, a release workflow, a pre-release
