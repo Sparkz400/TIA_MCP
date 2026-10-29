@@ -1,4 +1,5 @@
-"""Qualify library consumption in a software unit with a namespace preset, the one-instance-per-device rule and the unit-aware cleanup refusal."""
+"""Qualify library consumption in a software unit with a namespace preset, the one-instance-per-device rule, the unit-aware
+cleanup refusal and whether Openness can give a library instance an explicit namespace."""
 from __future__ import annotations
 
 import argparse
@@ -71,6 +72,19 @@ def body(h):
         require([x["version"] for x in h.versions(consumer, FB)] == ["1.0.0"], "The refused update copied a version into the project")
         return h.verify_use(consumer, fb, 1)
     h.stage("the unit stays at 1.0.0 and no newer version was copied", unchanged)
+
+    # The unit's namespace preset is not applied to library instances; probe an explicit namespace on each instance.
+    def namespace_kept(probe):
+        before, after = probe.get("before") or {}, probe.get("after") or {}
+        require(before.get("linked") is True and before.get("namespace") == before.get("typeNamespace"),
+                "Expected a linked instance carrying its type's namespace: %s" % probe)
+        require(after == before, "TIA changed the library instance's namespace or link: %s" % probe)
+        return {"setAccepted": probe.get("setAccepted"), "setError": probe.get("setError"), "namespace": after["namespace"]}
+    probes = h.report["namespaceProbes"] = {}
+    for name in (FB, UDT):
+        probe = h.seed("probe namespace %s on the %s instance" % (UNIT, name), "namespace", name, UNIT, required=False)
+        probes[name] = h.stage("TIA keeps the %s instance's type namespace" % name, lambda p=probe: namespace_kept(p))
+    h.stage("links and placement unchanged after the namespace probes", lambda: h.verify_use(consumer, fb, 1) and placement())
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
@@ -93,4 +107,5 @@ if __name__ == "__main__":
     Harness(args, "un_", "V21 library consumption in a software unit with a namespace preset beside the PLC root", [
         "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
+        "The namespace probe sets PlcBlock/PlcType.Namespace on the instances through that fixture tool; the types themselves have no namespace.",
         "No runtime execution."], [args.unit_seeder]).run(body)

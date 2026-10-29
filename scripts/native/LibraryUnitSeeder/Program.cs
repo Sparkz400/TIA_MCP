@@ -12,13 +12,16 @@ using Siemens.Engineering;
 using Siemens.Engineering.Compiler;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
+using Siemens.Engineering.Library.Types;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Units;
 
 /// <summary>
 /// Library scope fixtures in a worker-owned scratch project: one empty software unit (default), two related
-/// units ("related"), published unit objects ("publish") or know-how protection of one block ("protect").
+/// units ("related"), published unit objects ("publish"), know-how protection of one block ("protect") or a probe that
+/// sets an explicit namespace on one library instance in a unit ("namespace"), reporting what TIA does.
 /// Unlike UnitSeeder, the guard root is the authorization file's own directory, so short artifact roots work.
 /// </summary>
 internal static class Program
@@ -55,9 +58,9 @@ internal static class Program
     private static JObject Run(string[] args)
     {
         string mode = args.Length == 1 ? "unit" : args.Length > 1 ? args[0] : null;
-        if (!new[] { "unit", "related", "publish", "protect" }.Contains(mode) || mode == "unit" && args.Length != 1
-            || mode == "related" && args.Length != 2 || mode == "protect" && args.Length != 3 || mode == "publish" && args.Length < 4)
-            throw new InvalidOperationException("Usage: LibraryUnitSeeder.exe <authorization.json> | related <authorization.json> | publish <authorization.json> <unit> <object>... | protect <authorization.json> <block>");
+        if (!new[] { "unit", "related", "publish", "protect", "namespace" }.Contains(mode) || mode == "unit" && args.Length != 1
+            || mode == "related" && args.Length != 2 || mode == "protect" && args.Length != 3 || mode == "publish" && args.Length < 4 || mode == "namespace" && args.Length != 4)
+            throw new InvalidOperationException("Usage: LibraryUnitSeeder.exe <authorization.json> | related <authorization.json> | publish <authorization.json> <unit> <object>... | protect <authorization.json> <block> | namespace <authorization.json> <unit object> <namespace>");
         string authorizationPath = Path.GetFullPath(args[mode == "unit" ? 0 : 1]);
         string root = Path.GetDirectoryName(authorizationPath);
         var authorization = JObject.Parse(File.ReadAllText(authorizationPath));
@@ -113,6 +116,28 @@ internal static class Program
                         published.Add(new JObject { ["name"] = name, ["attribute"] = attributes[0], ["before"] = before.ToString(), ["after"] = item.GetAttribute(attributes[0]).ToString() });
                     }
                     result["published"] = published;
+                }
+                else if (mode == "namespace")
+                {
+                    var units = provider.UnitGroup.Units.ToArray();
+                    var matches = units.SelectMany(x => Blocks(x.BlockGroup)).Where(x => x.Name == args[2]).Cast<IEngineeringServiceProvider>()
+                        .Concat(units.Select(x => x.TypeGroup.Types.Find(args[2])).Where(x => x != null)).ToArray();
+                    if (matches.Length != 1) throw new InvalidOperationException("Expected exactly one unit block or type named " + args[2]);
+                    var item = matches[0];
+                    Func<JObject> observe = () =>
+                    {
+                        var link = item.GetService<LibraryTypeInstanceInfo>();
+                        return new JObject { ["namespace"] = (item is PlcBlock b ? b.Namespace : ((PlcType)item).Namespace) ?? "", ["linked"] = link != null,
+                            ["versionGuid"] = link?.LibraryTypeVersion.Guid.ToString("D"), ["typeNamespace"] = link == null ? null : link.LibraryTypeVersion.TypeObject.Namespace ?? "" };
+                    };
+                    result["object"] = args[2]; result["requestedNamespace"] = args[3]; result["before"] = observe();
+                    try
+                    {
+                        if (item is PlcBlock block) block.Namespace = args[3]; else ((PlcType)item).Namespace = args[3];
+                        result["setAccepted"] = true;
+                    }
+                    catch (EngineeringException ex) { result["setAccepted"] = false; result["setError"] = ex.GetType().Name; result["setMessage"] = ex.Message; }
+                    result["after"] = observe();
                 }
                 else
                 {
