@@ -3,9 +3,12 @@
 The matrix is derived from the feature catalog: one row per catalog feature, one
 cell per acceptance criterion. A cell is bound only when the feature is verified,
 and then names the evidence records and the hashes of their retained artifacts.
-Every other cell is open work, except in deferred rows and in unavailable_target
-rows, which are blocked on V21 and do not count toward 1.0. Owners come from the release-obligation ledger;
-features added after the ledger take the owner of their feature-name prefix.
+Every other cell is open, except in two support classes summarized apart. Cells of
+unavailable_target rows are blocked: they do not count toward 1.0 (maintainer decision,
+29 October 2026; the ledger's dispositions records each row). Cells of deferred (not
+implemented) rows are deferred: not open cells, but still 1.0 work, listed in docs/TODO.md.
+Owners come from the release-obligation ledger; features added after the ledger take the
+owner of their feature-name prefix.
 """
 import argparse
 import collections

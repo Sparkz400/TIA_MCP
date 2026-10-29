@@ -45,7 +45,7 @@ New-NetIPAddress -InterfaceAlias 'Ethernet 2' -IPAddress 192.168.0.10 -PrefixLen
 - [x] **Step 3 (operator, TIA UI):** Build a throwaway CPU 1511-1 PN V4.1 project at `192.168.0.1`. Activate the OPC UA server (guest access, runtime license *SIMATIC OPC UA S7-1500 small*, *automatically accept client certificates*) and the web server. Download it to a manually created TCP/IP instance.
 - [x] **Step 4 (agent):** From the Host, `runtime_ua_client_identity`, then `runtime_ua_connect` to `opc.tcp://192.168.0.1:4840/` (the trailing slash is required; see the gate record), pinning the server certificate shown in TIA's certificate manager. Then `runtime_ua_browse` and one `runtime_ua_read`. Also `runtime_web_connect` to `https://192.168.0.1`.
 - [x] **Step 5:** Record the outcome in `docs/verification/runtime-real-server-gate-<date>.md`. If either endpoint is unreachable or refused, stop here and record why. The plan below assumes both answer. Recorded in [the gate record](../verification/runtime-real-server-gate-20261028.md): OPC UA and the Web API both pass; the web login was Anonymous (web authentication disabled).
-- [ ] **Step 6 (operator):** Delete the throwaway instance and switch *Online Access* back to Softbus.
+- [x] **Step 6 (operator):** Delete the throwaway instance and switch *Online Access* back to Softbus. After the 29 October window the operator restored DHCP on the adapter and switched back to Softbus ([record](../verification/runtime-real-server-20261029.md)); the throwaway instance's deletion is not recorded.
 
 **Gate follow-up, endpoint form:**
 

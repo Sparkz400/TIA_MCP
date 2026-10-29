@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.77",
+  "catalogVersion": "0.4.78",
   "targetTiaVersions": [
     21
   ],
@@ -6621,9 +6621,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
         ]
       },
       "prerequisites": [
@@ -6673,9 +6673,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
         ]
       },
       "prerequisites": [
@@ -6726,9 +6726,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "blocked",
+        "status": "conditional",
         "reasons": [
-          "Apply refuses with CredentialRouteUnavailable until a Host-to-worker protected credential route exists."
+          "Apply refuses with CredentialRouteUnavailable until the Host-to-worker protected credential route exists; building it is 1.0 work (maintainer decision, 29 October 2026)."
         ]
       },
       "prerequisites": [
