@@ -49,6 +49,17 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no stored snapshot: InterfaceSnapshot.Export returned no snapshot values.");
         }
 
+        // Each export has a new DocumentInfo/Created, so a fresh export equals the reviewed capture (the Host-bound file with
+        // the reviewed hash) when their InterfaceSnapshot elements are equal.
+        private static bool SameStoredSnapshot(JObject payload, string current)
+        {
+            string reviewed = ChangeText(payload, "snapshotPath", 4096);
+            if (!File.Exists(reviewed) || ChangeFileHash(reviewed) != ChangeText(payload, "snapshotSha256", 64)) return false;
+            Func<string, XElement> snapshot = path => XDocument.Load(path).Root?.Elements().SingleOrDefault(e => e.Name.LocalName == "SW.Blocks.InterfaceSnapshot");
+            var expected = snapshot(reviewed);
+            return expected != null && XNode.DeepEquals(expected, snapshot(current));
+        }
+
         private void PrepareDbSnapshotChange(EngineeringChange change, JObject preview)
         {
             if (!_ownsPortal) throw new BridgeException("ScratchIsolationRequired", "DB snapshot capture and actual-value loads require a worker-owned TIA instance started with tia_start.");
@@ -76,7 +87,7 @@ namespace TiaMcp.Openness.V21
             string expected = ChangeText(change.Payload, "snapshotSha256", 64);
             string current = Path.Combine(change.Directory, "snapshot-to-load.xml");
             DbSnapshotExportTo(target, current);
-            if (ChangeFileHash(current) != expected) throw new BridgeException("DbSnapshotChanged", "The DB's stored snapshot differs from the reviewed capture; capture and review it again.");
+            if (!SameStoredSnapshot(change.Payload, current)) throw new BridgeException("DbSnapshotChanged", "The DB's stored snapshot differs from the reviewed capture; capture and review it again.");
             change.Backups.Add(new JObject { ["role"] = "snapshot-to-load", ["artifact"] = ChangeArtifact(current) });
             effects.Add(new JObject { ["action"] = "loadSnapshotAsActualValues", ["blockPath"] = target.Identity["objectPath"].DeepClone(),
                 ["snapshotRecordId"] = change.Payload["snapshotRecordId"]?.DeepClone(), ["snapshotSha256"] = expected });
@@ -93,7 +104,7 @@ namespace TiaMcp.Openness.V21
             {
                 string current = Path.Combine(change.Directory, "snapshot-before-load.xml");
                 DbSnapshotExportTo(target, current);
-                if (ChangeFileHash(current) != change.Payload.Value<string>("snapshotSha256"))
+                if (!SameStoredSnapshot(change.Payload, current))
                     throw new BridgeException("DbSnapshotChanged", "The DB's stored snapshot changed since preparation; nothing was loaded.");
             }
             var values = ((DataBlock)target.Block.Item).Interface?.GetService<ValueService>() ?? throw new BridgeException("UnsupportedCapability", "The selected DB interface exposes no ValueService.");

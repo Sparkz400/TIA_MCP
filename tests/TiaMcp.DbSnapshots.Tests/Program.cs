@@ -97,8 +97,9 @@ var capture = store.Capture(id, path, new JsonObject { ["identity"] = new JsonOb
     ["artifact"] = new JsonObject { ["path"] = exported, ["sha256"] = Hash(before) } });
 Check(capture["inputSource"] is JsonObject && !single.ContainsKey("inputSource") && JsonNode.DeepEquals(capture, store.Page((string)capture["recordId"]!)), "Captured record reopens with its native source; supplied receipts unchanged");
 JsonElement Payload(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
-var bound = store.LoadPayload(Payload(new { snapshotRecordId = (string)capture["recordId"]!, snapshotSha256 = new string('0', 64), projectPath = "forged.ap21" }));
+var bound = store.LoadPayload(Payload(new { snapshotRecordId = (string)capture["recordId"]!, snapshotSha256 = new string('0', 64), projectPath = "forged.ap21", snapshotPath = "forged.xml" }));
 Check((string)bound["snapshotSha256"]! == Hash(before) && (string)bound["blockPath"]! == path && (string)bound["projectPath"]! == "synthetic.ap21", "Load binds the reviewed DB and snapshot hash over caller values");
+Check(Path.IsPathFullyQualified((string)bound["snapshotPath"]!) && File.ReadAllBytes((string)bound["snapshotPath"]!).SequenceEqual(before), "Load binds the reviewed snapshot bytes over a caller path");
 Reject(() => store.LoadPayload(Payload(new { snapshotRecordId = (string)capture["recordId"]!, blockPath = path + "2" })), "Load on another DB refused", "DbSnapshotIdentityMismatch");
 Reject(() => store.LoadPayload(Payload(new { snapshotRecordId = record })), "Supplied review cannot authorize a load", "DbSnapshotSourceRequired");
 uploads.Release(left.Id); uploads.Release(right.Id); Check(JsonNode.DeepEquals(receipt, new DbSnapshotWorkflowStore(root).Page(record)), "Release and restart preserve references");
