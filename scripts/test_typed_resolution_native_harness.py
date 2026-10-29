@@ -498,8 +498,8 @@ class StaleAddressTests(unittest.TestCase):
 
 class CompetingDbTests(unittest.TestCase):
     def test_competing_db_requires_exact_addition_and_preserves_every_existing_object(self):
-        path = "/plc/units/B/blocks/namespaces/TiaMcp_UnitB/Tgp_ResolutionOne"
-        xml = '<Document><SW.Blocks.GlobalDB ID="0"><AttributeList><Name>Tgp_ResolutionOne</Name><Namespace>TiaMcp_UnitB</Namespace><Interface><Sections><Section Name="Static"><Member Name="Flag" Datatype="Bool"><StartValue>false</StartValue></Member><Member Name="RetainedMarker" Datatype="Int"><StartValue>91</StartValue></Member></Section></Sections></Interface></AttributeList></SW.Blocks.GlobalDB></Document>'
+        path = "/plc/units/B/blocks/Tgp_ResolutionOne"
+        xml = '<Document><SW.Blocks.GlobalDB ID="0"><AttributeList><Name>Tgp_ResolutionOne</Name><Namespace /><Interface><Sections><Section Name="Static"><Member Name="Flag" Datatype="Bool"><StartValue>false</StartValue></Member><Member Name="RetainedMarker" Datatype="Int"><StartValue>91</StartValue></Member></Section></Sections></Interface></AttributeList></SW.Blocks.GlobalDB></Document>'
         with tempfile.TemporaryDirectory() as directory:
             file = pathlib.Path(directory) / "competing.xml"
             file.write_text(xml, encoding="utf-8")
@@ -509,7 +509,7 @@ class CompetingDbTests(unittest.TestCase):
                 "inventory": {"blocks": [{"name": "Tgp_ResolutionOne", "path": path, "scopePath": "/plc/units/B"}]}}
             self.assertEqual(path, runner.verify_competing_db_change(before, after, "/plc/units/B"))
             for content in (xml.replace("91", "0"), xml.replace('Datatype="Bool"', 'Datatype="Int"'),
-                            xml.replace("GlobalDB", "InstanceDB"), xml.replace("TiaMcp_UnitB", "TiaMcp_UnitA")):
+                            xml.replace("GlobalDB", "InstanceDB"), xml.replace("<Namespace />", "<Namespace>TiaMcp_UnitB</Namespace>")):
                 file.write_text(content, encoding="utf-8")
                 with self.assertRaises(RuntimeError):
                     runner.verify_competing_db_change(before, after, "/plc/units/B")

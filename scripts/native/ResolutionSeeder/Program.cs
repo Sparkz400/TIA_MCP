@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
@@ -11,6 +12,8 @@ using Siemens.Engineering.Compiler;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
+using Siemens.Engineering.SW.Blocks;
+using Siemens.Engineering.SW.Units;
 
 internal static class Program
 {
@@ -55,9 +58,10 @@ internal static class Program
             throw new InvalidOperationException("An explicit bounded absolute artifact root is required.");
         string authorizationPath = Guard(root, args[1]);
         var authorization = JObject.Parse(File.ReadAllText(authorizationPath));
+        string operation = authorization.Value<string>("operation");
         if (authorization.Value<bool?>("ownsPortalProcess") != true || authorization.Value<string>("creationTool") != "tia_create_scratch"
-            || authorization.Value<string>("operation") != "duplicate-tag-diagnostic")
-            throw new InvalidOperationException("Only this exact owned scratch duplicate-tag diagnostic is authorized.");
+            || operation != "duplicate-tag-diagnostic" && operation != "duplicate-db-diagnostic")
+            throw new InvalidOperationException("Only an exact owned scratch duplicate-tag or duplicate-DB diagnostic is authorized.");
         string projectPath = Guard(root, authorization.Value<string>("projectPath"));
         if (!Path.GetFileName(projectPath).StartsWith("TiaMcpScratch_", StringComparison.Ordinal) || Path.GetExtension(projectPath) != ".ap21")
             throw new InvalidOperationException("Only a task-created TiaMcpScratch_ .ap21 may be used.");
@@ -74,6 +78,7 @@ internal static class Program
                 .Select(item => item.GetService<SoftwareContainer>()?.Software as PlcSoftware).Where(item => item != null).ToArray();
             if (plcs.Length != 1) throw new InvalidOperationException("The owned scratch must contain exactly one PLC.");
             var plc = plcs[0];
+            if (operation == "duplicate-db-diagnostic") return DuplicateDb(portal, project, plc, projectPath, pid, Path.GetDirectoryName(authorizationPath));
             var tables = plc.TagTableGroup.TagTables;
             var original = tables.Find("Tgp_ResolutionTags") ?? throw new InvalidOperationException("Observed baseline fixture table absent.");
             var ready = original.Tags.Find("Ready") ?? throw new InvalidOperationException("Observed baseline Ready tag absent.");
@@ -102,6 +107,56 @@ internal static class Program
                 result["completed"] = true;
                 return result;
             }
+        }
+    }
+
+    // A same-qualified-name competitor for the root DB: Tgp_ResolutionOne in unit B without a namespace, first by
+    // clearing the generated block's namespace, then by generating under an empty unit namespace preset.
+    private static JObject DuplicateDb(TiaPortal portal, Project project, PlcSoftware plc, string projectPath, int pid, string directory)
+    {
+        const string name = "Tgp_ResolutionOne", preset = "TiaMcp_UnitB";
+        var root = plc.BlockGroup.Blocks.Find(name) as GlobalDB;
+        var unit = plc.GetService<PlcUnitProvider>()?.UnitGroup.Units.Find(preset);
+        Func<PlcBlock[]> competitors = () => unit.BlockGroup.Blocks.Where(block => block.Name == name).ToArray();
+        if (root == null || !string.IsNullOrEmpty(root.Namespace) || unit == null || unit.NamespacePreset != preset || competitors().Length != 0)
+            throw new InvalidOperationException("Observed root DB, seeded unit B preset or competitor absence differs.");
+        string sourcePath = Path.Combine(directory, "competing-db.scl");
+        File.WriteAllText(sourcePath, "DATA_BLOCK \"" + name + "\"\n{ S7_Optimized_Access := 'TRUE' }\nVERSION : 0.1\nVAR\n Flag : Bool := FALSE;\n RetainedMarker : Int := 91;\nEND_VAR\nBEGIN\nEND_DATA_BLOCK\n", new UTF8Encoding(true));
+        using (portal.ExclusiveAccess("TIA MCP owned native duplicate-DB diagnostic"))
+        {
+            var attempts = new JArray();
+            var result = new JObject { ["completed"] = false, ["projectPath"] = projectPath, ["processId"] = pid,
+                ["duplicateCreated"] = false, ["mutationReplayed"] = false, ["attempts"] = attempts };
+            foreach (string route in new[] { "blockNamespace", "unitPreset" })
+            {
+                var attempt = new JObject { ["route"] = route };
+                attempts.Add(attempt);
+                try
+                {
+                    if (route == "unitPreset") { unit.NamespacePreset = ""; attempt["presetCleared"] = unit.NamespacePreset ?? ""; }
+                    var source = unit.ExternalSourceGroup.ExternalSources.CreateFromFile("Tgp_ResolutionCompetitor", sourcePath);
+                    try { source.GenerateBlocksFromSource(); } finally { source.Delete(); }
+                    var generated = competitors();
+                    attempt["generatedNamespaces"] = new JArray(generated.Select(block => block.Namespace ?? ""));
+                    foreach (var block in generated.Where(block => !string.IsNullOrEmpty(block.Namespace))) block.Namespace = "";
+                }
+                catch (EngineeringException error) { result["nativeRejection"] = attempt["nativeRejection"] = new JObject { ["type"] = error.GetType().FullName, ["message"] = error.Message }; }
+                finally { if (route == "unitPreset") unit.NamespacePreset = preset; }
+                var created = competitors();
+                attempt["namespaces"] = new JArray(created.Select(block => block.Namespace ?? ""));
+                if (created.Length == 1 && string.IsNullOrEmpty(created[0].Namespace)) { result["duplicateCreated"] = true; break; }
+                // No partial competitor survives into the next route or the observed project.
+                foreach (var block in created) block.Delete();
+                attempt["partialDeleted"] = created.Length;
+            }
+            result["unitNamespacePreset"] = unit.NamespacePreset;
+            var compile = plc.GetService<ICompilable>()?.Compile() ?? throw new InvalidOperationException("No compiler service.");
+            result["compileErrors"] = compile.ErrorCount;
+            result["compileWarnings"] = compile.WarningCount;
+            result["compileMessages"] = new JArray(Messages(compile.Messages).Take(100));
+            project.Save();
+            result["completed"] = true;
+            return result;
         }
     }
 
