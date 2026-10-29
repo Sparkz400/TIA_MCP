@@ -88,6 +88,43 @@ internal static class TextListAuthoringTests
             text!["translations"] = translations;
         }
         Reject(() => UnifiedTextListAuthoring.Build(escaped), "Escaping amplification is bounded before publication");
+        // Content V21 imports as success but changes (local.hmi.text-list-import.20261029) refuses before anything is published.
+        string Committed(JsonObject value)
+        {
+            byte[] data = JsonSerializer.SerializeToUtf8Bytes(value, BridgeProtocol.Json);
+            var upload = uploads.Begin("unfaithful.json", data.Length, Convert.ToHexStringLower(SHA256.HashData(data)));
+            uploads.Write(upload.UploadId, 0, Convert.ToBase64String(data)); return uploads.Commit(upload.UploadId).ArtifactRef!;
+        }
+        var unfaithful = new (string Code, string Where, Action<JsonObject> Edit)[] {
+            ("HmiTextListValueOutOfRange", "entry StateReady", p => { p["lists"]![0]!["entries"]![1]!["fromValue"] = 2147483648L; p["lists"]![0]!["entries"]![1]!["toValue"] = 2147483648L; }),
+            ("HmiTextListValueOutOfRange", "entry StateOff", p => { Entry(p)["fromValue"] = -2147483649L; Entry(p)["toValue"] = -2147483649L; }),
+            ("HmiTextListBoolDefaultEntry", "entry StateOff", p => p["lists"]![0]!["rangeType"] = "Bool"),
+            ("HmiTextListTextUnsupported", "entry StateOff", p => p["texts"]![0]!["translations"]!["en-US"] = "a\0b"),
+            ("HmiTextListTextUnsupported", "entry StateOff", p => p["texts"]![0]!["translations"]!["de-DE"] = "line\r\nbreak"),
+            ("HmiTextListTextUnsupported", "entry StateReady", p => p["texts"]![1]!["translations"]!["en-US"] = "next\u0085line"),
+            ("HmiTextListUnresolvedText", "entry StateOff", p => { Entry(p)["textId"] = "Missing"; p["texts"]!.AsArray().RemoveAt(0); }) }
+            .Concat(new[] { ".", ":", "#", "\"", "[" }.Select(c => ("HmiTextListNameUnsupported", "List Qualification" + c, (Action<JsonObject>)(p => p["lists"]![0]!["name"] = "Qualification" + c + "States"))));
+        string reviewsDirectory = Path.Combine(root, "hmi-component-reviews");
+        foreach (var (code, where, edit) in unfaithful)
+        {
+            var value = packet.DeepClone().AsObject(); edit(value); int published = Directory.GetFiles(reviewsDirectory).Length;
+            try { store.AuthorTextLists(Committed(value)); throw new Exception("Expected " + code + ": " + where); }
+            catch (BridgeException e) when (e.Code == code && e.Message.Contains(where)) { }
+            Check(Directory.GetFiles(reviewsDirectory).Length == published, "Nothing published for " + code + " at " + where);
+        }
+        // A record published before the refusal existed keeps its semantics: reopen recomputes the same bytes.
+        var legacy = packet.DeepClone().AsObject(); legacy["lists"]![0]!["entries"]![1]!["fromValue"] = 2147483648L; legacy["lists"]![0]!["entries"]![1]!["toValue"] = 2147483648L;
+        string Retain(byte[] data, string suffix)
+        {
+            string digest = Convert.ToHexStringLower(SHA256.HashData(data)); File.WriteAllBytes(Path.Combine(reviewsDirectory, digest + suffix), data); return digest;
+        }
+        JsonObject Ref(string digest, string suffix) => new() { ["path"] = "hmi-component-reviews/" + digest + suffix, ["sha256"] = digest };
+        var legacyRecord = receipt.DeepClone().AsObject(); legacyRecord.Remove("recordId"); legacyRecord.Remove("recordArtifact");
+        legacyRecord["input"] = Ref(Retain(JsonSerializer.SerializeToUtf8Bytes(legacy, BridgeProtocol.Json), ".author-input"), ".author-input");
+        legacyRecord["files"] = new JsonArray(UnifiedTextListAuthoring.Build(legacy).Select(c => (JsonNode?)new JsonObject { ["fileName"] = c.Name, ["bytes"] = c.Bytes.Length, ["artifact"] = Ref(Retain(c.Bytes, ".candidate"), ".candidate") }).ToArray());
+        string legacyId = Retain(JsonSerializer.SerializeToUtf8Bytes(legacyRecord, BridgeProtocol.Json), ".author.json");
+        var reopened = store.AuthorTextLists(recordId: legacyId);
+        Check((string)reopened["recordId"]! == legacyId && JsonNode.DeepEquals(reopened["files"], legacyRecord["files"]), "Retained record with now-refused content still reopens exactly");
         string incomplete = Path.Combine(root, "hmi-component-reviews", "partial.tmp");
         var retry = uploads.Begin("again.json", raw.Length, Convert.ToHexStringLower(SHA256.HashData(raw))); uploads.Write(retry.UploadId, 0, Convert.ToBase64String(raw)); string retryRef = uploads.Commit(retry.UploadId).ArtifactRef!;
         string candidatePath = Path.Combine(root, (string)receipt["files"]![0]!["artifact"]!["path"]!); byte[] originalCandidate = File.ReadAllBytes(candidatePath); File.Delete(candidatePath);

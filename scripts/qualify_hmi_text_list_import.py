@@ -1,7 +1,8 @@
 """Native import of Host-authored Unified text-list candidates.
 
 Phase 1 runs the production Host without native workers: the hmi_text_list_author MCP oracle authors its
-three variants plus three boundary requests, and the retained v1-v3 author and v1 set records are reopened.
+three variants, checks the refusals of content V21 changes, authors three boundary requests at the edge of
+what the tool accepts, and reopens the retained v1-v3 author and v1 set records.
 Phase 2 runs `HmiSeeder textlist-import`, which imports every candidate pair into a new owned MTP700 Unified
 Comfort fixture through HmiTextListComposition.Import (main sequence), saves, archives, reopens in a fresh
 Portal, retrieves both archives and runs the boundary probes on the restored checkpoint. Phase 3 compares
@@ -23,18 +24,9 @@ RETAINED = {'author': ROOT / 'fixtures/hmi-coordinated/retained-v1-v3', 'set': R
 AUTHOR_LABELS = ['author-v1-retained', 'author-v2-initial', 'author-v2-regenerated', 'author-v3-initial', 'author-v3-regenerated']
 SET_LABELS = ['set-v1', 'set-v1-evolved']
 MAIN = AUTHOR_LABELS + ['set-v1-run', 'set-v1-state', 'set-v1-evolved-run', 'set-v1-evolved-state', 'author-v1-base']
-PROBES = ['boundary-values', 'boundary-texts', 'boundary-names', 'author-v1-expanded', 'author-v1-extremes', 'unresolved-text-probe']
+PROBES = ['boundary-values', 'boundary-texts', 'boundary-names', 'author-v1-expanded', 'author-v1-extremes']
 # V21 exports omit these entry fields at their default value (observed in run q/tl1: an imported SingleValue 0 entry exports bare).
 ENTRY_DEFAULTS = {'Type': 'SingleValue', 'Value': 0, 'FromValue': 0, 'ToValue': 0, 'IsDefaultEntry': False}
-# A runner-made pair, not tool output: one valid list and one list whose text reference is missing.
-UNRESOLVED_PROBE = (
-    '#Version: 2.0\nTextListContainers:\n  TextList:\n    ResourceListType: TextList\n    ResourceLists:\n'
-    '      "ProbeValid":\n        RangeType: Decimal\n        Entries:\n          "Zero":\n            Type: SingleValue\n'
-    '            Value: 0\n            FromValue: 0\n            ToValue: 0\n            IsDefaultEntry: false\n            Text: "ProbeTexts.Zero"\n'
-    '      "ProbeBroken":\n        RangeType: Decimal\n        Entries:\n          "Zero":\n            Type: SingleValue\n'
-    '            Value: 0\n            FromValue: 0\n            ToValue: 0\n            IsDefaultEntry: false\n            Text: "ProbeTexts.Missing"\n',
-    '#Version: 2.0\nTextLibraries:\n  "ProbeTexts":\n    Type: Text\n    Languages:\n      - "en-US"\n      - "de-DE"\n'
-    '    DefaultLanguage: "en-US"\n    Entries:\n      "Zero":\n        Text:\n          - "Zero"\n          - "Null"\n')
 
 
 class TextLibraryLoader(yaml.SafeLoader):
@@ -52,7 +44,7 @@ def canonical(value):
 
 
 def boundary_requests():
-    """hmi_text_list_author requests that isolate one native boundary per list."""
+    """hmi_text_list_author requests at the edge of what the tool accepts; each list must import exactly."""
     base = json.loads((ROOT / 'fixtures/hmi/unified-text-list/author-request.json').read_text(encoding='utf-8'))
     def request(file_base, texts, lists):
         return dict(copy.deepcopy(base), fileBase=file_base, textLibrary=file_base + 'Texts', lists=lists,
@@ -61,20 +53,23 @@ def boundary_requests():
         return dict(id=identity, type=kind, fromValue=low, toValue=high, isDefault=default, textId=text)
     def plain(name, *entries, kind='Decimal'):
         return dict(name=name, rangeType=kind, entries=list(entries))
-    texts = {'Quote': '"quoted" \\ backslash', 'Whitespace': 'tab\there\r\nCRLF and\nLF', 'Unicode': 'Über 日本語 😀', 'Empty': '',
-             'Yaml': '---\n!tag &anchor #hash: colon', 'Nul': 'a\0b', 'Separators': 'x\x85y z '}
+    # Every C0/C1 control and DEL the tool still accepts (not NUL, CR or NEL), one list each.
+    controls = [code for code in [*range(1, 32), *range(127, 160)] if code not in (10, 13, 133)]
+    texts = {'Quote': '"quoted" \\ backslash', 'Whitespace': 'tab\there\nLF', 'Unicode': 'Über 日本語 😀', 'Empty': '',
+             'Yaml': '---\n!tag &anchor #hash: colon', 'Separators': 'x' + chr(0x2028) + 'y' + chr(0x2029) + 'z', 'Long': 'L' * 16381}
+    # Every printable ASCII punctuation the tool still accepts in a list name, plus spacing and the 256-character bound.
+    names = ['Plain_Name1', 'Name with space', 'Umlaut_Ä', 'Unicode_日本語', ' Leading', 'Trailing ', 'N' * 256] + \
+            ['P' + chr(code) + 'Name' for code in range(33, 127) if not chr(code).isalnum() and chr(code) not in '.:#"[_']
     return {
         'boundary-values': request('ProbeValues', {'T': 'Value'}, [
             plain('EntryTypes', entry('Low', 'T', 'To', None, -1), entry('Middle', 'T', 'Range', 0, 10), entry('High', 'T', 'From', 11, None)),
             plain('Int32Bounds', entry('Min', 'T', low=-2**31, high=-2**31), entry('Max', 'T', low=2**31 - 1, high=2**31 - 1)),
-            plain('BeyondInt32', entry('Below', 'T', low=-2**31 - 1, high=-2**31 - 1), entry('Above', 'T', low=2**31, high=2**31)),
-            plain('BoolDefault', entry('False', 'T', default=True), entry('True', 'T', low=1, high=1), kind='Bool'),
-            plain('BitDefault', entry('Bit0', 'T', default=True), entry('Bit5', 'T', low=5, high=5), kind='BitNumber')]),
-        'boundary-texts': request('ProbeTexts', texts, [
-            plain('TextChars', *(entry(key, key, low=index, high=index) for index, key in enumerate(['Quote', 'Whitespace', 'Unicode', 'Empty', 'Yaml']))),
-            plain('NulText', entry('Nul', 'Nul')), plain('SeparatorText', entry('Separators', 'Separators'))]),
-        'boundary-names': request('ProbeNames', {'T': 'Name'}, [plain(name, entry('Zero', 'T')) for name in (
-            'Plain_Name1', 'Name with space', 'Umlaut_Ä', 'Unicode_日本語', 'Dot.Name', 'Colon:Name', 'Hash#Name', 'Quote"Name', 'Bracket[Name]', 'Dash-Name')])}
+            plain('BoolNoDefault', entry('False', 'T'), entry('True', 'T', low=1, high=1), kind='Bool'),
+            plain('BitDefault', entry('Bit0', 'T', default=True), entry('Bit31', 'T', low=31, high=31), kind='BitNumber')]),
+        'boundary-texts': request('ProbeTexts', {**texts, **{f'C{code:02X}': 'a' + chr(code) + 'b' for code in controls}}, [
+            plain('TextChars', *(entry(key, key, low=index, high=index) for index, key in enumerate(texts))),
+            *(plain(f'Control_{code:02X}', entry('Zero', f'C{code:02X}')) for code in controls)]),
+        'boundary-names': request('ProbeNames', {'T': 'Name'}, [plain(name, entry('Zero', 'T')) for name in names])}
 
 
 def resolve(config_raw, library_raw):
@@ -209,6 +204,8 @@ def assess(nat, manifest, candidates_dir, gate):
         outcome = evaluate_import(before, after, candidate(row['label']), row.get('accepted') is True)
         outcome.update(label=row['label'], error=row.get('error'))
         result['probes'].append(outcome)
+        gate(outcome['outcome'] == 'exact', 'Boundary candidate the tool accepts imports exactly: ' + row['label'],
+             {k: outcome[k] for k in ('outcome', 'peersChanged', 'unexpectedLists', 'error')} | {'notExact': {n: s for n, s in outcome['lists'].items() if s != 'exact'}})
         before = after
     gate([row['label'] for row in nat['probes']] == [row['label'] for row in manifest['probes']], 'Seeder ran every boundary probe in order')
     return result
@@ -312,7 +309,6 @@ def main():
                     pairs[label + ('-' + output_id if output_id else '')] = [(name, raw) for name, raw, owner in files if owner == output_id]
         finally:
             close(client)
-        pairs['unresolved-text-probe'] = [('Probe.hmi.yml', UNRESOLVED_PROBE[0].encode()), ('Probe.TextLibrary.hmi.yml', UNRESOLVED_PROBE[1].encode())]
         assert sorted(MAIN + PROBES) == sorted(pairs), sorted(pairs)
         manifest = {}
         for group, labels in (('main', MAIN), ('probes', PROBES)):

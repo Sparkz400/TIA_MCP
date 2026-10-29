@@ -53,6 +53,8 @@ public sealed partial class HmiComponentWorkflowStore
                     new JsonObject { ["id"] = "False", ["type"] = "SingleValue", ["fromValue"] = 0, ["toValue"] = 0, ["isDefault"] = false, ["textId"] = "FalseText" },
                     new JsonObject { ["id"] = "True", ["type"] = "SingleValue", ["fromValue"] = 1, ["toValue"] = 1, ["isDefault"] = false, ["textId"] = "TrueText" }) }) };
         var candidates = UnifiedTextListAuthoring.Build(intent);
+        // A set preflight (preparedReport) refuses only when the set itself is new.
+        if (retained is null && preparedReport is null) UnifiedTextListAuthoring.RequireNativeImportable(intent);
         var conflicts = new JsonArray(); var gaps = new JsonArray();
         void Conflict(string message) => conflicts.Add(message);
         foreach (var row in output["conflicts"]!.AsArray()) Conflict("Selected output: " + (string)row!);

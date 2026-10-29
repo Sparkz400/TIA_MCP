@@ -59,7 +59,9 @@ internal static class UnifiedTextListAuthoring
             {
                 var entry = Object(row); Fields(entry, "id type fromValue toValue isDefault textId");
                 string id = Identifier(entry, "id"), type = Text(entry, "type", 16), text = Identifier(entry, "textId");
-                if (!entryIds.Add(id) || !textIds.Contains(text)) throw Error("Entry identifiers must be unique within a list and select an existing text.");
+                if (!entryIds.Add(id)) throw Error("Entry identifiers must be unique within a list.");
+                // V21 imports an unresolved reference as empty texts and still reports success (local.hmi.text-list-import.20261029).
+                if (!textIds.Contains(text)) throw new BridgeException("HmiTextListUnresolvedText", $"List {name}, entry {id}: text {text} is not declared.");
                 usedTexts.Add(text);
                 long? from = Number(entry, "fromValue"), to = Number(entry, "toValue");
                 bool valid = type switch { "SingleValue" => from.HasValue && from == to, "Range" => from.HasValue && to.HasValue && from <= to,
@@ -79,6 +81,32 @@ internal static class UnifiedTextListAuthoring
         }
         if (!usedTexts.SetEquals(textIds)) throw Error("Every authored text must be referenced; unused resources are not silently published.");
         return [(fileBase + ".hmi.yml", Utf8.GetBytes(configuration.ToString())), (fileBase + ".TextLibrary.hmi.yml", Utf8.GetBytes(translation.ToString()))];
+    }
+
+    /// <summary>Refuse new candidates whose content V21's Import reports as imported but changes
+    /// (local.hmi.text-list-import.20261029). Call after Build and only before publishing new records; retained records keep their semantics.</summary>
+    internal static void RequireNativeImportable(JsonObject intent)
+    {
+        var texts = intent["texts"]!.AsArray().ToDictionary(t => (string)t!["id"]!, t => t!["translations"]!.AsObject(), StringComparer.Ordinal);
+        foreach (var node in intent["lists"]!.AsArray())
+        {
+            var list = node!.AsObject(); string name = (string)list["name"]!;
+            if (name.IndexOfAny(['.', ':', '#', '"', '[']) >= 0)
+                throw new BridgeException("HmiTextListNameUnsupported", $"List {name}: V21 does not create a text list whose name contains . : # \" or [.");
+            foreach (var row in list["entries"]!.AsArray())
+            {
+                var entry = row!.AsObject(); string where = $"List {name}, entry {(string)entry["id"]!}";
+                foreach (string bound in new[] { "fromValue", "toValue" })
+                    if (Number(entry, bound) is long value && value is < int.MinValue or > int.MaxValue)
+                        throw new BridgeException("HmiTextListValueOutOfRange", $"{where}: {bound} {value} is outside signed 32-bit; V21 imports it as 0.");
+                if ((string?)list["rangeType"] == "Bool" && Boolean(entry, "isDefault"))
+                    throw new BridgeException("HmiTextListBoolDefaultEntry", $"{where}: V21 drops a default entry from a Bool list.");
+                string textId = (string)entry["textId"]!;
+                foreach (var (language, translation) in texts[textId])
+                    if (((string)translation!).IndexOfAny(['\0', '\r', '\u0085']) >= 0)
+                        throw new BridgeException("HmiTextListTextUnsupported", $"{where}: text {textId} ({language}) contains NUL, CR or NEL, which V21 empties or turns into LF.");
+            }
+        }
     }
 
     private static long? Number(JsonObject row, string name) => row[name] is null ? null : row[name] is JsonValue v && v.TryGetValue<long>(out var value) ? value :

@@ -139,7 +139,21 @@ See [verification](../verification/hmi-bound-generation-20261020.md).
 
 Bounds use exact signed 64-bit integer encoding; strings and fractions refuse.
 This is the authoring representation, not certification of a particular native
-data type or bit width. Overlapping intervals refuse instead of inventing a
+data type or bit width.
+
+New candidates also refuse, before anything is published, the content V21's import
+reports as imported but changes. Each refusal names the list and entry:
+
+| Code | Refused content | What V21 would do |
+| --- | --- | --- |
+| `HmiTextListValueOutOfRange` | a bound outside signed 32-bit | import it as 0 |
+| `HmiTextListBoolDefaultEntry` | a default entry in a `Bool` list | drop the entry |
+| `HmiTextListTextUnsupported` | a translation containing NUL, CR or NEL (U+0085) | empty the text, or read CR/NEL back as LF |
+| `HmiTextListNameUnsupported` | a list name containing `.`, `:`, `#`, `"` or `[` | not create the list |
+| `HmiTextListUnresolvedText` | an entry whose text ID is not declared | import empty texts |
+
+The same refusals apply to v2/v3 generation and to `hmi_text_list_generate_set`.
+Records published before them keep their meaning and still reopen. Overlapping intervals refuse instead of inventing a
 precedence policy. Unsupported fields, formatted/system-list intent and unknown
 entry/range types refuse. Output construction uses a conservative character budget
 to keep each candidate below 8 MiB; requests are limited to 4 MiB and share the
@@ -162,12 +176,10 @@ open.
 Native import was qualified separately on 29 October 2026 for MTP700 Unified Comfort
 with en-US/de-DE ([record](../verification/hmi-text-list-import-20261029.md)). Authored
 v1–v3 and set candidates import exactly through `HmiTextListComposition.Import` and
-survive save/reopen and archive retrieval. Within these bounds only: values within
-signed 32-bit, no default entry in a `Bool` list, no NUL, CR or NEL in texts, and list
-names without `.`, `:`, `#`, `"` or `[`. Outside them V21 reports success and changes
-the content, and this tool does not refuse it. V21's own export renames entries, pools
-the texts in one library and omits default fields, so a native export is never a valid
-current file set for regeneration; supply the retained candidate pair.
+survive save/reopen and archive retrieval. The content classes V21 changes are refused
+(table above). V21's own export renames entries, pools the texts in one library and
+omits default fields, so a native export is never a valid current file set for
+regeneration; supply the retained candidate pair.
 
 The official [V21 export description](https://docs.tia.siemens.cloud/r/en-us/v21/functions-for-accessing-the-data-of-an-hmi-unified-device/hmisoftware/text-lists/export-of-text-lists)
 documents the paired configuration/translation files and entry attributes. Its

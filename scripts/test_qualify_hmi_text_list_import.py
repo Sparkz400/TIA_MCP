@@ -1,9 +1,18 @@
 import unittest
 from pathlib import Path
 
-from qualify_hmi_text_list_import import UNRESOLVED_PROBE, boundary_requests, compile_messages, evaluate_import, orphan_texts, problems, resolve, stripped, unrelated
+from qualify_hmi_text_list_import import boundary_requests, compile_messages, evaluate_import, orphan_texts, problems, resolve, stripped, unrelated
 
 FIXTURE = Path(__file__).resolve().parents[1] / 'fixtures/hmi/unified-text-list'
+# Comparison data: one valid list and one list whose text reference is missing.
+UNRESOLVED_PROBE = (
+    '#Version: 2.0\nTextListContainers:\n  TextList:\n    ResourceListType: TextList\n    ResourceLists:\n'
+    '      "ProbeValid":\n        RangeType: Decimal\n        Entries:\n          "Zero":\n            Type: SingleValue\n'
+    '            Value: 0\n            FromValue: 0\n            ToValue: 0\n            IsDefaultEntry: false\n            Text: "ProbeTexts.Zero"\n'
+    '      "ProbeBroken":\n        RangeType: Decimal\n        Entries:\n          "Zero":\n            Type: SingleValue\n'
+    '            Value: 0\n            FromValue: 0\n            ToValue: 0\n            IsDefaultEntry: false\n            Text: "ProbeTexts.Missing"\n',
+    '#Version: 2.0\nTextLibraries:\n  "ProbeTexts":\n    Type: Text\n    Languages:\n      - "en-US"\n      - "de-DE"\n'
+    '    DefaultLanguage: "en-US"\n    Entries:\n      "Zero":\n        Text:\n          - "Zero"\n          - "Null"\n')
 # Shape of a V21 export (run q/tl1): renamed entries, one pooled library, defaults omitted, CRLF, unquoted Off/Null texts.
 NATIVE = ('#Version: 2.0\r\n\r\nTextListContainers:\r\n  DeviceTextList:\r\n    ResourceListType: TextList\r\n    ResourceLists:\r\n'
           '      QualificationStates:\r\n        Entries:\r\n          Text_list_entry_0:\r\n            IsDefaultEntry: True\r\n'
@@ -65,11 +74,23 @@ class TextListImportOracleTests(unittest.TestCase):
         self.assertIsNone(compile_messages([{**row, 'messagesComplete': False}]))
         self.assertIsNone(compile_messages([]))
 
-    def test_boundary_requests_isolate_one_factor_per_list(self):
+    def test_boundary_requests_stay_inside_what_the_tool_accepts(self):
         requests = boundary_requests()
         self.assertEqual(sorted(requests), ['boundary-names', 'boundary-texts', 'boundary-values'])
         names = [row['name'] for request in requests.values() for row in request['lists']]
-        self.assertEqual(len(names), len(set(names)))
+        self.assertEqual(len({name.lower() for name in names}), len(names))
+        for request in requests.values():
+            self.assertLessEqual(len(request['lists']), 128)
+            for row in request['lists']:
+                self.assertFalse(set(row['name']) & set('.:#"['), row['name'])
+                self.assertLessEqual(len(row['name']), 256)
+                for entry in row['entries']:
+                    self.assertTrue(all(v is None or -2**31 <= v < 2**31 for v in (entry['fromValue'], entry['toValue'])))
+                    self.assertFalse(row['rangeType'] == 'Bool' and entry['isDefault'])
+            for text in request['texts']:
+                for value in text['translations'].values():
+                    self.assertFalse(set(value) & {'\0', '\r', chr(0x85)})
+                    self.assertLessEqual(len(value), 16384)
 
 
 if __name__ == '__main__':
