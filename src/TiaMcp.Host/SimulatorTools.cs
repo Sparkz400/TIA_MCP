@@ -36,7 +36,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_select", new { instanceId, expectedName, creationId, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation") }, cancellationToken);
 
     [McpServerTool(Name = "sim_state", Destructive = true, OpenWorld = false)]
-    [Description("Change only a selected PLCSIM instance: powerOn, powerOff, run or stop. Exact local simulator identity is rechecked. Never targets a physical PLC. SimulationConfigurationPasswordRequired requests the separate confidential configuration-protection password; user login requires username and password only if separately requested. This tool accepts no raw credentials; follow the returned guidance and server authentication instructions.")]
+    [Description("Change only a selected PLCSIM instance: powerOn, powerOff, run, stop, or memoryReset (owned instances only; restarts the virtual controller with its loaded program). Exact local simulator identity is rechecked. Never targets a physical PLC. SimulationConfigurationPasswordRequired requests the separate confidential configuration-protection password; user login requires username and password only if separately requested. This tool accepts no raw credentials; follow the returned guidance and server authentication instructions.")]
     public Task<CallToolResult> State(int instanceId, string action, CancellationToken cancellationToken, int timeoutMs = 30000)
         => Call("sim_state", new { instanceId, action, timeoutMs }, cancellationToken);
 
@@ -56,9 +56,24 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_write", new { instanceId, writes = Array(writes) }, cancellationToken);
 
     [McpServerTool(Name = "sim_test", Destructive = true, OpenWorld = false)]
-    [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Polling is not scan-accurate; maximum duration/sample bounds are enforced by the adapter.")]
-    public Task<CallToolResult> Test(int instanceId, JsonElement signals, JsonElement steps, CancellationToken cancellationToken, int intervalMs = 100)
-        => Call("sim_test", new { instanceId, signals = Array(signals), steps = Array(steps), intervalMs, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-tests") }, cancellationToken);
+    [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Wall-clock polling is not scan-accurate. virtualTime:true (owned instances only) runs the scenario in TimespanSynchronized_C: every wait is a StartProcessing span of virtual time, samples are read while the CPU is frozen, elapsedMs is virtual time, and the previous operating mode is restored. Duration/sample bounds are enforced by the adapter.")]
+    public Task<CallToolResult> Test(int instanceId, JsonElement signals, JsonElement steps, CancellationToken cancellationToken, int intervalMs = 100, bool virtualTime = false)
+        => Call("sim_test", new { instanceId, signals = Array(signals), steps = Array(steps), intervalMs, virtualTime, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-tests") }, cancellationToken);
+
+    [McpServerTool(Name = "sim_time", Destructive = true, OpenWorld = false)]
+    [Description("Read or set the virtual clock of a selected PLCSIM instance. Without arguments it reads scaleFactor, virtual system time and operating mode. scaleFactor (greater than 0, at most 1000) speeds up or slows down the virtual clock in the default operating mode; systemTimeUtc (ISO 8601 ending in Z, 1970-2200) sets the virtual system time. Writes need an instance this session created or adopted and are read back. Never a physical PLC.")]
+    public Task<CallToolResult> Time(int instanceId, CancellationToken cancellationToken, double? scaleFactor = null, string? systemTimeUtc = null)
+        => Call("sim_time", new { instanceId, scaleFactor, systemTimeUtc }, cancellationToken);
+
+    [McpServerTool(Name = "sim_event", Destructive = true, OpenWorld = false)]
+    [Description("Inject one interrupt or fault into a running PLCSIM instance this session owns, and list its configured process events. event (optional; without it only the configured hardware-interrupt events are listed): {type:hardwareInterrupt,hardwareId,channel,edge:risingEdge|fallingEdge|limit1Underrun|limit1Overrun|limit2Underrun|limit2Overrun} (OB40), {type:pullOrPlug,hardwareId,action:pull|plug|plugErrorRemains|plugWrongModule} (OB83), {type:rackOrStationFault,hardwareId,action:fault|return} (OB86, distributed devices only), {type:diagnosticAlarm,hardwareId,moduleState:ok|error|maintenanceDemanded|maintenanceRequired,channels:[{channel,errorType,extErrorType,severity:failure|maintenanceDemanded|maintenanceRequired,direction:appear|disappear}]} (OB82) or {type:statusEvent,hardwareId,specifier} (OB55). The runtime's acceptance is reported; whether the OB ran must be read from program values.")]
+    public Task<CallToolResult> Event(int instanceId, CancellationToken cancellationToken, JsonElement? @event = null)
+        => Call("sim_event", new { instanceId, @event }, cancellationToken);
+
+    [McpServerTool(Name = "sim_storage", Destructive = true, OpenWorld = false)]
+    [Description("Archive or retrieve the virtual memory card of a powered-off PLCSIM instance this session owns. action archive writes a new .zip with a receipt (path, size, SHA-256) to the Host's simulation-archives directory; action retrieve restores archivePath only when it is an unchanged archive written from the same owned instance there (expectedSha256 required). The ownership marker must be unchanged afterwards.")]
+    public Task<CallToolResult> Storage(int instanceId, string action, CancellationToken cancellationToken, string? archivePath = null, string? expectedSha256 = null)
+        => Call("sim_storage", new { instanceId, action, archivePath, expectedSha256, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
 
     [McpServerTool(Name = "sim_release", Destructive = true, OpenWorld = false)]
     [Description("Release the adapter's simulation attachment. deleteOwned additionally removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]

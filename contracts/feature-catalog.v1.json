@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.74",
+  "catalogVersion": "0.4.75",
   "targetTiaVersions": [
     21
   ],
@@ -2912,6 +2912,62 @@
         "plc_online_compare, plc_station_upload and the discovery baseline stay Softbus-only.",
         "Earlier runs of the same window on 6c6701d and 029c347 found the defects fixed up to 1181f33 (vault contention between a UA subscription and a web capture); they are not curated."
       ]
+    },
+    {
+      "id": "local.engineering_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ec90975f0e89959ad0ebf29e8894f62334f998d6",
+        "passedScope": "scripts/qualify_engineering_gaps.py on a frozen Debug build of ec90975 (artifacts/gx4), 80/80 steps, in an owned scratch CPU 1511-1 PN V4.1. Tag tables: tag_table_create of an empty table, tag_table_rename and tag_table_delete of the emptied table, with refusals (default-table name in other case, case-only duplicate, rename onto the default table, missing table, non-empty TagTableNotEmpty, DefaultTagTable) and a created table restored from its checkpoint. Compile-only: device_compile and project_compile of the station with zero errors, no mutation stage and unchanged blocks, types and tag tables; refusals for a payload, a missing device and compile=false. CPU parameters: hardware_cpu_parameters sets CycleMaximumCycleTime 200, CycleMinimumCycleTime 5, CycleCommunicationLoad 30, CycleEnableMinimumCycleTime false (V21 then undeclares CycleMinimumCycleTime), StartupActionAfterPowerOn 1, StartupComparisonPresetToActualModule 1, StartupConfigurationTimeout 30000, TimeOfDayActivateDaylightSavingTime false, TimeOfDayLocalTimeZone 23 and TimeSynchronizationNtpV2 1, each device-compiled with configured-hardware preservation and native readback; refusals for an attribute outside the subset, an unchanged value, null, the rack, Disabled access control, a minimum cycle time while disabled and enabling it without a value; a fresh Portal reopens identical parameters, blocks, types and tag tables; one parameter change is restored from its checkpoint and the original values return in one combined change. Recorded native outcomes: PlcAccessControlConfiguration EnabledWithAccessControlViaAccessLevel fails compilation (full-access password required) and is restored; hmi_compile of a TP700 Comfort and an MTP700 Unified Basic created by hardware_add returns TIA's compile errors (no start screen; the Unified panel also its runtime password) as CompileFailed, and both restore from their checkpoints."
+      },
+      "artifacts": [
+        "evidence/local.engineering_gaps.20261029.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21; other CPU families, firmware, F-CPUs and software units are not qualified.",
+        "The CPU protection level cannot be changed through this route: V21 compiles access-level modes only with a full-access password, and the route never accepts passwords.",
+        "No successful HMI compilation: panels created through Openness have no start screen (the Unified panel also lacks its runtime password), and screen creation stays behind the closed HMI preservation gate; hmi_compile is not qualified by this run.",
+        "Runtime effects of the CPU parameters are not observed; tag tables are exercised at PLC-root scope only."
+      ]
+    },
+    {
+      "id": "local.plcsim_gaps.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "e38adf24e90bcc83a00a369481a64912910b5dd8",
+        "passedScope": "scripts/qualify_plcsim_gaps.py on a frozen Debug build of e38adf2 (artifacts/gs3), 73/73 steps, on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1 with a central DI 16x24VDC HF, an ET 200SP IM 155-6 PN ST station on the CPU's IO system, GapDb (counters, IEC TON, DTL), Main and interrupt OBs 40/82/83/86 imported with their event classes; card download, credential provisioning, power on and RUN as in the D09 runner. change.simulation_download_online (compile=false, save=false, runtime-user login, TLS never trusted): a Main change downloads with softwareScope changes and keepActualValues in RUN (ConsistentBlocksDownload answered, a kept counter 7, ProgramVersion 2); a GapDb layout change with keepActualValues answers TIA's DataBlockReinitializationOrKeepActualValues with KeepActualValues and keeps 7; a further layout change with reinitialize and allowStop answers StopPlcAndReinitialize, resets the counter to 0 and returns to RUN; plc_online_compare afterwards reports FolderContentsIdentical; refusals without a ticket, reinitialize without allowStop and compile/save=true. sim_test runs a 5 s TON scenario on the wall clock (5.97 s) and twice with virtualTime (TimespanSynchronized_C, 13 and 14 StartProcessing spans, 5.90 s virtual, previous mode restored); sim_time scaleFactor 10 completes the timer within 1.25 s of wall time and is restored to 1; systemTimeUtc 2031-06-15 is read by RD_SYS_T as year 2031. sim_event raises OB82 (diagnosticAlarm, +1), OB83 (pull and plug, +2) on the DI module and OB86 (station fault and return, +2) on the ET 200SP IO device, each changing only its own counter; a malformed event refuses before the runtime call. sim_state memoryReset restarts with start values and the downloaded program. sim_storage archives the powered-off card (791 737-byte zip with receipt), refuses a wrong hash, retrieves it with an unchanged ownership marker, and the retrieved card runs the online-downloaded program. The instance is released with deleteOwned."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.20261029.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1, provisioned with first-use TLS trust under the owned-empty-CPU policy; other CPUs, firmware and TCP/IP instances are not qualified.",
+        "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt is configured and PLCSIM answers ProcessEvent with NotSupportedByModule (-55); OB40 does not run. statusEvent on the central DI module is answered NotSupportedByModule as well (OB55 is for distributed modules).",
+        "Virtual-time scenarios at scale factor 1 run at wall-clock speed in deterministic StartProcessing spans; the speed-up comes from scaleFactor, and the combination of both is not exercised. Scan-exact timing is not claimed.",
+        "Each online download must start within the 15-minute ticket from sim_create; after a program change PLCSIM answers NotUpToDate until its tag list is refreshed with sim_tags. Archive and retrieve restore the same state that was archived; a cross-state restore is not exercised."
+      ]
+    },
+    {
+      "id": "local.plcsim_gaps.recovery.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ad7096c5e3b43c067b11177d277c50576fa6e642",
+        "passedScope": "Recovery top-up of local.plcsim_gaps.20261029: scripts/qualify_plcsim_gaps.py on a frozen Debug build of ad7096c (artifacts/gs4), 74/74 steps, same fixture and checks on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus. Added after the reinitialized online download: change_status keeps its applied state and checkpoint archive; change_restore retrieves the checkpoint into a new directory while the CPU keeps the downloaded program (ProgramVersion 2, reinitialized counter 0); a simulation_download_online prepared from the recovered copy refuses with SimulationTargetMismatch, because that copy is not the project that produced the instance's card; plc_online_compare of the recovered project reports FolderContentsIdentical (the checkpoint was taken after the layout change and before its download). Every other step of the 29 October run (code change keeping values, kept and reinitialized layout changes, virtual time, OB82/OB83/OB86, memory reset, storage archive and retrieve) passed again."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.recovery.20261029.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1; other CPUs, firmware and TCP/IP instances are not qualified.",
+        "The online download is a CPU write: change_restore recovers only the project, and the recovered copy can no longer download to the instance whose card came from the original project.",
+        "OB40 stays a V21 boundary (no hardware-interrupt configuration through V21 Openness; PLCSIM answers NotSupportedByModule)."
+      ]
     }
   ],
   "features": [
@@ -5213,13 +5269,15 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "memoryReset (owned instances only) restarts the virtual controller through IInstance.MemoryReset; natively it returned the instance with start values and the online-downloaded program (local.plcsim_gaps.20261029)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.state.rerun.20261028"
+          "local.sim.state.rerun.20261028",
+          "local.plcsim_gaps.20261029"
         ]
       },
       "availability": {
@@ -5385,14 +5443,16 @@
         "status": "implemented",
         "limitations": [
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "virtualTime=true (owned instances only) runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.sim.provision.20261024",
-          "local.sim.state.rerun.20261028"
+          "local.sim.state.rerun.20261028",
+          "local.plcsim_gaps.20261029"
         ]
       },
       "availability": {
@@ -5451,6 +5511,144 @@
         "AC-identity",
         "AC-completeness",
         "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_time",
+      "domain": "simulation",
+      "title": "Read and set the virtual clock of an owned simulated CPU",
+      "mcpTools": [
+        "sim_time"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ScaleFactor and IInstance.SystemTime; virtual-time scenarios use OperatingMode TimespanSynchronized_C, StartProcessing and the sync-point event."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "scaleFactor 10 completed a 5 s IEC TON within 1.25 s of wall time and was restored to 1; systemTimeUtc 2031-06-15 was read by RD_SYS_T as year 2031. The virtual system time is reported without a time-zone kind.",
+          "Reads any selected instance; writes need an instance this worker created or adopted, in its admitted network mode, and no active cycle-synchronous capture.",
+          "scaleFactor is greater than 0 and at most 1000 and acts in the default operating mode from the next cycle control point; systemTimeUtc is an explicit UTC instant from 1970 to 2200. Both are read back.",
+          "Virtual-time stepping itself is a sim_test option (virtualTime); sim_time never changes the operating mode."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_event",
+      "domain": "simulation",
+      "title": "Inject interrupts and faults into an owned running simulated CPU",
+      "mcpTools": [
+        "sim_event"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ProcessEvent, PullOrPlugEvent, RackOrStationFaultEvent, AlarmNotification, StatusEvent and GetConfiguredProcessEvents."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "OB82 (diagnosticAlarm), OB83 (pull and plug) on a central DI 16x24VDC HF and OB86 (station fault and return) on an ET 200SP IO device each raised only their own counter. Hardware IDs come from the PLC's system constants.",
+          "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt can be configured; PLCSIM answers ProcessEvent with NotSupportedByModule (-55) and OB40 does not run. statusEvent on the central module is answered NotSupportedByModule as well (OB55 serves distributed modules).",
+          "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
+          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_storage",
+      "domain": "simulation",
+      "title": "Archive and retrieve the virtual memory card of an owned simulated CPU",
+      "mcpTools": [
+        "sim_storage"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ArchiveStorage and RetrieveStorage (instance powered off)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "A powered-off card archived (791 737-byte zip with receipt), a wrong hash was refused, and the retrieved card powered on and ran the online-downloaded program with an unchanged ownership marker. Only a restore of the archived state itself is exercised.",
+          "Owned instances in OFF only. Archive writes a new .zip and a receipt (path, size, SHA-256) to the Host's simulation-archives directory.",
+          "Retrieve accepts only an unchanged archive written there from the same owned instance (expectedSha256 required); the instance's storage path and ownership marker must be unchanged afterwards."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-recovery",
         "AC-evidence"
       ]
     },
@@ -5918,6 +6116,153 @@
         "status": "verified",
         "evidenceIds": [
           "local.plc_object_mutations.rerun.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_create",
+      "domain": "data",
+      "title": "Create an empty PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTableComposition.Create."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope, with refusals for a case-only duplicate and the default table's name; checkpoint recovery restores the project without the created table.",
+          "Payload tagTableName and optional scopePath/groupPath; the name must be free in the software scope across every tag-table group (case-insensitive). compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_rename",
+      "domain": "data",
+      "title": "Rename a PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_rename",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTable.Name setter."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope, with refusals for a missing table and a rename onto the default table.",
+          "Payload tagTableName or tagTablePath and newName; the table keeps its members and newName must be free in the software scope. compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.tag_table_delete",
+      "domain": "data",
+      "title": "Delete an empty PLC tag table",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "tag_table_delete",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 PlcTagTable.Delete."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified at PLC-root scope on an emptied table, with refusals for a non-empty table (TagTableNotEmpty) and the default tag table (DefaultTagTable).",
+          "Payload tagTableName or tagTablePath; only an empty user table (no tags, no user constants) is deleted and the default tag table never. compile=true."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
         ]
       },
       "availability": {
@@ -12274,6 +12619,58 @@
         "status": "verified",
         "evidenceIds": [
           "local.cpu_memory_bytes.rerun.20261028"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_cpu_parameters",
+      "domain": "hardware",
+      "title": "Set reviewed CPU parameters",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hardware_cpu_parameters",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base typed attribute API on CPU device items."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Reviewed subset: CycleMaximumCycleTime, CycleMinimumCycleTime, CycleEnableMinimumCycleTime, CycleCommunicationLoad, StartupActionAfterPowerOn, StartupComparisonPresetToActualModule, StartupConfigurationTimeout, TimeSynchronizationNtpV2, TimeOfDayLocalTimeZone, TimeOfDayActivateDaylightSavingTime and PlcAccessControlConfiguration, each only where the selected item declares it. Coded values are V21's own numbers; V21 refused StartupActionAfterPowerOn = 2 in its setter (29 October 2026).",
+          "CycleMinimumCycleTime exists only while CycleEnableMinimumCycleTime is true: disabling drops it, a value for a disabled flag is refused, and enabling needs an explicit value (the flag is written first). A zone without daylight saving makes TIA switch TimeOfDayActivateDaylightSavingTime off, so request both together; any other dependent change fails preservation and needs checkpoint recovery.",
+          "PlcAccessControlConfiguration accepts only the exact names of the enabled access-control modes, never Disabled or a number. Changing the protection level is a recorded boundary: V21 compiles the access-level modes only with a full-access password, and this route never accepts passwords (the change fails compilation and is restored from its checkpoint).",
+          "Device compilation and configured-hardware preservation are mandatory; the runtime effect of the parameters is not observed.",
+          "Device compilation and configured-hardware preservation (identities, slots, reviewed attributes including the parameter subset, addresses and network associations) are mandatory; the runtime effect is not observed by this kind."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
         ]
       },
       "availability": {
@@ -19227,6 +19624,63 @@
       ]
     },
     {
+      "featureId": "change.simulation_download_online",
+      "domain": "simulation",
+      "title": "Download a changed program online to an existing owned PLCSIM instance",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "simulation_download_online",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 DownloadProvider.Download(IConfiguration, pre, post, DownloadOptions) on the PLC's PN/IE / PLCSIM (1) target interface, with the typed download configurations."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029, local.plcsim_gaps.recovery.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "Native outcomes: a code change downloads in RUN keeping actual values (TIA asks only ConsistentBlocksDownload); a layout change answers DataBlockReinitializationOrKeepActualValues with KeepActualValues or, with reinitialize and allowStop, StopPlcAndReinitialize and returns to RUN; plc_online_compare reports FolderContentsIdentical. change_restore recovers only the project into a new directory: the CPU keeps the downloaded program, and the recovered copy refuses further online downloads with SimulationTargetMismatch.",
+          "After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Softbus only, like plc_online_compare.",
+          "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
+          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
+          "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
+          "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_gaps.20261029",
+          "local.plcsim_gaps.recovery.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "PLCSIM Advanced V8 API and authorized Windows user"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence",
+        "AC-runtime"
+      ]
+    },
+    {
       "featureId": "drive_profile_review",
       "domain": "drive-profiles",
       "title": "Compare supplied drive parameters and typed telegrams",
@@ -20318,6 +20772,153 @@
         "TIA Portal V21 with the required engineering products and Openness access",
         "An explicitly selected offline project and PLC software compiler",
         "Writable checkpoint artifact directory; native qualification before production admission"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.device_compile",
+      "domain": "engineering",
+      "title": "Checkpoint and compile one device (station hardware and software)",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "device_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Uses Device.GetService<ICompilable>() for the exact device of the device compiler inventory."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified on the scratch station (CPU 1511-1 PN): zero errors, no mutation stage, unchanged blocks, types and tag tables, and refusals for a missing device and compile=false.",
+          "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.project_compile",
+      "domain": "engineering",
+      "title": "Checkpoint and compile every device of the project",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "project_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Uses Device.GetService<ICompilable>() for every device of the device compiler inventory, in order."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
+          "Qualified on a one-station project. A project whose devices do not all compile (for example an HMI panel without a start screen) fails with CompileFailed and needs checkpoint recovery.",
+          "Empty payload; compile=true. Every device needs a compiler service and the inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.engineering_gaps.20261029"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hmi_compile",
+      "domain": "hmi",
+      "title": "Checkpoint and compile one HMI target",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hmi_compile",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Classic HMI software ICompilable or, for Unified, the owning device's ICompilable (the documented hardware-and-software route)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Compiled against the installed API only; not natively qualified.",
+          "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified.",
+          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile is not qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "The HMI family's optional engineering product installed"
       ],
       "acceptanceCriteria": [
         "AC-identity",

@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.74`: 450 features, 405 verified, 45 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 122 shipped, 283 limited, 27 unqualified, 8 unavailable on V21, 10 deferred |
-| Matrix cells | 1,838 bound, **150 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.75`: 461 features, 415 verified, 46 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 122 shipped, 293 limited, 28 unqualified, 8 unavailable on V21, 10 deferred |
+| Matrix cells | 1,891 bound, **156 open**, 49 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09 against `0.4.74` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -23,8 +23,9 @@ names every row with an open cell.
   physical PLC.
 - **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
   station upload meets TLS verification it never trusts, an OPC UA reference-namespace import crashes TIA,
-  Unified text lists have no import route, and force-table rows can only be authored in the
-  TIA editor.
+  Unified text lists have no import route, force-table rows can only be authored in the
+  TIA editor, V21 Openness cannot configure a DI module's hardware interrupt (OB40), and the
+  CPU protection level needs a full-access password no route accepts.
 - **Rows that cannot close on V21:** eight `unavailable_target` rows (49 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`,
   the three block-protection kinds and the two OPC UA reference-namespace kinds) are blocked
@@ -49,7 +50,7 @@ record is cited by a feature; records no feature cites any more are in the retir
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
-[29 October](history/status-log.md#29-october-2026): the runtime UA, web and capture tools passed
+[29 October](history/status-log.md#29-october-2026): online downloads to an owned PLCSIM instance, PLCSIM virtual time, interrupt injection, memory reset and storage, typed CPU parameters, device/project compile and the tag-table lifecycle were added and natively qualified except HMI compilation ([record](verification/plcsim-openness-gaps-20261029.md)); the runtime UA, web and capture tools passed
 against the real servers of an owned TCP/IP PLCSIM instance ([record](verification/runtime-real-server-20261029.md)); the [MCP surface](reference/mcp-surface.md)
 gained `--toolsets`, tool titles, workflow prompts, progress heartbeats and output schemas; the remaining re-runnable lost records
 re-run and 21 replaced records retired (catalog 0.4.70); native qualification of web user
