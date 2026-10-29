@@ -645,7 +645,33 @@ namespace TiaMcp.Openness.V21
                         throw new BridgeException("OfflineRequired", "The worker-owned scratch connection changed before its explicit GoOnline call.");
                     report["goOnlineAttempted"] = true;
                     checkpoint("beforeGoOnline");
-                    var online = provider.GoOnline();
+                    OnlineState online;
+                    try { online = provider.GoOnline(); }
+                    catch (Exception first) when (network == "TCPIP") // Softbus never enters this handler.
+                    {
+                        string stateAfter;
+                        try { stateAfter = provider.State.ToString(); } catch { stateAfter = null; }
+                        var challenge = report["onlineChallengeType"];
+                        if (!SimulationNetworkAdmission.GoOnlineRetryAllowed(network, 0, challenge != null && challenge.Type != JTokenType.Null || tlsCallbackCount > 0 || callbackFailure != null,
+                            report.Value<bool>("credentialOpened") || report.Value<bool>("credentialSubmissionArmed") || failure != null, stateAfter))
+                            throw;
+                        const int retryDelayMs = 15000;
+                        report["goOnlineRetry"] = new JObject { ["delayMs"] = retryDelayMs, ["onlineStateAfterFirstAttempt"] = stateAfter,
+                            ["firstAttempt"] = SimulationProvisionExceptionDiagnostics(first, true), ["returned"] = false,
+                            ["policy"] = "TCP/IP only, once: the first GoOnline threw before any online callback, with no credential opened or submitted; the owned target is rechecked before the second call." };
+                        checkpoint("goOnlineRetryScheduled");
+                        Thread.Sleep(retryDelayMs);
+                        VerifySimulationProvisionIdentity(instance, marker, false);
+                        if (instance.OperatingState != EOperatingState.Stop || provider.State != OnlineState.Offline || !(instance.ControllerIP ?? new string[0]).Contains(address, StringComparer.Ordinal))
+                            throw new BridgeException("SimulationProvisionTargetMismatch", "The owned simulator state, connection or controller address changed before the GoOnline retry.");
+                        var retryRead = observer.Read(3, network);
+                        var retryChecked = WithoutSimulationPlaceholder(retryRead, AcceptedSimulationPlaceholder(discoveryBaseline), retryRead.Length > 2);
+                        if (retryChecked.Length != 1 || !SimulationNetworkAdmission.SameRuntimeTarget(runtimeTargetBasis, retryChecked[0].Address, retryChecked[0].MACAddress, retryChecked[0].DeviceSeries, address, startupMac))
+                            throw new BridgeException("SimulationProvisionTargetAmbiguous", "The exact PLCSIM accessible target changed before the GoOnline retry.");
+                        checkpoint("beforeGoOnlineRetry");
+                        online = provider.GoOnline();
+                        report["goOnlineRetry"]["returned"] = true;
+                    }
                     report["goOnlineCallReturned"] = true;
                     checkpoint("afterGoOnline");
                     report["goOnlineReturnedState"] = online.ToString();

@@ -87,6 +87,19 @@ internal static class SimulationNetworkAdmissionTests
         return Task.CompletedTask;
     }
 
+    internal static Task GoOnlineRetryOnlyBeforeAnyCallbackInTcpIp()
+    {
+        // Run rs_ad5dc0ea (29 October 2026): GoOnline threw, no callback, nothing opened, the connection stayed Offline.
+        Check.Equal(true, SimulationNetworkAdmission.GoOnlineRetryAllowed("TCPIP", 0, false, false, "Offline"));
+        Check.Equal(false, SimulationNetworkAdmission.GoOnlineRetryAllowed("Softbus", 0, false, false, "Offline"));
+        Check.Equal(false, SimulationNetworkAdmission.GoOnlineRetryAllowed("TCPIP", 1, false, false, "Offline"));
+        Check.Equal(false, SimulationNetworkAdmission.GoOnlineRetryAllowed("TCPIP", 0, true, false, "Offline"));
+        Check.Equal(false, SimulationNetworkAdmission.GoOnlineRetryAllowed("TCPIP", 0, false, true, "Offline"));
+        foreach (var state in new[] { "Online", "Connecting", null })
+            Check.Equal(false, SimulationNetworkAdmission.GoOnlineRetryAllowed("TCPIP", 0, false, false, state));
+        return Task.CompletedTask;
+    }
+
     // The machine-wide network mode is an operator setting; the simulator worker only reads it.
     internal static Task WorkerNeverAssignsNetworkMode()
     {

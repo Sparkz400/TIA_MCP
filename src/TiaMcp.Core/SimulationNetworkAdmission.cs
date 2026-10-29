@@ -38,6 +38,11 @@ namespace TiaMcp.Simulation
                 SameRuntimeTarget("tcpipMacIdentity", address, macAddress, deviceSeries, null, startupMac) ? "tcpipMacIdentity" : null;
         }
 
+        // TCP/IP only, once: GoOnline threw before any online callback, nothing was opened or submitted and the connection is
+        // still offline (seen once, 29 October 2026, minutes after another owned CPU left the same address). Softbus never retries.
+        public static bool GoOnlineRetryAllowed(string network, int retriesDone, bool onlineCallbackSeen, bool credentialTouched, string onlineState) =>
+            network == "TCPIP" && retriesDone == 0 && !onlineCallbackSeen && !credentialTouched && onlineState == "Offline";
+
         // Every later recheck of the decided target: the same address, or for tcpipMacIdentity the same MAC and PLCSIM series.
         public static bool SameRuntimeTarget(string basis, string address, string macAddress, string deviceSeries, string targetAddress, string startupMac) =>
             basis == "tcpipMacIdentity"
