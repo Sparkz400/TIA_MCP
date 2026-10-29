@@ -33,6 +33,7 @@ EXCLUDED = {"opcua_reference_namespace_import": _CRASH, "opcua_reference_namespa
             "opcua_server_settings_set": "Qualified by scripts/qualify_opcua_server_settings.py (local.opcua_server_settings.20261028)."}
 V1, V2 = ROOT / "fixtures/opcua/server-interface-v1.xml", ROOT / "fixtures/opcua/server-interface-v2.xml"
 NAME, ROLE, UA = "TiaMcpQ", "Operator", "http://opcfoundation.org/UA/"
+NAMESPACE = "urn:tiamcp:interface:1"  # The fixtures' namespace.
 SMALL = "SimaticOpcUaS71500Small"
 PERMISSIONS = ("Browse", "Read", "Write", "Call", "ReceiveEvents", "ReadRolePermissions")
 CRITERIA = {
@@ -49,6 +50,8 @@ LIMITATIONS = [
     "Role mappings: one OPC UA standard role (Operator) mapped to the scratch's runtime project role with namespace permissions; custom namespace roles are not created.",
     "opcua_engineering_export: the whole-server export and each server interface; SIMATIC interfaces and reference namespaces are empty in a scratch.",
     _CRASH,
+    "Importing or deleting an interface makes TIA add or remove its namespace row in the namespace access restrictions and in every role mapping; "
+    "these are recorded under sideEffects and checked to differ only by that namespace.",
     "Engineering only; nothing is downloaded and no OPC UA client connects.",
 ]
 
@@ -104,6 +107,22 @@ class Run(StateRun):
         return prepared
 
 
+def namespace_rows(category, key):
+    """Adding or deleting an interface adds or removes its namespace in the access restrictions and in every role mapping."""
+    return category == "changed" and (key == "opcua:namespaceAccess" or key.startswith("opcua:roleMapping:"))
+
+
+def only_namespace_rows(before, state):
+    """Those keys may differ only by rows of the fixtures' namespace."""
+    def strip(value):
+        if isinstance(value, list):
+            return [row for row in value if row.get("namespaceUri") != NAMESPACE]
+        return {**value, "namespacePermissions": strip(value["namespacePermissions"])}
+    for key in before.keys() & state.keys():
+        if namespace_rows("changed", key) and before[key] != state[key]:
+            require(strip(before[key]) == strip(state[key]), "%s changed beyond the %s rows" % (key, NAMESPACE))
+
+
 def interface(name):
     return "opcua:serverInterface:" + name
 
@@ -115,9 +134,10 @@ def import_payload(path, mode, name=NAME):
 def import_(run, label, path, mode, restore=False):
     payload = import_payload(path, mode)
     effect = {"action": "opcua_server_interface_import", "name": NAME, "mode": mode, "sourceSha256": payload["expectedSha256"]}
-    key = interface(NAME)
+    key, previous = interface(NAME), run.current["view"]
     if mode == "create":
-        return run.apply(label, "opcua_server_interface_import", payload, effect, added=[key], rows={key: {"name": NAME, "enabled": True}}, restore=restore)
+        return run.apply(label, "opcua_server_interface_import", payload, effect, added=[key], rows={key: {"name": NAME, "enabled": True}}, restore=restore,
+                         tolerated=namespace_rows, check=lambda applied, state: only_namespace_rows(previous, state))
     before = run.current["view"][key]["exportSha256"]
     return run.apply(label, "opcua_server_interface_import", payload, effect, changed=[key], restore=restore,
                      check=lambda applied, state: require(state[key]["exportSha256"] != before, "Replacing did not change the interface content"))
@@ -130,8 +150,10 @@ def enable(run, enabled, restore=False):
 
 
 def delete(run, restore=False):
+    previous = run.current["view"]
     return run.apply("delete the interface", "opcua_server_interface_delete", {"interfaceName": NAME},
-                     {"action": "opcua_server_interface_delete", "name": NAME}, removed=[interface(NAME)], restore=restore)
+                     {"action": "opcua_server_interface_delete", "name": NAME}, removed=[interface(NAME)], restore=restore,
+                     tolerated=namespace_rows, check=lambda applied, state: only_namespace_rows(previous, state))
 
 
 def role_payload(run):
