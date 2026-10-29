@@ -275,19 +275,20 @@ def verify_tag_address_change(before, after, owner_path, member_name, old_addres
 
 
 def verify_competing_db_change(before, after, scope_path):
-    """The ambiguity fixture may add only its exact namespaced competing DB."""
+    """The ambiguity fixture may add only its competing DB: unit B, no namespace, so the root DB's qualified name."""
     added = set(after["objects"]) - set(before["objects"])
     require(len(added) == 1 and set(before["objects"]) < set(after["objects"]),
             "Competing DB setup must add exactly one native object and delete none.")
     key = next(iter(added))
     row = after["objects"][key]
-    observed = select(after["inventory"]["blocks"], "Tgp_ResolutionOne", scope_path, "TiaMcp_UnitB")
-    require(row["kind"] == "block" and row["path"] == observed["path"], "The added object is not the exact competing DB identity.")
+    observed = select(after["inventory"]["blocks"], "Tgp_ResolutionOne", scope_path)
+    require(row["kind"] == "block" and row["path"] == observed["path"] and "/namespaces/" not in row["path"],
+            "The added object is not the exact competing DB identity.")
     assert_snapshot(before, {"objects": {name: value for name, value in after["objects"].items() if name != key}})
     document = native_document(pathlib.Path(row["file"]).read_bytes().decode("utf-8-sig"))
     block = document.find("SW.Blocks.GlobalDB")
     require(block is not None and block.findtext("AttributeList/Name") == "Tgp_ResolutionOne"
-            and block.findtext("AttributeList/Namespace") == "TiaMcp_UnitB", "Competing DB native kind/name/namespace differs.")
+            and not block.findtext("AttributeList/Namespace"), "Competing DB native kind/name/namespace differs.")
     local = lambda node: node.tag.rsplit("}", 1)[-1]
     members = [node for node in block.find("AttributeList/Interface").iter() if local(node) == "Member"]
     require(len(members) == 2, "Competing DB declaration inventory differs from authored source.")
@@ -469,6 +470,37 @@ class ResolutionRun:
         require(hashlib.sha256(executable.read_bytes()).hexdigest() == row["sha256"], "Seeder binary changed during fixture setup.")
         self.session.guard()
 
+    def resolution_seed(self, operation):
+        """One bounded native ResolutionSeeder call: a fixture that production collision guards refuse. Never replayed."""
+        executable = self.args.resolution_seeder.resolve()
+        require(executable.is_file(), "Guarded native ResolutionSeeder binary is required.")
+        self.session.guard()
+        authorization = self.native / (operation + "-authorization.json")
+        authorization.write_text(canonical({"processId": self.session.session["processId"], "projectPath": self.session.current_project,
+            "ownsPortalProcess": True, "creationTool": "tia_create_scratch", "operation": operation}), encoding="utf-8")
+        row = {"path": str(executable), "sha256": hashlib.sha256(executable.read_bytes()).hexdigest(), "operation": operation,
+            "dispatched": True, "replayPermitted": False, "nativeAmbiguityQualified": False}
+        self.report["nativeDuplicateSetup"] = row
+        self.persist()
+        try:
+            result = subprocess.run([str(executable), str(self.args.artifacts.resolve()), str(authorization)], cwd=ROOT,
+                capture_output=True, text=True, encoding="utf-8", timeout=self.args.timeout)
+        except subprocess.TimeoutExpired as error:
+            decode = lambda value: value.decode("utf-8", errors="replace") if isinstance(value, bytes) else value
+            row.update(outcome="unknown_after_timeout", stdout=decode(error.stdout), stderr=decode(error.stderr))
+            self.persist()
+            raise
+        row.update(exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)
+        self.persist()
+        response = json.loads(result.stdout.strip().splitlines()[-1])
+        row["result"] = response
+        require(result.returncode == 0 and response.get("completed") is True, "Native duplicate fixture dispatch did not complete.")
+        require(response.get("processId") == self.session.session["processId"]
+                and pathlib.Path(response["projectPath"]).resolve() == pathlib.Path(self.session.current_project), "Seeder receipt target differs.")
+        require(hashlib.sha256(executable.read_bytes()).hexdigest() == row["sha256"], "Native seeder binary changed.")
+        self.session.guard()
+        return row
+
     def observations(self):
         inventory = complete_inventory(self.session.call)
         scope = inventory["plcPath"]
@@ -598,16 +630,25 @@ class ResolutionRun:
             tag_owner = base["arguments"]["payload"]["model"]["operands"][0]["ownerPath"]
             deliberate, _ = self.apply("tag_set", {"tagTablePath": tag_owner, "memberName": "Ready", "attributes": {"LogicalAddress": "%M100.1"}})
         else:
+            # The resolver compares qualified names, and production imports refuse a same-qualified-name DB in
+            # another scope (NamespaceCollision), so only TIA itself can create the competitor.
             unit = select(complete_inventory(self.session.call)["softwareScopes"], "TiaMcp_UnitB")
-            deliberate, _ = self.apply("source_upsert", {"scopePath": unit["path"], "language": "SCL",
-                "source": self.fixture_text(SOURCES / "resolution-competing-db.scl"), "expectedBlockNames": ["Tgp_ResolutionOne"]})
+            deliberate, seeded = None, self.resolution_seed("duplicate-db-diagnostic")
         # Until explicit restore, keep the deliberate change available to failure recovery.
         self.pending_mutation = deliberate
         changed = snapshot(self.session.call, folder / "deliberate-change")
         if identifier == "stale-db-ambiguity":
+            if seeded["result"].get("duplicateCreated") is not True:
+                assert_snapshot(before, changed)
+                seeded.update(fullOriginalXmlPreserved=True, outcome="native-rejected")
+                self.persist()
+                raise RuntimeError("V21 refused every same-qualified-name competitor DB; the native stale DB ambiguity stays unqualified. See retained nativeRejection.")
             same_name = [row for row in changed["inventory"]["blocks"] if row["name"] == "Tgp_ResolutionOne"]
             require(len(same_name) == 2 and len({row["path"] for row in same_name}) == 2, "Competing DB identities were not independently observed.")
             case["competingDbPath"] = verify_competing_db_change(before, changed, unit["path"])
+            seeded.update(fullOriginalXmlPreserved=True, outcome="duplicate-created" if seeded["result"].get("compileErrors") == 0 else "compile-rejected")
+            self.persist()
+            require(seeded["result"].get("compileErrors") == 0, "The native competitor DB does not compile; the native stale DB ambiguity stays unqualified.")
             case["deliberateAdditionOnlyXmlVerified"] = True
             fresh = self.request("db-first-owner")
             case["freshAmbiguityDiagnostic"] = expect_rejection(self.session.call, "change_prepare", fresh["arguments"], {"AmbiguousOperand"})
@@ -630,7 +671,13 @@ class ResolutionRun:
         self.pending_mutation = deliberate
         self.persist()
         assert_snapshot(changed, snapshot(self.session.call, folder / "stale-rejected"))
-        self.recover(deliberate, before, folder, case)
+        if deliberate is None:
+            # The native competitor has no production checkpoint; a production delete removes it.
+            case["restored"] = self.apply("block_delete", {"scopePath": unit["path"], "blockName": "Tgp_ResolutionOne"})[1]
+            assert_snapshot(before, snapshot(self.session.call, folder / "restored"))
+            self.persist()
+        else:
+            self.recover(deliberate, before, folder, case)
         recovered = self.session.current_project
         self.session.reopen(recovered)
         assert_snapshot(before, snapshot(self.session.call, folder / "recovered-reopened"))
@@ -697,6 +744,7 @@ def main():
     parser.add_argument("--language", choices=("LAD", "FBD"), default="LAD")
     parser.add_argument("--case", action="append", default=[])
     parser.add_argument("--unit-seeder", type=pathlib.Path)
+    parser.add_argument("--resolution-seeder", type=pathlib.Path, help="Native competitor DB for stale-db-ambiguity.")
     parser.add_argument("--namespace-unqualified", action="store_true",
         help="Diagnostic native UDT reference-spelling probe. Canonicalized/rejected imports never qualify unqualified propagation.")
     parser.add_argument("--timeout", type=int, default=300)
@@ -709,6 +757,8 @@ def main():
         parser.error("Select unique cases belonging to the requested phase.")
     if (args.phase == "namespace" or "stale-db-ambiguity" in args.case) and not args.unit_seeder:
         parser.error("Namespace and stale DB ambiguity fixtures require --unit-seeder.")
+    if "stale-db-ambiguity" in args.case and not args.resolution_seeder:
+        parser.error("The stale DB ambiguity fixture requires --resolution-seeder.")
     if not 5 <= args.timeout <= 930:
         parser.error("--timeout must be within 5..930 seconds.")
     try:

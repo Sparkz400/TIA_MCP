@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.73",
+  "catalogVersion": "0.4.75",
   "targetTiaVersions": [
     21
   ],
@@ -2780,6 +2780,101 @@
       ]
     },
     {
+      "id": "local.online.snapshots.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+        "passedScope": "scripts/qualify_online_routes.py --skip-upload from commit 4963644 on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb (Count : Int := 5), downloaded to a fresh owned PLCSIM Advanced V8 instance whose protection credential was provisioned, in RUN, logged in only as the instance's generated scratch runtime user: typed refusals that change nothing (unknown ticket, the CPU's protection credential, runtime-user metadata naming another project or CPU, a copy outside scratch-credentials, no credential, an upload into an open project, db_snapshot_capture of a DB without a stored snapshot with DbSnapshotUnavailable, db_snapshot_create without a ticket with PhysicalPlcRefused, db_snapshot_load_actual without acknowledgement); plc_online_compare identical in every row; Count set to 42 through PLCSIM, db_snapshot_create applied with checkpoint, compile and save (preview without a previous snapshot), db_snapshot_capture reviews Count = 42; Count set to 7, db_snapshot_load_actual applied without compile and save, and PLCSIM reads Count back as 42 after a tag-list refresh; each online session completed its cleanup in RUN with at most one project-user login and the project state stayed unchanged; change_restore of the create gives the pre-change state, whose DB again has no stored snapshot; then stop, power off, owned release and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.snapshots.20261029.json"
+      ],
+      "limitations": [
+        "plc_station_upload ran only as its ProjectIsolationRequired refusal (--skip-upload); its TLS trust in an empty Portal is implemented on another branch.",
+        "One global DB with one Int; arrays, structures, instance DBs, retain values and a DB that already had a snapshot are not exercised.",
+        "InterfaceSnapshot.Export needs ExportOptions.WithReadOnly: Snapshot and SnapshotDate are read-only attributes. A DB without a stored snapshot exports empty SnapshotValues dated 0001-01-01, which the worker refuses as DbSnapshotUnavailable.",
+        "Each export carries a new DocumentInfo/Created, so the capture's file hash never equals a fresh export; the load compares the InterfaceSnapshot element of a fresh export with the reviewed capture's retained file, bound by its hash.",
+        "After LoadSnapshotAsActualValues PLCSIM reports its old tag list NotUpToDate (-47); the readback refreshes it through sim_tags. No public V21 API reads actual values back; PLCSIM is the independent reader.",
+        "Provisioning the protection credential trusts the owned, empty CPU's certificate on first use (trustOwnedEmptyCpuCertificate); the online sessions answer TLS NonTrusted and TIA asked them none. TIA reuses an online login within the same Portal.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.runtime.timers.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4963644d7610d5bfc8c5e8cba04a4a758954687f",
+        "passedScope": "scripts/run_block_tests.py --live --provision-runtime-credential --trust-owned-empty-cpu-certificate --fixture runtime-timers from commit 4963644: the updated runtime runner end to end on Softbus, both timer cases each on a fresh Host, owned TIA session and owned CPU1511, with download, the explicit checkpoint/compile/save of the generated scratch state (generatedProjectSave), credential provisioning through the discovery observer with card staging and restoration (every card move succeeded on its first attempt), RUN, the stimulus and assertion sequences, owned release and verified exits."
+      },
+      "artifacts": [
+        "evidence/local.runtime.timers.20261029.json"
+      ],
+      "limitations": [
+        "Two timer cases only; the full 65-case corpus last passed on 24 October (local.runtime.frozen.20261024).",
+        "The card-staging access denial of 23 October did not recur; the new lock-holder record stayed empty because no move was refused.",
+        "Certificate trust is the authorized first-use pin of each owned empty CPU, not independent CA verification; timing covers host-observed windows only.",
+        "PLCSIM Advanced V8 on local Softbus with the generated scratch fixture; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.typed.resolution-stale.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "dff2201826c4e96c8a1080bb81cce8b846887c2c",
+        "passedScope": "scripts/qualify_typed_resolution.py --phase stale on build dff2201 (frozen at the short project path y), each run in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1) with the UnitSeeder units, LAD and FBD. tag-duplicate-setup-guard (the production collision guard refuses a second Ready tag table with TagScopeMismatch, original unchanged) and stale-tag-address (a deliberate address change makes the prepared change fail at apply with StaleRevision/StaleDeclaration, then checkpoint recovery and a fresh reopen match the original) pass in both languages. stale-db-ambiguity now asks TIA itself for a competitor of the root DB Tgp_ResolutionOne with the same qualified name: ResolutionSeeder duplicate-db-diagnostic tries four routes in unit TiaMcp_UnitB and V21 refuses each one. A namespace-free source, generated under the unit's namespace preset or under an empty preset, fails with 'The block cannot be overwritten because it is already contained in another software unit'. Clearing the namespace of a generated TiaMcp_UnitB.Tgp_ResolutionOne, or renaming a namespace-free Tgp_ResolutionOne_Renamed to Tgp_ResolutionOne, fails with 'A program element with this fully qualified name already exists in this CPU'. Each refused route was removed again, the complete original project XML stayed unchanged and the project compiled clean."
+      },
+      "artifacts": [
+        "evidence/local.typed.resolution-stale.20261029.json"
+      ],
+      "limitations": [
+        "V21 keeps fully qualified program element names unique per CPU, so two DBs with one qualified name cannot exist. A native AmbiguousOperand for a DB operand, and a StaleDeclaration from a new same-name DB at apply, therefore cannot occur on V21; the dbSymbol uniqueness checks stay as a defensive guard with offline tests only. The stale-db-ambiguity runs end blocked by design and count only as this native boundary.",
+        "Duplicate PLC tag names are likewise refused by TIA itself (local.typed.native-boundaries.rerun.20261029).",
+        "A first probe on 84114ff (artifacts/q/yz/probe-db-lad) tried only the namespace-free source routes; it is not curated.",
+        "Owned local engineering only; runtime not run."
+      ]
+    },
+    {
+      "id": "local.typed.iec-effect-standard-wave9.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b4abe48803874ea53344082ab2eefa1c16fc20f5",
+        "passedScope": "scripts/capture_typed_routes_owned.py --unit '' (standard PLC program scope) on build b4abe48 (frozen at the short project path y): the 2 inputs of route-capture-iec-effect-standard-packet.v1.json in one owned TIA V21 project retrieved from the SHA-bound baseline (CPU 1511-1 PN V4.1): an FB with an instance DB (RetainedMarker 42), then the FB redeclared with one static member of each IEC instance type, now including TONR_TIME, R_TRIG and F_TRIG, while the dependent DB was observed. Both inputs compiled clean and saved; only the declared redeclaration and its observed DB changed (the R_TRIG/F_TRIG system FBs TIA copies into System blocks are generated, not authored); the saved state matched a fresh-process reopen. scripts/extract_typed_instance_effects.py --iec --route standard rewrote instance-effects-iec.v1.json: the DB keeps its full payload and appends exactly the nine members, and the six members of the replaced capture (local.typed.iec-effect-standard.20261026) are structurally identical in caller and DB."
+      },
+      "artifacts": [
+        "evidence/local.typed.iec-effect-standard-wave9.20261029.json"
+      ],
+      "limitations": [
+        "Native reference capture only; the builder's created TONR/R_TRIG/F_TRIG storage cells are qualified separately (local.typed.wave9-created-storage.engineering.20261029); runtime is not run.",
+        "Standard route only: the software-unit and namespace IEC effect profiles keep their six timer/counter members, and those routes have no wave 9 profiles."
+      ]
+    },
+    {
+      "id": "local.typed.wave9-created-storage.engineering.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "297c404512c57ce31bf3192e5e8ba3d3e6e68f7f",
+        "passedScope": "scripts/qualify_typed_graphical.py --engineering-only on build 297c404 (frozen at the short project path y), each case in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1, standard route), one batch: 14 wave 9 created-storage cells pass the four engineering gates (engineering, preservation, persistence, recovery): typed-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (a new TONR_TIME, R_TRIG or F_TRIG multi-instance member), typed-transitive-createmulti-{tonr,rtrig,ftrig}-{lad,fbd} (the same with the caller embedded two parent levels deep, so the parent FBs and DBs follow the captured transitive rule with the recaptured IEC member shapes) and typed-createglobal-tonr-{lad,fbd} (a new IEC_TIMER global DB from the captured TONR storage document). Profiles: local.typed.wave9-capture.20261027; IEC dependent-instance effect: local.typed.iec-effect-standard-wave9.20261029."
+      },
+      "artifacts": [
+        "evidence/local.typed.wave9-created-storage.engineering.20261029.json"
+      ],
+      "limitations": [
+        "Engineering only: the runtime gate is not run. The non-transitive cells need PLCSIM runtime (qualify_typed_graphical.py --live --runtime).",
+        "R_TRIG/F_TRIG global storage, existing or created, has no captured global storage document and stays refused (TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile).",
+        "Standard route only; the software-unit and namespace routes have no wave 9 profiles."
+      ]
+    },
+    {
       "id": "local.library_scopes.forced.20261029",
       "status": "passed",
       "profile": {
@@ -4682,7 +4777,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.sim.provision.20261024"
+          "local.sim.provision.20261024",
+          "local.runtime.timers.20261029"
         ]
       },
       "availability": {
@@ -4780,7 +4876,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.online.compare.20261029"
+          "local.online.compare.20261029",
+          "local.online.snapshots.20261029"
         ]
       },
       "availability": {
@@ -11776,10 +11873,10 @@
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
           "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
-          "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. The 12 October resolver increment has offline tests and authored native cases, not fresh native qualification.",
+          "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. Created TONR/R_TRIG/F_TRIG storage additionally needs a captured IEC dependent-instance effect member. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests."
         ]
       },
       "qualification": {
@@ -11817,7 +11914,10 @@
           "local.typed.wave9.engineering.rerun.20261029",
           "local.typed.native-boundaries.rerun.20261029",
           "local.typed.resolution.rerun.20261029",
-          "local.typed.wave9.runtime.20261029"
+          "local.typed.wave9.runtime.20261029",
+          "local.typed.resolution-stale.20261029",
+          "local.typed.iec-effect-standard-wave9.20261029",
+          "local.typed.wave9-created-storage.engineering.20261029"
         ]
       },
       "availability": {
@@ -19006,16 +19106,17 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Exports the snapshot stored on the offline DB (taken in TIA or by change kind db_snapshot_create); it is not a current CPU read, never goes online and leaves the project unchanged. A DB without a stored snapshot refuses with DbSnapshotUnavailable.",
           "The record binds the export's project path, PLC path and DB path to the selected saved review DB. It proves neither CPU/program identity nor freshness, structural compatibility or XSD conformance; all verification flags stay false.",
-          "Which V21 object exposes InterfaceSnapshot and whether repeated exports are byte-identical are unqualified; db_snapshot_load_actual fails closed with DbSnapshotChanged if they are not.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Exported with WithDefaults and WithReadOnly (the snapshot values and date are read-only attributes); exports differ in DocumentInfo/Created, so loads compare the InterfaceSnapshot element. A DB without a stored snapshot (empty SnapshotValues dated 0001-01-01) refuses with DbSnapshotUnavailable.",
+          "Native (29 October 2026, local.online.snapshots.20261029): the capture of a DB on an owned PLCSIM scratch reviewed Count = 42 after db_snapshot_create; arrays, structures and a DB that already held a snapshot are not exercised."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19055,17 +19156,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Payload: exact blockPath of a standard GlobalDB/InstanceDB/ArrayDB and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
-          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS trust and logins rejected, always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
-          "CreateSnapshot replaces the snapshot stored in the project. The previous snapshot export is kept as a backup; the readback export must differ from it. Recovery is the project checkpoint archive.",
+          "Online through the plc_online_compare route: single observed endpoint at the instance's own address, PN/IE / PLCSIM (1), TLS answered NonTrusted, and the one project-user login answered with the owned instance's generated runtime user (runtimeCredentialMetadataPath), always back offline. Prepare and apply must both finish within the 15-minute ticket lifetime.",
+          "CreateSnapshot replaces the snapshot stored in the project. A previous snapshot is backed up only if one exists (previousSnapshotExported false otherwise); the readback export must differ from it. Recovery is the project checkpoint archive.",
           "The project fingerprint does not cover snapshot values, so an unresolved admission is held for manual reconciliation. Snapshot timing and atomicity across DB members are not established.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "Native (29 October 2026, local.online.snapshots.20261029): logged in as the runtime user, the create stored Count = 42 with checkpoint, compile and save, and the checkpoint restore left the DB without a snapshot. Replacing an existing snapshot is not exercised natively."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -19109,17 +19211,19 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Writes CPU values. Payload: snapshotRecordId of a db_snapshot_capture review, acknowledgeActualValueWrite=true and downloadTicket of a ticket-bound owned PLCSIM Advanced instance already powered in STOP or RUN. Without a ticket it refuses with PhysicalPlcRefused; physical PLCs are never targeted. Worker-owned TIA instance only.",
           "The Host reopens the review and binds blockPath, project path and snapshot SHA-256 from it; supplied-upload reviews refuse with DbSnapshotSourceRequired and another DB with DbSnapshotIdentityMismatch. Prepare and apply re-export the stored snapshot and refuse with DbSnapshotChanged unless its hash equals the reviewed capture.",
-          "No public V21 API reads actual values back, so the write is reported, not verified. The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false, so the applied PLCSIM route is never saved.",
+          "No public V21 API reads actual values back, so the write is reported by TIA; PLCSIM read the loaded value back natively (its tag list is NotUpToDate (-47) after the load until sim_tags refreshes it). The project checkpoint cannot undo CPU values; change_restore only recovers the project. Apply requires compile=false and save=false.",
           "Online DB structure equality with the instance is not pre-checked; TIA decides consistency. The project fingerprint does not cover the CPU write, so an unresolved admission is held for manual reconciliation. Prepare and apply must both finish within the 15-minute ticket lifetime.",
-          "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does."
+          "The Host binds the reviewed snapshot's SHA-256 and retained file; prepare and apply refuse with DbSnapshotChanged unless that file keeps its hash and its InterfaceSnapshot element equals a fresh export's.",
+          "Native (29 October 2026, local.online.snapshots.20261029): with Count set to 7 in PLCSIM, loading the captured snapshot (Count = 42) as actual values read back 42."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.online.snapshots.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",

@@ -56,7 +56,7 @@ CRITERIA = {
         "AC-recovery": "The new project and its station-upload.json are saved.",
         "AC-evidence": "This report."},
     "db_snapshot_capture": {
-        "AC-identity": "A DB without a stored snapshot refuses: V21 exports an empty snapshot, which the review refuses as InvalidDbSnapshot; the record names the exact project and DB.",
+        "AC-identity": "A DB without a stored snapshot refuses with DbSnapshotUnavailable (V21 exports empty SnapshotValues dated 0001-01-01); the record names the exact project and DB.",
         "AC-completeness": "The review holds the value db_snapshot_create stored (Count = 42).",
         "AC-preserve": "The complete project state is unchanged.",
         "AC-evidence": "This report."},
@@ -157,6 +157,15 @@ class Lab:
             return error
         return self.unchanged("refuse %s: %s" % (name, label), check)
 
+    def resolve(self):
+        """Refresh PLCSIM's tag list through sim_tags and resolve OnDb.Count. After db_snapshot_load_actual PLCSIM reads the
+        old list as NotUpToDate (-47, observed 29 October 2026)."""
+        tags = self.h.tool("sim_tags", {"instanceId": self.instance["id"], "filter": DB, "maxItems": 2000})["tags"]
+        found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == DB + ".Count"]
+        require(len(found) == 1, "PLCSIM symbol %s.Count is missing or ambiguous: %s" % (DB, [t["symbol"] for t in tags]))
+        self.symbol = found[0]
+        return self.symbol
+
     def count(self, value=None):
         """Count read through PLCSIM; with a value, written first and read back."""
         signal = {"symbol": self.symbol, "type": "int16"}
@@ -234,10 +243,7 @@ def body(h):
         running = h.stage("run", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "run", "timeoutMs": 30000}))
         require(running["instance"]["operatingState"] == "Run", "The instance did not enter RUN")
         def resolve():
-            tags = h.tool("sim_tags", {"instanceId": lab.instance["id"], "filter": DB, "maxItems": 2000})["tags"]
-            found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == DB + ".Count"]
-            require(len(found) == 1, "PLCSIM symbol %s.Count is missing or ambiguous: %s" % (DB, [t["symbol"] for t in tags]))
-            lab.symbol = found[0]
+            lab.resolve()
             require(lab.count() == 5, "Count does not start at its start value 5")
             return lab.symbol
         h.stage("resolve OnDb.Count in PLCSIM", resolve)
@@ -269,8 +275,8 @@ def body(h):
             return error
         lab.unchanged("refuse plc_online_compare: no runtime credential", unauthenticated)
         lab.refuse("an open project", "plc_station_upload", {"downloadTicket": lab.ticket, "runtimeCredentialMetadataPath": lab.login}, "ProjectIsolationRequired")
-        # V21 exports an empty snapshot for a DB without one; the review refuses it (observed 29 October 2026).
-        lab.refuse("a DB without a stored snapshot", "db_snapshot_capture", {"reviewId": review, "objectPath": db}, "InvalidDbSnapshot", "Expected one unqualified Snapshot")
+        # V21 exports empty SnapshotValues for a DB without a stored snapshot (observed 29 October 2026).
+        lab.refuse("a DB without a stored snapshot", "db_snapshot_capture", {"reviewId": review, "objectPath": db}, "DbSnapshotUnavailable", "no stored snapshot")
         lab.refuse("db_snapshot_create without a download ticket", "change_prepare", {"kind": "db_snapshot_create", "payload": {"blockPath": db}, "plcPath": run.plc}, "PhysicalPlcRefused")
 
         def compare():
@@ -283,12 +289,10 @@ def body(h):
             return {**session, "rows": names, "fingerprint": report["fingerprint"], "projectModified": [report["projectModifiedBefore"], report["projectModifiedAfter"]]}
         lab.unchanged("plc_online_compare with the runtime user", compare)
 
-        # --skip-snapshots: V21 exported no snapshot values after db_snapshot_create on 29 October 2026; the compare and upload still run.
         if not h.args.skip_snapshots:
             h.stage("set Count to 42 through PLCSIM", lambda: lab.count(42))
             create = lab.prepare("db_snapshot_create", {"blockPath": db})
-            # V21 exports an empty snapshot for a DB without one, so the preview reports a backed-up previous snapshot (observed 29 October 2026).
-            require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": True}],
+            require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": False}],
                     "Unexpected db_snapshot_create effects: %s" % create["preview"]["effects"])
             readback = [r["artifact"] for r in lab.apply("db_snapshot_create", create)["readbacks"] if r["role"] == "db-snapshot-readback"]
             require(len(readback) == 1, "db_snapshot_create returned no snapshot readback")
@@ -310,7 +314,11 @@ def body(h):
             require(load["preview"]["effects"] == [{"action": "loadSnapshotAsActualValues", "blockPath": db, "snapshotRecordId": captured["recordId"],
                                                     "snapshotSha256": captured["snapshotSha256"]}], "Unexpected db_snapshot_load_actual effects: %s" % load["preview"]["effects"])
             lab.apply("db_snapshot_load_actual", load, compile=False, save=False)
-            h.stage("PLCSIM reads back the loaded snapshot", lambda: require(lab.count() == 42, "Count is not 42 after the load") or 42)
+            def loaded():
+                lab.resolve()
+                require(lab.count() == 42, "Count is not 42 after the load")
+                return 42
+            h.stage("PLCSIM reads back the loaded snapshot", loaded)
 
             def restore():
                 recovered = h.tool("change_restore", {"changeId": create["changeId"], "previewHash": create["previewHash"]})
@@ -319,7 +327,7 @@ def body(h):
                 after = run.state()
                 require(after == run.current, "The recovered state differs: %s" % diff(run.current, after))
                 error = h.call_error("db_snapshot_capture", {"reviewId": review, "objectPath": db})
-                require(error.get("code") == "InvalidDbSnapshot" and "Expected one unqualified Snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
+                require(error.get("code") == "DbSnapshotUnavailable" and "no stored snapshot" in (error.get("message") or ""), "The recovered DB still has a snapshot: %s" % error)
                 return {"recoveredProject": recovered["recoveredProject"], "stages": recovered["stages"], "capture": error.get("code")}
             h.stage("restore db_snapshot_create from its checkpoint", restore)
 

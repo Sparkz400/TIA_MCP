@@ -26,6 +26,7 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Compile Include="../TiaMcp.Core/SimulationCardMoveRetry.cs" Link="SimulationCardMoveRetry.cs" />
+    <Compile Include="../TiaMcp.Core/SimulationCardLockHolders.cs" Link="SimulationCardLockHolders.cs" />
     <Compile Include="../TiaMcp.Core/SimulationDiscoveryWait.cs" Link="SimulationDiscoveryWait.cs" />
     <Compile Include="../TiaMcp.Core/SimulationNetworkAdmission.cs" Link="SimulationNetworkAdmission.cs" />
     <Compile Include="../TiaMcp.Core/OpcUaServerSettings.cs" Link="OpcUaServerSettings.cs" />

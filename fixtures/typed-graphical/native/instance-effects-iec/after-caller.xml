@@ -2,7 +2,7 @@
 <Document>
   <Engineering version="V21" />
   <DocumentInfo>
-    <Created>2026-10-26T16:18:33.9631228Z</Created>
+    <Created>2026-10-29T17:37:30.3853359Z</Created>
     <ExportSetting>WithDefaults</ExportSetting>
     <InstalledProducts>
       <Product>
@@ -194,6 +194,62 @@
                   <Member Name="QD" Datatype="Bool" />
                   <Member Name="PV" Datatype="Int" />
                   <Member Name="CV" Datatype="Int" />
+                </Section>
+              </Sections>
+            </Member>
+            <Member Name="Timer_TONR" Datatype="TONR_TIME" Version="1.0" Remanence="NonRetain" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+              <Sections>
+                <Section Name="None">
+                  <Member Name="PT" Datatype="Time" />
+                  <Member Name="ET" Datatype="Time" />
+                  <Member Name="IN" Datatype="Bool" />
+                  <Member Name="Q" Datatype="Bool" />
+                </Section>
+              </Sections>
+            </Member>
+            <Member Name="Edge_RTRIG" Datatype="R_TRIG" Version="1.0" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+              <Sections>
+                <Section Name="Input">
+                  <Member Name="CLK" Datatype="Bool" />
+                </Section>
+                <Section Name="Output">
+                  <Member Name="Q" Datatype="Bool" />
+                </Section>
+                <Section Name="InOut" />
+                <Section Name="Static">
+                  <Member Name="Stat_Bit" Datatype="Bool" />
+                </Section>
+              </Sections>
+            </Member>
+            <Member Name="Edge_FTRIG" Datatype="F_TRIG" Version="1.0" Accessibility="Public">
+              <AttributeList>
+                <BooleanAttribute Name="ExternalAccessible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalVisible" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="ExternalWritable" SystemDefined="true">true</BooleanAttribute>
+                <BooleanAttribute Name="SetPoint" SystemDefined="true">true</BooleanAttribute>
+              </AttributeList>
+              <Sections>
+                <Section Name="Input">
+                  <Member Name="CLK" Datatype="Bool" />
+                </Section>
+                <Section Name="Output">
+                  <Member Name="Q" Datatype="Bool" />
+                </Section>
+                <Section Name="InOut" />
+                <Section Name="Static">
+                  <Member Name="Stat_Bit" Datatype="Bool" />
                 </Section>
               </Sections>
             </Member>

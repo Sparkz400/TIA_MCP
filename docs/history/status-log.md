@@ -10,7 +10,17 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 **Station upload qualified — 29 October 2026:**
 - **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.
 - **Native D09:** a first run refused, because the upload's three TLS challenges offered zero certificates ("certificate not matching"). After the decision, `local.online.upload.20261029` passed: one certificate-less challenge was trusted unauthenticated, then one runtime-user login, and the upload succeeded with the downloaded blocks. `plc_online_compare` passed again.
-- **Catalog 0.4.73:** 403 of 450 features verified; matrix 1,827 bound, 161 open, 49 blocked, 30 deferred. D09 keeps 16 open cells, all in the DB-snapshot routes.
+- **Catalog 0.4.75:** 406 of 450 features verified; matrix 1,843 bound, 145 open, 49 blocked, 30 deferred. D09 has no open cell.
+
+**DB snapshots on owned PLCSIM — 29 October 2026:**
+- **Runs:** `scripts/qualify_online_routes.py --skip-upload` passed on build `4963644` with the runtime-user login: `db_snapshot_create` with checkpoint, compile and save, `db_snapshot_capture` reviewing the stored value, `db_snapshot_load_actual` without compile and save read back through PLCSIM, and `change_restore` of the create (`local.online.snapshots.20261029`).
+- **Fixes found natively:** snapshot export needs `ExportOptions.WithReadOnly` (Snapshot and SnapshotDate are read-only attributes); an export without stored values is refused as `DbSnapshotUnavailable`; the load compares snapshot content instead of file hashes; PLCSIM's tag list is refreshed before the readback.
+- **Catalog 0.4.74:** 405 of 450 features verified; matrix 1,838 bound, 150 open. D09 keeps only `plc_station_upload`.
+
+**Typed stale phase and created wave 9 IEC storage — 29 October 2026:** ([record](../verification/typed-stale-and-created-iec-20261029.md))
+- **Stale phase:** V21 keeps fully qualified program element names unique per CPU and refuses every route to a second DB with the root DB's qualified name, so `stale-db-ambiguity` is recorded as that native boundary (`local.typed.resolution-stale.20261029`); the last open lost-evidence item is closed.
+- **Created storage:** the builder's created TONR, R_TRIG and F_TRIG storage passes engineering in 14 cells (`local.typed.wave9-created-storage.engineering.20261029`), and the standard IEC effect profile was recaptured with those members (`local.typed.iec-effect-standard-wave9.20261029`). Their runtime cells stay open.
+- **Catalog 0.4.73:** no count change; matrix 1,822 bound, 166 open.
 
 **Runtime real-server Tasks 4–6 — 29 October 2026:** ([record](../verification/runtime-real-server-20261029.md))
 - **Runs:** in an operator TCP/IP window, `scripts/qualify_runtime_plcsim_tcpip.py` passed all five modes (normal, server restart, Host loss during capture, UA and web write loss) on one frozen build, `1181f33`, each with the independent oracle; login was the scratch's generated runtime user (maintainer decision). Curated as `local.runtime.plcsim-tcpip.20261029`.
