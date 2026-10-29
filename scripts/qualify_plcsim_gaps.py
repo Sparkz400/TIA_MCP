@@ -133,6 +133,10 @@ class Lab:
             self.symbols[name] = found[0]
         return self.symbols
 
+    def refresh(self):
+        """PLCSIM answers NotUpToDate (-47) after a program change until its tag list is updated (observed 29 October 2026)."""
+        return self.resolve(list(self.symbols))
+
     def signal(self, name, kind):
         return {"symbol": self.symbols[name], "type": kind}
 
@@ -222,6 +226,7 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         require(applied["state"] == "applied", "Online download did not apply")
         row["state"] = "applied"
         report = next(r["report"] for r in applied["readbacks"] if r["role"] == "owned-simulation-download")
+        h.stage("refresh the PLCSIM tag list after " + label, lab.refresh)
         require(report["completed"] is True and report["operatingStateBefore"] == "Run" and report["operatingStateAfterDownload"] == "Run", "Online download report: %s"
                 % {k: report.get(k) for k in ("completed", "operatingStateBefore", "operatingStateAfterDownload", "failure")})
         return prepared, applied, report
@@ -250,6 +255,7 @@ def online_downloads(h, lab, plc, ticket, login, secret):
         content = outcome.get("structuredContent") or {}
         readbacks = content.get("readbacks") or ((content.get("error") or {}).get("details") or {}).get("readbacks") or []
         report = next((r["report"] for r in readbacks if r.get("role") == "owned-simulation-download"), {})
+        lab.refresh()
         result = {"isError": outcome.get("isError"), "error": (content.get("error") or {}).get("code"), "configurations": report.get("downloadConfigurations"),
                   "operatingStateAfter": report.get("operatingStateAfter"), "values": lab.read(ProgramVersion="int16", Ob82="int32")}
         if outcome.get("isError"):
@@ -376,6 +382,7 @@ def memory_reset(h, lab):
         state = lab.state("memoryReset")
         if state != "Run":
             state = lab.state("run", 30000)
+        lab.refresh()
         values = lab.read(Ob82="int32", ProgramVersion="int16")
         require(state == "Run" and values == {"Ob82": 0, "ProgramVersion": 2}, "After memory reset: %s %s" % (state, values))
         return {"state": state, "values": values}
@@ -397,6 +404,7 @@ def storage(h, lab):
     require(retrieved["ownershipMarkerUnchanged"] is True, "The ownership marker changed")
     h.stage("power on the retrieved card", lambda: lab.state("powerOn"))
     require(h.stage("run the retrieved card", lambda: lab.state("run", 30000)) == "Run", "The retrieved card did not enter RUN")
+    h.stage("refresh the PLCSIM tag list after the retrieve", lab.refresh)
     values = h.stage("the retrieved card runs the online-downloaded program", lambda: lab.read(ProgramVersion="int16"))
     require(values["ProgramVersion"] == 2, "The retrieved card runs %s" % values)
     require(lab.state("stop", 30000) == "Stop", "The instance did not stop")

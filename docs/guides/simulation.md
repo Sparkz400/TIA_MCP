@@ -116,7 +116,7 @@ reviewed options or refused:
 | anything else | refused with `UnsupportedDownloadConfiguration` |
 
 `reinitialize` requires `allowStop: true`. A CPU found in RUN must be in RUN again afterwards
-(`SimulationRunNotRestored` otherwise). Each completed download is recorded in the instance storage as
+(`SimulationRunNotRestored` otherwise). After the download PLCSIM answers reads with `NotUpToDate` (-47) until its tag list is refreshed: call `sim_tags` (its default `refresh: true`) before `sim_read`, `sim_write` or `sim_test`; the same applies after `memoryReset` and a storage retrieve. Each completed download is recorded in the instance storage as
 `simulation-download-online-<changeId>.json`; `programEvidence` then reports `status: "online-download"`,
 because the card's `programRevision` no longer describes the running program. This is a CPU write:
 `change_restore` recovers only the project, and an interrupted admission is held for manual
