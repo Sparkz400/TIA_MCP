@@ -33,7 +33,7 @@ class Plc:
     """One fake CPU, its sessions and acquisitions across fake Hosts."""
 
     def __init__(self, root):
-        self.root, self.state, self.started = root, "Off", 0
+        self.root, self.state, self.started, self.clock = root, "Off", 0, 0
         self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "Enable": False, "Active": False}
         self.inspections, self.sessions, self.captures, self.host, self.stale = 0, {}, {}, None, False
 
@@ -65,6 +65,11 @@ class Plc:
             raise Fail("UaOperationFailed")
         return s
 
+    def now(self):
+        """A fake UTC clock that advances one second per reading."""
+        self.clock += 1
+        return "2026-10-29T10:%02d:%02d.0000000Z" % divmod(self.clock, 60)
+
     def ua_item(self, node):
         if node == runner.START_TIME:
             return {"quality": "Good", "outcome": "value", "encoding": "utcDateTime", "value": "2026-10-29T10:%02d:00Z" % self.started}
@@ -79,7 +84,7 @@ class Plc:
                 s["alive"] = False
             for c in self.captures.values():
                 if c["state"] == "running":
-                    c.update(state="completed", downtime=True, terminalReason="readFailure")
+                    c.update(state="completed", downtime=True, terminalReason="readFailure", downAt=self.now())
         if action == "powerOn":
             self.started += 1
 
@@ -109,9 +114,9 @@ class Plc:
                 path.write_text("{}", encoding="utf-8")
                 return {"artifacts": [{"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}]}
             read = {"items": [self.ua_item(runner.ua_node("Cycles"))]} if capture["ua"] else {"status": "read", "value": 1}
-            rows = [{"kind": "read", "errorCode": None, "readResultJson": json.dumps(read)}] * capture["rows"]
+            rows = [{"kind": "read", "errorCode": None, "observedUtc": capture["started"], "readResultJson": json.dumps(read)}] * capture["rows"]
             if capture.get("downtime"):
-                rows[-1] = {"kind": "gap", "errorCode": None}
+                rows[-1] = {"kind": "gap", "errorCode": None, "observedUtc": capture["downAt"]}
             return {"rows": rows[arguments.get("offset", 0):][:arguments.get("count", 50)]}
         capture = self.captures.get(arguments["captureId"])
         if verb == "start":
@@ -119,7 +124,7 @@ class Plc:
                 self.live(arguments["request"]["attemptId"])
                 capture = self.captures[arguments["captureId"]] = {"id": arguments["captureId"], "state": "running", "rows": 0, "host": self.host,
                                                                    "ua": tool.startswith("runtime_ua"), "ref": "ref-" + arguments["captureId"], "polls": 0,
-                                                                   "limit": 6 if arguments["request"]["durationSeconds"] <= 10 else 10 ** 9}
+                                                                   "limit": 6 if arguments["request"]["durationSeconds"] <= 10 else 10 ** 9, "started": self.now()}
         elif verb == "stop" and capture["state"] == "running":
             capture.update(state="completed", terminalReason="stopped")
         elif capture["state"] == "running" and capture["host"] == self.host:
@@ -193,7 +198,7 @@ class Host:
         if tool in ("sim_state", "sim_select", "sim_create"):
             if tool == "sim_state":
                 p.power(a["action"])
-            return {"instance": {"id": 7, "name": "TiaMcp_fake", "owned": True, "operatingState": p.state}, "downloadTicket": "ticket"}
+            return {"observedAtUtc": p.now(), "instance": {"id": 7, "name": "TiaMcp_fake", "owned": True, "operatingState": p.state}, "downloadTicket": "ticket"}
         if tool == "sim_tags":
             p.stale = False
             return {"tags": [{"symbol": '"%s".%s' % (block, member)} for member, (block, _) in runner.SIGNALS.items() if block == a["filter"]]}
@@ -247,12 +252,12 @@ class Fake(runner.Runner):
     def watch(self):
         self.watched, self.report["hosts"][-1]["children"] = [], []
 
-    def credential(self, label, binding):
-        self.credentials.append(label)
+    def credential(self, label, binding, vault):
+        self.credentials.append((label, vault))
         return {"reference": label}
 
     def retire(self):
-        self.report["credentialRetirement"] = [{"credential": c, "exitCode": 0} for c in self.credentials]
+        self.report["credentialRetirement"] = [{"credential": c, "exitCode": 0} for c, _ in self.credentials]
 
 
 class TagRefresh(unittest.TestCase):

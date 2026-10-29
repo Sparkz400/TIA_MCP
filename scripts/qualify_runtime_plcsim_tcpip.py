@@ -8,7 +8,8 @@ read diagnostics and change the operating mode; the web server and the OPC UA se
 client-certificate acceptance) are switched on; a saved review and a diagnostic case on DiagGate. A TCP/IP instance gets
 the program (download, generated-state save, protection-credential provisioning); the OPC UA and web certificate pins
 come from certificate_inspect after the last compile; the CPU runs and TIA closes. The OPC UA and web login is the
-scratch's generated runtime user: its DPAPI password is copied into a run-owned Host credential vault, retired at the end.
+scratch's generated runtime user: its DPAPI password is copied into two run-owned Host credential vaults, one per channel,
+and retired at the end.
 
 --mode normal: every runtime_ua_*, runtime_web_* and runtime_capture_* tool plus runtime_plcsim_bind. Stale pins are
   refused, UA and web values equal PLCSIM API reads, writes need their expected values, RUN/STOP through the Web API.
@@ -144,7 +145,9 @@ class Runner(Harness):
         self.report["simWorker"] = {"path": str(args.sim_worker.resolve()), "sha256": hashlib.sha256(args.sim_worker.read_bytes()).hexdigest()}
         self.report.update(mode=args.mode, cpuIp=args.cpu_ip, hosts=[], comparisons=[], pins={}, attempts={"ua": [], "web": []})
         self.calls, self.credentials, self.password, self.selections, self.watched = [], [], None, {}, []
-        self.vault = uuid.uuid4().hex
+        # One vault per channel: the vault lock refuses a concurrent user at once (CredentialStoreBusy), which ended a UA
+        # subscription as UaCredentialUnavailable while a web capture polled the same vault (runs rs_abde1bb3, rs_db5b4b21).
+        self.vaults = {"ua": uuid.uuid4().hex, "web": uuid.uuid4().hex}
 
     def persist(self):
         self.report["toolCalls"] = self.calls + (self.client.tool_calls if self.client else [])
@@ -207,26 +210,26 @@ class Runner(Harness):
             row = {**read(), "beforeTagRefresh": row}
         return row
 
-    def credential(self, label, binding):
-        """Store the runtime user's password under one public binding in this run's own vault, through the Host's credential CLI."""
+    def credential(self, label, binding, vault):
+        """Store the runtime user's password under one public binding in one of this run's vaults, through the Host's credential CLI."""
         folder = self.directory / "credentials"
         folder.mkdir(exist_ok=True)
         path = folder / (label + ".binding.json")
         path.write_text(json.dumps(binding), encoding="utf-8")
-        created = subprocess.run([str(self.args.host.resolve()), "--credential-store", "create", "--vault-name", self.vault, "--binding", str(path), "--stdin"],
+        created = subprocess.run([str(self.args.host.resolve()), "--credential-store", "create", "--vault-name", vault, "--binding", str(path), "--stdin"],
                                  input=json.dumps(self.password).encode("utf-8"), capture_output=True, timeout=60)
         echoed = self.password.encode("utf-8") in created.stdout + created.stderr
         require(created.returncode == 0 and not echoed, "Credential %s was not created: %s" % (label, "<withheld>" if echoed else created.stderr.decode(errors="replace")[-300:]))
         reference = json.loads(created.stdout)["reference"]
         (folder / (label + ".reference.json")).write_text(json.dumps(reference), encoding="utf-8")
-        self.credentials.append(label)
+        self.credentials.append((label, vault))
         return reference
 
     def retire(self):
         rows = self.report.setdefault("credentialRetirement", [])
-        for label in self.credentials:
+        for label, vault in self.credentials:
             folder = self.directory / "credentials"
-            done = subprocess.run([str(self.args.host.resolve()), "--credential-store", "retire", "--vault-name", self.vault, "--binding", str(folder / (label + ".binding.json")),
+            done = subprocess.run([str(self.args.host.resolve()), "--credential-store", "retire", "--vault-name", vault, "--binding", str(folder / (label + ".binding.json")),
                                    "--reference", str(folder / (label + ".reference.json"))], capture_output=True, timeout=60)
             rows.append({"credential": label, "exitCode": done.returncode})
 
@@ -421,7 +424,7 @@ def compare(r, channel, label, session, member):
 def ua_selection(r, pin=None, anonymous=False):
     selection = {"endpoint": "opc.tcp://%s:4840/" % r.args.cpu_ip, "applicationUri": r.app_uri, "certificateSha256": pin or r.report["pins"]["ua"]["sha256"]}
     if not anonymous:
-        selection.update(authentication="username", user=r.username, vaultName=r.vault)
+        selection.update(authentication="username", user=r.username, vaultName=r.vaults["ua"])
         if getattr(r, "ua_credential", None):
             selection["credential"] = r.ua_credential
     return selection
@@ -429,17 +432,18 @@ def ua_selection(r, pin=None, anonymous=False):
 
 def web_login(r, pin=None, credential=None):
     return {"endpoint": "https://" + r.args.cpu_ip, "peerCertificateSha256": pin or r.report["pins"]["web"]["sha256"], "user": r.username, "mode": "local",
-            "vaultName": r.vault, "credential": credential or r.web_credential}
+            "vaultName": r.vaults["web"], "credential": credential or r.web_credential}
 
 
 def credentials(r):
     """The runtime user's vault credentials for the pinned UA and web endpoints."""
     r.ua_credential = None
-    r.ua_credential = r.credential("ua", r.stage("runtime_ua_credential_binding", lambda: r.tool("runtime_ua_credential_binding", {"selection": ua_selection(r)})))
+    r.ua_credential = r.credential("ua", r.stage("runtime_ua_credential_binding", lambda: r.tool("runtime_ua_credential_binding", {"selection": ua_selection(r)})), r.vaults["ua"])
     def web(pin):
         return r.tool("runtime_web_credential_binding", {"endpoint": "https://" + r.args.cpu_ip, "peerCertificateSha256": pin, "user": r.username, "mode": "local"})
-    r.web_credential = r.credential("web", r.stage("runtime_web_credential_binding", lambda: web(r.report["pins"]["web"]["sha256"])))
-    r.stale_web_credential = r.credential("web-stale", r.stage("runtime_web_credential_binding for the stale pin", lambda: web(r.report["stalePins"]["web"]["sha256"])))
+    r.web_credential = r.credential("web", r.stage("runtime_web_credential_binding", lambda: web(r.report["pins"]["web"]["sha256"])), r.vaults["web"])
+    r.stale_web_credential = r.credential("web-stale", r.stage("runtime_web_credential_binding for the stale pin", lambda: web(r.report["stalePins"]["web"]["sha256"])),
+                                          r.vaults["web"])
 
 
 def connect(r, channel, label, argument, connected=True):
@@ -620,6 +624,12 @@ def host_loss_capture(r):
                            "publishingIntervalMilliseconds": 200, "samplingIntervalMilliseconds": 100, "durationSeconds": 120}, wait=False)
     capture = acquire(r, "runtime_capture during the Host loss", "web", {"attemptId": web, "selectionIds": [r.selections["Cycles"]],
                       "intervalMilliseconds": 200, "durationSeconds": 120}, wait=False)
+    def running():
+        states = {channel: r.tool(ACQUIRE[kind] + "status", {"captureId": started["captureId"]})["state"]
+                  for channel, kind, started in (("ua", "subscription", subscription), ("web", "web", capture))}
+        require(all(state == "running" for state in states.values()), "An acquisition ended before the Host loss: %s" % states)
+        return states
+    r.stage(oracle.BEFORE_LOSS, running)
     r.watch()
     r.stage("terminate the Host", lambda: r.close_host(expected=1, kill=True))
     r.start_host("recovery")
@@ -647,7 +657,7 @@ def server_restart(r):
     captured = acquire(r, "runtime_capture across the restart", "web", {"attemptId": web, "selectionIds": [r.selections["Cycles"]],
                        "intervalMilliseconds": 500, "durationSeconds": 60}, wait=False)
     for action, state in (("stop", "Stop"), ("powerOff", "Off"), ("powerOn", None), ("run", "Run")):
-        result = r.stage("sim_state %s during the captures" % action, lambda a=action: r.tool("sim_state", {"instanceId": r.instance["id"], "action": a, "timeoutMs": 60000}))
+        result = r.stage(oracle.CYCLE % action, lambda a=action: r.tool("sim_state", {"instanceId": r.instance["id"], "action": a, "timeoutMs": 60000}))
         require(state in (None, result["instance"]["operatingState"]), "%s left the CPU in %s" % (action, result["instance"]["operatingState"]))
     r.stage("refresh the PLCSIM tag list after the restart", r.refresh_tags)
     for channel, started in (("ua", polled), ("web", captured)):

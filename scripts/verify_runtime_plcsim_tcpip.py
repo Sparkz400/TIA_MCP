@@ -7,6 +7,8 @@ boundaries: an interrupted acquisition is never resumed, a lost write is never r
 decides it.
 """
 import argparse
+import datetime
+import itertools
 import json
 from pathlib import Path
 
@@ -24,6 +26,8 @@ LOST_STATUS, RETRY = "status of the lost session", "refuse a retry of the lost w
 NEW_SESSION_REFUSED, ACKNOWLEDGED = "refuse a new session before acknowledgement", "acknowledge the lost session"
 DECISION, FRESH = "explicit read decides the lost write", "read through a fresh session"
 AFTER_LOSS, RESUME = "acquisition status after Host loss", "no implicit resume"
+BEFORE_LOSS = "both acquisitions still run right before the Host loss"
+CYCLE = "sim_state %s during the captures"
 START_BEFORE, START_AFTER = "server start time before the restart", "server start time after the restart"
 ACROSS, OLD_READ = "rows across the restart", "read on the old session after the restart"
 FINISHED = "acquisition status after the restart"
@@ -51,6 +55,16 @@ def channel_value(channel, read):
         decode = {"decimalInteger": int, "boolean": lambda v: v, "roundTripFloat": float, "roundTripDouble": float, "string": lambda v: v}
         return decode[read["encoding"]](read["value"]) if read.get("encoding") in decode else None
     return read.get("value") if read.get("status") == "read" else None
+
+
+def utc(text):
+    """An ISO 8601 UTC time with any number of fractional digits, or None."""
+    try:
+        whole, _, rest = text.partition(".")
+        digits = "".join(itertools.takewhile(str.isdigit, rest))
+        return datetime.datetime.strptime(whole[:19], "%Y-%m-%dT%H:%M:%S") + datetime.timedelta(microseconds=int((digits + "000000")[:6]))
+    except (AttributeError, TypeError, ValueError):
+        return None
 
 
 def same(left, right):
@@ -151,6 +165,7 @@ def verify(root):
             need(any(r["label"] == DECISION and r["channel"] == channel for r in report.get("comparisons", [])), "No explicit read decides the lost write")
         elif mode == "host-loss-capture":
             need(hosts[1].get("expectedExitCode") == 1 if len(hosts) > 1 else False, "The lost Host was not terminated")
+            need(result(BEFORE_LOSS) == {"ua": "running", "web": "running"}, "Both acquisitions must still run when the Host is terminated")
             for channel in ("ua", "web"):
                 lost(channel)
                 after, resumed = result(name(AFTER_LOSS, channel)), result(name(RESUME, channel))
@@ -162,14 +177,20 @@ def verify(root):
             before, after = (result(s).get("items", [{}])[0] for s in (START_BEFORE, START_AFTER))
             need(before.get("quality") == after.get("quality") == "Good" and before.get("value") and before.get("value") != after.get("value"),
                  "The server start time did not change")
+            # Downtime counts only from the STOP request on, and a credential failure is never the restart's downtime.
+            stopped = utc(result(CYCLE % "stop").get("observedAtUtc"))
+            need(stopped, "The STOP of the power cycle has no time")
             for channel in ("ua", "web"):
                 rows = result(name(ACROSS, channel)) or []
-                down = [r for r in rows if r.get("kind") == "gap" or r.get("errorCode")
-                        or r.get("kind") == "read" and channel_value(channel, json.loads(r["readResultJson"])["items"][0] if channel == "ua" else json.loads(r["readResultJson"])) is None]
-                final = result(name(FINISHED, channel)).get("recordedProgress", {})
-                # A failed read or gap row, or an acquisition that ended on the failure instead of its own limit.
-                need(down or final.get("terminalReason") not in ("durationLimit", "sampleLimit", "notificationLimit", "byteLimit", None)
-                     or result(name(FINISHED, channel)).get("localFailure"), "The %s capture records no downtime" % channel)
+                need(not any("Credential" in (r.get("errorCode") or "") for r in rows), "The %s capture failed on its credential, not on the restart" % channel)
+                down = [r for r in rows if stopped and (utc(r.get("observedUtc")) or datetime.datetime.min) >= stopped and (r.get("kind") == "gap" or r.get("errorCode")
+                        or r.get("kind") == "read" and channel_value(channel, json.loads(r["readResultJson"])["items"][0] if channel == "ua" else json.loads(r["readResultJson"])) is None)]
+                finished = result(name(FINISHED, channel))
+                final = finished.get("recordedProgress", {})
+                # A failed read or gap row after STOP, or an acquisition that ended after STOP on the failure instead of its own limit.
+                ended = (final.get("terminalReason") not in ("durationLimit", "sampleLimit", "notificationLimit", "byteLimit", None) or finished.get("localFailure")) \
+                    and stopped and (utc(final.get("observedUtc")) or datetime.datetime.min) >= stopped
+                need(down or ended, "The %s capture records no downtime" % channel)
                 need(result(name(OLD_READ, channel)).get("code"), "The old %s session still answers after the restart" % channel)
                 need(any(r["label"] == name(FRESH, channel) for r in report.get("comparisons", [])), "No fresh %s session after the restart" % channel)
     except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError) as error:

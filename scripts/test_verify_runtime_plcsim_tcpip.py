@@ -82,6 +82,7 @@ def host_loss():
     report = normal()
     report.update(mode="host-loss-capture", hosts=[host("setup", pid=1), host("lost", 1, pid=2), host("recovery", pid=3)])
     report["hosts"][1].update(children=[{"pid": 20, "exitVerified": True}], exit={"hostExitCode": 1, "forcedHostStop": False, "workerExits": []})
+    report["steps"].append(step(oracle.BEFORE_LOSS, {"ua": "running", "web": "running"}))
     for channel, status in (("ua", ua_status), ("web", web_status)):
         report["steps"] += [step(oracle.name(oracle.LOST_STATUS, channel), status("3" * 32, "hostEndedRemoteUnknown")),
                             step(oracle.name(oracle.NEW_SESSION_REFUSED, channel), {"code": oracle.REFUSALS[channel][1]}),
@@ -95,10 +96,12 @@ def host_loss():
 def server_restart():
     report = normal()
     report["mode"] = "server-restart"
-    report["steps"] += [step(oracle.START_BEFORE, {"items": [{"quality": "Good", "value": "2026-10-29T10:00:00Z"}]}),
+    report["steps"] += [step(oracle.CYCLE % "stop", {"observedAtUtc": "2026-10-29T10:01:00.1234567Z", "instance": {"operatingState": "Stop"}}),
+                        step(oracle.START_BEFORE, {"items": [{"quality": "Good", "value": "2026-10-29T10:00:00Z"}]}),
                         step(oracle.START_AFTER, {"items": [{"quality": "Good", "value": "2026-10-29T10:05:00Z"}]}),
-                        step(oracle.name(oracle.ACROSS, "ua"), [{"kind": "read", "errorCode": None, "readResultJson": json.dumps({"items": [ua_read(1)]})}, {"kind": "gap"}]),
-                        step(oracle.name(oracle.ACROSS, "web"), [{"kind": "read", "errorCode": None, "readResultJson": json.dumps({"status": "failed"})}]),
+                        step(oracle.name(oracle.ACROSS, "ua"), [{"kind": "read", "errorCode": None, "observedUtc": "2026-10-29T10:00:59Z", "readResultJson": json.dumps({"items": [ua_read(1)]})},
+                                                                  {"kind": "gap", "observedUtc": "2026-10-29T10:01:02.5+00:00"}]),
+                        step(oracle.name(oracle.ACROSS, "web"), [{"kind": "read", "errorCode": None, "observedUtc": "2026-10-29T10:01:03Z", "readResultJson": json.dumps({"status": "failed"})}]),
                         step(oracle.name(oracle.FINISHED, "ua"), {"state": "completed", "recordedProgress": {"terminalReason": "durationLimit"}}),
                         step(oracle.name(oracle.FINISHED, "web"), {"state": "completed", "recordedProgress": {"terminalReason": "durationLimit"}}),
                         step(oracle.name(oracle.OLD_READ, "ua"), {"code": "UaSessionUnavailable"}),
@@ -190,6 +193,24 @@ class Oracle(unittest.TestCase):
         self.assertTrue(any("downtime" in issue for issue in self.issues(report)))
         report = server_restart(); named(report, oracle.name(oracle.OLD_READ, "web"))["result"] = {"status": "read", "value": 1}
         self.assertTrue(any("still answers" in issue for issue in self.issues(report)))
+
+    def test_credential_failures_and_rows_before_stop_are_not_restart_downtime(self):
+        # Run rs_db5b4b21: the UA capture's only failure was UaCredentialUnavailable (vault contention with the web capture).
+        report = server_restart()
+        named(report, oracle.name(oracle.ACROSS, "ua"))["result"].append({"kind": "read", "errorCode": "UaCredentialUnavailable", "observedUtc": "2026-10-29T10:01:04Z"})
+        self.assertTrue(any("credential" in issue for issue in self.issues(report)))
+        report = server_restart()
+        named(report, oracle.name(oracle.ACROSS, "ua"))["result"][1]["observedUtc"] = "2026-10-29T10:01:00.1Z"
+        self.assertTrue(any("ua capture records no downtime" in issue for issue in self.issues(report)))
+        report = server_restart()
+        named(report, oracle.name(oracle.ACROSS, "ua"))["result"][1]["observedUtc"] = "2026-10-29T10:01:00.0999999Z"
+        named(report, oracle.name(oracle.FINISHED, "ua"))["result"] = {"state": "ended", "recordedProgress": {"terminalReason": "sessionUnavailable", "observedUtc": "2026-10-29T10:00:59Z"}}
+        self.assertTrue(any("ua capture records no downtime" in issue for issue in self.issues(report)))
+
+    def test_host_loss_needs_both_acquisitions_running_at_the_kill(self):
+        # Run rs_abde1bb3: the UA subscription had already ended (sessionUnavailable) before the Host was terminated.
+        report = host_loss(); named(report, oracle.BEFORE_LOSS)["result"] = {"ua": "ended", "web": "running"}
+        self.assertTrue(any("still run" in issue for issue in self.issues(report)))
 
     def test_a_failed_run_is_never_complete(self):
         report = normal(); report["completed"] = False
