@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "43e5515d67f758c22c6f804e148c65b845db5f51d39a5fd07898a6d820253667",
-      "bytes": 1292421
+      "sha256": "5596183d9932cac0aba54ed2ceceaaed33173a6c62b3563daa0c1775ea756d8b",
+      "bytes": 1292422
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1687,8 +1687,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
-      "sha256": "d6dc4deb63833f06aa6db0b5d4e7725c5d02c3f4646f28cabfcb28e40819799f",
-      "bytes": 38718
+      "sha256": "3bc351a46fc8e09be3687eca620af5edfe18a6c95efa7ee31f0fc7d90c4be95e",
+      "bytes": 39499
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableDocument.cs",
@@ -36760,8 +36760,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Save",
-          "line": 425,
-          "endLine": 425,
+          "line": 426,
+          "endLine": 426,
           "sha256": "8abfcea588c012c382774bac364df5e3df093e9e1c2af6c35a463a9f01f58c7c"
         },
         {
@@ -39190,7 +39190,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -39851,8 +39851,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 228,
-          "endLine": 271,
+          "line": 229,
+          "endLine": 272,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -40517,8 +40517,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Apply",
           "line": 127,
-          "endLine": 199,
-          "sha256": "6d932f7012814c428c632b48b34a20a724f0dbae145722ce4c151fe87d6c50b0"
+          "endLine": 200,
+          "sha256": "f39ee145649b1c97a500b13e9dbd659c57d4f51d9e30e1ea17efdc856be5f627"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -41410,7 +41410,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -42286,8 +42286,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 228,
-          "endLine": 271,
+          "line": 229,
+          "endLine": 272,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -42881,7 +42881,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -64890,7 +64890,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -65413,8 +65413,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 228,
-          "endLine": 271,
+          "line": 229,
+          "endLine": 272,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -67996,7 +67996,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -70049,8 +70049,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Apply",
           "line": 127,
-          "endLine": 199,
-          "sha256": "6d932f7012814c428c632b48b34a20a724f0dbae145722ce4c151fe87d6c50b0"
+          "endLine": 200,
+          "sha256": "f39ee145649b1c97a500b13e9dbd659c57d4f51d9e30e1ea17efdc856be5f627"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -71148,7 +71148,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",
@@ -72278,8 +72278,8 @@
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableDispatcher.cs",
           "name": "Recover",
-          "line": 228,
-          "endLine": 271,
+          "line": 229,
+          "endLine": 272,
           "sha256": "c1458f9d4dba96f037d4efda0d3235fccf36f1f23ed75d31db0be9512d673b21"
         },
         {
@@ -72942,7 +72942,7 @@
           "name": "Prepare",
           "line": 62,
           "endLine": 126,
-          "sha256": "dba375b5606fd4bca6c531da94583cf54f1b68b55a453b65e49fdbf07ad21aa7"
+          "sha256": "f375b7823cd3ede6523c718a52cc6d610110dba8a16c22523c352c7b853e245d"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteQualificationTools.cs",

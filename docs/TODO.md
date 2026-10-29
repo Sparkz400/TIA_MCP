@@ -81,9 +81,9 @@ All re-runnable lost records were re-run on 28 and 29 October ([28 October](veri
 
 - [x] How the six `unavailable_target` rows (37 cells V21 cannot close) count toward 1.0. Decided on 29 October: they stay blocked and do not count toward 1.0; the matrix summarizes their cells as `blocked`. They are `change.block_protect`, `change.block_unprotect` and `change.block_write_protection_set` (no Host-to-worker protected credential route), `change.call_connection_set` (V21 refuses an Access without a wire or on two wires), `change.project_attributes_set` (V21 declares the attributes read-only) and `change.hmi_engineering` (behind the closed preservation gate). The same day the two OPC UA reference-namespace kinds joined them, because `ReferenceNamespaces.Create` terminates TIA V21 Update 3 (8 rows, 49 cells).
 - [ ] The OPC UA login for the real-server Tasks 4–5; guest access is not settable through V21 Openness ([plan](plans/runtime-real-server-plan.md#task-4-real-server-runner-normal-path)).
-- [ ] Whether library updates may widen their scope beyond `entireSelectedPlc`. Until then: no forced downgrade and no per-instance version assignment ([library TODO](plans/library-management-todo.md#p1--plc-integration-and-version-workflows)).
-- [ ] Whether `plc_station_upload` may trust the owned, empty PLCSIM CPU's TLS certificate on first use, as credential provisioning does (`trustOwnedEmptyCpuCertificate`). Without it the upload refuses at TLS verification.
-- [ ] Whether production Hosts may dispatch force-table document edits now that `local.watch.force-edits.20261029` qualifies them; until then only the qualification harness does.
+- [x] Whether library updates may widen their scope beyond `entireSelectedPlc`. Decided on 29 October: yes; the narrower and wider scopes V21 supports, forced downgrade and per-instance version assignment are now in scope ([library TODO](plans/library-management-todo.md#p1--plc-integration-and-version-workflows)).
+- [x] Whether `plc_station_upload` may trust the owned, empty PLCSIM CPU's TLS certificate on first use, as credential provisioning does (`trustOwnedEmptyCpuCertificate`). Decided on 29 October: yes, as an explicit opt-in bound to the owned instance.
+- [x] Whether production Hosts may dispatch force-table document edits now that `local.watch.force-edits.20261029` qualifies them. Decided on 29 October: yes, for the qualified kinds (ForceValue, Address and DisplayFormat fields, comment, clone, delete); reorder and the Name field stay with the qualification harness.
 
 ## Repository and hosted CI
 
