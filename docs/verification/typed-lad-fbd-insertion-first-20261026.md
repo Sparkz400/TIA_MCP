@@ -8,7 +8,7 @@ E = import/compile; X = complete XML; P = save/reopen; R = checkpoint recovery/r
 
 | Exact fixture | E | X | P | R | B | Executed passing assertions | Selected report |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `typed-insert-first-fbd` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/rt7/typed-insert-first-fbd/result.json>) |
-| `typed-insert-first-lad` | pass | pass | pass | pass | — | 0 | [report](<../../artifacts/rt7/typed-insert-first-lad/result.json>) |
+| `typed-insert-first-fbd` | pass | pass | pass | pass | — | 0 | `artifacts/rt7/typed-insert-first-fbd/result.json` |
+| `typed-insert-first-lad` | pass | pass | pass | pass | — | 0 | `artifacts/rt7/typed-insert-first-lad/result.json` |
 
 The report path and its SHA-256, native target, profile IDs, operation, binary hashes, diagnostics, failed-change recovery and assertion counts are recorded in `fixtures/typed-graphical/qualification.v1.json`. A newly built binary needs its own acceptance evidence; earlier results are retained as development evidence.
