@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.71",
+  "catalogVersion": "0.4.72",
   "targetTiaVersions": [
     21
   ],
@@ -2796,6 +2796,26 @@
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
         "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
         "No runtime execution."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.20261029",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1181f33df9f3ffcddc7d25630cf6cc5a17ecae45",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py on build 1181f33, modes normal, server-restart, host-loss-capture, ua-write-loss and web-write-loss, each in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1 at 192.168.0.1) provisioned over TCP/IP to a fresh owned PLCSIM Advanced V8 instance (Online Access: PLCSIM Virtual Ethernet Adapter at 192.168.0.10/24), logged in to OPC UA and the Web API as the scratch's generated runtime user from a run-owned Host vault. Server certificate pins from certificate_inspect after the last compile; stale-pin connects end notConnected. normal: runtime_plcsim_bind, every runtime_ua_*, runtime_web_* and runtime_capture_* tool, each value read through UA or the Web API beside the PLCSIM API read of the same tag, UA write with expected (a stale expected refused), web write whose effect PLCSIM reads, runtime_web_operating_mode RUN to STOP to RUN confirmed by PLCSIM. server-restart: STOP, power off and power on during live sessions invalidate them, captures record the downtime, nothing reconnects. host-loss-capture: the Host is killed during a UA subscription and a web capture; a new Host adopts the instance, reports the sessions unknown, pages and exports the committed prefix, refuses implicit resume and a new session before acknowledgement, then a fresh session reads. ua-write-loss and web-write-loss: the Host exits right after sending (--runtime-qualification ua.write.afterSend / web.write.afterSend); a new Host reports the unknown outcome, refuses a retry, an explicit read decides and PLCSIM confirms. The independent oracle scripts/verify_runtime_plcsim_tcpip.py found no issue in any mode; every Host and worker has a verified exit proof and the owned instance was stopped, powered off and released."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.20261029.json"
+      ],
+      "limitations": [
+        "Owned PLCSIM Advanced V8 on this machine only; runtime.physical_plc and other machines or networks stay unqualified.",
+        "One CPU (1511-1 PN V4.1), one generated runtime user and the documented bootstrap address 192.168.0.1; TIA's TCP/IP discovery never showed that address, so provisioning identified the empty CPU by its MAC and TLS certificate series (tcpipMacIdentity).",
+        "Guest access and operator seeds were not used; guest access is not settable through V21 Openness.",
+        "plc_online_compare, plc_station_upload and the discovery baseline stay Softbus-only.",
+        "Earlier runs of the same window on 6c6701d and 029c347 found the defects fixed up to 1181f33 (vault contention between a UA subscription and a web capture); they are not curated."
       ]
     }
   ],
@@ -20330,8 +20350,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20372,8 +20394,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20414,8 +20438,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20456,8 +20482,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20498,8 +20526,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20541,8 +20571,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20582,8 +20614,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20625,8 +20659,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20667,8 +20703,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20709,8 +20747,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20757,8 +20797,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20799,8 +20841,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20841,8 +20885,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20882,8 +20928,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20924,8 +20972,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20966,8 +21016,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22349,8 +22401,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22392,8 +22446,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22435,8 +22491,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22478,8 +22536,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22521,8 +22581,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22565,8 +22627,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22607,8 +22671,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22650,8 +22716,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22693,8 +22761,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22735,8 +22805,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22776,8 +22848,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22817,8 +22891,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22858,8 +22934,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22899,8 +22977,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22941,8 +23021,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -22982,8 +23064,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23023,8 +23107,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -23064,8 +23150,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-tcpip.20261029"
+        ]
       },
       "availability": {
         "status": "conditional",
