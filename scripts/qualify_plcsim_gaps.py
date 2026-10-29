@@ -87,7 +87,7 @@ def ob_xml(number):
     return ('<?xml version="1.0" encoding="utf-8"?><Document><Engineering version="V21" /><SW.Blocks.OB ID="0"><AttributeList>'
             '<AutoNumber>false</AutoNumber><Interface><Sections xmlns="http://www.siemens.com/automation/Openness/SW/Interface/v5">'
             '<Section Name="Input">' + members + '</Section><Section Name="Temp" /><Section Name="Constant" /></Sections></Interface>'
-            '<MemoryLayout>Optimized</MemoryLayout><Name>' + escape(name) + '</Name><Number>%d</Number><ProgrammingLanguage>SCL</ProgrammingLanguage>'
+            '<MemoryLayout>Optimized</MemoryLayout><Name>' + escape(name) + '</Name><Namespace /><Number>%d</Number><ProgrammingLanguage>SCL</ProgrammingLanguage>'
             '<SecondaryType>%s</SecondaryType></AttributeList><ObjectList><SW.Blocks.CompileUnit ID="3" CompositionName="CompileUnits"><AttributeList><NetworkSource>'
             '<StructuredText xmlns="http://www.siemens.com/automation/Openness/SW/NetworkSource/StructuredText/v4">' % (number, secondary) + body +
             '</StructuredText></NetworkSource><ProgrammingLanguage>SCL</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.OB></Document>')
@@ -116,8 +116,9 @@ def rack(h, device):
 
 def hardware_ids(h, plc):
     """System constant name -> hardware identifier, from the PLC's system constants."""
-    tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 5000})["tagTables"]
-    return {c["name"]: c["value"] for table in tables for c in table.get("constants", []) if c.get("kind") == "system"}
+    tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]
+    # V21 reports each system constant's hardware identifier as a decimal string.
+    return {c["name"]: int(c["value"]) for table in tables for c in table.get("constants", []) if c.get("kind") == "system" and str(c.get("value")).isdigit()}
 
 
 class Lab:
@@ -316,7 +317,7 @@ def virtual_time(h, lab):
 def events(h, lab, ids, module, station, obs):
     configured = h.stage("list configured process events", lambda: h.tool("sim_event", {"instanceId": lab.instance["id"]})["configuredProcessEvents"])
     h.report["configuredProcessEvents"] = configured
-    di = next((value for name, value in ids.items() if name.endswith("GapDI")), None)
+    di = ids.get("Local~GapDI")
     require(di is not None, "No system constant names the GapDI module: %s" % sorted(ids))
     def inject(label, event, counter, delta):
         def run():
@@ -414,7 +415,7 @@ def remote_station(h, plc, cpu):
                                       "containerHardwarePath": rail, "positionNumber": 1, "attributes": {"AdditionalInformation": "", "Author": author, "Comment": "", "LocationIdentifier": "",
                                       "Name": server, "PlantDesignation": ""}}})
         ids = hardware_ids(h, plc)
-        station = next((value for name, value in ids.items() if name.endswith("GapStation") or name.endswith("GapHead")), None)
+        station = ids.get("GapHead~IODevice")
         require(station is not None, "No system constant names the ET 200SP station: %s" % sorted(ids))
         return {"station": station, "systemConstants": {k: v for k, v in ids.items() if "Gap" in k}}
     try:

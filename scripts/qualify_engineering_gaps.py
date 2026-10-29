@@ -22,7 +22,8 @@ PARAMETERS = {"CycleMaximumCycleTime": 200, "CycleMinimumCycleTime": 5, "CycleCo
 OBSERVED = {"CycleEnableMinimumCycleTime": False, "TimeSynchronizationNtpV2": 1, "PlcAccessControlConfiguration": "EnabledWithAccessControlViaAccessLevel"}
 TABLE, RENAMED, RESTORED_TABLE = "TiaMcpGapTable", "TiaMcpGapRenamed", "TiaMcpGapRestore"
 POLICY = {"dependencyPolicy": "rejectReferenced"}
-HMI_PANEL = "TP700 Comfort"
+# A Classic and a Unified panel, each created through hardware_add without a start screen.
+HMI_PANELS = ("TP700 Comfort", "MTP700 Unified Basic")
 LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21; other CPU families, firmware, F-CPUs and software units are not qualified.",
     "CPU parameters: the reviewed subset only, each set to one new value and read back; the runtime effect needs a download and is not observed here.",
@@ -59,7 +60,7 @@ def reopen(h, path):
 
 
 def compiled(applied, targets):
-    compilation = applied.get("compilation") or {}
+    compilation = applied.get("compile") or applied.get("compilation") or {}
     # Project compilation names each receipt by device and keeps its inventory path in targetPath.
     require(compilation.get("errorCount") == 0 and [t.get("targetPath") or t["target"] for t in compilation.get("targets", [])] == targets,
             "Unexpected compilation evidence: %s" % compilation)
@@ -114,19 +115,10 @@ def body(h):
     device_prepared = h.prepare("device_compile", {"devicePath": device})
     require(device_prepared["preview"]["effects"][0]["targets"] == [device], "Unexpected device compile preview: %s" % device_prepared["preview"]["effects"])
     h.report["deviceCompile"] = compiled(h.apply_prepared("device_compile", device_prepared), [device])
-    devices = [device]
-    hmi = add_hmi(h)
-    if hmi:
-        devices = sorted({device, hmi["devicePath"]})
     project_prepared = h.prepare("project_compile", {})
     targets = project_prepared["preview"]["effects"][0]["targets"]
-    require(sorted(targets) == devices, "project_compile targets differ from the project's devices: %s" % targets)
+    require(targets == [device], "project_compile targets differ from the project's devices: %s" % targets)
     h.report["projectCompile"] = compiled(h.apply_prepared("project_compile", project_prepared), targets)
-    if hmi:
-        target = {"family": hmi["family"], "hmiPath": hmi["hmiPath"]}
-        h.refuse("refuse hmi_compile of a missing target", "hmi_compile", {"target": {**target, "hmiPath": hmi["hmiPath"] + "Missing"}}, "HmiTargetNotFound")
-        prepared = h.prepare("hmi_compile", {"target": target})
-        h.report["hmiCompile"] = compiled(h.apply_prepared("hmi_compile", prepared), [hmi["compileScope"]])
     require(h.inventory() == inventory, "A compile-only change altered blocks, types or tag tables")
 
     # Typed CPU parameters.
@@ -170,6 +162,12 @@ def body(h):
         h.apply("hardware_cpu_parameters", {"hardwarePath": cpu, "attributes": {name: original[name]}})
     h.stage("original CPU parameters restored", lambda: require(cpu_values(h, cpu) == original, "Original CPU parameters not restored") or original)
 
+    # Last: every later device compile would include these panels, which TIA cannot compile without a start screen.
+    for panel in HMI_PANELS:
+        hmi = add_hmi(h, panel)
+        if hmi:
+            h.report.setdefault("hmiCompile", {})[panel] = hmi_compile(h, hmi)
+
 
 def observe(h, cpu, name, value):
     """Apply one parameter whose compile outcome V21 decides; a failed compile is recorded and restored from its checkpoint."""
@@ -196,29 +194,55 @@ def rack(h, device):
     return rows[0]
 
 
-def add_hmi(h):
-    """A Classic Comfort panel for hmi_compile; a refused creation is recorded and leaves hmi_compile unqualified."""
+def add_hmi(h, panel):
+    """A panel for hmi_compile, added without compile: a device created through Openness has no start screen. A refused
+    creation is recorded and leaves hmi_compile unqualified for that family."""
     def run():
-        entries = [e for e in h.tool("hardware_catalog_search", {"filter": HMI_PANEL, "maxItems": 200})["entries"] if e.get("typeName") == HMI_PANEL]
-        require(entries, "No catalog entry named " + HMI_PANEL)
-        selected = max(entries, key=lambda e: (e.get("version") or "", e["typeIdentifier"]))
+        before = {t["hmiPath"] for t in h.tool("library_query", {"request": {"action": "hmi_targets"}})["targets"]}
+        entries = [e for e in h.tool("hardware_catalog_search", {"filter": panel, "maxItems": 200})["entries"] if e.get("typeName") == panel]
+        require(entries, "No catalog entry named " + panel)
+        selected = max(entries, key=lambda e: (tuple(int(x) for x in (e.get("version") or "0").split(".") if x.isdigit()), e["typeIdentifier"]))
+        name = "TiaMcpGapHmi" + str(len(before) + 1)
         outcome = h.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": "hardware_add", "payload": {
-            "typeIdentifier": selected["typeIdentifier"], "deviceName": "TiaMcpGapHmi", "itemName": "TiaMcpGapPanel"}}})
+            "typeIdentifier": selected["typeIdentifier"], "deviceName": name, "itemName": name + "Panel"}}})
         if outcome.get("isError"):
             return {"catalog": selected, "refused": (outcome.get("structuredContent") or {}).get("error")}
-        prepared = outcome["structuredContent"]
-        applied = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
+        applied = h.client.request("tools/call", {"name": "change_apply", "arguments": {**h.apply_args(outcome["structuredContent"]), "compile": False, "save": False}})
         if applied.get("isError"):
             return {"catalog": selected, "applyFailed": (applied.get("structuredContent") or {}).get("error")}
-        found = h.tool("library_query", {"request": {"action": "hmi_targets"}})["targets"]
-        require(len(found) == 1, "Expected one HMI target: %s" % found)
+        found = [t for t in h.tool("library_query", {"request": {"action": "hmi_targets"}})["targets"] if t["hmiPath"] not in before]
+        require(len(found) == 1, "Expected one new HMI target: %s" % found)
         return {"catalog": selected, "target": found[0]}
-    result = h.stage("add a " + HMI_PANEL + " for hmi_compile", run)
-    h.report["hmiFixture"] = result
+    result = h.stage("add a " + panel + " for hmi_compile", run)
+    h.report.setdefault("hmiFixtures", {})[panel] = result
     if "target" not in result:
         return None
     target = result["target"]
     return {**target, "devicePath": target["hmiPath"].split("/items/", 1)[0]}
+
+
+def hmi_compile(h, hmi):
+    """hmi_compile of the exact target: either a clean compile, or TIA's compile errors returned as CompileFailed and the
+    checkpoint restored into a new directory. Both outcomes are recorded."""
+    target = {"family": hmi["family"], "hmiPath": hmi["hmiPath"]}
+    h.refuse("refuse hmi_compile of a missing " + hmi["family"] + " target", "hmi_compile", {"target": {**target, "hmiPath": hmi["hmiPath"] + "Missing"}}, "HmiTargetNotFound")
+    prepared = h.prepare("hmi_compile", {"target": target})
+    require(prepared["preview"]["effects"][0]["targets"] == [hmi["compileScope"]], "Unexpected hmi_compile preview: %s" % prepared["preview"]["effects"])
+    def run():
+        outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
+        content = outcome.get("structuredContent") or {}
+        if not outcome.get("isError"):
+            return {"outcome": "compiled", "compilation": compiled(content, [hmi["compileScope"]])}
+        error = content.get("error") or {}
+        details = error.get("details") or {}
+        compilation = details.get("compile") or details.get("compilation") or {}
+        errors = [m["description"] for t in compilation.get("targets", []) for m in t.get("messages", []) if m.get("state") == "Error" and m.get("description")]
+        require(error.get("code") == "CompileFailed" and [t.get("target") for t in compilation.get("targets", [])] == [hmi["compileScope"]] and errors,
+                "hmi_compile failed without typed compile diagnostics: %s" % error)
+        recovered = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        require(recovered["state"] == "restored", "The failed HMI compile was not restored")
+        return {"outcome": "compileErrorsReported", "errors": errors, "restoredStages": recovered["stages"]}
+    return h.stage("hmi_compile " + hmi["family"], run)
 
 
 if __name__ == "__main__":
