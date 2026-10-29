@@ -33,6 +33,7 @@ import re
 import subprocess
 import sys
 import threading
+import time
 
 URI, MIME = "ui://tia-project-explorer/view.html", "text/html;profile=mcp-app"
 FIELDS = {"schemaVersion", "snapshotId", "sessionGeneration", "projectPath", "nodeId", "objectPath"}
@@ -174,7 +175,7 @@ def prepare(args):
         report["project"] = scratch["project"]
     finally:
         client.tool("tia_detach")
-        report["host"] = client.close()
+        report["hostExits"] = [client.close()]
     project = report["project"]["path"]
     workspace = root / "workspace" / ".vscode"
     workspace.mkdir(parents=True)
@@ -245,7 +246,12 @@ def verify(args):
                 and URI not in [r["uri"] for r in client.request("resources/list")["resources"]], "App UI offered without negotiation")
         step("an unnegotiated client sees no app UI", len(tools))
         client.tool("tia_start")
-        client.tool("project_open", {"path": found["reference"]["projectPath"]})
+        for attempt in range(13):  # The desk session's Openness attachment can hold TIA's project lock for up to two minutes.
+            opened = client.request("tools/call", {"name": "project_open", "arguments": {"path": found["reference"]["projectPath"]}})
+            if not opened.get("isError"):
+                break
+            require(attempt < 12 and "already been opened" in json.dumps(opened), "project_open failed: %s" % json.dumps(opened)[:500])
+            time.sleep(15)
         direct = client.tool("block_read", {"blockPath": found["reference"]["objectPath"]})
         require(Path(direct["project"]["path"]).resolve() == Path(found["reference"]["projectPath"]).resolve(), "block_read answered from another project")
         step("independent block_read equals the details the product received", same_block(found["details"], direct["block"]))
@@ -268,7 +274,7 @@ def verify(args):
                 client.tool("tia_detach")
             except Exception as error:
                 report["detachFailure"] = str(error)
-            report["hostExit"] = client.close()
+            report["hostExits"] = [client.close()]
         report["completedAtUtc"] = now()
         path = args.report or root / "verification.json"
         path.write_text(json.dumps(report, indent=2), encoding="utf-8")
