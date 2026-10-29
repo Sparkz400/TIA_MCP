@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**PLCSIM and engineering gaps — 29 October 2026:** ([record](../verification/plcsim-openness-gaps-20261029.md))
+- **New routes:** `change.simulation_download_online` downloads a changed program online to the same owned PLCSIM instance; `sim_time` (scale factor, virtual system time), `sim_test` `virtualTime`, `sim_event` (OB40/82/83/86/55 injection), `sim_state` `memoryReset` and `sim_storage` (archive/retrieve); `change.hardware_cpu_parameters`, `change.device_compile`, `change.project_compile`, `change.hmi_compile` and `change.tag_table_create`/`_rename`/`_delete`.
+- **Native qualification:** CPU parameters, device and project compile and the tag-table lifecycle (`local.engineering_gaps.20261029`); virtual time, OB82/OB83/OB86, memory reset and storage (`local.plcsim_gaps.20261029`). The online download passed natively; its recovery top-up is open. Findings fixed on the way: V21 refuses some coded parameter values in its setter, a zone change switches daylight saving, disabling the minimum cycle time undeclares its value, and PLCSIM needs a tag-list refresh after a program change.
+- **Boundaries:** OB40 (no hardware-interrupt configuration in V21 Openness), the CPU protection level (password required) and `change.hmi_compile` (no compilable HMI fixture through public routes).
+- **Catalog 0.4.73:** 411 of 461 features verified; matrix 1,868 bound, 179 open, 49 blocked, 30 deferred.
+
 **Runtime real-server Tasks 4–6 — 29 October 2026:** ([record](../verification/runtime-real-server-20261029.md))
 - **Runs:** in an operator TCP/IP window, `scripts/qualify_runtime_plcsim_tcpip.py` passed all five modes (normal, server restart, Host loss during capture, UA and web write loss) on one frozen build, `1181f33`, each with the independent oracle; login was the scratch's generated runtime user (maintainer decision). Curated as `local.runtime.plcsim-tcpip.20261029`.
 - **Fixes found natively:** TCP/IP provisioning now recognizes the empty CPU by its MAC and TLS certificate series because TIA's discovery never shows its address; PLCSIM's tag list is refreshed after a restart; a TCP/IP `GoOnline` that throws before any callback is retried once; vault users of one Host take turns instead of failing, and a busy vault reports `UaCredentialStoreBusy`.
