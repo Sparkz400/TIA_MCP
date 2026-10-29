@@ -7,6 +7,11 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 29 October 2026
 
+**Station upload qualified — 29 October 2026:**
+- **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.
+- **Native D09:** a first run refused, because the upload's three TLS challenges offered zero certificates ("certificate not matching"). After the decision, `local.online.upload.20261029` passed: one certificate-less challenge was trusted unauthenticated, then one runtime-user login, and the upload succeeded with the downloaded blocks. `plc_online_compare` passed again.
+- **Catalog 0.4.76:** 416 of 461 features verified; matrix 1,896 bound, 151 open, 49 blocked, 30 deferred. D09 has no open cell.
+
 **PLCSIM and engineering gaps — 29 October 2026:** ([record](../verification/plcsim-openness-gaps-20261029.md))
 - **New routes:** `change.simulation_download_online` downloads a changed program online to the same owned PLCSIM instance; `sim_time` (scale factor, virtual system time), `sim_test` `virtualTime`, `sim_event` (OB40/82/83/86/55 injection), `sim_state` `memoryReset` and `sim_storage` (archive/retrieve); `change.hardware_cpu_parameters`, `change.device_compile`, `change.project_compile`, `change.hmi_compile` and `change.tag_table_create`/`_rename`/`_delete`.
 - **Native qualification:** CPU parameters, device and project compile and the tag-table lifecycle (`local.engineering_gaps.20261029`); the online download, virtual time, OB82/OB83/OB86, memory reset and storage (`local.plcsim_gaps.20261029`), with the download's checkpoint recovery in a top-up run (`local.plcsim_gaps.recovery.20261029`). Findings fixed on the way: V21 refuses some coded parameter values in its setter, a zone change switches daylight saving, disabling the minimum cycle time undeclares its value, and PLCSIM needs a tag-list refresh after a program change.

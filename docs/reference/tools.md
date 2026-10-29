@@ -379,7 +379,7 @@ option registers or admits the tool only on a qualification Host.
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
 | `plc_online_compare` | Compare offline PLC software with its owned PLCSIM instance online | limited | simulation |  |  |
-| `plc_station_upload` | Upload an owned PLCSIM station into a new worker-owned project | unqualified | simulation |  |  |
+| `plc_station_upload` | Upload an owned PLCSIM station into a new worker-owned project | limited | simulation |  |  |
 | `sim_create` | Create a new owned simulated CPU | shipped | simulation |  |  |
 | `sim_creation_status` | Inspect durable simulator creation and original worker exit | limited | simulation |  |  |
 | `sim_event` | Inject interrupts and faults into an owned running simulated CPU | limited | simulation |  |  |

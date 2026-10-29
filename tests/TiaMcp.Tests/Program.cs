@@ -135,6 +135,8 @@ internal static partial class Program
             ("Journal publication bounds retries and never overwrites or replays", JournalDirectoryPublicationTests.BoundsAndNoOverwrite),
             ("Card moves tolerate transient locks and reconcile without replay", SimulationCardMoveRetryTests.TransientLockAndReconciliation),
             ("Owned PLCSIM routes answer only the offered project-user login, once", SimulationOnlineLoginTests.OnlyTheOfferedProjectUserLoginOnce),
+            ("Owned PLCSIM first-use TLS trust pins one authorized certificate per attempt", SimulationTlsPinTests.FirstUsePinsOnlyTheAuthorizedOwnedCertificate),
+            ("Owned PLCSIM upload trusts a certificate-less TLS challenge only when authorized and owned", SimulationTlsPinTests.WithoutCertificateOnlyForTheAuthorizedOwnedUpload),
             ("Provisioning checkpoint refuses unsaved state and existing destinations", SimulationCheckpointTests.SavedStateAndCollisions),
             ("Provisioning checkpoint and durable receipt precede runtime continuation", SimulationCheckpointTests.ArchiveAndDurableReceiptPrecedeContinuation),
             ("Card move retries retain deadlines and never replay other operations", SimulationCardMoveRetryTests.BoundsAndNoNativeReplay),
