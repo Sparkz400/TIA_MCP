@@ -5,7 +5,27 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 30 October 2026
+
+**OB40 and the drive compile probe — 30 October 2026:** ([record](../verification/plcsim-openness-gaps-20261029.md))
+- **OB40:** the recorded V21 boundary was wrong. The channels sit on the DI submodule, and V21 exposes the OB link only while the rising-edge interrupt is active, so enabling now takes the OB in the same request. Channel 0 linked to OB40, the device compile passed, PLCSIM listed the event and `sim_event` ran OB40 once; enable, disable and restore pass with typed refusals (91/91 steps, build `807a189`, `local.plcsim_gaps.ob40.20261030`). A rising edge written to the input tag does not raise the interrupt; only PLCSIM's injected event does.
+- **Drives:** the device compile now lists devices without a compile service (a G120C PN) as not compiled instead of refusing the whole compile, so device-compiled changes run in a project with a drive (`local.drives.probe.20261030`). The drive kinds stay blocked: Startdrive cannot read `DriveObject.DriveObjectNumber` of a drive added through Openness, even after compile and save.
+- **Catalog 0.4.80:** evidence and limitations only; no matrix count change.
+
 ## 29 October 2026
+
+**Unified text-list import qualified — 29 October 2026:** ([record](../verification/hmi-text-list-import-20261029.md))
+- **Runs:** candidates authored by `hmi_text_list_author` and `hmi_text_list_generate_set` import exactly through V21 `HmiTextListComposition.Import` on MTP700 Unified Comfort (en-US/de-DE) via the independent HmiSeeder (run `q/tl4`, 227 checks, build `47491ab`), with other HMI content unchanged, a byte-identical roundtrip, save/reopen, archive retrieval and checkpoint restore. Curated as `local.hmi.text-list-import.20261029`.
+- **Fix found natively:** V21 reports success but silently changes some content, so both tools now refuse it before publishing: `HmiTextListValueOutOfRange`, `HmiTextListBoolDefaultEntry`, `HmiTextListDefaultEntryValue`, `HmiTextListTextUnsupported`, `HmiTextListNameUnsupported` and `HmiTextListUnresolvedText`. Retained records still reopen.
+- **Catalog 0.4.79:** both text-list tools verified; 418 of 461 features verified; matrix 1,906 bound, 159 open, 31 blocked, 30 deferred. No production import route exists.
+
+**Maintainer decisions — 29 October 2026:** the block-protection credential route is 1.0 work, so its three rows count as open again (5 blocked rows remain, 31 cells); live monitoring and active forcing are 1.0 scope; combined library apply becomes the default for its verified PLC recipe shapes (left to the coordinator); the "Not a 1.0 gate" section is confirmed; VS Code alone closes the Explorer roundtrip. Catalog 0.4.78; matrix 1,896 bound, 169 open, 31 blocked, 30 deferred.
+
+**Release tracking reconciled — 29 October 2026:** [Release acceptance](../plans/release-acceptance.md) defines how the maintainer accepts an obligation; the ledger records the eight blocked rows in `dispositions` and amends `completionCriteria`, and ten obligations were refreshed against catalog `0.4.76`. The TODO now lists the ten deferred rows with their dispositions, the work outside the matrix, capability gaps, release mechanics, one acceptance box per obligation group, open maintainer questions, and a "Not a 1.0 gate" section for the VM and recurring items (maintainer to confirm). Matrix counts are unchanged (151 open cells).
+
+**Hardware families — 29 October 2026:** ([record](../verification/hardware-families-20261029.md))
+- **Runs:** `scripts/qualify_hardware_changes.py` passed 276/276 steps on build `556cee5`: a CPU 1214C DC/DC/DC V4.7 and an ET 200MP IM 155-5 PN ST V4.1 station on a second S7-1500's IO system went through the S7-1500 gates (apply, exact state delta, fresh reopen, checkpoint restore, refusals). Curated as `local.hardware_changes.families.20261029`; no worker or Host change.
+- **Catalog 0.4.77:** evidence references only; no matrix cell changes.
 
 **Station upload qualified — 29 October 2026:**
 - **TLS trust:** `plc_station_upload` takes `trustOwnedSimulationCertificate` (opt-in, default off). One offered certificate is pinned per attempt, the rule credential provisioning uses. A challenge with no certificate is trusted as unauthenticated TLS for the revalidated, ticket-bound owned PLCSIM instance only (maintainer decision, "Allow, owned PLCSIM only"). Every TLS challenge now records its initial selection, PLC name and verification text.

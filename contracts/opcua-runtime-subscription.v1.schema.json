@@ -424,7 +424,7 @@
         "attemptId",
         "nodes"
       ],
-      "description": "Runtime additionally requires lifetimeCount >= 3 * keepAliveCount and canonical distinct node identities.",
+      "description": "Runtime additionally requires lifetimeCount >= 3 * keepAliveCount and canonical distinct node identities. A new start also requires publishingIntervalMilliseconds * keepAliveCount <= 4000 (UaSubscriptionKeepAliveLimit); retained plans are not rechecked.",
       "allOf": [
         {
           "anyOf": [
@@ -2147,7 +2147,8 @@
               "errorCode": {
                 "enum": [
                   "UaTransportInterrupted",
-                  "UaTimeout"
+                  "UaTimeout",
+                  "UaCredentialStoreBusy"
                 ]
               }
             }

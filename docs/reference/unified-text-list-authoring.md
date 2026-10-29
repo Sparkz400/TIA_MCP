@@ -139,8 +139,24 @@ See [verification](../verification/hmi-bound-generation-20261020.md).
 
 Bounds use exact signed 64-bit integer encoding; strings and fractions refuse.
 This is the authoring representation, not certification of a particular native
-data type or bit width. Overlapping intervals refuse instead of inventing a
-precedence policy. Unsupported fields, formatted/system-list intent and unknown
+data type or bit width.
+
+New candidates also refuse, before anything is published, the content V21's import
+reports as imported but changes. Each refusal names the list and entry:
+
+| Code | Refused content | What V21 would do |
+| --- | --- | --- |
+| `HmiTextListValueOutOfRange` | a bound outside signed 32-bit | import it as 0 |
+| `HmiTextListBoolDefaultEntry` | a default entry in a `Bool` list | drop the entry |
+| `HmiTextListDefaultEntryValue` | a default entry that is not `SingleValue` 0 | import it as `SingleValue` 0 |
+| `HmiTextListTextUnsupported` | a translation containing a control character other than tab and LF | empty the text, replace the character with `?`, or read CR/NEL back as LF |
+| `HmiTextListNameUnsupported` | a list name with a character other than a letter, a digit, an inner space or `!&'()+,-;<=>@\^_{\|}`, a leading or trailing space, or more than 128 characters | trim the name, rename the list `Text_list_N` or not create it |
+| `HmiTextListUnresolvedText` | an entry whose text ID is not declared | import empty texts |
+
+The same refusals apply to v2/v3 generation and to `hmi_text_list_generate_set`.
+Records published before them keep their meaning and still reopen.
+
+Overlapping intervals refuse instead of inventing a precedence policy. Unsupported fields, formatted/system-list intent and unknown
 entry/range types refuse. Output construction uses a conservative character budget
 to keep each candidate below 8 MiB; requests are limited to 4 MiB and share the
 existing 512 MiB HMI retention store, including incomplete files.
@@ -158,6 +174,14 @@ false. No project language activation, component/instance binding, system-list
 editing, rich-text export, native range acceptance, import, compile, reopen or HMI
 runtime acceptance is supplied. Full C01/SiVArc authoring and regeneration remain
 open.
+
+Native import was qualified separately on 29 October 2026 for MTP700 Unified Comfort
+with en-US/de-DE ([record](../verification/hmi-text-list-import-20261029.md)). Authored
+v1–v3 and set candidates import exactly through `HmiTextListComposition.Import` and
+survive save/reopen and archive retrieval. The content classes V21 changes are refused
+(table above). V21's own export renames entries, pools the texts in one library and
+omits default fields, so a native export is never a valid current file set for
+regeneration; supply the retained candidate pair.
 
 The official [V21 export description](https://docs.tia.siemens.cloud/r/en-us/v21/functions-for-accessing-the-data-of-an-hmi-unified-device/hmisoftware/text-lists/export-of-text-lists)
 documents the paired configuration/translation files and entry attributes. Its

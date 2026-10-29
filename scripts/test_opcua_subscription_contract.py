@@ -90,6 +90,7 @@ class SubscriptionContractTests(unittest.TestCase):
             for value in (-1, 4, 0.5, True): self.assertFalse(request.is_valid(value))
         event = {'attempt':1, 'state':'starting', 'errorCode':'UaTransportInterrupted'}
         validator('reconnectEvent').validate(event)
+        validator('reconnectEvent').validate({**event, 'errorCode':'UaCredentialStoreBusy'})
         validator('reconnectEvent').validate({**event, 'state':'succeeded', 'errorCode':None})
         validator('reconnectEvent').validate({**event, 'state':'failed', 'errorCode':'UaSessionExpired'})
         for change in ({'attempt':4}, {'errorCode':'UaAuthenticationDenied'}, {'state':'succeeded'}, {'extra':True}):

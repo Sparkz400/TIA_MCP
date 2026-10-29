@@ -41,6 +41,7 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         if ((string?)request["schemaVersion"] is "unified-text-list-author-request.v2" or "unified-text-list-author-request.v3")
             return AuthorBoundTextLists(request, bytes, input, retained, recordId, depth, budget);
         var candidates = UnifiedTextListAuthoring.Build(request);
+        if (retained is null) UnifiedTextListAuthoring.RequireNativeImportable(request);
         var files = new JsonArray();
         foreach (var candidate in candidates)
         {

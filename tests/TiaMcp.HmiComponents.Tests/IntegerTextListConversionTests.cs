@@ -209,6 +209,14 @@ internal static class IntegerTextListConversionTests
             ("UInt", "Int", 0, 32768), ("DInt", "UDInt", -1, 0), ("UDInt", "DInt", 0, 2147483648),
             ("UDInt", "DInt", 4294967295, 4294967295), ("DInt", "Int", -2147483648, -2147483648) })
         {
+            if (test.Low < int.MinValue || test.High > int.MaxValue)
+            {
+                // V21 imports values outside signed 32-bit as 0, so such a set is refused before its first candidate exists.
+                var unpublished = Published(); string? code = null;
+                try { Seed(test.From, test.Low, test.High); } catch (BridgeException e) { code = e.Code; }
+                Check(code == "HmiTextListValueOutOfRange" && Published().SequenceEqual(unpublished), $"seed beyond signed 32-bit refuses unpublished: {test.From} [{test.Low},{test.High}]");
+                continue;
+            }
             var seed = Seed(test.From, test.Low, test.High);
             Refuse(ConvertRequest(seed, test.To), $"overflow {test.From} to {test.To} [{test.Low},{test.High}]");
             var hidden = ConvertRequest(seed, test.To);

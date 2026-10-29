@@ -8,7 +8,7 @@ The harness distinguishes an acknowledged operation failure from an interrupted 
 
 | Case | Expected result |
 | --- | --- |
-| Worker exits before connecting | `WorkerExited`, then terminal `BridgeFaulted`; no mutation dispatched |
+| Worker exits before connecting | `WorkerExited`; nothing was sent, so the next call starts a fresh worker (`WorkerExited` again); no mutation dispatched |
 | Worker closes after committing | `WorkerDisconnected`; the durable outcome remains committed |
 | Worker sends an incomplete response then closes | `WorkerDisconnected`; no replay |
 | Wrong response identity | `ProtocolMismatch`; no replay |

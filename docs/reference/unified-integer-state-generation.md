@@ -31,7 +31,11 @@ template `dataType` must agree exactly.
 Aliases, enum inference, `ULInt`, bit strings, floating point, implicit
 conversions and native numeric/runtime representation are unsupported.
 `LInt` bounds are parsed as exact signed 64-bit JSON integers; fractions, strings,
-nulls and values outside that domain refuse.
+nulls and values outside that domain refuse. New candidates also need every state
+bound within signed 32-bit: V21 imports larger values as 0, so `UDInt` states above
+2147483647 and `LInt` states outside signed 32-bit refuse with
+`HmiTextListValueOutOfRange` before anything is published. A full `UDInt` or `LInt`
+domain therefore cannot be listed. Records published earlier still reopen.
 
 Each template contains 1–256 states. A state has a unique ASCII identifier,
 `SingleValue` with equal bounds or an explicit inclusive `Range`, a default flag,

@@ -52,6 +52,8 @@ internal static class SubscriptionChecks
             await Refuse(()=>subscriptions.Start(capture,request with {DurationSeconds=11},default),"UaSubscriptionRequestChanged",check);
             await Refuse(()=>subscriptions.Start(Id(),request with {Nodes=[request.Nodes[0],request.Nodes[0]]},default),"UaSubscriptionInvalid",check);
             await Refuse(()=>subscriptions.Start(Id(),request with {MaximumRepublish=65},default),"UaSubscriptionInvalid",check);
+            // 1000 ms x 10 keep-alives would reach the ten-second Publish deadline on a quiet signal.
+            await Refuse(()=>subscriptions.Start(Id(),request with {PublishingIntervalMilliseconds=1000},default),"UaSubscriptionKeepAliveLimit",check);
             check(server.Audit.Count==audit,"Invalid subscription admission sends no services");
             string active=Id();await subscriptions.Start(active,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:30,KeepAliveCount:1),default);
             await Refuse(()=>sessions.Read(attempt,[FixtureServer.Node("bool")]),"UaSessionAcquisitionBusy",check);
@@ -90,6 +92,12 @@ internal static class SubscriptionChecks
                 var bound=await End(subscriptions,id);
                 check(bound.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()==(budget==0?"sequenceGapLimit":"notificationLimit"),"Exact retransmission allowance "+budget+" distinguishes exhausted pending gap from complete recovery");
             }
+            server.Mode="subscriptionLongKeepAlive";string slow=Id();
+            await subscriptions.Start(slow,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:5),default);
+            var revised=await End(subscriptions,slow);var revisedRows=Events(subscriptions,revised);
+            check(revisedRows.Any(x=>x.Kind=="failure" && x.ErrorCode=="UaSubscriptionKeepAliveLimit") && !revisedRows.Any(x=>x.Kind=="publish") &&
+                revised.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean() && (await sessions.Status(attempt)).State=="connected",
+                "A server-revised keep-alive past the Publish budget deletes the subscription before any Publish");
             server.Mode="normal";
             await RetainedControls(root,sessions,capture,status,check);
             var next=typeof(OpcUaRuntimeSubscriptions).GetMethod("Next",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;
