@@ -296,7 +296,7 @@ namespace TiaMcp.Openness.V21
                 var restored = _portal.Projects.Retrieve(new FileInfo(change.ArchivePath), new DirectoryInfo(recoveryDirectory));
                 if (wasScratchProject) _scratchProject = restored;
                 change.RecoveredProject = ProjectInfo(restored);
-                if (change.Kind == "opcua_role_mapping_set") _opcUaRoleCacheProcess = _processId;
+                if (OpcUaPayloadFields.ContainsKey(change.Kind)) _opcUaRoleCacheProcess = _processId;
                 if (change.Kind == "hmi_engineering") VerifyHmiEngineeringRecovery(change, restored);
                 VerifyHardwareRecovery(change, restored);
                 change.State = "restored";

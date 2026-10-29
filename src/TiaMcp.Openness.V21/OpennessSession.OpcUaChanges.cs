@@ -30,8 +30,9 @@ namespace TiaMcp.Openness.V21
             ["opcua_role_mapping_set"] = new[] { "action", "roleName", "definedInNamespace", "projectRole", "namespacePermissions" }
         };
 
-        // TIA caches OPC UA role mappings per Portal process, keyed by an object id a recovered copy keeps. After change_restore of a
-        // role change that Portal shows the mappings from before the restore, and its next OPC UA change saves them into the copy.
+        // TIA caches OPC UA role mappings and namespace access rows per Portal process, keyed by an object id a recovered copy keeps.
+        // After change_restore of a role, interface or namespace change that Portal shows them as before the restore, including the
+        // namespace rows of an interface the restore removed or brought back, and its next OPC UA change saves them into the copy.
         private int? _opcUaRoleCacheProcess;
 
         // The V21 XML does not name the service owner: try the PLC software, then its owning device items.
@@ -82,7 +83,7 @@ namespace TiaMcp.Openness.V21
             if (unsupported.Length != 0) throw new BridgeException("InvalidRequest", "Unsupported OPC UA payload fields: " + string.Join(", ", unsupported) + ". Passwords, certificates and user credentials are never accepted.");
             if (change.Selector["scopePath"]?.Type == JTokenType.String) throw new BridgeException("InvalidRequest", "OPC UA changes target one PLC; scopePath is not supported.");
             if (_opcUaRoleCacheProcess != null && _opcUaRoleCacheProcess == _processId)
-                throw new BridgeException("StaleRevision", "This TIA process still holds the OPC UA role mappings from before a restored role change. Close it (tia_detach), start a new one and open the recovered project first.");
+                throw new BridgeException("StaleRevision", "This TIA process still holds the OPC UA role mappings from before a restored OPC UA change. Close it (tia_detach), start a new one and open the recovered project first.");
             var group = OpcUaGroup(SelectPlc(change.Selector));
             var budget = new ScanBudget(5000);
             preview["opcUaBefore"] = OpcUaSnapshot(group, budget);
