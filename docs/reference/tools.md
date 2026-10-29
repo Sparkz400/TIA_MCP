@@ -10,501 +10,503 @@ the domain of the tool's own catalog feature. Call `feature_catalog` for the ful
 `scripts/release_matrix.py`): `shipped` is implemented and verified, `limited` is partially
 implemented and verified, `unqualified` has no qualifying evidence yet, `unavailable_target` is
 blocked on TIA Portal V21 and `deferred` is not implemented.
+**Toolset** is the tool's `--toolsets` group ([MCP surface](mcp-surface.md#tool-groups---toolsets));
+`base` and `qualification` tools are never hidden by `--toolsets`.
 **Host option** lists the Host launch options the feature's catalog entry names; a qualification
 option registers or admits the tool only on a qualification Host.
 **Also in** lists the other catalog features that use the tool.
 
 ## addins
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `addin_selection_page` | Reopen retained Add-In selection evidence | limited | `--addin-enrollment` |  |
-| `addin_selection_review` | Review a supplied Add-In selection against an exact saved project | limited | `--addin-enrollment` |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `addin_selection_page` | Reopen retained Add-In selection evidence | limited | reviews | `--addin-enrollment` |  |
+| `addin_selection_review` | Review a supplied Add-In selection against an exact saved project | limited | reviews | `--addin-enrollment` |  |
 
 ## analysis
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `call_graph` | Resolve static calls and declared instances | limited |  |  |
-| `change_impact` | Find bounded static dependencies | limited |  |  |
-| `instance_lookup` | Look up exact FB/FC instances, call sites and bindings | limited |  |  |
-| `plc_compare` | Compare PLC software offline with another PLC or a library | limited |  |  |
-| `symbol_trace` | Trace native symbol references and configured I/O | limited |  |  |
-| `xref_query` | Read native cross-reference locations | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `call_graph` | Resolve static calls and declared instances | limited | core |  |  |
+| `change_impact` | Find bounded static dependencies | limited | core |  |  |
+| `instance_lookup` | Look up exact FB/FC instances, call sites and bindings | limited | core |  |  |
+| `plc_compare` | Compare PLC software offline with another PLC or a library | limited | core |  |  |
+| `symbol_trace` | Trace native symbol references and configured I/O | limited | core |  |  |
+| `xref_query` | Read native cross-reference locations | shipped | core |  |  |
 
 ## artifacts
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `artifact_read` | Transfer bounded artifact chunks with hashes | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `artifact_read` | Transfer bounded artifact chunks with hashes | shipped | base |  |  |
 
 ## catalog
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `feature_catalog` | Query versioned feature contracts and fixture evidence | shipped |  |  |
-| `target_capabilities` | Probe capabilities of an exact native target without mutation | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `feature_catalog` | Query versioned feature contracts and fixture evidence | shipped | base |  |  |
+| `target_capabilities` | Probe capabilities of an exact native target without mutation | shipped | core |  |  |
 
 ## changes
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `change_apply` | Checkpoint, mutate, compile and journal a prepared change | shipped |  | 120 features |
-| `change_prepare` | Validate and preview an explicit offline mutation | shipped |  | 120 features |
-| `change_restore` | Restore a recorded checkpoint into a new project | shipped |  | 120 features |
-| `change_status` | Read in-memory or persisted change outcomes | shipped |  | 119 features |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `change_apply` | Checkpoint, mutate, compile and journal a prepared change | shipped | core |  | 120 features |
+| `change_prepare` | Validate and preview an explicit offline mutation | shipped | core |  | 120 features |
+| `change_restore` | Restore a recorded checkpoint into a new project | shipped | core |  | 120 features |
+| `change_status` | Read in-memory or persisted change outcomes | shipped | core |  | 119 features |
 
 ## connections
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `connection_inspect` | Inspect configured communication connections and native endpoints | limited |  |  |
-| `connection_review` | Compare supplied connection observations and explicit endpoints | limited |  |  |
-| `connection_review_page` | Reopen retained connection differences and declared consumers | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `connection_inspect` | Inspect configured communication connections and native endpoints | limited | reviews |  |  |
+| `connection_review` | Compare supplied connection observations and explicit endpoints | limited | reviews |  |  |
+| `connection_review_page` | Reopen retained connection differences and declared consumers | limited | reviews |  |  |
 
 ## diagnostics
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `diagnostic_experiment_acquire_runtime` | Attach retained runtime observations to a diagnostic experiment | limited |  |  |
-| `diagnostic_experiment_compare_runs` | Compare repeated explicit diagnostic experiment pairs | limited |  |  |
-| `diagnostic_experiment_plan` | Compose a retained diagnostic experiment | limited |  |  |
-| `diagnostic_experiment_report_export` | Export a combined readable diagnostic experiment report | limited |  |  |
-| `diagnostic_experiment_review` | Review exact before and after diagnostic measurements | limited |  |  |
-| `diagnostic_plan` | Plan bug diagnosis from saved evidence | limited |  |  |
-| `diagnostic_plcsim_write` | Write diagnostic-case signals on an owned PLCSIM instance | limited |  |  |
-| `diagnostic_replan` | Revalidate a diagnostic case on another source or instance | limited |  |  |
-| `diagnostic_report_export` | Export readable diagnostic reports | shipped |  |  |
-| `diagnostic_runtime_acquisition_compare` | Compare before/after runtime acquisitions of a diagnostic experiment | limited |  |  |
-| `diagnostic_runtime_acquisition_export` | Export retained diagnostic runtime acquisition evidence | limited |  |  |
-| `diagnostic_ua_binding_plan` | Prebind explicit UA observations to a retained diagnostic experiment | limited |  |  |
-| `diagnostic_ua_compare` | Before and after retained UA capture comparison | limited |  |  |
-| `diagnostic_ua_observe` | Retained prebound UA observation report | limited |  |  |
-| `diagnostic_ua_report_export` | Readable retained UA observation and comparison exports | limited |  |  |
-| `diagnostic_watch_plan` | Plan watch rows from an exact saved diagnostic case | limited |  |  |
-| `trace_analyze` | Analyze recorded hypothesis predictions | limited |  |  |
-| `trace_capabilities` | Inspect offline trace route decisions | limited |  |  |
-| `trace_check_readback` | Compare supplied native readback evidence | limited |  |  |
-| `trace_compare` | Compare explicitly aligned captures | limited |  |  |
-| `trace_prepare` | Prepare a manual native trace specification | limited |  |  |
-| `trace_read` | Import a normalized diagnostic measurement | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `diagnostic_experiment_acquire_runtime` | Attach retained runtime observations to a diagnostic experiment | limited | diagnostics |  |  |
+| `diagnostic_experiment_compare_runs` | Compare repeated explicit diagnostic experiment pairs | limited | diagnostics |  |  |
+| `diagnostic_experiment_plan` | Compose a retained diagnostic experiment | limited | diagnostics |  |  |
+| `diagnostic_experiment_report_export` | Export a combined readable diagnostic experiment report | limited | diagnostics |  |  |
+| `diagnostic_experiment_review` | Review exact before and after diagnostic measurements | limited | diagnostics |  |  |
+| `diagnostic_plan` | Plan bug diagnosis from saved evidence | limited | diagnostics |  |  |
+| `diagnostic_plcsim_write` | Write diagnostic-case signals on an owned PLCSIM instance | limited | diagnostics |  |  |
+| `diagnostic_replan` | Revalidate a diagnostic case on another source or instance | limited | diagnostics |  |  |
+| `diagnostic_report_export` | Export readable diagnostic reports | shipped | diagnostics |  |  |
+| `diagnostic_runtime_acquisition_compare` | Compare before/after runtime acquisitions of a diagnostic experiment | limited | diagnostics |  |  |
+| `diagnostic_runtime_acquisition_export` | Export retained diagnostic runtime acquisition evidence | limited | diagnostics |  |  |
+| `diagnostic_ua_binding_plan` | Prebind explicit UA observations to a retained diagnostic experiment | limited | diagnostics |  |  |
+| `diagnostic_ua_compare` | Before and after retained UA capture comparison | limited | diagnostics |  |  |
+| `diagnostic_ua_observe` | Retained prebound UA observation report | limited | diagnostics |  |  |
+| `diagnostic_ua_report_export` | Readable retained UA observation and comparison exports | limited | diagnostics |  |  |
+| `diagnostic_watch_plan` | Plan watch rows from an exact saved diagnostic case | limited | diagnostics |  |  |
+| `trace_analyze` | Analyze recorded hypothesis predictions | limited | diagnostics |  |  |
+| `trace_capabilities` | Inspect offline trace route decisions | limited | diagnostics |  |  |
+| `trace_check_readback` | Compare supplied native readback evidence | limited | diagnostics |  |  |
+| `trace_compare` | Compare explicitly aligned captures | limited | diagnostics |  |  |
+| `trace_prepare` | Prepare a manual native trace specification | limited | diagnostics |  |  |
+| `trace_read` | Import a normalized diagnostic measurement | limited | diagnostics |  |  |
 
 ## drive-profiles
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `drive_profile_review` | Compare supplied drive parameters and typed telegrams | limited |  |  |
-| `drive_profile_review_page` | Reopen retained drive parameter and telegram evidence | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `drive_profile_review` | Compare supplied drive parameters and typed telegrams | limited | reviews |  |  |
+| `drive_profile_review_page` | Reopen retained drive parameter and telegram evidence | limited | reviews |  |  |
 
 ## drives
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | unqualified |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | unqualified | reviews |  |  |
 
 ## engineering
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `engineering_admission_reconcile` | Release an unresolved mutation admission on fresh native evidence | shipped |  |  |
-| `engineering_read` | Describe typed engineering targets and change metadata | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `engineering_admission_reconcile` | Release an unresolved mutation admission on fresh native evidence | shipped | core |  |  |
+| `engineering_read` | Describe typed engineering targets and change metadata | limited | core |  |  |
 
 ## engineering_jobs
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `engineering_operation_status` | Inspect shared durable engineering operation state | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `engineering_operation_status` | Inspect shared durable engineering operation state | limited | core |  |  |
 
 ## fixtures
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `fixture_sources` | Provide initial four-language reference fixtures | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `fixture_sources` | Provide initial four-language reference fixtures | shipped | core |  |  |
 
 ## hardware
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `automationml_artifact_read` | AutomationML artifact read | shipped |  |  |
-| `automationml_compare` | AutomationML compare | shipped |  |  |
-| `automationml_inspect` | AutomationML inspect | shipped |  |  |
-| `automationml_list` | AutomationML list | shipped |  |  |
-| `automationml_reopen` | AutomationML reopen | shipped |  |  |
-| `automationml_report_page` | AutomationML report page | shipped |  |  |
-| `cax_export` | Native CAx/AutomationML export | limited |  |  |
-| `composite_engineering_artifact_read` | Download exact retained combined engineering artifacts | limited |  |  |
-| `composite_engineering_capture` | Produce a composite phase from native captures of one saved project | limited |  |  |
-| `composite_engineering_list` | Discover complete and interrupted combined reviews | limited |  |  |
-| `composite_engineering_page` | Page combined engineering evidence and gaps | limited |  |  |
-| `composite_engineering_rebind_plan` | Plan technology-object rebinds after a declared hardware replacement | limited |  |  |
-| `composite_engineering_reopen` | Revalidate a retained combined engineering review | limited |  |  |
-| `composite_engineering_review` | Retain combined supplied engineering mappings | limited |  |  |
-| `device_identify` | Read actual device and module I&M0 identification | unqualified |  |  |
-| `device_inventory` | Capture and page device/module inventory | shipped |  |  |
-| `device_inventory_export` | Export device inventory to CSV and Excel | shipped |  |  |
-| `device_online_browse` | Browse online controller module identifiers | unqualified |  |  |
-| `hardware_catalog_search` | Search installed catalog identifiers | shipped |  |  |
-| `hardware_gsd_export` | Export an I-device GSD file | limited |  |  |
-| `hardware_inspect` | Read configured hardware attributes and addresses | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `automationml_artifact_read` | AutomationML artifact read | shipped | cax |  |  |
+| `automationml_compare` | AutomationML compare | shipped | cax |  |  |
+| `automationml_inspect` | AutomationML inspect | shipped | cax |  |  |
+| `automationml_list` | AutomationML list | shipped | cax |  |  |
+| `automationml_reopen` | AutomationML reopen | shipped | cax |  |  |
+| `automationml_report_page` | AutomationML report page | shipped | cax |  |  |
+| `cax_export` | Native CAx/AutomationML export | limited | cax |  |  |
+| `composite_engineering_artifact_read` | Download exact retained combined engineering artifacts | limited | reviews |  |  |
+| `composite_engineering_capture` | Produce a composite phase from native captures of one saved project | limited | reviews |  |  |
+| `composite_engineering_list` | Discover complete and interrupted combined reviews | limited | reviews |  |  |
+| `composite_engineering_page` | Page combined engineering evidence and gaps | limited | reviews |  |  |
+| `composite_engineering_rebind_plan` | Plan technology-object rebinds after a declared hardware replacement | limited | reviews |  |  |
+| `composite_engineering_reopen` | Revalidate a retained combined engineering review | limited | reviews |  |  |
+| `composite_engineering_review` | Retain combined supplied engineering mappings | limited | reviews |  |  |
+| `device_identify` | Read actual device and module I&M0 identification | unqualified | runtime |  |  |
+| `device_inventory` | Capture and page device/module inventory | shipped | runtime |  |  |
+| `device_inventory_export` | Export device inventory to CSV and Excel | shipped | runtime |  |  |
+| `device_online_browse` | Browse online controller module identifiers | unqualified | runtime |  |  |
+| `hardware_catalog_search` | Search installed catalog identifiers | shipped | core |  |  |
+| `hardware_gsd_export` | Export an I-device GSD file | limited | core |  |  |
+| `hardware_inspect` | Read configured hardware attributes and addresses | limited | core |  |  |
 
 ## hmi
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `hmi_capabilities` | Optional HMI installation and operation diagnostics | shipped |  |  |
-| `hmi_component_review` | Review component/interface-to-HMI proposals | shipped |  |  |
-| `hmi_component_review_page` | Read retained component/HMI review evidence | shipped |  |  |
-| `hmi_inspect` | Bounded Classic and Unified HMI inspection | limited |  |  |
-| `hmi_references` | Evidence-backed HMI and PLC relationships | limited |  |  |
-| `hmi_text_list_author` | Author plain Unified text-list candidates | unqualified |  |  |
-| `hmi_text_list_generate_set` | Generate coordinated Unified text-list output sets | unqualified |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `hmi_capabilities` | Optional HMI installation and operation diagnostics | shipped | hmi |  |  |
+| `hmi_component_review` | Review component/interface-to-HMI proposals | shipped | hmi |  |  |
+| `hmi_component_review_page` | Read retained component/HMI review evidence | shipped | hmi |  |  |
+| `hmi_inspect` | Bounded Classic and Unified HMI inspection | limited | hmi |  |  |
+| `hmi_references` | Evidence-backed HMI and PLC relationships | limited | hmi |  |  |
+| `hmi_text_list_author` | Author plain Unified text-list candidates | unqualified | hmi |  |  |
+| `hmi_text_list_generate_set` | Generate coordinated Unified text-list output sets | unqualified | hmi |  |  |
 
 ## inspection
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `block_interface` | Read declared block interface and offline values | limited |  |  |
-| `block_read` | Read original native block XML | shipped |  | `plc.document_formats` |
-| `object_resolve` | Resolve canonical identities across exposed software scopes | shipped |  |  |
-| `plc_alarm_inspect` | Read PLC alarm text lists, alarm texts, alarm classes and ProDiag supervisions | limited |  |  |
-| `plc_document_inventory` | List and export native PLC documents | limited |  |  |
-| `plc_loadable_generate` | Generate a loadable file for blocks or software units | limited |  |  |
-| `project_health_report` | Report captured inconsistency and coverage findings | limited |  |  |
-| `project_index` | Immutable metadata snapshots with bounded search, paging and explicit freshness verification | shipped |  | `project.index_paging` |
-| `project_inventory` | Enumerate PLCs, blocks and hardware with bounded scope | shipped |  |  |
-| `project_model` | Versioned read-only explorer model with explicit provider coverage | shipped |  |  |
-| `project_model_capture` | Bounded native hierarchy capture with empty groups | shipped |  |  |
-| `project_model_children` | Authenticated deterministic child paging | shipped |  |  |
-| `project_model_details` | Exact selection details with separate content freshness | shipped |  |  |
-| `project_model_export` | Portable JSON and self-contained HTML explorer exports | shipped |  |  |
-| `project_model_relationships` | Bounded relationships with evidence and unresolved endpoints | shipped |  |  |
-| `project_model_release` | Release snapshot and cursor state | shipped |  |  |
-| `project_model_search` | Bounded metadata search with exact ancestry | shipped |  |  |
-| `project_model_verify` | Explicit native metadata verification | shipped |  |  |
-| `project_snapshot_capture` | Persist bounded native hierarchy, source and direct relationships | limited |  |  |
-| `project_snapshot_compare` | Compare saved project reviews with explicit coverage | limited |  |  |
-| `project_snapshot_import` | Import a supplied saved project review | limited |  |  |
-| `project_snapshot_search` | Search saved native source and comments | limited |  |  |
-| `software_inspect` | Read exposed software scopes, types, tags and block identities | limited |  |  |
-| `tag_table_read` | Read native tag table and constants | shipped |  |  |
-| `type_read` | Read PLC type declarations and native XML | shipped |  | `plc.document_formats` |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `block_interface` | Read declared block interface and offline values | limited | core |  |  |
+| `block_read` | Read original native block XML | shipped | core |  | `plc.document_formats` |
+| `object_resolve` | Resolve canonical identities across exposed software scopes | shipped | core |  |  |
+| `plc_alarm_inspect` | Read PLC alarm text lists, alarm texts, alarm classes and ProDiag supervisions | limited | core |  |  |
+| `plc_document_inventory` | List and export native PLC documents | limited | core |  |  |
+| `plc_loadable_generate` | Generate a loadable file for blocks or software units | limited | core |  |  |
+| `project_health_report` | Report captured inconsistency and coverage findings | limited | core |  |  |
+| `project_index` | Immutable metadata snapshots with bounded search, paging and explicit freshness verification | shipped | core |  | `project.index_paging` |
+| `project_inventory` | Enumerate PLCs, blocks and hardware with bounded scope | shipped | core |  |  |
+| `project_model` | Versioned read-only explorer model with explicit provider coverage | shipped | explorer |  |  |
+| `project_model_capture` | Bounded native hierarchy capture with empty groups | shipped | explorer |  |  |
+| `project_model_children` | Authenticated deterministic child paging | shipped | explorer |  |  |
+| `project_model_details` | Exact selection details with separate content freshness | shipped | explorer |  |  |
+| `project_model_export` | Portable JSON and self-contained HTML explorer exports | shipped | explorer |  |  |
+| `project_model_relationships` | Bounded relationships with evidence and unresolved endpoints | shipped | explorer |  |  |
+| `project_model_release` | Release snapshot and cursor state | shipped | explorer |  |  |
+| `project_model_search` | Bounded metadata search with exact ancestry | shipped | explorer |  |  |
+| `project_model_verify` | Explicit native metadata verification | shipped | explorer |  |  |
+| `project_snapshot_capture` | Persist bounded native hierarchy, source and direct relationships | limited | explorer |  |  |
+| `project_snapshot_compare` | Compare saved project reviews with explicit coverage | limited | explorer |  |  |
+| `project_snapshot_import` | Import a supplied saved project review | limited | explorer |  |  |
+| `project_snapshot_search` | Search saved native source and comments | limited | explorer |  |  |
+| `software_inspect` | Read exposed software scopes, types, tags and block identities | limited | core |  |  |
+| `tag_table_read` | Read native tag table and constants | shipped | core |  |  |
+| `type_read` | Read PLC type declarations and native XML | shipped | core |  | `plc.document_formats` |
 
 ## language
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `graph_artifact_read` | GRAPH ARTIFACT READ | shipped |  |  |
-| `graph_compare` | GRAPH COMPARE | shipped |  |  |
-| `graph_edit` | Typed GRAPH sequence edits into a new retained document | limited |  |  |
-| `graph_export` | Export a GRAPH block into the GRAPH document store | limited |  |  |
-| `graph_inspect` | GRAPH INSPECT | shipped |  |  |
-| `graph_list` | GRAPH LIST | shipped |  |  |
-| `graph_reopen` | GRAPH REOPEN | shipped |  |  |
-| `graph_report_page` | GRAPH REPORT PAGE | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `graph_artifact_read` | GRAPH ARTIFACT READ | shipped | graph |  |  |
+| `graph_compare` | GRAPH COMPARE | shipped | graph |  |  |
+| `graph_edit` | Typed GRAPH sequence edits into a new retained document | limited | graph |  |  |
+| `graph_export` | Export a GRAPH block into the GRAPH document store | limited | graph |  |  |
+| `graph_inspect` | GRAPH INSPECT | shipped | graph |  |  |
+| `graph_list` | GRAPH LIST | shipped | graph |  |  |
+| `graph_reopen` | GRAPH REOPEN | shipped | graph |  |  |
+| `graph_report_page` | GRAPH REPORT PAGE | shipped | graph |  |  |
 
 ## libraries
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `artifact_upload_abort` | Artifact upload abort | shipped |  |  |
-| `artifact_upload_begin` | Artifact upload begin | shipped |  |  |
-| `artifact_upload_chunk` | Artifact upload chunk | shipped |  |  |
-| `artifact_upload_commit` | Artifact upload commit | shipped |  |  |
-| `artifact_upload_release` | Artifact upload release | shipped |  |  |
-| `artifact_upload_status` | Artifact upload status | shipped |  |  |
-| `library_capabilities` | Library capabilities | limited |  |  |
-| `library_close` | Library close | limited |  |  |
-| `library_compare` | Library compare | limited |  |  |
-| `library_export` | Export exact project library version as native documents | limited |  |  |
-| `library_list` | Library list | limited |  |  |
-| `library_open` | Library open | limited |  |  |
-| `library_package_inspect` | Library package inspect | shipped |  |  |
-| `library_package_release` | Library package release | shipped |  |  |
-| `library_package_stage` | Library package stage | shipped |  |  |
-| `library_package_status` | Library package status | shipped |  |  |
-| `library_query` | Library query | limited |  |  |
-| `library_update_check` | Library update check | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `artifact_upload_abort` | Artifact upload abort | shipped | base |  |  |
+| `artifact_upload_begin` | Artifact upload begin | shipped | base |  |  |
+| `artifact_upload_chunk` | Artifact upload chunk | shipped | base |  |  |
+| `artifact_upload_commit` | Artifact upload commit | shipped | base |  |  |
+| `artifact_upload_release` | Artifact upload release | shipped | base |  |  |
+| `artifact_upload_status` | Artifact upload status | shipped | base |  |  |
+| `library_capabilities` | Library capabilities | limited | library |  |  |
+| `library_close` | Library close | limited | library |  |  |
+| `library_compare` | Library compare | limited | library |  |  |
+| `library_export` | Export exact project library version as native documents | limited | library |  |  |
+| `library_list` | Library list | limited | library |  |  |
+| `library_open` | Library open | limited | library |  |  |
+| `library_package_inspect` | Library package inspect | shipped | library |  |  |
+| `library_package_release` | Library package release | shipped | library |  |  |
+| `library_package_stage` | Library package stage | shipped | library |  |  |
+| `library_package_status` | Library package status | shipped | library |  |  |
+| `library_query` | Library query | limited | library |  |  |
+| `library_update_check` | Library update check | limited | library |  |  |
 
 ## multiuser
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `multiuser_observation_page` | Reopen retained Project Server observation comparisons | limited |  |  |
-| `multiuser_observation_review` | Compare supplied Project Server observations | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `multiuser_observation_page` | Reopen retained Project Server observation comparisons | limited | reviews |  |  |
+| `multiuser_observation_review` | Compare supplied Project Server observations | limited | reviews |  |  |
 
 ## online-diagnostics
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `db_snapshot_capture` | Capture the stored snapshot of one exact DB into a snapshot review | unqualified |  |  |
-| `db_snapshot_review` | Inspect and compare supplied DB snapshot XML | limited |  |  |
-| `db_snapshot_review_page` | Reopen retained DB snapshot values and differences | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `db_snapshot_capture` | Capture the stored snapshot of one exact DB into a snapshot review | unqualified | simulation |  |  |
+| `db_snapshot_review` | Inspect and compare supplied DB snapshot XML | limited | simulation |  |  |
+| `db_snapshot_review_page` | Reopen retained DB snapshot values and differences | limited | simulation |  |  |
 
 ## opc_ua
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `opcua_artifact_read` | Opcua artifact read | shipped |  |  |
-| `opcua_compare` | Opcua compare | shipped |  |  |
-| `opcua_dependencies` | Opcua dependencies | shipped |  |  |
-| `opcua_dependency_compare` | Opcua dependency compare | shipped |  |  |
-| `opcua_engineering_export` | Export native OPC UA XML into the offline NodeSet store | limited |  |  |
-| `opcua_engineering_inspect` | Inspect native OPC UA server engineering | limited |  |  |
-| `opcua_inspect` | Opcua inspect | shipped |  |  |
-| `opcua_list` | Opcua list | shipped |  |  |
-| `opcua_reopen` | Opcua reopen | shipped |  |  |
-| `opcua_report_page` | Opcua report page | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `opcua_artifact_read` | Opcua artifact read | shipped | opcua |  |  |
+| `opcua_compare` | Opcua compare | shipped | opcua |  |  |
+| `opcua_dependencies` | Opcua dependencies | shipped | opcua |  |  |
+| `opcua_dependency_compare` | Opcua dependency compare | shipped | opcua |  |  |
+| `opcua_engineering_export` | Export native OPC UA XML into the offline NodeSet store | limited | opcua |  |  |
+| `opcua_engineering_inspect` | Inspect native OPC UA server engineering | limited | opcua |  |  |
+| `opcua_inspect` | Opcua inspect | shipped | opcua |  |  |
+| `opcua_list` | Opcua list | shipped | opcua |  |  |
+| `opcua_reopen` | Opcua reopen | shipped | opcua |  |  |
+| `opcua_report_page` | Opcua report page | shipped | opcua |  |  |
 
 ## project
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `project_copy` | Copy an open project's saved state to a new owned directory | limited |  |  |
-| `project_open` | Open an exact V21 project in an owned session | shipped |  | `project_open.read_only` |
-| `project_properties` | Read project metadata, history, languages and text categories | limited |  |  |
-| `project_retrieve` | Retrieve a hash-verified checkpoint to a new directory | shipped |  |  |
-| `tia_create_scratch` | Create a catalog-selected isolated reference project | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `project_copy` | Copy an open project's saved state to a new owned directory | limited | core |  |  |
+| `project_open` | Open an exact V21 project in an owned session | shipped | core |  | `project_open.read_only` |
+| `project_properties` | Read project metadata, history, languages and text categories | limited | core |  |  |
+| `project_retrieve` | Retrieve a hash-verified checkpoint to a new directory | shipped | core |  |  |
+| `tia_create_scratch` | Create a catalog-selected isolated reference project | shipped | core |  |  |
 
 ## public-certificates
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `certificate_inspect` | Read native CPU certificate stores and syslog servers as public data | limited |  |  |
-| `public_certificate_review` | Inspect public certificates and compare supplied associations | limited |  |  |
-| `public_certificate_review_page` | Inspect retained public certificate review | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `certificate_inspect` | Read native CPU certificate stores and syslog servers as public data | limited | reviews |  |  |
+| `public_certificate_review` | Inspect public certificates and compare supplied associations | limited | reviews |  |  |
+| `public_certificate_review_page` | Inspect retained public certificate review | limited | reviews |  |  |
 
 ## qualification
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `qualification_component_window` | Run an explicitly isolated component qualification lifetime | shipped | `--component-qualification` |  |
-| `qualification_testsuite_execute` | Qualification build only: one durable style dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope. | unqualified | `--testsuite-qualification` |  |
-| `qualification_testsuite_prepare` | Qualification build only: prepare the owned fixture, wait for independently reviewed current scope/license evidence, and retain an exact durable review. No executor invocation. | unqualified | `--testsuite-qualification` |  |
-| `qualification_testsuite_reconcile` | Qualification build only: independently reopen the original and each admitted recovery destination, compare complete fixture preservation and read the scope editor again. | unqualified | `--testsuite-qualification` |  |
-| `qualification_testsuite_recover` | Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation. | unqualified | `--testsuite-qualification` |  |
-| `qualification_testsuite_scope_probe` | Isolated scope investigation only: prepare one packaged style fixture in this worker's newly created scratch and show its scope editor, or read its public prerequisites. Does not run any executor or enable production profiles. Unavailable on normal Hosts. | shipped | `--testsuite-scope-probe` |  |
-| `qualification_translation_apply` | Qualification-session only: one durable import, readback, preservation, compile, save and fresh reopen. | shipped | `--translation-qualification` |  |
-| `qualification_translation_capture` | Qualification-session only: complete live bilingual text and peer capture. | shipped | `--translation-qualification` |  |
-| `qualification_translation_categories` | Qualification-session only: retained populated category controls and filtering matrix. | shipped | `--translation-qualification` |  |
-| `qualification_translation_fixture` | Qualification-session only: seed and reopen the exact newly owned bilingual scratch. | shipped | `--translation-qualification` |  |
-| `qualification_translation_prepare` | Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review. | shipped | `--translation-qualification` |  |
-| `qualification_translation_reconcile` | Qualification-session only: fresh original and restored observations, without import or restore replay. | shipped | `--translation-qualification` |  |
-| `qualification_translation_reconcile_before_checkpoint` | Qualification-session only: explicit fresh unchanged reconciliation after a pre-checkpoint worker fix, bound to original exact closed-process evidence. | shipped | `--translation-qualification` |  |
-| `qualification_translation_recover` | Qualification-session only: one original-checkpoint restoration to an absent reserved destination; optional retained reply-loss test. | shipped | `--translation-qualification` |  |
-| `qualification_translation_resume_closed_fixture` | Qualification-session only: reopen an already reconciled fixture after exact prior process closure; verify current content without replaying the completed import. | shipped | `--translation-qualification` |  |
-| `qualification_translation_status` | Qualification-session only: retained operation state; never resumes native work. | shipped | `--translation-qualification` |  |
-| `qualification_watch_authoring_source_negative` | Owned watch stale-source negative with checkpoint and restoration | shipped | `--component-qualification`, `--watch-qualification` |  |
-| `qualification_watch_authoring_source_reconcile` | Reconcile owned watch source-negative interruption from fresh unchanged evidence | shipped | `--component-qualification`, `--watch-qualification` |  |
-| `qualification_watch_compete` | Probe competing durable ownership without native dispatch | shipped | `--component-qualification`, `--watch-qualification` |  |
-| `qualification_watch_fixture_seed` | Seed a watch fixture in an owned qualification scratch | shipped | `--component-qualification`, `--watch-qualification` |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `qualification_component_window` | Run an explicitly isolated component qualification lifetime | shipped | qualification | `--component-qualification` |  |
+| `qualification_testsuite_execute` | Qualification build only: one durable style dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope. | unqualified | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_prepare` | Qualification build only: prepare the owned fixture, wait for independently reviewed current scope/license evidence, and retain an exact durable review. No executor invocation. | unqualified | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_reconcile` | Qualification build only: independently reopen the original and each admitted recovery destination, compare complete fixture preservation and read the scope editor again. | unqualified | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_recover` | Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation. | unqualified | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_scope_probe` | Isolated scope investigation only: prepare one packaged style fixture in this worker's newly created scratch and show its scope editor, or read its public prerequisites. Does not run any executor or enable production profiles. Unavailable on normal Hosts. | shipped | qualification | `--testsuite-scope-probe` |  |
+| `qualification_translation_apply` | Qualification-session only: one durable import, readback, preservation, compile, save and fresh reopen. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_capture` | Qualification-session only: complete live bilingual text and peer capture. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_categories` | Qualification-session only: retained populated category controls and filtering matrix. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_fixture` | Qualification-session only: seed and reopen the exact newly owned bilingual scratch. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_prepare` | Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_reconcile` | Qualification-session only: fresh original and restored observations, without import or restore replay. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_reconcile_before_checkpoint` | Qualification-session only: explicit fresh unchanged reconciliation after a pre-checkpoint worker fix, bound to original exact closed-process evidence. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_recover` | Qualification-session only: one original-checkpoint restoration to an absent reserved destination; optional retained reply-loss test. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_resume_closed_fixture` | Qualification-session only: reopen an already reconciled fixture after exact prior process closure; verify current content without replaying the completed import. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_translation_status` | Qualification-session only: retained operation state; never resumes native work. | shipped | qualification | `--translation-qualification` |  |
+| `qualification_watch_authoring_source_negative` | Owned watch stale-source negative with checkpoint and restoration | shipped | qualification | `--component-qualification`, `--watch-qualification` |  |
+| `qualification_watch_authoring_source_reconcile` | Reconcile owned watch source-negative interruption from fresh unchanged evidence | shipped | qualification | `--component-qualification`, `--watch-qualification` |  |
+| `qualification_watch_compete` | Probe competing durable ownership without native dispatch | shipped | qualification | `--component-qualification`, `--watch-qualification` |  |
+| `qualification_watch_fixture_seed` | Seed a watch fixture in an owned qualification scratch | shipped | qualification | `--component-qualification`, `--watch-qualification` |  |
 
 ## runtime
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `runtime_capture_analyze` | Analyze retained sequential polling observations | unqualified |  |  |
-| `runtime_capture_export` | Export retained capture as JSON and CSV | unqualified |  |  |
-| `runtime_capture_page` | Page exact retained polling records | unqualified |  |  |
-| `runtime_capture_start` | Start bounded Web or owned PLCSIM polling capture | unqualified |  |  |
-| `runtime_capture_status` | Reopen retained polling capture | unqualified |  |  |
-| `runtime_capture_stop` | Stop owned polling capture | unqualified |  |  |
-| `runtime_plcsim_bind` | Bind runtime endpoints to an owned PLCSIM instance | unqualified |  |  |
-| `runtime_ua_browse` | Browse bounded OPC UA references | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_capture_export` | Export exact retained OPC UA captures | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_capture_page` | Read a bounded OPC UA capture page | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_capture_start` | Start bounded OPC UA polling capture | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_capture_status` | Inspect retained OPC UA capture status | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_capture_stop` | Stop an owned OPC UA polling capture | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_client_identity` | Inspect the owned OPC UA client application identity | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_connect` | Connect an owned secure OPC UA session | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_credential_binding` | Build an OPC UA protected credential binding | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_disconnect` | Disconnect an owned OPC UA session | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_read` | Read selected OPC UA typed values | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_status` | Inspect retained OPC UA session state | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_export` | Export retained OPC UA subscription acquisition | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_page` | Read a bounded OPC UA subscription page | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_start` | Start bounded OPC UA subscription acquisition | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_status` | Inspect retained OPC UA subscription status | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_subscription_stop` | Stop an owned OPC UA subscription | unqualified |  | `runtime.physical_plc` |
-| `runtime_ua_write` | Write scalar values to an owned PLCSIM instance through OPC UA | unqualified |  |  |
-| `runtime_web_browse` | Browse bounded runtime symbols | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_connect` | Connect an owned pinned Web API session | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_credential_binding` | Build public runtime credential binding | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_diagnostics` | Read CPU diagnostics through an owned Web API session | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_disconnect` | Close owned session or acknowledge unresolved cleanup | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_operating_mode` | Request RUN or STOP on an owned PLCSIM instance through the Web API | unqualified |  |  |
-| `runtime_web_read` | Read one selected runtime symbol | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_status` | Inspect retained runtime session state | unqualified |  | `runtime.physical_plc` |
-| `runtime_web_write` | Write values to an owned PLCSIM instance through the Web API | unqualified |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `runtime_capture_analyze` | Analyze retained sequential polling observations | unqualified | runtime |  |  |
+| `runtime_capture_export` | Export retained capture as JSON and CSV | unqualified | runtime |  |  |
+| `runtime_capture_page` | Page exact retained polling records | unqualified | runtime |  |  |
+| `runtime_capture_start` | Start bounded Web or owned PLCSIM polling capture | unqualified | runtime |  |  |
+| `runtime_capture_status` | Reopen retained polling capture | unqualified | runtime |  |  |
+| `runtime_capture_stop` | Stop owned polling capture | unqualified | runtime |  |  |
+| `runtime_plcsim_bind` | Bind runtime endpoints to an owned PLCSIM instance | unqualified | runtime |  |  |
+| `runtime_ua_browse` | Browse bounded OPC UA references | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_export` | Export exact retained OPC UA captures | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_page` | Read a bounded OPC UA capture page | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_start` | Start bounded OPC UA polling capture | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_status` | Inspect retained OPC UA capture status | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_capture_stop` | Stop an owned OPC UA polling capture | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_client_identity` | Inspect the owned OPC UA client application identity | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_connect` | Connect an owned secure OPC UA session | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_credential_binding` | Build an OPC UA protected credential binding | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_disconnect` | Disconnect an owned OPC UA session | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_read` | Read selected OPC UA typed values | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_status` | Inspect retained OPC UA session state | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_export` | Export retained OPC UA subscription acquisition | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_page` | Read a bounded OPC UA subscription page | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_start` | Start bounded OPC UA subscription acquisition | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_status` | Inspect retained OPC UA subscription status | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_subscription_stop` | Stop an owned OPC UA subscription | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_ua_write` | Write scalar values to an owned PLCSIM instance through OPC UA | unqualified | runtime |  |  |
+| `runtime_web_browse` | Browse bounded runtime symbols | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_connect` | Connect an owned pinned Web API session | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_credential_binding` | Build public runtime credential binding | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_diagnostics` | Read CPU diagnostics through an owned Web API session | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_disconnect` | Close owned session or acknowledge unresolved cleanup | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_operating_mode` | Request RUN or STOP on an owned PLCSIM instance through the Web API | unqualified | runtime |  |  |
+| `runtime_web_read` | Read one selected runtime symbol | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_status` | Inspect retained runtime session state | unqualified | runtime |  | `runtime.physical_plc` |
+| `runtime_web_write` | Write values to an owned PLCSIM instance through the Web API | unqualified | runtime |  |  |
 
 ## safety
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `safety_evidence_report` | Reopen exact safety evidence signatures, issues and changes | limited |  |  |
-| `safety_evidence_review` | Compare supplied safety observations and retain supporting evidence | limited |  |  |
-| `safety_inspect` | Read native safety groups and signatures | limited |  |  |
-| `safety_printout` | Print the safety printout and activation-test reports to files | limited |  |  |
-| `safety_validation_inspect` | Read F-I/O F-parameters and Safety Validation Assistant activation tests | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `safety_evidence_report` | Reopen exact safety evidence signatures, issues and changes | limited | reviews |  |  |
+| `safety_evidence_review` | Compare supplied safety observations and retain supporting evidence | limited | reviews |  |  |
+| `safety_inspect` | Read native safety groups and signatures | limited | reviews |  |  |
+| `safety_printout` | Print the safety printout and activation-test reports to files | limited | reviews |  |  |
+| `safety_validation_inspect` | Read F-I/O F-parameters and Safety Validation Assistant activation tests | limited | reviews |  |  |
 
 ## security-access
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `access_inspect` | Read native UMAC, PLC protection and legacy web users without secrets | limited |  |  |
-| `access_review` | Compare supplied public grants and explicit monitoring policy | limited |  |  |
-| `access_review_page` | Inspect retained supplied public access review | limited |  |  |
-| `runtime_handoff_artifact_read` | Download exact handoff evidence and reports | limited |  |  |
-| `runtime_handoff_list` | Discover complete and interrupted handoff reviews | limited |  |  |
-| `runtime_handoff_observation` | Retain original public runtime handoff observations | limited |  |  |
-| `runtime_handoff_page` | Page security/runtime constraints and observations | limited |  |  |
-| `runtime_handoff_reopen` | Revalidate a retained security/runtime handoff | limited |  |  |
-| `runtime_handoff_review` | Publish a supplied security/runtime handoff review | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `access_inspect` | Read native UMAC, PLC protection and legacy web users without secrets | limited | reviews |  |  |
+| `access_review` | Compare supplied public grants and explicit monitoring policy | limited | reviews |  |  |
+| `access_review_page` | Inspect retained supplied public access review | limited | reviews |  |  |
+| `runtime_handoff_artifact_read` | Download exact handoff evidence and reports | limited | runtime |  |  |
+| `runtime_handoff_list` | Discover complete and interrupted handoff reviews | limited | runtime |  |  |
+| `runtime_handoff_observation` | Retain original public runtime handoff observations | limited | runtime |  |  |
+| `runtime_handoff_page` | Page security/runtime constraints and observations | limited | runtime |  |  |
+| `runtime_handoff_reopen` | Revalidate a retained security/runtime handoff | limited | runtime |  |  |
+| `runtime_handoff_review` | Publish a supplied security/runtime handoff review | limited | runtime |  |  |
 
 ## session
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `tia_attach` | Attach to an explicitly selected TIA instance | shipped |  |  |
-| `tia_capabilities` | Bridge installation and global feature summary | shipped |  |  |
-| `tia_detach` | Release owned connection without disposing process descriptors | shipped |  |  |
-| `tia_discover` | Discover accessible TIA instances | shipped |  |  |
-| `tia_session_status` | Read attachment and project identities | shipped |  |  |
-| `tia_start` | Start an owned headless TIA instance | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `tia_attach` | Attach to an explicitly selected TIA instance | shipped | core |  |  |
+| `tia_capabilities` | Bridge installation and global feature summary | shipped | core |  |  |
+| `tia_detach` | Release owned connection without disposing process descriptors | shipped | core |  |  |
+| `tia_discover` | Discover accessible TIA instances | shipped | core |  |  |
+| `tia_session_status` | Read attachment and project identities | shipped | core |  |  |
+| `tia_start` | Start an owned headless TIA instance | shipped | core |  |  |
 
 ## simulation
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `plc_online_compare` | Compare offline PLC software with its owned PLCSIM instance online | limited |  |  |
-| `plc_station_upload` | Upload an owned PLCSIM station into a new worker-owned project | unqualified |  |  |
-| `sim_create` | Create a new owned simulated CPU | shipped |  |  |
-| `sim_creation_status` | Inspect durable simulator creation and original worker exit | limited |  |  |
-| `sim_read` | Read typed simulated values | shipped |  |  |
-| `sim_release` | Release and optionally unregister an owned simulator | shipped |  |  |
-| `sim_select` | Select an exact existing simulator identity | shipped |  |  |
-| `sim_state` | Power and control a selected simulated CPU | shipped |  |  |
-| `sim_status` | Read local PLCSIM Advanced runtime state | shipped |  |  |
-| `sim_tags` | Read exposed simulated symbols | shipped |  |  |
-| `sim_test` | Capture and assert bounded simulated scenarios | shipped |  |  |
-| `sim_write` | Write typed simulated stimuli | shipped |  |  |
-| `simulation_discovery_baseline` | Record PLCSIM discovery before owned instance registration | limited |  |  |
-| `simulation_download` | Generate a verified owned virtual memory card | shipped |  |  |
-| `simulation_provision_reconcile` | Release a failed provisioning admission on fresh native evidence | shipped |  |  |
-| `simulation_provision_scratch_credential` | Provision the existing protected scratch credential to an owned virtual CPU | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `plc_online_compare` | Compare offline PLC software with its owned PLCSIM instance online | limited | simulation |  |  |
+| `plc_station_upload` | Upload an owned PLCSIM station into a new worker-owned project | unqualified | simulation |  |  |
+| `sim_create` | Create a new owned simulated CPU | shipped | simulation |  |  |
+| `sim_creation_status` | Inspect durable simulator creation and original worker exit | limited | simulation |  |  |
+| `sim_read` | Read typed simulated values | shipped | simulation |  |  |
+| `sim_release` | Release and optionally unregister an owned simulator | shipped | simulation |  |  |
+| `sim_select` | Select an exact existing simulator identity | shipped | simulation |  |  |
+| `sim_state` | Power and control a selected simulated CPU | shipped | simulation |  |  |
+| `sim_status` | Read local PLCSIM Advanced runtime state | shipped | simulation |  |  |
+| `sim_tags` | Read exposed simulated symbols | shipped | simulation |  |  |
+| `sim_test` | Capture and assert bounded simulated scenarios | shipped | simulation |  |  |
+| `sim_write` | Write typed simulated stimuli | shipped | simulation |  |  |
+| `simulation_discovery_baseline` | Record PLCSIM discovery before owned instance registration | limited | simulation |  |  |
+| `simulation_download` | Generate a verified owned virtual memory card | shipped | simulation |  |  |
+| `simulation_provision_reconcile` | Release a failed provisioning admission on fresh native evidence | shipped | simulation |  |  |
+| `simulation_provision_scratch_credential` | Provision the existing protected scratch credential to an owned virtual CPU | limited | simulation |  |  |
 
 ## software_units
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `software_unit_review` | Review supplied software-unit prerequisites and proposed edits | limited |  |  |
-| `software_unit_review_page` | Reopen retained software-unit before/after reports | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `software_unit_review` | Review supplied software-unit prerequisites and proposed edits | limited | reviews |  |  |
+| `software_unit_review_page` | Reopen retained software-unit before/after reports | limited | reviews |  |  |
 
 ## teamcenter
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `teamcenter_observation_page` | Reopen retained Teamcenter observations and manifests | limited |  |  |
-| `teamcenter_observation_review` | Compare supplied Teamcenter metadata and local manifests | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `teamcenter_observation_page` | Reopen retained Teamcenter observations and manifests | limited | reviews |  |  |
+| `teamcenter_observation_review` | Compare supplied Teamcenter metadata and local manifests | limited | reviews |  |  |
 
 ## technology
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `technology_read` | Read technology object identities and parameters | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `technology_read` | Read technology object identities and parameters | shipped | core |  |  |
 
 ## technology-profiles
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `technology_profile_report` | Reopen retained technology profile differences and context | limited |  |  |
-| `technology_profile_review` | Review supplied technology parameters and relationships | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `technology_profile_report` | Reopen retained technology profile differences and context | limited | reviews |  |  |
+| `technology_profile_review` | Review supplied technology parameters and relationships | limited | reviews |  |  |
 
 ## test_suite
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `testsuite_application_inventory` | List and export Test Suite application test cases and sets | limited |  |  |
-| `testsuite_application_plan_prepare` | Retain a bounded application-test run review on an owned PLCSIM instance | unqualified |  |  |
-| `testsuite_result_import` | Inspect supplied Test Suite results against a saved review | limited |  |  |
-| `testsuite_result_review` | Reopen and page retained supplied Test Suite findings | limited |  |  |
-| `testsuite_style_job_execute_next` | Execute one style run through native qualification gates | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_mark_interrupted` | Retain an interrupted style outcome as unknown | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_prepare` | Prepare an immutable durable style queue | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_reconcile` | Gate independent style resource reconciliation | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_recover` | Gate explicit style checkpoint recovery | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_results` | Retrieve and revalidate retained style results | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_status` | Reopen durable style progress | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_job_stop_request` | Persist stop between style runs | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_plan_prepare` | Retain a complete bounded style plan | unqualified | `--testsuite-qualification` |  |
-| `testsuite_style_plan_review` | Reopen and validate a complete style review | shipped |  |  |
-| `testsuite_system_inventory` | List and export Test Suite system test cases | limited |  |  |
-| `testsuite_system_plan_prepare` | Retain a bounded system-test run review against an owned PLCSIM endpoint | unqualified |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `testsuite_application_inventory` | List and export Test Suite application test cases and sets | limited | testsuite |  |  |
+| `testsuite_application_plan_prepare` | Retain a bounded application-test run review on an owned PLCSIM instance | unqualified | testsuite |  |  |
+| `testsuite_result_import` | Inspect supplied Test Suite results against a saved review | limited | testsuite |  |  |
+| `testsuite_result_review` | Reopen and page retained supplied Test Suite findings | limited | testsuite |  |  |
+| `testsuite_style_job_execute_next` | Execute one style run through native qualification gates | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_mark_interrupted` | Retain an interrupted style outcome as unknown | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_prepare` | Prepare an immutable durable style queue | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_reconcile` | Gate independent style resource reconciliation | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_recover` | Gate explicit style checkpoint recovery | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_results` | Retrieve and revalidate retained style results | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_status` | Reopen durable style progress | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_job_stop_request` | Persist stop between style runs | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_plan_prepare` | Retain a complete bounded style plan | unqualified | testsuite | `--testsuite-qualification` |  |
+| `testsuite_style_plan_review` | Reopen and validate a complete style review | shipped | testsuite |  |  |
+| `testsuite_system_inventory` | List and export Test Suite system test cases | limited | testsuite |  |  |
+| `testsuite_system_plan_prepare` | Retain a bounded system-test run review against an owned PLCSIM endpoint | unqualified | testsuite |  |  |
 
 ## translations
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `project_text_export` | Read-only native project-text export with filtered-export leak check | limited |  |  |
-| `translation_approve` | Translation approve | shipped |  |  |
-| `translation_artifact_read` | Translation artifact read | shipped |  |  |
-| `translation_candidate` | Translation candidate | shipped |  |  |
-| `translation_capture` | Translation capture | shipped |  |  |
-| `translation_inspect` | Translation inspect | shipped |  |  |
-| `translation_list` | Translation list | shipped |  |  |
-| `translation_native_apply` | Exact admitted native translation apply | limited |  |  |
-| `translation_native_capture` | Exact admitted native translation capture | limited |  |  |
-| `translation_native_prepare` | Exact admitted native translation prepare | limited |  |  |
-| `translation_native_reconcile` | Exact admitted native translation reconcile | limited |  |  |
-| `translation_native_recover` | Exact admitted native translation recover | limited |  |  |
-| `translation_native_status` | Exact admitted native translation status | limited |  |  |
-| `translation_prepare` | Translation prepare | shipped |  |  |
-| `translation_reconcile` | Translation reconcile | shipped |  |  |
-| `translation_reopen` | Translation reopen | shipped |  |  |
-| `translation_review_page` | Translation review page | shipped |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `project_text_export` | Read-only native project-text export with filtered-export leak check | limited | core |  |  |
+| `translation_approve` | Translation approve | shipped | translation |  |  |
+| `translation_artifact_read` | Translation artifact read | shipped | translation |  |  |
+| `translation_candidate` | Translation candidate | shipped | translation |  |  |
+| `translation_capture` | Translation capture | shipped | translation |  |  |
+| `translation_inspect` | Translation inspect | shipped | translation |  |  |
+| `translation_list` | Translation list | shipped | translation |  |  |
+| `translation_native_apply` | Exact admitted native translation apply | limited | translation |  |  |
+| `translation_native_capture` | Exact admitted native translation capture | limited | translation |  |  |
+| `translation_native_prepare` | Exact admitted native translation prepare | limited | translation |  |  |
+| `translation_native_reconcile` | Exact admitted native translation reconcile | limited | translation |  |  |
+| `translation_native_recover` | Exact admitted native translation recover | limited | translation |  |  |
+| `translation_native_status` | Exact admitted native translation status | limited | translation |  |  |
+| `translation_prepare` | Translation prepare | shipped | translation |  |  |
+| `translation_reconcile` | Translation reconcile | shipped | translation |  |  |
+| `translation_reopen` | Translation reopen | shipped | translation |  |  |
+| `translation_review_page` | Translation review page | shipped | translation |  |  |
 
 ## version_control
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `vci_artifact_read` | Vci artifact read | shipped | `--git-executable` |  |
-| `vci_branches` | Inspect local Git branches | shipped | `--git-executable` |  |
-| `vci_commit` | Vci commit | shipped | `--git-executable` |  |
-| `vci_file_read` | Vci file read | shipped | `--git-executable` |  |
-| `vci_history` | Vci history | shipped | `--git-executable` |  |
-| `vci_list` | Vci list | shipped | `--git-executable` |  |
-| `vci_materialize` | Vci materialize | shipped | `--git-executable` |  |
-| `vci_package_capture` | Vci package capture | shipped | `--git-executable` |  |
-| `vci_package_compare` | Vci package compare | shipped | `--git-executable` |  |
-| `vci_prepare` | Vci prepare | shipped | `--git-executable` |  |
-| `vci_reconcile` | Vci reconcile | shipped | `--git-executable` |  |
-| `vci_reopen` | Vci reopen | shipped | `--git-executable` |  |
-| `vci_workspace_inspect` | Inspect native VCI workspaces and mappings | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `vci_artifact_read` | Vci artifact read | shipped | vci | `--git-executable` |  |
+| `vci_branches` | Inspect local Git branches | shipped | vci | `--git-executable` |  |
+| `vci_commit` | Vci commit | shipped | vci | `--git-executable` |  |
+| `vci_file_read` | Vci file read | shipped | vci | `--git-executable` |  |
+| `vci_history` | Vci history | shipped | vci | `--git-executable` |  |
+| `vci_list` | Vci list | shipped | vci | `--git-executable` |  |
+| `vci_materialize` | Vci materialize | shipped | vci | `--git-executable` |  |
+| `vci_package_capture` | Vci package capture | shipped | vci | `--git-executable` |  |
+| `vci_package_compare` | Vci package compare | shipped | vci | `--git-executable` |  |
+| `vci_prepare` | Vci prepare | shipped | vci | `--git-executable` |  |
+| `vci_reconcile` | Vci reconcile | shipped | vci | `--git-executable` |  |
+| `vci_reopen` | Vci reopen | shipped | vci | `--git-executable` |  |
+| `vci_workspace_inspect` | Inspect native VCI workspaces and mappings | limited | vci |  |  |
 
 ## watch_tables
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `watch_table_apply` | Durably dispatch a reviewed watch edit once | limited |  | `watch_table_force_document_edit` |
-| `watch_table_generate` | Generate diagnostic watch intent from an exact native FB instance | limited |  |  |
-| `watch_table_group_prepare_create` | Prepare creating a user watch-table group | limited |  |  |
-| `watch_table_group_prepare_delete` | Prepare deleting an empty user watch-table group | limited |  |  |
-| `watch_table_group_prepare_rename` | Prepare renaming a user watch-table group | limited |  |  |
-| `watch_table_prepare` | Prepare one reviewed offline watch literal edit | limited |  | `watch_table_force_document_edit` |
-| `watch_table_prepare_authoring` | Review planner-backed native watch creation and maintenance | limited |  |  |
-| `watch_table_prepare_create` | Prepare creating an empty watch table in an exact group | limited |  |  |
-| `watch_table_prepare_delete` | Prepare deleting an exact watch table | limited |  |  |
-| `watch_table_prepare_rename` | Prepare renaming an exact watch table | limited |  |  |
-| `watch_table_read` | Read preserving native watch and peer snapshots | limited |  | `watch_table_force_document_edit` |
-| `watch_table_reconcile_interrupted` | Reconcile interrupted checkpoint or restore without replay | limited |  | `watch_table_force_document_edit` |
-| `watch_table_reconcile_recovery` | Reconcile original and freshly reopened recovered manifests | limited |  | `watch_table_force_document_edit` |
-| `watch_table_recover` | Restore a retained watch checkpoint into a new owned location | limited |  | `watch_table_force_document_edit` |
-| `watch_table_verify_reopen` | Verify watch persistence in a fresh native instance | limited |  | `watch_table_force_document_edit` |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `watch_table_apply` | Durably dispatch a reviewed watch edit once | limited | watch |  | `watch_table_force_document_edit` |
+| `watch_table_generate` | Generate diagnostic watch intent from an exact native FB instance | limited | watch |  |  |
+| `watch_table_group_prepare_create` | Prepare creating a user watch-table group | limited | watch |  |  |
+| `watch_table_group_prepare_delete` | Prepare deleting an empty user watch-table group | limited | watch |  |  |
+| `watch_table_group_prepare_rename` | Prepare renaming a user watch-table group | limited | watch |  |  |
+| `watch_table_prepare` | Prepare one reviewed offline watch literal edit | limited | watch |  | `watch_table_force_document_edit` |
+| `watch_table_prepare_authoring` | Review planner-backed native watch creation and maintenance | limited | watch |  |  |
+| `watch_table_prepare_create` | Prepare creating an empty watch table in an exact group | limited | watch |  |  |
+| `watch_table_prepare_delete` | Prepare deleting an exact watch table | limited | watch |  |  |
+| `watch_table_prepare_rename` | Prepare renaming an exact watch table | limited | watch |  |  |
+| `watch_table_read` | Read preserving native watch and peer snapshots | limited | watch |  | `watch_table_force_document_edit` |
+| `watch_table_reconcile_interrupted` | Reconcile interrupted checkpoint or restore without replay | limited | watch |  | `watch_table_force_document_edit` |
+| `watch_table_reconcile_recovery` | Reconcile original and freshly reopened recovered manifests | limited | watch |  | `watch_table_force_document_edit` |
+| `watch_table_recover` | Restore a retained watch checkpoint into a new owned location | limited | watch |  | `watch_table_force_document_edit` |
+| `watch_table_verify_reopen` | Verify watch persistence in a fresh native instance | limited | watch |  | `watch_table_force_document_edit` |
 
 ## web-applications
 
-| Tool | Feature | Support | Host option | Also in |
-| --- | --- | --- | --- | --- |
-| `web_application_review` | Review supplied web application configuration and ZIP files | limited |  |  |
-| `web_application_review_page` | Inspect retained web application review | limited |  |  |
-| `web_inspect` | Read native CPU web server and web application configuration | limited |  |  |
+| Tool | Feature | Support | Toolset | Host option | Also in |
+| --- | --- | --- | --- | --- | --- |
+| `web_application_review` | Review supplied web application configuration and ZIP files | limited | reviews |  |  |
+| `web_application_review_page` | Inspect retained web application review | limited | reviews |  |  |
+| `web_inspect` | Read native CPU web server and web application configuration | limited | reviews |  |  |

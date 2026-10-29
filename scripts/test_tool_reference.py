@@ -1,7 +1,7 @@
 """Keep the generated MCP tool reference in step with the feature catalog."""
 import unittest
 
-from tool_reference import PAGE, ROOT, build, named_flags, render
+from tool_reference import PAGE, ROOT, build, group_of, group_rules, named_flags, render
 
 
 def feature(feature_id, tools, domain="session", prerequisites=()):
@@ -22,12 +22,21 @@ class ToolReferenceTests(unittest.TestCase):
 
     def test_every_tool_needs_its_own_feature(self):
         with self.assertRaises(ValueError):
-            render({"features": [feature("change.x", ["change_apply"])]}, [])
+            render({"features": [feature("change.x", ["change_apply"])]}, [], [("change_", "core")])
 
     def test_shared_tools_list_their_other_features(self):
-        page = render({"features": [feature("a", ["a"]), feature("b", ["b", "a"], "hardware")]}, [])
-        self.assertIn("| `a` | a | shipped |  | `b` |", page)
+        page = render({"features": [feature("a", ["a"]), feature("b", ["b", "a"], "hardware")]}, [], [("", "core")])
+        self.assertIn("| `a` | a | shipped | core |  | `b` |", page)
         self.assertLess(page.index("## hardware"), page.index("## session"))
+
+    def test_groups_follow_the_host_prefix_table(self):
+        rules = group_rules()
+        self.assertEqual(group_of("plc_station_upload", rules), "simulation")
+        self.assertEqual(group_of("plc_compare", rules), "core")
+        self.assertEqual(group_of("feature_catalog", rules), "base")
+        self.assertEqual(group_of("qualification_component_window", rules), "qualification")
+        with self.assertRaises(ValueError):
+            group_of("unknown_tool", rules)
 
 
 if __name__ == "__main__":

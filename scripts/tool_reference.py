@@ -1,7 +1,8 @@
 """Generate or check docs/reference/tools.md, the list of every MCP tool in the feature catalog.
 
 Each tool is listed under the domain of its own catalog feature, with that feature's title,
-release-matrix support class and any Host launch option the feature's catalog entry names.
+release-matrix support class, its --toolsets group and any Host launch option the feature's
+catalog entry names.
 """
 import argparse
 import collections
@@ -12,10 +13,26 @@ from release_matrix import CATALOG, ROOT, support
 
 PAGE = "docs/reference/tools.md"
 HOST_OPTIONS = "src/TiaMcp.Host/HostOptions.cs"
+TOOL_GROUPS = "src/TiaMcp.Host/ToolGroups.cs"
 
 
 def host_flags():
     return sorted(set(re.findall(r'"(--[a-z][a-z-]+)"', (ROOT / HOST_OPTIONS).read_text(encoding="utf-8"))))
+
+
+def group_rules():
+    text = (ROOT / TOOL_GROUPS).read_text(encoding="utf-8")
+    names = {"Base": "base", "Qualification": "qualification"}
+    return [(prefix, names.get(group, group.strip('"')))
+            for prefix, group in re.findall(r'\("([a-z_]+)",\s*(Base|Qualification|"[a-z]+")\)', text)]
+
+
+def group_of(tool, rules):
+    # First matching prefix wins, as in ToolGroups.Of.
+    group = next((group for prefix, group in rules if tool.startswith(prefix)), None)
+    if group is None:
+        raise ValueError(f"Tool {tool} belongs to no --toolsets group in {TOOL_GROUPS}")
+    return group
 
 
 def named_flags(feature, flags):
@@ -23,7 +40,7 @@ def named_flags(feature, flags):
     return [flag for flag in flags if re.search(r"(?<![\w-])" + re.escape(flag) + r"(?![\w-])", text)]
 
 
-def render(catalog, flags):
+def render(catalog, flags, rules):
     users = collections.defaultdict(list)
     for feature in catalog["features"]:
         for tool in feature["mcpTools"] or []:
@@ -48,26 +65,29 @@ def render(catalog, flags):
         "`scripts/release_matrix.py`): `shipped` is implemented and verified, `limited` is partially",
         "implemented and verified, `unqualified` has no qualifying evidence yet, `unavailable_target` is",
         "blocked on TIA Portal V21 and `deferred` is not implemented.",
+        "**Toolset** is the tool's `--toolsets` group ([MCP surface](mcp-surface.md#tool-groups---toolsets));",
+        "`base` and `qualification` tools are never hidden by `--toolsets`.",
         "**Host option** lists the Host launch options the feature's catalog entry names; a qualification",
         "option registers or admits the tool only on a qualification Host.",
         "**Also in** lists the other catalog features that use the tool.",
         "",
     ]
     for domain in sorted(domains):
-        lines += [f"## {domain}", "", "| Tool | Feature | Support | Host option | Also in |", "| --- | --- | --- | --- | --- |"]
+        lines += [f"## {domain}", "", "| Tool | Feature | Support | Toolset | Host option | Also in |",
+                  "| --- | --- | --- | --- | --- | --- |"]
         for tool in domains[domain]:
             feature = own[tool]
             others = [f for f in users[tool] if f != tool]
             also = f"{len(others)} features" if len(others) > 5 else ", ".join(f"`{f}`" for f in others)
             option = ", ".join(f"`{flag}`" for flag in named_flags(feature, flags))
             title = feature["title"].replace("|", "\\|")
-            lines.append(f"| `{tool}` | {title} | {support(feature)} | {option} | {also} |")
+            lines.append(f"| `{tool}` | {title} | {support(feature)} | {group_of(tool, rules)} | {option} | {also} |")
         lines.append("")
     return "\n".join(lines)
 
 
 def build():
-    return render(json.loads((ROOT / CATALOG).read_text(encoding="utf-8")), host_flags())
+    return render(json.loads((ROOT / CATALOG).read_text(encoding="utf-8")), host_flags(), group_rules())
 
 
 def main():
