@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "4223861b93253350e5757434842221121627d11aeb26986643a051961823a8d1",
-      "bytes": 1356321
+      "sha256": "2f23dc11e368672ff28bd13f1c611ef90be0f5887815f8842a6d5a96aaefdd88",
+      "bytes": 1362373
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -94107,6 +94107,13 @@
           "artifacts": [
             "evidence/local.typed.wave9-created-storage.engineering.20261029.json"
           ]
+        },
+        {
+          "id": "local.typed.wave9-created-storage.runtime.20261029",
+          "profileSha256": "cee700ebf66224504c077dc086d4676164438721be1bcd8051d6d06ba4ef2f90",
+          "artifacts": [
+            "evidence/local.typed.wave9-created-storage.runtime.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94290,6 +94297,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.20261028.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94386,6 +94400,13 @@
           "profileSha256": "ca50c1f43818508669dba34e39fecc591966413679586c2b892c371e5b137cee",
           "artifacts": [
             "evidence/local.hardware_changes.20261028.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
           ]
         }
       ],
@@ -94570,6 +94591,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.20261028.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94681,6 +94709,13 @@
           "artifacts": [
             "evidence/local.remote-io.lifecycle.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94724,6 +94759,13 @@
           "profileSha256": "ca50c1f43818508669dba34e39fecc591966413679586c2b892c371e5b137cee",
           "artifacts": [
             "evidence/local.hardware_changes.20261028.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
           ]
         }
       ],
@@ -94769,6 +94811,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.20261028.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -94812,6 +94861,13 @@
           "profileSha256": "ca50c1f43818508669dba34e39fecc591966413679586c2b892c371e5b137cee",
           "artifacts": [
             "evidence/local.hardware_changes.20261028.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
           ]
         }
       ],
@@ -96641,6 +96697,13 @@
           "artifacts": [
             "evidence/local.milestones.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -96691,6 +96754,13 @@
           "profileSha256": "4e6b73b4a3841425f3f4a30d09b077996b17a51fc3dabe2366830b8720a1b19f",
           "artifacts": [
             "evidence/local.remote-io.lifecycle.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.families.20261029",
+          "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63",
+          "artifacts": [
+            "evidence/local.hardware_changes.families.20261029.json"
           ]
         }
       ],
@@ -118159,6 +118229,11 @@
       "sha256": "7b57d68b15c196a18bce32dd74638848eac0ffd81d3572d859eea1754025c1d5"
     },
     {
+      "path": "evidence/local.hardware_changes.families.20261029.json",
+      "state": "observed",
+      "sha256": "b30600658a303e425604a9771f01c34a9df2c2752855a95cd6af513fc1e7dc42"
+    },
+    {
       "path": "evidence/local.hmi.bridge.rerun.20261029.json",
       "state": "observed",
       "sha256": "4a682db29aa6102a3a16b03c490d69811d01eb6a1303f4da4aaee86bedec3d9c"
@@ -118754,6 +118829,11 @@
       "sha256": "aa087995694e8b9a0a045cba5fe5893b113b3ad964dc29609af979fb10bfbc92"
     },
     {
+      "path": "evidence/local.typed.wave9-created-storage.runtime.20261029.json",
+      "state": "observed",
+      "sha256": "aaaef3f3f8bf8eef6d2c951769a432aca62f4b04d8118a13d6499158eb30fe43"
+    },
+    {
       "path": "evidence/local.typed.wave9.engineering.rerun.20261029.json",
       "state": "observed",
       "sha256": "86417280fb127c7f842f0f0aa405e01ec816d31a4f0b195fa83a2f4080ab76b0"
@@ -118918,6 +118998,10 @@
     {
       "id": "local.hardware_changes.20261028",
       "profileSha256": "ca50c1f43818508669dba34e39fecc591966413679586c2b892c371e5b137cee"
+    },
+    {
+      "id": "local.hardware_changes.families.20261029",
+      "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63"
     },
     {
       "id": "local.hmi.bridge.rerun.20261029",
@@ -119394,6 +119478,10 @@
     {
       "id": "local.typed.wave9-created-storage.engineering.20261029",
       "profileSha256": "0d47c80c08b8e95b95d39b0d11b902a8f98f9d954f1c1b43ce598a75a4896448"
+    },
+    {
+      "id": "local.typed.wave9-created-storage.runtime.20261029",
+      "profileSha256": "cee700ebf66224504c077dc086d4676164438721be1bcd8051d6d06ba4ef2f90"
     },
     {
       "id": "local.typed.wave9.engineering.rerun.20261029",
