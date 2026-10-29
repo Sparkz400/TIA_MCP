@@ -36,7 +36,7 @@ def run(assembly, root, seconds, long=False, epochs=15):
              "tests/TiaMcp.PhysicalRuntime.Tests/RuntimeCaptureSoakChecks.cs", "tests/TiaMcp.PhysicalRuntime.Tests/RuntimePollingChecks.cs",
              "tests/TiaMcp.PhysicalRuntime.Tests/RuntimeCaptureLongSoakChecks.cs",
              "tests/TiaMcp.PhysicalRuntime.Tests/Program.cs", "tests/TiaMcp.PhysicalRuntime.Tests/TiaMcp.PhysicalRuntime.Tests.csproj",
-             "src/TiaMcp.Host/RuntimeCaptures.cs", "src/TiaMcp.Host/HostOptions.cs",
+             "src/TiaMcp.Host/RuntimeCaptures.cs", "src/TiaMcp.Host/HostOptions.cs", "src/TiaMcp.Host/ToolGroups.cs",
              "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs", "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs"]
     def inputs():
         return {"sources": [{"path": p, "sha256": hashlib.sha256((source_root / p).read_bytes()).hexdigest()} for p in paths],

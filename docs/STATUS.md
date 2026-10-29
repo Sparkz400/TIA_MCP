@@ -51,7 +51,8 @@ record is cited by a feature; records no feature cites any more are in the retir
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
-[29 October](history/status-log.md#29-october-2026): the remaining re-runnable lost records
+[29 October](history/status-log.md#29-october-2026): the [MCP surface](reference/mcp-surface.md)
+gained `--toolsets`, tool titles, workflow prompts, progress heartbeats and output schemas; the remaining re-runnable lost records
 re-run and 21 replaced records retired (catalog 0.4.70); native qualification of web user
 pages, OPC UA interfaces and role mappings, the Add-In companion, force-table edits and the
 logged-in online compare; Test Suite TS-Q01 ran natively and its defects are fixed; earlier, 53
