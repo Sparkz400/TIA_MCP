@@ -22,7 +22,7 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
                 "watch_read" => Element(await Snapshot(args, cancellationToken)),
                 "watch_generate" => Element(await Generate(args, cancellationToken)),
                 "watch_prepare_authoring" => Element(await PrepareAuthoring(args, cancellationToken)),
-                "watch_prepare" => Element(await Prepare(args, cancellationToken)),
+                "watch_prepare" => Element(await TypedEdit(Prepare(args, cancellationToken))),
                 "watch_prepare_lifecycle" => Element(await PrepareLifecycle(args, cancellationToken)),
                 "watch_apply" => Element(await Apply(args, cancellationToken)),
                 "watch_verify_reopen" => Element(await Verify(args, cancellationToken)),
@@ -432,5 +432,11 @@ public sealed partial class WatchTableDispatcher(IBridgeClient native, string ar
     private static NativeTargetObservation Observation(JsonObject snapshot) => snapshot["observation"]!.Deserialize<NativeTargetObservation>(BridgeProtocol.Json)!;
     private static JsonObject Node(JsonElement value) => JsonNode.Parse(value.GetRawText())!.AsObject();
     private static JsonElement Element(object value) => JsonSerializer.SerializeToElement(value, BridgeProtocol.Json);
+    // Editor refusals (absent field, ForceIntention, ordinal, opaque capture) reach clients typed like every other refusal.
+    private static async Task<object> TypedEdit(Task<object> prepare)
+    {
+        try { return await prepare; }
+        catch (InvalidDataException error) { throw new BridgeException("UnsupportedProfile", error.Message); }
+    }
     private static string Text(JsonObject args, string key) => args[key]?.GetValue<string>() ?? throw new BridgeException("InvalidRequest", key + " is required.");
 }

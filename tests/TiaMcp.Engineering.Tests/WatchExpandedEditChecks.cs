@@ -79,8 +79,8 @@ internal static class WatchExpandedEditChecks
         }
         foreach (var (code, bytes, edit, selected) in new (string, byte[], JsonObject, bool)[] {
             ("ForceSelectionRefused", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceValue", ["value"] = "TRUE" }, true),
-            ("InvalidDataException", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceIntention", ["value"] = "true" }, false),
-            ("InvalidDataException", force.ToBytes(), new() { ["modifyValue"] = "TRUE" }, false),
+            ("UnsupportedProfile", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceIntention", ["value"] = "true" }, false),
+            ("UnsupportedProfile", force.ToBytes(), new() { ["modifyValue"] = "TRUE" }, false),
             ("InvalidRequest", force.ToBytes(), new() { ["editKind"] = "field", ["field"] = "ForceValue", ["value"] = "TRUE", ["targetKind"] = "watchTableGroup" }, false),
             ("IdentityMismatch", genuine, new() { ["editKind"] = "field", ["field"] = "ModifyValue", ["value"] = "TRUE" }, false) })
         {
@@ -113,7 +113,7 @@ internal static class WatchExpandedEditChecks
             var dispatcher = new WatchTableDispatcher(native, root, allowUnqualifiedDocumentEdits: true);
             edit["tableName"] = "MilestoneWatch"; edit["idempotencyKey"] = "opaque-refusal";
             try { await dispatcher.CallAsync("watch_prepare", edit); throw new Exception("Opaque capture was accepted as a reviewed scalar."); }
-            catch (InvalidDataException) { passed++; }
+            catch (BridgeException error) when (error.Code == "UnsupportedProfile") { passed++; }
             if (native.ApplyCount != 0 || native.CheckpointCount != 0 || Directory.GetFiles(root, "reviewed.xml", SearchOption.AllDirectories).Length != 0)
                 throw new Exception("Opaque input must refuse before review publication or native side effects.");
         }
