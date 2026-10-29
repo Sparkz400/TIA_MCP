@@ -28,6 +28,7 @@ Native changes follow **prepare → preview → checkpoint → apply → verify*
 The diagram shows component boundaries, not support for every operation, target or environment. Offline tests, native compilation and runtime qualification are separate claims. Check:
 
 - [Current status](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/STATUS.md)
+- [Tool reference](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/tools.md)
 - [Engineering coverage](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/engineering-coverage.md)
 - `feature_catalog` and `target_capabilities` from the running server
 
