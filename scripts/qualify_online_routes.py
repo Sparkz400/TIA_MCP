@@ -274,7 +274,8 @@ def body(h):
 
         h.stage("set Count to 42 through PLCSIM", lambda: lab.count(42))
         create = lab.prepare("db_snapshot_create", {"blockPath": db})
-        require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": False}],
+        # V21 exports an empty snapshot for a DB without one, so the preview reports a backed-up previous snapshot (observed 29 October 2026).
+        require(create["preview"]["effects"] == [{"action": "createSnapshot", "blockPath": db, "previousSnapshotExported": True}],
                 "Unexpected db_snapshot_create effects: %s" % create["preview"]["effects"])
         readback = [r["artifact"] for r in lab.apply("db_snapshot_create", create)["readbacks"] if r["role"] == "db-snapshot-readback"]
         require(len(readback) == 1, "db_snapshot_create returned no snapshot readback")
