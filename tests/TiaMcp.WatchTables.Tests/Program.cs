@@ -19,7 +19,7 @@ var checks = new (string, Action)[] {
     ("One thousand captured rows retain deterministic bounded paging intent", Scale),
     ("Hash-bound case and native-gate separation", Claims),
     ("Group lifecycle manifest: exact expected subtree, wildcard creation and refusals", GroupManifest)
-}.Concat(DocumentChecks.Checks).Append(("Genuine owned XML captures: hashes, no-op, reviewed delta and recovery baseline", (Action)NativeDocumentChecks.Run)).ToArray();
+}.Concat(DocumentChecks.Checks).Concat(MonitorChecks.Checks).Append(("Genuine owned XML captures: hashes, no-op, reviewed delta and recovery baseline", (Action)NativeDocumentChecks.Run)).ToArray();
 int failed = 0;
 foreach (var (name, action) in checks) try { action(); Console.WriteLine("PASS " + name); } catch(Exception e) { failed++; Console.Error.WriteLine("FAIL " + name + "\n" + e); }
 if (args.Length > 1)

@@ -304,6 +304,7 @@ internal static class ToolTitles
         ["watch_table_group_prepare_create"] = "Prepare a watch table group",
         ["watch_table_group_prepare_delete"] = "Prepare a watch group deletion",
         ["watch_table_group_prepare_rename"] = "Prepare a watch group rename",
+        ["watch_table_monitor"] = "Monitor a watch table on PLCSIM",
         ["watch_table_prepare"] = "Prepare a watch row edit",
         ["watch_table_prepare_authoring"] = "Review watch table authoring",
         ["watch_table_prepare_create"] = "Prepare a watch table",
