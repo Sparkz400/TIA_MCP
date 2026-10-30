@@ -77,6 +77,7 @@ try
                 .WithTools<OpcUaRuntimeTools>()
                 .WithTools<OpcUaSubscriptionTools>()
                 .WithTools<RuntimeCaptureTools>()
+                .WithTools<WatchMonitorTools>()
                 .WithTools<AddInSelectionTools>()
                 .WithTools<MultiuserTools>()
                 .WithTools<TeamcenterTools>()

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.82",
+  "catalogVersion": "0.4.83",
   "targetTiaVersions": [
     21
   ],
@@ -3048,6 +3048,24 @@
         "The refusals cover what runs q/tl2 and q/tl3 showed V21 changes; list names use an allowlist (letters, digits, inner spaces, !&'()+,-;<=>@\\^_{|}, at most 128 characters), while text characters outside the control characters are refused only where observed. Records published before the refusals keep their meaning and still reopen, and their content is not re-qualified.",
         "V21 export renames entries, pools all texts in one library with renumbered IDs, omits default fields, writes CRLF and leaves texts such as Off, On and Null unquoted (YAML 1.1 reads them as bool/null). Candidate library names, entry and text IDs and DefaultLanguage are not retained, so a native export never equals a candidate byte for byte.",
         "One profile and language pair (MTP700 Unified Comfort, en-US/de-DE); no screen item consumes an imported list, and Unified PC, other devices and languages, runtime and visual behavior are not covered."
+      ]
+    },
+    {
+      "id": "local.watch.monitor.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "01bbf2b31e61242d9e27725d2b9ead90c04c7c03",
+        "passedScope": "scripts/qualify_watch_monitor.py on a frozen Debug build of 01bbf2b3 (artifacts/lm2, git archive), 23/23 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus. Fixture: an owned scratch CPU 1511-1 PN V4.1 with simulation support whose Main calls \"TiaMcp_EnableGate_DB\"(Enable := TRUE); the qualification-only watch fixture seed imports MilestoneWatch with two Bool rows, \"TiaMcp_EnableGate_DB\".Active and .Enable (Host flags --component-qualification --watch-qualification none). After simulation_download, the generated-state save and simulation_provision_scratch_credential, the instance runs. watch_table_monitor (3 samples, 200 ms apart) resolves both rows to the tag-list symbols an independent sim_tags lookup finds (TiaMcp_EnableGate_DB.Active/.Enable, unquoted, DataType Bool) and every sample equals an independent sim_read (TRUE, TRUE), in RUN and again in STOP. Paging (count 1) reports nextOffset 1 then null; the PLC's force table (Force table, 0 rows) is monitored with kind force; watch_table_read afterwards returns the unchanged table hash and rows. Refusals: InvalidRequest (count 0), SimulationOwnershipUnverified (foreign creationId), SimulationTargetMismatch (foreign instance name), WatchTableNotFound (unknown table), SimulationNotSelected (released instance). An earlier attempt (artifacts/q/lm/wm_80d37ed9, frozen 9bcf5dbe) stopped at power-on with SimulationConfigurationPasswordRequired because the runner skipped credential provisioning; no monitor call ran and it is not part of this record."
+      },
+      "artifacts": [
+        "evidence/local.watch.monitor.20261030.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus; one watch table with two Bool rows of one optimized instance DB, seeded through the qualification-only fixture seed. The force table has no rows, so no force-table value is read.",
+        "Both members read TRUE throughout because Main assigns Enable := TRUE every cycle; a value change during monitoring is not exercised. Reads within a sample are sequential PLCSIM API reads, not scan-consistent; the instance's program is not compared with the project.",
+        "Absolute-address rows, comment rows, unsupported types, ambiguous or missing symbols and non-Bool types are covered by offline checks only. Nothing is modified or forced: no public force route exists (docs/plans/live-monitoring-forcing-plan.md)."
       ]
     },
     {
@@ -13651,6 +13669,51 @@
       ]
     },
     {
+      "featureId": "watch_table_monitor",
+      "domain": "watch_tables",
+      "title": "Monitor watch or force table rows on an owned PLCSIM instance",
+      "mcpTools": [
+        "watch_table_monitor"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Composes the V21 watch/force table export (watch_table_read) with the PLCSIM Advanced V8 tag list and typed symbolic reads. V21 Openness has no online monitor or force API for watch tables."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Read only, PLCSIM Advanced instances this Host created or adopted only. Rows resolve by symbol against the instance's own tag list; comment rows, absolute-address-only rows, symbols missing or ambiguous in the tag list and types without a typed PLCSIM read (Struct, Char, WChar, ...) are reported, not read.",
+          "1..64 rows per page, 1..20 samples 100..5000 ms apart; the reads of one sample are sequential, not scan-consistent. MonitorTrigger is not honoured; TIA must be offline for the table read. No physical PLC, Web API or OPC UA route, and the instance's program is not compared with the project.",
+          "Forcing is not provided: V21 Openness, the PLCSIM Advanced V8 Runtime API, the S7-1500 Web API and OPC UA expose no force route (docs/plans/live-monitoring-forcing-plan.md). Stored ModifyValue, ForceValue and ForceIntention are never applied."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.monitor.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization; an owned PLCSIM instance with a loaded program is required."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for the table read",
+        "PLCSIM Advanced V8 API, an instance this Host created or adopted, and its loaded program"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "watch_table_prepare",
       "domain": "watch_tables",
       "title": "Prepare one reviewed offline watch literal edit",
@@ -13729,7 +13792,8 @@
           "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
           "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
           "Worker-owned saved offline scratch only. Production Hosts dispatch the natively qualified force edits; reorder and the Name field stay with the isolated qualification harness, like the other expanded document edits.",
-          "Native (29 October 2026, local.watch.force-edits.20261029): on rows an operator authored in the TIA editor, the ForceValue, Address and DisplayFormat field edits, comment, clone and delete pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore. Reorder is refused at readback, because TIA renumbers the rows' document IDs, and is recovered. The Name field is not exercised. watch_table_reconcile_interrupted is qualified on watch tables (local.watch.native.20261028), not on a force table."
+          "Native (29 October 2026, local.watch.force-edits.20261029): on rows an operator authored in the TIA editor, the ForceValue, Address and DisplayFormat field edits, comment, clone and delete pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore. Reorder is refused at readback, because TIA renumbers the rows' document IDs, and is recovered. The Name field is not exercised. watch_table_reconcile_interrupted is qualified on watch tables (local.watch.native.20261028), not on a force table.",
+          "Edits the force table document only; it never forces. V21 Openness, the PLCSIM Advanced V8 Runtime API, the S7-1500 Web API and OPC UA expose no force route (docs/plans/live-monitoring-forcing-plan.md); forcing stays a TIA Portal UI action."
         ]
       },
       "qualification": {

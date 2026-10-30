@@ -17,6 +17,11 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 - **Drives:** the device compile now lists devices without a compile service (a G120C PN) as not compiled instead of refusing the whole compile, so device-compiled changes run in a project with a drive (`local.drives.probe.20261030`). The drive kinds stay blocked: Startdrive cannot read `DriveObject.DriveObjectNumber` of a drive added through Openness, even after compile and save.
 - **Catalog 0.4.80:** evidence and limitations only; no matrix count change.
 
+**Live monitoring; forcing has no public route — 30 October 2026:** ([plan and search record](../plans/live-monitoring-forcing-plan.md))
+- **Monitoring:** new read-only `watch_table_monitor` resolves a watch or force table's rows against an owned PLCSIM instance's tag list and samples them (1–20 samples, 1–64 rows per page); unreadable rows are reported, never read. Natively 23/23 on build `01bbf2b3` in RUN and STOP against independent `sim_tags`/`sim_read` reads, with paging, the force table and five refusals (`local.watch.monitor.20261030`).
+- **Forcing:** V21 Openness, the PLCSIM Advanced V8 API, the S7-1500 Web API and OPC UA expose only assignments, no force; forcing stays a TIA Portal UI action and is recorded as a boundary.
+- **Catalog 0.4.81:** 462 features (419 verified); matrix 1,910 bound, 159 open.
+
 ## 29 October 2026
 
 **Typed created-storage runtime — 29 October 2026:** the 8 harnessed wave 9 created-storage cells (`createMulti` of TONR, R_TRIG and F_TRIG and `createGlobal` of TONR, LAD and FBD) passed all five gates, runtime behavior included, on owned PLCSIM (build `7db882c`; `local.typed.wave9-created-storage.runtime.20261029`). `change.graphical_typed_edit` stays unverified until the rest of the typed backlog closes; no matrix count change.

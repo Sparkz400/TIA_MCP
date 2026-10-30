@@ -38,10 +38,28 @@ Forcing is never selected or activated. `ForceIntention` cannot be set; asking f
 
 Force edits are expanded document profiles. The ForceValue, Address and DisplayFormat field edits, comment, clone and delete passed natively on operator-authored rows (`local.watch.force-edits.20261029`) and run on production Hosts (maintainer decision of 29 October 2026). Reorder (TIA renumbers force rows' document IDs on export) and the Name field are refused there with `UnsupportedProfile`; only the isolated qualification harness (`--component-qualification --watch-qualification`) dispatches them.
 
+## Live monitoring
+
+`watch_table_monitor` shows the current values of a table's rows on a PLCSIM Advanced instance this Host owns. Pass the table selector of `watch_table_read` (`tableName`, `group`, `forceTable`, optional `projectName`/`plcPath`) and the owned instance: `instanceId`, `instanceName` and the `creationId` it was created or adopted with.
+
+1. The ownership check runs first; a foreign instance, name or `creationId` is refused before anything is read.
+2. The table is read offline as `watch_table_read` does, so TIA Portal must not be online with the PLC (`OfflineRequired`).
+3. Rows `offset` to `offset + count` (`count` 1 to 64) resolve by symbol against the instance's own tag list. TIA writes `"DB".Member`, PLCSIM may write `DB.Member`; both sides are compared without quotes, and the tag list's spelling is what is read.
+4. The resolved symbols are read `samples` times (1 to 20), `intervalMs` apart (100 to 5000).
+
+Each row reports its stored fields and a `resolution`: `resolved` (with symbol, read type and PLC data type), `comment`, `unsupportedType` (Struct, Char, WChar and other types without a typed PLCSIM read), or `unresolved` with a reason (`absoluteAddressOnly`, `notInTargetTagList`, `ambiguousInTargetTagList`, `targetTagListTruncated`). Only resolved rows are read. `page.nextOffset` is null on the last page.
+
+The tool only reads. The values of one sample come from reads made one after another, not from one scan. `ModifyValue`, `ForceValue` and `ForceIntention` are stored configuration and are never applied. The instance's program is not compared with the project (`programMatchVerified: false`). Physical PLCs, the Web API and OPC UA are not used.
+
+It passed natively on an owned CPU 1511 instance on Softbus, with two Bool rows of an instance DB, in RUN and STOP (`local.watch.monitor.20261030`). There, PLCSIM's tag list spelled the symbols without quotes (`TiaMcp_EnableGate_DB.Active`).
+
+Forcing is not available: V21 Openness, the PLCSIM Advanced V8 API, the S7-1500 Web API and OPC UA have no force route, and a write is an assignment, not a force. The evidence is in the [live monitoring and forcing plan](../plans/live-monitoring-forcing-plan.md).
+
 ## Limits
 
 - The six profiles ran natively only in the isolated qualification harness (`local.watch.lifecycle.20261028`). That run renamed a table, so `PlcWatchTable.Name` is writable although the manual describes it as read-only.
 - References to a table outside the watch/force manifest are not inventoried, for example from other products. Access rules are checked only to refuse rename or delete.
 - There is no recursive group delete, no group or table move or copy, and no master-copy creation (`CreateFrom`). See the [watch and force table plan](../plans/expansion-plans/watch-and-force-table-engineering.md).
 - Force tables: the installed metadata does not state that a PLC has exactly one force table (the manual does), so edits target the exact named table and all other tables stay peers. Typed readback treats a field the export omits as empty, so rows with omitted fields (for example an `Undef` display format) are refused. Force rows get no document ID reindex. The planner-backed `watch_table_prepare_authoring` route stays watch-only.
-- Access rules live on the `WatchAndForceTableAccessManager` service of the PLC or display `DeviceItem`, not on the tables. They are not edited; they stay in the peer manifest, so an import that drops a rule fails verification. Live monitoring and forcing remain separate obligations.
+- Access rules live on the `WatchAndForceTableAccessManager` service of the PLC or display `DeviceItem`, not on the tables. They are not edited; they stay in the peer manifest, so an import that drops a rule fails verification.
+- Monitoring reads owned PLCSIM instances only and does not read absolute-address rows. Forcing has no public route (see [Live monitoring](#live-monitoring)).

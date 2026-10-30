@@ -2,8 +2,28 @@ using System.ComponentModel;
 using System.Text.Json;
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using TiaMcp.Core;
+using TiaMcp.Core.WatchTables;
 
 namespace TiaMcp.Host;
+
+[McpServerToolType]
+public sealed class WatchMonitorTools(IBridgeClient bridge, SimulatorClient simulator)
+{
+    [McpServerTool(Name = "watch_table_monitor", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Monitor the rows of an offline V21 watch table (or, with forceTable=true, a force table) on a PLCSIM Advanced instance this Host owns: instanceId, instanceName and the creationId it was created or adopted with. Reads the table as watch_table_read does, resolves rows [offset, offset+count) (count 1..64) by symbol against the instance's own tag list, then reads the resolved symbols samples times (1..20, intervalMs 100..5000 apart) over the PLCSIM API. Comment rows, absolute-address-only rows, symbols missing from or ambiguous in the tag list and types without a typed PLCSIM read (Struct, Char, WChar, ...) are reported per row and not read. Read only: the values of one sample come from sequential reads, not one scan; ModifyValue, ForceValue and ForceIntention are stored configuration and are never applied. Nothing is modified or forced (no public V21, PLCSIM, Web API or OPC UA route forces a value). The instance's program is not compared with the project. Never a physical PLC.")]
+    public async Task<CallToolResult> Monitor(string tableName, int instanceId, string instanceName, string creationId, CancellationToken cancellationToken,
+        string? projectName = null, string? plcPath = null, string group = "root", bool forceTable = false, int offset = 0, int count = 32, int samples = 1, int intervalMs = 500)
+    {
+        string json; bool error = false;
+        try { json = (await WatchTableMonitor.Run(bridge, simulator.Bridge, tableName, projectName, plcPath, group, forceTable, instanceId, instanceName, creationId,
+            offset, count, samples, intervalMs, cancellationToken)).ToJsonString(BridgeProtocol.Json); }
+        catch (BridgeException ex)
+        { json = JsonSerializer.Serialize(new { error = new { code = ex.Code, message = ex.Message, details = (ex as BridgeOperationException)?.Details } }, BridgeProtocol.Json); error = true; }
+        return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };
+    }
+}
+
 public sealed partial class TiaTools
 {
     [McpServerTool(Name = "watch_table_generate", ReadOnly = true, Destructive = false, OpenWorld = false)]

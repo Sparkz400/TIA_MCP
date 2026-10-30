@@ -587,8 +587,8 @@
       "qualification": "native_watch_lifecycle_authoring_force_edits_passed",
       "releaseAccepted": false,
       "currentResult": "29 October 2026 (catalog 0.4.70): 22 release-matrix rows (4 shipped, 18 limited); 137 cells bound and none open. watch_table_force_document_edit is verified natively on force rows an operator authored in the TIA editor (local.watch.force-edits.20261029): field, comment, clone and delete pass; reorder is refused at readback because TIA renumbers the rows' document IDs, and is recovered.",
-      "remainingWork": "No open matrix cells. Production Hosts dispatch the qualified force-table edits (maintainer decision, 29 October); reorder and the Name field stay with the qualification harness, and watch_table_reconcile_interrupted is qualified on watch tables only. Force-table create, rename and delete have no V21 API. Live monitoring and active forcing are 1.0 scope (maintainer decision, 29 October); their V21 routes are being investigated.",
-      "nextAction": "Qualify interruption reconciliation and the Name field on a force table, or accept them as limitations at acceptance. Investigate and build live monitoring and active forcing for owned PLCSIM targets.",
+      "remainingWork": "No open matrix cells. Production Hosts dispatch the qualified force-table edits (maintainer decision, 29 October); reorder and the Name field stay with the qualification harness, and watch_table_reconcile_interrupted is qualified on watch tables only. Force-table create, rename and delete have no V21 API. Live monitoring is watch_table_monitor (verified natively on owned PLCSIM, local.watch.monitor.20261030); active forcing has no public route on V21 Openness, PLCSIM Advanced V8, the Web API or OPC UA (docs/plans/live-monitoring-forcing-plan.md).",
+      "nextAction": "Qualify interruption reconciliation and the Name field on a force table, or accept them as limitations at acceptance.",
       "ownerRole": "Diagnostics and watch tables",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [

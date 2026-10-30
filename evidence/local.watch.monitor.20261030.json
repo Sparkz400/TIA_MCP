@@ -1,0 +1,93 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.watch.monitor.20261030",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T23:39:11+00:00",
+  "source": {
+    "commit": "01bbf2b31e61242d9e27725d2b9ead90c04c7c03",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_watch_monitor.py on a frozen Debug build of 01bbf2b3 (artifacts/lm2, git archive), 23/23 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus. Fixture: an owned scratch CPU 1511-1 PN V4.1 with simulation support whose Main calls \"TiaMcp_EnableGate_DB\"(Enable := TRUE); the qualification-only watch fixture seed imports MilestoneWatch with two Bool rows, \"TiaMcp_EnableGate_DB\".Active and .Enable (Host flags --component-qualification --watch-qualification none). After simulation_download, the generated-state save and simulation_provision_scratch_credential, the instance runs. watch_table_monitor (3 samples, 200 ms apart) resolves both rows to the tag-list symbols an independent sim_tags lookup finds (TiaMcp_EnableGate_DB.Active/.Enable, unquoted, DataType Bool) and every sample equals an independent sim_read (TRUE, TRUE), in RUN and again in STOP. Paging (count 1) reports nextOffset 1 then null; the PLC's force table (Force table, 0 rows) is monitored with kind force; watch_table_read afterwards returns the unchanged table hash and rows. Refusals: InvalidRequest (count 0), SimulationOwnershipUnverified (foreign creationId), SimulationTargetMismatch (foreign instance name), WatchTableNotFound (unknown table), SimulationNotSelected (released instance). An earlier attempt (artifacts/q/lm/wm_80d37ed9, frozen 9bcf5dbe) stopped at power-on with SimulationConfigurationPasswordRequired because the runner skipped credential provisioning; no monitor call ran and it is not part of this record.",
+  "limitations": [
+    "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus; one watch table with two Bool rows of one optimized instance DB, seeded through the qualification-only fixture seed. The force table has no rows, so no force-table value is read.",
+    "Both members read TRUE throughout because Main assigns Enable := TRUE every cycle; a value change during monitoring is not exercised. Reads within a sample are sequential PLCSIM API reads, not scan-consistent; the instance's program is not compared with the project.",
+    "Absolute-address rows, comment rows, unsupported types, ambiguous or missing symbols and non-Bool types are covered by offline checks only. Nothing is modified or forced: no public force route exists (docs/plans/live-monitoring-forcing-plan.md)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "def4dbc8311c599de4c822d08867f27caf33741fcf5cc74919869f846f64df28"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "379f4eada68cbfd906b63504e4c47baa8f34d6bdd3667682c417484990097566"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "5a7d085a07d9e8f474aaac5bbfae3d1a1a983540af92c2e7fde374e509ac1e94"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "fdd1cee79e58bbbd1e4ec213161e405ab59acf82846ae0a40e475b999c5d1c2a",
+      "bytes": 272355,
+      "completed": true,
+      "steps": [
+        "start owned TIA watch monitor",
+        "create owned scratch watch monitor",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "qualification_watch_fixture_seed",
+        "sim_create",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "watch_table_monitor in RUN",
+        "watch_table_monitor pages",
+        "watch_table_monitor the force table",
+        "refuse watch_table_monitor: count 0",
+        "refuse watch_table_monitor: a foreign creationId",
+        "refuse watch_table_monitor: a foreign instance name",
+        "refuse watch_table_monitor: an unknown table",
+        "the offline table is unchanged",
+        "stop",
+        "watch_table_monitor in STOP",
+        "power off",
+        "sim_release",
+        "refuse watch_table_monitor: a released instance"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_watch_fixture_seed",
+        "sim_create",
+        "sim_read",
+        "sim_release",
+        "sim_state",
+        "sim_tags",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "watch_table_monitor",
+        "watch_table_read"
+      ],
+      "toolsRejected": [
+        "watch_table_monitor"
+      ]
+    }
+  ]
+}
