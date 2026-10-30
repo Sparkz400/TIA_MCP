@@ -122,11 +122,24 @@ namespace TiaMcp.TestSuite.V21
             var executor = group.GetService<TestCaseExecutor>() ?? throw new InvalidOperationException("TargetPrerequisiteMissing: application executor is absent.");
             invoked = true; // Before SetScope: a partially written scope is never replayed either.
             var scopes = new JArray();
-            foreach (var test in casesById.Values)
+            bool scopeVerified = independentlyObservedScope && route == "testCase" && mode == ExecutionMode.ExternallyManagedPLCSIMInstance;
+            foreach (var pair in casesById)
             {
+                var test = pair.Value;
                 test.SetScope(software, instanceName, mode);
                 var row = new JObject { ["name"] = test.Name }; scopes.Add(row);
-                try { row["scope"] = test.GetScope(); } catch (Exception e) { row["scopeFailure"] = e.GetType().Name + ": " + e.Message; }
+                try
+                {
+                    row["scope"] = test.GetScope();
+                    // The re-export must still equal the reviewed original, which the qualification worker read back as this owned target.
+                    var export = ApplicationTestDefinitions.Export(test, Path.Combine(verificationDirectory, "scoped-" + scopes.Count + ".tat"));
+                    row["exportSha256"] = export["sha256"];
+                    string original = definitions.First(d => d.Value<string>("id") == pair.Key).Value<string>("originalSha256");
+                    row["matchesReviewedTarget"] = export.Value<string>("sha256") == original &&
+                        ApplicationQualificationFixture.ScopeMatches(row.Value<string>("scope"), File.ReadAllText(export.Value<string>("path")), software.Name, instanceName);
+                }
+                catch (Exception e) { row["scopeFailure"] = e.GetType().Name + ": " + e.Message; }
+                scopeVerified &= row.Value<bool?>("matchesReviewedTarget") == true;
             }
             TestResults native;
             switch (route)
@@ -140,7 +153,7 @@ namespace TiaMcp.TestSuite.V21
             }
             return RetainAggregate(native, new JObject { ["route"] = route, ["executionMode"] = executionMode, ["instanceName"] = instanceName,
                 ["dispatchDefinitionIds"] = new JArray(dispatchIds), ["scopeReadback"] = scopes, ["setContentVerified"] = false },
-                definitions, dispatchIds[0], executionReturnPath, rawResultPath);
+                definitions, dispatchIds[0], executionReturnPath, rawResultPath, scopeVerified);
         }
 
         /// <summary>
@@ -187,11 +200,11 @@ namespace TiaMcp.TestSuite.V21
                 default: throw new InvalidOperationException("Unknown system Run route.");
             }
             return RetainAggregate(native, new JObject { ["route"] = route, ["serverAddress"] = serverAddress, ["serverInterface"] = "StandardSIMATIC",
-                ["dispatchDefinitionIds"] = new JArray(dispatchIds), ["scopeReadback"] = scopes }, definitions, dispatchIds[0], executionReturnPath, rawResultPath);
+                ["dispatchDefinitionIds"] = new JArray(dispatchIds), ["scopeReadback"] = scopes }, definitions, dispatchIds[0], executionReturnPath, rawResultPath, false);
         }
 
         // Flushes the execution return before converting the one aggregate tree, labelled with the first dispatched unit.
-        private static byte[] RetainAggregate(TestResults native, JObject returned, JArray definitions, string firstId, string executionReturnPath, string rawResultPath)
+        private static byte[] RetainAggregate(TestResults native, JObject returned, JArray definitions, string firstId, string executionReturnPath, string rawResultPath, bool scopeVerified)
         {
             var receipt = new JObject { ["callReturned"] = true, ["atUtc"] = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture) };
             receipt.Merge(returned); receipt["rawResultPath"] = rawResultPath; receipt["automaticReplay"] = false;
@@ -201,8 +214,8 @@ namespace TiaMcp.TestSuite.V21
                 ["definitionId"] = firstId, ["definitionReference"] = definitions.First(d => d.Value<string>("id") == firstId)["reference"].DeepClone(),
                 ["state"] = native.State.ToString(), ["errorCount"] = native.ErrorCount, ["warningCount"] = native.WarningCount,
                 ["dispatched"] = true,
-                // Scope readback names only the target; executed objects are not independently observed.
-                ["scopeVerified"] = false, ["failureKind"] = null
+                // Only a qualified single-case run whose post-SetScope readback equals the reviewed owned target is scope-verified.
+                ["scopeVerified"] = scopeVerified, ["failureKind"] = null
             };
             return StyleRawCapture.Retain(rawResultPath, result, messages => Messages(native.Messages, messages, 1, ref count, ref textBytes));
         }

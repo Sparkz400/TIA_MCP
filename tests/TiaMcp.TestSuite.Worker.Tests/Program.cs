@@ -104,6 +104,7 @@ internal static class Program
         try { StyleRawCapture.Retain(oversized, new JObject(), _ => enumeratedAgain = true); } catch (IOException) { }
         Check(!enumeratedAgain && new FileInfo(oversized).Length == 128, "A failed raw capture is never enumerated again or overwritten");
         UiEvidenceChecks.Run(Check, Reject);
+        ApplicationFixtureChecks.Run(Check);
 
         // Actual production worker dispatch, with no TiaPortal constructed. No fake constructor gets registered.
         // The same override the builds take from MSBuild's TiaApiDirectory property.
