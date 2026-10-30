@@ -2892,8 +2892,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
-      "sha256": "51b3433764a3e0ebbd877ba5a6504dbc34b3b41e4b9bc5e9eb9167e0c03d9709",
-      "bytes": 36976
+      "sha256": "77eb37b0488a78f94a24b6af9f6bacf614e726d9874bfdf3b7bc980dfd49676d",
+      "bytes": 37402
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
@@ -3102,8 +3102,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalMultiInstanceTemplate.cs",
-      "sha256": "d166faab6a6c4ab7a71fe44f9981fc3722df30a0d156879c9999a01747426eb9",
-      "bytes": 14607
+      "sha256": "dd0a560f86af309b95a1c92beeb20e72d2d0c989cde892f086fda4f774aa1868",
+      "bytes": 15134
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalPayload.cs",
@@ -84511,8 +84511,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 337,
-              "endLine": 355,
+              "line": 343,
+              "endLine": 361,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             }
           ]
@@ -86361,8 +86361,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
               "name": "ApplyTypedGraphical",
-              "line": 337,
-              "endLine": 355,
+              "line": 343,
+              "endLine": 361,
               "sha256": "99c48a0cd96e6b6a9d984e3ac77fa943b9fffeba2c7335620bbce1ea3ff2f0a0"
             },
             {
@@ -119731,7 +119731,7 @@
     {
       "path": "docs/plans/typed-lad-fbd-todo.md",
       "state": "observed",
-      "sha256": "b47598aeedbfcd48a7cf5d30c42cd0d3fc3f139eba2588e9f93cac738812ae42"
+      "sha256": "4f6ad2611ce5e641e7abaf959c77b2835cdd996ef613e99d5a95d1acac6488ee"
     },
     {
       "path": "docs/verification/typed-lad-fbd-qualification.md",
