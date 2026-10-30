@@ -2487,8 +2487,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
-      "sha256": "0687b0f293d2771302f89a105433a7942038aebe57c8acc5811ced084cf68379",
-      "bytes": 8484
+      "sha256": "7576a3ba608a6f91f188ac763464d9ec3a8cc97b48607c68378657b48d4b96cb",
+      "bytes": 8961
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CredentialRoute.cs",
@@ -85054,8 +85054,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "PrepareCpuParameters",
               "line": 22,
-              "endLine": 68,
-              "sha256": "b17d6e281beee0e1ae2e5e5573237bce6fe3ed8a6c80a8048f98e434547060df"
+              "endLine": 72,
+              "sha256": "de23b2101d6aab7561ab70310ce5f5a4fdc506dcce37f521e68a61d6496c438e"
             }
           ]
         },
@@ -85073,9 +85073,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "ApplyCpuParameters",
-              "line": 70,
-              "endLine": 91,
-              "sha256": "2f3da32537f20a3a05919601a6a84693737d03ceaed236aa3e825704d0a61059"
+              "line": 74,
+              "endLine": 96,
+              "sha256": "77e19f3edc742ddb7b3d57966102754e9c415a9da01c291f134774aec5ab5ea0"
             }
           ]
         }
@@ -85843,8 +85843,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "PrepareCpuParameters",
               "line": 22,
-              "endLine": 68,
-              "sha256": "b17d6e281beee0e1ae2e5e5573237bce6fe3ed8a6c80a8048f98e434547060df"
+              "endLine": 72,
+              "sha256": "de23b2101d6aab7561ab70310ce5f5a4fdc506dcce37f521e68a61d6496c438e"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
@@ -86205,9 +86205,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.CpuParameters.cs",
               "name": "ApplyCpuParameters",
-              "line": 70,
-              "endLine": 91,
-              "sha256": "2f3da32537f20a3a05919601a6a84693737d03ceaed236aa3e825704d0a61059"
+              "line": 74,
+              "endLine": 96,
+              "sha256": "77e19f3edc742ddb7b3d57966102754e9c415a9da01c291f134774aec5ab5ea0"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.DbSnapshots.cs",
