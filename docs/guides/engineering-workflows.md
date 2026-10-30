@@ -438,7 +438,10 @@ complete/readable flags; older observations cannot silently qualify a fresh run.
 Refused pairs answer `UnsupportedTarget`; a missing or second target, a half address pair or a channel selector without
 `hardwarePath` answers `InvalidRequest`. Apply verifies `IsConnected` and the target the slot reports: the module, channel
 or tag, `InputModule`/`OutputModule`, `PathToDBMember` (quotes ignored), `InputAddress`/`OutputAddress`, `ChannelIndex` and
-a requested `ConnectOption`; any other readback needs checkpoint recovery. Siemens decides whether a target suits the
+a requested `ConnectOption`; any other readback needs checkpoint recovery. A real axis or external encoder compiles only
+once connected, so create it with `compile=false`. V21 cannot export an inconsistent (uncompiled) object, so for such an object
+`to_connect`, `to_disconnect`, `to_parameters` and `to_delete` skip the XML backup with a preview warning, and the project
+checkpoint archive is the recovery. Siemens decides whether a target suits the
 object (telegram, module mode, DB member type); its refusals are recorded per fixture in the
 [motion-connection record](../verification/motion-connections-20261030.md).
 

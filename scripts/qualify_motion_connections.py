@@ -1,11 +1,12 @@
 """Qualify the to_connect motion roles and module/telegram targets natively in one owned scratch CPU 1511-1 PN.
 
-The fixture plugs a TM PosInput 2 (channel 0 in MotionControl mode) and adds a SINAMICS G120C PN, which is put on one
-subnet and IO system with the CPU. Each connection is prepared and applied (checkpoint, PLC compile, save) and read back
-through technology_read: a TO_SpeedAxis actor on the drive's telegram item, connected again through the two-module and the
-address overloads and to a DB member; a TO_ExternalEncoder encoder on the TM PosInput item and on its channel; a
-measuring input under a virtual TO_PositioningAxis by channel index and on the channel; the axis's torque interface on
-the telegram. What V21 refuses, at preparation or apply, is recorded under boundaries with its exact error; a failed apply
+The fixture plugs a TM PosInput 2 (channel 0 in MotionControl mode) and an AQ 2xU/I ST, and adds a SINAMICS G120C PN,
+which is put on one subnet and IO system with the CPU. Each connection is prepared and applied (checkpoint, PLC compile,
+save) and read back through technology_read: a TO_SpeedAxis actor on the drive's telegram item when the drive exposes one,
+otherwise on an analog output channel; a TO_ExternalEncoder encoder on the TM PosInput item, connected again through the
+two-module and the address overloads, to a DB member and on its channel; a measuring input under a virtual
+TO_PositioningAxis by channel index and on the channel; the axis's torque interface on the telegram. A real axis or encoder
+is created without compile, since it compiles only once connected. What V21 refuses, at preparation or apply, is recorded under boundaries with its exact error; a failed apply
 is restored from its checkpoint. Role/target pairs without a V21 Connect overload refuse typed and change nothing. The last
 connection is restored from its checkpoint, and a fresh Portal reopen must show every connection read back before it.
 """
@@ -23,12 +24,12 @@ TM = "OrderNumber:6ES7 551-1AB01-0AB0/V2.0"  # TM PosInput 2 V2.0, the module of
 CHANNEL = {"channelType": "Technology", "channelIoType": "Complex", "channelNumber": 0}
 SPEED, AXIS, EXTERNAL, PROBE = ("TO_SpeedAxis", "10.0"), ("TO_PositioningAxis", "10.0"), ("TO_ExternalEncoder", "10.0"), ("TO_MeasuringInput", "10.0")
 SUBNET, IO_SYSTEM, DRIVE_ADDRESS = "MotionNet", "MotionIo", "192.168.0.20"
-TELEGRAM_DB = '''DATA_BLOCK "MoTelDb"
+TELEGRAM_DB = '''DATA_BLOCK "%s"
 { S7_Optimized_Access := 'FALSE' }
 VERSION : 0.1
 NON_RETAIN
    VAR
-      Tel : "PD_TEL1";
+      Tel : "%s";
    END_VAR
 
 BEGIN
@@ -36,8 +37,9 @@ BEGIN
 END_DATA_BLOCK
 
 '''
+AQ = "6ES7 532-5NB00-0AB0"  # AQ 2xU/I ST for an analog drive connection
 LIMITATIONS = [
-    "One owned scratch CPU 1511-1 PN V4.1 with one TM PosInput 2 V2.0 and one SINAMICS G120C PN (not commissioned in Startdrive); TO_SpeedAxis, "
+    "One owned scratch CPU 1511-1 PN V4.1 with one TM PosInput 2 V2.0, one AQ 2xU/I ST and one SINAMICS G120C PN (not commissioned in Startdrive); TO_SpeedAxis, "
     "TO_PositioningAxis (virtual), TO_ExternalEncoder and TO_MeasuringInput 10.0. Other CPUs, TO versions, drives, telegrams and modules are not exercised.",
     "Outcomes are what V21 does on this fixture: a role/target pair recorded under boundaries is refused by Siemens here, not proven impossible elsewhere.",
     "The drive itself is never compiled (no compiler service); PLC compiles validate the connections, not motion behavior.",
@@ -158,24 +160,53 @@ def fixture(run):
         h.report["boundaries"]["drive telegram target"] = {"ioAssignment": assigned["outcome"], "telegramItems": telegrams}
     else:
         run.addresses = {row["ioType"]: row["startAddress"] for row in drive_rows[run.telegram]["addresses"]}
+    tm = run.items(module)
+    run.tm_addresses = {row["ioType"]: row["startAddress"] for path in sorted(tm) + [run.encoder] for row in tm[path]["addresses"]}  # the channel owner wins
+    analog(run, station)
+
+
+def analog(run, station):
+    """An AQ 2xU/I ST and its first analog output channel, the actor target of an analog drive connection."""
+    run.analog = None
+    entries = [e for e in run.h.tool("hardware_catalog_search", {"filter": "AQ 2xU/I ST", "maxItems": 200})["entries"] if AQ in e["typeIdentifier"]]
+    if not entries:
+        run.h.report["boundaries"]["analog output module"] = "No %s in the installed catalog" % AQ
+        return
+    module = station + "/items/MoAq"
+    entry = sorted(entries, key=lambda e: e["typeIdentifier"])[-1]
+    plugged = run.change("plug the AQ 2xU/I ST MoAq", "hardware_plug", {"hardwarePath": station + "/items/Rail_0", "typeIdentifier": entry["typeIdentifier"],
+                                                                         "name": "MoAq", "positionNumber": 3}, plc=False)
+    if plugged["outcome"] != "applied":
+        return
+    outputs = [(p, c) for p, row in run.items(module).items() for c in row["channels"] if (c["type"], c["ioType"], c["number"]) == ("Analog", "Output", 0)]
+    if len(outputs) != 1:
+        run.h.report["boundaries"]["analog output channel"] = "Expected one analog output channel 0 under MoAq: %s" % [p for p, _ in outputs]
+        return
+    run.analog = {"hardwarePath": outputs[0][0], "channelType": "Analog", "channelIoType": "Output", "channelNumber": 0}
 
 
 def actor(run):
-    """One TO_SpeedAxis actor on the telegram item, then on the same item through the two-module, address and DB-member overloads."""
-    if run.telegram is None:
+    """One TO_SpeedAxis actor on the telegram item, then on the same item through the two-module, address and DB-member overloads;
+    without a telegram item, on the analog output channel."""
+    if run.telegram is None and run.analog is None:
         return
     run.create("MoSpeed", SPEED)
     path = run.to("MoSpeed")
-    run.refuse("actor with connectOption on a single module", path, "actor", {"hardwarePath": run.telegram, "connectOption": "AllowAllModules"}, "UnsupportedTarget")
-    run.refuse("actor with a measuring-input channel index", path, "actor", {"hardwarePath": run.telegram, "channelIndex": 0}, "UnsupportedTarget")
+    target = run.telegram or run.analog["hardwarePath"]
+    run.refuse("actor with connectOption on a single module", path, "actor", {"hardwarePath": target, "connectOption": "AllowAllModules"}, "UnsupportedTarget")
+    run.refuse("actor with a measuring-input channel index", path, "actor", {"hardwarePath": target, "channelIndex": 0}, "UnsupportedTarget")
     run.refuse("actor with one address", path, "actor", {"inputAddress": 0}, "InvalidRequest")
+    if run.telegram is None:
+        run.connect("connect MoSpeed actor to the MoAq analog output channel", path, "actor", run.analog)
+        run.unless_connected(path)
+        return
     run.connect("connect MoSpeed actor to the drive telegram", path, "actor", {"hardwarePath": run.telegram})
     run.connect("connect MoSpeed actor to the telegram as input and output module", path, "actor",
                 {"inputHardwarePath": run.telegram, "outputHardwarePath": run.telegram, "connectOption": "Default"})
     if "Input" in run.addresses and "Output" in run.addresses:
         run.connect("connect MoSpeed actor to the telegram addresses", path, "actor",
                     {"inputAddress": run.addresses["Input"], "outputAddress": run.addresses["Output"], "connectOption": "Default"})
-    db = run.change("create the telegram DB MoTelDb", "source_upsert", {"language": "SCL", "source": TELEGRAM_DB, "expectedBlockNames": ["MoTelDb"]})
+    db = run.change("create the telegram DB MoTelDb", "source_upsert", {"language": "SCL", "source": TELEGRAM_DB % ("MoTelDb", "PD_TEL1"), "expectedBlockNames": ["MoTelDb"]})
     if db["outcome"] == "applied":
         run.connect("connect MoSpeed actor to the DB member MoTelDb.Tel", path, "actor", {"dbMemberPath": "MoTelDb.Tel"})
     run.unless_connected(path)
@@ -199,11 +230,21 @@ def axis(run):
 
 
 def encoder(run):
-    """A TO_ExternalEncoder on the TM PosInput item (module target), then on its channel; the channel change is restored."""
+    """A TO_ExternalEncoder on the TM PosInput item (module target), connected again through the two-module and address
+    overloads and to a DB member, then on its channel; the channel change is restored."""
     run.create("MoEncoder", EXTERNAL)
     path = run.to("MoEncoder")
     run.refuse("encoder with a channel index", path, "encoder", {"hardwarePath": run.encoder, "channelIndex": 0}, "UnsupportedTarget")
+    run.refuse("encoder with only an input address", path, "encoder", {"inputAddress": 0}, "InvalidRequest")
     run.connect("connect MoEncoder to the MoEnc module", path, "encoder", {"hardwarePath": run.encoder})
+    run.connect("connect MoEncoder to MoEnc as input and output module", path, "encoder",
+                {"inputHardwarePath": run.encoder, "outputHardwarePath": run.encoder, "connectOption": "Default"})
+    if "Input" in run.tm_addresses and "Output" in run.tm_addresses:
+        run.connect("connect MoEncoder to the MoEnc addresses", path, "encoder",
+                    {"inputAddress": run.tm_addresses["Input"], "outputAddress": run.tm_addresses["Output"], "connectOption": "Default"})
+    db = run.change("create the encoder telegram DB MoEncDb", "source_upsert", {"language": "SCL", "source": TELEGRAM_DB % ("MoEncDb", "PD_TEL83"), "expectedBlockNames": ["MoEncDb"]})
+    if db["outcome"] == "applied":
+        run.connect("connect MoEncoder to the DB member MoEncDb.Tel", path, "encoder", {"dbMemberPath": "MoEncDb.Tel"})
     before = run.h.stage("read MoEncoder before the last connection", lambda: run.slot(path, "encoder"))
     last = run.connect("connect MoEncoder to the MoEnc channel", path, "encoder", {"hardwarePath": run.encoder, **CHANNEL})
     if last["outcome"] == "applied":

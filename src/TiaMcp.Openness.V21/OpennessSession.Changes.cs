@@ -766,8 +766,13 @@ namespace TiaMcp.Openness.V21
                     var entry = BindTechnologySelection(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", payload);
                     var technology = entry.Item;
                     string beforePath = Path.Combine(change.Directory, "before-to.xml");
-                    technology.Export(new FileInfo(beforePath), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-                    change.Backups.Add(ChangeArtifact(beforePath));
+                    // V21 exports no inconsistent object (native, 30 October 2026), and a real axis or encoder stays inconsistent until it is connected.
+                    if (technology.IsConsistent)
+                    {
+                        technology.Export(new FileInfo(beforePath), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                        change.Backups.Add(ChangeArtifact(beforePath));
+                    }
+                    else ((JArray)preview["warnings"]).Add("The technology object is inconsistent (not compiled) and V21 cannot export it, so no XML backup precedes this write; the project checkpoint archive is the recovery.");
                     if (change.Kind == "to_parameters")
                     {
                         preview["parameterChanges"] = PrepareTechnologyParameters(technology, ChangeObject(payload, "parameters"), out _);
