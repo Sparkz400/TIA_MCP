@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 30 October 2026
 
+**MCP surface, Test Suite application tests and the TLS recheck — 30 October 2026:**
+- **MCP surface:** resource templates for the feature catalog, retained artifacts and saved reviews (same path checks as `artifact_read`), completions for feature IDs, artifact paths and review IDs, MCP logging after `logging/setLevel` (Information and above, no request payloads or exception text), and output schemas on 85 tools; `scripts/smoke_mcp.py` validates every tool response against its declared schema.
+- **Test Suite application tests (TS-Q02):** a qualification mode runs one owned fixture case per Run, externally managed on a ticket-owned PLCSIM instance; pass, deliberate assertion failure with recovery, a lost reply and refusals passed natively 72/72 (`local.testsuite.application.20261030`). A shared reconcile bug (null text values counted as differences) is fixed for TS-Q01 too.
+- **TLS recheck:** the tightened `plc_station_upload` rule passed natively on owned PLCSIM (one `NonVerified` challenge, 0 certificates, upload equal to the download; `local.online.upload.tls-hardening.20261030`).
+- **Catalog 0.4.85:** 433 of 467 features verified; matrix 1,977 bound, 108 open, 31 blocked, 30 deferred.
+
 **Integration — 30 October 2026:** combined-apply pre-checks (#162), credential route follow-ups (#163), the PLCSIM signal tools and the typed backlog landed together, and the maintainer accepted the typed verification scope, so `change.graphical_typed_edit` is verified (its two pre-curation records retired). Catalog 0.4.84: 428 of 467 features verified, 319 tools; matrix 1,952 bound, 133 open, 31 blocked, 30 deferred; L01 has no open cell.
 
 **PLCSIM signals, areas and observation — 30 October 2026:** five new tools on owned PLCSIM: `sim_read_signals`/`sim_write_signals` (1–64 typed symbols per call; one unknown symbol makes PLCSIM reject the whole read batch), `sim_area_read`/`sim_area_write` (input, output and marker bytes or bits; writes only to inputs and markers of owned instances, as assignments) and `sim_observe` (operating state, mode and display summary plus state and LED changes in a window of up to 60 s). All passed natively 75/75 against single `sim_read`, symbolic tags at known addresses, an external PLCSIM client's Run/Stop and a foreign instance's refusals (`local.plcsim_signals.20261030`).

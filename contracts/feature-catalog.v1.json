@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.84",
+  "catalogVersion": "0.4.85",
   "targetTiaVersions": [
     21
   ],
@@ -3120,6 +3120,45 @@
         "A first capture on build 4f7603a (artifacts/q/ec) stopped at the same protected DB before the runner admitted declared protected additions; it is retained but not curated.",
         "Independent reference capture only: no typed builder, no runtime, no physical PLC."
       ]
+    },
+    {
+      "id": "local.testsuite.application.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d726fc9fce556d87014891e8df23ca402c58a511",
+        "passedScope": "scripts/qualify_testsuite_application.py on a frozen Debug build of d726fc9f (artifacts/ta3, git archive, TestSuiteQualification=true, Host --testsuite-qualification), four cases with one owned Portal, owned scratch CPU 1511-1 PN V4.1 and one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus each (72/72 steps). After simulation_download, the generated-state save, simulation_provision_scratch_credential, power on and RUN, qualification_testsuite_prepare imports TiaMcp_Q02_Pass/TiaMcp_Q02_Fail (ASSERT.Equal(\"TiaMcp_EnableGate_DB\".Active, true/false)), sets their scope externally managed on that instance and reviews one; qualification_testsuite_execute runs one TestCaseExecutor.Run(TestCase) with checkpoint archive, compile, preservation, fresh reopen and cleanup. GetScope reads ScratchPLC and the export names the owned instance and external mode, byte-identical after the Run SetScope (scopeVerified). pass: succeeded, classification passed. fail: assertionFailure, recoveryRequired, qualification_testsuite_recover to a new folder and qualification_testsuite_reconcile verifiedRestored. afterRun: injected lost Run reply, outcomeUnknown, recover and reconcile verifiedRestored. released: instance released after prepare, SimulationTargetMismatch at observation before any checkpoint. Refusals in pass: released instance ticket (SimulationTargetMismatch), tampered ticket (InvalidSimulationTicket), project outside the owned scratch (ProjectIsolationRequired), application fixture without ticket (InvalidRequest), production gate (TestSuiteProfileUnqualified, operation still prepared at revision 0), system-managed review of the same case (TestSuiteProfileUnqualified). Earlier frozen builds b14d63c2 (artifacts/q/ta/tq_59a7e531, tq_ec2a9eac: no result profile, inconclusive/executionError) and 9557c2c5 (tq_55361bf5, tq_721bd5cd, tq_f24a010d, tq_47166c55: reconcile PreservationFailed from a null-token compare) are not part of this record."
+      },
+      "artifacts": [
+        "evidence/local.testsuite.application.20261030.json",
+        "docs/verification/testsuite-application-20261030.md"
+      ],
+      "limitations": [
+        "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus; system-managed mode, case lists, sets (.ttst), whole-group runs and system tests stay unqualified. Production admission stays closed.",
+        "The result profile matches the exact fixture tree TIA V21 Update 3 wrote under its English UI; other UI languages or trees fail closed (inconclusive or executionError).",
+        "License: this session's TestCase.SaveToFile (documented to throw LicenseNotFoundException) is the pre-run observation; the returned Run is the execution acceptance. The simulator ticket expires 15 minutes after sim_create."
+      ]
+    },
+    {
+      "id": "local.online.upload.tls-hardening.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1a52ba5619f87cdf808e757c4458a08b7fe19d35",
+        "passedScope": "scripts/qualify_online_routes.py --run-native --skip-snapshots from frozen Debug build of 1a52ba5 (git archive in artifacts/tp1 with source-manifest.json), re-checking the station upload's TLS trust after the 30 October hardening (certificate-less trust only when TIA reports NonVerified; an attempt trusted without a certificate never pins one later), on one owned scratch CPU 1511-1 PN with simulation support and a global DB OnDb, downloaded to a fresh owned PLCSIM Advanced V8 instance on local Softbus whose protection credential was provisioned, in RUN: plc_online_compare with the generated runtime user passed again with every typed refusal; then plc_station_upload in an empty owned Portal with trustOwnedSimulationCertificate true met one TlsVerificationConfiguration challenge (initial selection NonVerified, verification text 'certificate not matching', zero offered certificates), answered Trusted as unauthenticated TLS for the revalidated owned instance (allowOwnedSimulationWithoutCertificate), and exactly one ProjectUser login as the runtime user; UploadResult Success with 0 errors and 0 warnings, the uploaded blocks equal the downloaded ones, the new project saved; then stop, power off, owned release, detach and unchanged preexisting TIA processes."
+      },
+      "artifacts": [
+        "evidence/local.online.upload.tls-hardening.20261030.json"
+      ],
+      "limitations": [
+        "The upload's TLS is unauthenticated: V21 offered no certificate, so identity rests on the ticket, ownership and observer-endpoint checks, not on a certificate (maintainer decision of 29 October 2026, 'Allow, owned PLCSIM only').",
+        "TIA asked one TLS question, without a certificate; the refusals of a later certificate challenge (attemptTrustedWithoutCertificate) and of a non-NonVerified selection (withoutCertificateNotReportedNonVerified) were not met natively and are covered only by the offline SimulationTlsPin tests.",
+        "Uploaded hardware/software completeness beyond the block list, compile and reopen of the uploaded project are not verified.",
+        "The DB-snapshot routes were skipped (--skip-snapshots); they are not part of this record.",
+        "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
     }
   ],
   "features": [
@@ -5110,13 +5149,15 @@
           "Every upload message is kept (bounded at 10000 with explicit truncation) in the response and station-upload.json; the partial destination project is saved and retained on failure.",
           "Uploaded hardware/software completeness, compile and reopen of the new project are not verified.",
           "Native observation (28 October 2026): against a downloaded, credential-provisioned owned PLCSIM Advanced instance of a scratch CPU 1511-1 PN (access protection is required for it to compile), going online requests OnlineAuthenticationConfiguration and the route refuses with SimulationOnlineAuthenticationRequired, since it never logs in or passes credentials. Qualifying it needs a reviewed route that authenticates with the generated scratch credential, as simulation_download does.",
-          "Native (29 October 2026, local.online.upload.20261029): in an empty owned Portal the one TlsVerificationConfiguration challenge offered no certificate ('certificate not matching') and was trusted as unauthenticated TLS for the revalidated owned instance; after one runtime-user login the upload succeeded with no errors or warnings and the uploaded blocks equal the downloaded ones. An earlier run the same day without certificate-less trust refused at that challenge."
+          "Native (29 October 2026, local.online.upload.20261029): in an empty owned Portal the one TlsVerificationConfiguration challenge offered no certificate ('certificate not matching') and was trusted as unauthenticated TLS for the revalidated owned instance; after one runtime-user login the upload succeeded with no errors or warnings and the uploaded blocks equal the downloaded ones. An earlier run the same day without certificate-less trust refused at that challenge.",
+          "TLS hardening (30 October 2026, local.online.upload.tls-hardening.20261030): a certificate-less challenge is trusted only when TIA reports the initial selection NonVerified, and an attempt that trusted one refuses any later certificate challenge; natively one NonVerified challenge with 0 certificates was trusted and the upload succeeded. The later-certificate refusal is covered offline only."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.online.upload.20261029"
+          "local.online.upload.20261029",
+          "local.online.upload.tls-hardening.20261030"
         ]
       },
       "availability": {
@@ -15766,7 +15807,7 @@
     {
       "featureId": "qualification_testsuite_prepare",
       "domain": "qualification",
-      "title": "Qualification build only: prepare the owned fixture, wait for independently reviewed current scope/license evidence, and retain an exact durable review. No executor invocation.",
+      "title": "Qualification build only: prepare an owned fixture and retain an exact durable review. Style fixtures (clean, violating) wait for independently reviewed current scope/license evidence. Application fixtures (applicationPass, applicationFail) need simulatorTicket, the downloadTicket of an owned sim_create instance loaded and in RUN; the worker imports both cases externally managed on that instance and reads their scope back natively. No executor invocation.",
       "mcpTools": [
         "qualification_testsuite_prepare"
       ],
@@ -15780,14 +15821,17 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Qualification build only: prepare the owned fixture, wait for independently reviewed current scope/license evidence, and retain an exact durable review. No executor invocation.",
+          "Qualification build only: prepare an owned fixture and retain an exact durable review. Style fixtures (clean, violating) wait for independently reviewed current scope/license evidence. Application fixtures (applicationPass, applicationFail) need simulatorTicket, the downloadTicket of an owned sim_create instance loaded and in RUN; the worker imports both cases externally managed on that instance and reads their scope back natively. No executor invocation.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
-          "Native blocker (28 October 2026, V21 Update 3): V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Without it prepare waits for the observation and refuses with TestSuiteScopeIncomplete; execute, recover and reconcile have no prepared job."
+          "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
+          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.application.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15809,7 +15853,7 @@
     {
       "featureId": "qualification_testsuite_execute",
       "domain": "qualification",
-      "title": "Qualification build only: one durable style dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.",
+      "title": "Qualification build only: one durable style or application dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.",
       "mcpTools": [
         "qualification_testsuite_execute"
       ],
@@ -15823,14 +15867,17 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Qualification build only: one durable style dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.",
+          "Qualification build only: one durable style or application dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
-          "Native blocker (28 October 2026, V21 Update 3): V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Without it prepare waits for the observation and refuses with TestSuiteScopeIncomplete; execute, recover and reconcile have no prepared job."
+          "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
+          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.application.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15868,12 +15915,15 @@
         "limitations": [
           "Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
-          "Native blocker (28 October 2026, V21 Update 3): V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Without it prepare waits for the observation and refuses with TestSuiteScopeIncomplete; execute, recover and reconcile have no prepared job."
+          "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
+          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.application.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15895,7 +15945,7 @@
     {
       "featureId": "qualification_testsuite_reconcile",
       "domain": "qualification",
-      "title": "Qualification build only: independently reopen the original and each admitted recovery destination, compare complete fixture preservation and read the scope editor again.",
+      "title": "Qualification build only: independently reopen the original and each admitted recovery destination and compare complete fixture preservation; style fixtures also read the scope editor again.",
       "mcpTools": [
         "qualification_testsuite_reconcile"
       ],
@@ -15909,14 +15959,17 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Qualification build only: independently reopen the original and each admitted recovery destination, compare complete fixture preservation and read the scope editor again.",
+          "Qualification build only: independently reopen the original and each admitted recovery destination and compare complete fixture preservation; style fixtures also read the scope editor again.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
-          "Native blocker (28 October 2026, V21 Update 3): V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Without it prepare waits for the observation and refuses with TestSuiteScopeIncomplete; execute, recover and reconcile have no prepared job."
+          "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
+          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.application.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18993,22 +19046,23 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
-          "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
-          "One native Run returns one TestResults tree. It is retained losslessly for every reviewed unit, but only a single-definition run owns it; lists, sets and groups stay inconclusive per unit until a per-case tree profile is qualified.",
-          "The owning worker verifies the sim_create downloadTicket (15-minute expiry) and the registered owned instance before SetScope and Run. System-managed mode, where Test Suite creates its own instance, still receives the owned instance name and is unqualified.",
-          "SetScope persists the target on every reviewed case after the checkpoint. Preservation, set content (no export route) and effective scope remain unverified; the existing checkpoint capture refuses projects that contain test sets.",
-          "Native blocker (28 October 2026, V21 Update 3): application and system test execution (TestCaseExecutor.Run, SystemTestCaseExecutor.Run) has no qualification mode, and the production profile gate refuses it on Host and worker, so AC-native, AC-recovery, AC-runtime and AC-simulator-lifecycle have no native run. The definitions themselves are qualified (local.testsuite.definitions.20261028). Qualifying execution needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance on Softbus."
+          "Compiled against the V21 PublicAPI. Native execution is qualified only through the TS-Q02 qualification mode (TestSuiteQualification build, --testsuite-qualification): one exact owned fixture case, Run(TestCase), externally managed on a ticket-owned PLCSIM Advanced V8 instance on Softbus, in a worker-created scratch (local.testsuite.application.20261030).",
+          "Reviews run through the testsuite_style_job_* lifecycle. Production execution and recovery stay disabled behind the code-owned profile gate (testsuite_style_job_execute_next refuses with TestSuiteProfileUnqualified, observed natively).",
+          "One native Run returns one TestResults tree. It is retained losslessly for every reviewed unit, but only a single-definition run owns it; lists, sets and groups stay inconclusive per unit until a per-case tree profile is qualified. Only the exact TS-Q02 fixture tree (English UI) is classified as passed or assertionFailed.",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry) and the registered owned instance at prepare, both observations and before SetScope and Run; tampered and released tickets refused natively. System-managed mode, where Test Suite creates its own instance, is refused by the qualification gate and stays unqualified.",
+          "SetScope persists the target on every reviewed case after the checkpoint; TS-Q02 pre-sets the identical scope so preservation holds and reads it back. Outside that fixture, preservation of the SetScope change, set content (no export route) and effective scope remain unverified; checkpoint capture refuses projects that contain test sets."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.application.20261030"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Offline retained workflow is available. Native actions require an accepted TS-Q02 profile, an owned PLCSIM instance and independent current observations."
+          "Offline retained workflow is available. Native execution is available only in the TS-Q02 qualification build on an owned PLCSIM instance; production admission stays closed."
         ]
       },
       "prerequisites": [

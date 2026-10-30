@@ -280,10 +280,10 @@ option registers or admits the tool only on a qualification Host.
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
 | `qualification_component_window` | Run an explicitly isolated component qualification lifetime | shipped | qualification | `--component-qualification` |  |
-| `qualification_testsuite_execute` | Qualification build only: one durable style dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope. | unqualified | qualification | `--testsuite-qualification` |  |
-| `qualification_testsuite_prepare` | Qualification build only: prepare the owned fixture, wait for independently reviewed current scope/license evidence, and retain an exact durable review. No executor invocation. | unqualified | qualification | `--testsuite-qualification` |  |
-| `qualification_testsuite_reconcile` | Qualification build only: independently reopen the original and each admitted recovery destination, compare complete fixture preservation and read the scope editor again. | unqualified | qualification | `--testsuite-qualification` |  |
-| `qualification_testsuite_recover` | Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation. | unqualified | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_execute` | Qualification build only: one durable style or application dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope. | shipped | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_prepare` | Qualification build only: prepare an owned fixture and retain an exact durable review. Style fixtures (clean, violating) wait for independently reviewed current scope/license evidence. Application fixtures (applicationPass, applicationFail) need simulatorTicket, the downloadTicket of an owned sim_create instance loaded and in RUN; the worker imports both cases externally managed on that instance and reads their scope back natively. No executor invocation. | shipped | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_reconcile` | Qualification build only: independently reopen the original and each admitted recovery destination and compare complete fixture preservation; style fixtures also read the scope editor again. | shipped | qualification | `--testsuite-qualification` |  |
+| `qualification_testsuite_recover` | Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation. | shipped | qualification | `--testsuite-qualification` |  |
 | `qualification_testsuite_scope_probe` | Isolated scope investigation only: prepare one packaged style fixture in this worker's newly created scratch and show its scope editor, or read its public prerequisites. Does not run any executor or enable production profiles. Unavailable on normal Hosts. | shipped | qualification | `--testsuite-scope-probe` |  |
 | `qualification_translation_apply` | Qualification-session only: one durable import, readback, preservation, compile, save and fresh reopen. | shipped | qualification | `--translation-qualification` |  |
 | `qualification_translation_capture` | Qualification-session only: complete live bilingual text and peer capture. | shipped | qualification | `--translation-qualification` |  |
@@ -435,7 +435,7 @@ option registers or admits the tool only on a qualification Host.
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
 | `testsuite_application_inventory` | List and export Test Suite application test cases and sets | limited | testsuite |  |  |
-| `testsuite_application_plan_prepare` | Retain a bounded application-test run review on an owned PLCSIM instance | unqualified | testsuite |  |  |
+| `testsuite_application_plan_prepare` | Retain a bounded application-test run review on an owned PLCSIM instance | limited | testsuite | `--testsuite-qualification` |  |
 | `testsuite_result_import` | Inspect supplied Test Suite results against a saved review | limited | testsuite |  |  |
 | `testsuite_result_review` | Reopen and page retained supplied Test Suite findings | limited | testsuite |  |  |
 | `testsuite_style_job_execute_next` | Execute one style run through native qualification gates | unqualified | testsuite | `--testsuite-qualification` |  |
