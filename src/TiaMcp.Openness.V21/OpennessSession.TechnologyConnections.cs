@@ -52,6 +52,45 @@ namespace TiaMcp.Openness.V21
             return rows;
         }
 
+        // The V21 Connect overloads per slot type (PublicAPI V21, SW.TechnologicalObjects.Motion); actor, sensor and encoder share one interface type.
+        private static readonly Dictionary<string, string[]> TechnologyConnectForms = new Dictionary<string, string[]>(StringComparer.Ordinal)
+        {
+            ["actor"] = new[] { "hardware", "channel", "tag", "modules", "dbMember", "addresses" },
+            ["torque"] = new[] { "hardware", "modules", "dbMember", "addresses" },
+            ["measuringInput"] = new[] { "channel", "channelIndex", "addresses" },
+            ["outputCam"] = new[] { "channel", "tag", "addresses" },
+        };
+
+        /// <summary>Validates the payload's one target and returns its form; refuses a role without a matching V21 Connect overload.</summary>
+        internal static string TechnologyTargetForm(string role, JObject payload)
+        {
+            string family = role == "sensor" || role == "encoder" ? "actor" : role;
+            if (!TechnologyConnectForms.TryGetValue(family, out var supported))
+                throw new BridgeException("InvalidRequest", "role must be actor, sensor, torque, encoder, measuringInput or outputCam.");
+            bool channel = new[] { "channelNumber", "channelType", "channelIoType" }.Any(field => payload[field] != null), index = payload["channelIndex"] != null;
+            var forms = new[]
+            {
+                payload["hardwarePath"] != null ? channel ? "channel" : index ? "channelIndex" : "hardware" : null,
+                payload["tagName"] != null ? "tag" : null,
+                payload["inputHardwarePath"] != null || payload["outputHardwarePath"] != null ? "modules" : null,
+                payload["dbMemberPath"] != null ? "dbMember" : null,
+                payload["inputAddress"] != null || payload["outputAddress"] != null ? "addresses" : null,
+            }.Where(form => form != null).ToArray();
+            // Any channel field selects the channel overload, so a partial selector never falls back to the whole module.
+            if (forms.Length != 1 || channel && index || (channel || index) && forms[0] != "channel" && forms[0] != "channelIndex"
+                || forms[0] == "modules" && (payload["inputHardwarePath"] == null || payload["outputHardwarePath"] == null))
+                throw new BridgeException("InvalidRequest", "Select exactly one target: hardwarePath, hardwarePath with channelNumber/channelType/channelIoType, hardwarePath with channelIndex, tagName, "
+                    + "inputHardwarePath with outputHardwarePath, dbMemberPath, or inputAddress/outputAddress.");
+            string form = forms[0];
+            if (!supported.Contains(form)) throw new BridgeException("UnsupportedTarget", "The " + role + " role has no V21 Connect overload for a " + form + " target.");
+            // Axis, encoder and torque address overloads take both addresses; a measuring input takes an input and an output cam an output address.
+            if (form == "addresses" && ((payload["inputAddress"] != null) != (family != "outputCam") || (payload["outputAddress"] != null) != (family != "measuringInput")))
+                throw new BridgeException("InvalidRequest", family == "measuringInput" ? "A measuring input connects to inputAddress only." : family == "outputCam" ? "An output cam connects to outputAddress only." : "The " + role + " role connects to inputAddress and outputAddress together.");
+            if (payload["connectOption"] != null && (family != "actor" && family != "torque" || form != "modules" && form != "addresses"))
+                throw new BridgeException("UnsupportedTarget", "connectOption exists only on the V21 two-module and address overloads of actor, sensor, encoder and torque connections.");
+            return form;
+        }
+
         private static void ConnectionWarning(JArray warnings, string path, string status)
             => warnings.Add(new JObject { ["path"] = path, ["status"] = status,
                 ["message"] = "Connection observation is unvisited, unresolved or display-only; native exception values are omitted." });

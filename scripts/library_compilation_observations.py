@@ -16,9 +16,13 @@ def check_compilation(value, same):
     modern = 'targetIdentityPolicy' in value
     identities = [row['targetPath'] if modern else row['target'] for row in targets]
     distinct(identities, 'target')
+    # Devices without a compiler service (a Startdrive drive) cover their required target only as notCompiled.
+    skipped = [row['targetPath'] for row in value.get('notCompiled', [])]
     if modern:
         distinct(value['requiredTargets'], 'required target')
-        require(set(identities) == set(value['requiredTargets']), 'required target coverage')
+        distinct(skipped, 'not compiled target')
+        require(not set(identities) & set(skipped), 'target both compiled and not compiled')
+        require(set(identities) | set(skipped) == set(value['requiredTargets']), 'required target coverage')
     same(value['errorCount'], sum(row['errorCount'] for row in targets), 'aggregate errorCount')
     same(value['warningCount'], sum(row['warningCount'] for row in targets), 'aggregate warningCount')
     complete = True
@@ -39,7 +43,7 @@ def check_compilation(value, same):
                       and row['state'] in SUCCESS_STATES
                       and all(message['state'] in SUCCESS_STATES for message in row['messages']))
     return {'compilerReportsSuccess': bool(successful), 'compilerMessagesComplete': bool(complete),
-            'compilerTargetIdentity': 'device-path-v1' if modern else 'target-labels'}
+            'compilerTargetIdentity': 'device-path-v1' if modern else 'target-labels', 'compilerNotCompiled': skipped}
 
 
 def bind_scope(compilation, context, same, is_lock=False):
@@ -62,7 +66,7 @@ def bind_scope(compilation, context, same, is_lock=False):
         distinct(paths, 'prepared target path')
         require(bool(paths) and 'targetIdentityPolicy' in compilation, 'prepared device-path policy')
         expected = dict(zip(paths, names))
-        observed = {row['targetPath']: row['target'] for row in compilation['targets']}
+        observed = {row['targetPath']: row['target'] for row in compilation['targets'] + compilation.get('notCompiled', [])}
         same(observed, expected, 'prepared device path/name coverage')
         return 'prepared-device-paths'
     if not is_lock:

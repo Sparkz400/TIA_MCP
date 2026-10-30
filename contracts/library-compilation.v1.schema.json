@@ -165,6 +165,35 @@
           "minItems": 1,
           "maxItems": 50000
         },
+        "notCompiled": {
+          "type": "array",
+          "description": "Devices without a compiler service (a Startdrive drive): listed, never counted as compiled.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "targetPath": {
+                "type": "string",
+                "pattern": "^/projects/\\S[\\s\\S]*"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "target",
+              "targetPath",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "maxItems": 50000
+        },
         "requiredTargets": {
           "type": "array",
           "items": {
@@ -178,7 +207,10 @@
           "const": "device-path-v1"
         },
         "scope": {
-          "const": "All devices of the explicitly selected affected project."
+          "enum": [
+            "All devices of the explicitly selected affected project.",
+            "All devices of the explicitly selected affected project; requiredTargets lists every device, each either compiled under targets or listed under notCompiled."
+          ]
         },
         "scopeComplete": {
           "const": true

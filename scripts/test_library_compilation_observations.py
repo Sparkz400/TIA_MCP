@@ -107,6 +107,33 @@ class LibraryCompilationObservations(unittest.TestCase):
         value = copy.deepcopy(self.hmi); value['runtimeVerified'] = True; self.reject(value)
         value = copy.deepcopy(self.hmi); value['targets'] *= 2; self.reject(value)
 
+    def drive(self, value):
+        """The current device compile receipt for a project that also holds a drive without a compiler service."""
+        path = '/projects/Synthetic/devices/Drive'
+        value['requiredTargets'].append(path)
+        value['notCompiled'] = [{'target': 'Drive', 'targetPath': path, 'reason': 'The device exposes no compiler service.'}]
+        value['scope'] = 'All devices of the explicitly selected affected project; requiredTargets lists every device, each either compiled under targets or listed under notCompiled.'
+        return path
+
+    def test_devices_without_a_compiler_are_reported_never_counted_as_compiled(self):
+        value = copy.deepcopy(self.modern); path = self.drive(value)
+        result = self.validate(value)
+        self.assertTrue(result['compilerReportsSuccess'])
+        self.assertEqual([path], result['compilerNotCompiled'])
+        self.assertEqual([], self.validate(self.modern)['compilerNotCompiled'])
+        bad = copy.deepcopy(value); bad['notCompiled'] = []; self.reject(bad)  # required target uncovered
+        bad = copy.deepcopy(value); bad['notCompiled'] *= 2; self.reject(bad)
+        bad = copy.deepcopy(value); bad['notCompiled'][0]['targetPath'] = value['targets'][0]['targetPath']; bad['requiredTargets'].pop(); self.reject(bad)
+        bad = copy.deepcopy(value); del bad['notCompiled'][0]['reason']; self.reject(bad)
+        bad = copy.deepcopy(self.legacy); bad['notCompiled'] = value['notCompiled']; self.reject(bad)
+        # A prepared device-path scope binds the drive through notCompiled, with its prepared name.
+        change = self.change(); self.drive(change['journal']['compile'])
+        for preview in (change['preview'], change['journal']['preview']):
+            preview.update(compileScope=['Station', 'Drive'], compileTargetPaths=change['journal']['compile']['requiredTargets'][:])
+        result = self.validate(change, 'compiler-change')
+        self.assertEqual(('prepared-device-paths', [path]), (result['compilerScopeBinding'], result['compilerNotCompiled']))
+        change['journal']['compile']['notCompiled'][0]['target'] = 'Other'; self.reject(change, 'compiler-change')
+
     def test_unknown_fields_and_partial_diagnostics_do_not_become_complete(self):
         for field in ('warningCount', 'state', 'messages', 'messagesTruncated'):
             value = copy.deepcopy(self.legacy); del value['targets'][0][field]; self.reject(value)

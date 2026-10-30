@@ -98,4 +98,7 @@ That guide is version-labelled; this workflow has no V21 native qualification.
 
 See [D07 remaining plan](../plans/expansion-plans/software-unit-lifecycle.md) and
 [verification](../verification/software-unit-review-20261016.md). No SDK worker
-or native mutation route has been added or promoted by this offline workflow.
+or native mutation route has been added or promoted by this offline workflow. The
+native lifecycle (create, create from a master copy, rename, relations, publication,
+delete) is a separate set of `software_unit_*` change kinds; V21 has no unit copy or
+move API ([payloads](../guides/engineering-workflows.md#supported-payloads)).

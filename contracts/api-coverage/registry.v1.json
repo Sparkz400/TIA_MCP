@@ -3737,6 +3737,18 @@
       "obligations": [
         "L03"
       ]
+    },
+    {
+      "featureId": "change.software_unit_rename",
+      "obligations": [
+        "D07"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_create_from",
+      "obligations": [
+        "D07"
+      ]
     }
   ],
   "manualResiduals": [

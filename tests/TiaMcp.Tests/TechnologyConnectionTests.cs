@@ -141,6 +141,48 @@ namespace TiaMcp.Tests
             return Task.CompletedTask;
         }
 
+        // Every role/target pair maps to a V21 Connect overload or refuses with a typed code before any native call.
+        internal static async Task TargetFormsFollowV21Overloads()
+        {
+            JObject P(string json) => JObject.Parse(json);
+            var targets = new Dictionary<string, string>
+            {
+                ["hardware"] = "{hardwarePath:'/d'}", ["channel"] = "{hardwarePath:'/d',channelType:'Technology',channelIoType:'Complex',channelNumber:0}",
+                ["channelIndex"] = "{hardwarePath:'/d',channelIndex:1}", ["tag"] = "{tagName:'T'}", ["modules"] = "{inputHardwarePath:'/i',outputHardwarePath:'/o'}",
+                ["dbMember"] = "{dbMemberPath:'DB.Tel'}",
+            };
+            var accepted = new Dictionary<string, string[]>
+            {
+                ["actor"] = ["hardware", "channel", "tag", "modules", "dbMember"], ["sensor"] = ["hardware", "channel", "tag", "modules", "dbMember"],
+                ["encoder"] = ["hardware", "channel", "tag", "modules", "dbMember"], ["torque"] = ["hardware", "modules", "dbMember"],
+                ["measuringInput"] = ["channel", "channelIndex"], ["outputCam"] = ["channel", "tag"],
+            };
+            foreach (var role in accepted)
+                foreach (var target in targets)
+                {
+                    if (role.Value.Contains(target.Key)) { Check.Equal(target.Key, OpennessSession.TechnologyTargetForm(role.Key, P(target.Value))); continue; }
+                    var refused = await Check.ThrowsAsync<BridgeException>(() => { OpennessSession.TechnologyTargetForm(role.Key, P(target.Value)); return Task.CompletedTask; });
+                    Check.Equal("UnsupportedTarget", refused.Code);
+                }
+            // Address overloads: both addresses for axis/encoder/torque, one direction for a measuring input or an output cam.
+            Check.Equal("addresses", OpennessSession.TechnologyTargetForm("actor", P("{inputAddress:256,outputAddress:256,connectOption:'AllowAllModules'}")));
+            Check.Equal("addresses", OpennessSession.TechnologyTargetForm("measuringInput", P("{inputAddress:8}")));
+            Check.Equal("addresses", OpennessSession.TechnologyTargetForm("outputCam", P("{outputAddress:8}")));
+            Check.Equal("modules", OpennessSession.TechnologyTargetForm("torque", P("{inputHardwarePath:'/i',outputHardwarePath:'/o',connectOption:'Default'}")));
+            foreach (var (role, json, code) in new[]
+            {
+                ("actor", "{inputAddress:256}", "InvalidRequest"), ("measuringInput", "{inputAddress:8,outputAddress:8}", "InvalidRequest"), ("outputCam", "{inputAddress:8}", "InvalidRequest"),
+                ("actor", "{}", "InvalidRequest"), ("actor", "{hardwarePath:'/d',tagName:'T'}", "InvalidRequest"), ("actor", "{inputHardwarePath:'/i'}", "InvalidRequest"),
+                ("actor", "{channelNumber:0}", "InvalidRequest"), ("measuringInput", "{hardwarePath:'/d',channelNumber:0,channelIndex:1}", "InvalidRequest"),
+                ("actor", "{hardwarePath:'/d',connectOption:'AllowAllModules'}", "UnsupportedTarget"), ("outputCam", "{outputAddress:8,connectOption:'Default'}", "UnsupportedTarget"),
+                ("cam", "{tagName:'T'}", "InvalidRequest"),
+            })
+            {
+                var refused = await Check.ThrowsAsync<BridgeException>(() => { OpennessSession.TechnologyTargetForm(role, P(json)); return Task.CompletedTask; });
+                Check.Equal(code, refused.Code);
+            }
+        }
+
         internal static Task AttributeFailuresKeepFieldEvidence()
         {
             foreach (string failure in new[] { "excluded", "metadata", "duplicate", "getter", "notReadable" })

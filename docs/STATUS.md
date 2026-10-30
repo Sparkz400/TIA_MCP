@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.85`: 467 features, 433 verified, 34 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 127 shipped, 306 limited, 19 unqualified, 5 unavailable on V21, 10 deferred |
-| Matrix cells | 1,977 bound, **108 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.86`: 469 features, 437 verified, 32 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 127 shipped, 310 limited, 19 unqualified, 5 unavailable on V21, 8 deferred |
+| Matrix cells | 1,995 bound, **108 open**, 31 blocked, 24 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -34,7 +34,7 @@ names every row with an open cell.
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision
   of 29 October; each row's disposition is in the ledger). The three block-protection kinds
   lacked only a repository route; building it is 1.0 work (decision of 29 October).
-- **Deferred rows:** ten `not_implemented` rows (30 cells) are not open cells but stay 1.0
+- **Deferred rows:** eight `not_implemented` rows (24 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
 - **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
   release workflow and the 30 October security review are in place; a contract freeze policy,

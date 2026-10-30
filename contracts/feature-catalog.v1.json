@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.85",
+  "catalogVersion": "0.4.86",
   "targetTiaVersions": [
     21
   ],
@@ -3158,6 +3158,59 @@
         "Uploaded hardware/software completeness beyond the block list, compile and reopen of the uploaded project are not verified.",
         "The DB-snapshot routes were skipped (--skip-snapshots); they are not part of this record.",
         "One owned PLCSIM Advanced V8 instance on local Softbus; never a physical PLC."
+      ]
+    },
+    {
+      "id": "local.software_units.lifecycle.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "43749ff6527a24f5db931ff3d397faf709e80d7e",
+        "passedScope": "scripts/qualify_software_unit_changes.py on a frozen Debug build of 43749ff6 (artifacts/um6, git archive), 161/161 steps, in an owned scratch CPU 1511-1 PN V4.1 without safety units. All six software_unit_* kinds applied with checkpoint, PLC compile and save, exact snapshot diffs, typed refusals, fresh-Portal reopen and checkpoint restore; new: software_unit_create_from of an empty unit master copy (library_create_master_copy kind softwareUnit into the project library; the copy keeps namespace preset Ns.T and its SoftwareUnit relation; createdUnitMembers reports only the renamed default tag table) and software_unit_rename of an unreferenced unit; refusals DependencyExists (referenced unit), ObjectExists (name in use, template-name conflict with onNameConflict=refuse), InvalidRequest (current name, unknown policy), TargetIncompatible (block master copy). Boundary probe: a same-PLC copy of a unit holding FB UnitFb fails after the compile with MutationVerificationFailed (MasterCopyMode.Rename renamed UnitFb to UnitFb_1) and is restored from its checkpoint."
+      },
+      "artifacts": [
+        "evidence/local.software_units.lifecycle.20261030.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 without safety units; master copies in the project library only, copies within the same PLC; global libraries, other PLCs or projects are not exercised.",
+        "V21 has no unit copy or move API; the copy route creates new objects and is not identity-preserving. A unit master copy describes only the unit, so renamed members are detected by TIA's <existing name>_<n> pattern, conservatively.",
+        "Engineering only; nothing is downloaded and runtime behavior is not observed."
+      ]
+    },
+    {
+      "id": "local.technology.motion_connections.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "79245419a1ba34c25100e3c4e3df9545a6399be1",
+        "passedScope": "scripts/qualify_motion_connections.py on a frozen Debug build of 79245419 (artifacts/um5, git archive), 44/44 steps, in an owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0 (channel 0 MotionControl), an AQ 2xU/I ST and a SINAMICS G120C PN on the CPU's IO system. Applied with checkpoint, PLC compile and save, read back through technology_read and equal after a fresh Portal reopen: a TO_ExternalEncoder 10.0 encoder on the TM PosInput item (Connect(DeviceItem)), replaced through Connect(DeviceItem, DeviceItem, ConnectOption.Default) and Connect(Int32 0, Int32 0, Default); a channel replacement restored from its checkpoint. Typed refusals UnsupportedTarget and InvalidRequest left the slots unchanged. V21 refusals recorded with exact errors and restored: TO_MeasuringInput on the TM PosInput item by channel index and on its channel (Target not available for input=0 and output=-1), TO_SpeedAxis actor on the AQ channel with Actor.Type 0 on a virtual axis (Target not available for input=-1 and output=-1), encoder on a PD_TEL83 DB member (No valid assignment for Encoder(MoEncoder)). The G120C exposes no telegram device item, so actor and torque on a telegram were not reached."
+      },
+      "artifacts": [
+        "evidence/local.technology.motion_connections.20261030.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1; TO_PositioningAxis (virtual), TO_SpeedAxis (virtual, analog actor), TO_ExternalEncoder and TO_MeasuringInput 10.0. Only the encoder role connected; actor, torque and measuring input were refused by V21 or unreachable on this fixture.",
+        "The G120C PN added through Openness exposes no telegram device item even on the IO system (same root as the D10 DriveObjectNumber blocker), so drive telegram targets are not qualified.",
+        "Engineering only; nothing is downloaded and no axis moves; the drive is never compiled (no compiler service)."
+      ]
+    },
+    {
+      "id": "local.library.drive_compile.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "eb127b7984a52c592a5c8a1ea1d4a40063e49ac0",
+        "passedScope": "scripts/qualify_library_drive_compile.py on a frozen Debug build of eb127b79 (artifacts/um3, git archive), 9/9 steps, in an owned scratch CPU 1511-1 PN V4.1 with an added SINAMICS G120C PN (6SL3210-1KE21-3AF1 V4.7.14, no compile or save): library_create_master_copy of TiaMcp_IsEnabled into the project library compiled the PLC station and listed only the drive under notCompiled. The plan (operation-plan), the applied change (compiler-change: compilerReportsSuccess, compilerNotCompiled = the drive, compilerScopeBinding prepared-device-paths) and the original lock-manifest bytes (compiler-lock) validate as library observations."
+      },
+      "artifacts": [
+        "evidence/local.library.drive_compile.20261030.json"
+      ],
+      "limitations": [
+        "One library transaction (library_create_master_copy into the project library) in one owned scratch CPU 1511-1 PN V4.1 with one G120C PN that is not on the CPU's IO system; other library kinds share the device compile and observation checks but were not run with a drive.",
+        "The drive itself is never compiled: it exposes no compiler service and is listed under notCompiled, never counted as compiled."
       ]
     }
   ],
@@ -7420,16 +7473,21 @@
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): an output cam connected to a PLC output tag, read back through technology_read; roles a target lacks, missing tags and ambiguous targets refused; reopen and checkpoint restore. A sensor on a channel target is natively exercised by local.composite_rebind.20261028: a virtual TO_PositioningAxis 10.0 sensor on a TM PosInput 2 V2.0 channel in MotionControl mode compiles clean and reads back; TIA puts the item's addresses into the servo process image and adds the sensor's PROFIdrive interface tags. Actor, torque, encoder and measuring-input roles and module (DeviceItem) targets are only refused.",
           "Existing objects are selected by exact technologyPath or a unique legacy name and bound to the exact path at prepare, as for to_parameters/to_delete; an XML backup of the TO and a project checkpoint precede the write.",
           "One role slot per change: actor, sensor (with sensorIndex), torque, encoder, measuringInput or outputCam, named as in technology_read hardwareConnections rows. A null service or slot refuses the preview.",
-          "Targets: hardwarePath (module, submodule or PROFIdrive telegram DeviceItem), hardwarePath with channelType/channelIoType/channelNumber (one native channel), hardwarePath with channelIndex (measuring input only) or tagName (one PLC tag). Unsupported role/target pairs refuse at prepare; native Siemens validation decides compatibility. ConnectOption.AllowAllModules, separate input/output modules, bit addresses and DB-member overloads are not exposed.",
+          "Targets per role follow the V21 Connect overloads: actor/sensor/encoder take a module or telegram item (DeviceItem), a channel, a PLC tag, separate input and output items (DeviceItem, DeviceItem, ConnectOption), a DB member (String) or input and output addresses (Int32, Int32, ConnectOption); torque takes a module, two items, a DB member or two addresses; a measuring input takes a channel, a module with channelIndex or an input address; an output cam a channel, a tag or an output address. Pairs without an overload refuse UnsupportedTarget at prepare; connectOption exists only on the two-item and address overloads. Apply verifies the reported module, channel, tag, InputModule/OutputModule, PathToDBMember, InputAddress/OutputAddress, ChannelIndex and a requested ConnectOption.",
           "Apply verifies IsConnected and that the slot's Channel/InputModule/OutputModule/InputOutputModule/OutputTag (and ChannelIndex) reports the requested object; a mismatch, including native normalization to another item, requires checkpoint recovery. The change fingerprint adds the selected TO's resolved connection observation; previews and evidence reuse the technology_read connection observation.",
-          "compile=true is mandatory; interrupted changes stay held for admission reconciliation like other to_ kinds."
+          "compile=true is mandatory; interrupted changes stay held for admission reconciliation like other to_ kinds.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0, an AQ 2xU/I ST and a SINAMICS G120C PN on the IO system of the CPU (local.technology.motion_connections.20261030): a TO_ExternalEncoder 10.0 encoder on the TM PosInput item (Connect(DeviceItem)), then replaced through Connect(DeviceItem, DeviceItem, ConnectOption.Default) and Connect(Int32, Int32, ConnectOption.Default), each compiled, saved, read back and equal after a fresh Portal reopen; a channel replacement restored from its checkpoint. Typed refusals: measuring input on a tag, actor with connectOption on one module or with channelIndex (UnsupportedTarget); measuring input with an output address, actor with one address, encoder with only an input address (InvalidRequest).",
+          "V21 refused on this fixture (failed applies restored): TO_MeasuringInput 10.0 on the TM PosInput item with channelIndex 0 and on its channel (\"Target not available for input=0 and output=-1\"); TO_SpeedAxis 10.0 actor on an AQ 2xU/I ST channel with the default and with Actor.Type 0 (\"Target not available for input=-1 and output=-1\"); encoder on a global DB member of type PD_TEL83 (\"No valid assignment for Encoder(MoEncoder)\"); Connect on a connected slot (\"Already connected\"), which to_connect now handles by disconnecting first within one checkpoint (replacesConnection).",
+          "Drive telegram targets stay open: a G120C PN added through Openness and assigned to the IO system exposes no telegram device item (no item carries I/O addresses), the root of the D10 blocker (DriveObject.DriveObjectNumber unreadable without Startdrive commissioning); actor and torque on a telegram were not reached.",
+          "V21 cannot export an inconsistent technology object, so the to_ kinds skip the XML backup for one (preview warning; the project checkpoint is the recovery). The first motion object adds MC_Servo and MC_Interpolator, which stay inconsistent without compile: create a compiled motion object before any created with compile=false, or the change fingerprint refuses (FingerprintUnavailable)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.technology_changes.20261028",
-          "local.composite_rebind.20261028"
+          "local.composite_rebind.20261028",
+          "local.technology.motion_connections.20261030"
         ]
       },
       "availability": {
@@ -7920,25 +7978,31 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 PublicAPI: PlcUnitComposition.Create/CreateFrom/Find, PlcUnitBase.Name/NamespacePreset/Relations, PlcUnit.Delete; no copy or move members."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "Delivered as change kinds: change.software_unit_create, change.software_unit_create_from, change.software_unit_rename, change.software_unit_relation_set, change.software_unit_publication_set and change.software_unit_delete. Block, type and tag-table changes accept a software-unit scopePath.",
+          "V21 has no unit copy or move API: PlcUnit exposes only Delete(); PlcUnitComposition only Create(String), CreateFrom(MasterCopy), CreateFrom(MasterCopy, MasterCopyMode) and Find(String); PlcUnitSystemGroup holds Units and SafetyUnits without user groups, so a unit has no other parent in its PLC (PublicAPI V21 Siemens.Engineering.Step7). A copy is library_create_master_copy of the unit (object kind softwareUnit) followed by change.software_unit_create_from; it creates new objects and is not identity-preserving. A move between PLCs would be such a copy plus a delete and is not offered.",
+          "NonUnitDB and TODB relations, safety units and namespace propagation to existing members are not covered.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.lifecycle.20261030): an empty unit with namespace preset Ns.T and a SoftwareUnit relation copied through library_create_master_copy (kind softwareUnit) and software_unit_create_from with onNameConflict=rename (the copy keeps the preset and the outgoing relation), and an unreferenced unit renamed, each applied, persisted across a fresh Portal reopen and restored from its checkpoint; referenced units, names in use, the current name, a block master copy, an unknown policy and the template-name conflict refused typed. The ContentDescriptions of a unit master copy list only the unit. In the same PLC MasterCopyMode.Rename also renames members (UnitFb became UnitFb_1 (FB3), Default tag table_3 became _4): the createdUnitMembers readback lists them, a renamed block or type fails the apply after the compile (MutationVerificationFailed) and restores from the checkpoint."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.20261028",
+          "local.software_units.lifecycle.20261030"
+        ]
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Requires a PLC exposing PlcUnitProvider; see the change.software_unit_* rows for each qualified kind."
         ]
       },
       "prerequisites": [
@@ -8184,25 +8248,33 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 Siemens.Engineering.SW.TechnologicalObjects.Motion: AxisHardwareConnectionProvider.ActorInterface/SensorInterface/TorqueInterface, EncoderHardwareConnectionProvider.SensorInterface, AxisEncoderHardwareConnectionInterface.Connect(Channel|DeviceItem|PlcTag), TorqueHardwareConnectionInterface.Connect(DeviceItem), MeasuringInputHardwareConnectionProvider.Connect(Channel|DeviceItem,Int32), OutputCamHardwareConnectionProvider.Connect(Channel|PlcTag)."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "Delivered through change.to_connect and change.to_disconnect (one role slot per change, exact technologyPath, XML backup of a consistent object, checkpoint, mandatory compile; a connected slot is replaced within one checkpoint).",
+          "Targets per role follow the V21 Connect overloads: actor/sensor/encoder take a module or telegram item (DeviceItem), a channel, a PLC tag, separate input and output items (DeviceItem, DeviceItem, ConnectOption), a DB member (String) or input and output addresses (Int32, Int32, ConnectOption); torque takes a module, two items, a DB member or two addresses; a measuring input takes a channel, a module with channelIndex or an input address; an output cam a channel, a tag or an output address. Pairs without an overload refuse UnsupportedTarget at prepare; connectOption exists only on the two-item and address overloads. Apply verifies the reported module, channel, tag, InputModule/OutputModule, PathToDBMember, InputAddress/OutputAddress, ChannelIndex and a requested ConnectOption.",
+          "Siemens decides whether a target suits the object (telegram, module operating mode, DB member type); the qualified pairs and the pairs V21 refused on the fixture are listed below. Drive-side configuration (telegram choice, commissioning) is not part of this route.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0, an AQ 2xU/I ST and a SINAMICS G120C PN on the IO system of the CPU (local.technology.motion_connections.20261030): a TO_ExternalEncoder 10.0 encoder on the TM PosInput item (Connect(DeviceItem)), then replaced through Connect(DeviceItem, DeviceItem, ConnectOption.Default) and Connect(Int32, Int32, ConnectOption.Default), each compiled, saved, read back and equal after a fresh Portal reopen; a channel replacement restored from its checkpoint. Typed refusals: measuring input on a tag, actor with connectOption on one module or with channelIndex (UnsupportedTarget); measuring input with an output address, actor with one address, encoder with only an input address (InvalidRequest).",
+          "V21 refused on this fixture (failed applies restored): TO_MeasuringInput 10.0 on the TM PosInput item with channelIndex 0 and on its channel (\"Target not available for input=0 and output=-1\"); TO_SpeedAxis 10.0 actor on an AQ 2xU/I ST channel with the default and with Actor.Type 0 (\"Target not available for input=-1 and output=-1\"); encoder on a global DB member of type PD_TEL83 (\"No valid assignment for Encoder(MoEncoder)\"); Connect on a connected slot (\"Already connected\"), which to_connect now handles by disconnecting first within one checkpoint (replacesConnection).",
+          "Drive telegram targets stay open: a G120C PN added through Openness and assigned to the IO system exposes no telegram device item (no item carries I/O addresses), the root of the D10 blocker (DriveObject.DriveObjectNumber unreadable without Startdrive commissioning); actor and torque on a telegram were not reached.",
+          "V21 cannot export an inconsistent technology object, so the to_ kinds skip the XML backup for one (preview warning; the project checkpoint is the recovery). The first motion object adds MC_Servo and MC_Interpolator, which stay inconsistent without compile: create a compiled motion object before any created with compile=false, or the change fingerprint refuses (FingerprintUnavailable)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.technology.motion_connections.20261030"
+        ]
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Requires an existing technology object exposing the selected connection service."
         ]
       },
       "prerequisites": [
@@ -9420,7 +9492,7 @@
         "status": "partial",
         "limitations": [
           "Creates one standard unit in the selected PLC; a case-insensitive name collision with any software or safety unit is refused. Without namespacePreset the native default preset is kept.",
-          "Name and namespace preset are read back after creation. Templates, master-copy instantiation (CreateFrom), copy, move and rename are not part of this kind.",
+          "Name and namespace preset are read back after creation. Master-copy instantiation and rename are change.software_unit_create_from and change.software_unit_rename; V21 has no unit copy or move API.",
           "Safety units are refused for every software-unit lifecycle kind.",
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.20261028): units created with and without namespace preset, the case-insensitive collision refused, exact snapshot diff, fresh-Portal reopen and checkpoint restore."
         ]
@@ -10989,7 +11061,8 @@
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "object.groupKind (blocks, types or tags) with groupPath and optional scopePath selects a native PLC user group as one composite master-copy source (MasterCopyComposition.Create(IMasterCopySource)); compiled against the V21 PublicAPI only, not natively qualified. Several unrelated objects in one master copy have no V21 API."
+          "object.groupKind (blocks, types or tags) with groupPath and optional scopePath selects a native PLC user group as one composite master-copy source (MasterCopyComposition.Create(IMasterCopySource)); compiled against the V21 PublicAPI only, not natively qualified. Several unrelated objects in one master copy have no V21 API.",
+          "The library transaction's device compile lists a device without a compiler service (a Startdrive SINAMICS G120C PN) under notCompiled; the library compiler observation accepts it only there, reports it as compilerNotCompiled and binds it through the prepared device path/name scope, never as compiled. Natively qualified (local.library.drive_compile.20261030): in an owned scratch CPU 1511-1 PN V4.1 holding a SINAMICS G120C PN, library_create_master_copy compiled the PLC station and listed only the drive under notCompiled; plan, change and original lock-manifest bytes validate with compilerNotCompiled naming the drive."
         ]
       },
       "qualification": {
@@ -11001,7 +11074,8 @@
           "local.library_releases.rerun.20261028",
           "local.library_interruption.rerun.20261028",
           "local.library_protected.rerun.20261029",
-          "local.library_scopes.rerun.20261029"
+          "local.library_scopes.rerun.20261029",
+          "local.library.drive_compile.20261030"
         ]
       },
       "availability": {
@@ -25475,6 +25549,113 @@
         "AC-identity",
         "AC-completeness",
         "AC-simulator-lifecycle",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_rename",
+      "domain": "software_units",
+      "title": "Rename one unreferenced software unit",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "software_unit_rename",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: PlcUnitBase.Name (get/set) and PlcUnitComposition.Find(string)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Renames one standard unit and reads it back under the new name through Find. A case-insensitive collision with any software or safety unit, the current name and safety units are refused.",
+          "Refused (DependencyExists, references listed) while any unit relation names the unit: V21 relations name units by text and whether TIA rewrites them on a rename is not established.",
+          "V21 has no unit copy or move API: PlcUnit exposes only Delete(); PlcUnitComposition only Create(String), CreateFrom(MasterCopy), CreateFrom(MasterCopy, MasterCopyMode) and Find(String); PlcUnitSystemGroup holds Units and SafetyUnits without user groups, so a unit has no other parent in its PLC (PublicAPI V21 Siemens.Engineering.Step7). A copy is library_create_master_copy of the unit (object kind softwareUnit) followed by change.software_unit_create_from; it creates new objects and is not identity-preserving. A move between PLCs would be such a copy plus a delete and is not offered.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.lifecycle.20261030): an empty unit with namespace preset Ns.T and a SoftwareUnit relation copied through library_create_master_copy (kind softwareUnit) and software_unit_create_from with onNameConflict=rename (the copy keeps the preset and the outgoing relation), and an unreferenced unit renamed, each applied, persisted across a fresh Portal reopen and restored from its checkpoint; referenced units, names in use, the current name, a block master copy, an unknown policy and the template-name conflict refused typed. The ContentDescriptions of a unit master copy list only the unit. In the same PLC MasterCopyMode.Rename also renames members (UnitFb became UnitFb_1 (FB3), Default tag table_3 became _4): the createdUnitMembers readback lists them, a renamed block or type fails the apply after the compile (MutationVerificationFailed) and restores from the checkpoint."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.lifecycle.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a PLC exposing PlcUnitProvider."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact unitPath from software_inspect or project_model"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.software_unit_create_from",
+      "domain": "software_units",
+      "title": "Create one software unit from a unit master copy",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "software_unit_create_from",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 PublicAPI: PlcUnitComposition.CreateFrom(MasterCopy, MasterCopyMode), MasterCopy.ContentDescriptions (ContentName, ContentType) and PlcUnitBase.Name."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "libraryId and masterCopyPath select one master copy of a registered project or global library; it must describe exactly one PlcUnit. The new unit is renamed to name; collisions refuse.",
+          "MasterCopyMode.ThrowIfExists unless the template's unit name already exists in the PLC: then onNameConflict=refuse (default) refuses at prepare and onNameConflict=rename uses MasterCopyMode.Rename. A unit master copy describes only the unit, and MasterCopyMode.Rename also renames members whose names exist in the PLC: the createdUnitMembers readback lists the blocks, types and tag tables and every <existing name>_<n> rename; a renamed block or type fails the apply after the compile (checkpoint recovery), a renamed tag table is reported. A master copy whose name or creation date changed refuses with StaleRevision.",
+          "V21 has no unit copy or move API: PlcUnit exposes only Delete(); PlcUnitComposition only Create(String), CreateFrom(MasterCopy), CreateFrom(MasterCopy, MasterCopyMode) and Find(String); PlcUnitSystemGroup holds Units and SafetyUnits without user groups, so a unit has no other parent in its PLC (PublicAPI V21 Siemens.Engineering.Step7). A copy is library_create_master_copy of the unit (object kind softwareUnit) followed by change.software_unit_create_from; it creates new objects and is not identity-preserving. A move between PLCs would be such a copy plus a delete and is not offered.",
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.lifecycle.20261030): an empty unit with namespace preset Ns.T and a SoftwareUnit relation copied through library_create_master_copy (kind softwareUnit) and software_unit_create_from with onNameConflict=rename (the copy keeps the preset and the outgoing relation), and an unreferenced unit renamed, each applied, persisted across a fresh Portal reopen and restored from its checkpoint; referenced units, names in use, the current name, a block master copy, an unknown policy and the template-name conflict refused typed. The ContentDescriptions of a unit master copy list only the unit. In the same PLC MasterCopyMode.Rename also renames members (UnitFb became UnitFb_1 (FB3), Default tag table_3 became _4): the createdUnitMembers readback lists them, a renamed block or type fails the apply after the compile (MutationVerificationFailed) and restores from the checkpoint."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.software_units.lifecycle.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires a PLC exposing PlcUnitProvider."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint",
+        "Exact plcPath when the project has more than one PLC",
+        "A library registered through library_open or library_list"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
         "AC-evidence"
       ]
     }

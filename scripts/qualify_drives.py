@@ -53,9 +53,8 @@ def scalar(rows):
     return next((p for p in rows if (p.get("value") or {}).get("kind") == "scalar" and "Single" in (p["value"].get("type") or "")), None)
 
 
-def body(h):
-    h.owned_scratch("drives")
-    boundaries = h.report["boundaries"] = {}
+def add_drive(h):
+    """The newest installed SINAMICS G120C PN as device DEVICE, added without compile or save."""
     entries = h.tool("hardware_catalog_search", {"filter": "G120C PN", "maxItems": 200})["entries"]
     rows = sorted((e for e in entries if " PN" in (e.get("typeName") or "")),
                   key=lambda e: [int(x) for x in e["typeIdentifier"].rsplit("/", 1)[1].split(".") if x.isdigit()])
@@ -64,6 +63,12 @@ def body(h):
     prepared = h.prepare("hardware_add", {"typeIdentifier": rows[-1]["typeIdentifier"], "deviceName": DEVICE, "itemName": DEVICE + "Item"})
     applied = h.stage("apply hardware_add without compile or save", lambda: h.tool("change_apply", {**h.apply_args(prepared), "compile": False, "save": False}))
     require(applied["state"] == "applied", "The drive was not added")
+
+
+def body(h):
+    h.owned_scratch("drives")
+    boundaries = h.report["boundaries"] = {}
+    add_drive(h)
     h.report["unsavedObserve"] = h.stage("drive_observe of the new unsaved drive", lambda: observe(h))
 
     compiled = h.apply("project_compile", {})

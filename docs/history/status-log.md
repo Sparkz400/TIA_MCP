@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 30 October 2026
 
+**Software units, motion connections and library compile with a drive — 30 October 2026:**
+- **Software units:** `software_unit_rename` and `software_unit_create_from` (from a unit master copy) passed natively 161/161 (`local.software_units.lifecycle.20261030`). `MasterCopyMode.Rename` silently renames copy members, so renamed blocks and types now fail the apply and restore; V21 has no unit copy or move.
+- **Motion connections:** the encoder role on a TM PosInput module, through the two-module and address overloads, and connection replacement within one checkpoint passed 44/44 (`local.technology.motion_connections.20261030`). V21 refuses the measuring input on TM PosInput, an analog speed-axis actor and a DB-member encoder; drive-telegram targets wait on the G120C's missing telegram item.
+- **Library compile with a drive:** the compilation observation now accepts a drive listed as not compiled, never as compiled (`local.library.drive_compile.20261030`, 9/9).
+- **Catalog 0.4.86:** `block.software_unit.create` and `technology.motion_connections` leave the deferred rows and are verified; 437 of 469 features verified; matrix 1,995 bound, 108 open, 31 blocked, 24 deferred.
+
 **MCP surface, Test Suite application tests and the TLS recheck — 30 October 2026:**
 - **MCP surface:** resource templates for the feature catalog, retained artifacts and saved reviews (same path checks as `artifact_read`), completions for feature IDs, artifact paths and review IDs, MCP logging after `logging/setLevel` (Information and above, no request payloads or exception text), and output schemas on 85 tools; `scripts/smoke_mcp.py` validates every tool response against its declared schema.
 - **Test Suite application tests (TS-Q02):** a qualification mode runs one owned fixture case per Run, externally managed on a ticket-owned PLCSIM instance; pass, deliberate assertion failure with recovery, a lost reply and refusals passed natively 72/72 (`local.testsuite.application.20261030`). A shared reconcile bug (null text values counted as differences) is fixed for TS-Q01 too.
