@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 30 October 2026
 
+**Integration — 30 October 2026:** combined-apply pre-checks (#162), credential route follow-ups (#163), the PLCSIM signal tools and the typed backlog landed together. Catalog 0.4.84: 427 of 467 features verified, 319 tools; matrix 1,944 bound, 141 open, 31 blocked, 30 deferred.
+
+**PLCSIM signals, areas and observation — 30 October 2026:** five new tools on owned PLCSIM: `sim_read_signals`/`sim_write_signals` (1–64 typed symbols per call; one unknown symbol makes PLCSIM reject the whole read batch), `sim_area_read`/`sim_area_write` (input, output and marker bytes or bits; writes only to inputs and markers of owned instances, as assignments) and `sim_observe` (operating state, mode and display summary plus state and LED changes in a window of up to 60 s). All passed natively 75/75 against single `sim_read`, symbolic tags at known addresses, an external PLCSIM client's Run/Stop and a foreign instance's refusals (`local.plcsim_signals.20261030`).
+
+**Typed backlog classified — 30 October 2026:** every open typed box is classified in the [typed TODO](../plans/typed-lad-fbd-todo.md). R_TRIG/F_TRIG global storage is a V21 boundary: with a referencing call the edge instance DB survives compile and save, but V21 marks it know-how protected, so no storage document can be exported (`local.typed.edge-global-storage.20261030`). Transitive parents outside the changed FB's scope are now refused. `change.graphical_typed_edit` binds once the maintainer settles the typed TODO's decisions.
+
 **Credential route follow-ups and the CPU protection level — 30 October 2026:** ([record](../verification/cpu-protection-20261030.md))
 - **Hardening:** the low findings of the #155 review are addressed: worker-side offline tests, length-prefixed seal entropy, pinned plaintext buffers; a tokenless begin reply stays refused and bindings keep not naming the change kind (both documented). Block protection passed natively again (`local.block_protection.rerun.20261030`).
 - **CPU protection level:** `hardware_cpu_parameters` takes `protectionLevel` with the full-access password through the credential route, and all 10 typed refusals passed natively; V21 then refuses the level itself while UMAC runtime access is enabled, which every owned scratch CPU needs for PLCSIM downloads. Recorded as a boundary; not qualified.

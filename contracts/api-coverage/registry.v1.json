@@ -3707,6 +3707,36 @@
         "X03",
         "D12"
       ]
+    },
+    {
+      "featureId": "sim_read_signals",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_write_signals",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_area_read",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_area_write",
+      "obligations": [
+        "L03"
+      ]
+    },
+    {
+      "featureId": "sim_observe",
+      "obligations": [
+        "L03"
+      ]
     }
   ],
   "manualResiduals": [
