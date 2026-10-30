@@ -245,15 +245,21 @@ namespace TiaMcp.Openness.V21
                 string callerName = QualifiedName(caller.Item);
                 // A parent FB or its InstanceDB embedding the changed caller at any depth follows the captured transitive effect.
                 bool embeds = capture.Documents[path].Descendants().Any(e => e.Name.LocalName == "Member" && (string)e.Attribute("Datatype") == "\"" + callerName + "\"");
+                Action requireParentScope = () => TypedGraphicalMultiInstanceTemplate.RequireCapturedParentScope(ObjectIdentity.ScopePath(capture.Plc.Path, capture.CallerPath),
+                    caller.Item.Namespace, ObjectIdentity.ScopePath(capture.Plc.Path, path), block.Item.Namespace);
                 if (block.Item is InstanceDB instance)
                 {
                     bool direct = instance.InstanceOfName == callerName && instance.Namespace == caller.Item.Namespace;
                     if (!direct && !embeds)
                         throw new BridgeException("DependencyProfileUnavailable", "Transitive dependent instance layout changes require an independently captured profile.");
+                    if (!direct) requireParentScope();
                     PrepareTypedDependentInstance(capture, dependency, callerName, declaration, transitive: !direct);
                 }
                 else if (block.Item is FB && embeds)
+                {
+                    requireParentScope();
                     PrepareTypedDependentInstance(capture, dependency, callerName, declaration, transitive: true);
+                }
                 ((JArray)preview["effects"]).Add(new JObject { ["action"] = "nativeDependentRecompile", ["path"] = path, ["declarationHash"] = capture.Hashes[path],
                     ["expectedArtifact"] = dependency["expectedArtifact"]?.DeepClone(),
                     ["startValueImpact"] = block.Item is InstanceDB || embeds ? "Only the explicit new storage member is added (nested in each embedded multi-instance for a parent) using captured native effects; existing full XML and start values must match the prepared document." : "Dependent type/call consistency is compiled; complete native XML must remain unchanged." });

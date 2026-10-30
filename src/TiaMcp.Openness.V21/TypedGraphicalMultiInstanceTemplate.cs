@@ -54,6 +54,13 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
+        // Transitive effects were captured only with the parent chain in the changed FB's own software scope and namespace.
+        internal static void RequireCapturedParentScope(string callerScope, string callerNamespace, string parentScope, string parentNamespace)
+        {
+            if (parentScope != callerScope || (parentNamespace ?? "") != (callerNamespace ?? ""))
+                Fail("A parent in another namespace or software unit has no captured transitive effect.", "DependencyProfileUnavailable");
+        }
+
         // Captured transitive effect (instance-effects-transitive.v1.json): every member typed as the changed FB, at any
         // depth of a parent FB or InstanceDB, gains the new member at the end of its nested Static section, in the direct
         // InstanceDB shape without the top-level AttributeList, Remanence and Accessibility.

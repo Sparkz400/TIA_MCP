@@ -6,7 +6,6 @@ The first blocked source stops capture and retains its tracked recovery result.
 """
 import argparse
 import hashlib
-import json
 import pathlib
 import re
 import shutil
@@ -39,14 +38,6 @@ def authored_reference(path, unit):
         names = [blocks[0].findtext("AttributeList/Name")]
         namespace = blocks[0].findtext("AttributeList/Namespace") or ""
         kind, payload, form = "block_import_xml", {"xml": text}, "native_xml_template_derivation"
-    elif path.name.lower().endswith(".instancedb.json"):
-        # SCL DATA_BLOCKs of R_TRIG/F_TRIG do not survive compile and save (wave 10 native slot); CreateInstanceDB is the route.
-        spec = json.loads(text)
-        require(isinstance(spec, dict) and set(spec) == {"name", "instanceOfName"} and all(isinstance(v, str) and v for v in spec.values()),
-                "An instance DB spec holds exactly a name and an instanceOfName.")
-        require(not unit, "Instance DB specs are captured on the standard route only.")
-        names, namespace, form = [spec["name"]], "", "instance_db_spec"
-        kind, payload = "instance_db_create", spec
     else:
         require(path.suffix.lower() in {".scl", ".s7dcl"}, "Unsupported authored source format.")
         names = re.findall(r'\b(?:FUNCTION_BLOCK|FUNCTION|DATA_BLOCK)\s+"([^\"]+)"', text)
@@ -78,8 +69,8 @@ def declare_changes(specifications, modify, observe):
             entry[field] = sorted(v.partition(":")[2] for v in values if v.partition(":")[0] == source)
         require(set(entry["modifies"]) <= set(entry["names"]) and not set(entry["observes"]) & set(entry["names"]),
                 "A modification must be declared by its source; observed dependents must not be.")
-        require(kind not in ("tag_table_import_xml", "instance_db_create") or not entry["modifies"] + entry["observes"],
-                "Tag tables and instance DB specs are captured as additions only.")
+        require(kind != "tag_table_import_xml" or not entry["modifies"] + entry["observes"],
+                "Tag tables are captured as additions only.")
 
 
 def verify_reference_additions(before, after, names, scope, namespace, modifies=(), observes=()):
@@ -91,9 +82,10 @@ def verify_reference_additions(before, after, names, scope, namespace, modifies=
     require(all(row.get("kind") == "block" and row.get("name") in allowed for row in changed), "Reference capture changed existing native XML.")
     require({row["name"] for row in changed} >= set(modifies), "A declared modification left its native block unchanged.")
     # Protected system FBs that TIA copies into System blocks on first use (R_TRIG, F_TRIG) are generated, not authored.
-    added = [new[key] for key in set(new) - set(old) if new[key]["kind"] != "protectedSystemBlock"]
+    # V21 marks an R_TRIG/F_TRIG instance DB know-how protected too (30 October): a declared one is added by identity only.
     expected = set(names) - set(modifies)
-    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable") for row in added)
+    added = [new[key] for key in set(new) - set(old) if new[key]["kind"] != "protectedSystemBlock" or "/systemGroups/" not in new[key]["path"]]
+    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable", "protectedSystemBlock") for row in added)
         and {row["name"] for row in added} == expected, "Reference capture did not add exactly the declared objects.")
     blocks, tables = after["inventory"]["blocks"], after["inventory"].get("tagTables", [])
     for row in added + changed:
@@ -168,7 +160,7 @@ def capture(args):
                     "New independent capture cannot overwrite an existing native reference.")
             require(all(any(block["scopePath"] == scope and block["identity"]["namespace"] == entry["namespace"] and block["name"] == name
                     for block in baseline["inventory"]["blocks"]) for name in entry["modifies"]), "A declared modification target does not exist.")
-            target = ({"expectedTableNames": entry["names"]} if kind == "tag_table_import_xml" else {} if kind == "instance_db_create"
+            target = ({"expectedTableNames": entry["names"]} if kind == "tag_table_import_xml"
                       else {"namespace": entry["namespace"], "expectedBlockNames": entry["names"]})
             if not args.unit:
                 target.pop("namespace", None)  # standard route: the PLC program scope, no namespace or scope path
@@ -187,6 +179,10 @@ def capture(args):
                 entry["modifies"], entry["observes"])
             entry["compile"], entry["exports"] = applied["compile"], []
             for row in additions + changes:
+                if row["kind"] == "protectedSystemBlock":
+                    # Not exportable: its inventory identity is the whole record.
+                    entry.setdefault("protectedAdditions", []).append({"name": row["name"], "path": row["path"], "identitySha256": row["payloadSha256"]})
+                    continue
                 # A changed block keeps its earlier export; its new state is named by this source's ordinal.
                 target = output / (row["name"] + (".xml" if row in additions else ".source-" + str(ordinal).zfill(2) + ".xml"))
                 require(not target.exists(), "Native export destination already exists.")

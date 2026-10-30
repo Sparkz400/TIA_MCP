@@ -882,6 +882,11 @@ internal static class TypedGraphicalTests
         var once =TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestParent"), "Tgp_NestEffect", members[0]);
         await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(once, "Tgp_NestEffect", members[0]));
         await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.AppendNested(Read("before-Tgp_NestEffect_DB"), "Tgp_NestEffect", members[0]));
+        // The captured parent chains share the changed FB's scope and namespace; other parents stay refused.
+        TypedGraphicalMultiInstanceTemplate.RequireCapturedParentScope("/plc/units/U", "U", "/plc/units/U", "U");
+        TypedGraphicalMultiInstanceTemplate.RequireCapturedParentScope("/plc", null, "/plc", "");
+        await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.RequireCapturedParentScope("/plc/units/U", "U", "/plc/units/U", "U.Other"));
+        await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.RequireCapturedParentScope("/plc/units/U", "U", "/plc/units/V", "U"));
     }
 
     internal static async Task MultiInstanceTemplatesPreserveObservedShapes()
