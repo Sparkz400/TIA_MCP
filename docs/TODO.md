@@ -124,10 +124,11 @@ One box per obligation group of the [release ledger](plans/release-obligations-2
 
 ## Release mechanics and policy
 
-- [ ] **One product version source.** Today the assemblies default to 1.0.0.0, `serverInfo` reports the catalog version (`0.4.76`) and the Add-In is 0.1.0.
-- [ ] **CHANGELOG** for the release, with exact limitations.
-- [ ] **Release workflow:** a tag-triggered workflow that runs `scripts/Package.ps1` and `scripts/Verify-TiaMcpBundle.ps1` and attaches the verified package.
-- [ ] **Pre-release security review:** a fresh NuGet vulnerability check and a supported-versions statement in `SECURITY.md`.
+- [x] **One product version source.** `Directory.Build.props` sets 0.9.0 for every assembly, the bundle name and manifest; `serverInfo.version` reports it and the catalog version moved to `capabilities.experimental["tiaMcp/featureCatalog"]`; `scripts/test_product_version.py` keeps the copies in package.json and the Add-In in step.
+- [x] **CHANGELOG:** `CHANGELOG.md` keeps an Unreleased section with known limitations; the release section is cut at release time ([releasing](guides/releasing.md)).
+- [x] **Release workflow:** `.github/workflows/release.yml` runs on `v*` tags only, reruns the offline and Explorer checks, packages and strictly verifies the bundle, and creates a draft pre-release with the bundle, checksum and manifest; it never publishes or pushes.
+- [x] **Pre-release security review:** done on 30 October ([review](verification/security-review-20261030.md)): no vulnerable NuGet or npm dependency, no critical or high finding; `SECURITY.md` has a supported-versions statement. Rerun the vulnerability check on the release candidate.
+- [ ] **Security review follow-ups:** the medium finding (combined library apply checks languages and instance profiles only after step 1 imported and saved) and an opt-out option are being fixed; the TLS pin gaps are being fixed; the vault lock held during network calls, `watch_table_monitor` export clean-up, empty vault folders for unknown vault names and the translation-reopen ownership scope stay open (all low).
 - [ ] **Contract freeze:** a public compatibility policy for the tool surface: which tool names, input/output schemas and error codes 1.0 freezes, and how they may change afterwards.
 - [ ] **Release candidate:** re-run the required regression on the frozen candidate and publish upgrade, recovery and rollback instructions ([1.0 checklist](history/1.0-release-checklist-20261013.md)).
 - [ ] **Explorer performance evidence:** warm/cold timings, memory and payload sizes next to the existing 1k/10k/50k tree and 500-node graph measurements ([1.0 checklist](history/1.0-release-checklist-20261013.md)).

@@ -36,9 +36,9 @@ names every row with an open cell.
   lacked only a repository route; building it is 1.0 work (decision of 29 October).
 - **Deferred rows:** ten `not_implemented` rows (30 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
-- **Release mechanics:** one version source, a CHANGELOG, a release workflow, a pre-release
-  security review, a contract freeze policy, the engineering package, tag and release notes
-  ([TODO](TODO.md#release-mechanics-and-policy)).
+- **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
+  release workflow and the 30 October security review are in place; a contract freeze policy,
+  the engineering package and the release itself remain ([TODO](TODO.md#release-mechanics-and-policy)).
 
 ## Where the evidence is
 

@@ -36,7 +36,7 @@ passing offline CI is not evidence that an engineering change is safe to deploy.
 
 ## Handling sensitive material
 
-Use an appropriate protected store for credentials. The [local credential commands](docs/reference/protected-credentials.md) provide current-user DPAPI storage with exact public context and restricted ACLs; native consumers and cross-user recovery remain unqualified. Do not put secrets in MCP arguments, public binding selectors, logs or plaintext configuration.
+Use an appropriate protected store for credentials. The [local credential commands](docs/reference/protected-credentials.md) provide current-user DPAPI storage with exact public context and restricted ACLs. The only native consumer is the [block-protection change route](docs/reference/protected-credentials.md#change-apply-credential-route), qualified on an owned scratch project; cross-user recovery remains unqualified. Do not put secrets in MCP arguments, public binding selectors, logs or plaintext configuration.
 Ignored files are not encrypted, and ignore rules do not remove previously
 committed content. If a credential is exposed, revoke or rotate it first.
 
