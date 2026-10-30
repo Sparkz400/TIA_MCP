@@ -26,7 +26,8 @@ namespace TiaMcp.Openness.V21
             // A protection level needs no other parameter.
             if (change.Payload["protectionLevel"] == null || attributes.Count != 0) HardwareEngineeringRules.RequireCpuParameterRequest(attributes);
             var declared = new HashSet<string>(item.Item.GetAttributeInfos().Select(info => info.Name), StringComparer.Ordinal);
-            HardwareEngineeringRules.RequireCpuProtectionRequest(change.Payload, declared.Contains(AccessControl) ? ReadAttributeValue(item.Item, AccessControl, CpuParameterAttributeSet, false, out _)?.ToString() : null);
+            string mode = declared.Contains(AccessControl) ? ReadAttributeValue(item.Item, AccessControl, CpuParameterAttributeSet, false, out _)?.ToString() : null;
+            HardwareEngineeringRules.RequireCpuProtectionRequest(change.Payload, mode);
             string level = change.Payload.Value<string>("protectionLevel");
             PlcAccessLevelProvider access = null; JObject binding = null;
             if (level != null)
@@ -35,7 +36,10 @@ namespace TiaMcp.Openness.V21
                 RoutedCredentials.RequireReference(change.Payload, "credential");
                 var plc = item.Item.GetService<SoftwareContainer>()?.Software as PlcSoftware
                     ?? throw new BridgeException("UnsupportedCapability", "The protection level is set on the CPU item that holds the PLC software; select that item.");
-                access = item.Item.GetService<PlcAccessLevelProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected CPU exposes no PlcAccessLevelProvider service.");
+                // V21 exposes the provider only under an access-level mode (30 October 2026); a change entering one finds it at apply.
+                access = item.Item.GetService<PlcAccessLevelProvider>();
+                if (access == null && HardwareEngineeringRules.IsAccessLevelMode(mode))
+                    throw new BridgeException("UnsupportedCapability", "The selected CPU exposes no PlcAccessLevelProvider service.");
                 // The full-access password is bound to this exact CPU: its PLC path, its hardware item and the purpose.
                 binding = RoutedCredentials.Binding(item.Path + "/plc/" + Segment(plc.Name), item.Path, "cpuProtection", "fullAccess", "fullAccessPassword");
             }
@@ -59,7 +63,7 @@ namespace TiaMcp.Openness.V21
                 ((JArray)preview["warnings"]).Add("Device compilation validates the parameter combination; the runtime effect is observed only after a download.");
                 if (level != null)
                 {
-                    effect["protectionLevelBefore"] = SecurityValue(() => access.PlcProtectionAccessLevel); effect["protectionLevelAfter"] = level;
+                    effect["protectionLevelBefore"] = access == null ? JValue.CreateNull() : SecurityValue(() => access.PlcProtectionAccessLevel); effect["protectionLevelAfter"] = level;
                     preview["credentials"] = RoutedCredentials.Slots(change.Payload, binding, "credential");
                     ((JArray)preview["warnings"]).Add("The full-access password is set from the credential reference; only the reference and its public binding are recorded. At apply the Host checks it against its credential store and seals the secret to that one admitted apply; no secret is previewed, journaled, checkpointed or returned. V21 cannot read a password back: device compilation is the evidence that one is set.");
                 }
@@ -77,7 +81,8 @@ namespace TiaMcp.Openness.V21
             string level = change.Payload.Value<string>("protectionLevel");
             if (level == null) return;
             // After the access-control mode, under which the level applies.
-            var access = target.GetService<PlcAccessLevelProvider>();
+            var access = target.GetService<PlcAccessLevelProvider>()
+                ?? throw new BridgeException("UnsupportedCapability", "The CPU exposes no PlcAccessLevelProvider service after its access-level mode was written.");
             access.PlcProtectionAccessLevel = (PlcProtectionAccessLevel)Enum.Parse(typeof(PlcProtectionAccessLevel), level);
             using (var password = OpenRoutedCredential(change, "credential"))
             {
