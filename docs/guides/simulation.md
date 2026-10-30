@@ -167,9 +167,11 @@ otherwise), and are refused before any runtime call when a value or bound is inv
   objects and types, except `string` and `wstring`: the V8 `ReadSignals`/`WriteSignals` calls carry only
   primitive values (`UnsupportedSignalType`). Symbols must be shorter than 300 characters, the V8 name
   buffer; a write needs distinct symbols. All signals go through one runtime call, but the values are not
-  claimed to come from one scan. A bad item reports its runtime error code (for example
-  `SignalNameDoesNotExist`) with `quality: "bad"`. A write fails as a whole with `PartialSimulationWrite`
-  and each item's `result` when any item fails; items not reported failed may have been written.
+  claimed to come from one scan. A bad item reports its runtime error code with `quality: "bad"`. PLCSIM
+  rejects the whole batch when one symbol is unknown: that item reports `DoesNotExist`, every other item
+  `SignalConfigurationError`, and none carries a value (observed natively). A write fails as a whole with
+  `PartialSimulationWrite` and each item's `result` when any item fails; items not reported failed may
+  have been written.
 - **Process image by address.** `sim_area_read` reads the input, output or marker image: `length` bytes
   from `offset`, or one `bit`. `sim_area_write` writes `bytes` from `offset`, or one `bit`, into the input
   or marker image. A range beyond the area's size is refused with `InvalidRequest`. Byte order is the

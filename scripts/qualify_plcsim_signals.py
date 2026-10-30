@@ -308,10 +308,14 @@ def signals(h, lab):
     h.report["batchAfterSingleWrite"] = h.stage("sim_read_signals after independent sim_write", single_write)
     h.report["batchSecond"] = h.stage("sim_write_signals the second value set", batch_write(1))
     def bad_item():
+        # Observed on 30 October 2026: PLCSIM rejects the whole batch; the unknown item reports DoesNotExist, the others
+        # SignalConfigurationError, and no item carries a value.
         rows = h.tool("sim_read_signals", {"instanceId": lab.instance["id"], "signals": [lab.signal("VBool"), {"symbol": '"SigDb".Missing', "type": "int16"}, lab.signal("Scans", "int32")]})["values"]
-        require(rows[0]["quality"] == "good" and rows[1]["quality"] == "bad" and rows[1].get("errorCode") and rows[2]["quality"] == "good", "Bad-item batch: %s" % rows)
-        return rows
-    h.report["batchBadItem"] = h.stage("sim_read_signals reports a missing symbol as a bad item", bad_item)
+        require(rows[1]["quality"] == "bad" and rows[1].get("errorCode") == "DoesNotExist" and all(r["quality"] == "bad" and r.get("errorCode") and "value" not in r for r in rows),
+                "Bad-item batch: %s" % rows)
+        good = lab.batch("VBool", "Scans")
+        return {"rejected": rows, "withoutTheUnknownSymbol": good}
+    h.report["batchBadItem"] = h.stage("sim_read_signals: an unknown symbol rejects the batch; without it the batch reads", bad_item)
     before = lab.single(*names)
     instance = lab.instance["id"]
     refuse(h, "a string type", "sim_read_signals", {"instanceId": instance, "signals": [lab.signal("Text", "string")]}, ["UnsupportedSignalType"])
