@@ -63,31 +63,65 @@ namespace TiaMcp.Openness.V21
         // Resolves the exact target and the matching V21 Connect overload; apply=false only validates the pair.
         private void ConnectTechnologySlot(object slot, Project project, PlcSelection plc, JObject payload, bool apply)
         {
-            bool hardware = payload["hardwarePath"] != null, index = payload["channelIndex"] != null, tag = payload["tagName"] != null;
-            // Any channel field selects the channel overload, so a partial selector never falls back to the whole module.
-            bool channel = new[] { "channelNumber", "channelType", "channelIoType" }.Any(field => payload[field] != null);
-            if (hardware == tag || (channel || index) && !hardware || channel && index)
-                throw new BridgeException("InvalidRequest", "Select exactly one target: hardwarePath, hardwarePath with channelNumber/channelType/channelIoType, hardwarePath with channelIndex, or tagName.");
-            object target = tag ? TechnologyConnectionTag(plc, payload) : channel ? HardwareChannel(project, payload) : (object)ChangeHardware(project, payload).Item;
-            int channelIndex = index ? HardwareIndex(payload, "channelIndex") : -1;
-            Action connect = null;
+            string form = TechnologyTargetForm(ChangeText(payload, "role", 32), payload);
+            object target = form == "tag" ? TechnologyConnectionTag(plc, payload) : form == "channel" ? HardwareChannel(project, payload)
+                : form == "hardware" || form == "channelIndex" ? ChangeHardware(project, payload).Item : null;
+            DeviceItem input = form == "modules" ? ChangeHardware(project, payload, "inputHardwarePath").Item : null;
+            DeviceItem output = form == "modules" ? ChangeHardware(project, payload, "outputHardwarePath").Item : null;
+            string member = form == "dbMember" ? ChangeText(payload, "dbMemberPath", 1024) : null;
+            int channelIndex = form == "channelIndex" ? HardwareIndex(payload, "channelIndex") : -1;
+            int inputAddress = payload["inputAddress"] != null ? HardwareIndex(payload, "inputAddress") : -1, outputAddress = payload["outputAddress"] != null ? HardwareIndex(payload, "outputAddress") : -1;
+            string optionText = payload["connectOption"] == null ? "Default" : ChangeText(payload, "connectOption", 32);
+            if (optionText != "Default" && optionText != "AllowAllModules") throw new BridgeException("InvalidRequest", "connectOption must be Default or AllowAllModules.");
+            var option = (ConnectOption)Enum.Parse(typeof(ConnectOption), optionText);
+            Action connect;
             switch (slot)
             {
-                case AxisEncoderHardwareConnectionInterface s when !index:
-                    connect = target is Channel axisChannel ? () => s.Connect(axisChannel) : target is PlcTag axisTag ? () => s.Connect(axisTag) : (Action)(() => s.Connect((DeviceItem)target));
+                case AxisEncoderHardwareConnectionInterface s:
+                    connect = form == "channel" ? () => s.Connect((Channel)target) : form == "tag" ? () => s.Connect((PlcTag)target) : form == "hardware" ? () => s.Connect((DeviceItem)target)
+                        : form == "modules" ? () => s.Connect(input, output, option) : form == "dbMember" ? () => s.Connect(member) : (Action)(() => s.Connect(inputAddress, outputAddress, option));
                     break;
-                case TorqueHardwareConnectionInterface s when target is DeviceItem d && !index: connect = () => s.Connect(d); break;
-                case MeasuringInputHardwareConnectionProvider s when target is Channel c: connect = () => s.Connect(c); break;
-                case MeasuringInputHardwareConnectionProvider s when target is DeviceItem d && index: connect = () => s.Connect(d, channelIndex); break;
-                case OutputCamHardwareConnectionProvider s when target is Channel c: connect = () => s.Connect(c); break;
-                case OutputCamHardwareConnectionProvider s when target is PlcTag t: connect = () => s.Connect(t); break;
+                case TorqueHardwareConnectionInterface s:
+                    connect = form == "hardware" ? () => s.Connect((DeviceItem)target) : form == "modules" ? () => s.Connect(input, output, option)
+                        : form == "dbMember" ? () => s.Connect(member) : (Action)(() => s.Connect(inputAddress, outputAddress, option));
+                    break;
+                case MeasuringInputHardwareConnectionProvider s:
+                    connect = form == "channel" ? () => s.Connect((Channel)target) : form == "channelIndex" ? () => s.Connect((DeviceItem)target, channelIndex) : (Action)(() => s.Connect(inputAddress));
+                    break;
+                default:
+                    var cam = (OutputCamHardwareConnectionProvider)slot;
+                    connect = form == "channel" ? () => cam.Connect((Channel)target) : form == "tag" ? () => cam.Connect((PlcTag)target) : (Action)(() => cam.Connect(outputAddress));
+                    break;
             }
-            if (connect == null) throw new BridgeException("UnsupportedTarget", "The selected connection role has no V21 Connect overload for this target kind.");
             if (!apply) return;
             connect();
-            if (!TechnologySlotConnected(slot) || !TechnologySlotTargets(slot).Any(linked => Equals(linked, target))
-                || index && ((MeasuringInputHardwareConnectionProvider)slot).ChannelIndex != channelIndex)
+            Func<string, object> read = field => TechnologySlotValue(slot, field);
+            // TIA may quote DB and member names in its readback.
+            bool reported = form == "modules" ? Equals(read("InputModule"), input) && Equals(read("OutputModule"), output)
+                : form == "dbMember" ? string.Equals((read("PathToDBMember") as string)?.Replace("\"", ""), member.Replace("\"", ""), StringComparison.Ordinal)
+                : form == "addresses" ? (inputAddress < 0 || Equals(read("InputAddress"), inputAddress)) && (outputAddress < 0 || Equals(read("OutputAddress"), outputAddress))
+                : TechnologySlotTargets(slot).Any(linked => Equals(linked, target));
+            if (!TechnologySlotConnected(slot) || !reported || form == "channelIndex" && ((MeasuringInputHardwareConnectionProvider)slot).ChannelIndex != channelIndex
+                || payload["connectOption"] != null && !Equals(read("ConnectOption"), option))
                 throw new BridgeException("MutationVerificationFailed", "The connection readback does not report the requested target; checkpoint recovery is required.");
+        }
+
+        // A property that does not apply to this connection type throws; it reads as null.
+        private static object TechnologySlotValue(object slot, string field)
+        {
+            try
+            {
+                if (slot is AxisEncoderHardwareConnectionInterface axis)
+                    return field == "InputModule" ? axis.InputModule : field == "OutputModule" ? axis.OutputModule : field == "InputAddress" ? axis.InputAddress
+                        : field == "OutputAddress" ? axis.OutputAddress : field == "PathToDBMember" ? axis.PathToDBMember : (object)axis.ConnectOption;
+                if (slot is TorqueHardwareConnectionInterface torque)
+                    return field == "InputModule" ? torque.InputModule : field == "OutputModule" ? torque.OutputModule : field == "InputAddress" ? torque.InputAddress
+                        : field == "OutputAddress" ? torque.OutputAddress : field == "PathToDBMember" ? torque.PathToDBMember : (object)torque.ConnectOption;
+                if (slot is MeasuringInputHardwareConnectionProvider measuring && field == "InputAddress") return measuring.InputAddress;
+                if (slot is OutputCamHardwareConnectionProvider cam && field == "OutputAddress") return cam.OutputAddress;
+            }
+            catch (Exception) { }
+            return null;
         }
 
         private static PlcTag TechnologyConnectionTag(PlcSelection plc, JObject payload)

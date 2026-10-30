@@ -18,11 +18,15 @@ report, support bounded paging/downloads, and verify derivation after restart.
 Existing project review/upload/artifact storage is reused. No native resolver,
 private project format, parallel identity scheme or new dependency is introduced.
 
-Prepared change kinds `software_unit_create`, `software_unit_relation_set` (SoftwareUnit
+Change kinds `software_unit_create`, `software_unit_relation_set` (SoftwareUnit
 relations only, cycles refused), `software_unit_publication_set` (native `Access` attribute)
-and `software_unit_delete` (empty, unreferenced units only) now cover part of SU02/SU04/SU05
-through the existing checkpoint/compile/readback flow. They are compiled against the V21
-API only; native qualification, rename/copy/move and NonUnitDB/TODB relations remain open.
+and `software_unit_delete` (empty, unreferenced units only) are verified
+(`local.software_units.20261028`). `software_unit_rename` (unreferenced units) and
+`software_unit_create_from` (`PlcUnitComposition.CreateFrom` of a unit master copy, SU04) use
+the same checkpoint/compile/readback flow. V21 has no unit copy or move API: a copy is
+`library_create_master_copy` of the unit followed by `software_unit_create_from`, which creates
+new objects; a move has no target, since a PLC's units have no user groups and a move between
+PLCs would be such a copy plus a delete. NonUnitDB/TODB relations remain open.
 See [engineering workflows](../../guides/engineering-workflows.md#supported-payloads).
 
 The [workflow](../../reference/software-unit-review.md) and its official sources

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Siemens.Engineering.Library.MasterCopies;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Types;
 using Siemens.Engineering.SW.Units;
@@ -28,20 +29,31 @@ namespace TiaMcp.Openness.V21
             {
                 string path = ChangeText(payload, key, 4096);
                 var scope = scopes.SingleOrDefault(item => item.Path == path) ?? throw new BridgeException("ScopeNotFound", key + " matches no exposed unit of the selected PLC.");
-                if (scope.Kind == "safetyUnit") throw new BridgeException("SafetyBoundary", "Software-unit lifecycle changes never create, relate, publish in or delete safety units.");
+                if (scope.Kind == "safetyUnit") throw new BridgeException("SafetyBoundary", "Software-unit lifecycle changes never change safety units.");
                 if (scope.Kind != "softwareUnit") throw new BridgeException("InvalidRequest", key + " must be an exact software-unit path.");
                 return scope;
             };
             Func<SoftwareScope, string, PlcUnitRelation[]> relationsTo = (owner, name) => owner.Unit.Relations
                 .Where(relation => relation.RelationType == UnitRelationType.SoftwareUnit && string.Equals(Convert.ToString(relation.RelatedObject), name, StringComparison.OrdinalIgnoreCase)).ToArray();
+            Func<SoftwareScope, string> newName = self =>
+            {
+                string name = ChangeText(payload, "name", 128);
+                if (scopes.Any(scope => scope.Unit != null && scope != self && string.Equals(scope.Name, name, StringComparison.OrdinalIgnoreCase)))
+                    throw new BridgeException("ObjectExists", "A software or safety unit already uses this name.");
+                return name;
+            };
+            // V21 relations name units by text, so every unit relation naming the target is a reference to it.
+            Func<SoftwareScope, JObject> references = target => new JObject { ["policy"] = "rejectReferenced", ["cascade"] = false,
+                ["references"] = new JArray(scopes.Where(scope => scope.Unit != null && scope.Path != target.Path)
+                    .SelectMany(scope => scope.Unit.Relations.Where(relation => string.Equals(Convert.ToString(relation.RelatedObject), target.Name, StringComparison.OrdinalIgnoreCase))
+                        .Select(relation => new JObject { ["unitPath"] = scope.Path, ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = Convert.ToString(relation.RelatedObject) }))),
+                ["scope"] = "Native relations of every exposed software and safety unit of the selected PLC." };
             switch (change.Kind)
             {
                 case "software_unit_create":
                 {
-                    string name = ChangeText(payload, "name", 128);
+                    string name = newName(null);
                     string preset = payload["namespacePreset"] == null ? null : ChangeText(payload, "namespacePreset", 128);
-                    if (scopes.Any(scope => scope.Unit != null && string.Equals(scope.Name, name, StringComparison.OrdinalIgnoreCase)))
-                        throw new BridgeException("ObjectExists", "A software or safety unit already uses this name.");
                     if (preview != null) { effects.Add(new JObject { ["createSoftwareUnit"] = name, ["unitPath"] = plc.Path + "/units/" + Segment(name), ["namespacePreset"] = preset }); break; }
                     var created = provider.UnitGroup.Units.Create(name);
                     if (preset != null) created.NamespacePreset = preset;
@@ -108,12 +120,9 @@ namespace TiaMcp.Openness.V21
                         + EngineeringGroupPaths(target.Blocks, "", 0).Concat(EngineeringGroupPaths(target.Types, "", 0)).Concat(EngineeringGroupPaths(target.Tags, "", 0)).Count() - 3;
                     if (budget.Truncated) throw new BridgeException("TraversalLimit", "Unit content check is incomplete.");
                     if (members != 0) throw new BridgeException("UnitNotEmpty", "Only an empty software unit can be deleted; delete or move its blocks, types, tags, user groups, external sources and user text lists explicitly first.");
-                    var references = new JArray(scopes.Where(scope => scope.Unit != null && scope.Path != target.Path)
-                        .SelectMany(scope => scope.Unit.Relations.Where(relation => string.Equals(Convert.ToString(relation.RelatedObject), target.Name, StringComparison.OrdinalIgnoreCase))
-                            .Select(relation => new JObject { ["unitPath"] = scope.Path, ["relationType"] = relation.RelationType.ToString(), ["relatedObject"] = Convert.ToString(relation.RelatedObject) })));
-                    var dependencies = new JObject { ["policy"] = "rejectReferenced", ["references"] = references, ["cascade"] = false,
-                        ["scope"] = "Native relations of every exposed software and safety unit of the selected PLC. The unit is empty, so none of its members can be referenced." };
-                    if (references.Count != 0) throw new BridgeException("DependencyExists", "Remove the relations that point to this unit before deleting it; no cascade is performed.", dependencies);
+                    var dependencies = references(target);
+                    dependencies["scope"] = dependencies.Value<string>("scope") + " The unit is empty, so none of its members can be referenced.";
+                    if (dependencies["references"].HasValues) throw new BridgeException("DependencyExists", "Remove the relations that point to this unit before deleting it; no cascade is performed.", dependencies);
                     change.ScopePath = target.Path;
                     if (preview != null)
                     {
@@ -125,6 +134,59 @@ namespace TiaMcp.Openness.V21
                     }
                     ((PlcUnit)target.Unit).Delete();
                     if (provider.UnitGroup.Units.Find(target.Name) != null) throw new BridgeException("MutationVerificationFailed", "The deleted software unit still exists.");
+                    break;
+                }
+                case "software_unit_rename":
+                {
+                    var target = unit("unitPath");
+                    string name = newName(target);
+                    if (name == target.Name) throw new BridgeException("InvalidRequest", "name equals the unit's current name.");
+                    var dependencies = references(target);
+                    // Whether TIA rewrites the name in other units' relations is not established, so a referenced unit is refused.
+                    if (dependencies["references"].HasValues) throw new BridgeException("DependencyExists", "Remove the relations that name this unit before renaming it.", dependencies);
+                    change.ScopePath = target.Path;
+                    if (preview != null) { preview["dependencies"] = dependencies; effects.Add(new JObject { ["renameSoftwareUnit"] = target.Path, ["name"] = name, ["unitPath"] = plc.Path + "/units/" + Segment(name) }); break; }
+                    target.Unit.Name = name;
+                    if (target.Unit.Name != name || !Equals(provider.UnitGroup.Units.Find(name), target.Unit))
+                        throw new BridgeException("MutationVerificationFailed", "The renamed software unit did not read back with the requested name.");
+                    break;
+                }
+                case "software_unit_create_from":
+                {
+                    string name = newName(null);
+                    string conflict = payload["onNameConflict"] == null ? "refuse" : ChangeText(payload, "onNameConflict", 16);
+                    if (conflict != "refuse" && conflict != "rename") throw new BridgeException("InvalidRequest", "onNameConflict must be refuse or rename.");
+                    var master = ResolveLibraryMaster(ResolveLibrary(ChangeText(payload, "libraryId", 64)), ChangeText(payload, "masterCopyPath", 4096));
+                    var contents = master.ContentDescriptions.ToArray();
+                    var templates = contents.Where(content => content.ContentType?.FullName == typeof(PlcUnit).FullName).ToArray();
+                    if (templates.Length != 1) throw new BridgeException("TargetIncompatible", "masterCopyPath must name a master copy holding exactly one software unit.");
+                    string template = templates[0].ContentName;
+                    bool renamed = scopes.Any(scope => scope.Unit != null && string.Equals(scope.Name, template, StringComparison.OrdinalIgnoreCase));
+                    if (renamed && conflict == "refuse")
+                        throw new BridgeException("ObjectExists", "The master copy's unit " + template + " already exists in the PLC; onNameConflict=rename inserts it with MasterCopyMode.Rename and then renames it to name.");
+                    var source = new JObject { ["masterCopyPath"] = payload["masterCopyPath"], ["masterCopy"] = master.Name, ["creationDate"] = master.CreationDate.ToString("O"),
+                        ["contents"] = new JArray(contents.Select(content => new JObject { ["name"] = content.ContentName, ["type"] = content.ContentType?.FullName })) };
+                    var mode = renamed ? MasterCopyMode.Rename : MasterCopyMode.ThrowIfExists;
+                    if (preview != null)
+                    {
+                        effects.Add(new JObject { ["createSoftwareUnitFrom"] = source, ["templateUnit"] = template, ["masterCopyMode"] = mode.ToString(), ["name"] = name, ["unitPath"] = plc.Path + "/units/" + Segment(name) });
+                        break;
+                    }
+                    if (!JToken.DeepEquals(source, change.Preview["effects"][0]["createSoftwareUnitFrom"])) throw new BridgeException("StaleRevision", "The master copy changed since preparation; no write was applied.");
+                    var before = provider.UnitGroup.Units.ToList();
+                    var created = provider.UnitGroup.Units.CreateFrom(master, mode);
+                    if (created == null || before.Contains(created)) throw new BridgeException("MutationVerificationFailed", "CreateFrom did not return a new software unit.");
+                    if (created.Name != name) created.Name = name;
+                    var readback = new ScanBudget(50000);
+                    var after = SoftwareScopes(plc, readback).SingleOrDefault(scope => Equals(scope.Unit, created));
+                    var members = after == null ? new HashSet<string>() : new HashSet<string>(ScopeBlocks(after, readback).Select(block => block.Item.Name)
+                        .Concat(ScopeTypes(after, readback).Select(type => type.Item.Name)).Concat(TagTables(after.Tags, after.Path + "/tags", readback).Select(table => table.Item.Name)), StringComparer.Ordinal);
+                    if (readback.Truncated) throw new BridgeException("TraversalLimit", "The created unit's readback is incomplete; checkpoint recovery is required.");
+                    // A member renamed by MasterCopyMode.Rename no longer carries its described name: refused, never reported as a copy.
+                    var described = contents.Where(content => content.ContentType != null && new[] { typeof(PlcBlock), typeof(PlcType), typeof(Siemens.Engineering.SW.Tags.PlcTagTable) }
+                        .Any(type => type.IsAssignableFrom(content.ContentType))).Select(content => content.ContentName);
+                    if (after == null || created.Name != name || !Equals(provider.UnitGroup.Units.Find(name), created) || described.Any(member => !members.Contains(member)))
+                        throw new BridgeException("MutationVerificationFailed", "The created software unit did not read back with the requested name and the master copy's block, type and tag-table names.");
                     break;
                 }
             }

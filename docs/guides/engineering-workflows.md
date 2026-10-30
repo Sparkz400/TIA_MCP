@@ -113,7 +113,9 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `group_create` | `groupKind: "blocks"`, `"types"` or `"tags"`, `groupPath`, `name`, optional `scopePath` | Creates a user group below the exact existing parent `groupPath`. |
 | `group_rename` | `groupKind`, `groupPath`, `name`, optional `scopePath` | Renames the exact existing user group to `name`; generated/root groups are excluded. |
 | `group_delete` | `groupKind`, `groupPath`, `dependencyPolicy: "rejectReferenced"`, optional `scopePath` | Deletes only an empty existing user group. |
-| `software_unit_create` | `name`, optional `namespacePreset`; outer `plcPath` | Creates one standard software unit and reads back its name and preset. Name collisions with any unit are refused; templates, copy, move and rename are not included. |
+| `software_unit_create` | `name`, optional `namespacePreset`; outer `plcPath` | Creates one standard software unit and reads back its name and preset. Name collisions with any unit are refused; master-copy instantiation and rename are the kinds below. |
+| `software_unit_create_from` | `libraryId` (from `library_open`/`library_list`), `masterCopyPath` (from `library_query`), `name`, optional `onNameConflict: "refuse"` (default) or `"rename"`; outer `plcPath` | Creates one standard unit from a master copy holding exactly one software unit (`PlcUnitComposition.CreateFrom`) and renames it to `name`. When the template's unit name already exists in the PLC, `refuse` refuses at prepare and `rename` inserts with `MasterCopyMode.Rename`; any described block, type or tag-table name missing from the new unit (a member TIA renamed) fails the apply and needs checkpoint recovery. A master copy's name and creation date changing after prepare refuses with `StaleRevision`. |
+| `software_unit_rename` | `unitPath`, `name` | Renames one standard unit (`PlcUnitBase.Name`) and reads the unit back under the new name. Refused while any unit relation names the unit (`DependencyExists`, listed like `software_unit_delete`), for a name in use and for the current name. |
 | `software_unit_relation_set` | `unitPath`, `relatedUnitPath`, `relationType: "SoftwareUnit"`, `action: "add"` or `"remove"` | Adds or removes one relation between two exact standard units of the same PLC. Duplicates, self-relations and relations that would close a cycle are refused; `NonUnitDB`/`TODB` relations are not supported. |
 | `software_unit_publication_set` | `objectPath`, `attributes: { "Access": "Published" }` or `"Unpublished"` | Writes the native `Access` (`UnitAccessType`) attribute of one exact unit block or PLC data type when metadata declares it readable and writable, then reads it back. OBs and protected, safety, generated or PLC-root objects are refused. |
 | `software_unit_delete` | `unitPath`, optional `dependencyPolicy: "rejectReferenced"` | Deletes one empty standard unit (no blocks, types, tags/constants, user groups, external sources or user text lists). It is refused while any unit relation names it; empty tag tables and the unit's own relations go with it and are listed in the preview. |
@@ -139,7 +141,7 @@ Block/type/tag-table changes also accept an exact `scopePath` for a standard PLC
 | `to_create` | `name`, `typeIdentifier`, `version`, optional `parameters: {...}` | Creates a native technology object and applies requested initial scalar parameters within the same recovery checkpoint before its first compile. Siemens validates CPU/type/version; parameter names, native types and exposed write access can be checked only after creation. |
 | `to_parameters` | `technologyPath` or unique `name`, `parameters: {...}` | Up to 500 scalar TO parameters with known read/write access and explicit native types; see the scalar-write boundary below. |
 | `to_delete` | `technologyPath` or unique `name` | Deletes an existing technology object after an XML backup and project checkpoint. |
-| `to_connect` | `technologyPath` or unique `name`, `role` (`actor`, `sensor` + `sensorIndex`, `torque`, `encoder`, `measuringInput`, `outputCam`), one target: `hardwarePath` (module or PROFIdrive telegram), `hardwarePath` + `channelType`/`channelIoType`/`channelNumber`, `hardwarePath` + `channelIndex` (measuring input) or `tagName` | Connects one slot through the matching V21 `Connect` overload; unsupported role/target pairs refuse at prepare. Apply reads back `IsConnected` and the reported module/channel/tag; the preview, fingerprint and `technologyAfter` reuse the `technology_read` connection rows. Requires `compile=true`. Verified (`local.technology_changes.20261028`, `local.composite_rebind.20261028`). |
+| `to_connect` | `technologyPath` or unique `name`, `role` (`actor`, `sensor` + `sensorIndex`, `torque`, `encoder`, `measuringInput`, `outputCam`), one target: `hardwarePath` (module or PROFIdrive telegram), `hardwarePath` + `channelType`/`channelIoType`/`channelNumber`, `hardwarePath` + `channelIndex` (measuring input), `tagName`, `inputHardwarePath` + `outputHardwarePath`, `dbMemberPath`, or `inputAddress`/`outputAddress`; optional `connectOption` (`Default`, `AllowAllModules`) with the two-module and address targets | Connects one slot through the matching V21 `Connect` overload ([role/target matrix](#technology-connections)); a pair without one refuses at prepare with `UnsupportedTarget`. Apply reads back `IsConnected` and the reported module/channel/tag; the preview, fingerprint and `technologyAfter` reuse the `technology_read` connection rows. Requires `compile=true`. Verified (`local.technology_changes.20261028`, `local.composite_rebind.20261028`). |
 | `to_disconnect` | `technologyPath` or unique `name`, `role` (+ `sensorIndex`) | Disconnects one connected slot and verifies `IsConnected=false`. Requires `compile=true`; a TO that is invalid unconnected fails compilation and needs recovery. Verified (`local.technology_changes.20261028`, `local.composite_rebind.20261028`). |
 | `to_child_create` | `ownerPath`, `composition` (`OutputCams` or `MeasuringInputs`), `name`, `typeIdentifier`, `version` | Creates one output cam/cam track or measuring input under an existing owner and verifies it at its child path. Verified (`local.technology_changes.20261028`). |
 | `drive_parameter_set` | `hardwarePath`, `driveObjectNumber`, `parameters: [{ name, expected, value }]` | Requires Startdrive. Writes 1..200 scalar parameters on one offline drive object; each `expected` must equal the value object `drive_observe` reports. BICO, Safety Integrated and commissioning/reset/identification parameters are refused; listed parameters are read back, dependent recalculation is not. See [drives](drives.md). |
@@ -194,7 +196,7 @@ This scan is conservative and does not prove the absence of runtime pointers, ex
 
 Group creation targets an existing parent; rename/delete target an existing user group. Deletion rejects contained objects and subgroups. Group moves, object moves, namespace relocation, recursive deletion, generated groups and generic safety-unit mutations remain unsupported. Native create/rename/delete outcomes are read back; the whole-project checkpoint remains the recovery mechanism.
 
-The four `software_unit_*` kinds refuse safety units, require `compile=true` and repeat their checks at apply. The change fingerprint already covers each unit's path, namespace preset and relations; for `software_unit_publication_set` it also covers the selected object's `Access` value. `Access` is not named in the V21 PublicAPI documentation; the name comes from native fixture evidence, so the route writes it only through the attribute metadata check. Relations are matched by unit name, as V21 exposes `RelatedObject` as a name. These kinds are verified (`local.software_units.20261028`); see the [D07 plan](../plans/expansion-plans/software-unit-lifecycle.md).
+The six `software_unit_*` kinds refuse safety units, require `compile=true` and repeat their checks at apply. V21 has no unit copy or move: `PlcUnit` exposes only `Delete`, `PlcUnitComposition` only `Create(String)`, `CreateFrom(MasterCopy[, MasterCopyMode])` and `Find`, and `PlcUnitSystemGroup` holds `Units` and `SafetyUnits` without user groups, so a unit has no other parent in its PLC. A copy is `library_create_master_copy` with `object: { "kind": "softwareUnit", "objectPath": <unitPath> }` followed by `software_unit_create_from`; it creates new objects and is not identity-preserving. Whether TIA rewrites other units' relations on a rename is not established, so referenced units are refused. The change fingerprint already covers each unit's path, namespace preset and relations; for `software_unit_publication_set` it also covers the selected object's `Access` value. `Access` is not named in the V21 PublicAPI documentation; the name comes from native fixture evidence, so the route writes it only through the attribute metadata check. Relations are matched by unit name, as V21 exposes `RelatedObject` as a name. Create, relation, publication and delete are verified (`local.software_units.20261028`); see the [D07 plan](../plans/expansion-plans/software-unit-lifecycle.md).
 
 ### PLC alarm and ProDiag imports
 
@@ -417,6 +419,28 @@ Current family/connected-encoder qualification scripts require the new explicit
 complete/readable flags; older observations cannot silently qualify a fresh run.
 [Source, tests and remaining native gates](../verification/technology-parameter-read-20261017.md).
 
+
+### Technology connections
+
+`to_connect` maps each role and target to one V21 `Connect` overload (`Siemens.Engineering.SW.TechnologicalObjects.Motion`);
+`actor`, `sensor` and `encoder` share `AxisEncoderHardwareConnectionInterface`:
+
+| Target | actor / sensor / encoder | torque | measuringInput | outputCam |
+| --- | --- | --- | --- | --- |
+| `hardwarePath` (module, submodule or telegram item) | `Connect(DeviceItem)` | `Connect(DeviceItem)` | refused | refused |
+| `hardwarePath` + channel selector | `Connect(Channel)` | refused | `Connect(Channel)` | `Connect(Channel)` |
+| `hardwarePath` + `channelIndex` | refused | refused | `Connect(DeviceItem, Int32)` | refused |
+| `tagName` | `Connect(PlcTag)` | refused | refused | `Connect(PlcTag)` |
+| `inputHardwarePath` + `outputHardwarePath` (+ `connectOption`) | `Connect(DeviceItem, DeviceItem, ConnectOption)` | same | refused | refused |
+| `dbMemberPath` | `Connect(String)` | `Connect(String)` | refused | refused |
+| `inputAddress` + `outputAddress` (+ `connectOption`) | `Connect(Int32, Int32, ConnectOption)` | same | `inputAddress` only: `Connect(Int32)` | `outputAddress` only: `Connect(Int32)` |
+
+Refused pairs answer `UnsupportedTarget`; a missing or second target, a half address pair or a channel selector without
+`hardwarePath` answers `InvalidRequest`. Apply verifies `IsConnected` and the target the slot reports: the module, channel
+or tag, `InputModule`/`OutputModule`, `PathToDBMember` (quotes ignored), `InputAddress`/`OutputAddress`, `ChannelIndex` and
+a requested `ConnectOption`; any other readback needs checkpoint recovery. Siemens decides whether a target suits the
+object (telegram, module mode, DB member type); its refusals are recorded per fixture in the
+[motion-connection record](../verification/motion-connections-20261030.md).
 
 ### Technology object selection
 

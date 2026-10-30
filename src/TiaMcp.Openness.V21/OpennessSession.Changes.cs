@@ -143,7 +143,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             // network_configure kept its optional compile when it joined the hardware rules; remote-I/O fixtures defer it.
             if (!compile && ((HardwareEngineeringRules.Applies(change.Kind) && change.Kind != "network_configure") || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "tag_table_create", "tag_table_rename", "tag_table_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
-                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "webserver_page_set", "webserver_user_pages_generate", "umac_role_set" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
+                "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "software_unit_rename", "software_unit_create_from", "webserver_page_set", "webserver_user_pages_generate", "umac_role_set" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
             var project = ProjectForChange(change);
@@ -507,6 +507,8 @@ namespace TiaMcp.Openness.V21
                 case "software_unit_relation_set":
                 case "software_unit_publication_set":
                 case "software_unit_delete":
+                case "software_unit_rename":
+                case "software_unit_create_from":
                     SoftwareUnitEdit(change, preview);
                     break;
                 case "plc_alarm_text_list_import":
@@ -915,6 +917,8 @@ namespace TiaMcp.Openness.V21
                 case "software_unit_relation_set":
                 case "software_unit_publication_set":
                 case "software_unit_delete":
+                case "software_unit_rename":
+                case "software_unit_create_from":
                     SoftwareUnitEdit(change, null);
                     break;
                 case "plc_alarm_text_list_import":

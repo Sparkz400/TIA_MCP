@@ -1,12 +1,15 @@
 """Qualify the D07 software-unit change kinds natively in one owned scratch CPU 1511-1 PN.
 
 Phase A creates units, puts an FB into one, and applies every covered kind with checkpoint, PLC compile and save: unit
-creation, publication of the FB, relations added and removed, and deletion of an empty unit. Each preview is asserted
+creation, publication of the FB, relations added and removed, deletion of an empty unit, a unit created from a master copy
+of another unit (library_create_master_copy into the project library, then PlcUnitComposition.CreateFrom: the copy route,
+since V21 has no unit copy or move API) and a rename. Each preview is asserted
 against the request, and a complete state (every block, type and tag-table export, every tag, constant and group path, and
 each software scope's name, kind, namespace preset and relations) must differ from the previous one in exactly the intended
 keys. A fresh Portal then reopens the saved project, which must show the identical state. Phase B applies one more change
 per kind from that state and restores its checkpoint in the applying Portal; the recovered copy must equal the pre-change
-state. Typed refusals must change nothing.
+state. Typed refusals must change nothing. Last, a master copy of the unit holding the FB is instantiated in the same PLC
+with onNameConflict=rename; whether V21 accepts it or the member check refuses it is recorded under boundaries.
 """
 from __future__ import annotations
 
@@ -20,8 +23,10 @@ from qualification_owned_scratch import complete_inventory, snapshot
 from qualify_access_changes import Run as StateRun
 from qualify_hardware_changes import under
 from qualify_plc_object_mutations import coverage_gaps, diff, matches, view
+from qualify_drives import outcome
 
-KINDS = ("software_unit_create", "software_unit_publication_set", "software_unit_relation_set", "software_unit_delete")
+KINDS = ("software_unit_create", "software_unit_publication_set", "software_unit_relation_set", "software_unit_delete",
+         "software_unit_create_from", "software_unit_rename")
 FB = '''FUNCTION_BLOCK "UnitFb"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -34,7 +39,8 @@ END_FUNCTION_BLOCK
 
 '''
 CRITERIA = {
-    "AC-identity": "refused: typed refusals of duplicate names, relation cycles, duplicate or missing relations, unsupported relation types, non-unit targets, non-empty or referenced units, each leaving the complete state unchanged.",
+    "AC-identity": "refused: typed refusals of duplicate names, relation cycles, duplicate or missing relations, unsupported relation types, non-unit targets, non-empty or referenced units, "
+                   "renames of referenced units or to the current name, master copies without exactly one unit and template-name conflicts, each leaving the complete state unchanged.",
     "AC-preview": "Every preview is asserted against the request and the current state before apply; a wrong previewHash refuses at apply.",
     "AC-preserve": "applied: every block, type and tag-table export, every member and group path, and each software scope's name, kind, namespace preset and relations differ in exactly the intended keys.",
     "AC-native": "applied + persisted: checkpoint, PLC compile and save stages, change_status, the native export (publication as <Access>) and a fresh owned Portal reopen with identical state.",
@@ -42,7 +48,10 @@ CRITERIA = {
     "AC-evidence": "This report: binaries, tool calls, step results, snapshots with state.json and limitations.",
 }
 LIMITATIONS = [
-    "One owned scratch CPU 1511-1 PN V4.1 without safety units; SafetyBoundary refusals, templates, CreateFrom, copy, move and rename of units are not exercised.",
+    "One owned scratch CPU 1511-1 PN V4.1 without safety units; SafetyBoundary refusals are not exercised. V21 has no unit copy or move API "
+    "(PlcUnit exposes only Delete; PlcUnitComposition only Create, CreateFrom(MasterCopy[, MasterCopyMode]) and Find; PlcUnitSystemGroup has no unit groups).",
+    "Copy is the composed route: library_create_master_copy of an empty unit into the project library, then software_unit_create_from in the same PLC; "
+    "master copies in global libraries and other PLCs or projects are not exercised. Rename covers an unreferenced unit; a referenced unit is refused by design.",
     "Publication is set on one SCL FB inside a unit; PLC data types, other block kinds and consumers in related units that unpublishing would break are not exercised.",
     "Relations are SoftwareUnit relations between standard units; NonUnitDB and TODB relations are refused by design.",
     "Unit deletion covers empty units, whose generated default tag table goes with them; deleting a unit with members is refused by design.",
@@ -138,6 +147,76 @@ def delete(run, name, restore=False):
               removed=removed, restore=restore)
 
 
+def master(run, kind, path):
+    """library_create_master_copy of one unit or block into the project library: the program state must not change."""
+    h, before, name = run.h, run.current, path.rsplit("/", 1)[1]
+    library = h.project_library()
+    h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": run.plc}, "object": {"kind": kind, "objectPath": path}})
+    run.current = run.snap("master copy " + name)
+    h.stage("master copy of %s leaves the program unchanged" % name,
+            lambda: require(run.current["view"] == before["view"], "Master copy changed the program: %s" % diff(before["view"], run.current["view"])) or name)
+    rows = [x for x in h.query(library)["items"] if x.get("kind") == "masterCopy" and x.get("name") == name]
+    require(len(rows) == 1, "Expected one master copy %s: %s" % (name, rows))
+    return library, rows[0]["masterCopyPath"]
+
+
+def instantiate(run, library, path, template, name, restore=False):
+    """software_unit_create_from with onNameConflict=rename; the copy's preset and relations are recorded against the template's."""
+    unit, source = run.unit(name), run.current["view"]["scope:" + run.unit(template)]
+    def record(applied, state):
+        run.h.report.setdefault("createFrom", {})[name] = {"template": source, "copy": state["scope:" + unit]}
+    run.apply("create %s from the master copy of %s" % (name, template), "software_unit_create_from",
+              {"libraryId": library, "masterCopyPath": path, "name": name, "onNameConflict": "rename"},
+              {"effects": [{"createSoftwareUnitFrom": {"masterCopyPath": path}, "templateUnit": template, "masterCopyMode": "Rename", "name": name, "unitPath": unit}]},
+              added=under(unit), rows={"scope:" + unit: {"name": name, "kind": "softwareUnit"}}, check=record, restore=restore)
+
+
+def rename(run, old, new, restore=False):
+    unit, renamed = run.unit(old), run.unit(new)
+    removed = under(unit)(None, run.current["view"])
+    run.apply("rename %s to %s" % (old, new), "software_unit_rename", {"unitPath": unit, "name": new},
+              {"effects": [{"renameSoftwareUnit": unit, "name": new, "unitPath": renamed}], "dependencies": {"references": []}, "targetScopePath": unit},
+              removed=removed, added=under(renamed), rows={"scope:" + renamed: {**run.current["view"]["scope:" + unit], "name": new}}, restore=restore)
+
+
+def copies(run):
+    """Copy through a master copy, the template-name conflict and rename refusals, then a rename."""
+    create(run, "UnitT", "Ns.T")
+    relate(run, "UnitT", "UnitA", "add")
+    run.library, run.template = master(run, "softwareUnit", run.unit("UnitT"))
+    root = next(key.split(":", 1)[1] for key in run.current["view"] if key.startswith("block:") and key.endswith("/blocks/TiaMcp_IsEnabled"))
+    _, block = master(run, "block", root)
+    template = {"libraryId": run.library, "masterCopyPath": run.template, "name": "UnitT2"}
+    run.refuse("software_unit_create_from", "the template unit's name already in the PLC", template, "ObjectExists")
+    run.refuse("software_unit_create_from", "a name already in the PLC", {**template, "name": "UnitA", "onNameConflict": "rename"}, "ObjectExists")
+    run.refuse("software_unit_create_from", "a block master copy", {**template, "masterCopyPath": block, "onNameConflict": "rename"}, "TargetIncompatible")
+    run.refuse("software_unit_create_from", "an unknown conflict policy", {**template, "onNameConflict": "replace"}, "InvalidRequest")
+    instantiate(run, run.library, run.template, "UnitT", "UnitT2")
+    rename(run, "UnitT2", "UnitR")
+    run.refuse("software_unit_rename", "a unit other units relate to", {"unitPath": run.unit("UnitA"), "name": "UnitZ"}, "DependencyExists")
+    run.refuse("software_unit_rename", "a name in use", {"unitPath": run.unit("UnitR"), "name": "unitb"}, "ObjectExists")
+    run.refuse("software_unit_rename", "the current name", {"unitPath": run.unit("UnitR"), "name": "UnitR"}, "InvalidRequest")
+
+
+def nonempty_copy(run):
+    """Boundary probe: instantiate a master copy of UnitA (holding UnitFb) in the same PLC with onNameConflict=rename."""
+    h = run.h
+    library, path = master(run, "softwareUnit", run.unit("UnitA"))
+    def probe():
+        payload = {"libraryId": library, "masterCopyPath": path, "name": "UnitA2", "onNameConflict": "rename"}
+        error, prepared = outcome(h, "change_prepare", run.args("software_unit_create_from", payload))
+        if error:
+            return {"outcome": "refusedAtPrepare", "error": error}
+        error, applied = outcome(h, "change_apply", h.apply_args(prepared))
+        if not error:
+            return {"outcome": "applied", "stages": applied["stages"], "units": sorted(k for k in run.state() if k.startswith("scope:"))}
+        if h.unresolved_admissions():
+            h.reconcile_admission("release the failed non-empty copy")
+        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        return {"outcome": "failedAtApply", "error": {k: error.get(k) for k in ("code", "message")}, "restore": restored["state"]}
+    h.report.setdefault("boundaries", {})["software_unit_create_from of a unit holding a block in its own PLC"] = h.stage("probe a copy of UnitA (with UnitFb) in the same PLC", probe)
+
+
 def phase_a(run):
     create(run, "UnitA", "Ns.A")
     create(run, "UnitB")
@@ -170,6 +249,7 @@ def phase_a(run):
     run.refuse("software_unit_delete", "the PLC root scope", {"unitPath": run.plc, "dependencyPolicy": "rejectReferenced"}, "InvalidRequest")
     relate(run, "UnitB", "UnitC", "remove")
     delete(run, "UnitC")
+    copies(run)
 
 
 def reopen(run):
@@ -190,6 +270,9 @@ def phase_b(run):
     publish(run, "Published", restore=True)
     relate(run, "UnitB", "UnitA", "remove", restore=True)
     delete(run, "UnitB", restore=True)
+    library = run.h.project_library()  # Library IDs do not survive the reopen; the master copy path does.
+    instantiate(run, library, run.template, "UnitT", "UnitT3", restore=True)
+    rename(run, "UnitR", "UnitR2", restore=True)
 
 
 def body(h):
@@ -202,6 +285,7 @@ def body(h):
     phase_b(run)
     gaps = coverage_gaps(run.coverage, KINDS)
     require(not gaps, "Kinds without applied, persisted, refused and restored evidence: %s" % gaps)
+    nonempty_copy(run)
 
 
 if __name__ == "__main__":

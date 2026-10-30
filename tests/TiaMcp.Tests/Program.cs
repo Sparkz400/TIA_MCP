@@ -95,6 +95,7 @@ internal static partial class Program
             ("Connection attribute failures retain independent field evidence", TechnologyConnectionTests.AttributeFailuresKeepFieldEvidence),
             ("Connection null sensors consume the shared budget", TechnologyConnectionTests.NullSensorsConsumeBudget),
             ("Connection service failures retain independent peers", TechnologyConnectionTests.IndependentFailures),
+            ("Connection targets follow the V21 Connect overloads per role", TechnologyConnectionTests.TargetFormsFollowV21Overloads),
             ("Inspection preserves finite scalar and version values", InspectionValueTests.Scalars),
             ("Inspection bounds and validates metadata before getters", InspectionValueTests.MetadataFailures),
             ("Inspection marks incomplete attributes explicitly", InspectionValueTests.IncompleteAttributes),
