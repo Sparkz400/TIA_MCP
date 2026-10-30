@@ -7,6 +7,8 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 30 October 2026
 
+**Integration — 30 October 2026:** OB40 and the drive probe (#154), live monitoring (#156) and default-on combined library apply (#153) landed together with the block-protection route (#155). Catalog 0.4.82: 422 of 462 features verified; matrix 1,928 bound, 141 open, 31 blocked, 30 deferred. The per-entry catalog numbers below are those of each branch.
+
 **Block-protection credential route — 30 October 2026:** ([record](../verification/block-protection-20261030.md))
 - **Route:** at admission the Host checks a block-protection credential slot (purpose, binding hash, active record, vault turn), decrypts the secret under the vault lock and re-seals it with DPAPI to that one apply's lease, change, preview hash, slot and binding; only that lease's dispatch carries it, the worker opens it into a read-only SecureString and clears it after the call. Checkpoints hold TIA's own archive, never a secret.
 - **Native:** 38/38 steps on build `b5fecd88` (`local.block_protection.20261030`): protect, unprotect, write protection define/enable/change/disable, three checkpoint restores, five pre-admission refusals with the block unchanged, a wrong password refused by TIA; none of the generated passwords appears in any run file, response or log. TIA's password policy is checked only in the native call and is now typed `CredentialPolicyViolation`.

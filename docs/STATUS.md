@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.81`: 461 features, 421 verified, 40 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 123 shipped, 298 limited, 25 unqualified, 5 unavailable on V21, 10 deferred |
-| Matrix cells | 1,924 bound, **141 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.82`: 462 features, 422 verified, 40 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 123 shipped, 299 limited, 25 unqualified, 5 unavailable on V21, 10 deferred |
+| Matrix cells | 1,928 bound, **141 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and

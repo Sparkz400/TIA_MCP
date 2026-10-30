@@ -69,7 +69,7 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--no-native-workers` | Off; always on in the portable package | Native calls return `NativeWorkersDisabled` without starting a worker | None |
 | `--addin-handoff` | Off | Runs the [Add-In selection receiver](../reference/addin-selections.md); not with `--diagnose` | None |
 | `--addin-enrollment <file>` | None | Enrollment file written by `scripts/Publish-AddIn.ps1`; requires `--addin-handoff`; once | None |
-| `--enable-library-integrate-apply` | Off | Lets `change_apply` install a prepared PLC `library_integrate` plan ([combined apply](plc-library-integration-recipes.md#combined-apply-opt-in)) | None |
+| `--enable-library-integrate-apply` | On (accepted, no effect) | Combined apply of the verified PLC recipe shapes is the default ([combined apply](plc-library-integration-recipes.md#combined-apply)); other shapes keep refusing | None |
 | `--library-limits-file <json>` | Built-in limits | Library package intake limits, a JSON object of at most 64 KiB ([storage policy](library-management.md#storage-policy-and-errors)) | None |
 
 Neither launcher script passes `--no-native-workers`, `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply` or `--library-limits-file`. The generated configuration runs `Start-TiaMcp.ps1`, so extra `args` do not reach the Host either. To use these options, point the MCP client at `TiaMcp.Host.exe` directly, with an explicit `--artifacts` directory.
