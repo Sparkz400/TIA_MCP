@@ -759,25 +759,23 @@ class RouteCapturePacketTests(unittest.TestCase):
             with self.subTest(fault=fault), self.assertRaises(RuntimeError):
                 verify_reference_additions(before, faulty, ["Effect"], "/unit", "Unit", modifies, observes)
 
-    def test_instance_db_spec_is_a_standard_route_addition(self):
-        with tempfile.TemporaryDirectory() as directory:
-            source = pathlib.Path(directory) / "storage.instancedb.json"
-            source.write_text('{"name": "Tgp_GlobalRTrig", "instanceOfName": "R_TRIG"}\n', encoding="utf-8")
-            entry, kind, payload = authored_reference(source, "")
-            self.assertEqual(("instance_db_create", {"name": "Tgp_GlobalRTrig", "instanceOfName": "R_TRIG"}, ["Tgp_GlobalRTrig"], "", "standard", "instance_db_spec"),
-                             (kind, payload, entry["names"], entry["namespace"], entry["route"], entry["authoredFormat"]))
-            with self.assertRaises(RuntimeError): authored_reference(source, "TiaMcp_UnitA")
-            for text in ('{"name": "X"}', '{"name": "X", "instanceOfName": "R_TRIG", "number": 1}', '{"name": "", "instanceOfName": "R_TRIG"}', '["X"]'):
-                source.write_text(text, encoding="utf-8")
-                with self.subTest(text=text), self.assertRaises(RuntimeError): authored_reference(source, "")
-        with self.assertRaises(RuntimeError):
-            declare_changes([({"sourcePath": "/x/s.instancedb.json", "names": ["Db"]}, "instance_db_create", {})], ["s.instancedb.json:Db"], [])
-        # CreateInstanceDB may also copy the protected system FB into System blocks; that copy is generated, not authored.
-        row = {"kind": "block", "name": "Tgp_GlobalRTrig", "path": "/plc/blocks/Tgp_GlobalRTrig", "payloadSha256": "db"}
+    def test_edge_storage_source_adds_the_db_and_its_keep_alive_caller(self):
+        source = pathlib.Path(__file__).resolve().parents[1] / "fixtures/typed-graphical/sources/global-rtrig-storage.scl"
+        entry, kind, payload = authored_reference(source, "")
+        self.assertEqual(("source_upsert", "SCL", ["Tgp_GlobalRTrig", "Tgp_GlobalRTrig_Ref"], "", "standard"),
+                         (kind, payload["language"], entry["names"], entry["namespace"], entry["route"]))
+        self.assertIn('"Tgp_GlobalRTrig"(CLK := #Signal);', payload["source"])
+        # The first R_TRIG use copies the protected system FB into System blocks; that copy is generated, not authored.
+        # V21 marks the declared edge instance DB know-how protected as well; it counts as a declared addition.
+        rows = [{"kind": "protectedSystemBlock", "name": "Tgp_GlobalRTrig", "path": "/plc/blocks/Tgp_GlobalRTrig", "payloadSha256": "db"},
+                {"kind": "block", "name": "Tgp_GlobalRTrig_Ref", "path": "/plc/blocks/Tgp_GlobalRTrig_Ref", "payloadSha256": "fc"}]
         system = {"kind": "protectedSystemBlock", "name": "R_TRIG", "path": "/plc/blocks/systemGroups/x/R_TRIG", "payloadSha256": "fb"}
-        after = {"objects": {"block:" + row["path"]: row, "block:" + system["path"]: system},
-                 "inventory": {"blocks": [{"path": row["path"], "name": row["name"], "scopePath": "/plc", "identity": {"namespace": ""}}]}}
-        self.assertEqual(["Tgp_GlobalRTrig"], [r["name"] for r in verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig"], "/plc", "")[0]])
+        after = {"objects": {"block:" + row["path"]: row for row in rows + [system]},
+                 "inventory": {"blocks": [{"path": row["path"], "name": row["name"], "scopePath": "/plc", "identity": {"namespace": ""}} for row in rows]}}
+        added, _ = verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig", "Tgp_GlobalRTrig_Ref"], "/plc", "")
+        self.assertEqual(["Tgp_GlobalRTrig", "Tgp_GlobalRTrig_Ref"], [r["name"] for r in added])
+        with self.assertRaises(RuntimeError):
+            verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig_Ref"], "/plc", "")
 
     def test_unit_tag_table_is_an_unnamespaced_scope_addition(self):
         with tempfile.TemporaryDirectory() as directory:

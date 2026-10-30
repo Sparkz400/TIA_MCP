@@ -1,0 +1,18 @@
+DATA_BLOCK "Tgp_GlobalFTrig"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"F_TRIG"
+BEGIN
+END_DATA_BLOCK
+
+FUNCTION "Tgp_GlobalFTrig_Ref" : Void
+VAR_INPUT
+  Signal : Bool;
+END_VAR
+VAR_OUTPUT
+  Pulse : Bool;
+END_VAR
+BEGIN
+  "Tgp_GlobalFTrig"(CLK := #Signal);
+  #Pulse := "Tgp_GlobalFTrig".Q;
+END_FUNCTION

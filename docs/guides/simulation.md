@@ -47,6 +47,11 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `sim_tags` | `instanceId`, optional `filter`, `maxItems` and `refresh`. Reads bounded symbolic tag metadata. |
 | `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation and completion time and quality, with error text and code for a bad read. |
 | `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Validates all values before writing and reports completed writes if a later write fails. |
+| `sim_read_signals` | `instanceId`, `signals` array of 1–64 `{symbol,type}` without `string`/`wstring`. Reads them in one `ReadSignals` call; see [Batch signals, process image and observation](#batch-signals-process-image-and-observation). |
+| `sim_write_signals` | `instanceId`, `writes` array of 1–64 `{symbol,type,value}` with distinct symbols. Owned instances only; one `WriteSignals` call. |
+| `sim_area_read` | `instanceId`, `area` (`input`, `output`, `marker`), `offset`, optional `length` (1–1024, default 1) or `bit` (0–7). Reads process-image bytes or one bit by address. |
+| `sim_area_write` | `instanceId`, `area` (`input`, `marker`), `offset`, then `bytes` (1–1024 values 0–255) or `bit` with a boolean `value`. Owned instances only. |
+| `sim_observe` | `instanceId`, optional `windowMs` (0–60000, default 0), `maxEvents` (1–256, default 64) and `includeDisplayData`. Operating state, mode and display data, plus the operating-state and LED changes within the window. |
 | `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs` and `virtualTime`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. `virtualTime: true` steps virtual time; see [Virtual time, events and storage](#virtual-time-events-and-storage). |
 | `sim_time` | `instanceId`, optional `scaleFactor` and `systemTimeUtc`. Reads, or on an owned instance sets and reads back, the virtual clock. |
 | `sim_event` | `instanceId`, optional `event`. Lists the configured hardware-interrupt events and injects one interrupt or fault into an owned instance in RUN. |
@@ -151,6 +156,45 @@ selected instance. None of them touches the machine-wide network mode, adapters 
   `<instance>-<guid>.zip` and a receipt with its SHA-256 to the Host's `simulation-archives` directory;
   `retrieve` accepts only an unchanged archive written there from the same instance. The instance's storage
   path and ownership marker must be unchanged afterwards (`SimulationOwnershipUnverified` otherwise).
+
+## Batch signals, process image and observation
+
+Reads and observation work on any selected instance. Writes need an instance this worker created or
+adopted, in its admitted network mode (`OwnedInstanceRequired`, `SoftbusRequired` or `TcpIpModeRequired`
+otherwise), and are refused before any runtime call when a value or bound is invalid.
+
+- **Batch signals.** `sim_read_signals` and `sim_write_signals` take the `sim_read`/`sim_write` signal
+  objects and types, except `string` and `wstring`: the V8 `ReadSignals`/`WriteSignals` calls carry only
+  primitive values (`UnsupportedSignalType`). Symbols must be shorter than 300 characters, the V8 name
+  buffer; a write needs distinct symbols. All signals go through one runtime call, but the values are not
+  claimed to come from one scan. A bad item reports its runtime error code with `quality: "bad"`. PLCSIM
+  rejects the whole batch when one symbol is unknown: that item reports `DoesNotExist`, every other item
+  `SignalConfigurationError`, and none carries a value (observed natively). A write fails as a whole with
+  `PartialSimulationWrite` and each item's `result` when any item fails; items not reported failed may
+  have been written. Natively, a write batch with an unknown symbol threw `SignalConfigurationError`
+  (`batchError`, the valid items' `result` `Unknown`) and its valid item was written.
+- **Process image by address.** `sim_area_read` reads the input, output or marker image: `length` bytes
+  from `offset`, or one `bit`. `sim_area_write` writes `bytes` from `offset`, or one `bit`, into the input
+  or marker image. A range beyond the area's size is refused with `InvalidRequest`. Byte order is the
+  PLC's: the first byte of a word is its high byte. Writing outputs is refused: the program writes the
+  output image every scan, so an assignment there would last until the next scan at most. Area writes are
+  assignments, never forces: the program overwrites on its next scan whatever marker it writes itself.
+  A CPU 1511 reports 32768 input and output bytes and 16384 marker bytes; an instance that is off reports
+  0-byte areas, so every range is refused.
+- **Operating state and LEDs.** `sim_observe` reports the operating state and mode before and after the
+  call, and a display summary (`hasDisplay`, `dataLength`, SHA-256; `includeDisplayData` adds the bytes
+  as base64, up to 4 MiB). With `windowMs` it subscribes to `OnOperatingStateChanged` and `OnLedChanged`
+  for that window only, and returns every reported change with the runtime's event time, up to
+  `maxEvents` (the window then ends early and `truncated` is true). The subscription ends before the
+  call returns; nothing keeps running. V8 has no getter for LEDs, so `ledModes` holds the last mode of
+  each LED reported in the window. The bridge runs one call at a time, so the window sees changes made by
+  the program (for example `STP`, a cycle-time error), the PLCSIM control panel, TIA Portal or other API
+  clients; a `sim_state` change is never inside it. A STOP to RUN arrives as `Stop`→`Startup` and
+  `Startup`→`Run`, with the RUN and STOP LEDs flashing in between.
+
+All five were verified natively on one owned Softbus CPU 1511 instance against single `sim_read` calls,
+PLC tags at the addressed bytes, the polled operating state and a separate PLCSIM API client's own log
+(`local.plcsim_signals.20261030`).
 
 ## Online compare and station upload
 

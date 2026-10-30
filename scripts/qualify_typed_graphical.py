@@ -242,8 +242,17 @@ def run_case(case, args, output):
         reference_xml, removed = adapt_reference_import(reference_xml)
         if removed:
             report["referenceImportAdaptation"] = {"nonExpandableCardValuesRemoved": removed}
+        def authored_source(specification):
+            payload = copy.deepcopy(specification)
+            if "sourcePath" in payload:
+                assert "source" not in payload, "An authored source must select exactly one source representation."
+                source_path = (ROOT / payload.pop("sourcePath")).resolve()
+                assert source_path.is_relative_to((ROOT / "fixtures").resolve()), "An authored source must be a repository fixture."
+                payload["source"] = source_path.read_bytes().decode("utf-8-sig")
+                report.setdefault("runtimeSourceArtifacts", []).append({"path": str(source_path), "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest()})
+            return payload
         for dependency in case.get("dependencySources", []):
-            apply_change(call, "source_upsert", {**route, **dependency})
+            apply_change(call, "source_upsert", {**route, **authored_source(dependency)})
         for dependency in case.get("dependencyXmls", []):
             xml, retargeted = adapt_reference_culture((ROOT / dependency["path"]).read_bytes().decode("utf-8-sig"), culture)
             report["referenceCultureAdaptation"]["dependencyItems"] += retargeted
@@ -251,14 +260,7 @@ def run_case(case, args, output):
         apply_change(call, "block_import_xml", {**route, "xml": reference_xml, "expectedBlockNames": [case["blockName"]]})
         # dependentSources embed the case block (e.g. parent multi-instance hosts), so they follow its import like runtime sources.
         for specification in case.get("dependentSources", []) + case.get("runtimeSources", []):
-            source_payload = copy.deepcopy(specification)
-            if "sourcePath" in source_payload:
-                assert "source" not in source_payload, "An authored runtime source must select exactly one source representation."
-                source_path = (ROOT / source_payload.pop("sourcePath")).resolve()
-                assert source_path.is_relative_to((ROOT / "fixtures").resolve()), "Runtime source must be an authored repository fixture."
-                source_payload["source"] = source_path.read_bytes().decode("utf-8-sig")
-                report.setdefault("runtimeSourceArtifacts", []).append({"path": str(source_path), "sha256": hashlib.sha256(source_path.read_bytes()).hexdigest()})
-            apply_change(call, "source_upsert", {**route, **source_payload})
+            apply_change(call, "source_upsert", {**route, **authored_source(specification)})
         if not engineering_only:
             runtime_name = case.get("runtimeBlockName", case["blockName"])
             interface = call("block_interface", {"blockName": runtime_name})

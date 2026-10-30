@@ -39,15 +39,19 @@ def var(section, members):
 
 def storage_source(instruction):
     name, system = STORAGE[instruction]
-    if instruction in EDGES:
-        # SCL DATA_BLOCKs of R_TRIG/F_TRIG vanish after compile and save (wave 10 native slot); instance_db_create builds them.
-        return "global-" + slug(instruction) + "-storage.instancedb.json", name, json.dumps({"name": name, "instanceOfName": system}) + "\n"
-    return ("global-" + slug(instruction) + "-storage.scl", name,
-            'DATA_BLOCK "' + name + '"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"' + system + '"\nBEGIN\nEND_DATA_BLOCK\n')
+    text = 'DATA_BLOCK "' + name + '"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"' + system + '"\nBEGIN\nEND_DATA_BLOCK\n'
+    if instruction not in EDGES:
+        return "global-" + slug(instruction) + "-storage.scl", [name], text
+    # TIA deletes an R_TRIG/F_TRIG instance DB that no call references when it compiles (wave 10 native slot), so the
+    # DB comes with a call in the same source and compile.
+    keep = name + "_Ref"
+    text += ('\nFUNCTION "' + keep + '" : Void\n' + var("VAR_INPUT", (("Signal", "Bool"),)) + "\n" + var("VAR_OUTPUT", (("Pulse", "Bool"),))
+             + '\nBEGIN\n  "' + name + '"(CLK := #Signal);\n  #Pulse := "' + name + '".Q;\nEND_FUNCTION\n')
+    return "global-" + slug(instruction) + "-storage.scl", [name, keep], text
 
 
 def references():
-    """(file name, block name, text); each storage DB before its global callers. The edge storage DBs follow the
+    """(file name, block names, text); each storage DB before its global callers. The edge storage DBs follow the
     first multi-instance use, which makes TIA copy the R_TRIG/F_TRIG system FB into the project."""
     rows = [storage_source("TONR")]
     for language in ("LAD", "FBD"):
@@ -58,7 +62,7 @@ def references():
         start = "RUNG wire#powerrail\n  Contact( #Enable )" if lad else "RUNG\n  #Enable"
 
         def add(file, block, declarations, body):
-            rows.append((file + "-" + language.lower() + ".s7dcl", block + "_" + language, source(block + "_" + language, language, declarations, body)))
+            rows.append((file + "-" + language.lower() + ".s7dcl", [block + "_" + language], source(block + "_" + language, language, declarations, body)))
         for data_type in ("DInt", "Real"):
             for op in COMPARISONS:
                 add(op.lower() + "-" + data_type.lower(), "Tgp_" + op + data_type,
@@ -130,12 +134,19 @@ def cases():
         instruction = next(node["instruction"] for node in case["payload"]["model"]["nodes"] if node["key"] == "instruction")
         storage, block = STORAGE[instruction][0], "Tgp_" + instruction + "_Global_" + case["language"]
         case.update(fixtureId=case["fixtureId"].replace("typed-", "typed-existingglobal-", 1), engineeringOnly=True, blockName=block,
-                    referenceXml="fixtures/typed-graphical/native/" + block + ".xml",
-                    dependencyXmls=[{"path": "fixtures/typed-graphical/native/" + storage + ".xml", "names": [storage]}])
+                    referenceXml="fixtures/typed-graphical/native/" + block + ".xml")
+        if instruction in EDGES:
+            # An imported edge DB alone would not survive its own compile; its source brings a referencing call. These four
+            # cases stay refused: the DB is know-how protected, so the builder cannot read its declaration.
+            file, names, _ = storage_source(instruction)
+            case["dependencySources"] = [{"language": "SCL", "sourcePath": "fixtures/typed-graphical/sources/" + file, "expectedBlockNames": names}]
+        else:
+            case["dependencyXmls"] = [{"path": "fixtures/typed-graphical/native/" + storage + ".xml", "names": [storage]}]
         case["payload"]["instances"] = [{"key": "storage", "kind": "existingGlobal", "blockPath": "$block:" + storage}]
         result.append(case)
     # Created storage, engineering only like the standard created cells: a new multi-instance member, also with the caller two
-    # parent levels deep, and a new global DB for TONR (no R_TRIG/F_TRIG global storage document is captured).
+    # parent levels deep, and a new global DB for TONR. V21 marks an R_TRIG/F_TRIG instance DB know-how protected, so no edge
+    # global storage document can be exported (local.typed.edge-global-storage.20261030).
     for original in [case for case in result if case["family"] in ("tonr", "rtrig", "ftrig")]:
         name = "Fresh_" + original["family"] + "_" + original["language"]
         global_storage = original["payload"]["instances"][0]["kind"] == "existingGlobal"
@@ -143,8 +154,8 @@ def cases():
             continue
         case = copy.deepcopy(original)
         case.update(fixtureId="typed-" + ("createglobal-" if global_storage else "createmulti-") + original["family"] + "-" + original["language"].lower(),
-                    engineeringOnly=True, referenceBindings=[binding("Instance", STORAGE["TONR"][0], name, "GlobalVariable") if global_storage
-                                                             else binding("Instance", "Storage", name)])
+                    engineeringOnly=True, referenceBindings=[binding("Instance", original["payload"]["instances"][0]["blockPath"][len("$block:"):], name, "GlobalVariable")
+                                                             if global_storage else binding("Instance", "Storage", name)])
         case["payload"]["instances"] = [{"key": "storage", "kind": "createGlobal" if global_storage else "createMulti", "name": name}]
         result.append(case)
         if not global_storage:
@@ -156,12 +167,11 @@ def cases():
 
 def main():
     sources = []
-    for file, block, text in references():
+    for file, names, text in references():
         path = ROOT / "sources" / file
         path.write_bytes(text.encode("utf-8"))
-        form = "SCL" if file.endswith(".scl") else "instance_db_spec" if file.endswith(".instancedb.json") else "SIMATIC_SD"
         sources.append({"path": path.relative_to(REPO).as_posix(), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "route": "standard",
-                        "authoredFormat": form, "names": [block], "namespace": ""})
+                        "authoredFormat": "SCL" if file.endswith(".scl") else "SIMATIC_SD", "names": names, "namespace": ""})
     paths = [row["path"] for row in sources]
     document = {"schemaVersion": 1, "status": "authored-not-executed",
                 "purpose": "Standard-route native references for the wave 9 typed families (DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR, "

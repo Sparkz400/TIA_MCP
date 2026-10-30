@@ -58,6 +58,22 @@ namespace TiaMcp.Openness.V21
                 return "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
             return null;
         }
+        // Step 1 imports and saves before step 2 creates the instance DB, so what step 2 needs from the target is decided
+        // before the claim. The verified runs were de-DE only; another active language changes the installed FB/UDT exports.
+        internal static string CombinedApplyLanguageRefusal(string[] active, string reference, string editing) =>
+            active?.Length == 1 && active[0] == "de-DE" && reference == "de-DE" && editing == "de-DE" ? null
+                : "Only de-DE-only projects are verified; this project has active languages " + string.Join(", ", active ?? new string[0]) +
+                  " (reference " + reference + ", editing " + editing + ").";
+        // The template route of the instance DB step, decided on the planned FB export instead of after its import.
+        internal static string CombinedApplyInstanceRefusal(XDocument callee, string instanceName, System.Collections.Generic.IEnumerable<XDocument> templates)
+        {
+            BridgeException last = null;
+            foreach (var template in templates)
+                try { TypedGraphicalInstanceTemplate.Create(instanceName, 1, callee, template); return null; }
+                catch (BridgeException error) { last = error; }
+            return "No instance creation profile covers the FB, so the instance DB step would fail after the import: " +
+                (last?.Message ?? "no instance template exists for this CPU and route.");
+        }
         internal static string CombinedApplyStep(string state) =>
             state == "created" ? "prepare_library_instantiate" : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
             state == "import_verified" ? "prepare_graphical_typed_edit" : state == "graphical_prepared" ? "apply_graphical_typed_edit" : state == "graphical_applied" ? "verify_installation_readback" : state;

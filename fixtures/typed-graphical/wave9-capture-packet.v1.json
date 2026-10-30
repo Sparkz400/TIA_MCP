@@ -320,12 +320,13 @@
       "namespace": ""
     },
     {
-      "path": "fixtures/typed-graphical/sources/global-rtrig-storage.instancedb.json",
-      "sha256": "8231d555d23265fb7f343c61e47752fa0150e10ac566b4a5d8e7088739dd57e6",
+      "path": "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
+      "sha256": "62ab125fe7377c39c854935143e782b853e5e2ee2c9be31b81151f6b6ac79b38",
       "route": "standard",
-      "authoredFormat": "instance_db_spec",
+      "authoredFormat": "SCL",
       "names": [
-        "Tgp_GlobalRTrig"
+        "Tgp_GlobalRTrig",
+        "Tgp_GlobalRTrig_Ref"
       ],
       "namespace": ""
     },
@@ -350,12 +351,13 @@
       "namespace": ""
     },
     {
-      "path": "fixtures/typed-graphical/sources/global-ftrig-storage.instancedb.json",
-      "sha256": "b0704507bb7082fef1dc16b33fa6d37e87523fe3a80ac6a0ebfc772d52407a16",
+      "path": "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
+      "sha256": "8947634e78a7b3018a4ec28772f2ba239f0246f501e5edfa9bf3e1a3f3ef4e68",
       "route": "standard",
-      "authoredFormat": "instance_db_spec",
+      "authoredFormat": "SCL",
       "names": [
-        "Tgp_GlobalFTrig"
+        "Tgp_GlobalFTrig",
+        "Tgp_GlobalFTrig_Ref"
       ],
       "namespace": ""
     },
@@ -732,10 +734,10 @@
     "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
     "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
-    "fixtures/typed-graphical/sources/global-rtrig-storage.instancedb.json",
+    "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
     "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
-    "fixtures/typed-graphical/sources/global-ftrig-storage.instancedb.json",
+    "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
     "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
     "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",
@@ -806,10 +808,10 @@
     "fixtures/typed-graphical/sources/tonr-lad.s7dcl",
     "fixtures/typed-graphical/sources/tonr-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/rtrig-lad.s7dcl",
-    "fixtures/typed-graphical/sources/global-rtrig-storage.instancedb.json",
+    "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
     "fixtures/typed-graphical/sources/rtrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/ftrig-lad.s7dcl",
-    "fixtures/typed-graphical/sources/global-ftrig-storage.instancedb.json",
+    "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
     "fixtures/typed-graphical/sources/ftrig-global-lad.s7dcl",
     "fixtures/typed-graphical/sources/eq-dint-fbd.s7dcl",
     "fixtures/typed-graphical/sources/ne-dint-fbd.s7dcl",

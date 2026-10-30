@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.83",
+  "catalogVersion": "0.4.84",
   "targetTiaVersions": [
     21
   ],
@@ -50,31 +50,6 @@
   ],
   "evidence": [
     {
-      "id": "typed.builders.checkpoint.20261008",
-      "status": "blocked",
-      "profile": {
-        "tiaVersion": 21,
-        "cpu": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
-        "languages": [
-          "LAD",
-          "FBD"
-        ],
-        "passedScope": "45 distinct cells passed all four native engineering gates; six LAD cells also passed independent runtime assertions. Exact binary, operation, route and profile lineages are retained in the per-case ledger."
-      },
-      "artifacts": [
-        "fixtures/typed-graphical/qualification.v1.json",
-        "docs/verification/typed-lad-fbd-qualification.md",
-        "docs/plans/typed-lad-fbd-todo.md",
-        "artifacts/tq05/user-stop-checkpoint.json"
-      ],
-      "limitations": [
-        "Work stopped at the user's requested checkpoint; full LAD-010 through LAD-070 acceptance is incomplete.",
-        "Ordinary network insertion violates strict unrelated document-ID preservation in the observed native envelope and is rejected explicitly.",
-        "Unexecuted instruction/storage/route/runtime cells, final immutable packaging and currently unavailable guest qualification remain pending.",
-        "Historical passed binaries do not automatically qualify a later release; native source references and pure tests are not behavior evidence."
-      ]
-    },
-    {
       "id": "vm.ssh.recovery.20261008",
       "status": "passed",
       "profile": {
@@ -100,38 +75,6 @@
         "Recovery matches the recorded standard SCL fixture and exposed program-block scope; it does not establish whole-project semantic completeness or universal device/language support.",
         "The same engineering user must remain logged in. Direct SSH service-session startup, simulator execution and physical PLC operations are not qualified by this result.",
         "The immutable release embeds earlier catalog evidence; this later qualification record is external and applies to the exact recorded hashes."
-      ]
-    },
-    {
-      "id": "typed.builders.advanced-unit.20261012",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "build": "fa0067bcbd32499485b72d8ea1cef38a",
-        "date": "2026-10-12",
-        "cpu": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
-        "languages": [
-          "LAD",
-          "FBD"
-        ],
-        "passedScope": "Twelve exact advanced software-unit cases, six per language: Int equality and numeric FC/FB bindings with existing/create global/multi instance storage passed compile, complete native preservation, saved reopen and checkpoint recovery.",
-        "payloadHashPolicy": "native-payload.v2-comments-pi-qnames",
-        "nativeXmlExports": 794,
-        "completePayloadComparisons": 636,
-        "exactOwnedTiaExits": 36,
-        "auditSha256": "c5cf63d665773017dcffbaeeeb4b0de735380534b89b74be80882b73f0129b17"
-      },
-      "artifacts": [
-        "artifacts/p16t/advanced-final-01/batch.json",
-        "artifacts/p16t/advanced-final-01-audit.json",
-        "artifacts/p16t/advanced-final-01-compile-audit.json",
-        "artifacts/p16t/advanced-final-harness/manifest.json",
-        "fixtures/typed-graphical/route-advanced-cases.v1.json"
-      ],
-      "limitations": [
-        "Exact fixtures and frozen binaries only; runtime was not run.",
-        "Existing-caller insertion, remaining namespace/ambiguity cases and additional captured profiles remain separate unqualified gates.",
-        "This scoped engineering evidence does not complete AC-runtime or qualify the full typed-builder feature."
       ]
     },
     {
@@ -3139,6 +3082,43 @@
         "Generated ASCII passwords; non-ASCII passwords and the 120-character bound are not probed. TIA checks its password policy and a wrong password only in the native call, after the checkpoint; the wrong password is reported as EngineeringError.",
         "The vault lives in the current Windows profile; another user, a roamed profile and packaged-context redirection are not exercised. CredentialAdmissionRequired, the worker's CredentialRequired and slot-set checks are covered offline only (TiaMcp.Credentials.Tests).",
         "Persistence is read back after save in the same Portal; a fresh Portal reopen is not part of this run. Engineering only; a protected block is not downloaded or run."
+      ]
+    },
+    {
+      "id": "local.plcsim_signals.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "52bed5b3ffa0b8cdb7369a3de12c45ffb75664c6",
+        "passedScope": "scripts/qualify_plcsim_signals.py on a frozen Debug build of 52bed5b3 (artifacts/ps3), 75/75 steps, on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1. sim_write_signals wrote all eleven primitive types (bool, SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300) in one WriteSignals call and single sim_read calls read them back; sim_read_signals equalled single reads after batch writes and after an independent sim_write. An unknown symbol rejected the whole ReadSignals batch (DoesNotExist, the others SignalConfigurationError, no values); a WriteSignals batch with an unknown symbol failed as PartialSimulationWrite and its valid item was written. sim_area_write of IB20 and IW22 read back through PLC tags and the program's QB20/QW22 copies (high byte first); a symbolic MW30 write read back by address, an area write of MW30 symbolically, the program overwrote an area write of MW32 on its next scan, and bits M34.5 and I20.0 matched their tags. Area sizes: inputs and outputs 32768, markers 16384 bytes. sim_observe saw the program's STP take RUN to STOP with STOP, RUN and ERROR LED changes, a separate PLCSIM API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; the display summary reported 41026 bytes. A foreign instance registered by another API client was selectable and observable, refused sim_write_signals and sim_area_write with OwnedInstanceRequired, and was unregistered by that client. Typed refusals for string types, duplicate symbols, bounds, the output area, out-of-area ranges, observation bounds and released instances."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_signals.20261030.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1, provisioned with first-use TLS trust under the owned-empty-CPU policy like the D09 runner.",
+        "Process-image addresses IB20..23, QB20..23 and MB30..34 have no configured I/O module; inputs of configured modules are not exercised.",
+        "Operating-state changes inside an observation window came from the program (STP) and a separate PLCSIM API client; the PLCSIM control panel and TIA Portal are not exercised. Display data is summarized by length and hash; its format is not decoded."
+      ]
+    },
+    {
+      "id": "local.typed.edge-global-storage.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "ffe22f285726cbc040819e0e37e6d8216b129d71",
+        "passedScope": "scripts/capture_typed_routes_owned.py on build ffe22f2 (frozen artifacts/te2), one owned TIA V21 lifetime on the SHA-bound standard baseline (CPU 1511-1 PN V4.1, archive 39cea56), 10 independently authored sources: the R_TRIG/F_TRIG multi-instance callers in LAD and FBD; global-rtrig-storage.scl and global-ftrig-storage.scl, each an R_TRIG/F_TRIG instance DB plus an SCL FC that calls it, in one source and one compile; and the LAD/FBD callers of those global DBs. Every source imported, compiled with zero errors, saved and added exactly its declared blocks, every other native object stayed unchanged, and the saved state matched a fresh-process reopen. Observed: with a call in the same compile, the instance DBs Tgp_GlobalRTrig and Tgp_GlobalFTrig survive compile, save and reopen (without one TIA deletes them at compile), and V21 reports both know-how protected (isKnowHowProtected=true), like the R_TRIG/F_TRIG system FBs it copies into System blocks. So they are recorded by inventory identity and cannot be exported."
+      },
+      "artifacts": [
+        "evidence/local.typed.edge-global-storage.20261030.json"
+      ],
+      "limitations": [
+        "Typed LAD/FBD boundary: no R_TRIG/F_TRIG global storage document can be exported, so the edge profiles get no globalInstanceType and existing-global and created global edge storage stay refused; the typed builder needs an exportable, hash-bound storage declaration. Multi-instance edge storage is the supported route.",
+        "The DB's protection is the Openness inventory flag (IsKnowHowProtected); the worker refuses to export protected blocks, so no separate export attempt was made.",
+        "A first capture on build 4f7603a (artifacts/q/ec) stopped at the same protected DB before the runner admitted declared protected additions; it is retained but not curated.",
+        "Independent reference capture only: no typed builder, no runtime, no physical PLC."
       ]
     }
   ],
@@ -10848,7 +10828,8 @@
           "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
           "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
-          "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable."
+          "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
+          "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects."
         ]
       },
       "qualification": {
@@ -10860,7 +10841,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Every Host applies the verified shapes; other PLC library_integrate shapes stay plan-only."
+          "Every Host applies the verified shapes; other PLC library_integrate shapes stay plan-only.",
+          "--disable-library-integrate-apply turns it off; every PLC recipe then stays plan-only."
         ]
       },
       "prerequisites": [
@@ -12382,22 +12364,21 @@
           "Schema v1 keeps LAD power flow separate from FBD dataflow; supports contacts, ordinary coils, branches, Boolean operators, Int comparisons, scalar FC/FB calls, Time TON/TOF/TP and Int CTU/CTD/CTUD using exact captured profiles.",
           "Exact CPU/firmware, language, instruction, data type and standard/software-unit/namespace route must match a deployed hash-bound native profile; unsupported combinations fail explicitly.",
           "Software-unit and namespace routes are engineering-qualified for compare, TON/TOF/TP, CTU/CTD/CTUD, numeric FC/FB calls and local, existing and created storage (48 audited profiles; local.typed.route-profiles.20261025, local.typed.route-iec.20261026, local.typed.route-created-storage.20261026). Scoped runtime passes all 140 route cells on a freshly seeded unit with the harness inside the unit (local.typed.scoped-runtime.20261026, .reruns, .local-fb, .createmulti, .iec-createmulti), using route FB and IEC dependent-instance effect profiles (local.typed.scoped-capture.20261026, local.typed.iec-effect-capture.20261026). Unit tag operands are a native V21 boundary (M-memory unit tags cannot be accessed in software units); namespaced global DB member operands in the caller's software scope are engineering-qualified (local.typed.route-dboperand.20261026); DB owners in other units are refused.",
-          "Cross-scope calls (27 October, offline tests only, not natively qualified): a call to a block in another namespace of the caller's own software unit emits the absolute namespace-qualified CallInfo Name through the route's captured namespaceQualified profile and is refused without it. A call into another software unit requires a direct SoftwareUnit relation of the caller's unit, a Published callee (native attribute Access, UnitAccessType) and its own crossUnitQualified profile. Relation, publication, callee namespace and interface are part of the preview and rechecked at apply. Storage creation for another unit's FB and instance DBs outside the caller's scope are refused; existing storage in the caller's scope follows the usual instance rules. Profiles captured 28 October (fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json, audit crossscope-candidates-20261028.audit.json): the cross-namespace references confirm the absolute Name the deployed namespace-route call profiles emit, and the cross-unit references bind v21.fw41.softwareUnit.lad.call.crossUnit.v1 and v21.fw41.softwareUnit.fbd.call.crossUnit.v1 (CPU 1511 V4.1 only). Engineering (four gates) passed natively for a cross-namespace and a cross-unit numeric FC call in LAD and FBD (local.typed.crossscope.engineering.20261028); FB callees, cross-unit storage and runtime are not qualified.",
+          "Cross-scope calls: a call to a block in another namespace of the caller's own software unit emits the absolute namespace-qualified CallInfo Name through the route's captured namespaceQualified profile and is refused without it. A call into another software unit requires a direct SoftwareUnit relation of the caller's unit, a Published callee (native attribute Access, UnitAccessType) and its own crossUnitQualified profile. Relation, publication, callee namespace and interface are part of the preview and rechecked at apply. Storage creation for another unit's FB and instance DBs outside the caller's scope are refused; existing storage in the caller's scope follows the usual instance rules. Profiles captured 28 October (fixtures/typed-graphical/route-capture-crossscope-call-packet.v1.json, audit crossscope-candidates-20261028.audit.json): the cross-namespace references confirm the absolute Name the deployed namespace-route call profiles emit, and the cross-unit references bind v21.fw41.softwareUnit.lad.call.crossUnit.v1 and v21.fw41.softwareUnit.fbd.call.crossUnit.v1 (CPU 1511 V4.1 only). Engineering (four gates) passed natively for a cross-namespace and a cross-unit numeric FC call in LAD and FBD (local.typed.crossscope.engineering.20261028); FB callees, cross-unit storage and runtime are not qualified.",
           "Operand resolution covers scalar local members, exact PLC tag declarations and scalar DB/UDT members. Array indexing, pointers, indirect operands, safety, protected/generated blocks and language conversion are excluded.",
-          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
+          "Existing global/multi instances and explicit storage creation require exact ownership and declaration effects; unprofiled declaration shapes or dependent layouts are rejected. Parent FBs and their instance DBs that embed the changed FB as a multi-instance at any depth follow the captured transitive effect of their route and are engineering-qualified for created multi-instance storage: standard (local.typed.transitive-capture.20261026, local.typed.transitive-effects.20261026) and software-unit/namespace with the parent chain in the caller's namespace (local.typed.route-transitive-capture.20261027, local.typed.route-transitive-effects.20261027); parents in another namespace or unit are refused (DependencyProfileUnavailable; offline test only) and custom declaration shapes stay rejected. Network editing, insertion and block creation have distinct qualification gates. Standard-route created storage passes runtime with the captured standard IEC dependent-instance effect profile (local.typed.iec-effect-standard.20261026, local.typed.standard-created-storage-runtime.20261026). Network insertion combined with storage creation is engineering-qualified for the standard-route TON family under its own composite contract (local.typed.insertion-storage.20261026).",
           "Compilation, full native preservation, persistence, checkpoint recovery and behavior are reported separately. Native reference imports and pure tests do not certify generated program behavior.",
           "Exact tag and DB symbol uniqueness is revalidated before apply; newly ambiguous declarations are rejected. V21 keeps fully qualified names unique per CPU: a second DB with an existing qualified name is refused on every route (local.typed.resolution-stale.20261029), as are duplicate tag names (local.typed.native-boundaries.rerun.20261029), so these ambiguity guards are defensive and covered offline only. The stale tag address and duplicate-tag setup guard pass natively in LAD and FBD.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October dependency-capture repair bounds each native dependency list to 1000 entries and retains GUIDs from the same observation. PLC integration writes its original dependency observation and requires a matching bounded reread after export; copy/publish, update impact and qualification-only captured storage use the shared reader. Ordered-list drift conservatively refuses; this is not an atomic native snapshot. Linked synthetic-shape and actual Framework helper checks do not compile or execute the Siemens callers. Complete native snapshot identity, freshness, preservation and qualification remain open; historical evidence is unchanged.",
-          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028); runtime is not qualified. R_TRIG/F_TRIG on existing global storage is refused for lack of a profile: TIA deletes an unreferenced R_TRIG/F_TRIG instance DB at compile. SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); runtime not qualified. R_TRIG/F_TRIG global storage, existing or created, has no captured document and is refused. Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests.",
-          "Created wave 9 storage at runtime (29 October 2026, local.typed.wave9-created-storage.runtime.20261029): a new TONR_TIME, R_TRIG or F_TRIG multi-instance member and a new IEC_TIMER global DB pass all five gates, runtime behavior included, in LAD and FBD on the standard route; created R_TRIG/F_TRIG global storage stays refused."
+          "Added 27 October 2026: the builder now accepts DInt/Real comparisons (eq/ne/lt/le/gt/ge), MOVE with one exact scalar type, ADD/SUB/MUL/DIV with one exact numeric type, TONR (Time) and R_TRIG/F_TRIG edge detectors with explicit IEC instance storage, in LAD and FBD. Operand, pin and template overload types must match exactly; other combinations are refused (GraphicalComparisonUnsupported, GraphicalArithmeticUnsupported, GraphicalMoveUnsupported, GraphicalInstructionUnsupported, OperandTypeMismatch). 60 profiles were captured natively (local.typed.wave9-capture.20261027); 62 of the 66 wave 9 cases pass the four native engineering gates (local.typed.wave9.engineering.20261028 and local.typed.wave9.engineering-early.20261028), and all 60 harnessed cells pass runtime on the standard route (local.typed.wave9.runtime.20261029). R_TRIG/F_TRIG global storage, existing or created, is refused: TIA deletes an edge instance DB that no call references at compile, and with a call in the same compile V21 marks the DB know-how protected, so no storage document can be exported (local.typed.edge-global-storage.20261030). SUB/DIV are emitted without the Card=2 that TIA exports but refuses on import. createMulti for TONR, R_TRIG and F_TRIG (also nested two levels deep) and createGlobal for TONR pass the four engineering gates in LAD and FBD (local.typed.wave9-created-storage.engineering.20261029), using the recaptured standard IEC effect (local.typed.iec-effect-standard-wave9.20261029); their runtime passes as well (local.typed.wave9-created-storage.runtime.20261029). Profiles are keyed by the exact CPU TypeIdentifier and exist only for CPU 1511-1 PN OrderNumber:6ES7 511-1AL03-0AB0/V4.1; no second CPU (S7-1500 or S7-1200) has captured typed profiles, creation/instance templates or dependent-effect manifests.",
+          "Created wave 9 storage at runtime (29 October 2026, local.typed.wave9-created-storage.runtime.20261029): a new TONR_TIME, R_TRIG or F_TRIG multi-instance member and a new IEC_TIMER global DB pass all five gates, runtime behavior included, in LAD and FBD on the standard route; created R_TRIG/F_TRIG global storage stays refused.",
+          "Verification scope (maintainer decision, 30 October 2026): the qualified profile is CPU 1511-1 PN V4.1 on the standard, software-unit and namespace routes with the audited profile set; a second CPU and the wave 9 software-unit/namespace route profiles are separate work, runtime acceptance covers every cell with a runtime harness (cells that are engineering-only by design are not runtime-gated), and the VMware guest deployment is tracked with deployment.vm_qualification."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "typed.builders.checkpoint.20261008",
-          "typed.builders.advanced-unit.20261012",
           "local.typed.route-capture.20261025",
           "local.typed.route-iec-capture.20261026",
           "local.typed.route-iec.20261026",
@@ -12432,7 +12413,8 @@
           "local.typed.resolution-stale.20261029",
           "local.typed.iec-effect-standard-wave9.20261029",
           "local.typed.wave9-created-storage.engineering.20261029",
-          "local.typed.wave9-created-storage.runtime.20261029"
+          "local.typed.wave9-created-storage.runtime.20261029",
+          "local.typed.edge-global-storage.20261030"
         ]
       },
       "availability": {
@@ -25211,6 +25193,234 @@
         "AC-preview",
         "AC-native",
         "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_read_signals",
+      "domain": "simulation",
+      "title": "Read several typed simulated values in one runtime call",
+      "mcpTools": [
+        "sim_read_signals"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.ReadSignals(SDataValueByName[]) for primitive types."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "bool, int8..uint64, float and double only: ReadSignals carries no strings, which stay with sim_read (UnsupportedSignalType). 1-64 symbols shorter than 300 characters (the V8 name buffer) per call.",
+          "One runtime call for all symbols; the values are not claimed to come from one scan. A bad item reports quality bad and its runtime error code.",
+          "One unknown symbol makes PLCSIM reject the whole batch: that item reports DoesNotExist, every other item SignalConfigurationError, and no item carries a value (observed natively).",
+          "Natively all eleven primitive types, range limits included, equalled independent single sim_read reads after batch writes and after an independent sim_write."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_signals.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_write_signals",
+      "domain": "simulation",
+      "title": "Write several typed simulated values in one runtime call on an owned instance",
+      "mcpTools": [
+        "sim_write_signals"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.WriteSignals(SDataValueByName[]) for primitive types."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "Instances this worker created or adopted only, in their admitted network mode (Softbus, or the operator's TCP/IP single-adapter mode); other selections refuse with OwnedInstanceRequired before any runtime call.",
+          "1-64 distinct symbols of the sim_read_signals types; every value is validated before the call. A failed item fails the call with PartialSimulationWrite and each item's result; items not reported failed may have been written.",
+          "Assignments, not forces; the program scan may overwrite them.",
+          "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_signals.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_area_read",
+      "domain": "simulation",
+      "title": "Read the input, output or marker process image of a simulated CPU by address",
+      "mcpTools": [
+        "sim_area_read"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.InputArea, OutputArea and MarkerArea (IIOArea.AreaSize, ReadBytes, ReadBit)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "1-1024 bytes or one bit per call; a range beyond IIOArea.AreaSize is refused before the read. Timer, counter and DB areas are not addressed.",
+          "Natively IB20, IW22, QB20, QW22, MW30, MW32 and the bits M34.5 and I20.0 equalled their PLC tags, high byte first. A CPU 1511 reports 32768 input and output and 16384 marker bytes; an instance that is off reports 0-byte areas."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_signals.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_area_write",
+      "domain": "simulation",
+      "title": "Write the input or marker process image of an owned simulated CPU by address",
+      "mcpTools": [
+        "sim_area_write"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IIOArea.WriteBytes and WriteBit on the input and marker areas."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "Instances this worker created or adopted only, in their admitted network mode (Softbus, or the operator's TCP/IP single-adapter mode); other selections refuse with OwnedInstanceRequired before any runtime call.",
+          "Input and marker areas only; the output area is refused because the program writes it every scan. 1-1024 bytes or one bit per call; a range beyond the area is refused before the write.",
+          "Assignments, never forces: the program can overwrite a marker it writes on its next scan.",
+          "Natively input bytes and bits read back through PLC tags and the program's output copies, a marker word symbolically, and the program overwrote an area write of the marker it writes on its next scan. Inputs were exercised at addresses without a configured module only."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_signals.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "sim_observe",
+      "domain": "simulation",
+      "title": "Observe the operating state, LEDs and display of a simulated CPU",
+      "mcpTools": [
+        "sim_observe"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V8 IInstance.OnOperatingStateChanged, OnLedChanged, OperatingState, OperatingMode, HasDisplay and GetDisplayData."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
+          "A bounded window of 0-60000 ms and 1-256 events; the subscription ends with the call. Calls run one at a time, so a change made by another tool call (sim_state) never falls inside a window.",
+          "V8 has no LED getter: LEDs are reported only as changes within the window. Display data is summarized (length, SHA-256) and returned as base64 only on request, up to 4 MiB; its format is not decoded.",
+          "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.plcsim_signals.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "PLCSIM Advanced V8 API and authorized Windows user",
+        "Applicable native runtime/license, instance ownership and CPU state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-simulator-lifecycle",
         "AC-evidence"
       ]
     }

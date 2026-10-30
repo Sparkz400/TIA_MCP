@@ -1,0 +1,67 @@
+{
+  "description": "Catalog evidence records retired from contracts/feature-catalog.v1.json in catalog 0.4.84 (30 October 2026). Both predate scripts/curate_evidence.py (no curated summary) and were cited only by change.graphical_typed_edit, which the maintainer accepted as verified on 30 October on its curated native evidence of 24-30 October; a verified feature may cite only passed, curated records. typed.builders.checkpoint.20261008 was a blocked work checkpoint; typed.builders.advanced-unit.20261012 recorded batch audits whose raw reports exist only under artifacts/. Kept verbatim.",
+  "retiredFromCatalog": "0.4.84",
+  "replacedBy": {
+    "typed.builders.checkpoint.20261008": null,
+    "typed.builders.advanced-unit.20261012": null
+  },
+  "records": [
+    {
+      "id": "typed.builders.checkpoint.20261008",
+      "status": "blocked",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "languages": [
+          "LAD",
+          "FBD"
+        ],
+        "passedScope": "45 distinct cells passed all four native engineering gates; six LAD cells also passed independent runtime assertions. Exact binary, operation, route and profile lineages are retained in the per-case ledger."
+      },
+      "artifacts": [
+        "fixtures/typed-graphical/qualification.v1.json",
+        "docs/verification/typed-lad-fbd-qualification.md",
+        "docs/plans/typed-lad-fbd-todo.md",
+        "artifacts/tq05/user-stop-checkpoint.json"
+      ],
+      "limitations": [
+        "Work stopped at the user's requested checkpoint; full LAD-010 through LAD-070 acceptance is incomplete.",
+        "Ordinary network insertion violates strict unrelated document-ID preservation in the observed native envelope and is rejected explicitly.",
+        "Unexecuted instruction/storage/route/runtime cells, final immutable packaging and currently unavailable guest qualification remain pending.",
+        "Historical passed binaries do not automatically qualify a later release; native source references and pure tests are not behavior evidence."
+      ]
+    },
+    {
+      "id": "typed.builders.advanced-unit.20261012",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "build": "fa0067bcbd32499485b72d8ea1cef38a",
+        "date": "2026-10-12",
+        "cpu": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+        "languages": [
+          "LAD",
+          "FBD"
+        ],
+        "passedScope": "Twelve exact advanced software-unit cases, six per language: Int equality and numeric FC/FB bindings with existing/create global/multi instance storage passed compile, complete native preservation, saved reopen and checkpoint recovery.",
+        "payloadHashPolicy": "native-payload.v2-comments-pi-qnames",
+        "nativeXmlExports": 794,
+        "completePayloadComparisons": 636,
+        "exactOwnedTiaExits": 36,
+        "auditSha256": "c5cf63d665773017dcffbaeeeb4b0de735380534b89b74be80882b73f0129b17"
+      },
+      "artifacts": [
+        "artifacts/p16t/advanced-final-01/batch.json",
+        "artifacts/p16t/advanced-final-01-audit.json",
+        "artifacts/p16t/advanced-final-01-compile-audit.json",
+        "artifacts/p16t/advanced-final-harness/manifest.json",
+        "fixtures/typed-graphical/route-advanced-cases.v1.json"
+      ],
+      "limitations": [
+        "Exact fixtures and frozen binaries only; runtime was not run.",
+        "Existing-caller insertion, remaining namespace/ambiguity cases and additional captured profiles remain separate unqualified gates.",
+        "This scoped engineering evidence does not complete AC-runtime or qualify the full typed-builder feature."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.edge-global-storage.20261030",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-30T07:30:09+00:00",
+  "source": {
+    "commit": "ffe22f285726cbc040819e0e37e6d8216b129d71",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py on build ffe22f2 (frozen artifacts/te2), one owned TIA V21 lifetime on the SHA-bound standard baseline (CPU 1511-1 PN V4.1, archive 39cea56), 10 independently authored sources: the R_TRIG/F_TRIG multi-instance callers in LAD and FBD; global-rtrig-storage.scl and global-ftrig-storage.scl, each an R_TRIG/F_TRIG instance DB plus an SCL FC that calls it, in one source and one compile; and the LAD/FBD callers of those global DBs. Every source imported, compiled with zero errors, saved and added exactly its declared blocks, every other native object stayed unchanged, and the saved state matched a fresh-process reopen. Observed: with a call in the same compile, the instance DBs Tgp_GlobalRTrig and Tgp_GlobalFTrig survive compile, save and reopen (without one TIA deletes them at compile), and V21 reports both know-how protected (isKnowHowProtected=true), like the R_TRIG/F_TRIG system FBs it copies into System blocks. So they are recorded by inventory identity and cannot be exported.",
+  "limitations": [
+    "Typed LAD/FBD boundary: no R_TRIG/F_TRIG global storage document can be exported, so the edge profiles get no globalInstanceType and existing-global and created global edge storage stay refused; the typed builder needs an exportable, hash-bound storage declaration. Multi-instance edge storage is the supported route.",
+    "The DB's protection is the Openness inventory flag (IsKnowHowProtected); the worker refuses to export protected blocks, so no separate export attempt was made.",
+    "A first capture on build 4f7603a (artifacts/q/ec) stopped at the same protected DB before the runner admitted declared protected additions; it is retained but not curated.",
+    "Independent reference capture only: no typed builder, no runtime, no physical PLC."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "0247e7a889d2902d116c7713235bedd7bc2a5072a702553a20749eda3468702a"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f8c3774ac4d96dbeb36f47e1e90bd9a2d143c28e4032c4c1f1b6a8293a3e59f6"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "22cb04bc4b0c3dc363aed46961693a530b3df9245c3466d43cc906d60f1dc037",
+      "bytes": 15726609,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

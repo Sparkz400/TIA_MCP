@@ -121,11 +121,64 @@ namespace TiaMcp.Simulation
             return code;
         }
 
-        private static int UInt16(JObject item, string name, int minimum)
+        /// <summary>The largest byte range one I/Q/M access reads or writes.</summary>
+        public const int MaxAreaBytes = 1024;
+
+        /// <summary>A normalized process-image access, checked before any runtime call. Writes reach inputs and markers only:
+        /// the program writes the output image every scan.</summary>
+        public static JObject AreaAccess(JObject args, bool writing)
+        {
+            string area = args["area"]?.Type == JTokenType.String ? args.Value<string>("area") : null;
+            if (area != "input" && area != "marker" && (writing || area != "output"))
+                throw new ArgumentException(writing ? "area must be input or marker; the program writes the output image every scan, so outputs are read-only here." : "area must be input, output or marker.");
+            var plan = new JObject { ["area"] = area, ["offset"] = Number(args, "offset", 0, int.MaxValue) };
+            if (Given(args, "bit"))
+            {
+                if (Given(args, "length") || Given(args, "bytes")) throw new ArgumentException("bit excludes length and bytes.");
+                plan["bit"] = Number(args, "bit", 0, 7);
+                plan["length"] = 1;
+                if (writing != Given(args, "value") || writing && args["value"].Type != JTokenType.Boolean)
+                    throw new ArgumentException(writing ? "A bit write needs a boolean value." : "A read takes no value.");
+                if (writing) plan["value"] = args["value"];
+            }
+            else if (writing)
+            {
+                var bytes = args["bytes"] as JArray;
+                if (Given(args, "value") || Given(args, "length") || bytes == null || bytes.Count < 1 || bytes.Count > MaxAreaBytes
+                    || bytes.Any(b => b.Type != JTokenType.Integer || (long)b < 0 || (long)b > 255))
+                    throw new ArgumentException("A byte write needs bytes: 1 to " + MaxAreaBytes + " integers 0..255 (or bit and a boolean value).");
+                plan["bytes"] = bytes;
+                plan["length"] = bytes.Count;
+            }
+            else
+            {
+                if (Given(args, "bytes") || Given(args, "value")) throw new ArgumentException("A read takes no bytes or value.");
+                plan["length"] = Given(args, "length") ? Number(args, "length", 1, MaxAreaBytes) : 1;
+            }
+            return plan;
+        }
+
+        /// <summary>Whether the planned range lies inside an area of the given size.</summary>
+        public static bool AreaFits(JObject plan, long areaSize) => plan.Value<long>("offset") + plan.Value<long>("length") <= areaSize;
+
+        /// <summary>ReadSignals/WriteSignals carry primitive values only, in a fixed 300-character name buffer (DTAG_NAME_MAX_LENGTH,
+        /// terminator included); one batch write needs distinct symbols. Returns the refusal code, or null.</summary>
+        public static string SignalBatchRefusal(IReadOnlyList<string> symbols, IReadOnlyList<string> types, bool writing)
+        {
+            if (types.Any(t => t == "string" || t == "wstring")) return "UnsupportedSignalType";
+            if (symbols.Any(s => s.Length >= 300) || writing && symbols.Distinct(StringComparer.Ordinal).Count() != symbols.Count) return "InvalidRequest";
+            return null;
+        }
+
+        private static bool Given(JObject item, string name) => item[name] != null && item[name].Type != JTokenType.Null;
+
+        private static int UInt16(JObject item, string name, int minimum) => Number(item, name, minimum, ushort.MaxValue);
+
+        private static int Number(JObject item, string name, int minimum, int maximum)
         {
             if (item[name]?.Type != JTokenType.Integer) throw new ArgumentException(name + " must be an integer.");
             long value = item.Value<long>(name);
-            if (value < minimum || value > ushort.MaxValue) throw new ArgumentException(name + " must be between " + minimum + " and 65535.");
+            if (value < minimum || value > maximum) throw new ArgumentException(name + " must be between " + minimum + " and " + maximum + ".");
             return (int)value;
         }
     }

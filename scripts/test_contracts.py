@@ -22,8 +22,6 @@ NATIVE_GATES = {"AC-native", "AC-recovery", "AC-runtime", "AC-simulator-lifecycl
 # Catalog records from before scripts/curate_evidence.py: no summary, so no source commit to check.
 # claim_errors refuses them for any verified feature; every newer record must cite a curated summary.
 LEGACY_UNCURATED = {
-    "typed.builders.checkpoint.20261008": "blocked LAD/FBD checkpoint ledger kept in fixtures/ and docs/",
-    "typed.builders.advanced-unit.20261012": "raw batch audits under artifacts/p16t only",
     "vm.ssh.recovery.20261008": "VM recovery reports under artifacts/ only",
 }
 

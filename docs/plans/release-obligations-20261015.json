@@ -266,9 +266,9 @@
       "implementation": "partial_builder_scoped_parents_shapes_missing",
       "qualification": "native_routes_wave9_engineering_runtime_passed_created_storage_runtime_open",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.76): 11 release-matrix rows (9 limited, 1 unqualified, 1 unavailable on V21); 54 cells bound, 8 open and 6 blocked. Wave 9 runtime passed on the standard route for all 60 cells with a runtime harness (local.typed.wave9.runtime.20261029), and the 14 wave 9 created-storage cells pass the four engineering gates (local.typed.wave9-created-storage.engineering.20261029). change.call_connection_set is blocked on V21 (dispositions).",
-      "remainingWork": "change.graphical_typed_edit (8 open cells): runtime of the wave 9 created-storage cells (in progress) and the four existing-global R_TRIG/F_TRIG cases, which have no profile because TIA deletes an unreferenced edge instance DB at compile (capture one or record the boundary). Candidate lineage before inactive profiles are enabled; a second CPU needs its own capture.",
-      "nextAction": "Finish the wave 9 created-storage runtime run, then settle the four existing-global R_TRIG/F_TRIG cases.",
+      "currentResult": "30 October 2026 (catalog 0.4.84): 11 release-matrix rows (10 limited, 1 unavailable on V21); 62 cells bound, 0 open and 6 blocked. change.graphical_typed_edit is verified under the maintainer's verification scope of 30 October: wave 9 runtime passed for all 60 harnessed cells and the 8 harnessed created-storage cells, and R_TRIG/F_TRIG global storage is a recorded V21 boundary (local.typed.edge-global-storage.20261030). change.call_connection_set stays blocked (dispositions).",
+      "remainingWork": "No open matrix cell. Separate typed work: a second CPU and the wave 9 software-unit/namespace route profiles; the VMware guest boxes are tracked with L05.",
+      "nextAction": "Maintainer acceptance review.",
       "ownerRole": "Typed",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
