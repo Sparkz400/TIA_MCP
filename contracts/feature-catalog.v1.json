@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.83",
+  "catalogVersion": "0.4.84",
   "targetTiaVersions": [
     21
   ],
@@ -10763,12 +10763,12 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified only for the PLC plc_component_plan route on a Host started with --enable-library-integrate-apply, in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.20261028); without the flag apply refuses with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
+          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
-          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs only on a Host started with --enable-library-integrate-apply and only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
+          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs on every Host, only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
           "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentRecoveryAnchorUnavailable, ComponentMultiInstanceUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -10822,7 +10822,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.20261028).",
-          "Off by default. Only a Host started with --enable-library-integrate-apply executes a prepared PLC library_integrate plan in change_apply; other Hosts refuse it with PlcIntegrationNotQualified exactly as before. With the flag, the preview states eligibility in combinedApply.",
+          "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
           "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
           "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
@@ -10838,11 +10838,11 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires --enable-library-integrate-apply. Normal Hosts keep PLC library_integrate plan-only."
+          "Every Host applies the verified shapes; other PLC library_integrate shapes stay plan-only."
         ]
       },
       "prerequisites": [
-        "TIA V21, an authorized engineering session and a Host started with --enable-library-integrate-apply",
+        "TIA V21 and an authorized engineering session",
         "A prepared PLC library_integrate plan with preview.combinedApply.eligible=true",
         "checkpointSave, compile and save set to true"
       ],

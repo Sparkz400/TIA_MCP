@@ -306,8 +306,8 @@
       "qualification": "native_install_runtime_combined_apply_passed",
       "releaseAccepted": false,
       "currentResult": "28 October 2026 (catalog 0.4.68): 41 release-matrix rows (11 shipped, 30 limited); 188 cells bound and 0 open. Combined apply behind --enable-library-integrate-apply passed natively for a new and an existing FBD FC caller with OB/LAD and no-flag refusals (28 October); OB insertion stays separate.",
-      "remainingWork": "OB caller insertion as its own route; the audit of native05's recovery (its artifacts are not on this PC); whether combined apply leaves the opt-in Host flag.",
-      "nextAction": "Qualify OB caller insertion separately, then decide whether --enable-library-integrate-apply becomes the default.",
+      "remainingWork": "OB caller insertion as its own route; the audit of native05's recovery (its artifacts are not on this PC). Combined apply is on by default for its verified shapes (decision of 29 October).",
+      "nextAction": "Qualify OB caller insertion separately.",
       "ownerRole": "Libraries and components",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
