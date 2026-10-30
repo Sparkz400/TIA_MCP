@@ -78,14 +78,14 @@ internal static partial class Program
             var data = Enumerable.Range(0, 70000).Select(i => (byte)(i % 255)).ToArray();
             File.WriteAllBytes(Path.Combine(root, "export.xml"), data);
             var store = new ArtifactStore(root);
-            var first = JsonSerializer.SerializeToElement(store.Read("export.xml"));
+            var first = JsonSerializer.SerializeToElement(store.Read("export.xml"), BridgeProtocol.Json);
             Check.Equal(65536, first.GetProperty("count").GetInt32());
             Check.Equal(false, first.GetProperty("complete").GetBoolean());
             Check.Equal(Convert.ToHexStringLower(SHA256.HashData(data)), first.GetProperty("sha256").GetString());
-            var last = JsonSerializer.SerializeToElement(store.Read("export.xml", 65536));
+            var last = JsonSerializer.SerializeToElement(store.Read("export.xml", 65536), BridgeProtocol.Json);
             Check.Equal(true, last.GetProperty("complete").GetBoolean());
             Check.Equal(4464, Convert.FromBase64String(last.GetProperty("data").GetString()!).Length);
-            var empty = JsonSerializer.SerializeToElement(store.Read("export.xml", data.Length));
+            var empty = JsonSerializer.SerializeToElement(store.Read("export.xml", data.Length), BridgeProtocol.Json);
             Check.Equal(0, empty.GetProperty("count").GetInt32());
         }
         finally { Directory.Delete(root, true); }
@@ -102,7 +102,7 @@ internal static partial class Program
             byte[] first = new byte[70000], second = new byte[70000], third = new byte[70000];
             Array.Fill(first, (byte)1); Array.Fill(second, (byte)2); Array.Fill(third, (byte)3);
             string Sha(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
-            string Read(long offset) => JsonSerializer.SerializeToElement(new ArtifactStore(root).Read("export.xml", offset)).GetProperty("sha256").GetString()!;
+            string Read(long offset) => JsonSerializer.SerializeToElement(new ArtifactStore(root).Read("export.xml", offset), BridgeProtocol.Json).GetProperty("sha256").GetString()!;
             File.WriteAllBytes(path, first);
             Check.Equal(Sha(first), Read(0));
             // Same length and restored write time: the continuation chunk reuses the sequence digest instead of rehashing.
@@ -167,7 +167,7 @@ internal static partial class Program
             {
                 try
                 {
-                    var result = JsonSerializer.SerializeToElement(store.Read(path));
+                    var result = JsonSerializer.SerializeToElement(store.Read(path), BridgeProtocol.Json);
                     var bytes = Convert.FromBase64String(result.GetProperty("data").GetString()!);
                     Check.Equal(true, versions.Contains(System.Text.Encoding.UTF8.GetString(bytes)));
                     Check.Equal(Convert.ToHexStringLower(SHA256.HashData(bytes)), result.GetProperty("sha256").GetString());

@@ -9,23 +9,23 @@ namespace TiaMcp.Host;
 [McpServerToolType]
 public sealed class LibraryPackageTools(HostOptions options)
 {
-    [McpServerTool(Name = "artifact_upload_begin", ReadOnly = false, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "artifact_upload_begin", ReadOnly = false, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(ArtifactUploadStatus))]
     [Description("Begin a bounded resumable upload to this TIA host. Supply the original display filename, exact byte count and SHA-256. The server chooses all storage paths and returns uploadId, chunk limit and expiry. Does not start TIA.")]
     public CallToolResult Begin(string fileName, long expectedBytes, string sha256) => Run(() => Uploads().Begin(fileName, expectedBytes, sha256));
 
-    [McpServerTool(Name = "artifact_upload_chunk", ReadOnly = false, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "artifact_upload_chunk", ReadOnly = false, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(ArtifactUploadStatus))]
     [Description("Append base64 bytes at receivedBytes for a server-issued uploadId. Default maximum is 64 KiB decoded. Retrying previously persisted bytes succeeds only if they match; gaps and partial overlaps are rejected.")]
     public CallToolResult Chunk(string uploadId, long offset, string data) => Run(() => Uploads().Write(uploadId, offset, data));
 
-    [McpServerTool(Name = "artifact_upload_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "artifact_upload_status", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(ArtifactUploadStatus))]
     [Description("Read durable upload progress, contiguous received byte range, expiry and committed artifactRef from this host. Status supports resuming byte transfer only, never a native engineering mutation.")]
     public CallToolResult UploadStatus(string uploadId) => Run(() => Uploads().Status(uploadId));
 
-    [McpServerTool(Name = "artifact_upload_commit", ReadOnly = false, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "artifact_upload_commit", ReadOnly = false, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(ArtifactUploadStatus))]
     [Description("Verify the expected complete length and SHA-256 and finalize an immutable artifactRef. Repeating commit verifies and returns the same artifact. Incomplete or mismatching uploads cannot be staged.")]
     public CallToolResult Commit(string uploadId) => Run(() => Uploads().Commit(uploadId));
 
-    [McpServerTool(Name = "artifact_upload_abort", ReadOnly = false, Destructive = true, OpenWorld = false)]
+    [McpServerTool(Name = "artifact_upload_abort", ReadOnly = false, Destructive = true, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(ArtifactUploadStatus))]
     [Description("Abort the specified bridge-owned incomplete upload and release its byte reservation. Committed artifacts cannot be aborted. Does not modify supplied source files or any TIA project.")]
     public CallToolResult Abort(string uploadId) => Run(() => Uploads().Abort(uploadId));
 

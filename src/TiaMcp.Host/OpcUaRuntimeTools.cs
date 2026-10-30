@@ -47,26 +47,26 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     [McpServerTool(Name = "runtime_ua_client_identity", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Return this Host's OPC UA client public certificate, application URI, validity and storage mode for explicit server trust provisioning. With --ua-client-identity NAME, a pre-created Windows current-user DPAPI identity survives Host restarts; its private key is never returned. Without that option identity is ephemeral. No physical connection, automatic replacement or server trust change is performed.")]
     public Task<CallToolResult> ClientIdentity() => Run(() => Task.FromResult(sessions.Store.ClientIdentity()));
-    [McpServerTool(Name = "runtime_ua_credential_binding", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "runtime_ua_credential_binding", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(TiaMcp.Core.Security.CredentialBinding))]
     [Description("Build the protected username credential binding for one exact opc.tcp endpoint, server application URI and leaf SHA256. Store a JSON-string password through the local credential CLI, never through MCP arguments. Set authentication=username; omit credential while obtaining this binding.")]
     public Task<CallToolResult> Binding(OpcUaRuntimeSelection selection) => Run(() => Task.FromResult<object>(OpcUaRuntimeSessionStore.Binding(selection)));
-    [McpServerTool(Name = "runtime_ua_connect", ReadOnly = false, Destructive = false, OpenWorld = true)]
+    [McpServerTool(Name = "runtime_ua_connect", ReadOnly = false, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeStatus))]
     [Description("Create one owned, read-only OPC UA session at an explicit endpoint. Require exact server application URI and leaf SHA256, valid certificate hostname/time/key usage, Basic256Sha256 SignAndEncrypt, anonymous or protected username authentication. Supply a new 32-lowercase-hex attemptId. Reusing an attempt observes its retained outcome without replay. Unresolved same-endpoint attempts block fresh IDs. Polling or subscriptions require their separate explicit start tools. No scans, downgrade, writes, methods or automatic reconnect. Physical qualification remains unverified.")]
     public Task<CallToolResult> Connect(string attemptId, OpcUaRuntimeSelection selection, CancellationToken cancellationToken) =>
         Run(async () => await sessions.Store.Connect(attemptId, selection, cancellationToken));
-    [McpServerTool(Name = "runtime_ua_browse", ReadOnly = true, Destructive = false, OpenWorld = true)]
+    [McpServerTool(Name = "runtime_ua_browse", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeBrowseResult))]
     [Description("Browse bounded immediate hierarchical references in this Host's owned UA session, using exact namespace URI and canonical numeric/string/guid/opaque identifier. At most 256 references and 16 pages; truncation and continuation cleanup are explicit. External server references are unsupported, not followed.")]
     public Task<CallToolResult> Browse(string attemptId, OpcUaRuntimeNode node, CancellationToken cancellationToken, int maximum = 256) =>
         Run(async () => await sessions.Store.Browse(attemptId, node, maximum, cancellationToken));
-    [McpServerTool(Name = "runtime_ua_read", ReadOnly = true, Destructive = false, OpenWorld = true)]
+    [McpServerTool(Name = "runtime_ua_read", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeReadResult))]
     [Description("Read 1..64 explicit UA node identities after rechecking namespace/server/start identity. Returns exact scalar or bounded array/matrix type/value encoding, raw status and Good/Uncertain/Bad quality, nullable original source/server timestamps and per-item errors. Int64/UInt64 use exact decimal strings. Arrays retain observed row-major dimensions and up to 4096 exact elements; structures remain unsupported. No fabricated quality/timestamps, device/program identity guarantee or writes.")]
     public Task<CallToolResult> Read(string attemptId, OpcUaRuntimeNode[] nodes, CancellationToken cancellationToken) =>
         Run(async () => await sessions.Store.Read(attemptId, nodes, cancellationToken));
-    [McpServerTool(Name = "runtime_ua_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "runtime_ua_status", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeStatus))]
     [Description("Read retained UA attempt state without network traffic. Host restart preserves hostEndedRemoteUnknown; session tokens are not persisted or adopted. A separately protected client certificate does not resume sessions or acquisition.")]
     public Task<CallToolResult> Status(string attemptId, CancellationToken cancellationToken) =>
         Run(async () => await sessions.Store.Status(attemptId, cancellationToken));
-    [McpServerTool(Name = "runtime_ua_disconnect", ReadOnly = false, Destructive = false, OpenWorld = true)]
+    [McpServerTool(Name = "runtime_ua_disconnect", ReadOnly = false, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeStatus))]
     [Description("Boundedly close only this Host's owned UA session/channel. Unknown remote cleanup remains explicit. acknowledgeUnknown=true releases an unresolved local reservation as abandonedRemoteUnknown without claiming server logout, allowing a separately requested new attempt. No forced device action.")]
     public Task<CallToolResult> Disconnect(string attemptId, CancellationToken cancellationToken, bool acknowledgeUnknown = false) =>
         Run(async () => await sessions.Store.Disconnect(attemptId, acknowledgeUnknown, cancellationToken));

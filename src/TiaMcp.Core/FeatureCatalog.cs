@@ -25,6 +25,7 @@ public sealed class FeatureCatalog
     }
 
     public string Version => _catalog.GetProperty("catalogVersion").GetString()!;
+    public IReadOnlyList<JsonElement> Features => _features;
 
     public bool HasChangeKind(string kind) => _features.Any(f => f.TryGetProperty("changeKind", out var k) && k.ValueKind == JsonValueKind.String && k.GetString() == kind);
 
