@@ -6,7 +6,7 @@ Three owned-scratch runs on CPU 1511-1 PN V4.1 (fail-safe access off), each from
 | Evidence | Runner | Build | Result |
 | --- | --- | --- | --- |
 | `local.technology.motion_connections.20261030` | `scripts/qualify_motion_connections.py` | `79245419` (um5) | 44/44 steps |
-| `local.software_units.lifecycle.20261030` | `scripts/qualify_software_unit_changes.py` | `79245419` (um5) | see below |
+| `local.software_units.lifecycle.20261030` | `scripts/qualify_software_unit_changes.py` | `43749ff6` (um6) | 161/161 steps |
 | `local.library.drive_compile.20261030` | `scripts/qualify_library_drive_compile.py` | `eb127b79` (um3) | 9/9 steps |
 
 ## to_connect roles and targets
@@ -53,8 +53,11 @@ Rename and creation from a unit master copy (the copy route) ran with apply, ref
 checkpoint restore in `local.software_units.lifecycle.20261030`. A unit master copy's `ContentDescriptions` list only
 the unit (`UnitT`, `Siemens.Engineering.SW.Units.PlcUnit`). The copy of an empty unit keeps the namespace preset and the
 outgoing relations. In the same PLC, `MasterCopyMode.Rename` also renames members: build 34d77f1f created `UnitA2`
-holding `UnitFb_1 (FB3)`, a renamed copy of `UnitFb`, and the default tag table `_3` became `_4`. Since build d0a9f316
-the `createdUnitMembers` readback lists such renames, and a renamed block or type fails the apply.
+holding `UnitFb_1 (FB3)`, a renamed copy of `UnitFb`, and the default tag table `_3` became `_4`. The
+`createdUnitMembers` readback now lists such renames. In the qualified run, the same copy fails after the compile with
+`MutationVerificationFailed` ("MasterCopyMode.Rename renamed blocks or PLC data types of the copy (UnitFb_1)") and is
+restored from its checkpoint. Refusing inside the mutation (build 79245419) had left `UnitFb_1` uncompiled, and
+`change_restore` then answered `FingerprintUnavailable`. The empty-unit copy reports only its renamed default tag table.
 
 ## Library compile with a drive
 
