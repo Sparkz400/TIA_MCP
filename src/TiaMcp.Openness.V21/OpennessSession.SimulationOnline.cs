@@ -473,8 +473,8 @@ namespace TiaMcp.Openness.V21
         // for the caller to throw. With a login, the one project-user login challenge is answered with the instance's generated
         // runtime user (SimulationOnlineLogin). Only the station upload may pass trustCertificate, the caller's explicit
         // first-use authorization: like credential provisioning, the revalidated owned instance's first certificate is pinned
-        // for this attempt and each later challenge must present it; a challenge offering no certificate is trusted as
-        // unauthenticated TLS for the revalidated owned instance (SimulationTlsPin).
+        // for this attempt and each later challenge must present it; a challenge offering no certificate that TIA reports NonVerified
+        // is trusted as unauthenticated TLS for the revalidated owned instance, after which no certificate is pinned (SimulationTlsPin).
         private sealed class OwnedSimulationChallenges
         {
             internal BridgeException Failure;
@@ -513,14 +513,15 @@ namespace TiaMcp.Openness.V21
                     if (request is TlsVerificationConfiguration tls)
                     {
                         _tlsChallenges++;
-                        entry["initialSelection"] = tls.CurrentSelection.ToString();
+                        var initial = tls.CurrentSelection;
+                        entry["initialSelection"] = initial.ToString();
                         tls.CurrentSelection = TlsVerificationConfigurationSelection.NonTrusted;
                         entry["decision"] = "NonTrusted";
                         entry["plcName"] = SimulationProvisionFilterPreCredentialText(tls.PlcName ?? "", 512);
                         entry["verificationInfo"] = SimulationProvisionFilterPreCredentialText(tls.VerificationInfo ?? "", 2048);
                         var certificates = tls.Certificates.Take(9).Select(certificate => SimulationProvisionPublicCertificate(certificate.Certificate)).ToArray();
                         entry["certificates"] = new JArray(certificates.Take(8));
-                        if (_trustCertificate && TrustCertificate(entry, certificates))
+                        if (_trustCertificate && TrustCertificate(entry, certificates, initial == TlsVerificationConfigurationSelection.NonVerified))
                         {
                             tls.CurrentSelection = TlsVerificationConfigurationSelection.Trusted;
                             entry["decision"] = "Trusted";
@@ -533,7 +534,7 @@ namespace TiaMcp.Openness.V21
                     "; it was not answered. TLS trust needs the station upload's explicit authorization for its revalidated owned instance; no other login, password or credential is supplied.");
             }
 
-            private bool TrustCertificate(JObject entry, JObject[] certificates)
+            private bool TrustCertificate(JObject entry, JObject[] certificates, bool reportedNonVerified)
             {
                 bool owned = false;
                 try { (Reverify ?? throw new BridgeException("SimulationOnlineRequired", "The owned instance was not verified."))(); owned = true; }
@@ -541,10 +542,11 @@ namespace TiaMcp.Openness.V21
                 var certificate = certificates.Length == 1 ? certificates[0] : null;
                 Func<string, DateTime> utc = name => DateTime.Parse(certificate.Value<string>(name), System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                 string observed = certificate?.Value<string>("sha256");
-                // Like provisioning, no trust is newly established once the login was released; trust granted before it may recur.
+                // Like provisioning, no trust is newly established once the login was released; trust granted before it may recur,
+                // in the same form only: an unauthenticated attempt never pins a certificate later.
                 string decision = SimulationTlsPin.Decide(true, CertificatePin, observed, certificates.Length, certificate == null ? default(DateTime) : utc("notBeforeUtc"),
                     certificate == null ? default(DateTime) : utc("notAfterUtc"), DateTime.UtcNow, true, owned, _answered && !_trusted,
-                    Failure != null || _tlsChallenges > 8, true);
+                    Failure != null || _tlsChallenges > 8, true, attemptTrustedWithoutCertificate: UnauthenticatedTls, reportedNonVerified: reportedNonVerified);
                 entry["pinPolicyDecision"] = decision;
                 if (!SimulationTlsPin.Allows(decision)) return false;
                 _trusted = true;
