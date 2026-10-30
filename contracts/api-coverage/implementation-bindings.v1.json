@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5fc88bc2beb7bbcfc3e6de5e8b45f3545d40aa2d54dc8c6a2937ec206626ae83",
-      "bytes": 1401119
+      "sha256": "5760f7ce586ca52be8db294b5b8b38741bb2efa4db91c5673f3ad18a62be1f1d",
+      "bytes": 1398596
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -95880,27 +95880,6 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
-          "id": "typed.builders.checkpoint.20261008",
-          "profileSha256": "bf57665212634a20b796db47646e0bd6bedbfee7fad0737b923d9e24d89ac7f2",
-          "artifacts": [
-            "fixtures/typed-graphical/qualification.v1.json",
-            "docs/verification/typed-lad-fbd-qualification.md",
-            "docs/plans/typed-lad-fbd-todo.md",
-            "artifacts/tq05/user-stop-checkpoint.json"
-          ]
-        },
-        {
-          "id": "typed.builders.advanced-unit.20261012",
-          "profileSha256": "ed2083873a8d98bb4ffd2a1419443e5efafe971843bc08280c46c87bf1ccc6a3",
-          "artifacts": [
-            "artifacts/p16t/advanced-final-01/batch.json",
-            "artifacts/p16t/advanced-final-01-audit.json",
-            "artifacts/p16t/advanced-final-01-compile-audit.json",
-            "artifacts/p16t/advanced-final-harness/manifest.json",
-            "fixtures/typed-graphical/route-advanced-cases.v1.json"
-          ]
-        },
-        {
           "id": "local.typed.route-capture.20261025",
           "profileSha256": "91cf403536fbc12eb962404ed1cee4978dd2ed83c57ab80915674cb9724363f9",
           "artifacts": [
@@ -120495,26 +120474,6 @@
       "sha256": "354fc7e0dff19cadfeb7e5e260d16a321fcc56d8d47862bbc503140a79c04922"
     },
     {
-      "path": "artifacts/p16t/advanced-final-01-audit.json",
-      "state": "observed",
-      "sha256": "c5cf63d665773017dcffbaeeeb4b0de735380534b89b74be80882b73f0129b17"
-    },
-    {
-      "path": "artifacts/p16t/advanced-final-01-compile-audit.json",
-      "state": "observed",
-      "sha256": "676398e2aac227b85dcd35187e418a43c25beb09bbcb468518b96f6e8078447d"
-    },
-    {
-      "path": "artifacts/p16t/advanced-final-01/batch.json",
-      "state": "observed",
-      "sha256": "1210fe60a4bcab1c2f6f45cf923cbc7469f308f752a81262b48c73faec52789e"
-    },
-    {
-      "path": "artifacts/p16t/advanced-final-harness/manifest.json",
-      "state": "observed",
-      "sha256": "887bad2632a317f7d8c4c4d4e9d3e8e2a40dd37e370caf6bd990f950c3e51b5b"
-    },
-    {
       "path": "artifacts/ssh-recovery-vm-qualified.json",
       "state": "observed",
       "sha256": "3384e5743a3a328034ba014d479fe91da15f6a870e8f1c80269547dd07f71eae"
@@ -120523,11 +120482,6 @@
       "path": "artifacts/ssh-transport-vm-qualified.json",
       "state": "observed",
       "sha256": "c0f0e3a1aa818af98264affe0418f94041dcf3f4f24233f8a353e4cf1e41ca57"
-    },
-    {
-      "path": "artifacts/tq05/user-stop-checkpoint.json",
-      "state": "observed",
-      "sha256": "8736f5f51b442fe2529287b485d18af830ba44bbeea9552267e95c51cf09a48d"
     },
     {
       "path": "artifacts/vm-access/deployment-recovery.json",
@@ -120543,16 +120497,6 @@
       "path": "artifacts/vm-access/qualified-session-evidence.json",
       "state": "observed",
       "sha256": "21838de6774f413575981d8e8036ccb3f6b03aee62217b95cd9d194907318b76"
-    },
-    {
-      "path": "docs/plans/typed-lad-fbd-todo.md",
-      "state": "observed",
-      "sha256": "d28bc55108882ad3baf37a68b47eb7e38133ee69b350f01f0b302b7a7b956b95"
-    },
-    {
-      "path": "docs/verification/typed-lad-fbd-qualification.md",
-      "state": "observed",
-      "sha256": "79efbde02a616898ed828ad69f670381edf9c7773e08fb9966c57fb326cf2220"
     },
     {
       "path": "evidence/local.access.qualify.20261029.json",
@@ -121378,16 +121322,6 @@
       "path": "evidence/local.wave-kinds.probe.rerun.20261029.json",
       "state": "observed",
       "sha256": "37fb510ab8c97f9bb266cbd46ab786a7fa7c3c3a229100a135cec0d9e61d02f3"
-    },
-    {
-      "path": "fixtures/typed-graphical/qualification.v1.json",
-      "state": "observed",
-      "sha256": "91a8d0fe2bf21cff626053bcac8e40c7e9a413285f647bcf32cbcd835e34ef66"
-    },
-    {
-      "path": "fixtures/typed-graphical/route-advanced-cases.v1.json",
-      "state": "observed",
-      "sha256": "67b20941eb34c79a413147169228cc83c2017773c5a355a1032c479f74362a97"
     }
   ],
   "evidenceProfiles": [
@@ -122050,14 +121984,6 @@
     {
       "id": "local.wave-kinds.probe.rerun.20261029",
       "profileSha256": "4d0f858029c4abd1bee17b76b2fe12ec74b02eb1f0fde4e5ab5b5546c1339ba8"
-    },
-    {
-      "id": "typed.builders.advanced-unit.20261012",
-      "profileSha256": "ed2083873a8d98bb4ffd2a1419443e5efafe971843bc08280c46c87bf1ccc6a3"
-    },
-    {
-      "id": "typed.builders.checkpoint.20261008",
-      "profileSha256": "bf57665212634a20b796db47646e0bd6bedbfee7fad0737b923d9e24d89ac7f2"
     },
     {
       "id": "vm.ssh.recovery.20261008",

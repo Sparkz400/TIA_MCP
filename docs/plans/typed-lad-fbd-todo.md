@@ -22,12 +22,7 @@ marks the feature verified).
 | TODO: typed runtime | Done for every harnessed cell; needs a decision for the rest | Runtime passes on all three routes (`local.typed.runtime.rerun.20261029`, `local.typed.scoped-runtime.*`, `local.typed.wave9.runtime.20261029`). Engineering-only by design: existing global storage of every family, insertion with storage, cross-scope calls, DB member operands and transitive parents. These change declarations or storage identity, which full native XML verifies; the same instruction's behavior passes in a sibling cell. Proposal: `AC-runtime` does not require them. |
 | Wave 9 on the software-unit and namespace routes (not a box yet) | Feasible, needs a decision | No route profile exists for DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR or R_TRIG/F_TRIG (120 profiles), so the builder refuses them (`GraphicalProfileUnavailable`). The route IEC capture of 26 October shows the way (`local.typed.route-iec-capture.20261026`). Either qualify them as their own box or state them as a limitation. |
 
-**What verification needs.** (1) Done: the four existing-global edge cases are a recorded V21 boundary.
-(2) The maintainer decides on the proposed per-profile rule (second CPU, wave 9 route profiles),
-on runtime for engineering-only cells, and on moving the guest boxes to L05. (3) The catalog limitations
-drop stale text: cross-scope calls are not "offline tests only", wave 9 runtime has passed, and the
-17/18 October repairs predate the 24–29 October native evidence. With those settled, every gate has
-current native evidence on CPU 1511-1 PN V4.1.
+**Verification — decided 30 October.** The maintainer accepted the per-profile rule (a second CPU and the wave 9 route profiles are separate boxes, not gates), runtime acceptance for every cell with a runtime harness only, and moving the guest boxes to L05's `deployment.vm_qualification`. `change.graphical_typed_edit` is verified on its curated native evidence on CPU 1511-1 PN V4.1; the two pre-curation records (`typed.builders.checkpoint.20261008`, `typed.builders.advanced-unit.20261012`) were retired.
 
 ## Instruction families — 27 October 2026
 
