@@ -85,6 +85,8 @@ driving the user's live desktop from an agent session was ruled out.
 `TestCaseExecutor.Run` and `SystemTestCaseExecutor.Run` have no qualification mode, and the production gate refuses
 them, so `AC-native`, `AC-recovery`, `AC-runtime` and `AC-simulator-lifecycle` have no native run. Qualifying them
 needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance.
+*Update 30 October:* application execution now has that mode and ran natively on an owned PLCSIM instance
+([TS-Q02 record](testsuite-application-20261030.md)); system execution is still blocked.
 
 **Interruption.** Native interruption of Test Suite style jobs (the open interruption TODO item) needs a dispatched
 style job, so it is blocked with the style lifecycle. The two import kinds are target-dependent `change_apply` kinds
