@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "7a8d341df9d9e57911a3cf1a6da76b44746528022885a9a98e3386dd41e1045f",
-      "bytes": 1381893
+      "sha256": "bd252c1bc62fe0d29f8d4828329156caab559e55ee62897035bda2680f6a2016",
+      "bytes": 1382420
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
