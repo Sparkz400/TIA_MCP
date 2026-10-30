@@ -1,0 +1,52 @@
+name: Release
+
+# Version tags only. Reruns the offline checks, packages and strictly verifies the offline bundle
+# and creates a DRAFT release; the maintainer reviews and publishes it (docs/guides/releasing.md).
+# It never publishes a release, creates a tag or pushes.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    name: Offline validation
+    uses: ./.github/workflows/offline.yml
+
+  explorer:
+    name: Explorer validation
+    uses: ./.github/workflows/playwright.yml
+
+  draft:
+    name: Package and draft release
+    needs: [offline, explorer]
+    runs-on: windows-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write # gh release create --draft only
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
+      - name: Package, verify and draft the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $bundle = ./scripts/Package.ps1 -Offline
+          $verified = ./scripts/Verify-TiaMcpBundle.ps1 -BundlePath $bundle -Strict
+          $version = $verified.productVersion
+          if ($env:TAG -cne "v$version") { throw "Tag $env:TAG does not name the bundle's product version $version." }
+          $section = [regex]::Match((Get-Content -LiteralPath CHANGELOG.md -Raw), '(?ms)^## \[' + [regex]::Escape($version) + '\][^\n]*\n(.*?)(?=^## \[|\z)')
+          if (-not $section.Success) { throw "CHANGELOG.md has no [$version] section." }
+          $notes = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+          $section.Groups[1].Value.Trim() | Set-Content -LiteralPath $notes -Encoding UTF8
+          Copy-Item -LiteralPath (Join-Path $bundle 'manifest.json') -Destination "$bundle.manifest.json"
+          $flags = @('--draft', '--verify-tag', '--title', "TIA MCP $version", '--notes-file', $notes)
+          if ($version -match '^0\.|-') { $flags += '--prerelease' }
+          gh release create $env:TAG "$bundle.zip" "$bundle.zip.sha256" "$bundle.manifest.json" @flags
+          if ($LASTEXITCODE -ne 0) { throw 'Creating the draft release failed.' }

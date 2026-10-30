@@ -62,6 +62,7 @@ listed as lost. Prose records per run are under [verification](#verification).
 - [Offline bug and trace diagnostics](guides/trace-diagnostics.md)
 - [Offline watch-table lifecycle](guides/watch-tables.md)
 - [SINAMICS drives (Startdrive)](guides/drives.md)
+- [Releasing](guides/releasing.md): product version, tag-triggered draft releases and the [changelog](../CHANGELOG.md)
 
 ## Reference
 

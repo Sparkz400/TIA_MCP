@@ -12,7 +12,7 @@ No. Use it only with offline projects, copies, scratch projects and simulators y
 
 ## Is it production-ready?
 
-No, it is pre-1.0. Offline tooling is validated in CI; live TIA Portal and PLCSIM runtime qualification is incomplete. [Current status](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/STATUS.md) records what is verified and with which evidence.
+No, it is pre-1.0. Offline tooling is validated in CI; live TIA Portal and PLCSIM runtime qualification is incomplete. [Current status](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/STATUS.md) records what is verified and with which evidence. Only the latest `main` revision and the newest release are supported ([security policy](https://github.com/Sparkz400/TIA_MCP/blob/main/SECURITY.md#supported-versions)); changes are listed in the [changelog](https://github.com/Sparkz400/TIA_MCP/blob/main/CHANGELOG.md).
 
 ## How do I find out what a feature supports?
 

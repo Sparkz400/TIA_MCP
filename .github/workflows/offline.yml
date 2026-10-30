@@ -9,6 +9,8 @@ on:
     # Nightly full run, including every packaged workflow stage.
     - cron: '0 3 * * *'
   workflow_dispatch:
+  # release.yml reruns these checks for a version tag.
+  workflow_call:
 
 permissions:
   contents: read
@@ -18,7 +20,9 @@ env:
   PYTHONUTF8: '1'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Literal prefix: a called workflow sees the caller's github.workflow, so release.yml's two
+  # called workflows would share one group and cancel each other.
+  group: offline-${{ github.ref }}
   cancel-in-progress: true
 
 # Hosted runners execute only the offline allowlist. Native Siemens builds and
