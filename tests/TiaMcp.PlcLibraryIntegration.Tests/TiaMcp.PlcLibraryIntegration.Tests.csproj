@@ -20,6 +20,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphical.Validation.cs" Link="TypedGraphical.Validation.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphical.Native.cs" Link="TypedGraphical.Native.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalCreation.cs" Link="TypedGraphicalCreation.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TypedGraphicalInstanceTemplate.cs" Link="TypedGraphicalInstanceTemplate.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringSources.cs" Link="EngineeringSources.cs" />
   </ItemGroup>
 </Project>

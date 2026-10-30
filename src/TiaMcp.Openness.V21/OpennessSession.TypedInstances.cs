@@ -180,24 +180,31 @@ namespace TiaMcp.Openness.V21
                 return PrepareCapturedStorageInstance(capture, name, number, callee);
             string catalogPath = TypedCatalogPath();
             if (catalogPath == null) throw new BridgeException("InstanceCreationProfileUnavailable", "No deployed native instance creation catalog exists.");
-            var catalog = JObject.Parse(File.ReadAllText(catalogPath));
-            string cpu = TypedCpuIdentifier(capture.Plc);
             string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
-            var templates = (catalog["globalInstanceTemplates"] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu && t.Value<string>("route") == route).ToArray();
             BridgeException last = null;
-            foreach (var template in templates)
+            foreach (var template in GlobalInstanceTemplates(catalogPath, TypedCpuIdentifier(capture.Plc), route))
             {
-                string path = TypedResourcePath(catalogPath, template.Value<string>("path"));
-                if (!File.Exists(path) || ChangeFileHash(path) != template.Value<string>("sha256")) throw new BridgeException("ProfileCatalogInvalid", "Captured native global instance template source hash does not match.");
                 try
                 {
-                    var result = TypedGraphicalInstanceTemplate.Create(name, number, capture.Export(callee), EngineeringSources.ReadXml(File.ReadAllText(path)));
-                    capture.Change.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = ChangeArtifact(path) });
+                    var result = TypedGraphicalInstanceTemplate.Create(name, number, capture.Export(callee), template.Value);
+                    capture.Change.TypedDependencies.Add(new JObject { ["kind"] = "profileCatalog", ["artifact"] = ChangeArtifact(template.Key) });
                     return result;
                 }
                 catch (BridgeException ex) { last = ex; }
             }
             throw new BridgeException("InstanceCreationProfileUnavailable", "No captured instance template covers the exact callee persistent declarations: " + last?.Message);
+        }
+
+        // Hash-checked global instance templates for one CPU and route, keyed by path; combined apply's pre-claim check reads the same ones.
+        private static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, XDocument>> GlobalInstanceTemplates(string catalogPath, string cpu, string route)
+        {
+            var catalog = JObject.Parse(File.ReadAllText(catalogPath));
+            foreach (var template in (catalog["globalInstanceTemplates"] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu && t.Value<string>("route") == route).ToArray())
+            {
+                string path = TypedResourcePath(catalogPath, template.Value<string>("path"));
+                if (!File.Exists(path) || ChangeFileHash(path) != template.Value<string>("sha256")) throw new BridgeException("ProfileCatalogInvalid", "Captured native global instance template source hash does not match.");
+                yield return new System.Collections.Generic.KeyValuePair<string, XDocument>(path, EngineeringSources.ReadXml(File.ReadAllText(path)));
+            }
         }
 
         private static XElement TypedFbInstanceDeclaration(TypedResolutionCapture capture, TypedGraphicalCallee callee, XNamespace ns, string name, string dataType)
