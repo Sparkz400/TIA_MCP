@@ -285,7 +285,7 @@ password can use the same route: the worker names a `cpuProtection` slot for the
 exact CPU and the Host adds that purpose to the ones it routes. That is not implemented.
 
 The Host uses Microsoft's
-[System.Security.Cryptography.ProtectedData 10.0.13](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/10.0.13).
+[System.Security.Cryptography.ProtectedData 10.0.14](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/10.0.14).
 The [DPAPI sample](https://github.com/dotnet/docs/blob/main/standard/security/snippets/how-to-use-data-protection/net/csharp/sample.cs)
 and [ACL-at-creation API](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesystemaclextensions.create?view=net-10.0)
 underpin the platform usage. Package metadata, license and notices are retained in
