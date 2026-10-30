@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering.Library.MasterCopies;
 using Siemens.Engineering.SW.Blocks;
@@ -173,20 +174,30 @@ namespace TiaMcp.Openness.V21
                         break;
                     }
                     if (!JToken.DeepEquals(source, change.Preview["effects"][0]["createSoftwareUnitFrom"])) throw new BridgeException("StaleRevision", "The master copy changed since preparation; no write was applied.");
+                    Func<SoftwareScope, ScanBudget, IEnumerable<Tuple<string, string>>> memberNames = (scope, scan) => ScopeBlocks(scope, scan).Select(block => Tuple.Create("block", block.Item.Name))
+                        .Concat(ScopeTypes(scope, scan).Select(type => Tuple.Create("type", type.Item.Name))).Concat(TagTables(scope.Tags, scope.Path + "/tags", scan).Select(table => Tuple.Create("tagTable", table.Item.Name)));
+                    var existing = new HashSet<string>(scopes.SelectMany(scope => memberNames(scope, budget)).Select(member => member.Item2), StringComparer.Ordinal);
+                    if (budget.Truncated) throw new BridgeException("TraversalLimit", "Member lookup before CreateFrom is incomplete.");
                     var before = provider.UnitGroup.Units.ToList();
                     var created = provider.UnitGroup.Units.CreateFrom(master, mode);
                     if (created == null || before.Contains(created)) throw new BridgeException("MutationVerificationFailed", "CreateFrom did not return a new software unit.");
                     if (created.Name != name) created.Name = name;
                     var readback = new ScanBudget(50000);
                     var after = SoftwareScopes(plc, readback).SingleOrDefault(scope => Equals(scope.Unit, created));
-                    var members = after == null ? new HashSet<string>() : new HashSet<string>(ScopeBlocks(after, readback).Select(block => block.Item.Name)
-                        .Concat(ScopeTypes(after, readback).Select(type => type.Item.Name)).Concat(TagTables(after.Tags, after.Path + "/tags", readback).Select(table => table.Item.Name)), StringComparer.Ordinal);
+                    var members = after == null ? new List<Tuple<string, string>>() : memberNames(after, readback).ToList();
                     if (readback.Truncated) throw new BridgeException("TraversalLimit", "The created unit's readback is incomplete; checkpoint recovery is required.");
-                    // A member renamed by MasterCopyMode.Rename no longer carries its described name: refused, never reported as a copy.
-                    var described = contents.Where(content => content.ContentType != null && new[] { typeof(PlcBlock), typeof(PlcType), typeof(Siemens.Engineering.SW.Tags.PlcTagTable) }
-                        .Any(type => type.IsAssignableFrom(content.ContentType))).Select(content => content.ContentName);
-                    if (after == null || created.Name != name || !Equals(provider.UnitGroup.Units.Find(name), created) || described.Any(member => !members.Contains(member)))
-                        throw new BridgeException("MutationVerificationFailed", "The created software unit did not read back with the requested name and the master copy's block, type and tag-table names.");
+                    if (after == null || created.Name != name || !Equals(provider.UnitGroup.Units.Find(name), created))
+                        throw new BridgeException("MutationVerificationFailed", "The created software unit did not read back with the requested name.");
+                    // The master copy describes only the unit, and MasterCopyMode.Rename also renames conflicting members (native, 30 October 2026:
+                    // block UnitFb -> UnitFb_1, Default tag table_3 -> _4), so TIA's "<existing>_<n>" names are reported; renamed blocks or types refuse.
+                    var renamedMembers = mode == MasterCopyMode.Rename ? members.Where(member => existing.Contains(Regex.Replace(member.Item2, "_[0-9]+$", ""))
+                        && !existing.Contains(member.Item2)).ToList() : new List<Tuple<string, string>>();
+                    change.Readbacks.Add(new JObject { ["role"] = "createdUnitMembers", ["unitPath"] = after.Path,
+                        ["members"] = new JArray(members.Select(member => new JObject { ["kind"] = member.Item1, ["name"] = member.Item2 })),
+                        ["renamedByMasterCopyMode"] = new JArray(renamedMembers.Select(member => new JObject { ["kind"] = member.Item1, ["name"] = member.Item2 })) });
+                    if (renamedMembers.Any(member => member.Item1 != "tagTable"))
+                        throw new BridgeException("MutationVerificationFailed", "MasterCopyMode.Rename renamed blocks or PLC data types of the copy (" + string.Join(", ", renamedMembers.Where(member => member.Item1 != "tagTable").Select(member => member.Item2))
+                            + "); callers would not reach them under their template names. Checkpoint recovery is required.");
                     break;
                 }
             }

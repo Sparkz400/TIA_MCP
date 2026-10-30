@@ -164,7 +164,9 @@ def instantiate(run, library, path, template, name, restore=False):
     """software_unit_create_from with onNameConflict=rename; the copy's preset and relations are recorded against the template's."""
     unit, source = run.unit(name), run.current["view"]["scope:" + run.unit(template)]
     def record(applied, state):
-        run.h.report.setdefault("createFrom", {})[name] = {"template": source, "copy": state["scope:" + unit]}
+        members = [row for row in applied.get("readbacks") or [] if row.get("role") == "createdUnitMembers"]
+        require(len(members) == 1 and not [m for m in members[0]["renamedByMasterCopyMode"] if m["kind"] != "tagTable"], "Unexpected member readback: %s" % members)
+        run.h.report.setdefault("createFrom", {})[name] = {"template": source, "copy": state["scope:" + unit], "members": members[0]}
     run.apply("create %s from the master copy of %s" % (name, template), "software_unit_create_from",
               {"libraryId": library, "masterCopyPath": path, "name": name, "onNameConflict": "rename"},
               {"effects": [{"createSoftwareUnitFrom": {"masterCopyPath": path}, "templateUnit": template, "masterCopyMode": "Rename", "name": name, "unitPath": unit}]},
