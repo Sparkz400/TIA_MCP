@@ -4,6 +4,31 @@
 
 See the [consolidated TODO](../TODO.md) for the current work order. This page retains detailed acceptance criteria and dated progress.
 
+## Open items classified — 30 October 2026
+
+Every open box on this page and the open typed clauses of the TODO's *Typed LAD/FBD* and *Typed runtime*
+items, against `change.graphical_typed_edit` (L01, 8 open matrix cells; they bind only when the catalog
+marks the feature verified).
+
+| Open item | Class | Evidence or next step |
+| --- | --- | --- |
+| Wave 9: the four existing-global R_TRIG/F_TRIG cases | Feasible now | TIA keeps an edge instance DB only if a call references it in the same compile: SCL and `CreateInstanceDB` DBs both vanish when compiled alone ([native slot](../verification/wave10-native-slot-20261027.md)). The typed apply imports a created DB and its caller before one compile, so only the capture lacks a referencing caller. Capture the DB with an SCL keep-alive caller, promote `globalInstanceType` for the four edge profiles, then qualify the four cases and the four `createGlobal` edge cells the same document enables. |
+| A second CPU | Needs a decision | Feasible natively (capture on that CPU, profile ids without the fixed `v21.fw41.` prefix, CPU-distinct effect manifest names), but every family and route would be recaptured. The TODO's proposed per-profile rule would make it its own box instead of a gate for this feature. |
+| §2: keep transitive parents in another namespace or unit and custom declaration shapes rejected | Feasible now (code fix), then needs a decision | The catalog says these parents stay rejected, but the worker applies the caller route's transitive effect to any parent FB/DB embedding the changed FB, whatever its namespace or unit. Fix: refuse such parents (offline test). Custom start/structured shapes are refused by the captured-shape checks. Capturing the other-scope effect is optional and needs a decision. |
+| §6: restore the VMware guest, then deploy and run both languages remotely | Needs a decision | Not a V21 boundary: the guest is unavailable. The same guest is L05's `deployment.vm_qualification` prerequisite in the TODO, and the typed catalog entry claims no remote qualification. Proposal: track both boxes under L05. |
+| TODO: candidate lineage before enabling inactive profiles | Done, unchecked | No profile is inactive: `route-pending-references.v1.json` is empty. All 168 deployed profiles come from audited captures (`route-candidates-20261025`, `route-candidates-iec-20261026`, `wave9-candidates-20261027`, `crossscope-candidates-20261028`; each passed with no findings) or the 8–13 October reference packet ([p17](../verification/typed-p17-qualification.md)). |
+| TODO: complete scoped operand/storage qualification | Done except two clauses | Namespaced DB member operands are engineering-qualified (`local.typed.route-dboperand.20261026`). Their runtime is not run because the harness drives only the DUT interface; that needs a decision. DB owners in another unit are refused (`UnsupportedScopeReference`), which is a stated limitation. |
+| TODO: runtime of the 14 wave 9 created-storage cells (stated as in progress) | Done, stale wording | The 8 harnessed cells pass all five gates (`local.typed.wave9-created-storage.runtime.20261029`). The 6 transitive cells are engineering-only, like the standard and route transitive cells. |
+| TODO: typed runtime | Done for every harnessed cell; needs a decision for the rest | Runtime passes on all three routes (`local.typed.runtime.rerun.20261029`, `local.typed.scoped-runtime.*`, `local.typed.wave9.runtime.20261029`). Engineering-only by design: existing global storage of every family, insertion with storage, cross-scope calls, DB member operands and transitive parents. These change declarations or storage identity, which full native XML verifies; the same instruction's behavior passes in a sibling cell. Proposal: `AC-runtime` does not require them. |
+| Wave 9 on the software-unit and namespace routes (not a box yet) | Feasible, needs a decision | No route profile exists for DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR or R_TRIG/F_TRIG (120 profiles), so the builder refuses them (`GraphicalProfileUnavailable`). The route IEC capture of 26 October shows the way (`local.typed.route-iec-capture.20261026`). Either qualify them as their own box or state them as a limitation. |
+
+**What verification needs.** (1) The four existing-global edge cases pass or are recorded as a boundary.
+(2) The maintainer decides on the proposed per-profile rule (second CPU, wave 9 route profiles),
+on runtime for engineering-only cells, and on moving the guest boxes to L05. (3) The catalog limitations
+drop stale text: cross-scope calls are not "offline tests only", wave 9 runtime has passed, and the
+17/18 October repairs predate the 24–29 October native evidence. With those settled, every gate has
+current native evidence on CPU 1511-1 PN V4.1.
+
 ## Instruction families — 27 October 2026
 
 - The builder, payload validation, JSON schemas and reader accept DInt/Real comparisons, MOVE,
