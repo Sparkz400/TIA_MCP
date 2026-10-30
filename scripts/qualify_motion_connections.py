@@ -277,8 +277,11 @@ def body(h):
     run.plc = h.owned_scratch("motion connections")
     run.base = "/projects/%s/devices/" % h.tool("tia_session_status")["projects"][0]["name"]
     fixture(run)
-    actor(run)
+    # The first motion object adds MC_Servo and MC_Interpolator, which stay inconsistent without a compile, and the change
+    # fingerprint refuses inconsistent blocks (native, 30 October 2026): the compiled virtual axis comes before any object
+    # created without compile.
     axis(run)
+    actor(run)
     encoder(run)
     reopen(run)
 

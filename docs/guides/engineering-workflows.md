@@ -439,7 +439,9 @@ Refused pairs answer `UnsupportedTarget`; a missing or second target, a half add
 `hardwarePath` answers `InvalidRequest`. Apply verifies `IsConnected` and the target the slot reports: the module, channel
 or tag, `InputModule`/`OutputModule`, `PathToDBMember` (quotes ignored), `InputAddress`/`OutputAddress`, `ChannelIndex` and
 a requested `ConnectOption`; any other readback needs checkpoint recovery. A real axis or external encoder compiles only
-once connected, so create it with `compile=false`. V21 cannot export an inconsistent (uncompiled) object, so for such an object
+once connected, so create it with `compile=false`, but only after a compiled motion object exists: the first one adds
+`MC_Servo` and `MC_Interpolator`, which stay inconsistent without a compile, and the change fingerprint then refuses with
+`FingerprintUnavailable`. V21 cannot export an inconsistent (uncompiled) object, so for such an object
 `to_connect`, `to_disconnect`, `to_parameters` and `to_delete` skip the XML backup with a preview warning, and the project
 checkpoint archive is the recovery. Siemens decides whether a target suits the
 object (telegram, module mode, DB member type); its refusals are recorded per fixture in the
