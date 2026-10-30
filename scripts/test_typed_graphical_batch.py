@@ -766,11 +766,16 @@ class RouteCapturePacketTests(unittest.TestCase):
                          (kind, payload["language"], entry["names"], entry["namespace"], entry["route"]))
         self.assertIn('"Tgp_GlobalRTrig"(CLK := #Signal);', payload["source"])
         # The first R_TRIG use copies the protected system FB into System blocks; that copy is generated, not authored.
-        row = {"kind": "block", "name": "Tgp_GlobalRTrig", "path": "/plc/blocks/Tgp_GlobalRTrig", "payloadSha256": "db"}
+        # V21 marks the declared edge instance DB know-how protected as well; it counts as a declared addition.
+        rows = [{"kind": "protectedSystemBlock", "name": "Tgp_GlobalRTrig", "path": "/plc/blocks/Tgp_GlobalRTrig", "payloadSha256": "db"},
+                {"kind": "block", "name": "Tgp_GlobalRTrig_Ref", "path": "/plc/blocks/Tgp_GlobalRTrig_Ref", "payloadSha256": "fc"}]
         system = {"kind": "protectedSystemBlock", "name": "R_TRIG", "path": "/plc/blocks/systemGroups/x/R_TRIG", "payloadSha256": "fb"}
-        after = {"objects": {"block:" + row["path"]: row, "block:" + system["path"]: system},
-                 "inventory": {"blocks": [{"path": row["path"], "name": row["name"], "scopePath": "/plc", "identity": {"namespace": ""}}]}}
-        self.assertEqual(["Tgp_GlobalRTrig"], [r["name"] for r in verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig"], "/plc", "")[0]])
+        after = {"objects": {"block:" + row["path"]: row for row in rows + [system]},
+                 "inventory": {"blocks": [{"path": row["path"], "name": row["name"], "scopePath": "/plc", "identity": {"namespace": ""}} for row in rows]}}
+        added, _ = verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig", "Tgp_GlobalRTrig_Ref"], "/plc", "")
+        self.assertEqual(["Tgp_GlobalRTrig", "Tgp_GlobalRTrig_Ref"], [r["name"] for r in added])
+        with self.assertRaises(RuntimeError):
+            verify_reference_additions({"objects": {}}, after, ["Tgp_GlobalRTrig_Ref"], "/plc", "")
 
     def test_unit_tag_table_is_an_unnamespaced_scope_addition(self):
         with tempfile.TemporaryDirectory() as directory:

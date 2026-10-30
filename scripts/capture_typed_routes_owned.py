@@ -82,9 +82,10 @@ def verify_reference_additions(before, after, names, scope, namespace, modifies=
     require(all(row.get("kind") == "block" and row.get("name") in allowed for row in changed), "Reference capture changed existing native XML.")
     require({row["name"] for row in changed} >= set(modifies), "A declared modification left its native block unchanged.")
     # Protected system FBs that TIA copies into System blocks on first use (R_TRIG, F_TRIG) are generated, not authored.
-    added = [new[key] for key in set(new) - set(old) if new[key]["kind"] != "protectedSystemBlock"]
+    # V21 marks an R_TRIG/F_TRIG instance DB know-how protected too (30 October): a declared one is added by identity only.
     expected = set(names) - set(modifies)
-    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable") for row in added)
+    added = [new[key] for key in set(new) - set(old) if new[key]["kind"] != "protectedSystemBlock" or "/systemGroups/" not in new[key]["path"]]
+    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable", "protectedSystemBlock") for row in added)
         and {row["name"] for row in added} == expected, "Reference capture did not add exactly the declared objects.")
     blocks, tables = after["inventory"]["blocks"], after["inventory"].get("tagTables", [])
     for row in added + changed:
@@ -178,6 +179,10 @@ def capture(args):
                 entry["modifies"], entry["observes"])
             entry["compile"], entry["exports"] = applied["compile"], []
             for row in additions + changes:
+                if row["kind"] == "protectedSystemBlock":
+                    # Not exportable: its inventory identity is the whole record.
+                    entry.setdefault("protectedAdditions", []).append({"name": row["name"], "path": row["path"], "identitySha256": row["payloadSha256"]})
+                    continue
                 # A changed block keeps its earlier export; its new state is named by this source's ordinal.
                 target = output / (row["name"] + (".xml" if row in additions else ".source-" + str(ordinal).zfill(2) + ".xml"))
                 require(not target.exists(), "Native export destination already exists.")
