@@ -4,24 +4,41 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.HW;
+using Siemens.Engineering.HW.Features;
+using Siemens.Engineering.SW;
 
 namespace TiaMcp.Openness.V21
 {
     // Typed CPU parameter edits, modelled on hardware_cpu_memory_bytes: a reviewed attribute subset of one exact hardware
     // item, previewed with before/after values, applied under the checkpoint, read back, device-compiled and checked by
-    // configured-hardware preservation.
+    // configured-hardware preservation. The CPU protection level takes its full-access password through the Host credential route.
     internal sealed partial class OpennessSession
     {
         private static HashSet<string> CpuParameterAttributeSet => new HashSet<string>(HardwareEngineeringRules.CpuParameterAttributes, StringComparer.Ordinal);
         // A property: partial-class static initializer order across files is not guaranteed.
         private static HashSet<string> HardwareCpuParameterPreservedAttributes => new HashSet<string>(HardwareWriteAttributes.Concat(HardwareEngineeringRules.CpuParameterAttributes), StringComparer.Ordinal);
+        private const string AccessControl = "PlcAccessControlConfiguration";
 
         private DeviceItem PrepareCpuParameters(EngineeringChange change, Project project, JObject preview)
         {
             var item = ChangeHardware(project, change.Payload);
             var attributes = ChangeObject(change.Payload, "attributes");
-            HardwareEngineeringRules.RequireCpuParameterRequest(attributes);
+            // A protection level needs no other parameter.
+            if (change.Payload["protectionLevel"] == null || attributes.Count != 0) HardwareEngineeringRules.RequireCpuParameterRequest(attributes);
             var declared = new HashSet<string>(item.Item.GetAttributeInfos().Select(info => info.Name), StringComparer.Ordinal);
+            HardwareEngineeringRules.RequireCpuProtectionRequest(change.Payload, declared.Contains(AccessControl) ? ReadAttributeValue(item.Item, AccessControl, CpuParameterAttributeSet, false, out _)?.ToString() : null);
+            string level = change.Payload.Value<string>("protectionLevel");
+            PlcAccessLevelProvider access = null; JObject binding = null;
+            if (level != null)
+            {
+                RoutedCredentials.RequireVaultName(change.Payload);
+                RoutedCredentials.RequireReference(change.Payload, "credential");
+                var plc = item.Item.GetService<SoftwareContainer>()?.Software as PlcSoftware
+                    ?? throw new BridgeException("UnsupportedCapability", "The protection level is set on the CPU item that holds the PLC software; select that item.");
+                access = item.Item.GetService<PlcAccessLevelProvider>() ?? throw new BridgeException("UnsupportedCapability", "The selected CPU exposes no PlcAccessLevelProvider service.");
+                // The full-access password is bound to this exact CPU: its PLC path, its hardware item and the purpose.
+                binding = RoutedCredentials.Binding(item.Path + "/plc/" + Segment(plc.Name), item.Path, "cpuProtection", "fullAccess", "fullAccessPassword");
+            }
             // The minimum cycle time is declared only after the same request has enabled it; it is converted then.
             bool pending = attributes[HardwareEngineeringRules.MinimumCycleTime] != null && !declared.Contains(HardwareEngineeringRules.MinimumCycleTime)
                 && declared.Contains(HardwareEngineeringRules.MinimumCycleFlag) && attributes.Value<bool?>(HardwareEngineeringRules.MinimumCycleFlag) == true;
@@ -32,14 +49,20 @@ namespace TiaMcp.Openness.V21
             var changes = PrepareAttributes(item.Item, new JObject(attributes.Properties().Where(p => declared.Contains(p.Name))), CpuParameterAttributeSet, out var converted);
             // Preservation and the unchanged check compare native scalars, not the JSON input spelling.
             foreach (var name in converted.Keys) attributes[name] = ChangeScalar(converted[name]);
-            HardwareEngineeringRules.RequireCpuParametersChanged(current, attributes);
+            if (attributes.Count != 0) HardwareEngineeringRules.RequireCpuParametersChanged(current, attributes);
             if (preview != null)
             {
                 if (pending) changes.Add(new JObject { ["name"] = HardwareEngineeringRules.MinimumCycleTime, ["type"] = null, ["before"] = null, ["after"] = attributes[HardwareEngineeringRules.MinimumCycleTime].DeepClone() });
                 preview["attributeChanges"] = changes;
-                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["cpuParametersBefore"] = current,
-                    ["cpuParametersAfter"] = HardwareEngineeringRules.CpuParametersAfter(current, attributes) });
+                var effect = new JObject { ["hardwarePath"] = item.Path, ["cpuParametersBefore"] = current, ["cpuParametersAfter"] = HardwareEngineeringRules.CpuParametersAfter(current, attributes) };
+                ((JArray)preview["effects"]).Add(effect);
                 ((JArray)preview["warnings"]).Add("Device compilation validates the parameter combination; the runtime effect is observed only after a download.");
+                if (level != null)
+                {
+                    effect["protectionLevelBefore"] = SecurityValue(() => access.PlcProtectionAccessLevel); effect["protectionLevelAfter"] = level;
+                    preview["credentials"] = RoutedCredentials.Slots(change.Payload, binding, "credential");
+                    ((JArray)preview["warnings"]).Add("The full-access password is set from the credential reference; only the reference and its public binding are recorded. At apply the Host checks it against its credential store and seals the secret to that one admitted apply; no secret is previewed, journaled, checkpointed or returned. V21 cannot read a password back: device compilation is the evidence that one is set.");
+                }
             }
             return item.Item;
         }
@@ -51,6 +74,20 @@ namespace TiaMcp.Openness.V21
             // The flag first: enabling it makes Openness declare the minimum cycle time.
             ApplyAttributes(target, new JObject(attributes.Properties().Where(p => p.Name == HardwareEngineeringRules.MinimumCycleFlag)), CpuParameterAttributeSet);
             ApplyAttributes(target, new JObject(attributes.Properties().Where(p => p.Name != HardwareEngineeringRules.MinimumCycleFlag)), CpuParameterAttributeSet);
+            string level = change.Payload.Value<string>("protectionLevel");
+            if (level == null) return;
+            // After the access-control mode, under which the level applies.
+            var access = target.GetService<PlcAccessLevelProvider>();
+            access.PlcProtectionAccessLevel = (PlcProtectionAccessLevel)Enum.Parse(typeof(PlcProtectionAccessLevel), level);
+            using (var password = OpenRoutedCredential(change, "credential"))
+            {
+                // As for block protection, TIA checks its password policy only in the native call, after the checkpoint.
+                try { access.SetPassword(PlcProtectionAccessLevel.FullAccess, password); }
+                catch (EngineeringPasswordPolicyViolationException error) { throw new BridgeException("CredentialPolicyViolation", "TIA refused the password under its password policy: " + error.Message); }
+            }
+            string readback = access.PlcProtectionAccessLevel.ToString();
+            change.Readbacks.Add(new JObject { ["role"] = "cpu-protection-readback", ["hardwarePath"] = change.Payload.Value<string>("hardwarePath"), ["protectionLevel"] = readback });
+            if (readback != level) throw new BridgeException("MutationVerificationFailed", "The CPU protection level reads back " + readback + ", not the prepared " + level + ".");
         }
     }
 }
