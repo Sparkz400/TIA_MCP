@@ -66,7 +66,7 @@ Configure a stdio server with your actual checkout path:
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
-The Host advertises about 290 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
+The Host advertises about 290 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
 
 ## Next steps
 

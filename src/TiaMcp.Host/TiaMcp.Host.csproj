@@ -9,7 +9,8 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Advertised as MCP output schemas by ToolSurface. -->
-    <EmbeddedResource Include="../../contracts/automationml-workflow.v1.schema.json;../../contracts/graph-workflow.v1.schema.json;../../contracts/opc-ua-workflow.v1.schema.json;../../contracts/project-review-import.v1.schema.json;../../contracts/vci-workspace.v1.schema.json" LogicalName="TiaMcp.Contracts.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../contracts/automationml-workflow.v1.schema.json;../../contracts/graph-workflow.v1.schema.json;../../contracts/opc-ua-workflow.v1.schema.json;../../contracts/project-review-import.v1.schema.json;../../contracts/vci-workspace.v1.schema.json;../../contracts/opcua-runtime-subscription.v1.schema.json;../../contracts/diagnostic-watch-plan.v1.schema.json" LogicalName="TiaMcp.Contracts.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../contracts/access-review.v1.schema.json;../../contracts/addin-selection.v1.schema.json;../../contracts/connection-review.v1.schema.json;../../contracts/db-snapshot-review.v1.schema.json;../../contracts/hmi-component-review.v1.schema.json;../../contracts/multiuser-observations.v1.schema.json;../../contracts/public-certificate-review.v1.schema.json;../../contracts/safety-evidence-review.v1.schema.json;../../contracts/software-unit-review.v1.schema.json;../../contracts/teamcenter-observations.v1.schema.json;../../contracts/technology-profile-review.v1.schema.json;../../contracts/web-application-review.v1.schema.json" LogicalName="TiaMcp.Contracts.%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="TiaMcp.Inventory.Tests" />

@@ -3,6 +3,10 @@ using System.Security.Cryptography;
 
 namespace TiaMcp.Core;
 
+/// <summary>One verified artifact_read chunk; sha256 covers the whole file.</summary>
+public sealed record ArtifactChunk(string RelativePath, long Bytes, string Sha256, long Offset, int Count, long NextOffset,
+    bool Complete, string Encoding, string Data);
+
 /// <summary>Explicit, bounded transfer of artifacts from the engineering machine.</summary>
 public sealed class ArtifactStore(string root)
 {
@@ -10,7 +14,7 @@ public sealed class ArtifactStore(string root)
     private static readonly ConcurrentDictionary<string, Digest> Digests = new(StringComparer.Ordinal);
     private readonly string _root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root));
 
-    public object Read(string path, long offset = 0, int count = 65536)
+    public ArtifactChunk Read(string path, long offset = 0, int count = 65536)
     {
         if (offset < 0 || count is < 1 or > 65536)
             throw new BridgeException("InvalidRequest", "offset must be nonnegative and count must be between 1 and 65536 bytes.");
@@ -57,12 +61,8 @@ public sealed class ArtifactStore(string root)
         stream.Position = offset;
         var buffer = new byte[(int)Math.Min(count, length - offset)];
         stream.ReadExactly(buffer);
-        return new
-        {
-            relativePath = Path.GetRelativePath(_root, full), bytes = length, sha256 = hash,
-            offset, count = buffer.Length, nextOffset = offset + buffer.Length,
-            complete = offset + buffer.Length == length, encoding = "base64", data = Convert.ToBase64String(buffer)
-        };
+        return new(Path.GetRelativePath(_root, full), length, hash, offset, buffer.Length, offset + buffer.Length,
+            offset + buffer.Length == length, "base64", Convert.ToBase64String(buffer));
     }
 
     private static FileStream OpenRead(string path)

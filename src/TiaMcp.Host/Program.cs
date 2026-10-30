@@ -37,6 +37,8 @@ try
             var builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder();
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole(o => o.LogToStandardErrorThreshold = LogLevel.Trace);
+            var clientLogging = new ClientLogging();
+            builder.Logging.AddProvider(clientLogging);
             builder.Services.AddSingleton(options);
             if (options.AddInHandoff) builder.Services.AddHostedService<AddInHandoffService>();
             builder.Services.AddSingleton<TiaMcp.Core.Inventory.InventoryStore>();
@@ -81,7 +83,8 @@ try
                 .WithTools<AddInSelectionTools>()
                 .WithTools<MultiuserTools>()
                 .WithTools<TeamcenterTools>()
-                .WithResources<ProjectExplorerResources>().WithRequestFilters(ProjectExplorerResources.Configure);
+                .WithResources<ProjectExplorerResources>().WithRequestFilters(ProjectExplorerResources.Configure)
+                .WithResources<TiaResources>().WithCompleteHandler(TiaResources.Complete).WithSetLoggingLevelHandler(clientLogging.SetLevel);
             if (options.WatchQualificationPoint is not null) mcp.WithTools<WatchQualificationTools>();
             if (options.WatchQualificationPoint is not null && options.ComponentQualification) mcp.WithTools<WatchAuthoringQualificationTools>();
             if (options.ComponentQualification) mcp.WithTools<ComponentQualificationTools>();

@@ -334,7 +334,7 @@ try {
             if ($LASTEXITCODE -ne 0) { throw 'Production Add-In receiver enrollment gate failed.' }
             $result.addInReceiverHost = 'passed; default Host refuses enrollment, explicit enrollment keeps challenge checks, no worker launched'
             python -B scripts/test_mcp_surface_host.py --host (Join-Path $buildOutput "bin/TiaMcp.Host/$($Configuration.ToLowerInvariant())/TiaMcp.Host.exe") --output (Join-Path $output 'mcp-surface')
-            if ($LASTEXITCODE -ne 0) { throw 'MCP surface (identity, titles, output schemas, prompts, progress, toolsets) failed.' }
+            if ($LASTEXITCODE -ne 0) { throw 'MCP surface (identity, titles, output schemas, prompts, resources, completions, logging, progress, toolsets) failed.' }
             $result.mcpSurface = 'passed; actual stdio Host without native workers'
             python -B scripts/test_encoder_checkpoint.py --fixture (Join-Path $output 'encoder-checkpoint/fixture.json')
             if ($LASTEXITCODE -ne 0) { throw 'C# encoder checkpoint receipt failed independent Python verification.' }

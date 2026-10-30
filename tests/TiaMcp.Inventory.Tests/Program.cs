@@ -364,6 +364,52 @@ using (var stopFailing = new CancellationTokenSource())
     stopFailing.Cancel(); await failing;
     Check(failing.IsCompletedSuccessfully, "A failed heartbeat never faults the call it accompanies");
 }
+// Output schemas: every advertised schema accepts the Host refusal envelope, stays self-contained and draft-07 safe.
+var outputSchemas = ToolSurface.OutputSchemas();
+Check(ToolSurface.ReviewContracts.All(r => outputSchemas.ContainsKey(r.Review) && outputSchemas.ContainsKey(r.Page)), "Every review family advertises receipt and page schemas");
+foreach (var (tool, schema) in outputSchemas)
+{
+    var text = schema.GetRawText();
+    Check(schema.GetProperty("type").GetString() == "object" && schema.GetProperty("anyOf").EnumerateArray().Any(a => a.TryGetProperty("$ref", out var r) && r.GetString() == "#/$defs/error")
+        && schema.GetProperty("$defs").TryGetProperty("error", out _), tool + " schema admits the refusal envelope");
+    Check(!text.Contains("\"prefixItems\"") && !Regex.IsMatch(text, "\"\\$ref\":\"(?!#/\\$defs/)"), tool + " schema has only local references and no prefixItems");
+}
+var wrapped = ToolSurface.WithError(JsonDocument.Parse("{\"type\":\"object\",\"properties\":{\"self\":{\"$ref\":\"#\"}}}").RootElement);
+Check(wrapped.GetProperty("$defs").GetProperty("result").GetProperty("properties").GetProperty("self").GetProperty("$ref").GetString() == "#/$defs/result"
+    && wrapped.GetProperty("anyOf").GetArrayLength() == 2, "Declared result schemas keep their references under the error alternative");
+
+// Resources read through the artifact-root and link checks of artifact_read; completion lists names only, never through links.
+var resourceRoot = Path.Combine(output, "resources");
+var outside = Path.Combine(output, "outside");
+Directory.CreateDirectory(Path.Combine(resourceRoot, "exports")); Directory.CreateDirectory(Path.Combine(resourceRoot, "project-reviews")); Directory.CreateDirectory(outside);
+File.WriteAllText(Path.Combine(resourceRoot, "exports", "plan.json"), "{\"ok\":true}");
+File.WriteAllBytes(Path.Combine(resourceRoot, "exports", "raw.bin"), [0, 159, 255]);
+File.WriteAllText(Path.Combine(outside, "secret.txt"), "outside");
+File.WriteAllBytes(Path.Combine(resourceRoot, "exports", "large.json"), new byte[TiaResources.MaxBytes + 1]);
+var reviewBytes = Encoding.UTF8.GetBytes("{\"schemaVersion\":\"project-review.v1\"}");
+var reviewId = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(reviewBytes));
+File.WriteAllBytes(Path.Combine(resourceRoot, "project-reviews", reviewId + ".json"), reviewBytes);
+File.WriteAllBytes(Path.Combine(resourceRoot, "project-reviews", new string('a', 64) + ".json"), reviewBytes);
+var link = Path.Combine(resourceRoot, "linked");
+var mklink = new System.Diagnostics.ProcessStartInfo("cmd.exe") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
+foreach (var argument in new[] { "/c", "mklink", "/J", link, outside }) mklink.ArgumentList.Add(argument);
+using (var child = System.Diagnostics.Process.Start(mklink)!) { child.WaitForExit(); Check(child.ExitCode == 0, "Test junction created"); }
+var resources = new TiaResources(options with { ArtifactsDirectory = resourceRoot });
+void Refused(Action action, string label) { try { action(); } catch (ModelContextProtocol.McpException) { checks++; return; } throw new Exception(label); }
+Check(resources.Artifact("exports/plan.json") is ModelContextProtocol.Protocol.TextResourceContents { Text: "{\"ok\":true}", MimeType: "application/json", Uri: "tia://artifacts/exports/plan.json" },
+    "JSON artifact reads as text with its canonical URI");
+Check(resources.Artifact("exports\\raw.bin") is ModelContextProtocol.Protocol.BlobResourceContents blob && blob.DecodedData.ToArray().SequenceEqual(new byte[] { 0, 159, 255 }),
+    "Other artifacts read as exact bytes");
+Refused(() => resources.Artifact("../outside/secret.txt"), "Path traversal leaves the artifact root");
+Refused(() => resources.Artifact(Path.Combine(outside, "secret.txt")), "Absolute path outside the root");
+Refused(() => resources.Artifact("linked/secret.txt"), "Junction inside the root is followed");
+Refused(() => resources.Artifact("exports/large.json"), "Artifact above the resource limit is read whole");
+Check(resources.Review(reviewId).Contains("project-review.v1"), "Saved review reads by its content hash");
+Refused(() => resources.Review(new string('a', 64)), "Review whose bytes do not match its ID");
+Refused(() => resources.Review("../exports/plan"), "Review ID that is not a content hash");
+var names = TiaResources.ArtifactPaths(resourceRoot).ToList();
+Check(names.Contains("exports/plan.json") && !names.Any(name => name.StartsWith("linked", StringComparison.Ordinal)), "Completion lists root files and never walks a junction");
+Directory.Delete(link);
 Console.WriteLine("Export artifacts: " + output);
 Console.WriteLine($"PASS Inventory: {checks} checks, 30000 rows / {pages} pages; protocol fixtures, exports and host guards. No physical hardware qualification.");
 
