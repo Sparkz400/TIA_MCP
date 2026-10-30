@@ -143,7 +143,7 @@ namespace TiaMcp.Openness.V21
                     api = new StylePublicApi(project, context.Value<string>("executionProfile"));
 #if TESTSUITE_QUALIFICATION
                     if (owner._testSuiteQualification) api = new StylePublicApi(project, context.Value<string>("executionProfile"),
-                        () => { owner.TsRequireQualification(context); owner.TsRequireUi(project, Rule, Capture()); }, true);
+                        () => { owner.TsRequireQualification(context); if (!Application) owner.TsRequireUi(project, Rule, Capture()); }, true);
 #endif
                 }
                 else if (owner._portal.Projects.Count != 0)
@@ -208,33 +208,34 @@ namespace TiaMcp.Openness.V21
             public JObject Run()
             {
                 var definitions = (JArray)context["run"]["definitions"];
-                if (context["application"] is JObject application)
-                {
-                    string output = Path.Combine(directory, "raw-results.json");
-                    if (application.Value<string>("executionMode") == "endpoint")
-                    {
-                        // Reverify the ticket-owned instance and its controller address immediately before SetScope and the one Run.
-                        string address = application.Value<string>("serverAddress");
-                        owner.TestSuiteOwnedEndpoint(application.Value<string>("simulatorTicket"), address);
-                        api.RunSystemOnce(address, application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
-                            Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), output);
-                        return new JObject { ["rawResults"] = Artifact(output) };
-                    }
-                    // Reverify the ticket-owned instance immediately before SetScope and the one Run.
-                    var simulator = owner.TestSuiteOwnedSimulator(application.Value<string>("simulatorTicket"));
-                    api.RunApplicationOnce(owner.SelectPlc(selector).Software, simulator.Value<string>("instanceName"), application.Value<string>("executionMode"),
-                        application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
-                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), output);
-                    return new JObject { ["rawResults"] = Artifact(output) };
-                }
-                if (definitions.Count != 1) throw new BridgeException("TestSuiteProfileUnqualified", "Only a separately reviewed single-rule dispatch is implemented.");
-                var definition = definitions[0];
+                var application = context["application"] as JObject;
+                if (application == null && definitions.Count != 1) throw new BridgeException("TestSuiteProfileUnqualified", "Only a separately reviewed single-rule dispatch is implemented.");
                 string raw = Path.Combine(directory, "raw-results.json");
 #if TESTSUITE_QUALIFICATION
                 if (owner._testSuiteQualification) owner.TsFault(context["operation"].Value<string>("id"), "beforeRun", directory);
 #endif
-                api.RunOnce(definition.Value<string>("name"), definition.Value<string>("originalSha256"), definition.Value<string>("id"),
-                    (JObject)definition["reference"], Path.Combine(directory, "dispatch-definition.xml"), Path.Combine(directory, "execution-return.json"), raw);
+                if (application?.Value<string>("executionMode") == "endpoint")
+                {
+                    // Reverify the ticket-owned instance and its controller address immediately before SetScope and the one Run.
+                    string address = application.Value<string>("serverAddress");
+                    owner.TestSuiteOwnedEndpoint(application.Value<string>("simulatorTicket"), address);
+                    api.RunSystemOnce(address, application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
+                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), raw);
+                }
+                else if (application != null)
+                {
+                    // Reverify the ticket-owned instance immediately before SetScope and the one Run.
+                    var simulator = owner.TestSuiteOwnedSimulator(application.Value<string>("simulatorTicket"));
+                    api.RunApplicationOnce(owner.SelectPlc(selector).Software, simulator.Value<string>("instanceName"), application.Value<string>("executionMode"),
+                        application.Value<string>("route"), definitions, context["run"]["dispatchDefinitionIds"].Values<string>().ToArray(),
+                        Path.Combine(directory, "dispatch-definitions"), Path.Combine(directory, "execution-return.json"), raw);
+                }
+                else
+                {
+                    var definition = definitions[0];
+                    api.RunOnce(definition.Value<string>("name"), definition.Value<string>("originalSha256"), definition.Value<string>("id"),
+                        (JObject)definition["reference"], Path.Combine(directory, "dispatch-definition.xml"), Path.Combine(directory, "execution-return.json"), raw);
+                }
 #if TESTSUITE_QUALIFICATION
                 if (owner._testSuiteQualification) owner.TsFault(context["operation"].Value<string>("id"), "afterRun", directory);
 #endif
@@ -306,7 +307,7 @@ namespace TiaMcp.Openness.V21
             private JObject Capture()
             {
 #if TESTSUITE_QUALIFICATION
-                if (owner._testSuiteQualification) return owner.TsCapture(project, selector, NewDirectory("capture"));
+                if (owner._testSuiteQualification) return owner.TsCapture(project, selector, NewDirectory("capture"), Application);
 #endif
                 var plc = owner.SelectPlc(selector);
                 if (project == null || plc.Project.Path.FullName != project.Path.FullName) throw new BridgeException("IdentityMismatch", "Exact preservation project required.");
