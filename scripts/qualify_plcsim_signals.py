@@ -8,8 +8,8 @@ and executes STP two seconds after SigDb.Arm is set. The program is downloaded t
 Independent oracles: every batch write is read back with single sim_read calls and every batch read equals them; area
 writes are read back symbolically (tags at the written addresses and the program's copies), symbolic writes are read back
 by address; observed operating-state changes match the polled state (sim_status) and the log of a separate PowerShell
-process that drives the instance through its own PLCSIM API connection. That process also registers a foreign instance for
-the ownership refusals and unregisters it afterwards.
+process that drives the instance through its own PLCSIM API connection. Another such process registers and holds a
+foreign instance for the ownership refusals and unregisters it at the end, also after a failure.
 """
 from __future__ import annotations
 
@@ -27,12 +27,12 @@ API_DIR = r"C:\Program Files (x86)\Common Files\Siemens\PLCSIMADV\API\8.0"
 DB = "SigDb"
 # member -> (S7 type, signal type, first value, second value)
 MEMBERS = {
-    "B": ("Bool", "bool", True, False), "I8": ("SInt", "int8", -128, 127), "U8": ("USInt", "uint8", 255, 1),
-    "I16": ("Int", "int16", -32768, 32767), "U16": ("UInt", "uint16", 65535, 2), "I32": ("DInt", "int32", -2147483648, 2147483647),
-    "U32": ("UDInt", "uint32", 4294967295, 3), "I64": ("LInt", "int64", -9223372036854775808, 9223372036854775807),
-    "U64": ("ULInt", "uint64", 18446744073709551615, 4), "R32": ("Real", "float", 1.5, -0.25), "R64": ("LReal", "double", -2.25e300, 3.0),
+    "VBool": ("Bool", "bool", True, False), "VSInt": ("SInt", "int8", -128, 127), "VUSInt": ("USInt", "uint8", 255, 1),
+    "VInt": ("Int", "int16", -32768, 32767), "VUInt": ("UInt", "uint16", 65535, 2), "VDInt": ("DInt", "int32", -2147483648, 2147483647),
+    "VUDInt": ("UDInt", "uint32", 4294967295, 3), "VLInt": ("LInt", "int64", -9223372036854775808, 9223372036854775807),
+    "VULInt": ("ULInt", "uint64", 18446744073709551615, 4), "VReal": ("Real", "float", 1.5, -0.25), "VLReal": ("LReal", "double", -2.25e300, 3.0),
 }
-TAGS = {"SigInByte": ("Byte", "%IB20", "uint8"), "SigInWord": ("Int", "%IW22", "int16"), "SigOutByte": ("Byte", "%QB20", "uint8"),
+TAGS = {"SigInByte": ("USInt", "%IB20", "uint8"), "SigInWord": ("Int", "%IW22", "int16"), "SigOutByte": ("USInt", "%QB20", "uint8"),
         "SigOutWord": ("Int", "%QW22", "int16"), "SigMarker": ("Int", "%MW30", "int16"), "SigMarkerCopy": ("Int", "%MW32", "int16"),
         "SigBit": ("Bool", "%M34.5", "bool")}
 EXTRA = {"Text": "string", "Arm": "bool", "Scans": "int32"}
@@ -68,7 +68,8 @@ BEGIN
 END_ORGANIZATION_BLOCK
 
 '''
-# A separate PLCSIM API client: registers or unregisters a foreign instance, or drives Run/Stop with delays and logs each result.
+# A separate PLCSIM API client: holds a foreign instance it registered until a line or EOF on stdin, then unregisters it;
+# or drives Run/Stop on an instance with delays and logs each result.
 ACTOR = r'''param([string]$ApiDir, [string]$Mode, [string]$Name, [string]$Storage = '', [string]$Steps = '')
 $ErrorActionPreference = 'Stop'
 [void][Reflection.Assembly]::LoadFrom((Join-Path $ApiDir 'Siemens.Simatic.Simulation.Runtime.Api.x64.dll'))
@@ -76,15 +77,18 @@ $manager = [Siemens.Simatic.Simulation.Runtime.SimulationRuntimeManager]
 function Emit($value) { [Console]::Out.WriteLine((ConvertTo-Json $value -Compress -Depth 5)); [Console]::Out.Flush() }
 function Now { (Get-Date).ToUniversalTime().ToString('o') }
 try {
-    if ($Mode -eq 'register') {
+    if ($Mode -eq 'hold') {
         $instance = $manager::RegisterInstance([Siemens.Simatic.Simulation.Runtime.ECPUType]::CPU1511, $Name)
-        $instance.StoragePath = $Storage
-        Emit @{ id = $instance.ID; name = $instance.Name; state = "$($instance.OperatingState)" }
-        $instance.Dispose()
+        try {
+            $instance.StoragePath = $Storage
+            Emit @{ id = $instance.ID; name = $instance.Name; state = "$($instance.OperatingState)" }
+            [void][Console]::In.ReadLine()
+        } finally { $instance.UnregisterInstance(); $instance.Dispose() }
+        Emit @{ unregistered = $Name; atUtc = (Now) }
     } elseif ($Mode -eq 'unregister') {
         $instance = $manager::CreateInterface($Name)
         $instance.UnregisterInstance(); $instance.Dispose()
-        Emit @{ unregistered = $Name }
+        Emit @{ unregistered = $Name; atUtc = (Now) }
     } else {
         $instance = $manager::CreateInterface($Name)
         Emit @{ ready = (Now); state = "$($instance.OperatingState)" }
@@ -188,11 +192,17 @@ def actor(h, mode, name, storage="", steps=""):
         command += ["-Storage", storage]
     if steps:
         command += ["-Steps", steps]
-    return subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8")
+    return subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8")
 
 
 def actor_result(process, timeout=120):
-    out, err = process.communicate(timeout=timeout)
+    """Ends a holding client (a line on stdin) and returns its JSON lines; a client that fails or hangs is killed."""
+    try:
+        out, err = process.communicate("\n", timeout=timeout)
+    except BaseException:
+        process.kill()
+        process.communicate()
+        raise
     require(process.returncode == 0, "PowerShell API client failed (%s): %s" % (process.returncode, err.strip()[-2000:]))
     lines = [json.loads(line) for line in out.splitlines() if line.strip().startswith("{")]
     require(lines, "PowerShell API client wrote no result: %s" % err.strip()[-2000:])
@@ -225,7 +235,7 @@ def body(h):
     creation = uuid.uuid4().hex
     created = h.stage("sim_create", lambda: h.tool("sim_create", {"cpuType": "CPU1511", "creationId": creation}))
     lab.instance = verify_owned_instance(created["instance"])
-    released, foreign = False, {}
+    released, foreign, failed = False, {}, True
     try:
         ticket = {"downloadTicket": created["downloadTicket"], "credentialMetadataPath": cpus[0]["credentialMetadataPath"]}
         download = h.stage("simulation_download", lambda: h.tool("simulation_download", ticket))
@@ -253,11 +263,26 @@ def body(h):
         for tool, arguments in (("sim_read_signals", {"signals": [{"symbol": "x", "type": "bool"}]}), ("sim_write_signals", {"writes": [{"symbol": "x", "type": "bool", "value": True}]}),
                                 ("sim_area_read", {"area": "input", "offset": 0}), ("sim_area_write", {"area": "input", "offset": 0, "bytes": [0]}), ("sim_observe", {})):
             refuse(h, "a released instance", tool, {"instanceId": lab.instance["id"], **arguments}, ["SimulationNotSelected"])
+        failed = False
     finally:
+        # Every cleanup runs even when an earlier one fails; a cleanup failure fails an otherwise passing run.
+        cleanups = []
         if not released:
-            h.stage("sim_release", lambda: h.tool("sim_release", {"instanceId": lab.instance["id"], "deleteOwned": True}))
-        if foreign.get("id") is not None and not foreign.get("unregistered"):
-            h.stage("unregister the foreign instance", lambda: actor_result(actor(h, "unregister", foreign["name"])))
+            cleanups.append(("sim_release", lambda: h.tool("sim_release", {"instanceId": lab.instance["id"], "deleteOwned": True})))
+        if foreign.get("selected"):
+            cleanups.append(("sim_release the foreign selection", lambda: h.tool("sim_release", {"instanceId": foreign["id"]})))
+        if foreign.get("name") and not foreign.get("unregistered"):
+            cleanups.append(("unregister the foreign instance", lambda: unregister_foreign(h, foreign)))
+        errors = []
+        for label, operation in cleanups:
+            try:
+                h.stage(label, operation)
+            except Exception as error:
+                errors.append("%s: %s" % (label, error))
+        if errors:
+            h.report["cleanupFailures"] = errors
+            if not failed:
+                raise AssertionError("Cleanup failed: %s" % errors)
 
 
 def signals(h, lab):
@@ -283,7 +308,7 @@ def signals(h, lab):
     h.report["batchAfterSingleWrite"] = h.stage("sim_read_signals after independent sim_write", single_write)
     h.report["batchSecond"] = h.stage("sim_write_signals the second value set", batch_write(1))
     def bad_item():
-        rows = h.tool("sim_read_signals", {"instanceId": lab.instance["id"], "signals": [lab.signal("B"), {"symbol": '"SigDb".Missing', "type": "int16"}, lab.signal("Scans", "int32")]})["values"]
+        rows = h.tool("sim_read_signals", {"instanceId": lab.instance["id"], "signals": [lab.signal("VBool"), {"symbol": '"SigDb".Missing', "type": "int16"}, lab.signal("Scans", "int32")]})["values"]
         require(rows[0]["quality"] == "good" and rows[1]["quality"] == "bad" and rows[1].get("errorCode") and rows[2]["quality"] == "good", "Bad-item batch: %s" % rows)
         return rows
     h.report["batchBadItem"] = h.stage("sim_read_signals reports a missing symbol as a bad item", bad_item)
@@ -291,17 +316,17 @@ def signals(h, lab):
     instance = lab.instance["id"]
     refuse(h, "a string type", "sim_read_signals", {"instanceId": instance, "signals": [lab.signal("Text", "string")]}, ["UnsupportedSignalType"])
     refuse(h, "a wstring write", "sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("Text", "wstring"), "value": "x"}]}, ["UnsupportedSignalType"])
-    refuse(h, "duplicate symbols", "sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("I16"), "value": 1}, {**lab.signal("I16"), "value": 2}]}, ["InvalidRequest"])
-    refuse(h, "65 signals", "sim_read_signals", {"instanceId": instance, "signals": [lab.signal("B")] * 65}, ["InvalidRequest"])
-    refuse(h, "a uint8 out of range", "sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("I16"), "value": 5}, {**lab.signal("U8"), "value": 256}]}, ["InvalidRequest"])
+    refuse(h, "duplicate symbols", "sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("VInt"), "value": 1}, {**lab.signal("VInt"), "value": 2}]}, ["InvalidRequest"])
+    refuse(h, "65 signals", "sim_read_signals", {"instanceId": instance, "signals": [lab.signal("VBool")] * 65}, ["InvalidRequest"])
+    refuse(h, "a uint8 out of range", "sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("VInt"), "value": 5}, {**lab.signal("VUSInt"), "value": 256}]}, ["InvalidRequest"])
     refuse(h, "a 300-character symbol", "sim_read_signals", {"instanceId": instance, "signals": [{"symbol": "x" * 300, "type": "bool"}]}, ["InvalidRequest"])
-    refuse(h, "an unselected instance", "sim_read_signals", {"instanceId": 987654, "signals": [lab.signal("B")]}, ["SimulationNotSelected"])
+    refuse(h, "an unselected instance", "sim_read_signals", {"instanceId": 987654, "signals": [lab.signal("VBool")]}, ["SimulationNotSelected"])
     after = h.stage("refused batches wrote nothing", lambda: lab.single(*names))
     require(after == before, "A refused batch changed values: %s -> %s" % (before, after))
     def partial():
-        error = h.call_error("sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("I16"), "value": 1234}, {"symbol": '"SigDb".Missing', "type": "int16", "value": 1}]})
+        error = h.call_error("sim_write_signals", {"instanceId": instance, "writes": [{**lab.signal("VInt"), "value": 1234}, {"symbol": '"SigDb".Missing', "type": "int16", "value": 1}]})
         require(error.get("code") == "PartialSimulationWrite" and error["details"]["retrySafe"] is False, "Partial batch write: %s" % error)
-        return {"items": error["details"]["writes"], "batchError": error["details"].get("batchError"), "validItemReadBack": lab.single("I16")["I16"]}
+        return {"items": error["details"]["writes"], "batchError": error["details"].get("batchError"), "validItemReadBack": lab.single("VInt")["VInt"]}
     h.report["batchPartialWrite"] = h.stage("sim_write_signals reports a failed item as PartialSimulationWrite", partial)
 
 
@@ -388,9 +413,16 @@ def observe(h, lab):
     def external(steps, window, expected, maximum=64):
         def run():
             process = actor(h, "sequence", lab.instance["name"], steps=steps)
-            ready = json.loads(process.stdout.readline())
-            require("ready" in ready, "The PowerShell API client did not start: %s" % ready)
-            result = h.tool("sim_observe", {"instanceId": instance, "windowMs": window, "maxEvents": maximum})
+            try:
+                line = process.stdout.readline()
+                ready = json.loads(line) if line.strip() else {}
+                require("ready" in ready, "The PowerShell API client did not start: %s %s" % (line, process.stderr.read() if process.poll() is not None else ""))
+                result = h.tool("sim_observe", {"instanceId": instance, "windowMs": window, "maxEvents": maximum})
+            except BaseException:
+                # Never leave a client that would still change the instance's state later.
+                process.kill()
+                process.communicate()
+                raise
             log = actor_result(process)[-1]["steps"]
             polled = lab.polled()
             observed = states(result)
@@ -427,11 +459,18 @@ def foreign_instance(h, lab, foreign):
     name = "TiaMcpForeign_" + uuid.uuid4().hex[:12]
     storage = h.directory / "foreign"
     storage.mkdir()
-    registered = h.stage("register a foreign instance through a separate API client", lambda: actor_result(actor(h, "register", name, storage=str(storage)))[-1])
-    foreign.update(name=name, id=registered["id"], registered=registered)
+    # The client holds its registration until a line or EOF on stdin; body's cleanup ends it (or unregisters by name).
+    foreign.update(name=name, holder=actor(h, "hold", name, storage=str(storage)))
+    def register():
+        line = foreign["holder"].stdout.readline()
+        require(line.strip().startswith("{"), "The holding API client did not register: %s" % line)
+        return json.loads(line)
+    registered = h.stage("register a foreign instance through a separate API client", register)
+    foreign.update(id=registered["id"], registered=registered)
     selected = h.stage("sim_select the foreign instance", lambda: h.tool("sim_select", {"instanceId": foreign["id"], "expectedName": name})["instance"])
+    foreign["selected"] = True
     require(selected["owned"] is False, "A foreign instance was selected as owned")
-    refuse(h, "a foreign instance", "sim_write_signals", {"instanceId": foreign["id"], "writes": [{"symbol": '"SigDb".B', "type": "bool", "value": True}]}, ["OwnedInstanceRequired"])
+    refuse(h, "a foreign instance", "sim_write_signals", {"instanceId": foreign["id"], "writes": [{"symbol": '"SigDb".VBool', "type": "bool", "value": True}]}, ["OwnedInstanceRequired"])
     refuse(h, "a foreign instance", "sim_area_write", {"instanceId": foreign["id"], "area": "marker", "offset": 0, "bytes": [1]}, ["OwnedInstanceRequired"])
     def readable():
         observed = h.tool("sim_observe", {"instanceId": foreign["id"], "windowMs": 200})
@@ -440,8 +479,23 @@ def foreign_instance(h, lab, foreign):
         return {"observe": {k: observed[k] for k in ("before", "after", "events", "display")}, "areaReadWhileOff": read.get("structuredContent")}
     foreign["readOnly"] = h.stage("observe and read the foreign instance", readable)
     h.stage("sim_release the foreign selection", lambda: h.tool("sim_release", {"instanceId": foreign["id"]}))
-    foreign["unregistered"] = h.stage("unregister the foreign instance through its API client", lambda: actor_result(actor(h, "unregister", name))[-1])
-    h.report["foreignInstance"] = foreign
+    foreign["selected"] = False
+    h.stage("unregister the foreign instance through its holding client", lambda: unregister_foreign(h, foreign))
+    h.report["foreignInstance"] = {k: v for k, v in foreign.items() if k != "holder"}
+
+
+def unregister_foreign(h, foreign):
+    """End the holding client, which unregisters the instance; if it failed, unregister by name. Then no instance of that name may remain."""
+    result = None
+    try:
+        result = actor_result(foreign["holder"])[-1]
+    except Exception as error:
+        foreign["holderFailure"] = str(error)
+    if any(i["name"] == foreign["name"] for i in h.tool("sim_status", {})["instances"]):
+        result = actor_result(actor(h, "unregister", foreign["name"]))[-1]
+    require(not any(i["name"] == foreign["name"] for i in h.tool("sim_status", {})["instances"]), "The foreign instance is still registered")
+    foreign["unregistered"] = result or True
+    return result
 
 
 if __name__ == "__main__":

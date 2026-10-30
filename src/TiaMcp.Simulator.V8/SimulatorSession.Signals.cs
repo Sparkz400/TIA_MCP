@@ -153,7 +153,7 @@ namespace TiaMcp.Simulator.V8
                     throw new SimulatorException("PartialSimulationWrite", "WriteBytes wrote " + written + " of " + plan.Value<uint>("length") + " bytes.", new JObject { ["access"] = plan, ["bytesWritten"] = written, ["retrySafe"] = false });
             }
             result["appliedAtUtc"] = DateTime.UtcNow.ToString("O");
-            result["note"] = "An assignment to the process image, not a force. The program may overwrite markers (and the input image of configured modules) on its next scan.";
+            result["note"] = "An assignment to the process image, not a force. The program overwrites on its next scan whatever it writes itself.";
             return result;
         }
 

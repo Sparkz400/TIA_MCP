@@ -175,8 +175,7 @@ otherwise), and are refused before any runtime call when a value or bound is inv
   or marker image. A range beyond the area's size is refused with `InvalidRequest`. Byte order is the
   PLC's: the first byte of a word is its high byte. Writing outputs is refused: the program writes the
   output image every scan, so an assignment there would last until the next scan at most. Area writes are
-  assignments, never forces; the program can overwrite markers (and inputs of configured modules) on its
-  next scan.
+  assignments, never forces: the program overwrites on its next scan whatever marker it writes itself.
 - **Operating state and LEDs.** `sim_observe` reports the operating state and mode before and after the
   call, and a display summary (`hasDisplay`, `dataLength`, SHA-256; `includeDisplayData` adds the bytes
   as base64, up to 4 MiB). With `windowMs` it subscribes to `OnOperatingStateChanged` and `OnLedChanged`
