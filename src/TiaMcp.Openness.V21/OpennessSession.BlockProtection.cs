@@ -9,7 +9,6 @@ namespace TiaMcp.Openness.V21
     internal sealed partial class OpennessSession
     {
         private static readonly string[] BlockProtectionKinds = { "block_protect", "block_unprotect", "block_write_protection_set" };
-        private static readonly string[] CredentialReferenceFields = { "bindingSha256", "cipherSha256", "credentialId", "schemaVersion", "vaultId" };
 
         private void PrepareBlockProtection(EngineeringChange change, JObject preview)
         {
@@ -23,12 +22,11 @@ namespace TiaMcp.Openness.V21
                 .Concat(write ? new[] { "action" } : new string[0]).Concat(action == "change" ? new[] { "newCredential" } : new string[0]);
             if (payload.Properties().Any(property => !allowed.Contains(property.Name, StringComparer.Ordinal)))
                 throw new BridgeException("CredentialInputInvalid", "Block protection payloads accept only block selectors, vaultName, action and protected credential references; plaintext passwords are never accepted.");
-            if (payload["vaultName"] != null && (payload["vaultName"].Type != JTokenType.String || payload.Value<string>("vaultName") != "default" && !LowerHex(payload.Value<string>("vaultName"), 32)))
-                throw new BridgeException("CredentialInputInvalid", "vaultName must be default or a 32-character lowercase hexadecimal vault name.");
-            RequireCredentialReference(payload, "credential");
+            RoutedCredentials.RequireVaultName(payload);
+            RoutedCredentials.RequireReference(payload, "credential");
             if (action == "change")
             {
-                RequireCredentialReference(payload, "newCredential");
+                RoutedCredentials.RequireReference(payload, "newCredential");
                 if (JToken.DeepEquals(payload["credential"], payload["newCredential"]) || payload["credential"].Value<string>("vaultId") != payload["newCredential"].Value<string>("vaultId"))
                     throw new BridgeException("CredentialInputInvalid", "credential and newCredential must be different references in the same vault.");
             }
@@ -56,10 +54,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidChangeState", "Write protection is already " + (action == "enable" ? "enabled." : "disabled."));
             preview["protectionBefore"] = state; preview["protectionAfter"] = after;
             // Each reference must be bound to exactly this public binding; the Host checks that against its vault before admission.
-            var binding = new JObject { ["resource"] = new JObject { ["provider"] = "siemensTiaPortalV21", ["authority"] = plc.Path, ["ownerId"] = entry.Path,
-                ["resourceKind"] = "blockProtection", ["resourceId"] = write ? "write" : "knowHow" }, ["purpose"] = "blockProtection", ["subjectId"] = "blockPassword" };
-            preview["credentials"] = new JArray(new[] { "credential", "newCredential" }.Where(slot => payload[slot] != null).Select(slot => new JObject {
-                ["slot"] = slot, ["vaultName"] = payload.Value<string>("vaultName") ?? "default", ["reference"] = payload[slot].DeepClone(), ["binding"] = binding.DeepClone() }));
+            preview["credentials"] = RoutedCredentials.Slots(payload, RoutedCredentials.Binding(plc.Path, entry.Path, "blockProtection", write ? "write" : "knowHow", "blockPassword"), "credential", "newCredential");
             warnings.Add("Only credential references and their public binding are recorded. At apply the Host checks each reference against its credential store and seals the secret to that one admitted apply; no secret is previewed, journaled, checkpointed or returned.");
         }
 
@@ -116,17 +111,5 @@ namespace TiaMcp.Openness.V21
 
         private static PlcBlockWriteProtectionProvider WriteProtectionProvider(PlcBlock block) => block.GetService<PlcBlockWriteProtectionProvider>()
             ?? throw new BridgeException("UnsupportedCapability", "The selected block exposes no PlcBlockWriteProtectionProvider service.");
-
-        private static void RequireCredentialReference(JObject payload, string key)
-        {
-            var reference = payload[key] as JObject;
-            if (reference == null || !reference.Properties().Select(property => property.Name).OrderBy(name => name, StringComparer.Ordinal).SequenceEqual(CredentialReferenceFields) ||
-                reference.Properties().Any(property => property.Value.Type != JTokenType.String) || reference.Value<string>("schemaVersion") != "protected-credential-reference.v1" ||
-                !LowerHex(reference.Value<string>("vaultId"), 32) || !LowerHex(reference.Value<string>("credentialId"), 32) ||
-                !LowerHex(reference.Value<string>("bindingSha256"), 64) || !LowerHex(reference.Value<string>("cipherSha256"), 64))
-                throw new BridgeException("CredentialInputInvalid", key + " must be an exact protected-credential-reference.v1 object from the Host credential store; plaintext passwords are never accepted.");
-        }
-
-        private static bool LowerHex(string value, int length) => value != null && value.Length == length && value.All(c => c >= '0' && c <= '9' || c >= 'a' && c <= 'f');
     }
 }

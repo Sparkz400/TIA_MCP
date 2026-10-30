@@ -10,7 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 class BlockProtectionRunnerTests(unittest.TestCase):
     def test_binding_matches_the_worker_derivation(self):
-        source = (ROOT / "src/TiaMcp.Openness.V21/OpennessSession.BlockProtection.cs").read_text(encoding="utf-8")
+        source = "".join((ROOT / "src/TiaMcp.Openness.V21" / name).read_text(encoding="utf-8") for name in ("OpennessSession.BlockProtection.cs", "RoutedCredentials.cs"))
         binding = q.binding("/p/plc", "/p/plc/blocks/FB", "write")
         self.assertEqual({"provider", "authority", "ownerId", "resourceKind", "resourceId"}, set(binding["resource"]))
         for literal in (binding["resource"]["provider"], binding["resource"]["resourceKind"], binding["purpose"], binding["subjectId"], '"write" : "knowHow"'):

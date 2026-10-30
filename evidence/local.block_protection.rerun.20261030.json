@@ -1,0 +1,96 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.block_protection.rerun.20261030",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-30T07:21:43+00:00",
+  "source": {
+    "commit": "1f11b012b0de59010c1a6109e28912469de3320e",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_block_protection.py rerun on a frozen Debug build of 1f11b012 (artifacts/cr1, git archive), 38/38 steps, after the credential-route hardening: length-prefixed seal entropy (v2), pinned plaintext buffers, the worker half in RoutedCredentials and the Host's purpose/resource-kind check. Same owned scratch CPU 1511-1 PN flow as local.block_protection.20261030: know-how protect/unprotect with readback, a correctly bound wrong password failing in Unprotect, both checkpoint restores; write protection define, enable, change, disable with the replaced and the new password, the disable checkpoint restore; refusals before admission (CredentialContextMismatch with the expected binding, CredentialUnavailable, CredentialRetired, CredentialFormatInvalid, CredentialStoreBusy) and CredentialPolicyViolation after the checkpoint. All 6 generated passwords absent from the 166 run files, every tool response, the report and the Host log.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN at PLC-root scope with one SCL FC and one SCL FB; software units, namespaces, LAD/FBD, OBs and safety blocks are not exercised.",
+    "Generated ASCII passwords; non-ASCII passwords and the 120-character bound are not probed. TIA checks its password policy and a wrong password only in the native call, after the checkpoint; the wrong password is reported as EngineeringError.",
+    "The vault lives in the current Windows profile; another user, a roamed profile and packaged-context redirection are not exercised. CredentialAdmissionRequired, the worker's CredentialRequired and slot-set checks are covered offline only (TiaMcp.Credentials.Tests).",
+    "Persistence is read back after save in the same Portal; a fresh Portal reopen is not part of this run. Engineering only; a protected block is not downloaded or run."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "da9209ca9111d27ed7da282d00006c5e4fc82d7d312c18a4fa62b620a224a49f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "3b5218269c09b35b2cc98c1d4102000031d56ead179b59bf918d02cc28055197"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "94e9ed5769a64ef5e16345c91bd56825b2791851439263861b16174c05822d0a",
+      "bytes": 391860,
+      "completed": true,
+      "steps": [
+        "start owned TIA block protection",
+        "create owned scratch block protection",
+        "refuse a credential bound to another block",
+        "prepare block_protect",
+        "refuse a missing credential",
+        "prepare block_protect",
+        "refuse a retired credential",
+        "prepare block_protect",
+        "refuse a non-UTF-8 secret",
+        "prepare block_protect",
+        "refuse while the vault is busy",
+        "prepare block_protect",
+        "TIA refuses a password that violates its policy",
+        "prepare block_protect",
+        "prepare block_protect",
+        "apply block_protect",
+        "unprotect with a correctly bound wrong secret",
+        "prepare block_unprotect",
+        "prepare block_unprotect",
+        "apply block_unprotect",
+        "restore the unprotect checkpoint",
+        "prepare block_unprotect",
+        "apply block_unprotect",
+        "prepare block_protect",
+        "apply block_protect",
+        "restore the protect checkpoint",
+        "prepare block_write_protection_set",
+        "apply block_write_protection_set",
+        "prepare block_write_protection_set",
+        "apply block_write_protection_set",
+        "prepare block_write_protection_set",
+        "apply block_write_protection_set",
+        "disable with the replaced password",
+        "prepare block_write_protection_set",
+        "prepare block_write_protection_set",
+        "apply block_write_protection_set",
+        "restore the disable checkpoint",
+        "scan every run file, response and Host log for the passwords"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

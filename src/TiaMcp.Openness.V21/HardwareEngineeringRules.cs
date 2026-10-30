@@ -106,6 +106,42 @@ namespace TiaMcp.Openness.V21
             "EnabledWithAccessControlAndCentralUser", "EnabledWithAccessControlViaAccessLevelAndCentralUsers",
             "EnabledWithAccessControlAndLocalWithCentralUsers", "EnabledWithAccessControlViaAccessLevelAndLocalWithCentralUsers" };
 
+        // The CPU protection level (PlcAccessLevelProvider) applies under the access-level modes. V21 compiles a level above full
+        // access only with the full-access password (29 October 2026), which only the Host credential route supplies. Full access
+        // would remove the protection, so only these levels are admitted.
+        internal static readonly string[] ProtectionLevels = { "ReadAccess", "HMIAccess", "NoAccess" };
+        private static readonly string[] CpuParameterPayload = { "hardwarePath", "attributes", "protectionLevel", "vaultName", "credential" };
+
+        internal static bool IsAccessLevelMode(string configuration) => configuration != null && configuration.IndexOf("ViaAccessLevel", StringComparison.Ordinal) >= 0;
+
+        // currentConfiguration: the CPU's PlcAccessControlConfiguration before the change, or null where the item does not declare it.
+        internal static void RequireCpuProtectionRequest(JObject payload, string currentConfiguration)
+        {
+            // The allowlist keeps any stray plaintext field out of the preview, journal and response.
+            if (payload.Properties().Any(property => Array.IndexOf(CpuParameterPayload, property.Name) < 0))
+                throw new BridgeException("CredentialInputInvalid", "hardware_cpu_parameters accepts only hardwarePath, attributes, protectionLevel, vaultName and a protected credential reference; plaintext passwords are never accepted.");
+            var requestedToken = payload["attributes"]?["PlcAccessControlConfiguration"];
+            string requested = requestedToken?.Type == JTokenType.String ? requestedToken.Value<string>() : null;
+            var level = payload["protectionLevel"];
+            if (level == null)
+            {
+                if (payload["credential"] != null || payload["vaultName"] != null)
+                    throw new BridgeException("CredentialInputInvalid", "credential and vaultName are accepted only with protectionLevel.");
+                if (IsAccessLevelMode(requested) && !IsAccessLevelMode(currentConfiguration))
+                    throw new BridgeException("InvalidRequest", "An access-level mode needs protectionLevel and credential, a protected reference to the full-access password: V21 compiles it only with that password.");
+                return;
+            }
+            string name = level.Type == JTokenType.String ? level.Value<string>() : null;
+            if (name == "FullAccess" || name == "FullAccessIncludingFailsafe")
+                throw new BridgeException("ProtectionDowngradeRefused", "protectionLevel " + name + " removes CPU access protection; only " + string.Join(", ", ProtectionLevels) + " are admitted.");
+            if (Array.IndexOf(ProtectionLevels, name) < 0)
+                throw new BridgeException("InvalidRequest", "protectionLevel must be one of " + string.Join(", ", ProtectionLevels) + ".");
+            if (!IsAccessLevelMode(requested ?? currentConfiguration))
+                throw new BridgeException("InvalidRequest", "protectionLevel applies only under an access-level mode of PlcAccessControlConfiguration: " + string.Join(", ", EnabledAccessControl.Where(IsAccessLevelMode)) + ".");
+            if (payload["credential"] == null)
+                throw new BridgeException("CredentialInputInvalid", "protectionLevel needs credential, a protected reference to the full-access password.");
+        }
+
         // V21 declares CycleMinimumCycleTime only while CycleEnableMinimumCycleTime is true (observed 29 October 2026).
         internal const string MinimumCycleFlag = "CycleEnableMinimumCycleTime", MinimumCycleTime = "CycleMinimumCycleTime";
 

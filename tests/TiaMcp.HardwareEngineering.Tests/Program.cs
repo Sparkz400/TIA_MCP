@@ -75,6 +75,38 @@ foreach (var (label, plcs, types, code) in new[] { ("no PLC in the device", 0, n
     catch (BridgeException error) when (error.Code == code) { count++; Console.WriteLine("PASS interrupt OB refused: " + label); }
 }
 HardwareEngineeringRules.RequireInterruptOb("GapHardwareInterrupt", 1, new[] { "HardwareInterrupt" }); count++; Console.WriteLine("PASS one hardware interrupt OB of the module's PLC");
+// The CPU protection level: only under an access-level mode, never a downgrade, and always with a full-access credential reference.
+const string umac = "EnabledWithAccessControl", viaLevel = "EnabledWithAccessControlViaAccessLevel";
+var reference = new JObject { ["schemaVersion"] = "protected-credential-reference.v1" };
+JObject Protection(string mode = null, JToken level = null, bool credential = true, string extra = null)
+{
+    var payload = new JObject { ["hardwarePath"] = controller, ["attributes"] = mode == null ? new JObject() : new JObject { ["PlcAccessControlConfiguration"] = mode } };
+    if (level != null) payload["protectionLevel"] = level;
+    if (credential && level != null) { payload["credential"] = reference.DeepClone(); payload["vaultName"] = "default"; }
+    if (extra != null) payload[extra] = "SYNTHETIC";
+    return payload;
+}
+foreach (var (label, payload, current, code) in new[] {
+    ("entering an access-level mode without a level", Protection(viaLevel), umac, "InvalidRequest"),
+    ("full access removes the protection", Protection(viaLevel, "FullAccess"), umac, "ProtectionDowngradeRefused"),
+    ("full access including fail-safe removes the protection", Protection(viaLevel, "FullAccessIncludingFailsafe"), umac, "ProtectionDowngradeRefused"),
+    ("an unknown level", Protection(viaLevel, "None"), umac, "InvalidRequest"),
+    ("a numeric level", Protection(viaLevel, 2), umac, "InvalidRequest"),
+    ("a level under a UMAC mode", Protection(null, "ReadAccess"), umac, "InvalidRequest"),
+    ("a level while leaving the access-level mode", Protection(umac, "ReadAccess"), viaLevel, "InvalidRequest"),
+    ("a level where the item declares no access control", Protection(null, "ReadAccess"), null, "InvalidRequest"),
+    ("a level without its credential", Protection(viaLevel, "ReadAccess", credential: false), umac, "CredentialInputInvalid"),
+    ("a credential without a level", new JObject { ["hardwarePath"] = controller, ["attributes"] = new JObject(), ["credential"] = reference.DeepClone() }, umac, "CredentialInputInvalid"),
+    ("a plaintext password field", Protection(viaLevel, "ReadAccess", extra: "password"), umac, "CredentialInputInvalid") })
+{
+    try { HardwareEngineeringRules.RequireCpuProtectionRequest(payload, current); throw new Exception("CPU protection request accepted: " + label); }
+    catch (BridgeException error) when (error.Code == code) { count++; Console.WriteLine("PASS CPU protection refused: " + label); }
+}
+foreach (var (label, payload, current) in new[] { ("entering with a level", Protection(viaLevel, "ReadAccess"), umac), ("a level alone under an access-level mode", Protection(null, "NoAccess"), viaLevel),
+    ("HMI access", Protection(null, "HMIAccess"), viaLevel), ("leaving the access-level mode without a credential", Protection(umac), viaLevel), ("other parameters only", Protection(), umac) })
+{
+    HardwareEngineeringRules.RequireCpuProtectionRequest(payload, current); count++; Console.WriteLine("PASS CPU protection admitted: " + label);
+}
 var mode = new JObject { ["hardwarePath"] = module, ["channelNumber"] = 0, ["channelType"] = "Digital", ["channelIoType"] = "Input", ["attributes"] = new JObject { ["OperatingMode"] = 269 } };
 void Modes(JArray rows) { foreach (var row in rows[1]["channels"]) row["attributes"]["OperatingMode"] = 277; }
 void Moded(JArray rows) { foreach (var row in rows[1]["channels"]) row["attributes"]["OperatingMode"] = 269; rows[1]["addresses"][0]["lengthBits"] = 8; }

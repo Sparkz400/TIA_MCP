@@ -139,16 +139,18 @@ internal sealed partial class CredentialVault
     }
     private void Decrypt(StoredCredential record, VaultHeader header, Action<byte[]> consumer)
     {
-        byte[]? clear = null;
+        byte[]? clear = null; System.Runtime.InteropServices.GCHandle pin = default;
         try
         {
             clear = ProtectedData.Unprotect(record.Ciphertext, Entropy(header, record.Reference.CredentialId, record.Reference.BindingSha256), DataProtectionScope.CurrentUser);
+            // Pinned until cleared, so the GC cannot move the plaintext and leave an uncleared copy behind.
+            pin = System.Runtime.InteropServices.GCHandle.Alloc(clear, System.Runtime.InteropServices.GCHandleType.Pinned);
             if (clear.Length is < 1 or > MaxSecretBytes) throw Error("CredentialUnavailable");
             try { consumer(clear); }
             catch { throw Error("CredentialConsumerFailed"); }
         }
         catch (CryptographicException) { throw Error("CredentialUnavailable"); }
-        finally { if (clear is not null) CryptographicOperations.ZeroMemory(clear); }
+        finally { if (clear is not null) CryptographicOperations.ZeroMemory(clear); if (pin.IsAllocated) pin.Free(); }
     }
     private Lifecycle ReadLifecycle(CredentialReference reference)
     {
