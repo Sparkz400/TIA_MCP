@@ -12,6 +12,11 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 - **Native:** 38/38 steps on build `b5fecd88` (`local.block_protection.20261030`): protect, unprotect, write protection define/enable/change/disable, three checkpoint restores, five pre-admission refusals with the block unchanged, a wrong password refused by TIA; none of the generated passwords appears in any run file, response or log. TIA's password policy is checked only in the native call and is now typed `CredentialPolicyViolation`.
 - **Catalog 0.4.81:** the three block-protection kinds are verified; 421 of 461 features verified; matrix 1,924 bound, 141 open, 31 blocked, 30 deferred.
 
+**OB40 and the drive compile probe — 30 October 2026:** ([record](../verification/plcsim-openness-gaps-20261029.md))
+- **OB40:** the recorded V21 boundary was wrong. The channels sit on the DI submodule, and V21 exposes the OB link only while the rising-edge interrupt is active, so enabling now takes the OB in the same request. Channel 0 linked to OB40, the device compile passed, PLCSIM listed the event and `sim_event` ran OB40 once; enable, disable and restore pass with typed refusals (91/91 steps, build `807a189`, `local.plcsim_gaps.ob40.20261030`). A rising edge written to the input tag does not raise the interrupt; only PLCSIM's injected event does.
+- **Drives:** the device compile now lists devices without a compile service (a G120C PN) as not compiled instead of refusing the whole compile, so device-compiled changes run in a project with a drive (`local.drives.probe.20261030`). The drive kinds stay blocked: Startdrive cannot read `DriveObject.DriveObjectNumber` of a drive added through Openness, even after compile and save.
+- **Catalog 0.4.80:** evidence and limitations only; no matrix count change.
+
 ## 29 October 2026
 
 **Typed created-storage runtime — 29 October 2026:** the 8 harnessed wave 9 created-storage cells (`createMulti` of TONR, R_TRIG and F_TRIG and `createGlobal` of TONR, LAD and FBD) passed all five gates, runtime behavior included, on owned PLCSIM (build `7db882c`; `local.typed.wave9-created-storage.runtime.20261029`). `change.graphical_typed_edit` stays unverified until the rest of the typed backlog closes; no matrix count change.

@@ -24,12 +24,12 @@ names every row with an open cell.
   prerequisites and the licensed AX trace package (B04), a native trace route (B06),
   nonproduction Project Server, Teamcenter and UMC endpoints (B10), and installations and SDKs
   of other TIA versions (B11).
-- **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
+- **Recorded V21 boundaries:** Startdrive cannot read a drive object number added through Openness, the
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
-  TIA editor, V21 Openness cannot configure a DI module's hardware interrupt (OB40), and the
+  TIA editor, and the
   CPU protection level needs a full-access password no route accepts.
-- **In progress:** the OB40 and Startdrive device-compile probes, and live monitoring and active forcing.
+- **In progress:** live monitoring and active forcing.
 - **Rows blocked by decision:** five `unavailable_target` rows (31 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision

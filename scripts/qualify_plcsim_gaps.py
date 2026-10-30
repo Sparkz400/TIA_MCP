@@ -2,11 +2,13 @@
 program (change.simulation_download_online), virtual time (sim_time, sim_test virtualTime), interrupt and fault injection
 (sim_event: OB40, OB82, OB83, OB86), memory reset (sim_state memoryReset) and storage archive/retrieve (sim_storage).
 
-The fixture is an owned scratch CPU 1511-1 PN with simulation support, a central DI module, optionally a hardware
-interrupt on its channel 0 and an ET 200SP station on the CPU's IO system, a global DB GapDb with one counter per
-interrupt OB, an IEC timer and the CPU clock, the interrupt OBs (imported with their explicit numbers and event classes)
-and Main. The program is downloaded to a fresh owned instance, provisioned and started like the D09 runner. Every
-injected event must raise its OB's counter; the OB a fixture could not configure is recorded as a boundary.
+The fixture is an owned scratch CPU 1511-1 PN with simulation support, a central DI module whose channel 0 rising-edge
+hardware interrupt is enabled and linked to OB40 (change.hardware_channel_attributes), a PLC tag on that input, an ET 200SP
+station on the CPU's IO system, a global DB GapDb with one counter per interrupt OB, an IEC timer and the CPU clock, the
+interrupt OBs (imported with their explicit numbers and event classes) and Main. The program is downloaded to a fresh
+owned instance, provisioned and started like the D09 runner. Every injected event must raise its OB's counter; a rising
+edge written to the input is recorded. After the instance is released, channel 1's interrupt is enabled and disabled
+again, and the disabling change is restored from its checkpoint.
 """
 from __future__ import annotations
 
@@ -66,11 +68,13 @@ OBS = {
     86: ("GapRackFailure", "RackOrStationFailure", "Ob86", [("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte")]),
 }
 DI_ARTICLE, DI_FILTER = "6ES7 521-1BH00", "DI 16x24VDC HF"
-# Channel attributes that enable the rising-edge hardware interrupt of DI channel 0 (filled from the V21 discovery).
-HARDWARE_INTERRUPT = {}
+# The DI 16x24VDC HF V1.0 channel attributes of its rising-edge hardware interrupt (V21 hardware parameters manual).
+INTERRUPT_ACTIVE, INTERRUPT_OB = "HardwareInterruptRisingEdgeActive", "HardwareInterruptRisingEdgeInterrupt"
+INPUT_TAG = "GapIn0"
 LIMITATIONS = [
     "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1, provisioned with first-use TLS trust under the owned-empty-CPU policy like the D09 runner.",
     "Events are injected on the fixture's central DI module and ET 200SP station; other modules, channels, event types and OBs are not exercised.",
+    "The hardware interrupt is configured on DI 16x24VDC HF V1.0 channel 0 (rising edge, OB40 linked by name); falling edges, priorities and other modules are not exercised.",
     "Virtual time is checked with one IEC TON in OB1 and the CPU clock read with RD_SYS_T; scan-exact timing is not claimed.",
 ]
 
@@ -166,16 +170,11 @@ def body(h):
     secret, login = cpus[0]["credentialMetadataPath"], cpus[0]["runtimeUser"]["credentialMetadataPath"]
     h.apply("project_simulation_enable", {"enabled": True})
 
-    # Hardware fixture: a central DI module; its channel 0 hardware interrupt when V21 exposes it; an ET 200SP station.
+    # Hardware fixture: a central DI module and an ET 200SP station; the DI channel 0 hardware interrupt follows the OBs.
     di = latest(h.tool("hardware_catalog_search", {"filter": DI_FILTER, "maxItems": 200})["entries"], DI_ARTICLE)
     h.apply("hardware_plug", {"hardwarePath": rack(h, device), "typeIdentifier": di["typeIdentifier"], "name": "GapDI", "positionNumber": 2})
     module = next(r["path"] for r in h.tool("project_inventory", {"maxItems": 1000})["hardware"] if r["path"].endswith("/items/GapDI"))
-    # OB40 is always planted: without a configurable hardware interrupt, its injection records the runtime's answer.
     obs, boundaries = [40, 82, 83], {}
-    if HARDWARE_INTERRUPT:
-        h.apply("hardware_channel_attributes", {"hardwarePath": module, "ioType": "Input", "channelNumber": 0, "attributes": HARDWARE_INTERRUPT})
-    else:
-        boundaries["OB40"] = "V21 Openness exposes no channels and no hardware-interrupt attribute on the DI 16x24VDC HF module (discovery of 29 October 2026)."
     station = remote_station(h, plc, cpu)
     if station:
         obs.append(86)
@@ -183,6 +182,7 @@ def body(h):
         boundaries["OB86"] = h.report.get("remoteStation")
     h.report["boundaries"] = boundaries
     plant(h, plc, sorted(obs))
+    lab.interrupt = configure_interrupt(h, plc, module)
     ids = hardware_ids(h, plc)
     h.report["hardwareIds"] = ids
 
@@ -213,6 +213,82 @@ def body(h):
     finally:
         released = h.stage("sim_release", lambda: h.tool("sim_release", {"instanceId": lab.instance["id"], "deleteOwned": True}))
         require(released.get("unregistered") is True, "The owned instance was not released")
+    restore_interrupt(h, lab.interrupt)
+
+
+def interrupt_channel(h, module, number):
+    """The digital input channel of the DI module's subtree, with its interrupt attribute metadata from hardware_inspect."""
+    items = {}
+    for row in h.tool("project_inventory", {"maxItems": 1000})["hardware"]:
+        if row["path"] == module or row["path"].startswith(module + "/"):
+            for item in h.tool("hardware_inspect", {"hardwarePath": row["path"], "maxItems": 2000})["items"]:
+                items[item["path"]] = item
+    rows = [(item, channel) for item in items.values() for channel in item.get("channels") or [] if channel["number"] == number and channel["ioType"] == "Input"]
+    require(len(rows) == 1, "Expected one input channel %d under GapDI: %s" % (number, [(i["path"], c.get("type")) for i, c in rows]))
+    item, channel = rows[0]
+    attributes = {a["name"]: a for a in channel.get("attributes", [])}
+    selector = {"hardwarePath": item["path"], "channelType": channel["type"], "channelIoType": "Input", "channelNumber": number}
+    return item, selector, {name: attributes.get(name) for name in (INTERRUPT_ACTIVE, INTERRUPT_OB)}
+
+
+def interrupt_payload(selector, attributes, ob=OBS[40][0]):
+    native = (attributes.get(INTERRUPT_ACTIVE) or {}).get("nativeValueType")
+    # The manual lists a Boolean for this module; V21 also declares an enum of the same name for other modules.
+    return {**selector, "attributes": {INTERRUPT_ACTIVE: "Active" if native == "Siemens.Engineering.HW." + INTERRUPT_ACTIVE else True, INTERRUPT_OB: ob}}
+
+
+def configure_interrupt(h, plc, module):
+    """Enable channel 0's rising-edge hardware interrupt and link OB40, then tag the input; V21's refusal fails the run with its exact text."""
+    item, selector, attributes = h.stage("inspect the DI channel 0 interrupt attributes", lambda: interrupt_channel(h, module, 0))
+    h.report["interruptChannel"] = {"selector": selector, "attributes": attributes, "addresses": item.get("addresses")}
+    payload = interrupt_payload(selector, attributes)
+    kind = "hardware_channel_attributes"
+    prepared = h.prepare(kind, payload)
+    changes = {row["name"]: row for row in prepared["preview"]["attributeChanges"]}
+    require(set(changes) == {INTERRUPT_ACTIVE, INTERRUPT_OB} and changes[INTERRUPT_OB]["after"] == OBS[40][0], "Interrupt preview: %s" % changes)
+    h.refuse("refuse an OB link to a diagnostic error OB", kind, interrupt_payload(selector, attributes, OBS[82][0]), "InvalidRequest", "not a hardware interrupt OB")
+    h.refuse("refuse an OB link to a missing block", kind, interrupt_payload(selector, attributes, "GapMissingOb"), "BlockNotFound")
+    h.refuse("refuse a non-string OB link", kind, {**payload, "attributes": {INTERRUPT_OB: 40}}, "InvalidRequest")
+    h.refuse("refuse enabling the interrupt without its OB", kind, {**payload, "attributes": {INTERRUPT_ACTIVE: payload["attributes"][INTERRUPT_ACTIVE]}}, "InvalidRequest", "requires")
+    applied = h.apply_prepared(kind, prepared)
+    require("configured_hardware_preservation_verified" in applied["stages"], "Interrupt preservation stage missing: %s" % applied["stages"])
+    # The worker verified the OB link by name; hardware_inspect's rendering of the linked object is recorded, the flag asserted.
+    after = h.stage("read back the DI channel 0 interrupt", lambda: interrupt_channel(h, module, 0)[2])
+    require((after[INTERRUPT_ACTIVE] or {}).get("value") in (True, "Active"), "Interrupt flag readback: %s" % after)
+    inputs = [a for a in item.get("addresses") or [] if a.get("ioType") == "Input"]
+    require(len(inputs) == 1, "Expected one input address range on the channel item: %s" % item.get("addresses"))
+    tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]
+    default = [t for t in tables if any(c.get("kind") == "system" for c in t.get("constants", []))]
+    require(len(default) == 1, "Expected one default tag table: %s" % [t["name"] for t in tables])
+    address = "%%I%d.0" % inputs[0]["startAddress"]
+    h.apply("tag_create", {"tagTablePath": default[0]["path"], "name": INPUT_TAG, "dataTypeName": "Bool", "logicalAddress": address})
+    h.report["hardwareInterrupt"] = {"selector": selector, "preview": prepared["preview"]["attributeChanges"], "stages": applied["stages"], "readback": after, "inputTag": {INPUT_TAG: address}}
+    return {"module": module, "plc": plc}
+
+
+def restore_interrupt(h, interrupt):
+    """Channel 1: enable and link, then disable (V21 then undeclares the OB link); the disabling change is restored from its
+    checkpoint, and the restored hardware manifest must equal the enabled one."""
+    def run():
+        kind = "hardware_channel_attributes"
+        _, selector, before = interrupt_channel(h, interrupt["module"], 1)
+        payload = interrupt_payload(selector, before)
+        h.apply(kind, payload)
+        enabled = interrupt_channel(h, interrupt["module"], 1)[2]
+        require(enabled[INTERRUPT_OB] is not None, "Enabling did not declare the OB link: %s" % enabled)
+        flag = payload["attributes"][INTERRUPT_ACTIVE]
+        h.refuse("refuse disabling the interrupt with an OB link", kind, {**selector, "attributes": {INTERRUPT_ACTIVE: False if flag is True else "Deactivated", INTERRUPT_OB: OBS[40][0]}}, "InvalidRequest", "omit")
+        prepared = h.prepare(kind, {**selector, "attributes": {INTERRUPT_ACTIVE: False if flag is True else "Deactivated"}})
+        disabling = h.apply_prepared(kind, prepared)
+        require("configured_hardware_preservation_verified" in disabling["stages"], "Disable preservation stage missing: %s" % disabling["stages"])
+        disabled = interrupt_channel(h, interrupt["module"], 1)[2]
+        require(disabled[INTERRUPT_OB] is None and disabled[INTERRUPT_ACTIVE]["value"] in (False, "Deactivated"), "Disabling left the interrupt: %s" % disabled)
+        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        require(restored["state"] == "restored" and "configured_hardware_recovery_verified" in restored["stages"], "Interrupt restore: %s" % restored["stages"])
+        back = interrupt_channel(h, interrupt["module"], 1)[2]
+        require(back == enabled, "The restored channel 1 interrupt differs from its prechange state: %s -> %s" % (enabled, back))
+        return {"selector": selector, "before": before, "enabled": enabled, "disabled": disabled, "stages": restored["stages"], "restored": back}
+    h.report["hardwareInterruptRestore"] = h.stage("enable, disable and restore channel 1's hardware interrupt", run)
 
 
 def online_downloads(h, lab, plc, ticket, login, secret):
@@ -366,20 +442,23 @@ def events(h, lab, ids, module, station, obs):
                              "channels": [{"channel": 0, "errorType": 1, "severity": "failure", "direction": "appear"}]}, "Ob82", 1)
     results["OB83"] = [inject("pull raises OB83", {"type": "pullOrPlug", "hardwareId": di, "action": "pull"}, "Ob83", 1),
                        inject("plug raises OB83", {"type": "pullOrPlug", "hardwareId": di, "action": "plug"}, "Ob83", 1)]
-    if HARDWARE_INTERRUPT:
-        process = next((row for row in configured if row["hardwareId"] == di or row["channel"] == 0), None)
-        require(process, "The configured hardware interrupt is not listed: %s" % configured)
-        results["OB40"] = inject("hardware interrupt raises OB40", {"type": "hardwareInterrupt", "hardwareId": process["hardwareId"], "channel": process["channel"], "edge": "risingEdge"}, "Ob40", 1)
-    else:
-        def unconfigured():
-            before = lab.counters()
-            outcome = h.client.request("tools/call", {"name": "sim_event", "arguments": {"instanceId": lab.instance["id"],
-                                       "event": {"type": "hardwareInterrupt", "hardwareId": di, "channel": 0, "edge": "risingEdge"}}})
-            time.sleep(2)
-            after = lab.counters()
-            require(after == before, "OB40 ran without a configured hardware interrupt: %s -> %s" % (before, after))
-            return {"configuredProcessEvents": configured, "isError": outcome.get("isError"), "content": outcome.get("structuredContent"), "counters": after}
-        results["OB40"] = h.stage("an unconfigured hardware interrupt does not raise OB40", unconfigured)
+    process = [row for row in configured if row["channel"] == 0]
+    require(len(process) == 1, "The configured channel 0 hardware interrupt is not listed once: %s" % configured)
+    results["OB40"] = inject("hardware interrupt raises OB40", {"type": "hardwareInterrupt", "hardwareId": process[0]["hardwareId"], "channel": 0, "edge": "risingEdge"}, "Ob40", 1)
+    def input_edge():
+        """Recorded, not asserted: whether a rising edge written to the input tag itself raises OB40."""
+        tag = [t["symbol"] for t in h.tool("sim_tags", {"instanceId": lab.instance["id"], "filter": INPUT_TAG, "maxItems": 50})["tags"] if t["symbol"].replace('"', "") == INPUT_TAG]
+        require(len(tag) == 1, "PLCSIM symbol %s is missing or ambiguous" % INPUT_TAG)
+        signal = {"symbol": tag[0], "type": "bool"}
+        h.tool("sim_write", {"instanceId": lab.instance["id"], "writes": [{**signal, "value": False}]})
+        time.sleep(0.5)
+        before = lab.counters()
+        h.tool("sim_write", {"instanceId": lab.instance["id"], "writes": [{**signal, "value": True}]})
+        time.sleep(2)
+        after = lab.counters()
+        h.tool("sim_write", {"instanceId": lab.instance["id"], "writes": [{**signal, "value": False}]})
+        return {"symbol": tag[0], "before": before, "after": after, "ob40Raised": after["Ob40"] - before["Ob40"]}
+    results["OB40inputEdge"] = h.stage("record whether a rising edge written to the input raises OB40", input_edge)
     if 86 in obs:
         results["OB86"] = [inject("station failure raises OB86", {"type": "rackOrStationFault", "hardwareId": station, "action": "fault"}, "Ob86", 1),
                            inject("station return raises OB86", {"type": "rackOrStationFault", "hardwareId": station, "action": "return"}, "Ob86", 1)]
