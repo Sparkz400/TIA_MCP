@@ -136,7 +136,8 @@ def cases():
         case.update(fixtureId=case["fixtureId"].replace("typed-", "typed-existingglobal-", 1), engineeringOnly=True, blockName=block,
                     referenceXml="fixtures/typed-graphical/native/" + block + ".xml")
         if instruction in EDGES:
-            # An imported edge DB alone would not survive its own compile; its source brings a referencing call.
+            # An imported edge DB alone would not survive its own compile; its source brings a referencing call. These four
+            # cases stay refused: the DB is know-how protected, so the builder cannot read its declaration.
             file, names, _ = storage_source(instruction)
             case["dependencySources"] = [{"language": "SCL", "sourcePath": "fixtures/typed-graphical/sources/" + file, "expectedBlockNames": names}]
         else:
@@ -144,10 +145,13 @@ def cases():
         case["payload"]["instances"] = [{"key": "storage", "kind": "existingGlobal", "blockPath": "$block:" + storage}]
         result.append(case)
     # Created storage, engineering only like the standard created cells: a new multi-instance member, also with the caller two
-    # parent levels deep, and a new global DB. The typed apply imports a new edge DB and its caller before one compile.
+    # parent levels deep, and a new global DB for TONR. V21 marks an R_TRIG/F_TRIG instance DB know-how protected, so no edge
+    # global storage document can be exported (local.typed.edge-global-storage.20261030).
     for original in [case for case in result if case["family"] in ("tonr", "rtrig", "ftrig")]:
         name = "Fresh_" + original["family"] + "_" + original["language"]
         global_storage = original["payload"]["instances"][0]["kind"] == "existingGlobal"
+        if global_storage and original["family"] != "tonr":
+            continue
         case = copy.deepcopy(original)
         case.update(fixtureId="typed-" + ("createglobal-" if global_storage else "createmulti-") + original["family"] + "-" + original["language"].lower(),
                     engineeringOnly=True, referenceBindings=[binding("Instance", original["payload"]["instances"][0]["blockPath"][len("$block:"):], name, "GlobalVariable")

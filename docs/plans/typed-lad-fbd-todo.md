@@ -12,7 +12,7 @@ marks the feature verified).
 
 | Open item | Class | Evidence or next step |
 | --- | --- | --- |
-| Wave 9: the four existing-global R_TRIG/F_TRIG cases | Feasible now | TIA keeps an edge instance DB only if a call references it in the same compile: SCL and `CreateInstanceDB` DBs both vanish when compiled alone ([native slot](../verification/wave10-native-slot-20261027.md)). The typed apply imports a created DB and its caller before one compile, so only the capture lacks a referencing caller. Capture the DB with an SCL keep-alive caller, promote `globalInstanceType` for the four edge profiles, then qualify the four cases and the four `createGlobal` edge cells the same document enables. |
+| Wave 9: the four existing-global R_TRIG/F_TRIG cases | V21 boundary, recorded | A call in the same compile keeps the DB through save and reopen, but V21 marks an R_TRIG/F_TRIG instance DB know-how protected, so its storage document cannot be exported. Existing and created edge global storage stay refused (`local.typed.edge-global-storage.20261030`, [record](../verification/typed-edge-global-storage-20261030.md)). Accepting a protected DB on identity alone would be a new rule and needs a decision. |
 | A second CPU | Needs a decision | Feasible natively (capture on that CPU, profile ids without the fixed `v21.fw41.` prefix, CPU-distinct effect manifest names), but every family and route would be recaptured. The TODO's proposed per-profile rule would make it its own box instead of a gate for this feature. |
 | §2: keep transitive parents in another namespace or unit and custom declaration shapes rejected | Guard fixed (offline); capture needs a decision | The catalog says these parents stay rejected, but the worker applied the caller route's transitive effect to any parent FB/DB embedding the changed FB, whatever its namespace or unit. It now refuses them with `DependencyProfileUnavailable` (`RequireCapturedParentScope`, offline test only). Custom start/structured shapes are refused by the captured-shape checks. Capturing the other-scope effect is optional and needs a decision. |
 | §6: restore the VMware guest, then deploy and run both languages remotely | Needs a decision | Not a V21 boundary: the guest is unavailable. The same guest is L05's `deployment.vm_qualification` prerequisite in the TODO, and the typed catalog entry claims no remote qualification. Proposal: track both boxes under L05. |
@@ -22,7 +22,7 @@ marks the feature verified).
 | TODO: typed runtime | Done for every harnessed cell; needs a decision for the rest | Runtime passes on all three routes (`local.typed.runtime.rerun.20261029`, `local.typed.scoped-runtime.*`, `local.typed.wave9.runtime.20261029`). Engineering-only by design: existing global storage of every family, insertion with storage, cross-scope calls, DB member operands and transitive parents. These change declarations or storage identity, which full native XML verifies; the same instruction's behavior passes in a sibling cell. Proposal: `AC-runtime` does not require them. |
 | Wave 9 on the software-unit and namespace routes (not a box yet) | Feasible, needs a decision | No route profile exists for DInt/Real compare, MOVE, ADD/SUB/MUL/DIV, TONR or R_TRIG/F_TRIG (120 profiles), so the builder refuses them (`GraphicalProfileUnavailable`). The route IEC capture of 26 October shows the way (`local.typed.route-iec-capture.20261026`). Either qualify them as their own box or state them as a limitation. |
 
-**What verification needs.** (1) The four existing-global edge cases pass or are recorded as a boundary.
+**What verification needs.** (1) Done: the four existing-global edge cases are a recorded V21 boundary.
 (2) The maintainer decides on the proposed per-profile rule (second CPU, wave 9 route profiles),
 on runtime for engineering-only cells, and on moving the guest boxes to L05. (3) The catalog limitations
 drop stale text: cross-scope calls are not "offline tests only", wave 9 runtime has passed, and the
@@ -47,8 +47,12 @@ current native evidence on CPU 1511-1 PN V4.1.
   engineering (`local.typed.wave9-created-storage.engineering.20261029`).
   - [x] Runtime of the 8 harnessed created-storage cells passed all five gates, runtime behavior included
     (`local.typed.wave9-created-storage.runtime.20261029`); the 6 transitive cells have no runtime harness.
-  - [ ] The four existing-global R_TRIG/F_TRIG cases: no profile, because TIA deletes an
+  - [x] The four existing-global R_TRIG/F_TRIG cases: no profile, because TIA deletes an
     unreferenced R_TRIG/F_TRIG instance DB at compile. Capture one or record the boundary.
+    Recorded as a V21 boundary on 30 October (`local.typed.edge-global-storage.20261030`,
+    [record](../verification/typed-edge-global-storage-20261030.md)). A call in the same compile keeps
+    the DB through save and reopen, but V21 marks it know-how protected, so no storage document can be
+    exported. Existing and created edge global storage stay refused.
 - [ ] A second CPU: profiles, creation/instance templates and dependent-effect manifests are keyed by
   the exact CPU TypeIdentifier, and every capture is CPU 1511-1 PN `OrderNumber:6ES7 511-1AL03-0AB0/V4.1`.
   No typed capture exists for any other CPU. Missing: a capture on that CPU

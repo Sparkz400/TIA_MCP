@@ -164,10 +164,11 @@ python -B scripts/extract_typed_graphical_profiles.py artifacts/w9e/capture.json
 python -B scripts/audit_typed_profile_candidates.py --catalog artifacts/w9es/profiles.candidate.v1.json --capture artifacts/w9e/capture.json --prerequisite fixtures/typed-graphical/native/Tgp_R_TRIG_LAD.xml --prerequisite fixtures/typed-graphical/native/Tgp_F_TRIG_LAD.xml --prerequisite fixtures/typed-graphical/native/Tgp_R_TRIG_FBD.xml --prerequisite fixtures/typed-graphical/native/Tgp_F_TRIG_FBD.xml --output artifacts/w9es/audit.json
 ```
 
-Expected: 10 `CAPTURED` lines and exit 0, then `Staged 4 exact native
-profiles`, each with `globalInstanceType` `R_TRIG` or `F_TRIG`. The four edge profile ids
-are already deployed without global storage, so promotion replaces them instead of
-appending, and keeps the committed multi-instance exports.
+Ran on 30 October: 10 `CAPTURED` lines and exit 0, but there is nothing to stage. V21
+marks both edge instance DBs know-how protected, so the capture records them by identity
+and no global storage document exists to attach `globalInstanceType`. Edge global
+storage stays refused ([record](typed-edge-global-storage-20261030.md)); skip the
+extraction and audit.
 
 ## Step 3: stage candidates
 
