@@ -151,7 +151,7 @@ class IndependentTopologyTests(unittest.TestCase):
             self.assertEqual(row["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
             sources[row["names"][0]] = path.read_text(encoding="utf-8")
         cases = json.loads((ROOT / "fixtures/typed-graphical/wave9-cases.v1.json").read_bytes())["cases"]
-        self.assertEqual(80, len(cases))
+        self.assertEqual(84, len(cases))
         for case in cases:
             with self.subTest(case=case["fixtureId"]):
                 self.assertEqual("fixtures/typed-graphical/native/" + case["blockName"] + ".xml", case["referenceXml"])

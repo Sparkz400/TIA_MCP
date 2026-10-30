@@ -124,9 +124,6 @@ def extract(reports, route="standard", *, stage_output=None):
                     derivation_path = source_path.with_suffix(".provenance.json")
                     record["derivationPath"] = derivation_path.relative_to(ROOT).as_posix()
                     record["derivationSha256"] = hashlib.sha256(derivation_path.read_bytes()).hexdigest()
-                if entry.get("authoredFormat") == "instance_db_spec":
-                    record["authoredFormat"] = entry["authoredFormat"]
-                    record["transportNormalization"] = "UTF-8 JSON spec; name and instanceOfName submitted through instance_db_create (PlcBlockComposition.CreateInstanceDB)"
                 sources.append(record)
                 observed_name = exported["name"]
                 if route != "standard":
