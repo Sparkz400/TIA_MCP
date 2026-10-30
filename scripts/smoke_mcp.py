@@ -17,6 +17,7 @@ class Client:
         self.lines = queue.Queue()
         self.errors = []
         self.tool_calls = []  # Curated evidence records which tools answered without error.
+        self.output_schemas = None  # Advertised outputSchema per tool, loaded before the first tools/call.
         self.process = subprocess.Popen(
             command if command is not None else [str(executable), "--timeout-seconds", str(timeout), *(extra_arguments or [])],
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -41,6 +42,8 @@ class Client:
         self.process.stdin.flush()
 
     def request(self, method, params=None):
+        if method == "tools/call" and self.output_schemas is None:
+            self.output_schemas = {tool["name"]: tool["outputSchema"] for tool in self.request("tools/list")["tools"] if "outputSchema" in tool}
         self.sequence += 1
         self.process.stdin.write(json.dumps({"jsonrpc": "2.0", "id": self.sequence, "method": method, "params": params or {}}) + "\n")
         self.process.stdin.flush()
@@ -56,7 +59,17 @@ class Client:
                 raise RuntimeError(response["error"])
             if method == "tools/call":
                 self.tool_calls.append({"name": params["name"], "isError": bool(response["result"].get("isError"))})
+                self.check_output(params["name"], response["result"])
             return response["result"]
+
+    def check_output(self, name, result):
+        """Every structured result, success or refusal, must match the tool's advertised outputSchema."""
+        schema = (self.output_schemas or {}).get(name)
+        if schema is not None and "structuredContent" in result:
+            if not hasattr(schema, "validate"):
+                from jsonschema import Draft202012Validator  # Only Hosts that advertise schemas need it.
+                schema = self.output_schemas[name] = Draft202012Validator(schema)
+            schema.validate(result["structuredContent"])
 
     def tool(self, name, arguments=None):
         result = self.request("tools/call", {"name": name, "arguments": arguments or {}})

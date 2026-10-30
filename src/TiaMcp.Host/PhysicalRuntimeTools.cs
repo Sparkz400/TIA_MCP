@@ -32,12 +32,12 @@ public sealed class PhysicalRuntimeTools(PhysicalRuntimeSessions sessions, Plcsi
         await targets.Require(bindingSha256,(await sessions.Status(attemptId,cancellationToken)).Context.Endpoint);
     }
 
-    [McpServerTool(Name="runtime_web_credential_binding",ReadOnly=true,Destructive=false,OpenWorld=false)]
+    [McpServerTool(Name="runtime_web_credential_binding",ReadOnly=true,Destructive=false,OpenWorld=false, UseStructuredContent = true, OutputSchemaType = typeof(TiaMcp.Core.Security.CredentialBinding))]
     [Description("Build public credential binding for one canonical HTTPS origin, explicit leaf-certificate SHA256, username and authentication mode. Store a JSON string password through the local credential CLI; never pass passwords or tokens to tools. The pin is supplied trust, not a discovered CPU identity.")]
     public Task<CallToolResult> Binding(string endpoint,string peerCertificateSha256,string user,string mode="local") =>
         Run(() => Task.FromResult<object>(PhysicalRuntimeSessions.Binding(endpoint,peerCertificateSha256,user,mode)));
 
-    [McpServerTool(Name="runtime_web_connect",ReadOnly=false,Destructive=false,OpenWorld=true)]
+    [McpServerTool(Name="runtime_web_connect",ReadOnly=false,Destructive=false,OpenWorld=true, UseStructuredContent = true, OutputSchemaType = typeof(RuntimeSessionStatus))]
     [Description("Open one owned Siemens Web API session using a protected credential reference. Required attemptId is a new 32-lowercase-hex ID; reuse that ID to observe a lost reply without another login. Login specifies canonical endpoint, certificate pin, user, mode, vaultName and credential reference. Explicit leaf pin, hostname and validity are checked. Advertised API version, quantity/authentication profiles and session identity are validated; v2 status retains observations. No redirects, proxy, inventory-token adoption or automatic login retry. No TIA install required; physical qualification remains unverified.")]
     public Task<CallToolResult> Connect(string attemptId,RuntimeLoginSelection login,CancellationToken cancellationToken) =>
         Run(async () => await sessions.Connect(attemptId,login,cancellationToken));
@@ -47,22 +47,22 @@ public sealed class PhysicalRuntimeTools(PhysicalRuntimeSessions sessions, Plcsi
     public Task<CallToolResult> Browse(string attemptId,CancellationToken cancellationToken,string? symbol=null,bool children=true) =>
         Run(() => sessions.Browse(attemptId,symbol,children,cancellationToken));
 
-    [McpServerTool(Name="runtime_web_read",ReadOnly=true,Destructive=false,OpenWorld=true)]
+    [McpServerTool(Name="runtime_web_read",ReadOnly=true,Destructive=false,OpenWorld=true, UseStructuredContent = true, OutputSchemaType = typeof(WebRuntimeReadResult))]
     [Description("Read one host-owned selectionId after rechecking protected credential, advertised session identity, current permissions and symbol metadata. Representation is simple JSON or raw bytes; exact numeric JSON is retained. Returns protocol errors and host times, never source timestamps, sensor-quality guarantees or program-match proof. No writes or forcing.")]
     public Task<CallToolResult> Read(string attemptId,string selectionId,CancellationToken cancellationToken,string representation="simple") =>
         Run(async () => await sessions.ReadValue(attemptId,selectionId,representation,cancellationToken));
 
-    [McpServerTool(Name="runtime_web_diagnostics",ReadOnly=true,Destructive=false,OpenWorld=true)]
+    [McpServerTool(Name="runtime_web_diagnostics",ReadOnly=true,Destructive=false,OpenWorld=true, UseStructuredContent = true, OutputSchemaType = typeof(WebRuntimeDiagnosticResult))]
     [Description("Read one CPU diagnostic kind in an owned session after rechecking protected credential and advertised session identity. kind: languages (Project.ReadLanguages), alarms (Alarms.Browse), diagnosticBuffer (DiagnosticBuffer.Browse), operatingMode (Plc.ReadOperatingMode), modeSelector (Plc.ReadModeSelectorState), systemTime (Plc.ReadSystemTime), timeSettings (Plc.ReadTimeSettings) or projectInformation (Project.ReadInformation). alarms and diagnosticBuffer require language (a tag from languages, e.g. en-US) and count 1..500; other kinds take neither. A method the session did not advertise returns unsupported without a request; provider denial stays explicit. Returns bounded raw JSON, entry count, truncation against count_current (null when unknown) and host request/receive times. No acknowledgment, filters, clock setting, mode change, lossless-history or program-identity claim.")]
     public Task<CallToolResult> Diagnostics(string attemptId,string kind,CancellationToken cancellationToken,string? language=null,int? count=null) =>
         Run(async () => await sessions.Diagnostics(attemptId,kind,language,count,cancellationToken));
 
-    [McpServerTool(Name="runtime_web_status",ReadOnly=true,Destructive=false,OpenWorld=false)]
+    [McpServerTool(Name="runtime_web_status",ReadOnly=true,Destructive=false,OpenWorld=false, UseStructuredContent = true, OutputSchemaType = typeof(RuntimeSessionStatus))]
     [Description("Read retained local session state and observed profile without contacting the PLC. V1 records remain readable without inventing a profile. After Host restart the remote session outcome remains unknown; tokens are not persisted and no login is replayed. Unknown outcomes block another login to the same endpoint in this artifact root.")]
     public Task<CallToolResult> Status(string attemptId,CancellationToken cancellationToken) =>
         Run(async () => await sessions.Status(attemptId,cancellationToken));
 
-    [McpServerTool(Name="runtime_web_disconnect",ReadOnly=false,Destructive=false,OpenWorld=true)]
+    [McpServerTool(Name="runtime_web_disconnect",ReadOnly=false,Destructive=false,OpenWorld=true, UseStructuredContent = true, OutputSchemaType = typeof(RuntimeSessionStatus))]
     [Description("Close only this Host's owned Web API session with one bounded Api.Logout request. Invalidates local selections. Lost response stays unknown and is never automatically retried. Explicit acknowledgeUnknown=true releases only an unresolved local reservation, preserving abandonedRemoteUnknown without claiming remote logout; it permits a separately requested new attempt. Does not log out borrowed inventory sessions or modify the PLC program.")]
     public Task<CallToolResult> Disconnect(string attemptId,CancellationToken cancellationToken,bool acknowledgeUnknown=false) =>
         Run(async () => await sessions.Disconnect(attemptId,cancellationToken,acknowledgeUnknown));

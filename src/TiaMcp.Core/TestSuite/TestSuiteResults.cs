@@ -55,7 +55,7 @@ public static class TestSuiteResultNormalizer
             { results.Add(new(id, "excluded", raw, hash, ["Required dependency was excluded; coverage gate fails."])); continue; }
             if (captured is null) { results.Add(new(id, "notRun", null, null, ["No captured result for required definition."])); continue; }
             var reasons = new List<string>();
-            string? fixtureOutcome = TestSuiteCasingResultProfile.Interpret(definitions[id], captured);
+            string? fixtureOutcome = TestSuiteCasingResultProfile.Interpret(definitions[id], captured) ?? TestSuiteApplicationResultProfile.Interpret(definitions[id], captured);
             string outcome;
             if (!captured.Dispatched) { outcome = "blocked"; reasons.Add("Not dispatched."); }
             else if (!captured.CollectionComplete || !captured.ScopeVerified) { outcome = "inconclusive"; reasons.Add("Result collection or effective required scope is incomplete."); }
