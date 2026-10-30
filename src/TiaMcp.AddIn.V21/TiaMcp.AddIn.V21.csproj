@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework><PlatformTarget>x64</PlatformTarget><LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable><ImplicitUsings>disable</ImplicitUsings><AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
-    <Version>0.1.0</Version>
     <!-- The enrolled assembly identity is the deterministic module version ID. -->
     <Deterministic>true</Deterministic>
     <TiaApiDirectory Condition="'$(TiaApiDirectory)' == ''">C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48</TiaApiDirectory>

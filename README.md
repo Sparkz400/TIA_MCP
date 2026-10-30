@@ -234,7 +234,7 @@ and screenshots belong in ignored `artifacts/` and `output/` directories.
 - [Simulation](docs/guides/simulation.md) and [block testing](docs/guides/block-testing.md)
 - [Library management](docs/guides/library-management.md) and [HMI integration](docs/guides/hmi-integration.md)
 - [Detailed previous README and verification history](docs/history/readme-before-repository-cleanup-20261015.md)
-- [Security reporting](SECURITY.md)
+- [Changelog](CHANGELOG.md), [releasing](docs/guides/releasing.md) and [security reporting](SECURITY.md)
 
 ## License
 

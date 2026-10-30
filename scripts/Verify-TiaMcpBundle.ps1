@@ -65,6 +65,10 @@ else {
 foreach ($required in $runtimeFiles) {
     if (-not $listed.Contains($required)) { throw ('Manifest omits a required runtime file: ' + $required) }
 }
+# Bundles from before the product version carry none; a stated version must be the bundled Host's own.
+$productVersion = $manifest.productVersion
+if ($null -ne $productVersion -and ($productVersion -isnot [string] -or
+    [Diagnostics.FileVersionInfo]::GetVersionInfo($actualFiles['host/TiaMcp.Host.dll']).ProductVersion -cne $productVersion)) { throw 'Manifest productVersion differs from the bundled Host.' }
 $extras = @($actualFiles.Keys | Where-Object { $_ -ne 'manifest.json' -and -not $listed.Contains($_) })
 foreach ($required in @('contracts/typed-graphical-model.schema.json', 'contracts/typed-graphical-change.schema.json', 'contracts/typed-graphical-read.schema.json', 'contracts/typed-graphical-profiles.schema.json', 'fixtures/typed-graphical/profiles.v1.json', 'fixtures/typed-graphical/instance-effects.v1.json')) {
     if (-not $listed.Contains($required)) { throw ('Manifest omits a required typed graphical resource: ' + $required) }
@@ -76,6 +80,7 @@ foreach ($extra in $extras) {
     verified = $true
     bundlePath = $bundleRoot
     bundleKind = $bundleKind
+    productVersion = $productVersion
     fileCount = $listed.Count
     strict = [bool]$Strict
     extraNonRuntimeFiles = $extras

@@ -2,7 +2,7 @@
 
 Current deployment/reliability work and its exact evidence are tracked in [deployment-reliability-status.md](../verification/deployment-reliability-status.md). New releases use isolated source builds and write `<bundle>.mcp.json` beside the immutable bundle; regenerate that external configuration after relocation. The detailed launch/verification procedure is in [remote-qualification.md](remote-qualification.md).
 
-Run `scripts/Package.ps1` to produce a versioned bundle and ZIP under `artifacts/releases`. It contains the MCP host, isolated engineering/simulator workers, launcher, configuration generator, dependency license notices and SHA-256 manifest. Siemens binaries and licenses are excluded. Copy or extract the entire bundle to the Windows machine running TIA V21.
+Run `scripts/Package.ps1` to produce a versioned bundle and ZIP under `artifacts/releases`, named `tia-mcp-v21-<version>_<UTC time>_<id>` (`tia-mcp-offline-…` with `-Offline`); `<version>` is the product version from `Directory.Build.props`, which `manifest.json` records as `productVersion` and `Verify-TiaMcpBundle.ps1` checks against the bundled Host. It contains the MCP host, isolated engineering/simulator workers, launcher, configuration generator, dependency license notices and SHA-256 manifest. Siemens binaries and licenses are excluded. Copy or extract the entire bundle to the Windows machine running TIA V21.
 
 That full bundle requires the Siemens SDK build environment. On a workstation
 with no Siemens products, use the [Host-only build and offline workflows](../../README.md#working-without-any-siemens-installation).

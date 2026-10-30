@@ -14,7 +14,7 @@ Point a stdio MCP client at `artifacts/host-only/bin/TiaMcp.Host/release/TiaMcp.
 
 For OPC UA trust that survives Host restarts, explicitly create a protected client identity and add `--ua-client-identity <name>` to the Host arguments. Setup, public certificate export and rotation are described in the [OPC UA identity workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md#protected-persistent-client-identity). The option needs a Windows user profile; it does not configure server trust or resume sessions.
 
-For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration. See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens).
+For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration; the bundle name and its manifest carry the product version. See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens). Version tags attach the same verified ZIP to a draft GitHub release that the maintainer publishes ([releasing](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/releasing.md)).
 
 ## On an engineering workstation
 

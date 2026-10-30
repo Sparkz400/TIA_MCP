@@ -23,9 +23,12 @@ foreach ($entry in @($inputs.files) + @($outputs.files)) {
     $file = Join-Path $buildRoot $entry.path
     if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ine $entry.sha256) { throw "Build input/output changed: $($entry.path)" }
 }
+# The product version (Directory.Build.props) as compiled into the Host; Verify-TiaMcpBundle.ps1 checks the manifest against it.
+$productVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $buildRoot 'published-host/TiaMcp.Host.dll')).ProductVersion
+if (-not $productVersion) { throw 'The published Host carries no product version.' }
 $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd_HHmmss') + '_' + [Guid]::NewGuid().ToString('N').Substring(0,8)
 $packageName = if ($Offline) { 'tia-mcp-offline' } else { 'tia-mcp-v21' }
-$bundleRoot = Join-Path $repoRoot "artifacts/releases/${packageName}_$stamp"
+$bundleRoot = Join-Path $repoRoot "artifacts/releases/${packageName}-${productVersion}_$stamp"
 New-Item -ItemType Directory -Path $bundleRoot | Out-Null
 Copy-Item -LiteralPath (Join-Path $buildRoot 'published-host') -Destination (Join-Path $bundleRoot 'host') -Recurse
 foreach ($worker in $(if ($Offline) { @() } else { @(@{name='openness';project='TiaMcp.Openness.V21'}, @{name='simulator';project='TiaMcp.Simulator.V8'}) })) {
@@ -73,7 +76,7 @@ if (Get-ChildItem -LiteralPath $bundleRoot -Recurse -File -Filter 'Siemens.*.dll
 $files = @(Get-ChildItem -LiteralPath $bundleRoot -Recurse -File | Sort-Object FullName | ForEach-Object {
     @{path=$_.FullName.Substring($bundleRoot.Length + 1).Replace('\','/');bytes=$_.Length;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
 })
-@{schemaVersion=1;createdAtUtc=[DateTime]::UtcNow.ToString('O');frameworkDependent=$true;configuration=$Configuration;bundleKind=$bundleKind;
+@{schemaVersion=1;createdAtUtc=[DateTime]::UtcNow.ToString('O');productVersion=$productVersion;frameworkDependent=$true;configuration=$Configuration;bundleKind=$bundleKind;
     sourceInputManifestSha256=$outputs.inputManifestSha256;files=$files} |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $bundleRoot 'manifest.json') -Encoding UTF8
 & (Join-Path $bundleRoot 'scripts/Verify-TiaMcpBundle.ps1') -BundlePath $bundleRoot -Strict | Out-Host

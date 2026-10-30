@@ -84,5 +84,9 @@ the result, and a failed notification never changes the outcome of the call.
 
 ## Version
 
-`serverInfo.version` reports the bundled feature catalog version (for example `0.4.70`) until 1.0
-chooses a product version; `serverInfo.title` is `TIA MCP`.
+`serverInfo.version` is the product version, set once as `<Version>` in
+[`Directory.Build.props`](../../Directory.Build.props) (pre-1.0, for example `0.9.0`); `serverInfo.title`
+is `TIA MCP`. The bundled feature catalog version, the data contract version that `feature_catalog`
+also returns, is advertised as `capabilities.experimental["tiaMcp/featureCatalog"].version`
+(for example `0.4.82`). Release bundles record the product version in `manifest.json`
+([releasing](../guides/releasing.md)).
