@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>System.Security.Cryptography.ProtectedData</id>
-    <version>10.0.13</version>
+    <version>10.0.14</version>
     <authors>Microsoft</authors>
     <license type="expression">MIT</license>
     <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
@@ -17,7 +17,7 @@ System.Security.Cryptography.ProtectedData</description>
     <releaseNotes>https://go.microsoft.com/fwlink/?LinkID=799421</releaseNotes>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <serviceable>true</serviceable>
-    <repository type="git" url="https://github.com/dotnet/dotnet" commit="4099f83977f4d29604a9aeb971fb0a7bc1d5f699" />
+    <repository type="git" url="https://github.com/dotnet/dotnet" commit="0427b9abbead3fa64c6655eb4290c537397131fa" />
     <dependencies>
       <group targetFramework=".NETFramework4.6.2" />
       <group targetFramework="net8.0" />
