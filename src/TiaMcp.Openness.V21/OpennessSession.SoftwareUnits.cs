@@ -195,13 +195,21 @@ namespace TiaMcp.Openness.V21
                     change.Readbacks.Add(new JObject { ["role"] = "createdUnitMembers", ["unitPath"] = after.Path,
                         ["members"] = new JArray(members.Select(member => new JObject { ["kind"] = member.Item1, ["name"] = member.Item2 })),
                         ["renamedByMasterCopyMode"] = new JArray(renamedMembers.Select(member => new JObject { ["kind"] = member.Item1, ["name"] = member.Item2 })) });
-                    if (renamedMembers.Any(member => member.Item1 != "tagTable"))
-                        throw new BridgeException("MutationVerificationFailed", "MasterCopyMode.Rename renamed blocks or PLC data types of the copy (" + string.Join(", ", renamedMembers.Where(member => member.Item1 != "tagTable").Select(member => member.Item2))
-                            + "); callers would not reach them under their template names. Checkpoint recovery is required.");
                     break;
                 }
             }
             if (preview != null) ((JArray)preview["warnings"]).Add("Unit membership, relations and publication change cross-unit visibility. compile=true reports affected consumers; recovery uses the whole-project checkpoint.");
+        }
+
+        // Checked after the compile: a refused copy's uncompiled blocks would leave no change fingerprint for change_restore
+        // (native, 30 October 2026: FingerprintUnavailable on UnitFb_1).
+        private static void RequireUnrenamedUnitMembers(EngineeringChange change)
+        {
+            var renamed = change.Readbacks.Where(row => row.Value<string>("role") == "createdUnitMembers").SelectMany(row => row["renamedByMasterCopyMode"])
+                .Where(member => member.Value<string>("kind") != "tagTable").Select(member => member.Value<string>("name")).ToArray();
+            if (renamed.Length != 0)
+                throw new BridgeException("MutationVerificationFailed", "MasterCopyMode.Rename renamed blocks or PLC data types of the copy (" + string.Join(", ", renamed)
+                    + "); callers would not reach them under their template names. Checkpoint recovery is required.");
         }
 
         // Conservative: follows SoftwareUnit relations by unit name; reaching target means the new relation closes a cycle.

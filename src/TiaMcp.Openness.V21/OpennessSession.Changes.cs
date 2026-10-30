@@ -200,6 +200,7 @@ namespace TiaMcp.Openness.V21
                             throw new BridgeException("CompileFailed", "The change was applied but compilation failed or its diagnostic evidence is incomplete. Recovery archive and changed project state are retained.");
                     }
                     if (change.Kind == "hmi_engineering") VerifyHmiEngineeringPreservation(change, project);
+                    if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
                     VerifyHardwarePreservation(change, project);
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
                     {
