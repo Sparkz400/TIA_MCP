@@ -45,6 +45,14 @@ internal static class ApplicationFixtureChecks
         check(!ApplicationQualificationFixture.ScopeMatches("ScratchPLC", Export("TiaMcp_Owned", scope: "OtherPLC"), "ScratchPLC", "TiaMcp_Owned"), "The export must name the owned controller");
         string twice = Export("TiaMcp_Owned").Replace("END_PROPERTY", "PLCSIM_INSTANCE_NAME : \"Foreign\"\r\nEND_PROPERTY");
         check(!ApplicationQualificationFixture.ScopeMatches("ScratchPLC", twice, "ScratchPLC", "TiaMcp_Owned"), "An ambiguous repeated property refuses");
+        // Reconciliation compares a live capture with the checkpoint baseline read back from its file (TS-Q02 fail case, 30 October 2026).
+        Directory.CreateDirectory(root);
+        var live = new JObject { ["typeIdentifier"] = (string)null, ["name"] = "Main", ["number"] = 1 };
+        string saved = Path.Combine(root, "baseline.json"); StyleUiEvidence.Save(saved, live);
+        var reread = StyleUiEvidence.Read(saved);
+        check(!JToken.DeepEquals(live, reread) && StyleUiEvidence.SameContent(live, reread), "A null string survives the baseline file round trip as the same content");
+        reread["name"] = "Other";
+        check(!StyleUiEvidence.SameContent(live, reread) && !StyleUiEvidence.SameContent(live, null), "Changed or missing content still differs");
         check(ApplicationQualificationFixture.Text(ApplicationQualificationFixture.Pass, "ScratchPLC").Contains("Active,true)") &&
             ApplicationQualificationFixture.Text(ApplicationQualificationFixture.Fail, "ScratchPLC").Contains("Active,false)"), "Pass asserts the observed TRUE, Fail deliberately asserts FALSE");
     }

@@ -323,7 +323,7 @@ namespace TiaMcp.Openness.V21
                     ["coverage"] = "Exposed single-PLC engineering exports and Test Suite definitions; not yet a qualified complete project preservation profile." };
             }
             private static void Equal(JObject before, JObject after)
-            { if (before == null || !JToken.DeepEquals(before, after)) throw new BridgeException("PreservationFailed", "Native project preservation manifests differ."); }
+            { if (!StyleUiEvidence.SameContent(before, after)) throw new BridgeException("PreservationFailed", "Native project preservation manifests differ."); }
             private string NewDirectory(string name)
             { string value = Path.Combine(directory, name + "-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(value); return value; }
             private JObject Artifact(string path) => new JObject { ["relativePath"] = path.Substring(root.TrimEnd(Path.DirectorySeparatorChar).Length + 1).Replace('\\', '/'), ["sha256"] = ChangeFileHash(path) };

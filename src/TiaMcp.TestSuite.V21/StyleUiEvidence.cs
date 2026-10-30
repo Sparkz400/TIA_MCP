@@ -24,6 +24,10 @@ namespace TiaMcp.TestSuite.V21
                 return value;
             }
         }
+        // A manifest read back from its file holds JTokenType.Null where the live capture holds a null string token;
+        // DeepEquals tells them apart, so compare both as they serialize.
+        internal static bool SameContent(JToken before, JToken after) =>
+            before != null && after != null && JToken.DeepEquals(JToken.Parse(before.ToString(Formatting.None)), JToken.Parse(after.ToString(Formatting.None)));
         internal static void Save(string path, JObject value)
         {
             var bytes = Encoding.UTF8.GetBytes(value.ToString(Formatting.Indented));
