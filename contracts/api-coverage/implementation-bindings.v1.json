@@ -1516,6 +1516,11 @@
       "bytes": 1947
     },
     {
+      "path": "src/TiaMcp.Core/TestSuite/TestSuiteApplicationResultProfile.cs",
+      "sha256": "b043f6a175c0c232ebc9a16ce0f8fbaed609af4920821c84a103dd353bcd3097",
+      "bytes": 2714
+    },
+    {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteApplicationRun.cs",
       "sha256": "63c6529f089a18521cbca13b01b5ce4ffe3d68f8d4ee8753d59ea64a6cd3383c",
       "bytes": 5410
@@ -1547,8 +1552,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteResults.cs",
-      "sha256": "e0d5992d864b959f575c2cb021bda5e100e1676afd431706d2090446e7557557",
-      "bytes": 16757
+      "sha256": "f0ee055858c8a5322bbe98b07fbd1507018a51e6334f77a02190e2b5eeb266ef",
+      "bytes": 16831
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteScopeCoverage.cs",

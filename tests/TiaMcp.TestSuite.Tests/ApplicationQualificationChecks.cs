@@ -83,6 +83,34 @@ internal static class ApplicationQualificationChecks
             [new("Success", "native", pass.Manifest.Name, null, "Unknown", 0, 0, [])], true, true, scopeVerified);
         Check(TestSuiteResultNormalizer.Normalize(plan, TestSuiteApplicationRun.Captures(plan, [Tree(true)])).Results[0].Outcome == "passed", "Verified single-case scope can pass");
         Check(TestSuiteResultNormalizer.Normalize(plan, TestSuiteApplicationRun.Captures(plan, [Tree(false)])).Results[0].Outcome == "inconclusive", "Unverified scope never passes");
+
+        // The exact trees TIA wrote on 30 October 2026: an Information footer, so only the fixture profile can pass or fail them.
+        var instanceScope = reference with { Object = reference.Object with { ObjectPath = "PLC/A/plcsim/TiaMcp_owned", Kind = "plcsimInstance" } };
+        foreach (bool passing in new[] { true, false })
+        {
+            string name = passing ? "TiaMcp_Q02_Pass" : "TiaMcp_Q02_Fail", state = passing ? "Success" : "Error";
+            int errors = passing ? 0 : 1;
+            var bytes = Encoding.ASCII.GetBytes("TEST_CASE \"" + name + "\"");
+            var definition = new TestSuiteDefinitionCapture(name, "application", name, ".tat", reference with { Object = reference.Object with { ObjectPath = "PLC/A/testsuite/application/" + name, Kind = "applicationTest" }, ContentSha256 = null },
+                bytes, profile, [reference, instanceScope], [], true, true, []);
+            var run = TestSuiteRunPlanner.Prepare([definition], [name], [], "externallyManaged");
+            NativeTestMessage M(string? path, string description, string nodeState, int nodeErrors, params NativeTestMessage[] children) =>
+                new(nodeState, description, path, "2026-10-30T07:52:05.7232752Z", "Utc", nodeErrors, 0, children);
+            NativeTestResult Observed(string instance = "TiaMcp_owned", string expected = "", string footer = "Test case(s) execution completed.") => new(name, run.Definitions[0].Reference, state, errors, 0, [
+                M("Application test", "Test cases executed : 1 ; Passed : " + (1 - errors) + " ; Failed : " + errors + " ; Inconclusive : 0", state, errors,
+                    M(name, "ScratchPLC[PLCSIM Instance : " + instance + "]", state, errors,
+                        M("\"Enable gate output\"", passing ? "Pass" : "Fail", state, errors,
+                            M("TiaMcp_EnableGate_DB.Active", "Actual: True, Expected: " + (expected == "" ? (passing ? "True" : "False") : expected) + ", Assert type: Equal", state, errors)))),
+                M(null, footer, "Information", 0)], true, true, true);
+            string Outcome(NativeTestResult tree, TestSuiteRunPlan? p = null) => TestSuiteResultNormalizer.Normalize(p ?? run, TestSuiteApplicationRun.Captures(p ?? run, [tree])).Results[0].Outcome;
+            Check(Outcome(Observed()) == (passing ? "passed" : "assertionFailed"), name + " maps to " + (passing ? "passed" : "an assertion failure"));
+            Check(Outcome(Observed() with { ScopeVerified = false }) == "inconclusive", name + " without a verified scope readback stays inconclusive");
+            Check(Outcome(Observed("Foreign")) == (passing ? "inconclusive" : "executionError"), name + " on another instance is not the fixture result");
+            Check(Outcome(Observed(expected: passing ? "False" : "True")) == (passing ? "inconclusive" : "executionError"), name + " with another assertion is not the fixture result");
+            Check(Outcome(Observed(footer: "Testfall-Ausführung abgeschlossen.")) == (passing ? "inconclusive" : "executionError"), name + " under an unobserved UI language fails closed");
+            var generic = TestSuiteRunPlanner.Prepare([new TestSuiteDefinitionCapture(name, "application", name, ".tat", definition.Manifest.Reference, bytes, "other-profile", [reference, instanceScope], [], true, true, [])], [name], [], "externallyManaged");
+            Check(Outcome(Observed() with { DefinitionReference = generic.Definitions[0].Reference }, generic) == (passing ? "inconclusive" : "executionError"), name + " tree under another profile gets no fixture interpretation");
+        }
         return checks;
     }
 

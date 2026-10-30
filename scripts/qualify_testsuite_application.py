@@ -54,8 +54,8 @@ def body(h, case):
         require(instance.get("operatingState") == "Off", "A fresh owned OFF instance is required")
         return created, instance
 
-    def release(instance):
-        for action in ("stop", "powerOff"):
+    def release(instance, powered=True):
+        for action in ("stop", "powerOff") if powered else ():
             try:
                 h.stage("sim_state " + action, lambda: h.tool("sim_state", {"instanceId": instance["id"], "action": action, "timeoutMs": 60000}))
             except Exception:
@@ -66,7 +66,7 @@ def body(h, case):
     if case == "pass":
         # A released owned instance is no longer registered: its ticket refuses before any fixture import.
         gone_created, gone = create("(released before use)")
-        release(gone)
+        release(gone, powered=False)
         h.report["releasedRefusal"] = refuse("a released instance's ticket", "qualification_testsuite_prepare",
             {"projectPath": project, "fixture": "applicationPass", "idempotencyKey": uuid.uuid4().hex,
              "simulatorTicket": gone_created["downloadTicket"]}, ["SimulationTargetMismatch"])
