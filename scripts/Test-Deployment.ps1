@@ -80,6 +80,8 @@ Write-TestManifest (@($entries) + @{path='HOST/TIAMCP.HOST.EXE'; bytes=$entries[
 Assert-Rejected { & $verifier -BundlePath $testRoot } 'Case-insensitive duplicate manifest entry accepted.'
 Write-TestManifest @($entries | Select-Object -Skip 1)
 Assert-Rejected { & $verifier -BundlePath $testRoot } 'Missing required manifest entry accepted.'
+@{productVersion='0.0.0-not-this-host';files=@($entries)} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+Assert-Rejected { & $verifier -BundlePath $testRoot } 'Manifest product version accepted without a matching Host.' 'productVersion differs'
 Write-TestManifest $entries
 $missing = Join-Path $testRoot $required[0]
 Move-Item -LiteralPath $missing -Destination ($missing + '.saved')

@@ -1,5 +1,10 @@
 <Project>
   <PropertyGroup>
+    <!-- The one product version (pre-1.0 SemVer): every assembly, serverInfo, npm metadata and release bundles.
+         scripts/test_product_version.py keeps the copies that cannot read it in step. -->
+    <Version>0.9.0</Version>
+    <!-- Report exactly this version, without a +commit suffix, so serverInfo and bundle manifests match it. -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <LangVersion>latest</LangVersion>
     <Authors>Nico Schürmann</Authors>
     <Copyright>Copyright 2026 Nico Schürmann</Copyright>

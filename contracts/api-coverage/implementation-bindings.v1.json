@@ -12,8 +12,8 @@
   "sourceInputs": [
     {
       "path": "Directory.Build.props",
-      "sha256": "367abb8a96b7fa73c3e21de6691b6f0e1bdf85bb3ad17b11f80c6829423f87e1",
-      "bytes": 606
+      "sha256": "845561146ba0a293f3e5e43719baa0b29681b415b23afa2dbc2bba340653041e",
+      "bytes": 1053
     },
     {
       "path": "contracts/access-review.v1.schema.json",
@@ -832,13 +832,13 @@
     },
     {
       "path": "src/TiaMcp.AddIn.V21/SelectionHandoff.cs",
-      "sha256": "5c48e302665145152b549eb7908b8be6fe3fca1557f80dfe61a2a0ed3c836909",
-      "bytes": 10537
+      "sha256": "3ab50692560f3b1a186e6df9f4b9d48f9e20b6c68f23f0dbd7314d26af39040f",
+      "bytes": 10572
     },
     {
       "path": "src/TiaMcp.AddIn.V21/TiaMcp.AddIn.V21.csproj",
-      "sha256": "f01f3fce3f1884725bcab071834d6e80c26a605107a25a932de2ee10af4e997b",
-      "bytes": 1775
+      "sha256": "ed237f7906695b365118ec7aa645c5c4d8461e0cd7fa547beba58625f46ace75",
+      "bytes": 1746
     },
     {
       "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -2102,8 +2102,8 @@
     },
     {
       "path": "src/TiaMcp.Host/ToolSurface.cs",
-      "sha256": "d59d7da97e646de9d184cc574696646277ac69d1ba9fc1e29a5d00775aea4bea",
-      "bytes": 6301
+      "sha256": "0f1600205c1ae7cb728417c7c84375d1b1f84c10debfcbf2caf7159050dd7261",
+      "bytes": 6666
     },
     {
       "path": "src/TiaMcp.Host/ToolTitles.cs",
@@ -19369,8 +19369,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -38385,8 +38385,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -39738,8 +39738,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -40240,8 +40240,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -40447,8 +40447,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -40784,8 +40784,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -41274,9 +41274,9 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "Apply",
-          "line": 23,
-          "endLine": 41,
-          "sha256": "536a454f87d65f7ba56b0dfef1f89d3a62404aa3a3d3bd7a713726e607910248"
+          "line": 24,
+          "endLine": 46,
+          "sha256": "56d92ed7f46161f1ac98a6662156f48692cee49b572068c370421fcea4fd8523"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -41589,8 +41589,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -49062,8 +49062,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -51494,8 +51494,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -52133,8 +52133,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -52656,8 +52656,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -53116,8 +53116,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -55638,8 +55638,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -56298,8 +56298,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -56930,8 +56930,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -57292,8 +57292,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -57662,8 +57662,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -58010,8 +58010,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -58470,8 +58470,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -58953,8 +58953,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -71583,9 +71583,9 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "Apply",
-          "line": 23,
-          "endLine": 41,
-          "sha256": "536a454f87d65f7ba56b0dfef1f89d3a62404aa3a3d3bd7a713726e607910248"
+          "line": 24,
+          "endLine": 46,
+          "sha256": "56d92ed7f46161f1ac98a6662156f48692cee49b572068c370421fcea4fd8523"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -71856,8 +71856,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -72495,8 +72495,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -73010,8 +73010,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -73723,8 +73723,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {
@@ -74149,8 +74149,8 @@
         {
           "path": "src/TiaMcp.Host/ToolSurface.cs",
           "name": "async",
-          "line": 43,
-          "endLine": 55,
+          "line": 48,
+          "endLine": 60,
           "sha256": "a8a583ac7c0d216f1ce1e7e4478115506f290a8501639a1bf221fa352600335a"
         },
         {

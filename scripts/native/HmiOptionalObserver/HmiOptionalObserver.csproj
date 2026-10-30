@@ -4,6 +4,8 @@
     <OutputType>Library</OutputType>
     <AssemblyName>TiaMcp.OptionalStartup.Observer</AssemblyName>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <!-- qualify_hmi_optional_startup.py names this identity in the generated appDomainManagerAssembly. -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
   </PropertyGroup>
 </Project>
