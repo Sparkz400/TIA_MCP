@@ -1,0 +1,108 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.technology.motion_connections.20261030",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-30T08:58:17+00:00",
+  "source": {
+    "commit": "79245419a1ba34c25100e3c4e3df9545a6399be1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_motion_connections.py on a frozen Debug build of 79245419 (artifacts/um5, git archive), 44/44 steps, in an owned scratch CPU 1511-1 PN V4.1 with a TM PosInput 2 V2.0 (channel 0 MotionControl), an AQ 2xU/I ST and a SINAMICS G120C PN on the CPU's IO system. Applied with checkpoint, PLC compile and save, read back through technology_read and equal after a fresh Portal reopen: a TO_ExternalEncoder 10.0 encoder on the TM PosInput item (Connect(DeviceItem)), replaced through Connect(DeviceItem, DeviceItem, ConnectOption.Default) and Connect(Int32 0, Int32 0, Default); a channel replacement restored from its checkpoint. Typed refusals UnsupportedTarget and InvalidRequest left the slots unchanged. V21 refusals recorded with exact errors and restored: TO_MeasuringInput on the TM PosInput item by channel index and on its channel (Target not available for input=0 and output=-1), TO_SpeedAxis actor on the AQ channel with Actor.Type 0 on a virtual axis (Target not available for input=-1 and output=-1), encoder on a PD_TEL83 DB member (No valid assignment for Encoder(MoEncoder)). The G120C exposes no telegram device item, so actor and torque on a telegram were not reached.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN V4.1; TO_PositioningAxis (virtual), TO_SpeedAxis (virtual, analog actor), TO_ExternalEncoder and TO_MeasuringInput 10.0. Only the encoder role connected; actor, torque and measuring input were refused by V21 or unreachable on this fixture.",
+    "The G120C PN added through Openness exposes no telegram device item even on the IO system (same root as the D10 DriveObjectNumber blocker), so drive telegram targets are not qualified.",
+    "Engineering only; nothing is downloaded and no axis moves; the drive is never compiled (no compiler service)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "56a0ffa782202ec09df94a79a0a2ebf788729c6c071ebd8e80a9b6eefb51668a"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "37627f219889af45a1486b9088346382555d4cd7d13f0aec04d94df6ab5ca698"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "ad9ea0bdd3f6301142fbf7ef006db8707746c9bef0b8e7b3695a14e0996a5fdf",
+      "bytes": 281590,
+      "completed": true,
+      "steps": [
+        "start owned TIA motion connections",
+        "create owned scratch motion connections",
+        "prepare hardware_plug",
+        "apply hardware_plug",
+        "prepare hardware_channel_attributes",
+        "apply hardware_channel_attributes",
+        "prepare hardware_add",
+        "apply hardware_add without compile or save",
+        "put the CPU on MotionNet",
+        "put the drive on MotionNet",
+        "assign the drive to MotionIo",
+        "plug the AQ 2xU/I ST MoAq",
+        "create TO_PositioningAxis 10.0 MoAxis",
+        "create measuring input MoProbe under MoAxis",
+        "refuse measuring input on a tag",
+        "refuse measuring input on an output address",
+        "connect MoProbe to MoEnc by channel index 0",
+        "connect MoProbe to the MoEnc channel",
+        "delete the unconnected MoProbe",
+        "create virtual TO_SpeedAxis MoSpeed with an analog actor",
+        "refuse actor with connectOption on a single module",
+        "refuse actor with a measuring-input channel index",
+        "refuse actor with one address",
+        "connect MoSpeed actor to the MoAq analog output channel",
+        "delete the unconnected MoSpeed",
+        "create TO_ExternalEncoder 10.0 MoEncoder",
+        "refuse encoder with a channel index",
+        "refuse encoder with only an input address",
+        "connect MoEncoder to the MoEnc module",
+        "read back connect MoEncoder to the MoEnc module",
+        "connect MoEncoder to MoEnc as input and output module",
+        "read back connect MoEncoder to MoEnc as input and output module",
+        "connect MoEncoder to the MoEnc addresses",
+        "read back connect MoEncoder to the MoEnc addresses",
+        "create the encoder telegram DB MoEncDb",
+        "connect MoEncoder to the DB member MoEncDb.Tel",
+        "read MoEncoder before the last connection",
+        "connect MoEncoder to the MoEnc channel",
+        "read back connect MoEncoder to the MoEnc channel",
+        "restore the last connection from its checkpoint",
+        "close the changed session",
+        "start owned TIA reopen",
+        "reopen the saved project",
+        "reopened connections equal the saved ones"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "device_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "project_open",
+        "technology_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare",
+        "project_open"
+      ]
+    }
+  ]
+}
