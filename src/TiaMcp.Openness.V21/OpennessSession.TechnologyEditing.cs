@@ -18,6 +18,7 @@ namespace TiaMcp.Openness.V21
             var slot = TechnologyConnectionSlot(entry.Item, change.Payload);
             if (change.Kind == "to_connect") ConnectTechnologySlot(slot, project, plc, change.Payload, false);
             else if (!TechnologySlotConnected(slot)) throw new BridgeException("NotConnected", "The selected technology connection is not connected.");
+            if (change.Kind == "to_connect") preview["replacesConnection"] = TechnologySlotConnected(slot);
             var warnings = new JArray();
             var rows = TechnologyConnections(entry.Item, new ScanBudget(500), warnings, entry.Path, out var coverage, new TechnologyReferenceReader(plc.Project, plc.Path));
             preview["connectionsBefore"] = new JObject { ["rows"] = rows, ["coverage"] = coverage, ["warnings"] = warnings };
@@ -27,12 +28,15 @@ namespace TiaMcp.Openness.V21
         {
             var plc = SelectPlc(change.Selector);
             var slot = TechnologyConnectionSlot(RequiredTechnologyObject(plc, change.Payload), change.Payload);
-            if (change.Kind == "to_connect") { ConnectTechnologySlot(slot, project, plc, change.Payload, true); return; }
+            // V21 refuses Connect on a connected slot ("Already connected", native 30 October 2026), and a real axis or encoder
+            // does not compile disconnected, so to_connect replaces a previewed connection within one checkpoint and compile.
+            if (change.Kind == "to_connect" && !change.Preview.Value<bool>("replacesConnection")) { ConnectTechnologySlot(slot, project, plc, change.Payload, true); return; }
             if (slot is AxisEncoderHardwareConnectionInterface axis) axis.Disconnect();
             else if (slot is TorqueHardwareConnectionInterface torque) torque.Disconnect();
             else if (slot is MeasuringInputHardwareConnectionProvider measuring) measuring.Disconnect();
             else ((OutputCamHardwareConnectionProvider)slot).Disconnect();
             if (TechnologySlotConnected(slot)) throw new BridgeException("MutationVerificationFailed", "The technology connection still reports connected; checkpoint recovery is required.");
+            if (change.Kind == "to_connect") ConnectTechnologySlot(slot, project, plc, change.Payload, true);
         }
 
         // Role names match the technology_read hardwareConnections rows.

@@ -435,6 +435,9 @@ complete/readable flags; older observations cannot silently qualify a fresh run.
 | `dbMemberPath` | `Connect(String)` | `Connect(String)` | refused | refused |
 | `inputAddress` + `outputAddress` (+ `connectOption`) | `Connect(Int32, Int32, ConnectOption)` | same | `inputAddress` only: `Connect(Int32)` | `outputAddress` only: `Connect(Int32)` |
 
+V21 refuses `Connect` on a connected slot ("Already connected"), and a real axis or encoder does not compile disconnected,
+so on a connected slot `to_connect` disconnects and connects within one checkpoint and compile; the preview reports
+`replacesConnection: true` beside the `connectionsBefore` rows.
 Refused pairs answer `UnsupportedTarget`; a missing or second target, a half address pair or a channel selector without
 `hardwarePath` answers `InvalidRequest`. Apply verifies `IsConnected` and the target the slot reports: the module, channel
 or tag, `InputModule`/`OutputModule`, `PathToDBMember` (quotes ignored), `InputAddress`/`OutputAddress`, `ChannelIndex` and

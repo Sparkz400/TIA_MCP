@@ -3,8 +3,9 @@
 The fixture plugs a TM PosInput 2 (channel 0 in MotionControl mode) and an AQ 2xU/I ST, and adds a SINAMICS G120C PN,
 which is put on one subnet and IO system with the CPU. Each connection is prepared and applied (checkpoint, PLC compile,
 save) and read back through technology_read: a TO_SpeedAxis actor on the drive's telegram item when the drive exposes one,
-otherwise on an analog output channel; a TO_ExternalEncoder encoder on the TM PosInput item, connected again through the
-two-module and the address overloads, to a DB member and on its channel; a measuring input under a virtual
+otherwise a virtual speed axis with an analog actor (Actor.Type 0) on an analog output channel; a TO_ExternalEncoder encoder
+on the TM PosInput item, then replaced (V21 refuses Connect on a connected slot, so to_connect disconnects first) through
+the two-module and the address overloads, a DB member and its channel; a measuring input under a virtual
 TO_PositioningAxis by channel index and on the channel; the axis's torque interface on the telegram. A real axis or encoder
 is created without compile, since it compiles only once connected. What V21 refuses, at preparation or apply, is recorded under boundaries with its exact error; a failed apply
 is restored from its checkpoint. Role/target pairs without a V21 Connect overload refuse typed and change nothing. The last
@@ -190,7 +191,14 @@ def actor(run):
     without a telegram item, on the analog output channel."""
     if run.telegram is None and run.analog is None:
         return
-    run.create("MoSpeed", SPEED)
+    if run.telegram is None:
+        # Natively a PROFIdrive actor (the default Actor.Type) answers "Target not available" for an analog channel.
+        created = run.change("create virtual TO_SpeedAxis MoSpeed with an analog actor", "to_create", {"name": "MoSpeed", "typeIdentifier": SPEED[0],
+                             "version": SPEED[1], "parameters": {"VirtualAxis.Mode": 1, "Actor.Type": 0}})
+        if created["outcome"] != "applied":
+            return
+    else:
+        run.create("MoSpeed", SPEED)
     path = run.to("MoSpeed")
     target = run.telegram or run.analog["hardwarePath"]
     run.refuse("actor with connectOption on a single module", path, "actor", {"hardwarePath": target, "connectOption": "AllowAllModules"}, "UnsupportedTarget")
