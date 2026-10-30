@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.82",
+  "catalogVersion": "0.4.83",
   "targetTiaVersions": [
     21
   ],
@@ -10826,7 +10826,8 @@
           "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
           "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
-          "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable."
+          "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
+          "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects."
         ]
       },
       "qualification": {
@@ -10838,7 +10839,8 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Every Host applies the verified shapes; other PLC library_integrate shapes stay plan-only."
+          "Every Host applies the verified shapes; other PLC library_integrate shapes stay plan-only.",
+          "--disable-library-integrate-apply turns it off; every PLC recipe then stays plan-only."
         ]
       },
       "prerequisites": [

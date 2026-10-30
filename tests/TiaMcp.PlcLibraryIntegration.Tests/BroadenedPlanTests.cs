@@ -120,6 +120,30 @@ internal static class BroadenedPlanTests
             Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(preview, f.Caller) == null); Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject(), null) == null);
         });
         test("combined apply names each coordinator step", () => Equal("apply_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("graphical_prepared")));
+        // Decided before the claim, so step 1 never imports and saves a component that step 2 must refuse (30 October review).
+        test("combined apply admits only de-DE-only projects before the claim", () => {
+            Equal(null, PlcComponentQualificationGate.CombinedApplyLanguageRefusal(["de-DE"], "de-DE", "de-DE"));
+            foreach (var (active, reference, editing) in new[] { (new[] { "de-DE", "en-US" }, "de-DE", "de-DE"), (new[] { "en-US" }, "en-US", "en-US"),
+                         (new[] { "de-DE" }, "de-DE", "en-US"), (Array.Empty<string>(), null, null), (null, "de-DE", "de-DE") })
+                Equal(true, PlcComponentQualificationGate.CombinedApplyLanguageRefusal(active, reference, editing)?.StartsWith("Only de-DE-only projects", StringComparison.Ordinal));
+        });
+        test("combined apply needs an instance profile covering the planned FB before the claim", () => {
+            var callee = new Fixture().Fb; callee.Root.Element("SW.Blocks.FB").Element("AttributeList").Add(new XElement("MemoryLayout", "Optimized"));
+            var covering = InstanceTemplate(callee);
+            Equal(null, PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, "Motor_1", [covering]));
+            Equal(true, PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, "Motor_1", []).EndsWith("no instance template exists for this CPU and route.", StringComparison.Ordinal));
+            var other = new XDocument(callee); other.Descendants(XName.Get("Member", Interface)).First().SetAttributeValue("Datatype", "Int");
+            Equal(true, PlcComponentQualificationGate.CombinedApplyInstanceRefusal(other, "Motor_1", [covering]).StartsWith("No instance creation profile covers the FB", StringComparison.Ordinal));
+        });
+    }
+
+    // A standard global instance DB template whose persistent members match the callee's.
+    private static XDocument InstanceTemplate(XDocument callee)
+    {
+        var template = new XDocument(callee); var db = template.Root.Element("SW.Blocks.FB"); db.Name = "SW.Blocks.InstanceDB";
+        var attributes = db.Element("AttributeList"); attributes.Element("ProgrammingLanguage").Value = "DB";
+        attributes.Add(new XElement("AutoNumber", "true"), new XElement("Number", "9"), new XElement("InstanceOfName", "Prototype"), new XElement("InstanceOfType", "FB"));
+        return template;
     }
 
     private static Fixture Unit()

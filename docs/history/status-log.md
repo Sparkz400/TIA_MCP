@@ -9,6 +9,8 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 **Release mechanics — 30 October 2026:** one product version, 0.9.0, set in `Directory.Build.props` for every assembly, the bundle name and its manifest; `serverInfo.version` reports it and the catalog version moved to `capabilities.experimental["tiaMcp/featureCatalog"]`. `CHANGELOG.md`, a `v*`-tag release workflow that only drafts a pre-release with the verified bundle, a supported-versions statement in `SECURITY.md` and [releasing](../guides/releasing.md) steps.
 
+**Combined library apply checks up front — 30 October 2026:** fixes the medium finding of the [security review](../verification/security-review-20261030.md). Combined apply now refuses before any claim, import or save, also in the preview, unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB; before, such a project was refused only at step 2 and left in `recovery_required`. `--disable-library-integrate-apply` turns combined apply off. Catalog 0.4.83; offline tests only.
+
 **Integration — 30 October 2026:** OB40 and the drive probe (#154), live monitoring (#156) and default-on combined library apply (#153) landed together with the block-protection route (#155). Catalog 0.4.82: 422 of 462 features verified; matrix 1,928 bound, 141 open, 31 blocked, 30 deferred. The per-entry catalog numbers below are those of each branch.
 
 **Block-protection credential route — 30 October 2026:** ([record](../verification/block-protection-20261030.md))
