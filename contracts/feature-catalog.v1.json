@@ -3121,6 +3121,25 @@
         "The vault lives in the current Windows profile; another user, a roamed profile and packaged-context redirection are not exercised. CredentialAdmissionRequired (pinned reference) and worker-side CredentialRequired are covered offline only.",
         "Persistence is read back after save in the same Portal; a fresh Portal reopen is not part of this run. Engineering only; a protected block is not downloaded or run."
       ]
+    },
+    {
+      "id": "local.block_protection.rerun.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1f11b012b0de59010c1a6109e28912469de3320e",
+        "passedScope": "scripts/qualify_block_protection.py rerun on a frozen Debug build of 1f11b012 (artifacts/cr1, git archive), 38/38 steps, after the credential-route hardening: length-prefixed seal entropy (v2), pinned plaintext buffers, the worker half in RoutedCredentials and the Host's purpose/resource-kind check. Same owned scratch CPU 1511-1 PN flow as local.block_protection.20261030: know-how protect/unprotect with readback, a correctly bound wrong password failing in Unprotect, both checkpoint restores; write protection define, enable, change, disable with the replaced and the new password, the disable checkpoint restore; refusals before admission (CredentialContextMismatch with the expected binding, CredentialUnavailable, CredentialRetired, CredentialFormatInvalid, CredentialStoreBusy) and CredentialPolicyViolation after the checkpoint. All 6 generated passwords absent from the 166 run files, every tool response, the report and the Host log."
+      },
+      "artifacts": [
+        "evidence/local.block_protection.rerun.20261030.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN at PLC-root scope with one SCL FC and one SCL FB; software units, namespaces, LAD/FBD, OBs and safety blocks are not exercised.",
+        "Generated ASCII passwords; non-ASCII passwords and the 120-character bound are not probed. TIA checks its password policy and a wrong password only in the native call, after the checkpoint; the wrong password is reported as EngineeringError.",
+        "The vault lives in the current Windows profile; another user, a roamed profile and packaged-context redirection are not exercised. CredentialAdmissionRequired, the worker's CredentialRequired and slot-set checks are covered offline only (TiaMcp.Credentials.Tests).",
+        "Persistence is read back after save in the same Portal; a fresh Portal reopen is not part of this run. Engineering only; a protected block is not downloaded or run."
+      ]
     }
   ],
   "features": [
@@ -6732,7 +6751,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.block_protection.20261030"
+          "local.block_protection.20261030",
+          "local.block_protection.rerun.20261030"
         ]
       },
       "availability": {
@@ -6786,7 +6806,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.block_protection.20261030"
+          "local.block_protection.20261030",
+          "local.block_protection.rerun.20261030"
         ]
       },
       "availability": {
@@ -6841,7 +6862,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.block_protection.20261030"
+          "local.block_protection.20261030",
+          "local.block_protection.rerun.20261030"
         ]
       },
       "availability": {
@@ -12826,7 +12848,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Installed V21 Siemens.Engineering.Base typed attribute API on CPU device items."
+          "Installed V21 Siemens.Engineering.Base typed attribute API on CPU device items.",
+          "V21 PlcAccessLevelProvider.PlcProtectionAccessLevel and SetPassword(FullAccess, SecureString), present only under an access-level mode."
         ]
       },
       "implementation": {
@@ -12835,7 +12858,7 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
           "Reviewed subset: CycleMaximumCycleTime, CycleMinimumCycleTime, CycleEnableMinimumCycleTime, CycleCommunicationLoad, StartupActionAfterPowerOn, StartupComparisonPresetToActualModule, StartupConfigurationTimeout, TimeSynchronizationNtpV2, TimeOfDayLocalTimeZone, TimeOfDayActivateDaylightSavingTime and PlcAccessControlConfiguration, each only where the selected item declares it. Coded values are V21's own numbers; V21 refused StartupActionAfterPowerOn = 2 in its setter (29 October 2026).",
           "CycleMinimumCycleTime exists only while CycleEnableMinimumCycleTime is true: disabling drops it, a value for a disabled flag is refused, and enabling needs an explicit value (the flag is written first). A zone without daylight saving makes TIA switch TimeOfDayActivateDaylightSavingTime off, so request both together; any other dependent change fails preservation and needs checkpoint recovery.",
-          "PlcAccessControlConfiguration accepts only the exact names of the enabled access-control modes, never Disabled or a number. Changing the protection level is a recorded boundary: V21 compiles the access-level modes only with a full-access password, and this route never accepts passwords (the change fails compilation and is restored from its checkpoint).",
+          "PlcAccessControlConfiguration accepts only the exact names of the enabled access-control modes, never Disabled or a number. Entering an access-level mode needs protectionLevel (ReadAccess, HMIAccess or NoAccess) and credential, a protected-credential-reference.v1 to the full-access password bound to provider siemensTiaPortalV21, authority plcPath, ownerId the CPU item, resourceKind cpuProtection, resourceId fullAccess, purpose cpuProtection; the Host routes it to that one apply (docs/reference/protected-credentials.md#change-apply-credential-route). Full access, a level outside an access-level mode, a missing credential and other payload fields refuse at prepare. V21 refuses to set the level while UMAC runtime access is enabled on the device, as on every owned scratch CPU, so the protection level is not natively qualified (docs/verification/cpu-protection-20261030.md); its typed refusals passed natively.",
           "Device compilation and configured-hardware preservation are mandatory; the runtime effect of the parameters is not observed.",
           "Device compilation and configured-hardware preservation (identities, slots, reviewed attributes including the parameter subset, addresses and network associations) are mandatory; the runtime effect is not observed by this kind."
         ]
@@ -12854,7 +12877,8 @@
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state"
+        "Applicable native services and project protection state",
+        "For protectionLevel: a protected credential reference from the Host credential store bound to the exact CPU (cpuProtection)"
       ],
       "acceptanceCriteria": [
         "AC-identity",

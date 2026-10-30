@@ -28,7 +28,7 @@ names every row with an open cell.
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
   TIA editor, and the
-  CPU protection level needs a full-access password no route accepts.
+  CPU protection level is refused while UMAC runtime access is enabled (its password now has a route).
 - **Rows blocked by decision:** five `unavailable_target` rows (31 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision

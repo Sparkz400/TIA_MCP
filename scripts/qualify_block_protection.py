@@ -70,6 +70,22 @@ class Vault:
         return status
 
 
+def secret_scan(h, vault):
+    """Every run file, tool response, the report and the Host log must be free of the vault's passwords."""
+    hits = []
+    for path in sorted(p for p in h.directory.rglob("*") if p.is_file()):
+        if leaks(path.read_bytes(), vault.passwords):
+            hits.append(str(path.relative_to(h.directory)))
+    report_hit = leaks(json.dumps(h.report).encode("utf-8"), vault.passwords) or leaks(json.dumps(h.client.tool_calls).encode(), vault.passwords)
+    log_hit = leaks("\n".join(h.client.errors).encode("utf-8"), vault.passwords)
+    # TIA's own project and archive files are listed apart: what TIA stores for protection is not Host retention.
+    native = [p for p in hits if p.endswith((".zap21", ".ap21")) or "/scratch/" in p.replace("\\", "/") or "/recovery/" in p.replace("\\", "/")]
+    host = [p for p in hits if p not in native]
+    require(not host and not report_hit and not log_hit, "Secret retained outside TIA: files %s, report %s, log %s" % (host, report_hit, log_hit))
+    return {"passwords": len(vault.passwords), "filesScanned": sum(1 for p in h.directory.rglob("*") if p.is_file()),
+            "hostRetained": host, "tiaProjectFilesContaining": native, "toolResponsesOrReport": report_hit, "hostLog": log_hit}
+
+
 def body(h):
     plc = h.owned_scratch("block protection")
     blocks = {b["name"]: b for b in h.tool("project_inventory", {"maxItems": 1000})["blocks"]}
@@ -185,20 +201,7 @@ def body(h):
     for label in [label for label in vault.labels if label != "retired"]:
         vault.retire(label)
 
-    def scan():
-        hits = []
-        for path in sorted(p for p in h.directory.rglob("*") if p.is_file()):
-            if leaks(path.read_bytes(), vault.passwords):
-                hits.append(str(path.relative_to(h.directory)))
-        report_hit = leaks(json.dumps(h.report).encode("utf-8"), vault.passwords) or leaks(json.dumps(h.client.tool_calls).encode(), vault.passwords)
-        log_hit = leaks("\n".join(h.client.errors).encode("utf-8"), vault.passwords)
-        # TIA's own project and archive files are listed apart: what TIA stores for protection is not Host retention.
-        native = [p for p in hits if p.endswith((".zap21", ".ap21")) or "/scratch/" in p.replace("\\", "/") or "/recovery/" in p.replace("\\", "/")]
-        host = [p for p in hits if p not in native]
-        require(not host and not report_hit and not log_hit, "Secret retained outside TIA: files %s, report %s, log %s" % (host, report_hit, log_hit))
-        return {"passwords": len(vault.passwords), "filesScanned": sum(1 for p in h.directory.rglob("*") if p.is_file()),
-                "hostRetained": host, "tiaProjectFilesContaining": native, "toolResponsesOrReport": report_hit, "hostLog": log_hit}
-    h.report["secretScan"] = h.stage("scan every run file, response and Host log for the passwords", scan)
+    h.report["secretScan"] = h.stage("scan every run file, response and Host log for the passwords", lambda: secret_scan(h, vault))
     h.report["observed"] = {"policyViolation": policy, "wrongSecretUnprotect": wrong_result, "replacedSecretDisable": old_result,
                             "applied": [protect, unprotect, again, define, enable, change, disable]}
 

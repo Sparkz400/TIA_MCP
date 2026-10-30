@@ -160,7 +160,7 @@ namespace TiaMcp.Openness.V21
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) VciRequireUnchangedFiles(change, project);
                 if (change.Kind == "webserver_user_pages_generate") WebSourceUnchanged(change);
                 // An unopenable credential must refuse before the checkpoint save, not after it.
-                if (BlockProtectionKinds.Contains(change.Kind)) RequireRoutedCredentials(change);
+                if (change.Preview["credentials"] != null) RequireRoutedCredentials(change);
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
                 change.IdempotencyKey = key;
                 _changeKeys[key] = change.Id;

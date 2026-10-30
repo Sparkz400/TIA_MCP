@@ -207,7 +207,8 @@ restrictions. Do not pass these references as scratch simulation metadata.
 ## Change apply credential route
 
 Block protection changes (`block_protect`, `block_unprotect` and
-`block_write_protection_set`, see [engineering workflows](../guides/engineering-workflows.md))
+`block_write_protection_set`) and the CPU protection level (`hardware_cpu_parameters`
+with `protectionLevel`, see [engineering workflows](../guides/engineering-workflows.md))
 take a vault secret through this route. No other path hands a vault secret to a worker.
 
 **Create one credential per block and protection.** The worker derives the expected
@@ -234,20 +235,52 @@ password change needs a second credential with the same binding (`newCredential`
 A renamed or moved block, or a project copied under another name, needs a new
 credential, because the binding names the paths.
 
+**The CPU protection level takes the full-access password**, bound to the CPU. The
+authority is the `plcPath`; the owner is the CPU item, which is the `plcPath` without
+its `/plc/<name>` suffix:
+
+```json
+{
+  "resource": {
+    "provider": "siemensTiaPortalV21",
+    "authority": "/projects/P/devices/PLC_1/items/PLC_1/plc/PLC_1",
+    "ownerId": "/projects/P/devices/PLC_1/items/PLC_1",
+    "resourceKind": "cpuProtection",
+    "resourceId": "fullAccess"
+  },
+  "purpose": "cpuProtection",
+  "subjectId": "fullAccessPassword"
+}
+```
+
+Every change of the level sets this password again from the reference. V21 cannot
+read a CPU password back, so device compilation is the evidence that one is set.
+V21 exposes the CPU's `PlcAccessLevelProvider` only after an access-level mode is
+written, and refuses to set the level while UMAC runtime access is enabled on the
+device ("This operation cannot be performed because runtime access is enabled"); the
+change then fails after its checkpoint and needs `change_restore`. Every owned scratch
+CPU has runtime access enabled (its generated runtime user), so the CPU level is not
+natively qualified: its typed refusals passed natively, setting the level did not
+([record](../verification/cpu-protection-20261030.md)).
+
 **Prepare** names the slots. The preview lists each slot with its `vaultName`,
 reference and expected binding; no secret is read.
 
 **Apply.** The worker returns the same public slots when it opens the shared mutation
-lease. Before admission, the Host checks each slot: the purpose is one it routes, the
-reference's `bindingSha256` matches the binding, the record exists, is active and not
-pinned to an engineering operation, the store is free, and the secret is UTF-8. Under
-the vault lock it decrypts the secret and immediately seals it again with DPAPI
-CurrentUser. The entropy binds the lease token, change ID, preview hash, slot,
-credential ID and binding hash. The plaintext buffer is cleared at once. Only the
+lease. Before admission, the Host checks each slot: the purpose is one it routes
+(`blockProtection`, `cpuProtection`) and the binding names a TIA V21 resource of that
+purpose, the reference's `bindingSha256` matches the binding, the record exists, is
+active and not pinned to an engineering operation, the store is free, and the secret
+is UTF-8. Under the vault lock it decrypts the secret and immediately seals it again
+with DPAPI CurrentUser. The entropy binds the lease token, change ID, preview hash,
+slot, credential ID and binding hash, each prefixed with its length. The plaintext
+buffer is pinned, so the garbage collector cannot copy it, and cleared at once. Only the
 `mutation_dispatch` of that lease carries the sealed envelopes, over the Host-created
 current-user pipe whose peer process is verified. The worker opens each envelope into a
 read-only `SecureString` before the checkpoint and once more for the native call, and
 clears the envelopes when the dispatch returns. A new lease cannot open an old envelope.
+A begin reply that names slots without a lease token is refused; the Host cannot end
+a lease without its token, and `tia_detach` releases it.
 
 | Refusal | When | State |
 | --- | --- | --- |
@@ -257,7 +290,7 @@ clears the envelopes when the dispatch returns. A new lease cannot open an old e
 | `CredentialAdmissionRequired` | Reference pinned by an engineering operation | Before admission |
 | `CredentialStoreBusy` | Another holder keeps the vault lock past the bounded wait | Before admission |
 | `CredentialFormatInvalid` | Secret is not 1 to 4,096 bytes of strict UTF-8 | Before admission |
-| `CredentialRouteInvalid` | Malformed or duplicate slots, slots in more than one vault, a purpose the Host does not route, or slots on an operation other than `change_apply` | Before admission |
+| `CredentialRouteInvalid` | Malformed or duplicate slots, slots in more than one vault, a purpose the Host does not route, a binding whose provider or resource kind does not match its purpose, or slots on an operation other than `change_apply` | Before admission |
 | `CredentialRequired` | The worker received no envelope for a slot | Before the checkpoint |
 | `CredentialPolicyViolation` | TIA's password policy refuses the password (V21: 8 to 120 characters with a digit, a special character, upper and lower case) | In the native call, after the checkpoint; the change is `recovery_required` and the block unchanged |
 
@@ -265,7 +298,8 @@ A refusal before admission leaves no admission record, and the change stays `pre
 TIA checks its password policy only in the native call, so create credentials that meet it.
 A correctly bound credential holding the wrong password also fails only there, as
 `EngineeringError` ("The password used was rejected"), with the block unchanged.
-Natively qualified on an owned scratch CPU (`local.block_protection.20261030`,
+Block protection is natively qualified on an owned scratch CPU (`local.block_protection.20261030`,
+rerun on the hardened route as `local.block_protection.rerun.20261030`,
 [record](../verification/block-protection-20261030.md)).
 
 **What is retained.** Preview, change journal, admission record and responses hold only
@@ -280,9 +314,15 @@ a lost reply cannot replay the native call.
 
 **Limits.** Like the vault, the route does not defend against the Windows account owner
 or an administrator. Retiring a credential after the lease opened does not recall the
-envelope already sealed for that one apply. The CPU protection level's full-access
-password can use the same route: the worker names a `cpuProtection` slot for the
-exact CPU and the Host adds that purpose to the ones it routes. That is not implemented.
+envelope already sealed for that one apply.
+
+A binding names the target and the protection, not the change kind: a credential that
+protects a block also unprotects it, as its password does in TIA itself. A protect-only
+grant would need a second, kind-specific binding that the worker offers next to the
+general one, and naming the kind in the existing binding would change every binding
+hash and invalidate existing credentials, so it is not built (decision of 30 October).
+The seal binds the exact prepared change, whose preview hash covers its kind and
+payload, so one sealed envelope never serves another change.
 
 The Host uses Microsoft's
 [System.Security.Cryptography.ProtectedData 10.0.14](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/10.0.14).

@@ -66,7 +66,9 @@ Recorded boundaries:
   (no protection) is set, the password for full access (no protection) must be set." This route never
   accepts passwords (as for block protection, no Host-to-worker credential route exists), so changing the
   protection level stays out of reach; the change is restored from its checkpoint. `Disabled` and numeric
-  values are refused before any native call.
+  values are refused before any native call. Update 30 October: the credential route now carries the
+  full-access password, but V21 refuses the level while UMAC runtime access is enabled, as on every owned
+  scratch CPU ([record](cpu-protection-20261030.md)).
 - **HMI compilation.** A TP700 Comfort and an MTP700 Unified Basic created through `hardware_add` compile
   on their exact targets, and TIA's errors return as `CompileFailed` ("A start screen has not been
   configured"; the Unified panel also reports its unset runtime password); both restore from their
