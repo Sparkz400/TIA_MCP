@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from jsonschema import Draft202012Validator
 from smoke_mcp import Client, ROOT
+from test_product_version import product_version
 
 OUTPUT_CONTRACTS = ['automationml-workflow.v1', 'graph-workflow.v1', 'opc-ua-workflow.v1', 'project-review-import.v1', 'vci-workspace.v1']
 PROMPT_ARGUMENTS = {'safe_change': {'goal': 'rename tag Start to StartButton'}, 'project_health': {},
@@ -60,7 +61,9 @@ def main():
     client, initialized = start()
     try:
         info = initialized['serverInfo']
-        check(info['version'] == catalog['catalogVersion'] and info['title'] == 'TIA MCP', 'Server reports the bundled catalog version, never an unearned 1.0')
+        check(info['version'] == product_version() and info['title'] == 'TIA MCP', 'Server reports the product version from Directory.Build.props')
+        check(initialized['capabilities']['experimental']['tiaMcp/featureCatalog'] == {'version': catalog['catalogVersion']},
+              'Server advertises the bundled catalog version as the data contract version')
         tools = {tool['name']: tool for tool in client.request('tools/list')['tools']}
         default_count = len(tools)
         titles = [tool.get('title') for tool in tools.values()]

@@ -7,6 +7,12 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 30 October 2026
 
+**Credential route follow-ups and the CPU protection level — 30 October 2026:** ([record](../verification/cpu-protection-20261030.md))
+- **Hardening:** the low findings of the #155 review are addressed: worker-side offline tests, length-prefixed seal entropy, pinned plaintext buffers; a tokenless begin reply stays refused and bindings keep not naming the change kind (both documented). Block protection passed natively again (`local.block_protection.rerun.20261030`).
+- **CPU protection level:** `hardware_cpu_parameters` takes `protectionLevel` with the full-access password through the credential route, and all 10 typed refusals passed natively; V21 then refuses the level itself while UMAC runtime access is enabled, which every owned scratch CPU needs for PLCSIM downloads. Recorded as a boundary; not qualified.
+
+**Release mechanics — 30 October 2026:** one product version, 0.9.0, set in `Directory.Build.props` for every assembly, the bundle name and its manifest; `serverInfo.version` reports it and the catalog version moved to `capabilities.experimental["tiaMcp/featureCatalog"]`. `CHANGELOG.md`, a `v*`-tag release workflow that only drafts a pre-release with the verified bundle, a supported-versions statement in `SECURITY.md` and [releasing](../guides/releasing.md) steps.
+
 **Integration — 30 October 2026:** OB40 and the drive probe (#154), live monitoring (#156) and default-on combined library apply (#153) landed together with the block-protection route (#155). Catalog 0.4.82: 422 of 462 features verified; matrix 1,928 bound, 141 open, 31 blocked, 30 deferred. The per-entry catalog numbers below are those of each branch.
 
 **Block-protection credential route — 30 October 2026:** ([record](../verification/block-protection-20261030.md))

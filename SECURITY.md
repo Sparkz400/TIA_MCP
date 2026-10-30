@@ -12,11 +12,22 @@ maintainers for a private reporting channel without disclosing the vulnerability
 or exploit details. No dedicated security email or response-time guarantee is
 currently published.
 
-## Supported scope
+## Supported versions
 
-This project is under active development and has no published LTS support policy.
-Reports against the latest development revision are preferred; include the exact
-commit or package manifest so maintainers can identify the affected code.
+TIA MCP is pre-1.0. Only the latest `main` revision and the newest release are
+supported; fixes land on `main` and ship in the next release, never as backports
+to older 0.x releases. There is no LTS policy.
+
+| Version | Supported |
+| --- | --- |
+| `main` and the newest 0.x release | Yes |
+| Older 0.x releases | No |
+
+Check that the issue reproduces on current `main`, and include the exact commit
+or the bundle's `manifest.json` (`productVersion` and its SHA-256) so maintainers
+can identify the affected code.
+
+## Supported scope
 
 Relevant boundaries include MCP input validation, named-pipe and SSH access,
 artifact and library paths, project checkpoints, credential handling and owned
@@ -25,7 +36,7 @@ passing offline CI is not evidence that an engineering change is safe to deploy.
 
 ## Handling sensitive material
 
-Use an appropriate protected store for credentials. The [local credential commands](docs/reference/protected-credentials.md) provide current-user DPAPI storage with exact public context and restricted ACLs; native consumers and cross-user recovery remain unqualified. Do not put secrets in MCP arguments, public binding selectors, logs or plaintext configuration.
+Use an appropriate protected store for credentials. The [local credential commands](docs/reference/protected-credentials.md) provide current-user DPAPI storage with exact public context and restricted ACLs. The only native consumer is the [block-protection change route](docs/reference/protected-credentials.md#change-apply-credential-route), qualified on an owned scratch project; cross-user recovery remains unqualified. Do not put secrets in MCP arguments, public binding selectors, logs or plaintext configuration.
 Ignored files are not encrypted, and ignore rules do not remove previously
 committed content. If a credential is exposed, revoke or rotate it first.
 

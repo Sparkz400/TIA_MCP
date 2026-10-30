@@ -87,6 +87,8 @@ def run(bundle, configuration, archive, output, git_executable):
             capabilities={'extensions': {'io.modelcontextprotocol/ui': {'mimeTypes': ['text/html;profile=mcp-app']}}},
             clientInfo=dict(name='offline-bundle', version='1')))
         assert 'native workers disabled' in initialized['instructions']
+        manifest = json.loads((bundle / 'manifest.json').read_text(encoding='utf-8-sig'))
+        assert initialized['serverInfo']['version'] == manifest['productVersion'], 'Packaged Host and manifest name different product versions'
         client.notify('notifications/initialized')
         names = {row['name'] for row in client.request('tools/list')['tools']}
         assert not any(name.startswith('qualification_') for name in names)

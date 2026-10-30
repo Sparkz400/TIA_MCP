@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,8 +23,12 @@ internal static class ToolSurface
     /// <summary>Runs after the SDK collected the registered primitives.</summary>
     internal static void Apply(McpServerOptions server, HostOptions options)
     {
-        // Until 1.0 picks a product version, the bundled catalog version identifies what this build advertises.
-        server.ServerInfo = new Implementation { Name = "TiaMcp.Host", Title = "TIA MCP", Version = FeatureCatalog.LoadBundled().Version };
+        // Product version from Directory.Build.props; the catalog version stays visible as the data contract version.
+        server.ServerInfo = new Implementation { Name = "TiaMcp.Host", Title = "TIA MCP",
+            Version = typeof(ToolSurface).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!.InformationalVersion };
+        server.Capabilities ??= new ServerCapabilities();
+        (server.Capabilities.Experimental ??= new Dictionary<string, object>())["tiaMcp/featureCatalog"] =
+            new JsonObject { ["version"] = FeatureCatalog.LoadBundled().Version };
         var schemas = OutputSchemas();
         var tools = server.ToolCollection!;
         foreach (var tool in tools.ToArray())

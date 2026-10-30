@@ -5,10 +5,11 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: explorer-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   explorer:

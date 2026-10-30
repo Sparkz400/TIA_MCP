@@ -24,7 +24,7 @@ namespace TiaMcp.AddIn
     internal static class SelectionHandoff
     {
         internal const int MaximumReferences = 64;
-        private const string ProductId = "TiaMcp.AddIn.V21", Version = "0.1.0";
+        private const string ProductId = "TiaMcp.AddIn.V21", Version = "0.9.0"; // Directory.Build.props <Version>
         private const long DiscoveryLimit = 64 << 10, ReviewLimit = 64 << 20, ResponseLimit = 2 << 20;
 
         internal static string Send(IEnumerable<IEngineeringObject> selected)
