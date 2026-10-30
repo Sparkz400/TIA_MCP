@@ -108,6 +108,7 @@ Earlier ledgers:
 Records no other page links to:
 
 - Typed LAD/FBD runs: [route profiles](verification/typed-lad-fbd-route-profiles-20261025.md), [routes](verification/typed-lad-fbd-routes-20261025.md), [created multi-instance runtime](verification/typed-lad-fbd-route-runtime-createmulti-20261026.md), wave 9 batches [w9q](verification/typed-lad-fbd-w9q-20261028.md), [w9q4](verification/typed-lad-fbd-w9q4-20261028.md), [w9q5](verification/typed-lad-fbd-w9q5-20261028.md), cross-scope [xsqo](verification/typed-lad-fbd-xsqo-20261028.md); [typed resolution](verification/typed-resolution-20261012.md), [resolution p15](verification/typed-resolution-p15-qualification.md), [captured component storage p15](verification/component-captured-storage-p15.md)
+- Security: [pre-release security review](verification/security-review-20261030.md)
 - Runtime and startup: [first native startup](verification/first-native-startup-20261023.md), [long-soak wave 3](verification/runtime-long-wave3-20261020.md), [UA before/after comparison](verification/ua-comparison-20261025.md)
 - Other: [explorer relationship scope](verification/project-explorer-relationship-native-20261024.md), [RT Professional attempt](verification/hmi-rt-professional-20261025.md), [publication review](verification/publication-review-20261023.md), [parallel offline continuation](verification/parallel-resume-20261016.md), [translation Host workflow](verification/translation-host-workflow-20261016.md)
 
