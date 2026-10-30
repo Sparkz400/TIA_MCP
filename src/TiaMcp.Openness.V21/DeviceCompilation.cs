@@ -109,11 +109,14 @@ namespace TiaMcp.Openness.V21
             var entries = Entries(project);
             if (expectedTargets != null) RequireTargets(entries, expectedTargets);
             if (entries.Count == 0) throw new BridgeException("UnsupportedCapability", "No project device compiler target exists.");
-            // Resolve every service before the first compiler can change project state.
-            var selected = entries.Select(entry => new { Entry = entry, Compiler = entry.Item.GetService<ICompilable>()
-                ?? throw new BridgeException("UnsupportedCapability", "Device compiler unavailable: " + entry.Path) }).ToList();
+            // Resolve every service before the first compiler can change project state. A device without one (a Startdrive
+            // SINAMICS G120C PN, observed 28 October 2026) is listed under notCompiled, never counted as compiled.
+            var selected = entries.Select(entry => new { Entry = entry, Compiler = entry.Item.GetService<ICompilable>() }).ToList();
+            var skipped = new JArray(selected.Where(target => target.Compiler == null).Select(target => new JObject { ["target"] = target.Entry.Item.Name,
+                ["targetPath"] = target.Entry.Path, ["reason"] = "The device exposes no compiler service (Device.GetService<ICompilable>() is null)." }));
+            if (skipped.Count == selected.Count) throw new BridgeException("UnsupportedCapability", "No project device exposes a compiler service.");
             var targets = new JArray(); int errors = 0, warnings = 0;
-            foreach (var target in selected)
+            foreach (var target in selected.Where(target => target.Compiler != null))
             {
                 journal?.Invoke(target.Entry.Path, "dispatching");
                 var compiled = target.Compiler.Compile();
@@ -126,9 +129,9 @@ namespace TiaMcp.Openness.V21
             var after = Entries(project).ToDictionary(entry => entry.Path, entry => entry.Item, StringComparer.Ordinal);
             if (after.Count != entries.Count || entries.Any(entry => !after.TryGetValue(entry.Path, out var item) || !Equals(item, entry.Item)))
                 throw new BridgeException("CompileScopeChanged", "Device identities changed during compilation; coverage is unqualified.");
-            return new JObject { ["errorCount"] = errors, ["warningCount"] = warnings, ["targets"] = targets,
+            return new JObject { ["errorCount"] = errors, ["warningCount"] = warnings, ["targets"] = targets, ["notCompiled"] = skipped,
                 ["requiredTargets"] = new JArray(entries.Select(entry => entry.Path)), ["targetIdentityPolicy"] = "device-path-v1",
-                ["scope"] = "All devices of the explicitly selected affected project.", ["scopeComplete"] = true };
+                ["scope"] = "All devices of the explicitly selected affected project; requiredTargets lists every device, each either compiled under targets or listed under notCompiled.", ["scopeComplete"] = true };
         }
     }
 }

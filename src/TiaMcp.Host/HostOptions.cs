@@ -14,8 +14,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     // Selected --toolsets groups; null advertises every tool.
     public IReadOnlySet<string>? Toolsets { get; init; }
     public bool AddInHandoff { get; init; }
-    // Opt-in production combined PLC library_integrate apply; off keeps every recipe plan-only.
-    public bool LibraryIntegrateApply { get; init; }
+    // Combined PLC library_integrate apply of the verified shapes runs on every Host (decision of 29 October 2026).
+    public bool LibraryIntegrateApply { get; init; } = true;
     internal TiaMcp.Core.AddIns.AddInEnrollment? AddInEnrollment { get; init; }
     // Deliberately excluded from normal feature/catalog advertisements.
     public bool ComponentQualification { get; init; }
@@ -43,7 +43,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var timeout = 120;
         var diagnose = false;
         var addInHandoff = false;
-        var libraryIntegrateApply = false;
+        var libraryIntegrateApply = true;
         TiaMcp.Core.AddIns.AddInEnrollment? addInEnrollment = null;
 #if OFFLINE_PACKAGE
         var noNativeWorkers = true;
@@ -64,7 +64,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             var option = args[i];
             if (option == "--no-native-workers") { noNativeWorkers = true; continue; }
             if (option == "--addin-handoff") { addInHandoff = true; continue; }
-            if (option == "--enable-library-integrate-apply") { libraryIntegrateApply = true; continue; }
+            if (option == "--enable-library-integrate-apply") { libraryIntegrateApply = true; continue; } // the default; kept for existing launch configurations
             if (option == "--diagnose") { diagnose = true; continue; }
             if (option == "--component-qualification") { componentQualification = true; continue; }
             if (option == "--testsuite-scope-probe") { testSuiteScopeProbe = true; continue; }

@@ -2063,6 +2063,12 @@
       ]
     },
     {
+      "featureId": "watch_table_monitor",
+      "obligations": [
+        "D02"
+      ]
+    },
+    {
       "featureId": "watch_table_prepare",
       "obligations": [
         "D02"

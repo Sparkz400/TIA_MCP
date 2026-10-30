@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.81",
+  "catalogVersion": "0.4.82",
   "targetTiaVersions": [
     21
   ],
@@ -3051,6 +3051,59 @@
       ]
     },
     {
+      "id": "local.watch.monitor.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "01bbf2b31e61242d9e27725d2b9ead90c04c7c03",
+        "passedScope": "scripts/qualify_watch_monitor.py on a frozen Debug build of 01bbf2b3 (artifacts/lm2, git archive), 23/23 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus. Fixture: an owned scratch CPU 1511-1 PN V4.1 with simulation support whose Main calls \"TiaMcp_EnableGate_DB\"(Enable := TRUE); the qualification-only watch fixture seed imports MilestoneWatch with two Bool rows, \"TiaMcp_EnableGate_DB\".Active and .Enable (Host flags --component-qualification --watch-qualification none). After simulation_download, the generated-state save and simulation_provision_scratch_credential, the instance runs. watch_table_monitor (3 samples, 200 ms apart) resolves both rows to the tag-list symbols an independent sim_tags lookup finds (TiaMcp_EnableGate_DB.Active/.Enable, unquoted, DataType Bool) and every sample equals an independent sim_read (TRUE, TRUE), in RUN and again in STOP. Paging (count 1) reports nextOffset 1 then null; the PLC's force table (Force table, 0 rows) is monitored with kind force; watch_table_read afterwards returns the unchanged table hash and rows. Refusals: InvalidRequest (count 0), SimulationOwnershipUnverified (foreign creationId), SimulationTargetMismatch (foreign instance name), WatchTableNotFound (unknown table), SimulationNotSelected (released instance). An earlier attempt (artifacts/q/lm/wm_80d37ed9, frozen 9bcf5dbe) stopped at power-on with SimulationConfigurationPasswordRequired because the runner skipped credential provisioning; no monitor call ran and it is not part of this record."
+      },
+      "artifacts": [
+        "evidence/local.watch.monitor.20261030.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus; one watch table with two Bool rows of one optimized instance DB, seeded through the qualification-only fixture seed. The force table has no rows, so no force-table value is read.",
+        "Both members read TRUE throughout because Main assigns Enable := TRUE every cycle; a value change during monitoring is not exercised. Reads within a sample are sequential PLCSIM API reads, not scan-consistent; the instance's program is not compared with the project.",
+        "Absolute-address rows, comment rows, unsupported types, ambiguous or missing symbols and non-Bool types are covered by offline checks only. Nothing is modified or forced: no public force route exists (docs/plans/live-monitoring-forcing-plan.md)."
+      ]
+    },
+    {
+      "id": "local.plcsim_gaps.ob40.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "807a189179dc0ae5e0753ed250e62949bd40b019",
+        "passedScope": "scripts/qualify_plcsim_gaps.py on a frozen Debug build of 807a189 (artifacts/ob2), 91/91 steps, on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1. change.hardware_channel_attributes enabled the rising-edge hardware interrupt of DI 16x24VDC HF V1.0 submodule channel 0 (HardwareInterruptRisingEdgeActive true) and linked it to the hardware interrupt OB GapHardwareInterrupt (OB40) by name, device-compiled with configured-hardware preservation; refusals for a diagnostic OB, a missing block, a non-string link and enabling without the link. After download PLCSIM listed one configured process event (Rising edge0, channel 0, RisingEdge) and sim_event hardwareInterrupt on it raised OB40 exactly once; a rising edge written to a PLC tag on %I0.0 with sim_write did not raise OB40. Channel 1: enabled and linked, disabling with a link refused, disabled (V21 undeclares the link), and the disabling change restored from its checkpoint (configured_hardware_recovery_verified) to the enabled state. The rest of the PLCSIM gaps run (online download, virtual time, OB82/OB83/OB86, memory reset, storage) passed unchanged."
+      },
+      "artifacts": [
+        "evidence/local.plcsim_gaps.ob40.20261030.json"
+      ],
+      "limitations": [
+        "One DI 16x24VDC HF V1.0 central module, channels 0 and 1, rising edge only; falling edges, priorities, other modules and remote or shared-device modules are not exercised.",
+        "OB40 runs on PLCSIM's ProcessEvent for the configured event; a rising edge written to the input tag through sim_write does not raise it.",
+        "One owned PLCSIM Advanced V8 instance on Softbus; simulated runtime, not physical I/O."
+      ]
+    },
+    {
+      "id": "local.drives.probe.20261030",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "807a189179dc0ae5e0753ed250e62949bd40b019",
+        "passedScope": "scripts/qualify_drives.py on a frozen Debug build of 807a189 (artifacts/ob2), 11 steps, in an owned scratch CPU 1511-1 PN V4.1 with an added SINAMICS G120C PN (6SL3210-1KE21-3AF1 V4.7.14). project_compile with save compiled the PLC station with zero errors and listed the drive under notCompiled (no device compiler service). drive_observe before and after that compile and save returned the drive with no drive objects: Startdrive answers DriveObject.DriveObjectNumber with EngineeringTargetInvocationException \"Drive object number could not be retrieved\". drive_parameter_set and drive_telegram_set refuse at preparation with EngineeringError carrying that message."
+      },
+      "artifacts": [
+        "evidence/local.drives.probe.20261030.json"
+      ],
+      "limitations": [
+        "Boundary record: it qualifies no drive kind. The drive is unassigned to the CPU's IO system and not configured in Startdrive's commissioning UI.",
+        "Offline engineering only; no online values, upload, download or RAM-to-ROM."
+      ]
+    },
+    {
       "id": "local.block_protection.20261030",
       "status": "passed",
       "profile": {
@@ -5681,7 +5734,7 @@
         "limitations": [
           "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_gaps.20261029); other CPUs, firmware and TCP/IP instances are not qualified.",
           "OB82 (diagnosticAlarm), OB83 (pull and plug) on a central DI 16x24VDC HF and OB86 (station fault and return) on an ET 200SP IO device each raised only their own counter. Hardware IDs come from the PLC's system constants.",
-          "OB40 is a V21 boundary: V21 Openness exposes no channels and no hardware-interrupt attribute on the DI module, so no hardware interrupt can be configured; PLCSIM answers ProcessEvent with NotSupportedByModule (-55) and OB40 does not run. statusEvent on the central module is answered NotSupportedByModule as well (OB55 serves distributed modules).",
+          "OB40 is verified with a hardware interrupt configured through change.hardware_channel_attributes on DI 16x24VDC HF V1.0 channel 0 (local.plcsim_gaps.ob40.20261030): PLCSIM lists the configured process event and ProcessEvent on it raises OB40 once. A rising edge written to the input tag with sim_write does not raise OB40. statusEvent on the central module is answered NotSupportedByModule (OB55 serves distributed modules).",
           "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
           "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
         ]
@@ -5689,7 +5742,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_gaps.20261029"
+          "local.plcsim_gaps.20261029",
+          "local.plcsim_gaps.ob40.20261030"
         ]
       },
       "availability": {
@@ -10709,12 +10763,12 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified only for the PLC plc_component_plan route on a Host started with --enable-library-integrate-apply, in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.20261028); without the flag apply refuses with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
+          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
-          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs only on a Host started with --enable-library-integrate-apply and only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
+          "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs on every Host, only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
           "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentRecoveryAnchorUnavailable, ComponentMultiInstanceUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -10768,7 +10822,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.20261028).",
-          "Off by default. Only a Host started with --enable-library-integrate-apply executes a prepared PLC library_integrate plan in change_apply; other Hosts refuse it with PlcIntegrationNotQualified exactly as before. With the flag, the preview states eligibility in combinedApply.",
+          "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
           "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
           "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
@@ -10784,11 +10838,11 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires --enable-library-integrate-apply. Normal Hosts keep PLC library_integrate plan-only."
+          "Every Host applies the verified shapes; other PLC library_integrate shapes stay plan-only."
         ]
       },
       "prerequisites": [
-        "TIA V21, an authorized engineering session and a Host started with --enable-library-integrate-apply",
+        "TIA V21 and an authorized engineering session",
         "A prepared PLC library_integrate plan with preview.combinedApply.eligible=true",
         "checkpointSave, compile and save set to true"
       ],
@@ -12673,6 +12727,7 @@
         "status": "partial",
         "limitations": [
           "Reviewed channel settings in the allowlist; natively qualified are Smoothing (ET 200SP None/Weak/Medium/Strong) on the AI 4xU/I 2-wire ST V2.0 and OperatingMode MotionControl on a TM PosInput 2 V2.0 (local.composite_rebind.20261028). TIA applies OperatingMode to every channel of the module and resizes its address ranges, which preservation accepts for the selected item only (same start addresses), and may renumber the submodule's hardware identifier. Other allowlisted names are module-specific and unqualified.",
+          "The rising-edge hardware interrupt of a digital input channel is qualified on DI 16x24VDC HF V1.0 (local.plcsim_gaps.ob40.20261030): HardwareInterruptRisingEdgeActive with HardwareInterruptRisingEdgeInterrupt, the exact name of a hardware interrupt OB of the one PLC in the module's own device (manifest records the OB by name). V21 declares the link only while the flag is on, so enabling requires the link in the same request and disabling must omit it; a diagnostic OB, a non-string link, a missing block or enabling without the link refuse typed. Falling edges, priorities, remote and shared-device modules are not covered.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
@@ -12684,7 +12739,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.composite_rebind.20261028",
-          "local.remote-io.full-route.rerun.20261028"
+          "local.remote-io.full-route.rerun.20261028",
+          "local.plcsim_gaps.ob40.20261030"
         ]
       },
       "availability": {
@@ -13613,6 +13669,51 @@
       ]
     },
     {
+      "featureId": "watch_table_monitor",
+      "domain": "watch_tables",
+      "title": "Monitor watch or force table rows on an owned PLCSIM instance",
+      "mcpTools": [
+        "watch_table_monitor"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Composes the V21 watch/force table export (watch_table_read) with the PLCSIM Advanced V8 tag list and typed symbolic reads. V21 Openness has no online monitor or force API for watch tables."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Read only, PLCSIM Advanced instances this Host created or adopted only. Rows resolve by symbol against the instance's own tag list; comment rows, absolute-address-only rows, symbols missing or ambiguous in the tag list and types without a typed PLCSIM read (Struct, Char, WChar, ...) are reported, not read.",
+          "1..64 rows per page, 1..20 samples 100..5000 ms apart; the reads of one sample are sequential, not scan-consistent. MonitorTrigger is not honoured; TIA must be offline for the table read. No physical PLC, Web API or OPC UA route, and the instance's program is not compared with the project.",
+          "Forcing is not provided: V21 Openness, the PLCSIM Advanced V8 Runtime API, the S7-1500 Web API and OPC UA expose no force route (docs/plans/live-monitoring-forcing-plan.md). Stored ModifyValue, ForceValue and ForceIntention are never applied."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.watch.monitor.20261030"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog registration is not target authorization; an owned PLCSIM instance with a loaded program is required."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 authorized user and exact offline target for the table read",
+        "PLCSIM Advanced V8 API, an instance this Host created or adopted, and its loaded program"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-runtime",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "watch_table_prepare",
       "domain": "watch_tables",
       "title": "Prepare one reviewed offline watch literal edit",
@@ -13691,7 +13792,8 @@
           "Force-table create, rename and delete are not offered (no V21 API). The planner-backed watch_table_prepare_authoring route stays watch-only: it materializes FB-instance watch rows with ModifyValue, which do not fit force rows.",
           "Access rules are exposed only through the DeviceItem service Siemens.Engineering.HW.Features.WatchAndForceTableAccessManager (ForcetableAccessRules, ForceTableAccessRuleComposition.Create/Find, ForceTableAccessRule.Access/Delete), not on PlcForceTable. They are hardware web/display configuration, are not edited here and stay in the peer manifest, so an import that drops a rule fails preservation.",
           "Worker-owned saved offline scratch only. Production Hosts dispatch the natively qualified force edits; reorder and the Name field stay with the isolated qualification harness, like the other expanded document edits.",
-          "Native (29 October 2026, local.watch.force-edits.20261029): on rows an operator authored in the TIA editor, the ForceValue, Address and DisplayFormat field edits, comment, clone and delete pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore. Reorder is refused at readback, because TIA renumbers the rows' document IDs, and is recovered. The Name field is not exercised. watch_table_reconcile_interrupted is qualified on watch tables (local.watch.native.20261028), not on a force table."
+          "Native (29 October 2026, local.watch.force-edits.20261029): on rows an operator authored in the TIA editor, the ForceValue, Address and DisplayFormat field edits, comment, clone and delete pass with checkpoint, readback, unchanged peers, fresh reopen and checkpoint restore. Reorder is refused at readback, because TIA renumbers the rows' document IDs, and is recovered. The Name field is not exercised. watch_table_reconcile_interrupted is qualified on watch tables (local.watch.native.20261028), not on a force table.",
+          "Edits the force table document only; it never forces. V21 Openness, the PLCSIM Advanced V8 Runtime API, the S7-1500 Web API and OPC UA expose no force route (docs/plans/live-monitoring-forcing-plan.md); forcing stays a TIA Portal UI action."
         ]
       },
       "qualification": {
@@ -20924,7 +21026,8 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
           "Qualified on the scratch station (CPU 1511-1 PN): zero errors, no mutation stage, unchanged blocks, types and tag tables, and refusals for a missing device and compile=false.",
-          "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state."
+          "Payload devicePath only; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Compilation may change generated state.",
+          "A selected device without a compiler service (for example a Startdrive drive) is refused with UnsupportedCapability."
         ]
       },
       "qualification": {
@@ -20973,13 +21076,14 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 in TIA Portal V21 (local.engineering_gaps.20261029); other CPU families, firmware, F-CPUs and software units are not qualified.",
           "Qualified on a one-station project. A project whose devices do not all compile (for example an HMI panel without a start screen) fails with CompileFailed and needs checkpoint recovery.",
-          "Empty payload; compile=true. Every device needs a compiler service and the inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
+          "Empty payload; compile=true. Every device with a compiler service is compiled; a device without one (a Startdrive G120C PN, local.drives.probe.20261030) is listed under notCompiled with its path and never counted as compiled, and the compile refuses when no device has a compiler service. The inventory must equal the preview at dispatch. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.engineering_gaps.20261029"
+          "local.engineering_gaps.20261029",
+          "local.drives.probe.20261030"
         ]
       },
       "availability": {
@@ -24299,8 +24403,8 @@
           "One exact hardwarePath and driveObjectNumber; 1..200 exact parameter names, each with the expected current value exactly as drive_observe reports it. Prepare and apply refuse any difference before the first write; the requested values are also part of the change fingerprint.",
           "Scalar values only, converted to the current native CLR type; BICO interconnections, unavailable values, Safety Integrated parameters (p9300..p10999) and commissioning/reset/save/motor-identification parameters (p0009, p0010, p0970-p0972, p0976, p0977, p1900, p1910, p1960, p3900) are refused.",
           "Openness exposes no per-parameter write access: a read-only or rejected value fails at the native setter after earlier writes and requires checkpoint recovery. Startdrive may recalculate dependent parameters; readback covers only the listed parameters, so compare drive_observe snapshots with drive_profile_review.",
-          "compile=true compiles all project devices; no online write, download or RAM-to-ROM.",
-          "Native observation (28 October 2026): a SINAMICS G120C PN added to an owned scratch exposes no device-level ICompilable, and the worker's device compile requires one on every device, so every device-compiled change, including this kind, refuses with UnsupportedCapability (\"Device compiler unavailable\") in a project that holds a drive. Qualifying this kind needs a reviewed compile route for Startdrive drives."
+          "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled. No online write, download or RAM-to-ROM.",
+          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): a SINAMICS G120C PN exposes no device-level ICompilable; the device compile now compiles every other device and lists the drive under notCompiled, so device-compiled changes run in a project that holds a drive. Startdrive still cannot read DriveObject.DriveObjectNumber of a new drive, before or after compile and save (\"Drive object number could not be retrieved\"), so this kind refuses at preparation with EngineeringError. Qualifying it needs a Startdrive-configured drive fixture."
         ]
       },
       "qualification": {
@@ -24353,8 +24457,8 @@
           "Operations: change the TelegramNumber of the only MainTelegram or SupplementaryTelegram; insert a SupplementaryTelegram (telegramNumber) or an AdditionalTelegram (inputSize/outputSize in native Telegram.GetSize units, read back through GetSize) when none of that type exists; erase the only SupplementaryTelegram or AdditionalTelegram. Startdrive's CanChangeTelegram/CanInsert* must agree; Openness has no erase check. Safety telegrams are refused as a safety boundary; torque/edge telegrams, main-telegram insert/erase, ChangeSize and PKW are not supported.",
           "Startdrive assigns addresses only during the write, so the preview shows the current rows and the request. Apply reads back every telegram row, reports the address shift, and fails after the write (checkpoint recovery) on a collateral telegram type/number change or an I/O overlap. Overlaps that already exist refuse at prepare.",
           "Overlap check: same-IoType byte ranges against every configured project address; ranges sharing an address controller, or with unresolved controllers, conflict. Matching a telegram range to its own device-item range uses native object equality or equal parent/type/start/length, which is unqualified.",
-          "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles all project devices). No online write, download or RAM-to-ROM.",
-          "Native observation (28 October 2026): a SINAMICS G120C PN added to an owned scratch exposes no device-level ICompilable, and the worker's device compile requires one on every device, so every device-compiled change, including this kind, refuses with UnsupportedCapability (\"Device compiler unavailable\") in a project that holds a drive. Qualifying this kind needs a reviewed compile route for Startdrive drives."
+          "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled). No online write, download or RAM-to-ROM.",
+          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): a SINAMICS G120C PN exposes no device-level ICompilable; the device compile now compiles every other device and lists the drive under notCompiled, so device-compiled changes run in a project that holds a drive. Startdrive still cannot read DriveObject.DriveObjectNumber of a new drive, before or after compile and save (\"Drive object number could not be retrieved\"), so this kind refuses at preparation with EngineeringError. Qualifying it needs a Startdrive-configured drive fixture."
         ]
       },
       "qualification": {
@@ -24406,7 +24510,7 @@
           "Telegram addresses use the repository's hardware Address convention (start byte, length in bits); PLC ownership, PKW and hardware identifiers are not resolved.",
           "maxItems bounds all rows; parameters page per drive object with parameterOffset/nextParameterOffset and a 50,000-parameter scan bound. Motor/encoder configuration is read only for caller-supplied dataset/encoder numbers because their index ranges are undocumented; side-effect freedom of GetCurrent*Configuration is not natively verified.",
           "No online values, upload, download, RAM-to-ROM, activation, safety or motion.",
-          "Native observation (28 October 2026): on a SINAMICS G120C PN newly added to an owned scratch (no compile, unsaved), Startdrive Openness cannot read DriveObject.DriveObjectNumber (\"could not be retrieved\"); drive_observe reports it as a warning with scopeComplete false and no drive objects. Qualifying it needs a Startdrive-configured drive fixture."
+          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): on a SINAMICS G120C PN newly added to an owned scratch, Startdrive Openness cannot read DriveObject.DriveObjectNumber (\"could not be retrieved\"), neither before nor after a project_compile with save; drive_observe reports it as a warning with scopeComplete false and no drive objects. Qualifying it needs a Startdrive-configured drive fixture."
         ]
       },
       "qualification": {

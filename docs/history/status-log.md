@@ -7,10 +7,22 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
 ## 30 October 2026
 
+**Integration — 30 October 2026:** OB40 and the drive probe (#154), live monitoring (#156) and default-on combined library apply (#153) landed together with the block-protection route (#155). Catalog 0.4.82: 422 of 462 features verified; matrix 1,928 bound, 141 open, 31 blocked, 30 deferred. The per-entry catalog numbers below are those of each branch.
+
 **Block-protection credential route — 30 October 2026:** ([record](../verification/block-protection-20261030.md))
 - **Route:** at admission the Host checks a block-protection credential slot (purpose, binding hash, active record, vault turn), decrypts the secret under the vault lock and re-seals it with DPAPI to that one apply's lease, change, preview hash, slot and binding; only that lease's dispatch carries it, the worker opens it into a read-only SecureString and clears it after the call. Checkpoints hold TIA's own archive, never a secret.
 - **Native:** 38/38 steps on build `b5fecd88` (`local.block_protection.20261030`): protect, unprotect, write protection define/enable/change/disable, three checkpoint restores, five pre-admission refusals with the block unchanged, a wrong password refused by TIA; none of the generated passwords appears in any run file, response or log. TIA's password policy is checked only in the native call and is now typed `CredentialPolicyViolation`.
 - **Catalog 0.4.81:** the three block-protection kinds are verified; 421 of 461 features verified; matrix 1,924 bound, 141 open, 31 blocked, 30 deferred.
+
+**OB40 and the drive compile probe — 30 October 2026:** ([record](../verification/plcsim-openness-gaps-20261029.md))
+- **OB40:** the recorded V21 boundary was wrong. The channels sit on the DI submodule, and V21 exposes the OB link only while the rising-edge interrupt is active, so enabling now takes the OB in the same request. Channel 0 linked to OB40, the device compile passed, PLCSIM listed the event and `sim_event` ran OB40 once; enable, disable and restore pass with typed refusals (91/91 steps, build `807a189`, `local.plcsim_gaps.ob40.20261030`). A rising edge written to the input tag does not raise the interrupt; only PLCSIM's injected event does.
+- **Drives:** the device compile now lists devices without a compile service (a G120C PN) as not compiled instead of refusing the whole compile, so device-compiled changes run in a project with a drive (`local.drives.probe.20261030`). The drive kinds stay blocked: Startdrive cannot read `DriveObject.DriveObjectNumber` of a drive added through Openness, even after compile and save.
+- **Catalog 0.4.80:** evidence and limitations only; no matrix count change.
+
+**Live monitoring; forcing has no public route — 30 October 2026:** ([plan and search record](../plans/live-monitoring-forcing-plan.md))
+- **Monitoring:** new read-only `watch_table_monitor` resolves a watch or force table's rows against an owned PLCSIM instance's tag list and samples them (1–20 samples, 1–64 rows per page); unreadable rows are reported, never read. Natively 23/23 on build `01bbf2b3` in RUN and STOP against independent `sim_tags`/`sim_read` reads, with paging, the force table and five refusals (`local.watch.monitor.20261030`).
+- **Forcing:** V21 Openness, the PLCSIM Advanced V8 API, the S7-1500 Web API and OPC UA expose only assignments, no force; forcing stays a TIA Portal UI action and is recorded as a boundary.
+- **Catalog 0.4.81:** 462 features (419 verified); matrix 1,910 bound, 159 open.
 
 ## 29 October 2026
 
@@ -20,6 +32,8 @@ and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 - **Runs:** candidates authored by `hmi_text_list_author` and `hmi_text_list_generate_set` import exactly through V21 `HmiTextListComposition.Import` on MTP700 Unified Comfort (en-US/de-DE) via the independent HmiSeeder (run `q/tl4`, 227 checks, build `47491ab`), with other HMI content unchanged, a byte-identical roundtrip, save/reopen, archive retrieval and checkpoint restore. Curated as `local.hmi.text-list-import.20261029`.
 - **Fix found natively:** V21 reports success but silently changes some content, so both tools now refuse it before publishing: `HmiTextListValueOutOfRange`, `HmiTextListBoolDefaultEntry`, `HmiTextListDefaultEntryValue`, `HmiTextListTextUnsupported`, `HmiTextListNameUnsupported` and `HmiTextListUnresolvedText`. Retained records still reopen.
 - **Catalog 0.4.79:** both text-list tools verified; 418 of 461 features verified; matrix 1,906 bound, 159 open, 31 blocked, 30 deferred. No production import route exists.
+
+**Combined library apply on by default — 29 October 2026:** every Host now executes a prepared PLC `library_integrate` recipe in `change_apply` for the natively verified shapes (`local.library_integrate.combined_apply.rerun.20261028`); `--enable-library-integrate-apply` is still accepted and changes nothing; unverified shapes keep refusing with `PlcIntegrationNotQualified`. Catalog 0.4.79; no matrix count change.
 
 **Maintainer decisions — 29 October 2026:** the block-protection credential route is 1.0 work, so its three rows count as open again (5 blocked rows remain, 31 cells); live monitoring and active forcing are 1.0 scope; combined library apply becomes the default for its verified PLC recipe shapes (left to the coordinator); the "Not a 1.0 gate" section is confirmed; VS Code alone closes the Explorer roundtrip. Catalog 0.4.78; matrix 1,896 bound, 169 open, 31 blocked, 30 deferred.
 

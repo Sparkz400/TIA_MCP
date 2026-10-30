@@ -80,7 +80,14 @@ nothing touched a user project, a PLC or PLCSIM.
   worker's device compile requires one on every device, so no device-compiled change (including the drive kinds) can
   run in a project that holds a drive. On the newly added drive, Startdrive Openness also cannot read the drive
   object number, so `drive_observe` returns no drive objects (reported as incomplete). The drive rows need a reviewed
-  compile route and a Startdrive-configured fixture.
+  compile route and a Startdrive-configured fixture. *Update 30 October:* the device compile now compiles every device
+  with a compiler service and lists the others under `notCompiled`, so device-compiled changes run in a project with a
+  drive. The drive still cannot be read after compile and save. `scripts/qualify_drives.py`
+  (`local.drives.probe.20261030`) added a G120C PN (6SL3210-1KE21-3AF1 V4.7.14), and a `project_compile` with save
+  compiled the PLC station and listed the drive as not compiled. Before and after that compile and save, Startdrive
+  answered `DriveObject.DriveObjectNumber` with "Drive object number could not be retrieved"
+  (`EngineeringTargetInvocationException`). `drive_parameter_set` and `drive_telegram_set` therefore refuse at
+  preparation with `EngineeringError`.
 - **Online routes cannot authenticate.** Against a downloaded, credential-provisioned owned PLCSIM Advanced instance,
   going online asks for authentication, because the scratch CPU must be access-protected to compile. The online
   routes (`plc_online_compare`, `plc_station_upload`, the DB-snapshot kinds) never log in by design and refuse with

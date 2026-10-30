@@ -72,7 +72,7 @@ internal static partial class Program
             ("Shared device hardware bounds stop before any compiler dispatch", DeviceCompilationTests.HardwareBounds),
             ("Shared compiler diagnostics retain errors and explicit count depth bounds", DeviceCompilationTests.DiagnosticBounds),
             ("Device compilers retain exact paths across duplicate display names", DeviceCompilationTests.ExactPaths),
-            ("Device compiler services preflight before any dispatch", DeviceCompilationTests.ServicesBeforeDispatch),
+            ("Device compiler services preflight before any dispatch; devices without one are listed as not compiled", DeviceCompilationTests.ServicesBeforeDispatch),
             ("Device compiler ambiguity and enumeration fail before dispatch", DeviceCompilationTests.AmbiguityAndEnumeration),
             ("Device compiler inventory bounds fail before dispatch", DeviceCompilationTests.Bounds),
             ("Device compiler scope drift cannot establish coverage", DeviceCompilationTests.ScopeDrift),

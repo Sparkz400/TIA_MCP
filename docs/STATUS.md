@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.81`: 461 features, 421 verified, 40 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 123 shipped, 298 limited, 25 unqualified, 5 unavailable on V21, 10 deferred |
-| Matrix cells | 1,924 bound, **141 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.82`: 462 features, 422 verified, 40 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 123 shipped, 299 limited, 25 unqualified, 5 unavailable on V21, 10 deferred |
+| Matrix cells | 1,928 bound, **141 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -24,12 +24,11 @@ names every row with an open cell.
   prerequisites and the licensed AX trace package (B04), a native trace route (B06),
   nonproduction Project Server, Teamcenter and UMC endpoints (B10), and installations and SDKs
   of other TIA versions (B11).
-- **Recorded V21 boundaries:** Startdrive drives expose no device compile service, the
+- **Recorded V21 boundaries:** no public API forces a value (only the TIA Portal UI does), Startdrive cannot read a drive object number added through Openness, the
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
-  TIA editor, V21 Openness cannot configure a DI module's hardware interrupt (OB40), and the
+  TIA editor, and the
   CPU protection level needs a full-access password no route accepts.
-- **In progress:** the OB40 and Startdrive device-compile probes, and live monitoring and active forcing.
 - **Rows blocked by decision:** five `unavailable_target` rows (31 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision

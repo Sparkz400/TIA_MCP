@@ -9,7 +9,7 @@ documented in [simulation](../guides/simulation.md) and [engineering workflows](
 | --- | --- | --- | --- |
 | 1. Download a changed program to an existing owned PLCSIM instance | `change.simulation_download_online` | Verified | `local.plcsim_gaps.20261029`, `local.plcsim_gaps.recovery.20261029` |
 | 2. Virtual time and time scaling | `sim_time`, `sim_test` `virtualTime` | Verified | `local.plcsim_gaps.20261029` |
-| 3. Interrupt and fault injection | `sim_event` | Verified for OB82, OB83 and OB86; OB40 is a V21 boundary | `local.plcsim_gaps.20261029` |
+| 3. Interrupt and fault injection | `sim_event` | Verified for OB82, OB83 and OB86; OB40 verified on 30 October with a channel hardware interrupt | `local.plcsim_gaps.20261029`, `local.plcsim_gaps.ob40.20261030` |
 | 4. Memory reset, storage archive/retrieve | `sim_state` `memoryReset`, `sim_storage` | Verified | `local.plcsim_gaps.20261029` |
 | 5. Typed CPU parameter edits | `change.hardware_cpu_parameters` | Verified; the protection level is a recorded boundary | `local.engineering_gaps.20261029` |
 | 6. Compile a device, the project or an HMI target | `change.device_compile`, `change.project_compile`, `change.hmi_compile` | Device and project compile verified; HMI compile unverified (no compilable HMI fixture through public routes) | `local.engineering_gaps.20261029` |
@@ -32,8 +32,8 @@ names and validated the PLCSIM fixture (interrupt OB XML, hardware IDs, the ET 2
   `EnabledWithAccessControlViaAccessLevel` and the central-user variants). NTP server addresses are not
   declared on the CPU or its interface.
 - The central DI 16x24VDC HF module (6ES7 521-1BH00) exposes no channels and no hardware-interrupt
-  attribute through V21 Openness, so its rising-edge hardware interrupt and the event's OB40 assignment
-  cannot be configured by this route.
+  attribute through V21 Openness. The probe looked only at the module item; its channels sit on the
+  submodule (see [OB40 on 30 October](#ob40-on-30-october)).
 - Interrupt OBs import through `block_import_xml` with their number, `SecondaryType` and an empty
   `<Namespace />`; SCL external sources cannot set an OB's event class. `Version` and `Timer` are SCL
   keywords and cannot name DB members.
@@ -107,10 +107,9 @@ OBs 40/82/83/86, then card download, credential provisioning, power on and RUN a
 
 Boundaries:
 
-- **OB40.** V21 Openness exposes neither channels nor a hardware-interrupt attribute on the DI module, so
-  no hardware interrupt is configured: `GetConfiguredProcessEvents` lists nothing and PLCSIM answers
-  `ProcessEvent` with `NotSupportedByModule` (-55); OB40 does not run. `statusEvent` on the central module
-  is answered `NotSupportedByModule` too (OB55 serves distributed modules).
+- **OB40 (superseded on 30 October).** With no hardware interrupt configured, `GetConfiguredProcessEvents`
+  lists nothing and PLCSIM answers `ProcessEvent` with `NotSupportedByModule` (-55); OB40 does not run.
+  `statusEvent` on the central module is answered `NotSupportedByModule` too (OB55 serves distributed modules).
 
 ### Recovery top-up
 
@@ -122,3 +121,28 @@ downloaded program (ProgramVersion 2, reinitialized counter 0); a download prepa
 copy refused with `SimulationTargetMismatch`, because that copy did not produce the instance's card; and
 `plc_online_compare` of the recovered project reported `FolderContentsIdentical` (its checkpoint was
 taken after the layout change and before its download).
+
+## OB40 on 30 October
+
+Siemens' *TIA Portal Openness Hardware parameters* manual (V21) lists, for DI 16x24VDC HF V1.0, per
+channel `HardwareInterruptRisingEdgeActive` (Boolean), `HardwareInterruptRisingEdgeInterrupt` (an OB link)
+and `...Priority`. The channels sit on the submodule (`.../items/GapDI/items/GapDI`), not on the module.
+`change.hardware_channel_attributes` now takes the flag and the OB link. The link names a hardware interrupt
+OB of the one PLC in the module's own device. Anything else is refused typed: a diagnostic OB or a
+non-string value with `InvalidRequest`, a missing block with `BlockNotFound`.
+
+- **Attempt 1** (`2e90783`, frozen in `artifacts/ob1`) stopped at preparation. V21 declares
+  `HardwareInterruptRisingEdgeInterrupt` only while `HardwareInterruptRisingEdgeActive` is true, so the
+  route refused with `AttributeNotWritable`. Enabling the flag now requires the OB link in the same request.
+  Apply writes the flag first, then checks the link's access and sets it. Disabling must omit the link,
+  and preservation expects V21 to undeclare it.
+- **Attempt 2** (`807a189`, `artifacts/ob2`) passed 91 of 91 steps (`local.plcsim_gaps.ob40.20261030`).
+  Channel 0 was enabled and linked to `GapHardwareInterrupt` (OB40), device-compiled, with
+  configured-hardware preservation verified. After download PLCSIM listed one configured process event
+  (`Rising edge0`, the submodule's hardware ID, channel 0, `RisingEdge`). `sim_event` `hardwareInterrupt`
+  on it raised OB40 exactly once and changed no other counter. A rising edge written to a PLC tag on the
+  input (`%I0.0`) with `sim_write` did not raise OB40: PLCSIM raises hardware interrupts through its
+  process-event API, not through input writes. On channel 1 the runner enabled and linked the interrupt,
+  refused disabling with a link, and disabled it. `hardware_inspect` then showed the link undeclared again.
+  The disabling change was restored from its checkpoint (`configured_hardware_recovery_verified`), and
+  the channel matched its enabled state. The rest of the PLCSIM gaps run passed again, unchanged.

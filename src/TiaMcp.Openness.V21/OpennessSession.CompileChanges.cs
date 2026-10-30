@@ -31,7 +31,7 @@ namespace TiaMcp.Openness.V21
                 var entries = DeviceCompilation.Entries(project);
                 if (entries.Count == 0) throw new BridgeException("UnsupportedCapability", "No project device compiler target exists.");
                 return new JObject { ["action"] = "compile", ["scope"] = "project", ["targets"] = new JArray(entries.Select(entry => entry.Path)),
-                    ["coverage"] = "Every device of the project (station hardware and software); devices are compiled in inventory order." };
+                    ["coverage"] = "Every device of the project (station hardware and software) in inventory order; a device without a compiler service is listed under notCompiled, never compiled." };
             }
             if (change.Kind == "device_compile")
             {

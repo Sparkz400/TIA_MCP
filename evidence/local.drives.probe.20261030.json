@@ -1,0 +1,68 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.probe.20261030",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-29T23:24:32+00:00",
+  "source": {
+    "commit": "807a189179dc0ae5e0753ed250e62949bd40b019",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "D10 drive probe on an owned scratch CPU 1511-1 PN V4.1 with an added SINAMICS G120C PN (6SL3210-1KE21-3AF1 V4.7.14): device compile through project_compile with save compiles the PLC station and lists the drive under notCompiled; drive_observe before and after compile and save; drive_parameter_set and drive_telegram_set preparation answers. Frozen Debug build of 807a1891 in artifacts/ob2.",
+  "limitations": [
+    "This is a boundary record, not a qualification of the drive kinds: Startdrive cannot read DriveObject.DriveObjectNumber on the new drive before or after compile and save, so drive_observe returns no drive objects and both change kinds refuse at preparation with EngineeringError.",
+    "The drive is not connected to the CPU's IO system and has not been configured in Startdrive's commissioning UI.",
+    "Offline engineering only; no online values, upload, download or RAM-to-ROM."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "7c22a73af899cdc776998fbe7c3f266f116176a42c50ef8c740f2ebb878ba1c4"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "f4a34067409b1de45738ee362948c6ba926e44203adc4e65394c4403c9f18466"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "6ac1c9eee03491531d79ee09bd51c5c1ab26d851254cc4942157c96638e0d6cb",
+      "bytes": 68394,
+      "completed": true,
+      "steps": [
+        "start owned TIA drives",
+        "create owned scratch drives",
+        "prepare hardware_add",
+        "apply hardware_add without compile or save",
+        "drive_observe of the new unsaved drive",
+        "prepare project_compile",
+        "apply project_compile",
+        "project_compile lists the drive as not compiled",
+        "drive_observe after compile and save",
+        "record the drive_parameter_set answer without readable drive objects",
+        "record the drive_telegram_set answer without readable drive objects"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "drive_observe",
+        "hardware_catalog_search",
+        "project_inventory",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}
