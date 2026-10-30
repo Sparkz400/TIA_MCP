@@ -56,7 +56,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_write", new { instanceId, writes = Array(writes) }, cancellationToken);
 
     [McpServerTool(Name = "sim_read_signals", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Read 1-64 typed symbols of a selected PLCSIM instance in one ReadSignals runtime call. signals is an array of {symbol,type}; types bool, int8..uint64, float, double (string and wstring stay with sim_read). Returns each value with quality and the runtime error code of a bad item. One call; the values are not claimed to come from one scan.")]
+    [Description("Read 1-64 typed symbols of a selected PLCSIM instance in one ReadSignals runtime call. signals is an array of {symbol,type}; types bool, int8..uint64, float, double (string and wstring stay with sim_read). Returns each value with quality and the runtime error code of a bad item; one unknown symbol makes PLCSIM reject the whole batch (that item DoesNotExist, the others SignalConfigurationError, no values). One call; the values are not claimed to come from one scan.")]
     public Task<CallToolResult> ReadSignals(int instanceId, JsonElement signals, CancellationToken cancellationToken)
         => Call("sim_read_signals", new { instanceId, signals = Array(signals) }, cancellationToken);
 
