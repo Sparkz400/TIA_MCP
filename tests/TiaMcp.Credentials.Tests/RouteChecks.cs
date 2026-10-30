@@ -42,11 +42,12 @@ internal static class RouteChecks
         int Admissions() => Directory.GetDirectories(Path.Combine(root, "engineering-admissions")).Length;
         bool Leaks(byte[] haystack) => new[] { password, other }.Any(text => haystack.AsSpan().IndexOf(Encoding.UTF8.GetBytes(text)) >= 0 ||
             haystack.AsSpan().IndexOf(Encoding.Unicode.GetBytes(text)) >= 0 || haystack.AsSpan().IndexOf(Encoding.UTF8.GetBytes(Convert.ToBase64String(Encoding.UTF8.GetBytes(text)))) >= 0);
-        string Opened(JsonObject dispatched, string slot, CredentialStatus status, string lease = Lease, string change = "c1", string? asSlot = null)
+        string Opened(JsonObject dispatched, string slot, CredentialStatus status, string lease = Lease, string change = "c1", string? asSlot = null,
+            string? previewHash = null, string? credentialId = null, string? bindingSha256 = null)
         {
             var envelope = dispatched["credentials"]!.AsArray().Single(row => row!["slot"]!.GetValue<string>() == slot)!["envelope"]!.GetValue<string>();
-            using var secure = CredentialRouteEnvelope.Open(Convert.FromBase64String(envelope),
-                CredentialRouteEnvelope.Entropy(lease, change, new string('a', 64), asSlot ?? slot, status.Reference.CredentialId, status.Reference.BindingSha256));
+            using var secure = CredentialRouteEnvelope.Open(Convert.FromBase64String(envelope), CredentialRouteEnvelope.Entropy(lease, change, previewHash ?? new string('a', 64),
+                asSlot ?? slot, credentialId ?? status.Reference.CredentialId, bindingSha256 ?? status.Reference.BindingSha256));
             return secure is null ? "<sealed>" : new NetworkCredential(string.Empty, secure).Password;
         }
 
@@ -57,7 +58,18 @@ internal static class RouteChecks
         check(Opened(dispatched, "credential", knowHow, lease: new string('1', 32)) == "<sealed>" && Opened(dispatched, "credential", knowHow, change: "c2") == "<sealed>" &&
               Opened(dispatched, "credential", knowHow, asSlot: "newCredential") == "<sealed>" && Opened(dispatched, "credential", write) == "<sealed>",
             "Envelope does not open for another lease, change, slot or reference");
+        check(Opened(dispatched, "credential", knowHow, previewHash: new string('b', 64)) == "<sealed>", "Envelope does not open for another preview hash alone");
+        check(Opened(dispatched, "credential", knowHow, credentialId: write.Reference.CredentialId) == "<sealed>", "Envelope does not open for another credential ID alone");
+        check(Opened(dispatched, "credential", knowHow, bindingSha256: write.Reference.BindingSha256) == "<sealed>", "Envelope does not open for another binding hash alone");
+        check(!CredentialRouteEnvelope.Entropy(Lease, "c1\nX", "p", "credential", "i", "b").SequenceEqual(CredentialRouteEnvelope.Entropy(Lease, "c1", "X\np", "credential", "i", "b")) &&
+              !CredentialRouteEnvelope.Entropy(Lease, "c1", "p", "credential", "i", "b").SequenceEqual(CredentialRouteEnvelope.Entropy(Lease, "c1p", "", "credential", "i", "b")),
+            "Entropy fields carry their lengths, so moving a separator or characters between fields changes the entropy");
         check(!applied.Native.Frames.Any(frame => Leaks(Encoding.UTF8.GetBytes(frame))), "No bridge frame carries the plaintext secret");
+
+        CredentialBinding Cpu(string purpose = "cpuProtection", string kind = "cpuProtection") => new(new("siemensTiaPortalV21", Plc, Plc.Split("/plc/")[0], kind, "fullAccess"), purpose, "fullAccessPassword");
+        var fullAccess = vault.Create(Cpu(), Encoding.UTF8.GetBytes(password));
+        var cpu = Apply(Slot("credential", fullAccess)).GetAwaiter().GetResult();
+        check(cpu.Error is null && Opened(cpu.Native.Dispatched!, "credential", fullAccess) == password, "The CPU full-access password routes under the cpuProtection purpose");
 
         var changed = Apply(Slot("credential", write), Slot("newCredential", next)).GetAwaiter().GetResult();
         check(changed.Error is null && Opened(changed.Native.Dispatched!, "credential", write) == password && Opened(changed.Native.Dispatched!, "newCredential", next) == other,
@@ -83,6 +95,10 @@ internal static class RouteChecks
         Refused(Apply(Slot("credential", vault.Create(Block("FB_A", "knowHow"), [0xff, 0xfe]))).GetAwaiter().GetResult(), "CredentialFormatInvalid", "A non-UTF-8 secret refuses before sealing");
         var login = new CredentialBinding(new("siemensWebApiRuntime", "https://plc.example", new string('c', 64), "authenticationMode", "local"), "runtimeLogin", "user");
         Refused(Apply(Slot("credential", vault.Create(login, Encoding.UTF8.GetBytes(password)))).GetAwaiter().GetResult(), "CredentialRouteInvalid", "A runtime login credential is not a routable purpose");
+        Refused(Apply(Slot("credential", vault.Create(Cpu(kind: "blockProtection"), Encoding.UTF8.GetBytes(password)))).GetAwaiter().GetResult(), "CredentialRouteInvalid",
+            "A routed binding must name a resource of its own purpose");
+        Refused(Apply(Slot("credential", fullAccess, Block("FB_A", "knowHow"))).GetAwaiter().GetResult(), "CredentialContextMismatch", "A CPU full-access credential cannot serve block protection");
+        Refused(Apply(Slot("credential", knowHow, Cpu())).GetAwaiter().GetResult(), "CredentialContextMismatch", "A block credential cannot serve the CPU protection level");
         Refused(Apply(Slot("credential", knowHow), Slot("newCredential", next, vaultName: new string('e', 32))).GetAwaiter().GetResult(), "CredentialRouteInvalid", "Slots of one apply share one vault");
         Refused(Apply(Slot("credential", knowHow), Slot("credential", write)).GetAwaiter().GetResult(), "CredentialRouteInvalid", "Duplicate slot names refuse");
         var saved = CredentialVault.LockWait; CredentialVault.LockWait = TimeSpan.FromMilliseconds(300);
@@ -97,13 +113,17 @@ internal static class RouteChecks
         var direct = new RouteNative(new JsonArray(Slot("credential", knowHow)), Path.Combine(root, "direct.ap21"));
         try { Route(direct).CallAsync("mutation_begin", new { operation = "change_restore", arguments = new { changeId = "c1", previewHash = new string('a', 64) } }).GetAwaiter().GetResult(); check(false, "Expected refusal"); }
         catch (BridgeException error) when (error.Code == "CredentialRouteInvalid") { check(direct.Calls.SequenceEqual(["mutation_begin", "mutation_end"]), "Only change_apply may request credentials"); }
+        // mutation_end needs the exact token, so a reply without one cannot be ended; nothing is sealed or dispatched.
+        var tokenless = new RouteNative(new JsonArray(Slot("credential", knowHow)), Path.Combine(root, "tokenless.ap21"), leaseToken: false);
+        try { new WatchTableDispatcher(Route(tokenless), root).CallAsync("change_apply", new { changeId = "c1", previewHash = new string('a', 64), idempotencyKey = "tokenless", checkpointSave = true }).GetAwaiter().GetResult(); check(false, "Expected refusal"); }
+        catch (BridgeException error) when (error.Code == "CredentialRouteInvalid") { check(tokenless.Calls.SequenceEqual(["mutation_begin"]), "A begin reply with credentials but no lease token refuses before admission and dispatch"); }
 
         foreach (string path in Directory.EnumerateFiles(output, "*", SearchOption.AllDirectories).Where(path => !path.EndsWith(".credential.json", StringComparison.Ordinal)))
             if (Leaks(File.ReadAllBytes(path))) throw new Exception("Plaintext secret retained in " + path);
         check(true, "No admission record, response or receipt retains the plaintext secret");
     }
 
-    private sealed class RouteNative(JsonArray? credentials, string project) : IBridgeClient
+    private sealed class RouteNative(JsonArray? credentials, string project, bool leaseToken = true) : IBridgeClient
     {
         internal List<string> Calls { get; } = [];
         internal List<string> Frames { get; } = [];
@@ -116,7 +136,7 @@ internal static class RouteChecks
                 [new("project", project, "checkpointMutationCompileSave")]);
             JsonNode value = operation switch
             {
-                "mutation_begin" => new JsonObject { ["leaseToken"] = Lease, ["scope"] = JsonSerializer.SerializeToNode(scope, BridgeProtocol.Json), ["credentials"] = credentials?.DeepClone() },
+                "mutation_begin" => new JsonObject { ["leaseToken"] = leaseToken ? Lease : null, ["scope"] = JsonSerializer.SerializeToNode(scope, BridgeProtocol.Json), ["credentials"] = credentials?.DeepClone() },
                 "mutation_dispatch" => new JsonObject { ["state"] = "applied" },
                 "mutation_end" => new JsonObject { ["released"] = true },
                 _ => throw new Exception("Unadmitted native operation: " + operation)

@@ -94,7 +94,7 @@ public sealed partial class TiaTools
         }).ToArray();
     }
 
-    [McpServerTool(Name = "testsuite_style_plan_review", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "testsuite_style_plan_review", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(TiaMcp.Core.TestSuite.TestSuiteStyleReview))]
     [Description("Reopen and validate the complete style review, every requested scope, frozen definition bundle and durable effect/checkpoint plan. No pagination or omitted run membership; no native calls.")]
     public CallToolResult TestSuiteStylePlanReview(string relativePath, string sha256) => StyleResult(() => StyleJobs().ReadReview(new(relativePath, sha256)));
 
@@ -103,11 +103,11 @@ public sealed partial class TiaTools
     public CallToolResult TestSuiteStyleJobPrepare(string relativePath, string sha256, string reviewedSha256, string idempotencyKey)
         => StyleResult(() => StyleJobs().Prepare(new(relativePath, sha256), reviewedSha256, idempotencyKey));
 
-    [McpServerTool(Name = "testsuite_style_job_status", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "testsuite_style_job_status", ReadOnly = true, Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(TiaMcp.Core.TestSuite.TestSuiteStyleJobStatus))]
     [Description("Reopen durable Test Suite queue progress, stop request, operation revisions and unknown outcomes. Never dispatches, resumes or releases native ownership.")]
     public CallToolResult TestSuiteStyleJobStatus(string jobId) => StyleResult(() => StyleJobs().Status(jobId));
 
-    [McpServerTool(Name = "testsuite_style_job_stop_request", Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "testsuite_style_job_stop_request", Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(TiaMcp.Core.TestSuite.TestSuiteStyleJobStatus))]
     [Description("Persist a stop-between-runs request across Host restarts. Stops remaining unattempted runs. An active checkpoint or blocking native Run is not cancelled; unknown outcomes retain ownership until reconciliation.")]
     public CallToolResult TestSuiteStyleJobStop(string jobId, string reviewedSha256) => StyleResult(() => StyleJobs().RequestStop(jobId, reviewedSha256));
 
@@ -120,7 +120,7 @@ public sealed partial class TiaTools
     [Description("Retrieve retained raw/result/scope/assessment artifact references and shared operation evidence. Revalidates hashes and rederives results from original raw bytes. Assertion failure, incomplete evidence, execution failure and unknown outcomes remain separate; reconciled does not mean passed.")]
     public CallToolResult TestSuiteStyleJobResults(string jobId, string operationId) => StyleResult(() => StyleJobs().Results(jobId, operationId));
 
-    [McpServerTool(Name = "testsuite_style_job_mark_interrupted", Destructive = false, OpenWorld = false)]
+    [McpServerTool(Name = "testsuite_style_job_mark_interrupted", Destructive = false, OpenWorld = false, UseStructuredContent = true, OutputSchemaType = typeof(TiaMcp.Core.TestSuite.TestSuiteStyleJobStatus))]
     [Description("Explicitly mark a retained in-flight checkpoint/dispatch/recovery intent unknown after interruption. Requires current revision and no active execution lock. Keeps all resource reservations and results; never invokes native code or replays a call.")]
     public CallToolResult TestSuiteStyleJobInterrupted(string jobId, string operationId, int expectedRevision)
         => StyleResult(() => StyleJobs().MarkInterrupted(jobId, operationId, expectedRevision));

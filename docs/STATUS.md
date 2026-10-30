@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.82`: 462 features, 422 verified, 40 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 123 shipped, 299 limited, 25 unqualified, 5 unavailable on V21, 10 deferred |
-| Matrix cells | 1,928 bound, **141 open**, 31 blocked, 30 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.86`: 469 features, 437 verified, 32 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 127 shipped, 310 limited, 19 unqualified, 5 unavailable on V21, 8 deferred |
+| Matrix cells | 1,995 bound, **108 open**, 31 blocked, 24 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -28,17 +28,17 @@ names every row with an open cell.
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
   TIA editor, and the
-  CPU protection level needs a full-access password no route accepts.
+  CPU protection level is refused while UMAC runtime access is enabled (its password now has a route).
 - **Rows blocked by decision:** five `unavailable_target` rows (31 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision
   of 29 October; each row's disposition is in the ledger). The three block-protection kinds
   lacked only a repository route; building it is 1.0 work (decision of 29 October).
-- **Deferred rows:** ten `not_implemented` rows (30 cells) are not open cells but stay 1.0
+- **Deferred rows:** eight `not_implemented` rows (24 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
-- **Release mechanics:** one version source, a CHANGELOG, a release workflow, a pre-release
-  security review, a contract freeze policy, the engineering package, tag and release notes
-  ([TODO](TODO.md#release-mechanics-and-policy)).
+- **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
+  release workflow and the 30 October security review are in place; a contract freeze policy,
+  the engineering package and the release itself remain ([TODO](TODO.md#release-mechanics-and-policy)).
 
 ## Where the evidence is
 

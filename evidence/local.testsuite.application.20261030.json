@@ -1,0 +1,231 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.testsuite.application.20261030",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-30T08:15:01+00:00",
+  "source": {
+    "commit": "d726fc9fce556d87014891e8df23ca402c58a511",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_testsuite_application.py on a frozen Debug build of d726fc9f (artifacts/ta3, git archive, TestSuiteQualification=true, Host --testsuite-qualification), four cases with one owned Portal, owned scratch CPU 1511-1 PN V4.1 and one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus each (72/72 steps). After simulation_download, the generated-state save, simulation_provision_scratch_credential, power on and RUN, qualification_testsuite_prepare imports TiaMcp_Q02_Pass/TiaMcp_Q02_Fail (ASSERT.Equal(\"TiaMcp_EnableGate_DB\".Active, true/false)), sets their scope externally managed on that instance and reviews one; qualification_testsuite_execute runs one TestCaseExecutor.Run(TestCase) with checkpoint archive, compile, preservation, fresh reopen and cleanup. GetScope reads ScratchPLC and the export names the owned instance and external mode, byte-identical after the Run SetScope (scopeVerified). pass: succeeded, classification passed. fail: assertionFailure, recoveryRequired, qualification_testsuite_recover to a new folder and qualification_testsuite_reconcile verifiedRestored. afterRun: injected lost Run reply, outcomeUnknown, recover and reconcile verifiedRestored. released: instance released after prepare, SimulationTargetMismatch at observation before any checkpoint. Refusals in pass: released instance ticket (SimulationTargetMismatch), tampered ticket (InvalidSimulationTicket), project outside the owned scratch (ProjectIsolationRequired), application fixture without ticket (InvalidRequest), production gate (TestSuiteProfileUnqualified, operation still prepared at revision 0), system-managed review of the same case (TestSuiteProfileUnqualified). Earlier frozen builds b14d63c2 (artifacts/q/ta/tq_59a7e531, tq_ec2a9eac: no result profile, inconclusive/executionError) and 9557c2c5 (tq_55361bf5, tq_721bd5cd, tq_f24a010d, tq_47166c55: reconcile PreservationFailed from a null-token compare) are not part of this record.",
+  "limitations": [
+    "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus; system-managed mode, case lists, sets (.ttst), whole-group runs and system tests stay unqualified. Production admission stays closed.",
+    "The result profile matches the exact fixture tree TIA V21 Update 3 wrote under its English UI; other UI languages or trees fail closed (inconclusive or executionError).",
+    "License: this session's TestCase.SaveToFile (documented to throw LicenseNotFoundException) is the pre-run observation; the returned Run is the execution acceptance. The simulator ticket expires 15 minutes after sim_create."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "089a0e1eb5f15eb66b4c6ce095817a1e3ac818050f9b81434424422b6e29db2a"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "6d9354470e8744424d2e1061eebb5c661cff973b643f9473eba6b825d42de6a6"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "779779de077b2e4c6e5aefdaa99eabdc2e11e6edef7777014c35422c23a80126"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "f61a1695a109c301aeca96e2c330d813767eac42e7179ba5feab9b16a071e8ef",
+      "bytes": 307671,
+      "completed": true,
+      "steps": [
+        "start owned TIA testsuite application pass",
+        "create owned scratch testsuite application pass",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "sim_create (released before use)",
+        "sim_release",
+        "refuse a released instance's ticket",
+        "sim_create (owned target)",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "refuse a tampered ticket",
+        "refuse an application fixture without a ticket",
+        "refuse a project outside the owned scratch",
+        "qualification_testsuite_prepare",
+        "refuse the production gate",
+        "system-managed review",
+        "refuse a system-managed (Test Suite owned) instance",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "sim_state stop",
+        "sim_state powerOff",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "testsuite_application_plan_prepare",
+        "testsuite_style_job_prepare",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "testsuite_style_job_execute_next"
+      ]
+    },
+    {
+      "report": "qualification.json",
+      "sha256": "3fd621c78f53002c2005b13c422b175fb2f44d7ac69655798749e74505d079f1",
+      "bytes": 311133,
+      "completed": true,
+      "steps": [
+        "start owned TIA testsuite application fail",
+        "create owned scratch testsuite application fail",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "sim_create (owned target)",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "qualification_testsuite_reconcile",
+        "sim_state stop",
+        "sim_state powerOff",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "qualification_testsuite_recover",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "qualification.json",
+      "sha256": "2458f85c65b91aa1079793ff1fca7837fb74d0690cfb5e6967fff41776aed0a8",
+      "bytes": 284566,
+      "completed": true,
+      "steps": [
+        "start owned TIA testsuite application afterRun",
+        "create owned scratch testsuite application afterRun",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "sim_create (owned target)",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "qualification_testsuite_prepare",
+        "refuse the injected lost Run reply",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "qualification_testsuite_reconcile",
+        "sim_state stop",
+        "sim_state powerOff",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "qualification_testsuite_recover",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_execute"
+      ]
+    },
+    {
+      "report": "qualification.json",
+      "sha256": "fc4e45594297d9349644775bc8d28b651181d52c1c630a99b529886d70fe1416",
+      "bytes": 256690,
+      "completed": true,
+      "steps": [
+        "start owned TIA testsuite application released",
+        "create owned scratch testsuite application released",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "sim_create (owned target)",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "power on",
+        "run",
+        "qualification_testsuite_prepare",
+        "sim_state stop",
+        "sim_state powerOff",
+        "sim_release",
+        "refuse an instance released after prepare"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "qualification_testsuite_prepare",
+        "sim_create",
+        "sim_release",
+        "sim_state",
+        "simulation_download",
+        "simulation_provision_scratch_credential",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_execute"
+      ]
+    }
+  ]
+}

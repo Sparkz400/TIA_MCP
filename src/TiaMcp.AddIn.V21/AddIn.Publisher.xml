@@ -2,11 +2,11 @@
 <PackageConfiguration xmlns="http://www.siemens.com/automation/Openness/AddIn/Publisher/V21">
   <Author>TIA MCP</Author>
   <Description>Sends the exact selected project-tree objects to a locally enrolled TIA MCP Host for review. Reads only; makes no engineering changes.</Description>
-  <AddInVersion>0.1.0</AddInVersion>
+  <AddInVersion>0.9.0</AddInVersion>
   <Product>
     <Name>TIA MCP selection companion</Name>
     <Id>TiaMcp.AddIn.V21</Id>
-    <Version>0.1.0</Version>
+    <Version>0.9.0</Version>
   </Product>
   <FeatureAssembly>
     <AssemblyInfo>

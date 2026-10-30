@@ -142,7 +142,36 @@ namespace TiaMcp.Openness.V21
             catch (PlcComponentException error) { return "The retained caller export is unusable: " + error.Message; }
             return PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
-                    ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
+                    ? "Only the verified read-only global source with its retained snapshot is eligible." : null) ??
+                PlcCombinedApplyTargetRefusal(change);
+        }
+
+        // Step 1 imports and saves before step 2 creates the instance DB; what step 2 needs from the target is decided here, before any claim.
+        private string PlcCombinedApplyTargetRefusal(LibraryChange change)
+        {
+            var languages = change.Project.LanguageSettings;
+            string refusal = PlcComponentQualificationGate.CombinedApplyLanguageRefusal(languages.ActiveLanguages.Select(l => l.Culture.Name).ToArray(),
+                languages.ReferenceLanguage?.Culture.Name, languages.EditingLanguage?.Culture.Name);
+            if (refusal != null) return refusal;
+            try
+            {
+                var scope = LibraryPlcScope(change, out var plc); string cpu = TypedCpuIdentifier(plc);
+                // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
+                var captured = CapturedStorageContext(change, true);
+                if (captured != null)
+                {
+                    CapturedStorageEnvironment(captured);
+                    return cpu == TypedGraphicalCapturedStorageTemplate.Cpu ? null : "The captured storage profile covers only " + TypedGraphicalCapturedStorageTemplate.Cpu + ", not " + cpu + ".";
+                }
+                var plan = (JObject)change.Preview["integrationPlan"]; var pin = Guid.Parse(change.Payload["selection"][0].Value<string>("versionGuid"));
+                var root = ((JArray)plan["versions"]).OfType<JObject>().Single(v => Guid.Parse(v.Value<string>("versionGuid")) == pin);
+                var callee = EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)root["artifact"], root.Value<string>("contentSha256")));
+                string catalog = TypedCatalogPath();
+                return PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, plan["instanceDb"].Value<string>("name"),
+                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null)).Select(t => t.Value));
+            }
+            catch (BridgeException error) { return error.Message; }
+            catch (PlcComponentException error) { return error.Message; }
         }
 
         // Every production Host enables this (Host default since 29 October 2026); the preview, and so the reviewed hash, states whether change_apply installs.

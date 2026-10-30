@@ -55,6 +55,31 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
     public Task<CallToolResult> Write(int instanceId, JsonElement writes, CancellationToken cancellationToken)
         => Call("sim_write", new { instanceId, writes = Array(writes) }, cancellationToken);
 
+    [McpServerTool(Name = "sim_read_signals", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read 1-64 typed symbols of a selected PLCSIM instance in one ReadSignals runtime call. signals is an array of {symbol,type}; types bool, int8..uint64, float, double (string and wstring stay with sim_read). Returns each value with quality and the runtime error code of a bad item; one unknown symbol makes PLCSIM reject the whole batch (that item DoesNotExist, the others SignalConfigurationError, no values). One call; the values are not claimed to come from one scan.")]
+    public Task<CallToolResult> ReadSignals(int instanceId, JsonElement signals, CancellationToken cancellationToken)
+        => Call("sim_read_signals", new { instanceId, signals = Array(signals) }, cancellationToken);
+
+    [McpServerTool(Name = "sim_write_signals", Destructive = true, OpenWorld = false)]
+    [Description("Write 1-64 typed symbols of a PLCSIM instance this session created or adopted in one WriteSignals runtime call. writes is an array of {symbol,type,value} with distinct symbols; types as sim_read_signals. Every value is validated before the call; a runtime error on any item fails with PartialSimulationWrite and each item's result. Assignments, not forces: the program scan may overwrite them.")]
+    public Task<CallToolResult> WriteSignals(int instanceId, JsonElement writes, CancellationToken cancellationToken)
+        => Call("sim_write_signals", new { instanceId, writes = Array(writes) }, cancellationToken);
+
+    [McpServerTool(Name = "sim_area_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Read the process image of a selected PLCSIM instance by address: area input, output or marker, byte offset, and either length (1-1024 bytes, default 1) or bit (0-7) for one bit. Returns the bytes (or the bit) and the area size; ranges beyond the area are refused before the read.")]
+    public Task<CallToolResult> AreaRead(int instanceId, string area, int offset, CancellationToken cancellationToken, int? length = null, int? bit = null)
+        => Call("sim_area_read", new { instanceId, area, offset, length, bit }, cancellationToken);
+
+    [McpServerTool(Name = "sim_area_write", Destructive = true, OpenWorld = false)]
+    [Description("Write the input or marker image of a PLCSIM instance this session created or adopted, by address: byte offset and either bytes (1-1024 integers 0-255) or bit (0-7) with a boolean value. Outputs are refused: the program writes the output image every scan. Writes are assignments, never forces; the program may overwrite markers on its next scan.")]
+    public Task<CallToolResult> AreaWrite(int instanceId, string area, int offset, CancellationToken cancellationToken, JsonElement? bytes = null, int? bit = null, bool? value = null)
+        => Call("sim_area_write", new { instanceId, area, offset, bytes, bit, value }, cancellationToken);
+
+    [McpServerTool(Name = "sim_observe", ReadOnly = true, Destructive = false, OpenWorld = false)]
+    [Description("Observe a selected PLCSIM instance: operating state and mode before and after, the display data summary (includeDisplayData adds the bytes as base64) and, for windowMs 1-60000 (default 0, a snapshot only), every operating-state and LED change the runtime reports, up to maxEvents (1-256, default 64; the window ends when reached). The subscription ends with the call. V8 has no LED getter, so LEDs appear only as changes. Calls run one at a time, so the window sees changes from the program, the PLCSIM UI or other API clients, not from other tool calls.")]
+    public Task<CallToolResult> Observe(int instanceId, CancellationToken cancellationToken, int windowMs = 0, int maxEvents = 64, bool includeDisplayData = false)
+        => Call("sim_observe", new { instanceId, windowMs, maxEvents, includeDisplayData }, cancellationToken);
+
     [McpServerTool(Name = "sim_test", Destructive = true, OpenWorld = false)]
     [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Wall-clock polling is not scan-accurate. virtualTime:true (owned instances only) runs the scenario in TimespanSynchronized_C: every wait is a StartProcessing span of virtual time, samples are read while the CPU is frozen, elapsedMs is virtual time, and the previous operating mode is restored. Duration/sample bounds are enforced by the adapter.")]
     public Task<CallToolResult> Test(int instanceId, JsonElement signals, JsonElement steps, CancellationToken cancellationToken, int intervalMs = 100, bool virtualTime = false)

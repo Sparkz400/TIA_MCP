@@ -5869,11 +5869,13 @@
         ]
       },
       "engineeringOnly": true,
-      "dependencyXmls": [
+      "dependencySources": [
         {
-          "path": "fixtures/typed-graphical/native/Tgp_GlobalRTrig.xml",
-          "names": [
-            "Tgp_GlobalRTrig"
+          "language": "SCL",
+          "sourcePath": "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
+          "expectedBlockNames": [
+            "Tgp_GlobalRTrig",
+            "Tgp_GlobalRTrig_Ref"
           ]
         }
       ]
@@ -5962,11 +5964,13 @@
         ]
       },
       "engineeringOnly": true,
-      "dependencyXmls": [
+      "dependencySources": [
         {
-          "path": "fixtures/typed-graphical/native/Tgp_GlobalFTrig.xml",
-          "names": [
-            "Tgp_GlobalFTrig"
+          "language": "SCL",
+          "sourcePath": "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
+          "expectedBlockNames": [
+            "Tgp_GlobalFTrig",
+            "Tgp_GlobalFTrig_Ref"
           ]
         }
       ]
@@ -6193,11 +6197,13 @@
         ]
       },
       "engineeringOnly": true,
-      "dependencyXmls": [
+      "dependencySources": [
         {
-          "path": "fixtures/typed-graphical/native/Tgp_GlobalRTrig.xml",
-          "names": [
-            "Tgp_GlobalRTrig"
+          "language": "SCL",
+          "sourcePath": "fixtures/typed-graphical/sources/global-rtrig-storage.scl",
+          "expectedBlockNames": [
+            "Tgp_GlobalRTrig",
+            "Tgp_GlobalRTrig_Ref"
           ]
         }
       ]
@@ -6288,11 +6294,13 @@
         ]
       },
       "engineeringOnly": true,
-      "dependencyXmls": [
+      "dependencySources": [
         {
-          "path": "fixtures/typed-graphical/native/Tgp_GlobalFTrig.xml",
-          "names": [
-            "Tgp_GlobalFTrig"
+          "language": "SCL",
+          "sourcePath": "fixtures/typed-graphical/sources/global-ftrig-storage.scl",
+          "expectedBlockNames": [
+            "Tgp_GlobalFTrig",
+            "Tgp_GlobalFTrig_Ref"
           ]
         }
       ]

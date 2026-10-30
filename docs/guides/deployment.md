@@ -2,7 +2,7 @@
 
 Current deployment/reliability work and its exact evidence are tracked in [deployment-reliability-status.md](../verification/deployment-reliability-status.md). New releases use isolated source builds and write `<bundle>.mcp.json` beside the immutable bundle; regenerate that external configuration after relocation. The detailed launch/verification procedure is in [remote-qualification.md](remote-qualification.md).
 
-Run `scripts/Package.ps1` to produce a versioned bundle and ZIP under `artifacts/releases`. It contains the MCP host, isolated engineering/simulator workers, launcher, configuration generator, dependency license notices and SHA-256 manifest. Siemens binaries and licenses are excluded. Copy or extract the entire bundle to the Windows machine running TIA V21.
+Run `scripts/Package.ps1` to produce a versioned bundle and ZIP under `artifacts/releases`, named `tia-mcp-v21-<version>_<UTC time>_<id>` (`tia-mcp-offline-…` with `-Offline`); `<version>` is the product version from `Directory.Build.props`, which `manifest.json` records as `productVersion` and `Verify-TiaMcpBundle.ps1` checks against the bundled Host. It contains the MCP host, isolated engineering/simulator workers, launcher, configuration generator, dependency license notices and SHA-256 manifest. Siemens binaries and licenses are excluded. Copy or extract the entire bundle to the Windows machine running TIA V21.
 
 That full bundle requires the Siemens SDK build environment. On a workstation
 with no Siemens products, use the [Host-only build and offline workflows](../../README.md#working-without-any-siemens-installation).
@@ -70,9 +70,10 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--addin-handoff` | Off | Runs the [Add-In selection receiver](../reference/addin-selections.md); not with `--diagnose` | None |
 | `--addin-enrollment <file>` | None | Enrollment file written by `scripts/Publish-AddIn.ps1`; requires `--addin-handoff`; once | None |
 | `--enable-library-integrate-apply` | On (accepted, no effect) | Combined apply of the verified PLC recipe shapes is the default ([combined apply](plc-library-integration-recipes.md#combined-apply)); other shapes keep refusing | None |
+| `--disable-library-integrate-apply` | Off | Turns combined apply off: `change_apply` refuses every PLC `library_integrate` recipe with `PlcIntegrationNotQualified`; not with `--enable-library-integrate-apply` | None |
 | `--library-limits-file <json>` | Built-in limits | Library package intake limits, a JSON object of at most 64 KiB ([storage policy](library-management.md#storage-policy-and-errors)) | None |
 
-Neither launcher script passes `--no-native-workers`, `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply` or `--library-limits-file`. The generated configuration runs `Start-TiaMcp.ps1`, so extra `args` do not reach the Host either. To use these options, point the MCP client at `TiaMcp.Host.exe` directly, with an explicit `--artifacts` directory.
+Neither launcher script passes `--no-native-workers`, `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply` or `--library-limits-file`. The generated configuration runs `Start-TiaMcp.ps1`, so extra `args` do not reach the Host either. To use these options, point the MCP client at `TiaMcp.Host.exe` directly, with an explicit `--artifacts` directory.
 
 Qualification-only options register gated test tools and interruption points for the native runners. They stay out of the normal feature advertisement, are refused together with `--no-native-workers`, and are not for production use:
 

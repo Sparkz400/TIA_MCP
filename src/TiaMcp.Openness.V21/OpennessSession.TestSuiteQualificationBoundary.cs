@@ -16,6 +16,29 @@ namespace TiaMcp.Openness.V21
         {
             private QualificationLease qualificationLease;
             private string Rule => context["run"]["definitions"][0].Value<string>("name");
+            private bool Application => context["application"] is JObject;
+            private string instanceName; // The owned instance verified at observation; Verify and Reconcile read scope against it.
+            private string Profile => Application ? ApplicationQualificationFixture.Profile : TestSuiteQualificationProfile;
+            private JObject Definition(JObject manifest, JObject target, string output) => Application
+                ? owner.TsApplicationDefinition(project, selector, Rule, instanceName, manifest, target, output)
+                : owner.TsDefinition(project, selector, Rule, manifest, target, output);
+            private JObject ObserveApplication()
+            {
+                var manifest = Capture();
+                string output = NewDirectory("observation");
+                var simulator = owner.TestSuiteOwnedSimulator(context["application"].Value<string>("simulatorTicket"));
+                if (instanceName != null && instanceName != simulator.Value<string>("instanceName")) throw new BridgeException("SimulationTargetMismatch", "The owned instance changed between observations.");
+                instanceName = simulator.Value<string>("instanceName");
+                var target = owner.TsTarget(project, selector, manifest, Profile);
+                var probes = owner.TsProbes(root, output, target, context["operation"]["plan"]["resources"][0].Value<string>("resourceKey"), TsApplicationProbes);
+                var definition = Definition(manifest, target, output);
+                var scope = QualificationScope(definition);
+                var evidence = ScopeArtifact(scope, output);
+                Save(Path.Combine(output, "observation-source.json"), new JObject { ["simulator"] = simulator, ["manifest"] = manifest, ["definition"] = definition, ["target"] = target });
+                return new JObject { ["target"] = target, ["originalDefinitions"] = new JObject {
+                    [definition.Value<string>("id")] = Convert.ToBase64String(File.ReadAllBytes(Resolve(definition["originalArtifact"]))) },
+                    ["scope"] = scope, ["scopeEvidenceKind"] = "nativeReadback", ["scopeEvidence"] = evidence, ["probeEvidence"] = probes };
+            }
             private sealed class QualificationLease : IDisposable
             {
                 private readonly OpennessSession owner;
@@ -34,6 +57,7 @@ namespace TiaMcp.Openness.V21
             }
             private JObject ObserveQualification()
             {
+                if (Application) return ObserveApplication();
                 var manifest = Capture(); owner.TsRequireUi(project, Rule, manifest);
                 if (owner._testSuiteUiProof["challenge"].Value<bool?>("requireLicenseCheck") != true)
                     throw new BridgeException("TargetPrerequisiteMissing", "Execution admission requires a fresh license observation, not a reopen-only proof.");
@@ -66,14 +90,18 @@ namespace TiaMcp.Openness.V21
                 owner._testSuiteEpoch = Guid.NewGuid().ToString("N"); owner._watchEpoch = Guid.NewGuid().ToString("N");
                 owner._projectIndexes.Invalidate("testsuiteFreshReopen");
                 var reopened = Capture(); Equal(baseline, reopened);
-                qualificationLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, reopened, "reopen", false));
-                var locked = Capture(); Equal(baseline, locked); owner.TsRequireUi(project, Rule, locked);
-                string output = NewDirectory("reopened-scope"); var target = owner.TsTarget(project, selector, locked);
-                var scope = QualificationScope(owner.TsDefinition(project, selector, Rule, locked, target, output));
+                var locked = reopened;
+                if (!Application)
+                {
+                    qualificationLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, reopened, "reopen", false));
+                    locked = Capture(); Equal(baseline, locked); owner.TsRequireUi(project, Rule, locked);
+                }
+                string output = NewDirectory("reopened-scope"); var target = owner.TsTarget(project, selector, locked, Profile);
+                var scope = QualificationScope(Definition(locked, target, output));
                 var scopeArtifact = ScopeArtifact(scope, output);
                 var reopenArtifact = Save(Path.Combine(directory, "fresh-reopen.json"), new JObject { ["beforeEpoch"] = beforeEpoch,
                     ["afterEpoch"] = owner._testSuiteEpoch, ["projectPath"] = path, ["manifest"] = locked,
-                    ["uiEvidence"] = TsArtifact(root, owner._testSuiteUiProofPath) });
+                    ["uiEvidence"] = Application ? null : TsArtifact(root, owner._testSuiteUiProofPath) });
                 project.Close(); project = null; owner._scratchProject = null;
                 if (owner._portal.Projects.Count != 0) throw new BridgeException("NativeCleanupUnverified", "Fixture project did not close.");
                 var cleanup = Save(Path.Combine(directory, "project-cleanup.json"), new JObject { ["processId"] = owner._processId,
@@ -118,17 +146,20 @@ namespace TiaMcp.Openness.V21
                 if (!ProjectPathIsAbsolute(path) || !File.Exists(path)) throw new BridgeException("ReconciliationIncomplete", "Exact existing project required.");
                 project = owner._portal.Projects.Open(new FileInfo(path)); selector["projectPath"] = project.Path.FullName;
                 owner._testSuiteEpoch = Guid.NewGuid().ToString("N"); owner._watchEpoch = Guid.NewGuid().ToString("N");
-                JObject manifest; string epoch = owner._testSuiteEpoch, proof;
+                JObject manifest; string epoch = owner._testSuiteEpoch, proof = null;
                 try
                 {
                     manifest = Capture(); Equal(baseline, manifest);
-                    qualificationLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, manifest, "reconcile-" + phase, false));
-                    var locked = Capture(); Equal(baseline, locked); owner.TsRequireUi(project, Rule, locked); proof = owner._testSuiteUiProofPath;
+                    if (!Application)
+                    {
+                        qualificationLease.ObserveUi(() => owner.TsObserveUi(project, selector, root, Rule, manifest, "reconcile-" + phase, false));
+                        var locked = Capture(); Equal(baseline, locked); owner.TsRequireUi(project, Rule, locked); proof = owner._testSuiteUiProofPath;
+                    }
                 }
                 finally { project.Close(); project = null; owner._scratchProject = null; }
                 if (owner._portal.Projects.Count != 0) throw new BridgeException("NativeCleanupUnverified", "Reconciliation project did not close.");
                 return Save(Path.Combine(NewDirectory("reconciled-" + phase), "receipt.json"), new JObject { ["path"] = path,
-                    ["manifest"] = manifest, ["epoch"] = epoch, ["uiEvidence"] = TsArtifact(root, proof), ["openProjectsAfter"] = 0, ["automaticReplay"] = false });
+                    ["manifest"] = manifest, ["epoch"] = epoch, ["uiEvidence"] = proof == null ? null : TsArtifact(root, proof), ["openProjectsAfter"] = 0, ["automaticReplay"] = false });
             }
             private static string ResolveRecoveredProject(string location)
             {

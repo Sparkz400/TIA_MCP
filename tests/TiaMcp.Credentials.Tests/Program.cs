@@ -163,6 +163,7 @@ OperationChecks.Run(Path.Combine(output, "operations"));
 RecoveryChecks.Run(Path.Combine(output, "recovery"));
 UaIdentityChecks.Run(Path.Combine(output, "ua-identity"), Check);
 RouteChecks.Run(Path.Combine(output, "route"), Check);
+WorkerRouteChecks.Run(Path.Combine(output, "worker-route"), Check);
 await RuntimeSessionChecks.Run(Path.Combine(output, "runtime-sessions"), Check);
 File.WriteAllText(Path.Combine(output, "verification.json"), JsonSerializer.Serialize(new { completed=true, nativeExecuted=false, currentUserDpapiExecuted=true, crossUserProfileTested=false, count=checks.Count, checks }, CredentialVault.Json));
 Console.WriteLine($"PASS protected credential storage: {checks.Count} checks; actual current-user DPAPI/ACL, no native provider. Receipts retained at {output}");

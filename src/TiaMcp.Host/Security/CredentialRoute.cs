@@ -16,8 +16,8 @@ internal sealed record CredentialRouteSlot(string Slot, string VaultName, Creden
 /// </summary>
 internal sealed class CredentialRoute(IBridgeClient inner, Func<string, CredentialVault>? vaults = null) : IBridgeClient
 {
-    // Purposes a worker may request. The CPU protection level's full-access password would join as "cpuProtection".
-    private static readonly string[] Purposes = ["blockProtection"];
+    // Purposes a worker may request: block know-how/write passwords and the CPU protection level's full-access password.
+    private static readonly string[] Purposes = ["blockProtection", "cpuProtection"];
     private readonly Func<string, CredentialVault> open = vaults ?? (name => new CredentialVault(CredentialVault.UserRoot(name)));
     private string? lease;
     private List<(string Slot, byte[] Envelope)>? envelopes;
@@ -29,6 +29,7 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
             Clear();
             var begin = await inner.CallAsync(operation, arguments, cancellationToken);
             if (!begin.TryGetProperty("credentials", out var requested) || requested.ValueKind == JsonValueKind.Null) return begin;
+            // mutation_end needs the exact token; a reply without one names no lease the Host could end (tia_detach releases it).
             string token = begin.TryGetProperty("leaseToken", out var value) && value.ValueKind == JsonValueKind.String ? value.GetString()! : throw Invalid();
             try { envelopes = Seal(JsonSerializer.SerializeToNode(arguments, BridgeProtocol.Json)!.AsObject(), requested, token); lease = token; return begin; }
             catch
@@ -67,7 +68,9 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
         foreach (var slot in slots)
         {
             ProtectedCredentialGuard.ValidateReference(slot.Reference); ProtectedCredentialGuard.ValidateBinding(slot.Binding);
-            if (!Purposes.Contains(slot.Binding.Purpose, StringComparer.Ordinal)) throw Invalid();
+            // A routed binding always names a V21 resource of its own purpose, so a credential of one purpose never serves another.
+            if (!Purposes.Contains(slot.Binding.Purpose, StringComparer.Ordinal) || slot.Binding.Resource.Provider != "siemensTiaPortalV21" ||
+                slot.Binding.Resource.ResourceKind != slot.Binding.Purpose) throw Invalid();
             string expected = ProtectedCredentialGuard.BindingHash(slot.Binding);
             // The public binding the worker derived from the exact target goes back to the caller, so a matching credential can be created.
             if (slot.Reference.BindingSha256 != expected)

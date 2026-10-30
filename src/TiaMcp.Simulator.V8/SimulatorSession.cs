@@ -45,6 +45,11 @@ namespace TiaMcp.Simulator.V8
                 case "sim_time": return Time(args);
                 case "sim_event": return Event(args);
                 case "sim_storage": return Storage(args);
+                case "sim_read_signals": return SignalsRead(args);
+                case "sim_write_signals": return SignalsWrite(args);
+                case "sim_area_read": return AreaRead(args);
+                case "sim_area_write": return AreaWrite(args);
+                case "sim_observe": return Observe(args);
                 default: throw new SimulatorException("UnknownOperation", "Unknown simulator operation: " + operation);
             }
         }

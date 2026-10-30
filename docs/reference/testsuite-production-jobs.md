@@ -1,6 +1,6 @@
 # TS-03 production Host integration
 
-**TS-05 application tests:** [Application-test inventory, strict import and owned-simulator run reviews](#ts-05-application-tests) reuse this job lifecycle. Their native execution stays behind the same disabled profile gate.
+**TS-05 application tests:** [Application-test inventory, strict import and owned-simulator run reviews](#ts-05-application-tests) reuse this job lifecycle. Production execution stays behind the same disabled profile gate; the [TS-Q02 qualification mode](#ts-q02-qualification-mode) runs one owned fixture case on an owned PLCSIM instance.
 
 **Offline supplied-result review:** Two separate [result intake/review tools](testsuite-result-review.md) now retain supplied packets, page exact findings and export JUnit without invoking this native execution queue. The ten style tools below retain their original gating.
 
@@ -66,7 +66,7 @@ Application/system execution, scope authoring/import, native list/group profiles
 
 ## TS-05 application tests
 
-The inventory and the `.tat` import are natively qualified (`local.testsuite.definitions.20261028`); `.ttst` imports and execution have not run natively ([record](../verification/testsuite-native-20261028.md)). Ledger D06; qualification is TS-Q02.
+The inventory and the `.tat` import are natively qualified (`local.testsuite.definitions.20261028`); `.ttst` imports have not run natively ([record](../verification/testsuite-native-20261028.md)). Execution ran natively only through the [TS-Q02 qualification mode](#ts-q02-qualification-mode) ([record](../verification/testsuite-application-20261030.md)). Ledger D06.
 
 | Entry | What it does |
 | --- | --- |
@@ -76,11 +76,22 @@ The inventory and the `.tat` import are natively qualified (`local.testsuite.def
 
 Each reviewed run is one native `TestCaseExecutor.Run` call, chosen by [TestSuiteApplicationRun.Route](../../src/TiaMcp.Core/TestSuite/TestSuiteApplicationRun.cs): one case, a case list, one set, a set list, or the whole `ApplicationTestSystemGroup` (`wholeGroup`, every reviewed case and nothing excluded). One call never mixes cases and sets. The operation is `testSuite.application.run`. Its required probes add `testsuite.applicationService` and `simulator.ownedInstance`.
 
-In the owning worker, observation and dispatch both decode the ticket with the `simulation_download` ownership rules: DPAPI ticket, on-disk marker, registered instance ID, name and storage, Softbus and runtime V8. The instance does not need to be OFF, because Test Suite drives the CPU state. The ticket expires 15 minutes after `sim_create`. Before the single Run, every reviewed case must re-export to its original bytes; sets resolve by exact name only. A whole-group run refuses if the group holds unreviewed cases. `SetScope(PlcSoftware, instanceName, ExecutionMode)` is then written to every reviewed case. That persists in the project, so it runs after the checkpoint and is never replayed. The `GetScope` readback goes into the execution-return receipt. `scopeVerified` stays false.
+In the owning worker, observation and dispatch both decode the ticket with the `simulation_download` ownership rules: DPAPI ticket, on-disk marker, registered instance ID, name and storage, Softbus and runtime V8. The instance does not need to be OFF, because Test Suite drives the CPU state. The ticket expires 15 minutes after `sim_create`. Before the single Run, every reviewed case must re-export to its original bytes; sets resolve by exact name only. A whole-group run refuses if the group holds unreviewed cases. `SetScope(PlcSoftware, instanceName, ExecutionMode)` is then written to every reviewed case. That persists in the project, so it runs after the checkpoint and is never replayed. The `GetScope` readback goes into the execution-return receipt. `scopeVerified` stays false, except in the TS-Q02 qualification mode below.
 
 The native `TestResults` tree is retained losslessly in the existing raw format (`NativeTestResult`). One call returns one tree for all its units. `TestSuiteApplicationRun.Captures` gives the whole tree to every required, non-excluded definition. Only a run whose closure is exactly one definition owns it. Lists, set members and groups stay `inconclusive` per unit until a per-case tree profile is qualified. `TestSuiteResultNormalizer` and the JUnit export are unchanged.
 
-Open gaps: production `RequireQualification` refuses on both Host and worker. System-managed mode still receives the owned instance's name, although Test Suite creates its own instance there. Checkpoint capture refuses projects that contain test sets, because sets have no export route. Preservation does not yet account for the intended `SetScope` change.
+Open gaps: production `RequireQualification` refuses on both Host and worker. System-managed mode still receives the owned instance's name, although Test Suite creates its own instance there. Checkpoint capture refuses projects that contain test sets, because sets have no export route. Outside the TS-Q02 fixture, preservation does not yet account for the intended `SetScope` change.
+
+### TS-Q02 qualification mode
+
+A `TestSuiteQualification=true` build started with `--testsuite-qualification` admits application execution for one exact profile, `v21.owned-plcsim.application.qualification-v1` ([TestSuiteApplicationQualification](../../src/TiaMcp.Core/TestSuite/TestSuiteApplicationQualification.cs) on the Host, [ApplicationQualificationFixture](../../src/TiaMcp.TestSuite.V21/ApplicationQualificationFixture.cs) in the worker). Both refuse with `TestSuiteProfileUnqualified` unless the review dispatches exactly one fixture case (`TiaMcp_Q02_Pass` or `TiaMcp_Q02_Fail`) with `Run(TestCase)` in `externallyManaged` mode, and with `ProjectIsolationRequired` unless the project lies in the Host's own `scratch` folder. System-managed mode is refused because Test Suite would create its own, unowned instance. The worker decodes the ticket at prepare, at both observations and before the Run, so a tampered ticket refuses with `InvalidSimulationTicket` and a released instance with `SimulationTargetMismatch`. Production admission is unchanged.
+
+- **Prepare:** `qualification_testsuite_prepare` with `fixture` `applicationPass` or `applicationFail` and `simulatorTicket` (an owned `sim_create` instance with the scratch program downloaded and in RUN). The worker imports both cases into the worker-created scratch, sets their scope to that instance (`ExternallyManagedPLCSIMInstance`), compiles and saves, and reviews the selected case. Pass asserts `"TiaMcp_EnableGate_DB".Active = TRUE`, which Main produces; Fail deliberately asserts `FALSE`.
+- **Scope:** `TestCase.GetScope()` names only the controller, so the complete scope reads back from both: `GetScope` must be the PLC and the case's own `SaveToFile` export must name the owned instance and the external mode. The required scope is that PLC and that instance. Because prepare already wrote the scope the Run writes again, the Run's `SetScope` is idempotent and preservation still compares the whole fixture. After `SetScope` the Run re-exports the case; only a byte-identical export marks the result `scopeVerified`.
+- **License:** V21 documents `LicenseNotFoundException` for `TestCase.SaveToFile`, so the export in the current session is the pre-run license observation. Execution acceptance is the returned Run itself. No operator observation is needed.
+- **Lifecycle:** `qualification_testsuite_execute`, `_recover` and `_reconcile` run the unchanged durable job: checkpoint archive, one Run, compile, preservation, fresh reopen with the scope read again, cleanup, and the `beforeRun`/`afterRun` lost-reply boundaries. Reconciliation compares the original and the restored copy with the checkpoint's preservation baseline.
+
+[`qualify_testsuite_application.py`](../../scripts/qualify_testsuite_application.py) runs one case per Host: `pass`, `fail`, `afterRun` and `released`. All four passed natively on 30 October (`local.testsuite.application.20261030`, [record](../verification/testsuite-application-20261030.md)).
 
 ## TS-06 system tests
 

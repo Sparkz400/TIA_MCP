@@ -87,6 +87,53 @@ internal static class SimulationRuntimeControlTests
         return Task.CompletedTask;
     }
 
+    internal static Task AreaAccessIsBoundedBeforeTheRuntimeCall()
+    {
+        var bytes = SimulationRuntimeControl.AreaAccess(JObject.Parse("{\"area\":\"output\",\"offset\":20,\"length\":1024,\"bit\":null}"), false);
+        Check.Equal("output", bytes.Value<string>("area"));
+        Check.Equal(1024, bytes.Value<int>("length"));
+        Check.Equal(null, bytes["bit"]);
+        Check.Equal(1, SimulationRuntimeControl.AreaAccess(JObject.Parse("{\"area\":\"input\",\"offset\":0}"), false).Value<int>("length"));
+        var bit = SimulationRuntimeControl.AreaAccess(JObject.Parse("{\"area\":\"marker\",\"offset\":34,\"bit\":7}"), false);
+        Check.Equal(7, bit.Value<int>("bit"));
+        Check.Equal(1, bit.Value<int>("length"));
+        var write = SimulationRuntimeControl.AreaAccess(JObject.Parse("{\"area\":\"input\",\"offset\":22,\"bytes\":[18,52],\"bit\":null,\"value\":null}"), true);
+        Check.Equal(2, write.Value<int>("length"));
+        Check.Equal(52, write["bytes"]![1]!.Value<int>());
+        var bitWrite = SimulationRuntimeControl.AreaAccess(JObject.Parse("{\"area\":\"marker\",\"offset\":34,\"bit\":5,\"value\":true,\"bytes\":null}"), true);
+        Check.Equal(true, bitWrite.Value<bool>("value"));
+        Check.Equal(true, SimulationRuntimeControl.AreaFits(write, 24));
+        Check.Equal(false, SimulationRuntimeControl.AreaFits(write, 23));
+        var far = SimulationRuntimeControl.AreaAccess(JObject.Parse("{\"area\":\"input\",\"offset\":2147483647,\"length\":1024}"), false);
+        Check.Equal(false, SimulationRuntimeControl.AreaFits(far, int.MaxValue + 1023L));
+        Check.Equal(true, SimulationRuntimeControl.AreaFits(far, int.MaxValue + 1024L));
+        foreach (string bad in new[] {
+            "{\"area\":\"Input\",\"offset\":0}", "{\"area\":\"timer\",\"offset\":0}", "{\"offset\":0}", "{\"area\":\"input\"}", "{\"area\":\"input\",\"offset\":-1}",
+            "{\"area\":\"input\",\"offset\":\"1\"}", "{\"area\":\"input\",\"offset\":0,\"length\":0}", "{\"area\":\"input\",\"offset\":0,\"length\":1025}",
+            "{\"area\":\"input\",\"offset\":0,\"bit\":8}", "{\"area\":\"input\",\"offset\":0,\"bit\":1,\"length\":1}", "{\"area\":\"input\",\"offset\":0,\"value\":true}",
+            "{\"area\":\"input\",\"offset\":0,\"bytes\":[1]}" })
+            Refused(() => SimulationRuntimeControl.AreaAccess(JObject.Parse(bad), false));
+        foreach (string bad in new[] {
+            "{\"area\":\"output\",\"offset\":0,\"bytes\":[1]}", "{\"area\":\"input\",\"offset\":0}", "{\"area\":\"input\",\"offset\":0,\"bytes\":[]}",
+            "{\"area\":\"input\",\"offset\":0,\"bytes\":[256]}", "{\"area\":\"input\",\"offset\":0,\"bytes\":[-1]}", "{\"area\":\"input\",\"offset\":0,\"bytes\":[1.5]}",
+            "{\"area\":\"input\",\"offset\":0,\"bytes\":[1],\"value\":true}", "{\"area\":\"input\",\"offset\":0,\"bytes\":[1],\"length\":1}", "{\"area\":\"input\",\"offset\":0,\"bit\":0}",
+            "{\"area\":\"input\",\"offset\":0,\"bit\":0,\"value\":1}", "{\"area\":\"input\",\"offset\":0,\"bit\":0,\"value\":true,\"bytes\":[1]}" })
+            Refused(() => SimulationRuntimeControl.AreaAccess(JObject.Parse(bad), true));
+        Refused(() => SimulationRuntimeControl.AreaAccess(new JObject { ["area"] = "marker", ["offset"] = 0, ["bytes"] = new JArray(Enumerable.Repeat(0, 1025)) }, true));
+        return Task.CompletedTask;
+    }
+
+    internal static Task SignalBatchesCarryPrimitiveValues()
+    {
+        Check.Equal(null, SimulationRuntimeControl.SignalBatchRefusal(["\"Db\".A", "\"Db\".A", new string('x', 299)], ["bool", "bool", "uint64"], false));
+        Check.Equal(null, SimulationRuntimeControl.SignalBatchRefusal(["\"Db\".A", "\"Db\".B"], ["double", "int8"], true));
+        Check.Equal("UnsupportedSignalType", SimulationRuntimeControl.SignalBatchRefusal(["\"Db\".A", "\"Db\".S"], ["bool", "string"], false));
+        Check.Equal("UnsupportedSignalType", SimulationRuntimeControl.SignalBatchRefusal(["\"Db\".W"], ["wstring"], true));
+        Check.Equal("InvalidRequest", SimulationRuntimeControl.SignalBatchRefusal([new string('x', 300)], ["bool"], false));
+        Check.Equal("InvalidRequest", SimulationRuntimeControl.SignalBatchRefusal(["\"Db\".A", "\"Db\".A"], ["bool", "bool"], true));
+        return Task.CompletedTask;
+    }
+
     // Every new runtime write sits behind the owned-instance check; the source is read like the network-mode guard.
     internal static Task WritesRequireAnOwnedInstance()
     {
@@ -102,6 +149,17 @@ internal static class SimulationRuntimeControlTests
         }
         string session = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Simulator.V8", "SimulatorSession.cs"));
         Check.Equal(true, System.Text.RegularExpressions.Regex.IsMatch(session, @"case ""memoryReset"": RequireOwned\(selected\); EnsureAdmitted\(selected\); selected\.Instance\.MemoryReset\("));
+        // Batch and area writes: owned and admitted before the write; reads and observation call no write, state or mode change.
+        string signals = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Simulator.V8", "SimulatorSession.Signals.cs"));
+        string Body(string method) { int start = signals.IndexOf(method, StringComparison.Ordinal); Check.Equal(true, start >= 0); int end = signals.IndexOf("\n        private ", start + 1, StringComparison.Ordinal); return signals[start..(end < 0 ? signals.Length : end)]; }
+        foreach (var (method, write) in new[] { ("JObject SignalsWrite(", "Instance.WriteSignals("), ("JObject AreaWrite(", "area.WriteBytes("), ("JObject AreaWrite(", "area.WriteBit(") })
+        {
+            string body = Body(method);
+            int owned = body.IndexOf("RequireOwned(selected);\n            EnsureAdmitted(selected);", StringComparison.Ordinal), call = body.IndexOf(write, StringComparison.Ordinal);
+            Check.Equal(true, owned > 0 && call > owned);
+        }
+        foreach (string method in new[] { "JObject SignalsRead(", "JObject AreaRead(", "JObject Observe(" })
+            Check.Equal(false, System.Text.RegularExpressions.Regex.IsMatch(Body(method), @"\.Write|\.Run\(|\.Stop\(|\.Power|OperatingMode\s*=|MemoryReset"));
         return Task.CompletedTask;
     }
 }

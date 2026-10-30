@@ -14,7 +14,7 @@ Point a stdio MCP client at `artifacts/host-only/bin/TiaMcp.Host/release/TiaMcp.
 
 For OPC UA trust that survives Host restarts, explicitly create a protected client identity and add `--ua-client-identity <name>` to the Host arguments. Setup, public certificate export and rotation are described in the [OPC UA identity workflow](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/opcua-runtime.md#protected-persistent-client-identity). The option needs a Windows user profile; it does not configure server trust or resume sessions.
 
-For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration. See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens).
+For a relocatable ZIP, run `./scripts/Package.ps1 -Offline`. It writes the bundle, hashes, notices and an MCP configuration; the bundle name and its manifest carry the product version. See [portable deployment](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#portable-package-without-siemens). Version tags attach the same verified ZIP to a draft GitHub release that the maintainer publishes ([releasing](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/releasing.md)).
 
 ## On an engineering workstation
 
@@ -39,11 +39,11 @@ From the repository root:
 
 If the probe reports missing prerequisites, follow [environment diagnostics](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/environment-diagnostics.md).
 
-Combined library install: on every Host, `change_apply` installs a prepared PLC `library_integrate` plan in one step for the natively qualified shapes only and refuses OB insertion and every other shape. The former opt-in flag `--enable-library-integrate-apply` is still accepted and changes nothing. See [combined apply](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply).
+Combined library install: on every Host, `change_apply` installs a prepared PLC `library_integrate` plan in one step for the natively qualified shapes only and refuses OB insertion and every other shape. The former opt-in flag `--enable-library-integrate-apply` is still accepted and changes nothing; `--disable-library-integrate-apply` turns combined apply off. See [combined apply](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/plc-library-integration-recipes.md#combined-apply).
 
 Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll); one native selection handoff is verified (`local.addin.companion.20261029`).
 
-The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--library-limits-file` or `--no-native-workers`; start the Host directly for those. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options).
+The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--library-limits-file` or `--no-native-workers`; start the Host directly for those. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options).
 
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
@@ -66,7 +66,7 @@ Configure a stdio server with your actual checkout path:
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
-The Host advertises about 290 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
+The Host advertises about 290 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
 
 ## Next steps
 

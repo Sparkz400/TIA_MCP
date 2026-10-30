@@ -12,6 +12,10 @@ credential CLI's stdin into an isolated named vault.
 | --- | --- | --- | --- | --- |
 | `change.block_protect`, `change.block_unprotect`, `change.block_write_protection_set` | [`qualify_block_protection.py`](../../scripts/qualify_block_protection.py) | `artifacts/bp2` (`b5fecd8`) | Passed, 38/38 steps | `local.block_protection.20261030` |
 | same | same | `artifacts/bp1` (`5a8a947`) | Stopped at the first protect; not evidence | `artifacts/q/bp/bp_da34915a` |
+| same, rerun after the route hardening | same | `artifacts/cr1` (`1f11b01`) | Passed, 38/38 steps, same observations | `local.block_protection.rerun.20261030` |
+
+The rerun ran the hardened route: length-prefixed seal entropy, pinned plaintext buffers, the worker half in
+`RoutedCredentials` (now tested offline) and the Host's check that a binding names a V21 resource of its own purpose.
 
 One owned TIA Portal V21 instance and one owned scratch project (CPU 1511-1 PN), built and run from a frozen
 `git archive` copy; nothing touched a user project, a PLC or PLCSIM.
@@ -41,6 +45,6 @@ No admission stayed unresolved: every native failure returned and was recorded a
 ## Not covered
 
 Software units, namespaces, LAD/FBD, OBs and safety blocks; non-ASCII passwords and the length bound; another
-Windows user or profile; a fresh Portal reopen after the changes; `CredentialAdmissionRequired` and the worker's
-`CredentialRequired`, which are covered offline only (`TiaMcp.Credentials.Tests`). A wrong password is not yet a typed
+Windows user or profile; a fresh Portal reopen after the changes; `CredentialAdmissionRequired`, the worker's
+`CredentialRequired` and its slot-set checks, which are covered offline only (`TiaMcp.Credentials.Tests`). A wrong password is not yet a typed
 refusal.

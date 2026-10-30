@@ -14,7 +14,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     // Selected --toolsets groups; null advertises every tool.
     public IReadOnlySet<string>? Toolsets { get; init; }
     public bool AddInHandoff { get; init; }
-    // Combined PLC library_integrate apply of the verified shapes runs on every Host (decision of 29 October 2026).
+    // Combined PLC library_integrate apply of the verified shapes runs by default (decision of 29 October 2026); --disable-library-integrate-apply turns it off.
     public bool LibraryIntegrateApply { get; init; } = true;
     internal TiaMcp.Core.AddIns.AddInEnrollment? AddInEnrollment { get; init; }
     // Deliberately excluded from normal feature/catalog advertisements.
@@ -44,6 +44,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var diagnose = false;
         var addInHandoff = false;
         var libraryIntegrateApply = true;
+        var enableLibraryIntegrateApplyGiven = false;
         TiaMcp.Core.AddIns.AddInEnrollment? addInEnrollment = null;
 #if OFFLINE_PACKAGE
         var noNativeWorkers = true;
@@ -64,7 +65,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             var option = args[i];
             if (option == "--no-native-workers") { noNativeWorkers = true; continue; }
             if (option == "--addin-handoff") { addInHandoff = true; continue; }
-            if (option == "--enable-library-integrate-apply") { libraryIntegrateApply = true; continue; } // the default; kept for existing launch configurations
+            if (option == "--enable-library-integrate-apply") { enableLibraryIntegrateApplyGiven = true; continue; } // the default; kept for existing launch configurations
+            if (option == "--disable-library-integrate-apply") { libraryIntegrateApply = false; continue; }
             if (option == "--diagnose") { diagnose = true; continue; }
             if (option == "--component-qualification") { componentQualification = true; continue; }
             if (option == "--testsuite-scope-probe") { testSuiteScopeProbe = true; continue; }
@@ -127,6 +129,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
+        if (enableLibraryIntegrateApplyGiven && !libraryIntegrateApply)
+            throw new ArgumentException("--enable-library-integrate-apply and --disable-library-integrate-apply exclude each other.");
         return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
     }
 
