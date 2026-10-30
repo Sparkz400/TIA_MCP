@@ -188,7 +188,12 @@ power state is reported before and after.
   "certificate not matching"), is accepted under the same opt-in for the revalidated owned
   instance only and recorded as unauthenticated TLS (`tlsAuthentication: "unauthenticated"`,
   `tlsUnauthenticated: true`): its identity rests on the ticket and ownership checks, not on a
-  certificate (maintainer decision of 29 October, "Allow, owned PLCSIM only"). More than one
+  certificate (maintainer decision of 29 October, "Allow, owned PLCSIM only"). It is accepted
+  only when TIA's initial selection is `NonVerified`: another selection refuses
+  (`withoutCertificateNotReportedNonVerified`). The localized verification text is recorded but
+  not matched. An attempt that was trusted without a certificate never pins one later. A later
+  challenge offering a certificate is refused (`attemptTrustedWithoutCertificate`), also after
+  the login. A certificate-less challenge may recur under the same rule. More than one
   certificate, no opt-in, or any other target still refuses.
   The compare and DB-snapshot routes never trust TLS: they run in the scratch project's Portal,
   which downloaded the CPU's certificate configuration, and TIA asked them no TLS question in the

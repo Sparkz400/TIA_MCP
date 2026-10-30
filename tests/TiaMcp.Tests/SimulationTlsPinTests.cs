@@ -42,11 +42,17 @@ namespace TiaMcp.Tests
             var now = new DateTime(2026, 10, 29, 0, 0, 0, DateTimeKind.Utc);
             string pin = new string('a', 64);
             string None(bool allow = true, bool authorized = true, string? attempt = null, int count = 0, bool owned = true, bool opened = false,
-                bool latched = false, bool metadata = true) =>
-                SimulationTlsPin.Decide(authorized, attempt!, count == 1 ? pin : null!, count, from, from.AddYears(20), now, metadata, owned, opened, latched, allow);
+                bool latched = false, bool metadata = true, bool unauthenticated = false, bool nonVerified = true) =>
+                SimulationTlsPin.Decide(authorized, attempt!, count == 1 ? pin : null!, count, from, from.AddYears(20), now, metadata, owned, opened, latched, allow,
+                    unauthenticated, nonVerified);
 
             Check.Equal(SimulationTlsPin.WithoutCertificate, None());
             Check.Equal(true, SimulationTlsPin.Allows(None()));
+            // Only the NonVerified state TIA reported natively; Trusted, NonTrusted or an unread selection refuses, and so does the default.
+            Check.Equal("withoutCertificateNotReportedNonVerified", None(nonVerified: false));
+            Check.Equal(false, SimulationTlsPin.Allows(None(nonVerified: false)));
+            Check.Equal("withoutCertificateNotReportedNonVerified",
+                SimulationTlsPin.Decide(true, null!, null!, 0, from, from.AddYears(20), now, true, true, false, false, true));
             Check.Equal("certificateCountNotOne", None(allow: false));
             Check.Equal("firstUseTrustNotAuthorized", None(authorized: false));
             Check.Equal("ownedTargetNotVerified", None(owned: false));
@@ -58,6 +64,30 @@ namespace TiaMcp.Tests
             // One certificate keeps the pin rule.
             Check.Equal(SimulationTlsPin.FirstUse, None(count: 1));
             Check.Equal(SimulationTlsPin.SamePin, None(count: 1, attempt: pin));
+            return Task.CompletedTask;
+        }
+
+        // The mirror of "a pinned attempt never falls back to no certificate": once an attempt trusted a certificate-less challenge,
+        // a later challenge offering a certificate is refused. The caller passes credentialOpened=false then (the trust preceded the
+        // login), so this is the only rule that keeps a certificate from being pinned after the login was answered.
+        internal static Task UnauthenticatedAttemptNeverPinsACertificateLater()
+        {
+            var from = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var now = new DateTime(2026, 10, 29, 0, 0, 0, DateTimeKind.Utc);
+            string pin = new string('a', 64);
+            string Later(int count, bool unauthenticated = true, bool nonVerified = true) =>
+                SimulationTlsPin.Decide(true, null!, count == 1 ? pin : null!, count, from, from.AddYears(20), now, true, true, false, false, true, unauthenticated, nonVerified);
+
+            Check.Equal("attemptTrustedWithoutCertificate", Later(1));
+            Check.Equal("attemptTrustedWithoutCertificate", Later(2));
+            Check.Equal(false, SimulationTlsPin.Allows(Later(1)));
+            // A later certificate-less challenge may recur in the same form, still only when reported NonVerified.
+            Check.Equal(SimulationTlsPin.WithoutCertificate, Later(0));
+            Check.Equal("withoutCertificateNotReportedNonVerified", Later(0, nonVerified: false));
+            // Without a prior unauthenticated trust the certificate is pinned on first use as before.
+            Check.Equal(SimulationTlsPin.FirstUse, Later(1, unauthenticated: false));
+            // Provisioning never trusts without a certificate, so the flag cannot arise there; its defaults keep the old rule.
+            Check.Equal(SimulationTlsPin.FirstUse, SimulationTlsPin.Decide(true, null!, pin, 1, from, from.AddYears(20), now, true, true, false, false, false));
             return Task.CompletedTask;
         }
     }

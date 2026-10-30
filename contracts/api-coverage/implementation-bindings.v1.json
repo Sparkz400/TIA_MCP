@@ -1862,8 +1862,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "449ff6a45f3705426b50ee2c287a27540da99246e852f769137b72eb75fcfc8e",
-      "bytes": 37435
+      "sha256": "c2cd0fbad0727098a20304c7e6f6dfedbff3e2010737a702a972e52a9372ea42",
+      "bytes": 37527
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -2782,8 +2782,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationOnline.cs",
-      "sha256": "7749b9087d3ea93aaf05a67649fbc666769d5fdd5e90177b9aa746e140555460",
-      "bytes": 38539
+      "sha256": "f1b72662ad244b0e523c0d250caf3c70ee3cdec5f58140bdf616ba1ee962ff44",
+      "bytes": 38938
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationOnlineDownload.cs",
@@ -3052,8 +3052,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationTlsPin.cs",
-      "sha256": "38c228928b56375f037c7e25b3a955d761ffd72bf17e7b0f88667b2ee6ec270a",
-      "bytes": 2955
+      "sha256": "b0398530ea73dcee3ccaeb7c3e10ca563f88d8b614ad4351ccbea5e5c8ffed34",
+      "bytes": 3695
     },
     {
       "path": "src/TiaMcp.Openness.V21/TagTableLifecycleRules.cs",
