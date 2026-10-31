@@ -154,6 +154,7 @@ internal static partial class Program
             ("TCP/IP provisioning decides its target by address, or by MAC once the budget is spent", SimulationNetworkAdmissionTests.RuntimeTargetFromDiscoverySamples),
             ("Only TCP/IP retries GoOnline, once, before any callback or credential use", SimulationNetworkAdmissionTests.GoOnlineRetryOnlyBeforeAnyCallbackInTcpIp),
             ("Simulator worker never assigns network mode, adapters or IPs", SimulationNetworkAdmissionTests.WorkerNeverAssignsNetworkMode),
+            ("Runtime and Test Suite writes to a TCP/IP instance must route through the PLCSIM adapter", SimulationNetworkAdmissionTests.WritesRouteThroughThePlcsimAdapter),
             ("Simulator time requests are bounded, finite and explicit UTC", SimulationRuntimeControlTests.TimeBoundsAndUtc),
             ("Simulator events map to the exact V8 enum codes", SimulationRuntimeControlTests.EventsMapToV8Codes),
             ("Simulator events refuse malformed requests before any runtime call", SimulationRuntimeControlTests.EventsRefuseBeforeTheRuntimeCall),

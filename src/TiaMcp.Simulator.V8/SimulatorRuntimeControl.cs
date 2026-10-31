@@ -149,6 +149,7 @@ namespace TiaMcp.Simulator.V8
                 var previous = selected.Instance.OperatingMode;
                 selected.Instance.RegisterOnSyncPointReachedEvent();
                 selected.CaptureRestoreMode = previous;
+                selected.CaptureHeld = true;
                 try
                 {
                     selected.Instance.OperatingMode = EOperatingMode.TimespanSynchronized_C;
@@ -186,10 +187,10 @@ namespace TiaMcp.Simulator.V8
             if (!selected.Owned) throw new SimulatorException("OwnedInstanceRequired", "Only an instance this worker created or adopted can be changed by this operation.");
         }
 
-        // A held operating mode is restored only by its capture's end or the worker's shutdown, never from under it.
+        // A running capture or scenario's mode is restored only by its own end or the worker's shutdown, never from under it.
         private static void RequireNoCapture(Selection selected)
         {
-            if (selected.CaptureRestoreMode != null) throw new SimulatorException("SimulationCaptureModeActive", "A cycle-synchronous capture or virtual-time scenario holds this instance.");
+            if (selected.CaptureHeld) throw new SimulatorException("SimulationCaptureModeActive", "A cycle-synchronous capture or virtual-time scenario holds this instance.");
         }
 
         private static T Control<T>(Func<T> parse)

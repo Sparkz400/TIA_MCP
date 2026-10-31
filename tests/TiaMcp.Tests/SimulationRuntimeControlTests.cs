@@ -161,7 +161,12 @@ internal static class SimulationRuntimeControlTests
         string scenario = Body(session, "JObject Test(");
         Check.Equal(true, scenario.IndexOf("item[\"writes\"] != null) == true) RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var first &&
             first < scenario.IndexOf("EnsureAdmitted(selected)", StringComparison.Ordinal) && first < scenario.IndexOf("ApplyWrites(", StringComparison.Ordinal));
-        Check.Equal(true, Body(session, "JObject Release(").Contains("else RequireNoCapture(selected);", StringComparison.Ordinal));
+        Check.Equal(true, Body(session, "JObject Release(").Contains("else { RequireNoCapture(selected); RestoreCaptureMode(selected); }", StringComparison.Ordinal));
+        // Only a running capture or scenario holds the instance: every restore, also a failed one, ends the hold first, so release can retry it.
+        Check.Equal(true, Body(session, "static void RestoreCaptureMode(").Contains("{\n            selected.CaptureHeld = false;\n            if (selected.CaptureRestoreMode == null) return;", StringComparison.Ordinal));
+        Check.Equal(true, Body(source, "static void RequireNoCapture(").Contains("if (selected.CaptureHeld) throw", StringComparison.Ordinal));
+        foreach (string text in new[] { session, source })
+            Check.Equal(true, text.Split("CaptureRestoreMode = previous;").Length == 2 && text.Contains("CaptureRestoreMode = previous;\n                selected.CaptureHeld = true;", StringComparison.Ordinal));
         // Batch and area writes: owned and admitted before the write; reads and observation call no write, state or mode change.
         foreach (var (method, write) in new[] { ("JObject SignalsWrite(", "Instance.WriteSignals("), ("JObject AreaWrite(", "area.WriteBytes("), ("JObject AreaWrite(", "area.WriteBit(") })
         {

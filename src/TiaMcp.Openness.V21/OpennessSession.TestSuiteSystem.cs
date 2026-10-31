@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Siemens.Engineering;
+using TiaMcp.Simulation;
 using TiaMcp.TestSuite.V21;
 
 namespace TiaMcp.Openness.V21
@@ -28,13 +29,18 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        // A system test writes through OPC UA, so its endpoint must be a controller address of the ticket-owned PLCSIM instance.
+        // A system test writes through OPC UA, so its endpoint must be a controller address of the ticket-owned PLCSIM instance
+        // that Windows routes through the PLCSIM adapter: a physical PLC with the same address can sit behind another network card.
         private JObject TestSuiteOwnedEndpoint(string ticket, string serverAddress)
         {
             var simulator = TestSuiteOwnedSimulator(ticket);
             if (!Uri.TryCreate(serverAddress, UriKind.Absolute, out var uri) || uri.Scheme != "opc.tcp" ||
                 !simulator["controllerAddresses"].Values<string>().Contains(uri.Host, StringComparer.Ordinal))
                 throw new BridgeException("RuntimeTargetNotOwnedPlcsim", "serverAddress is not a controller address of the ticket-owned PLCSIM instance.");
+            string route = SimulationNetworkAdmission.RouteRefusal(SimulationNetworkRoute.Adapter(serverAddress));
+            if (route != null) throw new BridgeException(route, route == "RuntimeTargetRouteUnverified"
+                ? "The network adapter Windows routes serverAddress through could not be determined. Nothing was written."
+                : "Windows routes serverAddress through a network adapter other than the PLCSIM Virtual Ethernet Adapter, where a physical PLC can hold the same address. Nothing was written.");
             return simulator;
         }
 

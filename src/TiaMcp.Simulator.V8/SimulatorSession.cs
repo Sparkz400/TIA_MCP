@@ -365,6 +365,7 @@ namespace TiaMcp.Simulator.V8
                 var previous = selected.Instance.OperatingMode;
                 selected.Instance.RegisterOnSyncPointReachedEvent();
                 selected.CaptureRestoreMode = previous;
+                selected.CaptureHeld = true;
                 try
                 {
                     selected.Instance.OperatingMode = EOperatingMode.SingleStep_C;
@@ -404,8 +405,10 @@ namespace TiaMcp.Simulator.V8
             return result;
         }
 
+        // Every restore ends the hold, also a failed one: the recorded mode then blocks only a new begin until a release retries it.
         private static void RestoreCaptureMode(Selection selected)
         {
+            selected.CaptureHeld = false;
             if (selected.CaptureRestoreMode == null) return;
             var previous = selected.CaptureRestoreMode.Value;
             selected.Instance.OperatingMode = previous;
@@ -442,7 +445,7 @@ namespace TiaMcp.Simulator.V8
                     SimulationCreationJournal.Save(selected.CreationRoot, selected.CreationReceipt);
                 }
             }
-            else RequireNoCapture(selected);
+            else { RequireNoCapture(selected); RestoreCaptureMode(selected); }
             selected.Instance.Dispose();
             _instances.Remove(selected.Id);
             return new JObject { ["instanceId"] = selected.Id, ["instanceName"] = selected.Name, ["unregistered"] = remove,
@@ -805,7 +808,8 @@ namespace TiaMcp.Simulator.V8
         }
 
         private sealed class Selection { internal IInstance Instance; internal int Id; internal string Name; internal bool Owned; internal string Storage;
-            internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode; }
+            internal string CreationRoot; internal JObject CreationReceipt; internal EOperatingMode? CaptureRestoreMode;
+            internal bool CaptureHeld; }
         private sealed class Signal { internal string Symbol; internal string Type; internal JToken Value; }
     }
 }

@@ -111,4 +111,25 @@ internal static class SimulationNetworkAdmissionTests
         Check.Equal(true, source.Contains("SimulationNetworkAdmission.Refusal", StringComparison.Ordinal));
         return Task.CompletedTask;
     }
+
+    // Writes to a TCP/IP instance's address leave only through the PLCSIM adapter; the same address behind any other card is a physical PLC.
+    internal static Task WritesRouteThroughThePlcsimAdapter()
+    {
+        Check.Equal(null, SimulationNetworkAdmission.RouteRefusal("Siemens PLCSIM Virtual Ethernet Adapter"));
+        Check.Equal(null, SimulationNetworkAdmission.RouteRefusal("siemens plcsim virtual ethernet adapter #2"));
+        foreach (string other in new[] { "Intel(R) Ethernet Connection I219-LM", "", "PLCSIM" })
+            Check.Equal("RuntimeTargetNotOwnedPlcsim", SimulationNetworkAdmission.RouteRefusal(other));
+        Check.Equal("RuntimeTargetRouteUnverified", SimulationNetworkAdmission.RouteRefusal(null));
+        Check.Equal(null, SimulationNetworkRoute.Adapter("opc.tcp://plc.example:4840"));
+        // Both write paths decide on Windows' route: the Host runtime gate and the Test Suite system-test endpoint.
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "src", "TiaMcp.Host", "PlcsimTargets.cs"))) root = root.Parent;
+        string Source(params string[] path) => File.ReadAllText(Path.Combine([root?.FullName ?? throw new InvalidOperationException("Source missing."), "src", .. path]));
+        Check.Equal(true, Source("TiaMcp.Host", "PlcsimTargets.cs").Contains("RequireEndpoint(recorded, endpoint, SimulationNetworkRoute.Adapter(endpoint))", StringComparison.Ordinal));
+        Check.Equal(true, Source("TiaMcp.Core", "PhysicalRuntime", "PlcsimTargetBinding.cs").Contains("SimulationNetworkAdmission.RouteRefusal(routeAdapter)", StringComparison.Ordinal));
+        string system = Source("TiaMcp.Openness.V21", "OpennessSession.TestSuiteSystem.cs");
+        int guard = system.IndexOf("SimulationNetworkAdmission.RouteRefusal(SimulationNetworkRoute.Adapter(serverAddress))", StringComparison.Ordinal);
+        Check.Equal(true, guard > system.IndexOf("private JObject TestSuiteOwnedEndpoint(", StringComparison.Ordinal) && guard < system.IndexOf("return simulator;", StringComparison.Ordinal));
+        return Task.CompletedTask;
+    }
 }
