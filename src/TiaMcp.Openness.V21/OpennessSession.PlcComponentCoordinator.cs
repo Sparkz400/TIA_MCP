@@ -51,8 +51,9 @@ namespace TiaMcp.Openness.V21
                     if (_session.LibraryChangeFingerprint(_plan) != _plan.Preview.Value<string>("fingerprint")) throw new BridgeException("PreviewStale", "Source or target changed after the component plan; no native mutation was dispatched.");
                     return _session.LibraryChangePrepare(arguments, (JArray)_plan.Preview["integrationPlan"]["versions"]);
                 }
-                // The natively captured storage profile applies only to a plan whose installed FB/UDT content equals the captured one.
-                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _session.CapturedStorageContext(_plan, _production));
+                // The natively captured storage profile applies only to a plan whose installed FB/UDT content equals the captured one,
+                // and it is a global instance DB; a multi-instance takes the typed route's own multi-instance profiles.
+                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _plan.Preview["integrationPlan"]["multiInstance"] != null ? null : _session.CapturedStorageContext(_plan, _production));
                 throw new BridgeException("UnsupportedComponentStep", "Coordinator can prepare only library_instantiate and graphical_typed_edit.");
             }
 
@@ -187,13 +188,18 @@ namespace TiaMcp.Openness.V21
                     {
                         var prepared = typedPreparation["preview"];
                         CompareArtifact((JObject)prepared["typed"]["nativeArtifact"], callerFile);
+                        var multi = contract["plan"]["multiInstance"] as JObject;
                         if (!standalone)
                         {
                             var original = (JObject)contract["plan"]["callerArtifact"];
                             result["callerInsertion"] = PlcComponentCallerInsertion.Verify(
                                 EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(original, original.Value<string>("sha256"))),
-                                EngineeringSources.ReadXml(File.ReadAllText(callerFile)), payload["integration"]["caller"].Value<string>("insertAfterNetworkId"));
+                                EngineeringSources.ReadXml(File.ReadAllText(callerFile)), payload["integration"]["caller"].Value<string>("insertAfterNetworkId"), multi?.Value<string>("name"));
                         }
+                        // The whole caller, new multi-instance member included, already equals the prepared typed artifact above.
+                        if (multi != null) result["multiInstance"] = new JObject { ["callerPath"] = callerPath, ["name"] = multi.Value<string>("name"), ["dataType"] = result["callerInsertion"]["addedStaticMember"]["dataType"].DeepClone() };
+                        else
+                        {
                         var effects = ((JArray)prepared["effects"]).Where(e => e.Value<string>("action") == "createInstanceDB").ToArray();
                         if (effects.Length != 1) throw new BridgeException("ComponentReadbackMismatch", "Expected exactly one prepared instance creation.");
                         var effect = effects[0];
@@ -203,7 +209,9 @@ namespace TiaMcp.Openness.V21
                         string instanceFile = Path.Combine(directory, "instance.xml"); instance.Export(new FileInfo(instanceFile), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                         CompareArtifact((JObject)effect["artifact"], instanceFile);
                         result["instance"] = new JObject { ["path"] = instances[0].Path, ["number"] = instance.Number, ["instanceOfName"] = instance.InstanceOfName, ["contentSha256"] = ChangeFileHash(instanceFile), ["artifact"] = ChangeArtifact(instanceFile) };
-                        result["callerMatchesPrepared"] = true; result["instanceMatchesPrepared"] = true;
+                        result["instanceMatchesPrepared"] = true;
+                        }
+                        result["callerMatchesPrepared"] = true;
                     }
                     }
                     result["scopeComplete"] = true;

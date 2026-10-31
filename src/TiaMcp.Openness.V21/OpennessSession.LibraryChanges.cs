@@ -52,7 +52,7 @@ namespace TiaMcp.Openness.V21
             if (_libraryIntegrateApplyEnabled)
             {
                 result["plcIntegration"]["applySupported"] = true;
-                result["plcIntegration"]["combinedApply"] = "Enabled on every Host for a fresh FB/dependency import with a new global instance DB and a new FBD FC caller or an existing one after its last network in the standard PLC scope; preview.combinedApply states eligibility. OB insertion, LAD/FB callers, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only. Natively qualified for these shapes (local.library_integrate.combined_apply.rerun.20261028).";
+                result["plcIntegration"]["combinedApply"] = "Enabled on every Host for a fresh FB/dependency import with a new global instance DB and a new FBD FC caller or an existing one after its last network in the standard PLC scope; preview.combinedApply states eligibility. OB insertion, LAD/FB callers, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only. Natively qualified for these shapes (local.library_integrate.combined_apply.rerun.20261028). LAD and FB callers, earlier placements, reuse of the installed FB and multi-instances with a reused FB have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch (preview.combinedApply.candidateFeatures).";
             }
             result["limitations"] = new JArray("Type authoring uses documented CreateFromDocuments; direct block-to-type creation is not exposed by the installed public API.", "PLC library_integrate prepares an explicit recipe. Combined apply runs only for the verified shapes in plcIntegration; otherwise the proposed steps require separate fresh preparation. Steps are never atomic.", "Library copy/publication can initialize a default or promote a newer source default, with exact effects pinned in preview. Arbitrary default changes and project updates require separate prepared actions.", "Full document/preservation/runtime qualification must be retained for each target profile.");
             return result;
@@ -436,11 +436,13 @@ namespace TiaMcp.Openness.V21
                 // TIA does not apply a unit's namespace preset to library instances; an explicit namespace is set after creation.
                 string nameSpace = ChangeText(change.Payload, "namespace", 128);
                 if (scope.Unit == null) throw new BridgeException("TargetIncompatible", "An explicit instance namespace requires a software-unit scopePath; the PLC root has no namespaces.");
-                if (change.Masters.Count != 0 || change.Versions.Count == 0) throw new BridgeException("InvalidRequest", "An explicit namespace applies to selected type versions only, not to master copies.");
+                // Tag tables have no namespace; a master copy of a block or type gets it like a type version root.
+                if (change.Masters.Count != 0 && change.Payload.Value<string>("destinationComposition") == "tagTables") throw new BridgeException("InvalidRequest", "An explicit namespace applies to blocks and PLC data types, not to tag tables.");
                 if (!System.Text.RegularExpressions.Regex.IsMatch(nameSpace, @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$")) throw new BridgeException("InvalidRequest", "namespace must be dot-separated identifiers.");
                 change.Preview["instanceNamespace"] = new JObject { ["namespace"] = nameSpace, ["unitNamespacePreset"] = scope.Unit.NamespacePreset,
                     ["objects"] = new JArray(change.Versions.Select(x => new JObject { ["typeName"] = x.TypeObject.Name, ["typeNamespace"] = x.TypeObject.Namespace ?? "" })),
-                    ["scope"] = "Selected roots only; created dependencies keep their type namespace and reused ones are unchanged." };
+                    ["masterCopies"] = new JArray(change.Masters.SelectMany(m => m.ContentDescriptions.Select(d => d.ContentName))),
+                    ["scope"] = "Selected roots and master copies only; created dependencies keep their type namespace and reused ones are unchanged." };
             }
             var names = ScopeBlocks(scope, budget).Select(x => x.Item.Name).Concat(ScopeTypes(scope, budget).Select(x => x.Item.Name)).ToHashSet(StringComparer.OrdinalIgnoreCase);
             if (budget.Truncated) throw new BridgeException("DependencyUnresolved", "Target inventory exceeded its completeness budget.");
@@ -1122,6 +1124,11 @@ namespace TiaMcp.Openness.V21
                         object created = composition == "blocks" ? (object)scope.Blocks.Blocks.CreateFrom(master, MasterCopyMode.ThrowIfExists)
                             : composition == "tagTables" ? (object)scope.Tags.TagTables.CreateFrom(master, MasterCopyMode.ThrowIfExists)
                             : scope.Types.Types.CreateFrom(master, MasterCopyMode.ThrowIfExists);
+                        if (nameSpace != null)
+                        {
+                            if (created is PlcBlock masterBlock) masterBlock.Namespace = nameSpace; else ((PlcType)created).Namespace = nameSpace;
+                            if ((created is PlcBlock b ? b.Namespace : ((PlcType)created).Namespace) != nameSpace) throw new BridgeException("PreservationMismatch", "The created master-copy object does not carry the requested namespace.");
+                        }
                         rows.Add(LibraryObjectDescription(created)); LibraryJournal(change, "instantiate_master_" + master.Name, "completed");
                     }
                     break;

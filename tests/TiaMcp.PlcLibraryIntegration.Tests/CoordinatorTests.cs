@@ -275,6 +275,63 @@ internal static class CoordinatorTests
             var s = new Scenario(create: false); ((JArray)s.PreparedPlan["preview"]["integrationPlan"]["blockers"]).Add(new JObject { ["code"] = "NativeIdPreservationUnsupported" }); s.RehashPlan();
             Reject("ComponentPlanBlocked", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops)); Equal(0, s.Ops.Applies);
         });
+        test("reused FB installs through one reviewed typed step anchored on its own checkpoint", () => {
+            var s = new Scenario(reused: true); Equal("graphical_prepared", s.Next().Value<string>("state"));
+            Equal(0, s.Ops.LibraryPreparations); Equal(1, s.Ops.ImportReads); Equal(0, s.Ops.Applies);
+            Equal("graphical_applied", s.Apply("graphical").Value<string>("state")); var installed = s.Next();
+            Equal("installation_verified", installed.Value<string>("state")); Equal(1, s.Ops.Applies);
+            Equal(s.Ops.TypedCheckpoint, installed["initialCheckpoint"].Value<string>("archivePath")); Equal("typed-step", installed["initialCheckpoint"].Value<string>("changeId"));
+            Equal("typed-step", installed["recovery"].Value<string>("initialTypedChangeId")); Equal(null, installed["library"]["dispatch"]);
+        });
+        test("reused FB receipt with its archive after the mutation is not an initial checkpoint", () => {
+            var s = new Scenario(reused: true); s.Next(); s.Ops.ResultMutation = r => r["stages"] = new JArray("prechange_project_saved", "mutation_applied", "recovery_archive_created");
+            Reject("ComponentCheckpointOrderInvalid", () => s.Apply("graphical")); Equal(true, s.Coordinator.Status()["initialCheckpoint"] == null);
+        });
+        test("reused FB receipt with changed archive bytes is refused", () => {
+            var s = new Scenario(reused: true); s.Next(); s.Ops.ResultMutation = r => File.WriteAllText(s.Ops.TypedCheckpoint, "changed");
+            Reject("ComponentCheckpointInvalid", () => s.Apply("graphical")); Equal("outcome_unknown", s.Coordinator.Status().Value<string>("state"));
+        });
+        test("reused FB lost typed response reconciles and adopts the typed checkpoint without replay", () => {
+            var s = new Scenario(reused: true); s.Next(); s.Ops.LoseResponse = true; Throws<IOException>(() => s.Apply("graphical"));
+            var status = s.Coordinator.Reconcile(); Equal("graphical_applied", status.Value<string>("state")); Equal(s.Ops.TypedCheckpoint, status["initialCheckpoint"].Value<string>("archivePath"));
+            Equal("installation_verified", s.Next().Value<string>("state")); Equal(1, s.Ops.Applies);
+        });
+        test("reused FB typed preparation failure needs no recovery", () => {
+            var s = new Scenario(reused: true); s.Ops.FailTypedPrepare = true; Throws<IOException>(() => s.Next());
+            Equal("preparation_failed", s.Coordinator.Status().Value<string>("state")); Equal(0, s.Ops.Applies);
+        });
+        test("installed component drift before typed preparation of a reused FB blocks it", () => {
+            var s = new Scenario(reused: true); s.Ops.ImportMutation = r => r["versions"][0]["contentSha256"] = new string('f', 64);
+            Reject("ComponentReadbackMismatch", () => s.Next()); Equal(0, s.Ops.TypedPreparations);
+        });
+        test("a reused FB contract with an import step is invalid", () => {
+            var s = new Scenario(create: false, reused: true); var steps = (JArray)s.PreparedPlan["preview"]["integrationPlan"]["steps"];
+            steps.Insert(0, new JObject { ["order"] = 0, ["kind"] = "library_instantiate", ["prepareArguments"] = new JObject { ["kind"] = "library_instantiate" } }); s.RehashPlan();
+            Reject("InvalidComponentContract", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops));
+        });
+        test("multi-instance installs its exact caller member and no instance DB", () => {
+            var s = new Scenario(multi: true); s.ToTypedPrepared(); s.Apply("graphical"); var installed = s.Next();
+            Equal("installation_verified", installed.Value<string>("state")); Equal("Motor1", installed["installationEvidence"]["multiInstance"].Value<string>("name"));
+            Equal(s.Ops.InitialCheckpoint, installed["initialCheckpoint"].Value<string>("archivePath"));
+        });
+        test("multi-instance preparation that also creates an instance DB is refused", () => {
+            var s = new Scenario(multi: true); s.ToLibraryApplied(); s.Next();
+            s.Ops.PreparedMutation = p => ((JArray)p["preview"]["effects"]).Add(new JObject { ["action"] = "createInstanceDB", ["name"] = "Motor_1", ["path"] = "/plc/blocks/Motor_1", ["number"] = 3 });
+            Reject("ComponentPreparationMismatch", () => s.Next()); Equal(1, s.Ops.Applies);
+        });
+        test("multi-instance preparation of another member name is refused", () => {
+            var s = new Scenario(multi: true); s.ToLibraryApplied(); s.Next(); s.Ops.PreparedMutation = p => p["preview"]["effects"][0]["member"] = "Other";
+            Reject("ComponentPreparationMismatch", () => s.Next());
+        });
+        test("multi-instance readback with another member type is refused", () => {
+            var s = new Scenario(multi: true); s.ToTypedPrepared(); s.Apply("graphical"); s.Ops.InstallationMutation = r => r["multiInstance"]["dataType"] = "\"Other\"";
+            Reject("ComponentReadbackMismatch", () => s.Next()); Equal("recovery_required", s.Coordinator.Status().Value<string>("state"));
+        });
+        test("global instance preparation that also creates a multi-instance is refused", () => {
+            var s = new Scenario(); s.ToLibraryApplied(); s.Next();
+            s.Ops.PreparedMutation = p => ((JArray)p["preview"]["effects"]).Add(new JObject { ["action"] = "createMultiInstance", ["callerPath"] = "/plc/blocks/Main", ["member"] = "Motor1", ["dataType"] = "\"Motor\"" });
+            Reject("ComponentPreparationMismatch", () => s.Next());
+        });
         test("planOnly steps cannot be dispatched by coordinator", () => {
             var s = new Scenario(create: false); s.PreparedPlan["preview"]["integrationPlan"]["steps"][1]["planOnly"] = true; s.RehashPlan();
             Reject("ComponentPlanBlocked", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops)); Equal(0, s.Ops.Applies);
@@ -309,9 +366,20 @@ internal static class CoordinatorTests
         internal PlcComponentCoordinator Coordinator;
         internal FakeOperations Ops;
         internal JObject PreparedPlan;
-        internal Scenario(bool create = true, bool standalone = false)
+        internal Scenario(bool create = true, bool standalone = false, bool reused = false, bool multi = false)
         {
-            System.IO.Directory.CreateDirectory(Root); var fixture = new Fixture(); if (standalone) fixture.Standalone(); var plan = fixture.Build(); if (!standalone) plan["callerArtifact"] = new JObject { ["sha256"] = new string('c', 64) };
+            System.IO.Directory.CreateDirectory(Root); var fixture = new Fixture(); if (standalone) fixture.Standalone();
+            if (reused)
+            {
+                ((JArray)fixture.Inventory["objects"]).Add(new JObject { ["name"] = "Motor", ["path"] = "/plc/blocks/Motor", ["kind"] = "FB", ["number"] = 9, ["language"] = "SCL", ["protected"] = false, ["namespace"] = "" });
+                fixture.Inventory["reusedVersions"] = new JArray(new JObject { ["typeName"] = "Motor", ["typeGuid"] = Fixture.Type, ["versionGuid"] = Fixture.Version });
+            }
+            if (multi)
+            {
+                var recipe = (JObject)fixture.Payload["integration"]; recipe.Remove("instanceDb"); recipe["multiInstance"] = new JObject { ["name"] = "Motor1" };
+                fixture.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; fixture.Inventory["objects"][0]["kind"] = "FB";
+            }
+            var plan = fixture.Build(); if (!standalone) plan["callerArtifact"] = new JObject { ["sha256"] = new string('c', 64) };
             var preview = new JObject { ["kind"] = "library_integrate", ["projectPath"] = Path.Combine(Root, "Scratch.ap21"), ["payload"] = fixture.Payload, ["integrationPlan"] = plan };
             PreparedPlan = new JObject { ["changeId"] = "lib-plan", ["state"] = "prepared", ["preview"] = preview }; RehashPlan();
             Ops = new FakeOperations(Root, PreparedPlan); if (create) { Coordinator = PlcComponentCoordinator.Create(Root, PreparedPlan, Ops); Directory = Path.Combine(Root, Coordinator.Status().Value<string>("operationId")); }
@@ -330,19 +398,26 @@ internal static class CoordinatorTests
         private readonly Dictionary<string, JObject> _results = new();
         internal string Token = "original-session";
         public string SessionToken => Token;
-        internal string InitialCheckpoint;
+        internal string InitialCheckpoint, TypedCheckpoint;
         internal int Applies, TypedPreparations, LibraryPreparations, ImportReads, InstallationReads;
         internal bool LoseResponse, FailTypedPrepare;
         internal Action BeforeApply, AfterApply;
         internal Action<JObject> ResultMutation, StatusMutation, ImportMutation, InstallationMutation, PreparedMutation;
-        internal FakeOperations(string root, JObject plan) { _plan = plan; InitialCheckpoint = Path.Combine(root, "initial.zap21"); File.WriteAllText(InitialCheckpoint, "original-complete-project"); }
+        internal FakeOperations(string root, JObject plan)
+        {
+            _plan = plan; InitialCheckpoint = Path.Combine(root, "initial.zap21"); File.WriteAllText(InitialCheckpoint, "original-complete-project");
+            TypedCheckpoint = Path.Combine(root, "typed.zap21"); File.WriteAllText(TypedCheckpoint, "project-before-typed-edit");
+        }
+        private JObject Multi => _plan["preview"]["integrationPlan"]["multiInstance"] as JObject;
         public JObject Prepare(JObject arguments)
         {
             bool library = arguments.Value<string>("kind") == "library_instantiate";
             if (library) LibraryPreparations++; else { TypedPreparations++; if (FailTypedPrepare) throw new IOException("typed preparation rejected"); }
             string id = library ? "lib-step" : "typed-step";
             var preview = new JObject { ["kind"] = arguments["kind"].DeepClone(), ["payload"] = arguments["payload"].DeepClone(), ["projectPath"] = _plan["preview"]["projectPath"].DeepClone() };
-            if (!library) preview["effects"] = new JArray(new JObject { ["action"] = "createInstanceDB", ["name"] = "Motor_1", ["path"] = "/plc/blocks/Motor_1", ["number"] = 3, ["instanceOfName"] = "Motor" });
+            if (!library) preview["effects"] = new JArray(Multi != null
+                ? new JObject { ["action"] = "createMultiInstance", ["callerPath"] = Multi["callerPath"].DeepClone(), ["member"] = Multi["name"].DeepClone(), ["dataType"] = Multi["dataType"].DeepClone() }
+                : new JObject { ["action"] = "createInstanceDB", ["name"] = "Motor_1", ["path"] = "/plc/blocks/Motor_1", ["number"] = 3, ["instanceOfName"] = "Motor" });
             if (!library && PlcLibraryIntegrationPlanner.CreatesStandaloneCaller((JObject)_plan["preview"]["payload"]))
             {
                 ((JArray)preview["effects"]).Add(new JObject { ["action"] = "create", ["blockName"] = "MotorCaller" });
@@ -359,7 +434,9 @@ internal static class CoordinatorTests
             if (library) result["journal"] = new JObject { ["changeId"] = id, ["previewHash"] = p["previewHash"].DeepClone(), ["state"] = "applied", ["idempotencyKeyHash"] = result["componentIdempotencyKeyHash"].DeepClone(), ["compile"] = SuccessfulCompilation(),
                 ["checkpoints"] = new JArray(new JObject { ["kind"] = "project", ["originalPath"] = _plan["preview"]["projectPath"].DeepClone(), ["archivePath"] = InitialCheckpoint, ["sha256"] = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(InitialCheckpoint))) }),
                 ["events"] = new JArray(new JObject { ["stage"] = "checkpoint_project_archive", ["state"] = "completed" }, new JObject { ["stage"] = "native_mutation", ["state"] = "dispatching" }, new JObject { ["stage"] = "compile", ["state"] = "completed" }, new JObject { ["stage"] = "save_project", ["state"] = "completed" }) };
-            else { result["compile"] = SuccessfulCompilation(); result["typedQualification"] = new JObject { ["engineeringVerified"] = true, ["preservationVerified"] = true, ["saved"] = true }; result["recoveryArchive"] = "later-typed-checkpoint"; }
+            else { result["compile"] = SuccessfulCompilation(); result["typedQualification"] = new JObject { ["engineeringVerified"] = true, ["preservationVerified"] = true, ["saved"] = true }; result["recoveryArchive"] = TypedCheckpoint;
+                result["recoveryArchiveSha256"] = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(TypedCheckpoint)));
+                result["stages"] = new JArray("prechange_project_saved", "recovery_archive_created", "mutation_applied", "compile_finished", "changed_project_saved"); }
             ResultMutation?.Invoke(result); _results[id] = (JObject)result.DeepClone(); AfterApply?.Invoke();
             if (LoseResponse) throw new IOException("native operation response lost"); return result;
         }
@@ -375,7 +452,8 @@ internal static class CoordinatorTests
             InstallationReads++; var result = Evidence(contract);
             result["callerExists"] = true; result["caller"] = new JObject { ["kind"] = "FC", ["language"] = "FBD" };
             result["callerSha256"] = new string('d', 64); result["callerMatchesPrepared"] = true; result["instanceMatchesPrepared"] = true; result["callerInsertion"] = new JObject { ["verified"] = true };
-            result["instance"] = new JObject { ["path"] = "/plc/blocks/Motor_1", ["number"] = 3, ["instanceOfName"] = "Motor", ["contentSha256"] = new string('e', 64) };
+            if (Multi != null) result["multiInstance"] = new JObject { ["callerPath"] = Multi["callerPath"].DeepClone(), ["name"] = Multi["name"].DeepClone(), ["dataType"] = Multi["dataType"].DeepClone() };
+            else result["instance"] = new JObject { ["path"] = "/plc/blocks/Motor_1", ["number"] = 3, ["instanceOfName"] = "Motor", ["contentSha256"] = new string('e', 64) };
             InstallationMutation?.Invoke(result); return result;
         }
         private static JObject Evidence(JObject contract) {

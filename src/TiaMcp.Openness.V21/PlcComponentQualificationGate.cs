@@ -40,23 +40,40 @@ namespace TiaMcp.Openness.V21
                 throw new PlcComponentException("InvalidRequest", "An explicit caller idempotencyKey is required for the review request.");
         }
 
-        // Production combined apply (on by default since 29 October 2026) runs only the shapes the component route
-        // verified natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
-        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport)
+        // Production combined apply (on by default since 29 October 2026) runs the shapes the component route verified
+        // natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
+        // Each further feature below has a builder; it joins VerifiedFeatures only with its own native evidence. Until then only a
+        // qualification Host (--component-qualification) runs it, on its own owned scratch (candidates=true).
+        internal static readonly string[] VerifiedFeatures = { };
+        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
             if (payload == null || caller == null || PlcHmiIntegrationPlanner.IsRecipe(payload)) return "Only a prepared PLC component plan is eligible; HMI targets and PLC/HMI recipes stay plan-only.";
             if (caller.Value<bool?>("obCallAdded") != false || caller.Value<string>("kind") == "OB") return "OB insertion is refused; add the OB call as its own reviewed change.";
-            if (caller.Value<string>("kind") != "FC" || caller.Value<string>("language") != "FBD")
-                return "Only a new or existing FBD FC caller is verified; " + caller.Value<string>("language") + " " + caller.Value<string>("kind") + " callers stay plan-only.";
-            if (plan["fb"]?.Value<bool?>("reused") != false || (plan["reuse"]?["versions"] as JArray)?.Count != 0 || plan["instanceDb"] == null || plan["instanceDb"].Value<bool?>("reused") == true)
-                return "Only a fresh FB/dependency import with a new global instance DB is verified; reuse and multi-instances stay plan-only.";
+            if (!(caller.Value<string>("kind") is "FC" or "FB") || !(caller.Value<string>("language") is "FBD" or "LAD"))
+                return "Only LAD/FBD FC and FB callers have a combined apply builder.";
+            bool reused = plan["fb"]?.Value<bool?>("reused") == true;
+            if ((plan["reuse"]?["versions"] as JArray)?.Count != (reused ? ((JArray)plan["versions"]).Count : 0) || plan["instanceDb"]?.Value<bool?>("reused") == true)
+                return "Only a fresh FB/dependency import or the complete installed FB, each with new instance storage, has a builder; partial dependency reuse and reused instance DBs stay plan-only.";
             if (!(plan["blockers"] is JArray blockers) || blockers.Count != 0 || !(plan["steps"] is JArray steps) || steps.Any(s => s["planOnly"] != null))
                 return "Resolve every planner blocker and planOnly step first.";
+            return candidates ? null : (string)UnverifiedFeatures(plan, payload, callerExport).Properties().FirstOrDefault()?.Value;
+        }
+
+        // The features of a plan beyond the first verified shape that have no native evidence yet, each with its refusal, in order.
+        internal static JObject UnverifiedFeatures(JObject plan, JObject payload, XDocument callerExport)
+        {
+            var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
+            var features = new JObject();
+            if (language == "LAD") features["ladCaller"] = "Only a new or existing FBD FC caller is verified; LAD " + kind + " callers stay plan-only.";
+            if (kind == "FB") features["fbCaller"] = "Only a new or existing FBD FC caller is verified; " + language + " FB callers stay plan-only.";
+            if (plan["multiInstance"] != null) features["multiInstance"] = "Only a fresh FB/dependency import with a new global instance DB is verified; multi-instances stay plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Only a fresh FB/dependency import with a new global instance DB is verified; reuse of the installed FB stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
-                return "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
-            return null;
+                features["earlierPlacement"] = "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
+            foreach (string verified in VerifiedFeatures) features.Remove(verified);
+            return features;
         }
         // Step 1 imports and saves before step 2 creates the instance DB, so what step 2 needs from the target is decided
         // before the claim. The verified runs were de-DE only; another active language changes the installed FB/UDT exports.
@@ -74,8 +91,8 @@ namespace TiaMcp.Openness.V21
             return "No instance creation profile covers the FB, so the instance DB step would fail after the import: " +
                 (last?.Message ?? "no instance template exists for this CPU and route.");
         }
-        internal static string CombinedApplyStep(string state) =>
-            state == "created" ? "prepare_library_instantiate" : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
+        internal static string CombinedApplyStep(string state, bool reusedFb = false) =>
+            state == "created" ? (reusedFb ? "prepare_graphical_typed_edit" : "prepare_library_instantiate") : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
             state == "import_verified" ? "prepare_graphical_typed_edit" : state == "graphical_prepared" ? "apply_graphical_typed_edit" : state == "graphical_applied" ? "verify_installation_readback" : state;
     }
 }

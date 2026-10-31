@@ -80,9 +80,8 @@ an exact proposal for separate preparation.
 
 | Code | Cause |
 |---|---|
-| `ComponentScopeUnqualified` | Software-unit scope: readback covers the standard scope only, and namespaces of library instances in units are unqualified. |
-| `ComponentRecoveryAnchorUnavailable` | Reused FB: no import step whose checkpoint anchors recovery. |
-| `ComponentMultiInstanceUnqualified` | `createMulti` changes the caller interface; readback proves interface-preserving insertion only. |
+| `ComponentScopeUnqualified` | Software-unit scope: readback covers the standard scope only. No storage profile covers a structured FB's new instance in a unit, another unit's FB gets no new storage on the typed route, and unit tags are a V21 boundary. |
+| `ComponentInstanceReuseUnqualified` | Reused instance DB (`existingGlobal`): readback proves new instance storage only. |
 | `ComponentReadbackUnavailable` | DB-member binding: readback re-resolves root tags only. |
 | `UnsupportedOperandRoute` | UDT-typed tag member: the typed route binds root scalar tags only. |
 | `UnsupportedScopeReference` | Tag binding inside a software unit: the typed route refuses unit tags. |
@@ -112,6 +111,18 @@ Only the natively verified shapes run ([fresh install](../verification/component
 
 Everything else is refused with `PlcIntegrationNotQualified` before any claim: OB insertion (add the OB call as its own reviewed change), LAD and FB callers, placements before another network, reuse of installed versions or instance DBs, multi-instances, software units, DB or UDT-tag member bindings, HMI targets and PLC/HMI recipes.
 
+### Candidate shapes (31 October)
+
+Five more features have a builder but no native evidence yet. Each preview names them in `combinedApply.candidateFeatures`; a production Host refuses them as above. Only a Host started with `--component-qualification` runs them, and only in its own single owned scratch. A feature moves to the verified shapes (`PlcComponentQualificationGate.VerifiedFeatures`) once its native run passes.
+
+- `ladCaller`: a new or existing LAD FC caller; the call is enabled by the power rail. The captured instance storage profile serves LAD callers as well, because the instance DB depends on the FB alone.
+- `fbCaller`: an existing LAD/FBD FB caller with a new global instance DB.
+- `earlierPlacement`: insertion after a network other than the caller's last one. The readback reverses the following-ID shift of the [insertion-ID decision](../plans/insertion-id-renumbering-decision-20261025.md), so the later networks shift too.
+- `reusedComponent`: the FB and every dependency are already installed at their exact versions (native reuse proofs). The plan has the typed step only, nothing is imported twice, and the typed step's own pre-mutation archive is the single recovery checkpoint.
+- `multiInstance`: a new multi-instance in an existing FB caller. The readback proves the caller FB gained exactly the inserted network and one new Static member. With an import step it is refused before the claim: the typed multi-instance profile can only be checked against the installed FB export, after the import is saved. With a reused FB the typed preparation decides before any mutation.
+
+Software units, reused instance DBs, partial dependency reuse and DB or UDT-tag member bindings keep their `planOnly` reasons or refusals on every Host. Evidence: [candidate shapes](../verification/component-candidate-shapes-20261031.md).
+
 The same refusal checks the target, in the preview and again in `change_apply` before any claim, import or save, because the import step saves before the instance DB step runs:
 
 - de-DE must be the project's only active language and its reference and editing language. The verified runs were de-DE only; another language changes the installed FB/UDT exports.
@@ -130,6 +141,8 @@ python -B scripts/qualify_library_integrate_apply.py `
   --host <frozen-host.exe> --worker <frozen-worker.exe> `
   --artifacts <short-artifacts-dir> --timeout 600 --run-native
 ```
+
+With `--candidates` the runner authors the same source, then runs each candidate case on a `--component-qualification` Host, each in its own new owned scratch: `ladStandalone`, `ladExisting`, `fbCaller` (FB `TiaMcpComponentHost`), `earlierPlacement` (a two-network FC built from the peer's native export), `reuse` (a second new FBD FC after a verified install) and `multiInstance` (in `TiaMcpComponentHost` after a verified install). Each install gets the checks above plus the exact `candidateFeatures`; `reuse` also requires one typed step, no second import and a checkpoint that restores the first installation. A `multiInstance` refused by the typed route's storage profiles before any dispatch, with the project unchanged, is recorded as `outcome: "boundary"`. A failed case stops only itself; `candidateCases` holds every outcome.
 
 Expected outcome: `<short-artifacts-dir>/i<6 hex>/result.json` with `status: "passed"`, all five `steps` passed, and `combinedApplyVerified`, `refusalsVerified` and `defaultHostVerified` true. The 28 October reports name the last step `noFlag` and record `noFlagRefusalVerified` instead. `runtimeVerified` stays false. A failed step stops the run with `status: "failed"`; nothing is restored or replayed automatically. Offline checks of its oracles: `python -B scripts/test_qualify_library_integrate_apply.py`.
 

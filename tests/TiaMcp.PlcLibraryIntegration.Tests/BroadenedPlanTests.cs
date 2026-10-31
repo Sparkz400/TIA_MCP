@@ -32,11 +32,11 @@ internal static class BroadenedPlanTests
             Equal(2, ((JArray)p["steps"]).Count); Equal(null, p["steps"][1]["planOnly"]); Compile(p, f.Caller);
         });
 
-        test("multi-instance plan creates a static member in the FB caller and is plan-only", () => {
+        test("multi-instance plan creates a static member in the FB caller with no planOnly step", () => {
             var f = Multi(); var p = f.Build(); var typed = Typed(p); TypedGraphicalPayload.Validate(typed);
             Equal("createMulti", typed["instances"][0].Value<string>("kind")); Equal("Motor1", typed["instances"][0].Value<string>("name"));
             Equal("\"Motor\"", p["multiInstance"].Value<string>("dataType")); Equal(null, p["instanceDb"]);
-            Equal("ComponentMultiInstanceUnqualified", Codes(p["steps"][1])); Equal(null, p["steps"][0]["planOnly"]);
+            Equal(null, p["steps"][1]["planOnly"]); Equal(null, p["steps"][0]["planOnly"]);
         });
         test("multi-instance needs an FB caller", () => Reject("UnsupportedIntegrationCaller", Multi(), f => { f.Caller.Root.Element("SW.Blocks.FB").Name = "SW.Blocks.FC"; f.Inventory["objects"][0]["kind"] = "FC"; }));
         test("existing caller member is not adopted as a multi-instance", () => Reject("DeclarationCollision", Multi(), f => f.Payload["integration"]["multiInstance"]["name"] = "existing"));
@@ -57,9 +57,9 @@ internal static class BroadenedPlanTests
             Equal(1, ((JArray)p["steps"]).Count); Equal(1, p["steps"][0].Value<int>("order")); Equal("graphical_typed_edit", p["steps"][0].Value<string>("kind"));
             Equal("existingGlobal", typed["instances"][0].Value<string>("kind")); Equal("/plc/blocks/Motor_1", typed["instances"][0].Value<string>("blockPath"));
             Equal(true, p["instanceDb"].Value<bool>("reused")); Equal("/plc/blocks/Motor_1", p["reuse"].Value<string>("instanceDbPath")); Equal(true, p["fb"].Value<bool>("reused"));
-            Equal("ComponentRecoveryAnchorUnavailable", Codes(p["steps"][0]));
+            Equal("ComponentInstanceReuseUnqualified", Codes(p["steps"][0]));
         });
-        test("reused FB with a new instance DB keeps createGlobal", () => { var p = ReusedRoot().Build(); Equal("createGlobal", Typed(p)["instances"][0].Value<string>("kind")); Equal(2, p["instanceDb"].Value<int>("provisionalNumber")); });
+        test("reused FB with a new instance DB keeps createGlobal in one typed step", () => { var p = ReusedRoot().Build(); Equal("createGlobal", Typed(p)["instances"][0].Value<string>("kind")); Equal(2, p["instanceDb"].Value<int>("provisionalNumber")); Equal(1, ((JArray)p["steps"]).Count); Equal(null, p["steps"][0]["planOnly"]); });
         test("instance DB with unproven users is not reused", () => Reject("InstanceUseUnproven", ReusedRoot(), f => InstanceDb(f, null)));
         test("instance DB already used elsewhere is not reused", () => Reject("InstanceAlreadyUsed", ReusedRoot(), f => InstanceDb(f, new JArray("/plc/blocks/Other"))));
         test("same-name DB of another FB is not reused", () => Reject("LibraryConflict", ReusedRoot(), f => { InstanceDb(f, new JArray()); f.Inventory["objects"].Last["instanceOfName"] = "Other"; }));
@@ -97,7 +97,8 @@ internal static class BroadenedPlanTests
         });
 
         // Production combined apply (on every Host since 29 October 2026) admits only the natively verified shapes.
-        static string Refusal(Fixture f) => PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller);
+        static string Refusal(Fixture f, bool candidates = false) => PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, candidates);
+        static string Features(Fixture f) => string.Join(",", PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller).Properties().Select(p => p.Name));
         static Fixture Titled(string networks, int title) { var f = new Fixture(); f.Caller = XDocument.Parse("<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList>" + networks + "<MultilingualText ID=\"" + title + "\" CompositionName=\"Title\" /></ObjectList></SW.Blocks.FC></Document>"); f.Payload["integration"]["caller"]["insertAfterNetworkId"] = "1"; return f; }
         static Fixture Ob() { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB"; return f; }
         test("combined apply admits the verified existing FBD FC caller", () => Equal(null, Refusal(new Fixture())));
@@ -106,20 +107,38 @@ internal static class BroadenedPlanTests
         test("combined apply admits insertion after the last network with shifted title IDs", () => Equal(null, Refusal(Titled(Unit1, 2))));
         test("combined apply refuses insertion before another network", () => Equal(true, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3)).StartsWith("Only insertion after", StringComparison.Ordinal)));
         test("combined apply refuses OB insertion by name", () => Equal(true, Refusal(Ob()).StartsWith("OB insertion is refused", StringComparison.Ordinal)));
+        Func<Fixture> ladExisting = () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
+        Func<Fixture> fbCaller = () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; };
+        // Candidate shapes: each has a builder but no native evidence, so only a qualification Host's owned scratch admits it.
+        foreach (var (name, shape, features) in new (string, Func<Fixture>, string)[] {
+            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }, "ladCaller"), ("existing LAD FC", ladExisting, "ladCaller"),
+            ("FB caller", fbCaller, "fbCaller"), ("multi-instance", Multi, "fbCaller,multiInstance"), ("reused FB", ReusedRoot, "reusedComponent"),
+            ("insertion before another network", () => Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3), "earlierPlacement") })
+        {
+            test("combined apply refuses candidate " + name + " in production", () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
+            test("qualification Host admits candidate " + name, () => { Equal(null, Refusal(shape(), true)); Equal(features, Features(shape())); });
+        }
         foreach (var (name, shape) in new (string, Func<Fixture>)[] {
-            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }),
-            ("existing LAD FC", () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; }),
-            ("FB caller", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; }),
-            ("multi-instance", Multi), ("software unit", Unit), ("DB-member binding", DbMember), ("UDT tag member", TagMember), ("reused FB", ReusedRoot),
+            ("software unit", Unit), ("DB-member binding", DbMember), ("UDT tag member", TagMember),
+            ("reused instance DB", () => { var f = ReusedRoot(); InstanceDb(f, new JArray()); return f; }),
             ("reused dependency", () => { var f = new Fixture(); f.AddDependency(); Add(f, "MotorState", "/plc/types/MotorState", "UDT"); Prove(f, 1); return f; }),
-            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }) })
-            test("combined apply refuses " + name, () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
+            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }),
+            ("OB caller", Ob) })
+            test("combined apply refuses " + name + " even on a qualification Host", () => { if (Refusal(shape(), true) == null) throw new Exception("Shape without a builder admitted."); });
+        test("verified shapes have no candidate features", () => { Equal("", Features(new Fixture())); var f = new Fixture(); f.Standalone("FBD"); Equal("", Features(f)); Equal("", Features(Titled(Unit1, 2))); });
+        test("candidate refusals keep their earlier wording", () => {
+            Equal(true, Refusal(ladExisting()).StartsWith("Only a new or existing FBD FC caller is verified; LAD FC callers", StringComparison.Ordinal));
+            Equal(true, Refusal(fbCaller()).StartsWith("Only a new or existing FBD FC caller is verified; FBD FB callers", StringComparison.Ordinal));
+        });
         test("combined apply refuses PLC/HMI recipes and missing plans", () => {
             var f = new Fixture(); var preview = new JObject { ["payload"] = f.Payload.DeepClone(), ["integrationPlan"] = f.Build() };
             preview["payload"]["action"] = PlcHmiIntegrationPlanner.InstallAction;
             Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(preview, f.Caller) == null); Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject(), null) == null);
         });
-        test("combined apply names each coordinator step", () => Equal("apply_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("graphical_prepared")));
+        test("combined apply names each coordinator step", () => {
+            Equal("apply_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("graphical_prepared"));
+            Equal("prepare_library_instantiate", PlcComponentQualificationGate.CombinedApplyStep("created")); Equal("prepare_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("created", true));
+        });
         // Decided before the claim, so step 1 never imports and saves a component that step 2 must refuse (30 October review).
         test("combined apply admits only de-DE-only projects before the claim", () => {
             Equal(null, PlcComponentQualificationGate.CombinedApplyLanguageRefusal(["de-DE"], "de-DE", "de-DE"));

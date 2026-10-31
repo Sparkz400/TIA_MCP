@@ -70,6 +70,34 @@ internal static class CallerInsertionTests
         });
         test("second inserted network fails closed", () => { var i = Insert(Insert(original)); Rejects(original, i); });
         test("non-consecutive caller IDs block prediction", () => { var gap = new XDocument(original); Id(gap, "9").Value = "B"; Equal(true, PlcComponentCallerInsertion.ShiftBlocker(gap) != null); });
+
+        // A multi-instance adds one direct Static member to the caller FB (which carries no IDs) besides the network.
+        const string Ns = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
+        XDocument Fb(XDocument fc) { var fb = new XDocument(fc); var block = fb.Descendants("SW.Blocks.FC").Single(); block.Name = "SW.Blocks.FB";
+            block.Element("AttributeList").AddFirst(new XElement("Interface", new XElement(XName.Get("Sections", Ns), new XElement(XName.Get("Section", Ns), new XAttribute("Name", "Static"),
+                new XElement(XName.Get("Member", Ns), new XAttribute("Name", "Kept"), new XAttribute("Datatype", "Bool")))))); return fb; }
+        XDocument WithMember(XDocument fb, string name = "Gate") { var copy = new XDocument(fb);
+            copy.Descendants(XName.Get("Section", Ns)).Single().Add(new XElement(XName.Get("Member", Ns), new XAttribute("Name", name), new XAttribute("Datatype", "\"Motor\""))); return copy; }
+        var caller = Fb(original);
+        test("multi-instance insertion accepts exactly one new Static member and the shift", () => {
+            var proof = PlcComponentCallerInsertion.Verify(caller, WithMember(Insert(caller)), "3", "Gate");
+            Equal("Gate", proof["addedStaticMember"].Value<string>("name")); Equal("\"Motor\"", proof["addedStaticMember"].Value<string>("dataType"));
+        });
+        test("multi-instance insertion without the member fails closed", () => { try { PlcComponentCallerInsertion.Verify(caller, Insert(caller), "3", "Gate"); } catch (PlcComponentException) { return; } throw new Exception("Expected a refusal"); });
+        test("multi-instance member under another name fails closed", () => { try { PlcComponentCallerInsertion.Verify(caller, WithMember(Insert(caller), "Other"), "3", "Gate"); } catch (PlcComponentException) { return; } throw new Exception("Expected a refusal"); });
+        test("a second changed declaration besides the member fails closed", () => {
+            var i = WithMember(Insert(caller)); i.Descendants(XName.Get("Member", Ns)).First().SetAttributeValue("Datatype", "Int"); Rejects(caller, i);
+            try { PlcComponentCallerInsertion.Verify(caller, i, "3", "Gate"); } catch (PlcComponentException) { return; } throw new Exception("Expected a refusal");
+        });
+        test("an unannounced new member fails the plain insertion proof", () => Rejects(caller, WithMember(Insert(caller))));
+        test("a member in a formerly empty Static section restores the empty element exactly", () => {
+            string text = Fb(original).ToString(SaveOptions.DisableFormatting);
+            Equal(true, text.Contains("<Section Name=\"Static\"><Member Name=\"Kept\" Datatype=\"Bool\" /></Section>"));
+            var empty = EngineeringSources.ReadXml(text.Replace("<Section Name=\"Static\"><Member Name=\"Kept\" Datatype=\"Bool\" /></Section>", "<Section Name=\"Static\" />"));
+            var installed = Insert(empty); var section = installed.Descendants(XName.Get("Section", Ns)).Single();
+            section.Add(new XText("\n  "), new XElement(XName.Get("Member", Ns), new XAttribute("Name", "Gate"), new XAttribute("Datatype", "\"Motor\"")), new XText("\n"));
+            Equal("Gate", PlcComponentCallerInsertion.Verify(empty, installed, "3", "Gate")["addedStaticMember"].Value<string>("name"));
+        });
     }
 
     static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }

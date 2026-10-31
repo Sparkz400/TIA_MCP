@@ -140,11 +140,15 @@ namespace TiaMcp.Openness.V21
             var caller = change.Preview["integrationPlan"]?["callerArtifact"] as JObject; System.Xml.Linq.XDocument export;
             try { export = caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))); }
             catch (PlcComponentException error) { return "The retained caller export is unusable: " + error.Message; }
-            return PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export) ??
+            return PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change)) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
                     ? "Only the verified read-only global source with its retained snapshot is eligible." : null) ??
                 PlcCombinedApplyTargetRefusal(change);
         }
+
+        // Shapes without native evidence run only on a qualification Host, in its own single owned scratch.
+        private bool PlcComponentCandidatesAdmitted(LibraryChange change) =>
+            _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;
 
         // Step 1 imports and saves before step 2 creates the instance DB; what step 2 needs from the target is decided here, before any claim.
         private string PlcCombinedApplyTargetRefusal(LibraryChange change)
@@ -156,6 +160,11 @@ namespace TiaMcp.Openness.V21
             try
             {
                 var scope = LibraryPlcScope(change, out var plc); string cpu = TypedCpuIdentifier(plc);
+                var plan = (JObject)change.Preview["integrationPlan"];
+                // With a reused FB the typed preparation runs before any mutation, so it decides storage itself. After an import it
+                // would fail only once the import is saved; a multi-instance profile needs the installed FB export, unknown before it.
+                if (plan["fb"].Value<bool>("reused")) return null;
+                if (plan["multiInstance"] != null) return "A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.";
                 // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
                 var captured = CapturedStorageContext(change, true);
                 if (captured != null)
@@ -163,7 +172,7 @@ namespace TiaMcp.Openness.V21
                     CapturedStorageEnvironment(captured);
                     return cpu == TypedGraphicalCapturedStorageTemplate.Cpu ? null : "The captured storage profile covers only " + TypedGraphicalCapturedStorageTemplate.Cpu + ", not " + cpu + ".";
                 }
-                var plan = (JObject)change.Preview["integrationPlan"]; var pin = Guid.Parse(change.Payload["selection"][0].Value<string>("versionGuid"));
+                var pin = Guid.Parse(change.Payload["selection"][0].Value<string>("versionGuid"));
                 var root = ((JArray)plan["versions"]).OfType<JObject>().Single(v => Guid.Parse(v.Value<string>("versionGuid")) == pin);
                 var callee = EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)root["artifact"], root.Value<string>("contentSha256")));
                 string catalog = TypedCatalogPath();
@@ -179,11 +188,16 @@ namespace TiaMcp.Openness.V21
         {
             if (!_libraryIntegrateApplyEnabled) return;
             string refusal = PlcCombinedApplyRefusal(change);
+            var caller = change.Preview["integrationPlan"]["callerArtifact"] as JObject;
+            var unverified = refusal != null ? new JObject() : PlcComponentQualificationGate.UnverifiedFeatures((JObject)change.Preview["integrationPlan"], change.Payload,
+                caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))));
             change.Preview["applySupported"] = refusal == null;
             change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal,
-                ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate, then graphical_typed_edit. Not atomic.",
-                ["checkpoint"] = "The import step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
-                ["qualification"] = "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028)." };
+                ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate (absent for a reused FB), then graphical_typed_edit. Not atomic.",
+                ["checkpoint"] = "The first step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
+                ["candidateFeatures"] = unverified,
+                ["qualification"] = unverified.Count != 0 ? "Candidate shape without native evidence, admitted only on this qualification Host's owned scratch."
+                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
             coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";
@@ -213,7 +227,7 @@ namespace TiaMcp.Openness.V21
                 change.Journal["combinedApply"] = CombinedApplySummary(journal, record, null); LibraryJournal(change, "component_steps", "dispatching");
                 for (int i = 0; i < 6 && record.Value<string>("state") != "installation_verified"; i++)
                 {
-                    string state = record.Value<string>("state"); step = PlcComponentQualificationGate.CombinedApplyStep(state);
+                    string state = record.Value<string>("state"); step = PlcComponentQualificationGate.CombinedApplyStep(state, change.Preview["integrationPlan"]["fb"].Value<bool>("reused"));
                     record = coordinator.Advance(state.EndsWith("_prepared", StringComparison.Ordinal) ? record[state.Split('_')[0]]["prepared"].Value<string>("previewHash") : null);
                 }
                 if (record.Value<string>("state") != "installation_verified") throw new BridgeException("ComponentOutcomeUnknown", "The component sequence did not reach verified installation.");
@@ -239,6 +253,7 @@ namespace TiaMcp.Openness.V21
         private static JObject CombinedApplySummary(string journal, JObject record, string failedStep) => new JObject {
             ["coordinatorJournal"] = journal, ["state"] = record?["state"]?.DeepClone(), ["failedStep"] = failedStep,
             ["libraryChangeId"] = record?["library"]?["prepared"]?["changeId"]?.DeepClone(), ["typedChangeId"] = record?["graphical"]?["prepared"]?["changeId"]?.DeepClone(),
+            ["typedStepDispatched"] = record?["graphical"]?["dispatch"] != null,
             ["libraryStepDispatched"] = record?["library"]?["dispatch"] != null, ["initialCheckpointRecorded"] = record?["initialCheckpoint"] != null,
             ["recovery"] = "change_restore on this changeId retrieves the single initial checkpoint into a new location in an empty owned Portal. Originals are never overwritten and no step is replayed." };
 

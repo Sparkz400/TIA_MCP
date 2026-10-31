@@ -199,10 +199,13 @@ tests.Add(("Unobserved DB defaults and absent MemoryLayout remain absent", () =>
 }));
 tests.Add(("Unproved release CPU software-unit and namespace routes reject", () => {
     Reject(() => Build(cpu: "different")); Reject(() => Build(release: "V21 Update 3"));
-    Reject(() => Build(language: "LAD")); Reject(() => Build(api: "2100.0.999.1"));
+    Reject(() => Build(language: "SCL")); Reject(() => Build(api: "2100.0.999.1"));
     Reject(() => Build(route: "softwareUnit")); Reject(() => Build(route: "namespace"));
     Reject(() => Build(profile with { Id = "another-profile" }));
 }));
+// The instance DB is generated from the FB alone, so a LAD caller gets exactly the FBD caller's instance document.
+tests.Add(("LAD caller receives the identical captured instance document", () =>
+    Require(Build(language: "LAD").ToString() == Build().ToString(), "Caller language changed the captured instance DB")));
 tests.Add(("Document provenance is required absent rather than normalized away", () => {
     var altered = ArtifactOf(Mutate(fb, d => d.Root!.AddFirst(new XElement("DocumentInfo", "provenance"))));
     Reject(() => Build(profile with { ReferenceCallee = altered }, boundFb with { Document = altered }));

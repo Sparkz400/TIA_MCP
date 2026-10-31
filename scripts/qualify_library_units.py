@@ -1,5 +1,6 @@
 """Qualify library consumption in a software unit with a namespace preset, the one-instance-per-device rule, the unit-aware
-cleanup refusal and an explicit namespace on a library instance."""
+cleanup refusal and an explicit namespace on a library instance: on an FB root, on a UDT dependency that the namespaced FB then
+reuses, on a master copy, and kept by a later reachable library update of the namespaced FB."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +11,46 @@ from library_native_harness import Harness, identity, require
 
 ROOT = Path(__file__).resolve().parents[1]
 FB, UDT, UNIT = "TiaMcpLibraryGate", "TiaMcpLibraryState", "TiaMcp_LibUnit"
+# An FB that depends on its UDT, and a plain FC for a master copy.
+DEPENDENT_FB, DEPENDENCY = "TiaMcpComponentGate", "TiaMcpComponentState"
+MASTER_FC = "TiaMcpUnitMasterFc"
+MASTER_SOURCE = 'FUNCTION "' + MASTER_FC + """" : Void
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+BEGIN
+END_FUNCTION
+"""
+# An OB in the unit's namespace that calls the namespaced FB, so a PLC-wide update can prove the use reachable.
+CALLER_SOURCE = "NAMESPACE " + UNIT + """
+DATA_BLOCK "TiaMcpUnitNamespaced_Gate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+\"""" + FB + """\"
+BEGIN
+END_DATA_BLOCK
+
+ORGANIZATION_BLOCK "TiaMcpUnitNamespaced_Cycle"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_TEMP
+    Active : Bool;
+END_VAR
+BEGIN
+    "TiaMcpUnitNamespaced_Gate"(Enable := TRUE, Active => #Active);
+END_ORGANIZATION_BLOCK
+END_NAMESPACE
+"""
+CALLERS = ["TiaMcpUnitNamespaced_Gate", "TiaMcpUnitNamespaced_Cycle"]
+
+
+def namespaced(software, unit, names):
+    """Path of each named block/type in the unit; every one must sit in the unit's namespace."""
+    rows = [x for key in ("blocks", "types") for x in software[key] if x["path"].rsplit("/", 1)[-1] in names]
+    paths = {x["path"].rsplit("/", 1)[-1]: x["path"] for x in rows if x.get("scopePath") == unit}
+    require(len(rows) == len(names) and len(paths) == len(names), "Expected each object once, in the unit: %s" % rows)
+    require(all("/namespaces/" + UNIT + "/" in path for path in paths.values()), "Not every object is in namespace %s: %s" % (UNIT, paths))
+    return paths
 
 
 def body(h):
@@ -25,6 +66,18 @@ def body(h):
     global_library = h.apply("library_create", {"schemaVersion": 1, "name": "UnitQualification"})["journal"]["result"]["library"]["libraryId"]
     h.apply("library_publish", h.selected(library, [udt], destinationLibraryId=global_library))
     h.apply("library_publish", h.selected(library, [fb], destinationLibraryId=global_library))
+    # A dependent FB with its UDT, and a master copy of a plain FC, in the same first generation.
+    dependent_documents = h.directory / "dependent-documents"; dependent_documents.mkdir()
+    for name in (DEPENDENT_FB + ".scl", DEPENDENCY + ".udt"):
+        shutil.copyfile(ROOT / "fixtures/libraries/component-qualification" / name, dependent_documents / name)
+    dependency = h.release(library, h.create_type(library, dependent_documents, DEPENDENCY, "types", plc), "1.0.0")
+    dependent = h.release(library, h.create_type(library, dependent_documents, DEPENDENT_FB, "blocks", plc), "1.0.0")
+    h.apply("library_publish", h.selected(library, [dependency], destinationLibraryId=global_library))
+    h.apply("library_publish", h.selected(library, [dependent], destinationLibraryId=global_library))
+    h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MASTER_SOURCE, "expectedBlockNames": [MASTER_FC]})
+    software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
+    h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": global_library, "target": {"plcPath": plc},
+            "object": {"kind": "block", "objectPath": next(x["path"] for x in software["blocks"] if x["path"].rsplit("/", 1)[-1] == MASTER_FC)}})
     generation_one = h.archive(global_library)
     second = h.release(library, h.edit_source(library, plc, fb, FB, change), "1.1.0")
     h.apply("library_set_default", h.selected(library, [second]))
@@ -84,6 +137,31 @@ def body(h):
     h.refuse("refuse the FB in the PLC root while the unit holds it", "library_instantiate",
              h.selected(source, [fb], target={"plcPath": plc}), "LibraryConflict", "per device")
     h.refuse("refuse a second UDT copy in the unit", "library_instantiate", h.selected(source, [udt], target=in_unit), "LibraryConflict")
+
+    # A namespace on a dependency: the UDT is instantiated as its own root in the namespace, then the namespaced FB reuses it.
+    with_dependency = h.prepare("library_instantiate", h.selected(source, [dependency], target=in_unit, namespace=UNIT))
+    h.apply_prepared("library_instantiate", with_dependency)
+    dependent_prepared = h.prepare("library_instantiate", h.selected(source, [dependent], target=in_unit, namespace=UNIT))
+    h.stage("the dependent FB reuses the namespaced UDT", lambda: require(
+        [x.get("typeName") for x in dependent_prepared["preview"].get("reusedDependencies", [])] == [DEPENDENCY]
+        and dependent_prepared["preview"].get("createdNames") == [DEPENDENT_FB],
+        "Preview does not reuse the namespaced UDT: %s" % dependent_prepared["preview"].get("reusedDependencies")) or True)
+    h.apply_prepared("library_instantiate", dependent_prepared)
+    h.report["dependencyPlacement"] = h.stage("FB and its UDT both in namespace %s" % UNIT,
+        lambda: namespaced(h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}), unit, [DEPENDENT_FB, DEPENDENCY]))
+    consumer = h.project_library()
+    h.stage("dependent FB and its UDT used once each", lambda: h.verify_use(consumer, dependent, 1) and h.verify_use(consumer, dependency, 1))
+
+    # A namespace on a master copy: the created block carries it.
+    masters = [x for x in h.query(source)["items"] if x.get("kind") == "masterCopy"]
+    require(len(masters) == 1, "Expected exactly the one master copy: %s" % masters)
+    master = h.prepare("library_instantiate", {"schemaVersion": 1, "source": h.source_ref(source), "destinationComposition": "blocks",
+                       "selection": [{"masterCopyPath": masters[0]["masterCopyPath"]}], "target": in_unit, "namespace": UNIT})
+    h.stage("preview declares the namespace for the master copy", lambda: require(
+        (master["preview"].get("instanceNamespace") or {}).get("masterCopies") == [MASTER_FC], "Preview lacks the master copy: %s" % master["preview"].get("instanceNamespace")) or True)
+    h.apply_prepared("library_instantiate", master)
+    h.report["masterPlacement"] = h.stage("the master-copy FC is in namespace %s" % UNIT,
+        lambda: namespaced(h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}), unit, [MASTER_FC]))
     h.tool("library_close", {"libraryId": source})
 
     # Unit uses have no OB-rooted reference here, so a PLC-wide native update is refused before any write.
@@ -94,6 +172,18 @@ def body(h):
         require([x["version"] for x in h.versions(consumer, FB)] == ["1.0.0"], "The refused update copied a version into the project")
         return h.verify_use(consumer, fb, 1)
     h.stage("the unit stays at 1.0.0 and no newer version was copied", unchanged)
+
+    # An OB in the namespace calls the namespaced FB, so the PLC-wide update proves the use reachable and keeps the namespace.
+    h.apply("source_upsert", {"scopePath": unit, "language": "SCL", "source": CALLER_SOURCE, "expectedBlockNames": CALLERS})
+    update = h.prepare("library_update_project", h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": plc}))
+    guard = update["preview"]["updateCleanupGuard"]
+    h.report["cleanupGuard"] = guard
+    h.stage("guard proved the namespaced FB use through the unit's OB", lambda: require(
+        h.report["placement"][FB] in guard["reachablePaths"] and any(root.endswith("/TiaMcpUnitNamespaced_Cycle") for root in guard["obRoots"]),
+        "The guard did not prove reachability: %s" % guard) or guard["reachablePaths"])
+    h.apply_prepared("library_update_project", update)
+    h.stage("FB at exactly 1.1.0", lambda: h.verify_use(consumer, second, 1))
+    h.stage("the updated FB keeps namespace %s" % UNIT, lambda: require(placement() == h.report["placement"], "The update moved the FB or UDT") or True)
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
@@ -117,7 +207,7 @@ def body(h):
 
     h.owned_portal("reopen")
     h.stage("reopen consumer", lambda: h.reopen_project(project_path))
-    h.stage("reopened: namespaced FB and UDT intact", lambda: h.verify_use(h.project_library(), fb, 1) and placement())
+    h.stage("reopened: namespaced FB at 1.1.0 and UDT intact", lambda: h.verify_use(h.project_library(), second, 1) and placement())
 
 
 if __name__ == "__main__":
@@ -133,5 +223,5 @@ if __name__ == "__main__":
     Harness(args, "un_", "V21 library consumption in a software unit with a namespace preset beside the PLC root", [
         "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
-        "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
+        "The explicit namespace is exercised on two FB roots, a UDT root that the second FB then reuses, and one master-copy FC; a dependency created alongside a namespaced root keeps its type namespace, unexercised.",
         "No runtime execution."], [args.unit_seeder]).run(body)
