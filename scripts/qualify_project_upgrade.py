@@ -43,7 +43,7 @@ LIMITATIONS = [
     "DigitalTwinAtEducation_TIAProject_Basic_V16 cannot be upgraded by V21: it contains a TP700 Comfort device of version 15.0.0.0, which V21 no longer supports (MissingProductsException); only that typed refusal is qualified for it.",
     "The pinned inventory is device, PLC and block counts and PLC paths; content is not compared with the older version, which needs that TIA version.",
     "Nothing is compiled: block consistency after the upgrade is recorded as TIA reports it.",
-    "Protected (UMAC) projects, missing optional products and locked sources are not exercised.",
+    "Protected (UMAC) projects, locked sources and an interrupted upgrade (reconciliation) are not exercised natively.",
 ]
 
 
