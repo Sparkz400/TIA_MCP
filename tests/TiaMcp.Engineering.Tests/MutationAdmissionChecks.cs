@@ -236,8 +236,22 @@ internal static class MutationAdmissionChecks
         try { await new WatchTableDispatcher(failedRestore, dispatcherRoot).CallAsync("change_restore", new { changeId = "failed-restore" }); throw new Exception("Expected restore failure"); }
         catch (BridgeOperationException error) when (error.Code == "RecoveryRequired")
         { Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Read(error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!).State == "returned", "Structured change_restore failure is returned too"); }
+        // A structured project_upgrade failure only read its source; its owned copy is retained for inspection and the source can be admitted again.
+        string upgradeSource = Path.Combine(dispatcherRoot, "upgrade-source");
+        var upgradeFailed = new AdmissionNative(Scope(upgradeSource) with { Operation = "project_upgrade", ScopeSha256 = new('6', 64) }) {
+            DispatchError = new BridgeOperationException("ProjectUpgradeFailed", "TIA could not upgrade the owned copy", JsonSerializer.SerializeToElement(new { upgraded = false, sourceUnchanged = true })) };
+        try { await new WatchTableDispatcher(upgradeFailed, dispatcherRoot).CallAsync("project_upgrade", new { path = "x.ap16" }); throw new Exception("Expected upgrade failure"); }
+        catch (BridgeOperationException error) when (error.Code == "ProjectUpgradeFailed")
+        {
+            string id = error.Details!.Value.GetProperty("mutationAdmission").GetProperty("admissionId").GetString()!;
+            Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Read(id).State == "returned" && error.Details!.Value.GetProperty("sourceUnchanged").GetBoolean(),
+                "Structured project_upgrade failure is a returned outcome that keeps its source proof");
+            Check(new EngineeringMutationAdmissionStore(dispatcherRoot).Acquire(Scope(upgradeSource) with { Operation = "project_upgrade", ScopeSha256 = new('3', 64) }, new('a', 64)).State == "dispatchIntent",
+                "A returned upgrade failure releases its source for a new attempt");
+        }
         // Transport loss and deliberate simulator retention stay unknown and keep their reservation.
         foreach (var (route, failure) in new (string, Exception)[] {
+            ("project_upgrade", new BridgeException("WorkerDisconnected", "The TIA worker connection failed")),
             ("change_apply", new BridgeException("WorkerDisconnected", "The TIA worker connection failed")),
             ("change_apply", new BridgeException("TimeoutOutcomeUnknown", "The bridge call was interrupted")),
             ("change_restore", new BridgeException("CancelledOutcomeUnknown", "The bridge call was interrupted")),

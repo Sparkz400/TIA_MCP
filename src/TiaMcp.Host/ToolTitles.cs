@@ -145,6 +145,7 @@ internal static class ToolTitles
         ["project_snapshot_import"] = "Import a project snapshot",
         ["project_snapshot_search"] = "Search a project snapshot",
         ["project_text_export"] = "Export project texts",
+        ["project_upgrade"] = "Upgrade an older project to V21",
         ["public_certificate_review"] = "Review public certificates",
         ["public_certificate_review_page"] = "Page a certificate review",
         ["qualification_component_window"] = "Qualification: component window",

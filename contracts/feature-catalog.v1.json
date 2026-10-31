@@ -3690,6 +3690,51 @@
       ]
     },
     {
+      "featureId": "project_upgrade",
+      "domain": "project",
+      "title": "Upgrade a V14-V20 project or archive to V21 on an owned copy",
+      "mcpTools": [
+        "project_upgrade"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectComposition.OpenWithUpgrade(FileInfo) for a project file and ProjectComposition.RetrieveWithUpgrade(FileInfo, DirectoryInfo) for an archive, each called on the owned copy only; the UmacDelegate and ProjectOpenMode overloads are not used."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Accepts .ap14-.ap20 project files (V15.1: .ap15_1) and .zap14-.zap20 archives with their SHA-256. V13 and older, V21 and newer are refused before any file read or native call (ProjectVersionUnsupported).",
+          "The source is never opened or written: the project file's whole folder (at most 20000 files and 4 GiB) or the archive (at most 1 GiB) is copied into a new owned directory under the host's upgrades artifacts and only that copy is upgraded. The source hash (the archive bytes, or a sorted manifest of every file in the folder) is checked before and after the copy and after the upgrade (sourceUnchanged).",
+          "Nothing is compiled or saved beyond what TIA's upgrade does. The upgraded project stays open with its isModified flag reported; TIA's ConversionLog_*_to_21 files are returned with their project success marker and error and warning counts. Block consistency (the compile state) is read with project_inventory.",
+          "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile (source hash unchanged; destination absent, empty or holding the one V21 project its completed upgrade receipt names).",
+          "Protected (UMAC) projects, missing products and the V15.1 and V17-V20 formats are not exercised. Not run natively yet; the native runner is scripts/qualify_project_upgrade.py."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Implemented but not natively qualified; this catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "An empty worker-owned instance started with tia_start",
+        "Short artifacts root for TIA's 143-character project directory limit"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "plc_compare",
       "domain": "analysis",
       "title": "Compare PLC software offline with another PLC or a library",

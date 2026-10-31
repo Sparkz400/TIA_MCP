@@ -213,6 +213,7 @@ namespace TiaMcp.Openness.V21
                 Capability("catalog_query", "conditional", "Queries the installed hardware catalog of the attached V21 instance; an open project is required."),
                 Capability("scratch_create", "conditional", "Only a worker-owned empty TIA instance can create a uniquely named scratch project, one catalog-verified CPU and fixed SCL fixtures."),
                 Capability("project_open", "conditional", "Existing .ap21 files can be opened in an empty worker-owned instance; no automatic upgrade. readOnly opens a secondary project on which every mutation is refused."),
+                Capability("project_upgrade", "conditional", "Upgrades an owned copy of a V14-V20 project folder or archive to V21 with OpenWithUpgrade/RetrieveWithUpgrade; the source is hashed before and after and never opened. V13 and older are refused before any native call."),
                 Capability("project_copy", "conditional", "Archives the saved open project and retrieves it into a new owned directory as a closed copy; the source is never saved or changed."),
                 Capability("plc_compare", "conditional", "Bounded offline PlcSoftware.CompareTo tree against another PLC in the project or an open library; no online compare."),
                 Capability("software_inspect", "conditional", "Tags/constants, types, software/safety units, block/DB interfaces and TO parameters via exposed services and native XML."),

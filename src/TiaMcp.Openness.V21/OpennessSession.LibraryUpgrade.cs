@@ -9,11 +9,11 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
-        // Another process holding the source exclusively must surface as an explicit refusal, not a generic engineering error.
+        // Another process holding a library or project upgrade source exclusively must surface as an explicit refusal, not a generic engineering error.
         private static string LibrarySourceHash(string path)
         {
             try { return ChangeFileHash(path); }
-            catch (IOException error) { throw new BridgeException("SourceLocked", "The library source is locked by another process; nothing was opened or changed: " + error.Message); }
+            catch (IOException error) { throw new BridgeException("SourceLocked", "The source is locked by another process; nothing was opened or changed: " + error.Message); }
         }
 
         /// <summary>

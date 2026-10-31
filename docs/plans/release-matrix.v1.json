@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "3f9d9a8185e311e253632511266754d45ef56cb2b2d37408ddec666b7b404a09",
+    "catalogSha256": "f7145f1d4029c41d7e2c4b61a9d223a41fb0f64b08d9cf16c2203c644e121ac7",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -12,19 +12,19 @@
     21
   ],
   "summary": {
-    "features": 469,
+    "features": 470,
     "support": {
       "deferred": 8,
       "limited": 310,
       "shipped": 127,
       "unavailable_target": 5,
-      "unqualified": 19
+      "unqualified": 20
     },
     "cells": {
       "blocked": 31,
       "bound": 1995,
       "deferred": 24,
-      "open": 108
+      "open": 111
     },
     "openCellsByOwner": {
       "D06": {
@@ -45,6 +45,10 @@
       },
       "L06": {
         "role": "Coordinator and release",
+        "open": 3
+      },
+      "X01": {
+        "role": "Platform",
         "open": 3
       },
       "X07": {
@@ -481,6 +485,36 @@
           "evidenceIds": [
             "local.project_settings.20261028"
           ]
+        }
+      ]
+    },
+    {
+      "featureId": "project_upgrade",
+      "domain": "project",
+      "mcpTools": [
+        "project_upgrade"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "X01"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },
