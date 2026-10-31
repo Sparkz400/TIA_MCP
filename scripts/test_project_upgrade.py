@@ -4,8 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from qualify_project_upgrade import (EXAMPLES, fingerprint, inventory_view, public, refuse, released, stage_input, summary,
-                                     upgrade_view)
+from qualify_project_upgrade import (EXAMPLES, fingerprint, inventory_view, paths_fit, public, refuse, released, stage_input,
+                                     summary, upgrade_view)
 
 
 def write(path, data=b"x"):
@@ -45,6 +45,14 @@ class FingerprintTests(Folder):
         write(self.root / "other.txt")
         self.assertEqual(first, fingerprint(archive))
         self.assertEqual((first["files"], first["bytes"]), (1, 3))
+
+
+class PathLimitTests(unittest.TestCase):
+    def test_longest_upgrade_directory_fits_tia_limit(self):
+        run = Path("D:/") / ("r" * 70)
+        self.assertEqual(paths_fit(run, EXAMPLES), len(str(run)) + len("/upgrades/u_12345678/p/DigitalTwinAtEducation_TIAProject_Basic_V16_V21"))
+        with self.assertRaises(AssertionError):
+            paths_fit(Path("D:/") / ("r" * 74), EXAMPLES)
 
 
 class InputTests(Folder):

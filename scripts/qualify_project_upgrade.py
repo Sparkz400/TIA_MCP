@@ -170,7 +170,15 @@ def upgrade(h, original):
     return {**view, "inputCopy": before, "admission": admission, "inventory": inventory}
 
 
+def paths_fit(run, names):
+    """project_upgrade's own limit, checked before any TIA start: <run>/upgrades/u_<8>/<p|w>/<stem>_V21 within 143 characters."""
+    longest = max(len(str(run / "upgrades" / "u_12345678" / ("w" if is_archive(Path(name)) else "p") / (Path(name).stem + "_V21"))) for name in names)
+    require(longest <= 143, "Choose a shorter --artifacts path: the upgraded project directory would need %d characters" % longest)
+    return longest
+
+
 def body(h):
+    h.report["longestUpgradeDirectory"] = paths_fit(h.directory, EXAMPLES)
     sources = public([Path(p) for p in h.args.source], EXAMPLES)
     refused = public([Path(h.args.refused)], REFUSED)
     originals = {**sources, **refused}
@@ -205,4 +213,4 @@ if __name__ == "__main__":
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "pu_", "X01 project_upgrade of public V14-V16 example projects and archives into V21 on owned copies", LIMITATIONS, []).run(body)
+    Harness(args, "pu_", "X01 project_upgrade of public V14-V16 example projects and archives into V21 on owned copies", LIMITATIONS, [], scratch=False).run(body)
