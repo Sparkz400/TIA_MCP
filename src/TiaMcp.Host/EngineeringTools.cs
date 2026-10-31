@@ -72,7 +72,7 @@ public sealed partial class TiaTools
         => Call("software_inspect", new { projectName, plcPath, scopePath, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "type_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export and inspect a PLC data type (UDT), preserving native XML and normalized member declarations. Select exact typeName or typePath from software_inspect. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its .udt external source file; both return SHA-256 hashed artifacts instead of parsed members.")]
+    [Description("Export and inspect a PLC data type (UDT), preserving native XML and normalized member declarations. Select exact typeName or typePath from software_inspect. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its .udt external source file and needs a writable offline project, because any external source the generation leaves is deleted; both return SHA-256 hashed artifacts instead of parsed members.")]
     public Task<CallToolResult> TypeRead(CancellationToken cancellationToken, string? typeName = null, string? typePath = null, string? projectName = null, string? plcPath = null, int maxItems = 500, string? scopePath = null, string? format = null)
         => Call("type_read", new { typeName, typePath, projectName, plcPath, scopePath, format, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
@@ -166,7 +166,7 @@ public sealed partial class TiaTools
         => Call("fixture_sources", new { language, blockName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "fixtures") }, cancellationToken);
 
     [McpServerTool(Name = "change_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply. Source/XML must explicitly describe intended objects. Does not change the project; writes preview artifacts.")]
+    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project awaits change_restore. Source/XML must explicitly describe intended objects. Does not change the project; writes preview artifacts.")]
     public async Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
     {
         object request;
