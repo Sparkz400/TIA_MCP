@@ -226,12 +226,14 @@ public sealed class ComponentQualificationWindowStore
         var files = Directory.GetFiles(path, "*.json").Order(StringComparer.Ordinal).ToArray();
         if (files.Length is < 1 or > 96) Fail("JournalInvalid", "Component reservation revisions must be bounded.");
         // A scan needs a finished window only for its chain: its plan, sources or evidence may be gone.
-        bool live = !scan || !Terminal(PackageStorage.Load<ComponentWindowReservation>(files[^1]));
+        if (new FileInfo(files[^1]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
+        var last = PackageStorage.Load<ComponentWindowReservation>(files[^1]);
+        bool live = !scan || !Terminal(last);
         ComponentWindowReservation? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
             if (Path.GetFileName(files[i]) != i.ToString("D8") + ".json" || new FileInfo(files[i]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
-            var record = PackageStorage.Load<ComponentWindowReservation>(files[i]);
+            var record = i == files.Length - 1 ? last : PackageStorage.Load<ComponentWindowReservation>(files[i]);
             if (record.Id != id || record.Revision != i) Fail("JournalInvalid", "Component reservation identity changed.");
             ValidateRecord(root, previous, record, live); previous = record;
         }

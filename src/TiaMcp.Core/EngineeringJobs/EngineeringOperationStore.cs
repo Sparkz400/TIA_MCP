@@ -16,22 +16,24 @@ public sealed class EngineeringOperationStore
     private readonly string directory;
     private readonly string archive;
     private static readonly string[] Terminal = ["succeeded", "reconciled", "stopped"];
-    // Every scan reads each record left in place, so once a store holds this many, records that finish move to its archive sibling.
+    // Every scan reads each record left in place, so once a store holds this many, records that finish move into its .archive folder.
+    // An older Host's scan refuses that folder (InvalidRequest) instead of silently missing archived keys.
     internal static int ArchiveAbove = 1000;
     public EngineeringOperationStore(string artifactRoot)
     {
         artifacts = Path.GetFullPath(artifactRoot);
         PackageStorage.EnsureNoLinks(artifacts);
         directory = PackageStorage.Under(artifacts, "engineering-operations");
-        archive = PackageStorage.Under(artifacts, "engineering-operations-archive");
+        archive = PackageStorage.Under(directory, ".archive");
         Directory.CreateDirectory(directory);
     }
 
     // Best effort once the finished revision is durable: a record left in place stays valid and only counts toward the store bound.
-    internal static void Archive(string record, string destination)
+    // A failed index write (beforeMove) skips the move, so an archived operation is always findable by its key.
+    internal static void Archive(string record, string destination, Action? beforeMove = null)
     {
-        try { Directory.CreateDirectory(Path.GetDirectoryName(destination)!); Directory.Move(record, destination); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException) { }
+        try { Directory.CreateDirectory(Path.GetDirectoryName(destination)!); beforeMove?.Invoke(); Directory.Move(record, destination); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or BridgeException) { }
     }
 
     public EngineeringOperationRecord Prepare(EngineeringOperationPlan plan, string idempotencyKey)
@@ -44,6 +46,7 @@ public sealed class EngineeringOperationStore
         VerifyArtifacts(plan.Inputs);
         string hash = Hash(plan);
         var prior = Records().SingleOrDefault(r => r.IdempotencyKey == idempotencyKey);
+        prior = prior is null ? null : ReadLocked(prior.Id); // The scan may have read it without filesystem checks.
         if (prior is null && File.Exists(Marker(idempotencyKey))) prior = ReadLocked(PackageStorage.Load<string>(Marker(idempotencyKey)));
         if (prior is not null)
         {
@@ -298,13 +301,15 @@ public sealed class EngineeringOperationStore
         ValidateTransition(previous, next);
         string folder = Folder(id), active = PackageStorage.Under(directory, id);
         // An archived success that reserves recovery must be visible to scans before that revision is durable.
-        if (folder != active && !Terminal.Contains(next.State)) { Directory.Move(folder, active); folder = active; }
+        if (folder != active && !Terminal.Contains(next.State))
+        {
+            try { Directory.Move(folder, active); folder = active; }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            { throw new BridgeException("OperationStoreBusy", "The archived operation could not return to the active store; nothing was recorded. Retry the same request.", error); }
+        }
         Write(next, folder);
         if (folder == active && Terminal.Contains(next.State) && Directory.GetDirectories(directory).Length > ArchiveAbove)
-        {
-            Directory.CreateDirectory(archive); PackageStorage.Save(Marker(next.IdempotencyKey), id); // Prepare still finds the key.
-            Archive(active, PackageStorage.Under(archive, id));
-        }
+            Archive(active, PackageStorage.Under(archive, id), () => PackageStorage.Save(Marker(next.IdempotencyKey), id)); // Prepare still finds the key.
         return next;
     }
 
@@ -387,12 +392,12 @@ public sealed class EngineeringOperationStore
         {
             string name = Path.GetFileName(path);
             // A staged prepare never authorizes checkpoint/dispatch and is not a committed operation.
-            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit)) continue;
+            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
             yield return ReadLocked(name, scan: true);
         }
     }
 
-    // A finished record may have moved to the archive sibling; ids are unique across both.
+    // A finished record may have moved into .archive; ids are unique across both.
     private string Folder(string id)
     {
         string active = PackageStorage.Under(directory, id);
@@ -409,12 +414,14 @@ public sealed class EngineeringOperationStore
         var files = Directory.GetFiles(root, "*.json").OrderBy(x => x, StringComparer.Ordinal).ToArray();
         if (files.Length is 0 or > 10000) Fail("JournalInvalid", "Missing or excessive operation revisions.");
         // A scan needs a record that owns nothing only for its chain: its paths or artifacts may be gone (a removed drive, a deleted folder).
-        bool live = !scan || HoldsResources(PackageStorage.Load<EngineeringOperationRecord>(files[^1]));
+        if (new FileInfo(files[^1]).Length > 8 * 1024 * 1024) Fail("JournalInvalid", "A persisted revision exceeds 8 MiB.");
+        var last = PackageStorage.Load<EngineeringOperationRecord>(files[^1]);
+        bool live = !scan || HoldsResources(last);
         EngineeringOperationRecord? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
             if (new FileInfo(files[i]).Length > 8 * 1024 * 1024) Fail("JournalInvalid", "A persisted revision exceeds 8 MiB.");
-            var record = PackageStorage.Load<EngineeringOperationRecord>(files[i]);
+            var record = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringOperationRecord>(files[i]);
             ValidatePlan(record.Plan, live);
             if (Path.GetFileName(files[i]) != i.ToString("D6") + ".json" || record.Id != id || record.Revision != i ||
                 record.PlanSha256 != Hash(record.Plan) || record.PreviousSha256 != (previous is null ? null : Hash(previous)) ||

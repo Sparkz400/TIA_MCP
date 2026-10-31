@@ -109,8 +109,7 @@ content and three archive levels. Existing ZIP path, link, CRC, collision and ac
 streamed-size checks apply. Nested ZIP validation also applies to ZIP files intended
 as downloadable assets; unsupported nested content can therefore refuse the input.
 Extraction is serialized, bounded to 60 seconds per phase and removed afterward.
-A concurrent analysis waits up to five seconds for the running one, then returns
-`IntakeBusy`; it does not start another extraction.
+Concurrent analysis returns `IntakeBusy`; it does not start another extraction.
 
 Both phases validate before immutable review publication. Failed transient
 extractions are removed; original generic uploads remain until explicit release.

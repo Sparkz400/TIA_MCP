@@ -6,7 +6,6 @@ using System.Text.Json.Nodes;
 using TiaMcp.Core;
 using TiaMcp.Core.WebApplications;
 
-PackageStorage.LockWait=TimeSpan.FromMilliseconds(250);// Contention checks hold a store lock past this short bound.
 if(args.Length!=1||Directory.Exists(args[0]))throw new ArgumentException("Fresh evidence directory required.");
 string root=Path.GetFullPath(args[0]);Directory.CreateDirectory(root);var checks=new List<string>();
 void Check(bool ok,string label){if(!ok)throw new Exception(label);checks.Add(label);}

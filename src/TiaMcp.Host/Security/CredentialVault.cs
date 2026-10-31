@@ -199,6 +199,8 @@ internal sealed partial class CredentialVault
         public void Dispose() { try { file.Dispose(); } finally { turn.Release(); } }
     }
 
+    // Lock order: this vault lock, then engineering-operations/store.lock (operation methods, VerifyReleased); the store's credential
+    // callbacks run inside that vault lock and never take it, so the two locks cannot wait on each other.
     private IDisposable Lock()
     {
         CheckDirectory(); string path = Path.Combine(root, ".lock");

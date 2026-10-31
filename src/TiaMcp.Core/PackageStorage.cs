@@ -74,10 +74,11 @@ internal static class PackageStorage
     // A short holder (a status poll, another Host) is waited out, so a returned native call is still recorded; a longer hold refuses.
     internal static TimeSpan LockWait = TimeSpan.FromSeconds(5);
 
-    internal static FileStream Lock(string path)
+    /// <summary>Ownership locks held for a whole job pass <see cref="TimeSpan.Zero"/>: waiting would only delay their refusal.</summary>
+    internal static FileStream Lock(string path, TimeSpan? wait = null)
     {
         EnsureNoLinks(path);
-        try { return WaitForLock(() => new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None), System.Diagnostics.Stopwatch.StartNew(), LockWait); }
+        try { return WaitForLock(() => new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None), System.Diagnostics.Stopwatch.StartNew(), wait ?? LockWait); }
         catch (IOException error) { throw new BridgeException("IntakeBusy", "Another intake operation holds this resource. Retry the same read or upload request later.", error); }
     }
 

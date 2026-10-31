@@ -25,7 +25,7 @@ public sealed class EngineeringMutationAdmissionStore
         string operations = PackageStorage.Under(artifacts, "engineering-operations");
         Directory.CreateDirectory(directory); Directory.CreateDirectory(operations);
         lockPath = Path.Combine(operations, "store.lock");
-        archive = PackageStorage.Under(artifacts, "engineering-admissions-archive");
+        archive = PackageStorage.Under(directory, ".archive");
     }
 
     public EngineeringMutationAdmission Acquire(EngineeringMutationScope scope, string requestSha256)
@@ -102,16 +102,16 @@ public sealed class EngineeringMutationAdmissionStore
         foreach (string folder in folders)
         {
             string name = Path.GetFileName(folder);
-            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit)) continue;
+            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
             yield return ReadUnderLock(artifacts, name, scan: true);
         }
     }
 
-    // A finished record may have moved to the archive sibling; ids are unique across both.
+    // A finished record may have moved into .archive (an older Host's scan refuses that folder); ids are unique across both.
     private static string Folder(string artifacts, string id)
     {
         string active = PackageStorage.Under(artifacts, "engineering-admissions/" + id);
-        return Directory.Exists(active) ? active : PackageStorage.Under(artifacts, "engineering-admissions-archive/" + id);
+        return Directory.Exists(active) ? active : PackageStorage.Under(artifacts, "engineering-admissions/.archive/" + id);
     }
 
     private static EngineeringMutationAdmission ReadUnderLock(string artifacts, string id, bool scan = false)
@@ -121,13 +121,15 @@ public sealed class EngineeringMutationAdmissionStore
         var files = Directory.GetFiles(root, "*.json").Order(StringComparer.Ordinal).ToArray();
         if (files.Length is < 1 or > 16) throw new BridgeException("JournalInvalid", "Mutation admission revisions are missing or excessive.");
         // A scan needs a finished record only for its chain: its paths or responses may be gone (a removed drive, a deleted folder).
-        bool live = !scan || PackageStorage.Load<EngineeringMutationAdmission>(files[^1]).State is not ("returned" or "reconciled");
+        if (new FileInfo(files[^1]).Length > 1024 * 1024) throw new BridgeException("JournalInvalid", "Mutation admission revisions must be contiguous and bounded.");
+        var last = PackageStorage.Load<EngineeringMutationAdmission>(files[^1]);
+        bool live = !scan || last.State is not ("returned" or "reconciled");
         EngineeringMutationAdmission? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
             if (Path.GetFileName(files[i]) != i.ToString("D8") + ".json" || new FileInfo(files[i]).Length > 1024 * 1024)
                 throw new BridgeException("JournalInvalid", "Mutation admission revisions must be contiguous and bounded.");
-            var next = PackageStorage.Load<EngineeringMutationAdmission>(files[i]);
+            var next = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringMutationAdmission>(files[i]);
             if (next.Id != id || next.Revision != i) throw new BridgeException("JournalInvalid", "Mutation admission revision identity differs.");
             ValidateRecord(artifacts, previous, next, live); previous = next;
         }

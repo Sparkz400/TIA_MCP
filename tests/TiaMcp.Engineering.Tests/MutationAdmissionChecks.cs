@@ -141,8 +141,9 @@ internal static class MutationAdmissionChecks
         {
             var archived = scans.Acquire(Scope(Path.Combine(scanRoot, "archived.ap21")), new('9', 64));
             archived = scans.Returned(archived.Id, archived.Revision, response);
-            Check(!Directory.Exists(Path.Combine(scanRoot, "engineering-admissions", archived.Id)) && scans.Read(archived.Id).State == "returned" &&
-                scans.AdmittedAt(archived.Id) <= archived.RecordedAt, "A finished admission leaves the store the growth bound counts and still reads by id");
+            Check(!Directory.Exists(Path.Combine(scanRoot, "engineering-admissions", archived.Id)) && Directory.Exists(Path.Combine(scanRoot, "engineering-admissions", ".archive", archived.Id)) &&
+                scans.Read(archived.Id).State == "returned" && scans.AdmittedAt(archived.Id) <= archived.RecordedAt, "A finished admission moves into .archive, out of the growth bound, and still reads by id");
+            Check(scans.Acquire(Scope(Path.Combine(scanRoot, "after-archive.ap21")), new('b', 64)).State == "dispatchIntent", "Scans skip the .archive folder");
         }
         finally { EngineeringOperationStore.ArchiveAbove = bound; }
         // A clock stepped back after the intent was stamped keeps the returned outcome valid.
