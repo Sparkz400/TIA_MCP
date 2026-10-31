@@ -2742,8 +2742,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectUpgrade.cs",
-      "sha256": "b4c677c4d3e21ffb0de32711ecc369a931d518f6410e7813950f43eee92b8e4f",
-      "bytes": 7385
+      "sha256": "f528f24c2904b3edb153617692d4bbeda9697ab0b65cc1543525f2457e0ca562",
+      "bytes": 7201
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
@@ -3057,8 +3057,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ProjectUpgradeRules.cs",
-      "sha256": "35b3ec0dca18a9867a130b63991c14aeb82c60aa85bcbac7e95333454db7f93b",
-      "bytes": 4117
+      "sha256": "6543896fd5db57607fa8a915bc5528090264ad7d48f3b694cf3e46cdd300da0d",
+      "bytes": 5804
     },
     {
       "path": "src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs",

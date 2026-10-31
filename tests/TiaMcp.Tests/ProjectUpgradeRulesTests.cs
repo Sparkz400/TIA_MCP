@@ -34,23 +34,37 @@ internal static class ProjectUpgradeRulesTests
     internal static async Task LayoutStaysOwnedAndBounded()
     {
         string root = Path.Combine(Path.GetPathRoot(AppContext.BaseDirectory)!, "tia-upgrade-" + Guid.NewGuid().ToString("N"), "u_12345678");
-        var project = ProjectUpgradeRules.Plan(root, @"E:\Examples\Demo\Demo.ap16", false);
-        Check.Equal(Path.Combine(root, "p", "Demo.ap16"), project.Input);
-        Check.Equal(Path.Combine(root, "p"), project.Target);
+        // The folder keeps its name: V21 saves <folder>_V21/<folder>_V21.ap21 next to it (observed 31 October 2026).
+        var project = ProjectUpgradeRules.Plan(root, @"E:\Examples\Demo\Main.ap16", false);
+        Check.Equal(Path.Combine(root, "Demo", "Main.ap16"), project.Input);
+        Check.Equal(root, project.Target);
+        Check.Equal(Path.Combine(root, "Demo_V21", "Demo_V21.ap21"), project.Upgraded);
         Check.Equal(Path.Combine(root, "upgrade-receipt.json"), project.Receipt);
-        var archive = ProjectUpgradeRules.Plan(root, @"E:\Examples\Demo.zap14", true);
-        Check.Equal(Path.Combine(root, "s", "Demo.zap14"), archive.Input);
+        var archive = ProjectUpgradeRules.Plan(root, @"E:\Examples\Demo_1.zap14", true);
+        Check.Equal(Path.Combine(root, "s", "Demo_1.zap14"), archive.Input);
         Check.Equal(Path.Combine(root, "w"), archive.Target);
+        Check.Equal(null, archive.Upgraded);
+        // Only the observed upgrade location is accepted; an archive's project name comes from inside the archive.
+        Check.Equal(true, ProjectUpgradeRules.InLayout(project, Path.Combine(root, "Demo_V21", "DEMO_V21.ap21")));
+        foreach (string other in new[] { Path.Combine(root, "Demo", "Main.ap16"), Path.Combine(root, "Demo", "Demo_V21", "Demo_V21.ap21"), Path.Combine(root, "Main_V21", "Main_V21.ap21"), "", null! })
+            Check.Equal(false, ProjectUpgradeRules.InLayout(project, other));
+        Check.Equal(true, ProjectUpgradeRules.InLayout(archive, Path.Combine(root, "w", "Demo_V21", "Demo_V21.ap21")));
+        foreach (string other in new[] { Path.Combine(root, "w", "Demo", "Demo.ap21"), Path.Combine(root, "w", "Demo_V21", "Other_V21.ap21"), Path.Combine(root, "Demo_V21", "Demo_V21.ap21"),
+            Path.Combine(root, "w", "Demo", "Demo_V21", "Demo_V21.ap21"), Path.Combine(root, "w", "Demo_V21", "Demo_V21.ap16") })
+            Check.Equal(false, ProjectUpgradeRules.InLayout(archive, other));
         // A project folder is copied whole, so the destination may not lie inside it; an archive is copied alone.
         string folder = Path.GetDirectoryName(root)!;
-        foreach (string inside in new[] { Path.Combine(folder, "Demo.ap16"), Path.Combine(root, "Demo.ap16") })
+        foreach (string inside in new[] { Path.Combine(folder, "Demo.ap16"), Path.Combine(root, "Demo.ap16"), @"E:\Demo.ap16" })
             Check.Equal("InvalidRequest", (await Check.ThrowsAsync<EngineeringBridgeException>(() => Task.Run(() => ProjectUpgradeRules.Plan(root, inside, false)))).Code);
         Check.Equal(Path.Combine(root, "s", "Demo.zap16"), ProjectUpgradeRules.Plan(root, Path.Combine(folder, "Demo.zap16"), true).Input);
-        Check.Equal(Path.Combine(root, "p", "Demo.ap16"), ProjectUpgradeRules.Plan(root, Path.Combine(folder + "x", "Demo.ap16"), false).Input);
-        // The upgraded <name>_V21 directory must fit TIA's 143-character limit.
-        string stem = new('N', 143 - Path.Combine(root, "p").Length - 1 - "_V21".Length);
-        ProjectUpgradeRules.Plan(root, @"E:\Examples\" + stem + ".ap16", false);
-        Check.Equal("ProjectPathTooLong", (await Check.ThrowsAsync<EngineeringBridgeException>(() => Task.Run(() => ProjectUpgradeRules.Plan(root, @"E:\Examples\" + stem + "N.ap16", false)))).Code);
+        Check.Equal(Path.Combine(root, Path.GetFileName(folder) + "x", "Demo.ap16"), ProjectUpgradeRules.Plan(root, Path.Combine(folder + "x", "Demo.ap16"), false).Input);
+        // The upgraded <folder>_V21 directory must fit TIA's 143-character limit.
+        string name = new('N', 143 - root.Length - 1 - "_V21".Length);
+        ProjectUpgradeRules.Plan(root, @"E:\Examples\" + name + @"\Main.ap16", false);
+        Check.Equal("ProjectPathTooLong", (await Check.ThrowsAsync<EngineeringBridgeException>(() => Task.Run(() => ProjectUpgradeRules.Plan(root, @"E:\Examples\" + name + @"N\Main.ap16", false)))).Code);
+        string stem = new('N', 143 - Path.Combine(root, "w").Length - 1 - "_V21".Length);
+        ProjectUpgradeRules.Plan(root, @"E:\Examples\" + stem + ".zap16", true);
+        Check.Equal("ProjectPathTooLong", (await Check.ThrowsAsync<EngineeringBridgeException>(() => Task.Run(() => ProjectUpgradeRules.Plan(root, @"E:\Examples\" + stem + "N.zap16", true)))).Code);
         Check.Equal(false, Directory.Exists(folder));
     }
 

@@ -74,11 +74,10 @@ namespace TiaMcp.Openness.V21
             var info = ProjectInfo(project); info["isModified"] = project.IsModified;
             result["project"] = info;
             ProjectUpgradeEvidence(result, source, layout.Root);
-            string upgraded = project.Path?.FullName ?? "";
-            if (!upgraded.StartsWith(layout.Root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) || !string.Equals(Path.GetExtension(upgraded), ".ap21", StringComparison.OrdinalIgnoreCase))
+            if (!ProjectUpgradeRules.InLayout(layout, project.Path?.FullName))
             {
                 project.Close();
-                throw new BridgeException("UpgradeVerificationFailed", "TIA returned a project outside the owned destination or not in V21 format; it was closed unsaved.", result);
+                throw new BridgeException("UpgradeVerificationFailed", "TIA returned a project that is not the V21 upgrade in the observed owned layout; it was closed unsaved.", result);
             }
             if (result.Value<bool>("sourceUnchanged") != true) throw new BridgeException("SourceChanged", "The source changed during the upgrade; the upgraded copy stays open.", result);
             result["upgraded"] = true;

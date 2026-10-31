@@ -4,8 +4,11 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from qualify_project_upgrade import (EXAMPLES, fingerprint, inventory_view, paths_fit, public, refuse, released, stage_input,
-                                     summary, upgrade_view)
+from qualify_project_upgrade import (EXAMPLES, fingerprint, inventory_view, paths_fit, pinned, public, refuse, refusal_view, released,
+                                     stage_input, upgrade_view)
+
+SPEC = {"version": "V16", "format": "project", "project": "Demo_V21"}
+REFUSAL = EXAMPLES["DigitalTwinAtEducation_TIAProject_Basic_V16.ap16"]
 
 
 def write(path, data=b"x"):
@@ -50,9 +53,17 @@ class FingerprintTests(Folder):
 class PathLimitTests(unittest.TestCase):
     def test_longest_upgrade_directory_fits_tia_limit(self):
         run = Path("D:/") / ("r" * 70)
-        self.assertEqual(paths_fit(run, EXAMPLES), len(str(run)) + len("/upgrades/u_12345678/p/DigitalTwinAtEducation_TIAProject_Basic_V16_V21"))
+        self.assertEqual(paths_fit(run, EXAMPLES), len(str(run)) + len("/upgrades/u_12345678/DigitalTwinAtEducation_TIAProject_Basic_V16_V21"))
         with self.assertRaises(AssertionError):
-            paths_fit(Path("D:/") / ("r" * 74), EXAMPLES)
+            paths_fit(Path("D:/") / ("r" * 76), EXAMPLES)
+
+    def test_pinned_projects_follow_the_observed_names(self):
+        # V21 names a folder's upgrade <folder>_V21 (the runner copies the folder under its file's stem) and an archive's
+        # after the archived project; refused examples pin their native reason instead.
+        for name, spec in EXAMPLES.items():
+            if spec["format"] == "project" and "project" in spec:
+                self.assertEqual(spec["project"], Path(name).stem + "_V21")
+            self.assertEqual("refusal" in spec, "project" not in spec and "inventory" not in spec)
 
 
 class InputTests(Folder):
@@ -81,7 +92,7 @@ class InputTests(Folder):
 def result(run, **changes):
     value = {"upgraded": True, "compiled": False, "sourceUnchanged": True,
              "source": {"version": "V16", "format": "project", "sha256": "a" * 64, "sourceSha256": "b" * 64, "path": str(run / "inputs" / "x.ap16")},
-             "project": {"name": "Demo_V21", "path": str(run / "upgrades" / "u_1" / "p" / "Demo_V21" / "Demo_V21.ap21"), "isModified": False},
+             "project": {"name": "Demo_V21", "path": str(run / "upgrades" / "u_1" / "Demo_V21" / "Demo_V21.ap21"), "isModified": False},
              "upgradeLogs": [{"path": str(run / "upgrades" / "u_1" / "Logs" / "ConversionLog_16.0.0.0_to_21.0.0.0.xml"), "bytes": 10, "sha256": "c" * 64,
                               "succeeded": True, "errors": 0, "warnings": 2}]}
     for key, item in changes.items():
@@ -94,8 +105,8 @@ def result(run, **changes):
 
 class UpgradeViewTests(Folder):
     def test_keeps_names_hashes_and_run_relative_paths(self):
-        view = upgrade_view(result(self.root), self.root, "V16", "project")
-        self.assertEqual(view["project"]["path"], "upgrades/u_1/p/Demo_V21/Demo_V21.ap21")
+        view = upgrade_view(result(self.root), self.root, SPEC)
+        self.assertEqual(view["project"]["path"], "upgrades/u_1/Demo_V21/Demo_V21.ap21")
         self.assertEqual(view["logs"], [{"name": "ConversionLog_16.0.0.0_to_21.0.0.0.xml", "bytes": 10, "sha256": "c" * 64,
                                          "succeeded": True, "errors": 0, "warnings": 2}])
         self.assertNotIn(str(self.root), json.dumps(view))
@@ -104,23 +115,49 @@ class UpgradeViewTests(Folder):
         outside = Path(tempfile.gettempdir()) / "elsewhere" / "Demo_V21.ap21"
         for changes in ({"upgraded": False}, {"compiled": True}, {"sourceUnchanged": False}, {"source": {"version": "V15"}},
                         {"source": {"format": "archive"}}, {"project": {"path": str(outside)}},
-                        {"project": {"path": str(self.root / "upgrades" / "Demo.ap16")}}, {"upgradeLogs": []},
+                        {"project": {"path": str(self.root / "upgrades" / "Demo.ap16")}}, {"upgradeLogs": []}, {"project": {"name": "p_V21"}},
+                        {"project": {"path": str(self.root / "upgrades" / "u_1" / "p_V21" / "p_V21.ap21")}},
                         {"upgradeLogs": [{"path": "l", "bytes": 1, "sha256": "c", "succeeded": False, "errors": 1, "warnings": 0}]}):
             with self.subTest(changes=changes), self.assertRaises(AssertionError):
-                upgrade_view(result(self.root, **changes), self.root, "V16", "project")
+                upgrade_view(result(self.root, **changes), self.root, SPEC)
+
+
+def refused(run, **changes):
+    details = {"upgraded": False, "nativeType": REFUSAL["refusal"]["nativeType"], "sourceUnchanged": True, "upgradedProjects": [],
+               "destination": str(run / "upgrades" / "u_2"), "source": {"sha256": "a" * 64, "sourceSha256": "b" * 64}}
+    error = {"code": "ProjectUpgradeFailed", "message": "Required products are missing. " + REFUSAL["refusal"]["text"], "details": details}
+    for key, item in changes.items():
+        (details if key in details else error)[key] = item
+    return error
+
+
+class RefusalViewTests(Folder):
+    def test_pinned_native_refusal_with_retained_copy(self):
+        (self.root / "upgrades" / "u_2").mkdir(parents=True)
+        view = refusal_view(refused(self.root), self.root, REFUSAL)
+        self.assertEqual((view["nativeType"], view["ownedCopy"]), ("Siemens.Engineering.MissingProductsException", "upgrades/u_2"))
+        self.assertNotIn(str(self.root), json.dumps(view))
+
+    def test_any_other_failure_fails(self):
+        (self.root / "upgrades" / "u_2").mkdir(parents=True)
+        for changes in ({"code": "UpgradeVerificationFailed"}, {"nativeType": "System.IO.IOException"}, {"message": "another reason"},
+                        {"sourceUnchanged": False}, {"upgraded": True}, {"upgradedProjects": ["x.ap21"]},
+                        {"destination": str(self.root / "upgrades" / "missing")}, {"destination": tempfile.gettempdir()}):
+            with self.subTest(changes=changes), self.assertRaises(AssertionError):
+                refusal_view(refused(self.root, **changes), self.root, REFUSAL)
 
 
 class InventoryTests(unittest.TestCase):
     INVENTORY = {"completeness": {"truncated": False}, "warnings": [],
                  "hardware": [{"path": "d/1", "typeIdentifier": "OrderNumber:6ES7"}, {"path": "d/0", "typeIdentifier": None}],
-                 "plcs": [{"path": "d/1/plc/PLC_1"}],
+                 "plcs": [{"path": "/projects/Demo_V21/devices/d/items/1/plc/PLC_1"}],
                  "blocks": [{"path": "b/Main", "isConsistent": True}, {"path": "b/FB1", "isConsistent": False}]}
 
     def test_view_is_order_independent_and_counts_the_compile_state(self):
         shuffled = dict(self.INVENTORY, hardware=self.INVENTORY["hardware"][::-1], blocks=self.INVENTORY["blocks"][::-1])
         self.assertEqual(inventory_view(self.INVENTORY), inventory_view(shuffled))
-        self.assertEqual(summary(inventory_view(self.INVENTORY)),
-                         {"hardwareItems": 2, "plcs": 1, "blocks": 2, "inconsistentBlocks": 1, "warnings": 0})
+        self.assertEqual(pinned(inventory_view(self.INVENTORY)),
+                         {"hardwareItems": 2, "plcs": ["devices/d/items/1/plc/PLC_1"], "blocks": 2, "inconsistentBlocks": 1})
 
     def test_truncated_inventory_is_refused(self):
         with self.assertRaises(AssertionError):
