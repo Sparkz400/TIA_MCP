@@ -97,7 +97,7 @@ namespace TiaMcp.Openness.V21
                     {
                         var node = new JObject { ["typeName"] = version.TypeObject.Name, ["typeGuid"] = version.TypeObject.Guid.ToString("D") };
                         RequireNoInstanceInOtherScope(change, plc, scope, node);
-                        reused.Add(ProveInstalledLibraryDependency(change, plc, node, version));
+                        reused.Add(ProveInstalledLibraryDependency(change, plc, node, version, versionCommentMayDiffer: true));
                     }
                 }
                 string dbName = change.Payload["integration"]["instanceDb"]?.Value<string>("name");
@@ -135,28 +135,33 @@ namespace TiaMcp.Openness.V21
 
         private readonly bool _libraryIntegrateApplyEnabled;
 
-        private string PlcCombinedApplyRefusal(LibraryChange change)
+        // Null when combined apply may run; otherwise the refusal's code (PlcIntegrationNotQualified unless a precise one applies) and message.
+        private JObject PlcCombinedApplyRefusal(LibraryChange change)
         {
             var caller = change.Preview["integrationPlan"]?["callerArtifact"] as JObject; System.Xml.Linq.XDocument export;
             try { export = caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))); }
-            catch (PlcComponentException error) { return "The retained caller export is unusable: " + error.Message; }
-            return PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change)) ??
+            catch (PlcComponentException error) { return NotQualified("The retained caller export is unusable: " + error.Message); }
+            string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change)) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
-                    ? "Only the verified read-only global source with its retained snapshot is eligible." : null) ??
+                    ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
+            return shape != null ? NotQualified(shape) :
                 PlcCombinedApplyTargetRefusal(change);
         }
+        private static JObject NotQualified(string message) => message == null ? null : new JObject { ["code"] = PlcLibraryIntegrationPlanner.ApplyError, ["message"] = message };
 
         // Shapes without native evidence run only on a qualification Host, in its own single owned scratch.
         private bool PlcComponentCandidatesAdmitted(LibraryChange change) =>
             _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;
 
         // Step 1 imports and saves before step 2 creates the instance DB; what step 2 needs from the target is decided here, before any claim.
-        private string PlcCombinedApplyTargetRefusal(LibraryChange change)
+        private JObject PlcCombinedApplyTargetRefusal(LibraryChange change)
         {
             var languages = change.Project.LanguageSettings;
             string refusal = PlcComponentQualificationGate.CombinedApplyLanguageRefusal(languages.ActiveLanguages.Select(l => l.Culture.Name).ToArray(),
                 languages.ReferenceLanguage?.Culture.Name, languages.EditingLanguage?.Culture.Name);
-            if (refusal != null) return refusal;
+            if (refusal != null) return NotQualified(refusal);
+            var path = PlcComponentQualificationGate.CombinedApplyPathRefusal(PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id));
+            if (path != null) return path;
             try
             {
                 var scope = LibraryPlcScope(change, out var plc); string cpu = TypedCpuIdentifier(plc);
@@ -164,40 +169,59 @@ namespace TiaMcp.Openness.V21
                 // With a reused FB the typed preparation runs before any mutation, so it decides storage itself. After an import it
                 // would fail only once the import is saved; a multi-instance profile needs the installed FB export, unknown before it.
                 if (plan["fb"].Value<bool>("reused")) return null;
-                if (plan["multiInstance"] != null) return "A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.";
+                if (plan["multiInstance"] != null) return NotQualified("A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.");
                 // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
                 var captured = CapturedStorageContext(change, true);
+                var numbers = PlcComponentQualificationGate.CombinedApplyNumberRefusal(
+                    ((JArray)plan["versions"]).OfType<JObject>().Select(v => EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)v["artifact"], v.Value<string>("contentSha256")))),
+                    PlcIntegrationNumberedBlocks(plc).OfType<JObject>(), TypedGraphicalCapturedStorageTemplate.FbName, captured == null ? (int?)null : CapturedStorageFbNumber(captured));
+                if (numbers != null) return numbers;
                 if (captured != null)
                 {
                     CapturedStorageEnvironment(captured);
-                    return cpu == TypedGraphicalCapturedStorageTemplate.Cpu ? null : "The captured storage profile covers only " + TypedGraphicalCapturedStorageTemplate.Cpu + ", not " + cpu + ".";
+                    return cpu == TypedGraphicalCapturedStorageTemplate.Cpu ? null : NotQualified("The captured storage profile covers only " + TypedGraphicalCapturedStorageTemplate.Cpu + ", not " + cpu + ".");
                 }
                 var pin = Guid.Parse(change.Payload["selection"][0].Value<string>("versionGuid"));
                 var root = ((JArray)plan["versions"]).OfType<JObject>().Single(v => Guid.Parse(v.Value<string>("versionGuid")) == pin);
                 var callee = EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)root["artifact"], root.Value<string>("contentSha256")));
                 string catalog = TypedCatalogPath();
-                return PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, plan["instanceDb"].Value<string>("name"),
-                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null)).Select(t => t.Value));
+                return NotQualified(PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, plan["instanceDb"].Value<string>("name"),
+                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null)).Select(t => t.Value)));
             }
-            catch (BridgeException error) { return error.Message; }
-            catch (PlcComponentException error) { return error.Message; }
+            catch (BridgeException error) { return NotQualified(error.Message); }
+            catch (PlcComponentException error) { return NotQualified(error.Message); }
+        }
+
+        // Every numbered block of the PLC, all software scopes included: block numbers are unique per PLC.
+        private JArray PlcIntegrationNumberedBlocks(PlcSelection plc)
+        {
+            var budget = new ScanBudget(50000); var rows = new JArray();
+            foreach (var scope in SoftwareScopes(plc, budget))
+                foreach (var block in ScopeBlocks(scope, budget)) rows.Add(new JObject { ["kind"] = BlockNumberKind(block.Item), ["number"] = block.Item.Number, ["path"] = block.Path });
+            if (budget.Truncated) throw new BridgeException("IntegrationInventoryIncomplete", "The block-number check needs the complete PLC block inventory.");
+            return rows;
+        }
+        private int CapturedStorageFbNumber(CapturedStorageQualification captured)
+        {
+            var reference = EngineeringSources.ReadXml(new System.Text.UTF8Encoding(false).GetString(CapturedStorageProfile(captured).ReferenceCallee.Bytes).TrimStart('\uFEFF'));
+            return int.Parse(reference.Descendants("SW.Blocks.FB").Single().Element("AttributeList").Element("Number").Value, System.Globalization.CultureInfo.InvariantCulture);
         }
 
         // Every production Host enables this (Host default since 29 October 2026); the preview, and so the reviewed hash, states whether change_apply installs.
         private void PreparePlcCombinedApply(LibraryChange change)
         {
             if (!_libraryIntegrateApplyEnabled) return;
-            string refusal = PlcCombinedApplyRefusal(change);
+            var refused = PlcCombinedApplyRefusal(change); string refusal = refused?.Value<string>("message");
             var caller = change.Preview["integrationPlan"]["callerArtifact"] as JObject;
             var unverified = refusal != null ? new JObject() : PlcComponentQualificationGate.UnverifiedFeatures((JObject)change.Preview["integrationPlan"], change.Payload,
                 caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))));
             change.Preview["applySupported"] = refusal == null;
-            change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal,
+            change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal, ["refusalCode"] = refused?["code"]?.DeepClone(), ["refusalDetails"] = refused?.DeepClone(),
                 ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate (absent for a reused FB), then graphical_typed_edit. Not atomic.",
                 ["checkpoint"] = "The first step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
                 ["candidateFeatures"] = unverified,
                 ["qualification"] = unverified.Count != 0 ? "Candidate shape without native evidence, admitted only on this qualification Host's owned scratch."
-                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028; LAD FC callers and earlier placements: local.library_integrate.candidate_shapes.20261031)." };
+                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
             coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";
@@ -211,7 +235,7 @@ namespace TiaMcp.Openness.V21
         private PlcComponentCoordinator PlcComponentApplyCoordinator(LibraryChange change)
         {
             if (_sharedMutationLease == null) throw new BridgeException("MutationScopeIncomplete", "Combined library_integrate apply runs only under the Host's shared-mutation admission, which holds one exclusive lease across every step.");
-            try { return CreatePlcComponentProductionCoordinator(change, Path.Combine(change.Directory, "c")); }
+            try { return CreatePlcComponentProductionCoordinator(change, PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id)); }
             catch (PlcComponentException error) { throw new BridgeException(error.Code, error.Message, LibraryChangeView(change)); }
         }
 
@@ -223,7 +247,7 @@ namespace TiaMcp.Openness.V21
             change.State = "applying"; LibraryJournal(change, "claim", "completed");
             try
             {
-                record = coordinator.Status(); journal = Path.Combine(change.Directory, "c", record.Value<string>("operationId"), "component-journal.json");
+                record = coordinator.Status(); journal = Path.Combine(PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id), record.Value<string>("operationId"), "component-journal.json");
                 change.Journal["combinedApply"] = CombinedApplySummary(journal, record, null); LibraryJournal(change, "component_steps", "dispatching");
                 for (int i = 0; i < 6 && record.Value<string>("state") != "installation_verified"; i++)
                 {

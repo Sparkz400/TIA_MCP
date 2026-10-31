@@ -33,10 +33,14 @@ from typed_graphical_transport import artifact_bytes
 
 FLAG = "--enable-library-integrate-apply"
 CANDIDATE_FLAG = "--component-qualification"
+COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/before")
 REFUSED = "PlcIntegrationNotQualified"
-# LAD FC callers and earlier placements are verified since 31 October; an FB caller is still refused in production.
+# An FB caller stays refused in production whichever further shapes are verified.
 FB_REFUSAL = "Only a new or existing FBD FC caller is verified; FBD FB callers"
 HOST_FB = "TiaMcpComponentHost"
+# The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
+# (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
+HOST_FB_NUMBER = 30
 MODES = ("createStandaloneFc", "existing")
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "library_capabilities")
 OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
@@ -54,13 +58,12 @@ def candidate_client(host, timeout, arguments):
     return Client(host, timeout, [*arguments, CANDIDATE_FLAG])
 
 
-# Candidate install cases: manifest overrides and the exact unverified features the preview must name. ladCaller and
-# earlierPlacement passed natively on 31 October and are verified shapes, so their previews name no feature any more.
+# Candidate install cases: manifest overrides and the exact unverified features the preview must name.
 CANDIDATES = {
-    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, []),
-    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, []),
+    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, ["ladCaller"]),
+    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, ["ladCaller"]),
     "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, ["fbCaller"]),
-    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
+    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, ["earlierPlacement"]),
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
 # The typed route's multi-instance profiles do not cover an FB with a structured (UDT) static; a refusal before any
@@ -196,8 +199,10 @@ class IntegrateApplyRun(ComponentRun):
         self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))
         self.base = copy.deepcopy(self.manifest)
         # Report, fixture documents and the Host's own artifacts share one fresh short run directory.
-        # Not resolved: a short subst drive keeps the nested coordinator change paths within TIA's 143 characters.
         self.output = self.native = Path(os.path.abspath(args.artifacts)) / ("i" + uuid.uuid4().hex[:6])
+        # The worker refuses at prepare when a step archive would exceed TIA's 143 characters (ComponentPathTooLong);
+        # check the same length here, before any authoring: root + changes/c/<8 hex>/change-lib-<32 hex>/before.
+        require(len(str(self.native)) + COMBINED_PATH_OVERHEAD <= 143, "Choose a shorter --artifacts path for the combined apply's step archives.")
         require(len(str(self.native / "scratch" / ("TiaMcpScratch_" + "0" * 24) / ("TiaMcpScratch_" + "0" * 24))) <= 143,
                 "Choose a short native --artifacts path.")
         self.output.mkdir(parents=True, exist_ok=False)
@@ -278,6 +283,7 @@ class IntegrateApplyRun(ComponentRun):
         self.use(overrides if overrides is not None else {"callerMode": name})
         out, case = self.output / name, self.case(name, True)
         scratch, opened, plc = self.stage_consumer(archive, released)
+        if self.manifest["caller"] == HOST_FB: self.apply("block_number_set", {"blockName": HOST_FB, "number": HOST_FB_NUMBER})
         if self.manifest.get("twoNetworks"):
             peer = artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + self.manifest["unrelatedCaller"]})["artifact"]).decode("utf-8-sig")
             self.apply("block_import_xml", {"xml": two_network_fc(peer, self.manifest["caller"], 77), "expectedBlockNames": [self.manifest["caller"]]})
@@ -363,8 +369,7 @@ class IntegrateApplyRun(ComponentRun):
         case, out = self.case(name, True), self.output / name
         scratch, opened, plc = self.stage_consumer(archive, released)
         if multi:
-            host = (self.native / "documents" / "callers" / "TiaMcpComponentHost.s7dcl").read_text(encoding="utf-8-sig")
-            self.apply("source_upsert", {"language": "SIMATIC_SD", "source": host, "expectedBlockNames": ["TiaMcpComponentHost"]})
+            self.host_fb(plc)
         baseline = snapshot(self.call, out / "before-first")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         first, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
@@ -431,6 +436,7 @@ class IntegrateApplyRun(ComponentRun):
         """The FBD FB caller fixture, imported before the baseline; returns its path and an insertion recipe after its network."""
         source = (self.native / "documents" / "callers" / (HOST_FB + ".s7dcl")).read_text(encoding="utf-8-sig")
         self.apply("source_upsert", {"language": "SIMATIC_SD", "source": source, "expectedBlockNames": [HOST_FB]})
+        self.apply("block_number_set", {"blockName": HOST_FB, "number": HOST_FB_NUMBER})
         return plc + "/blocks/" + HOST_FB
 
     def host_fb_recipe(self, baseline, path):

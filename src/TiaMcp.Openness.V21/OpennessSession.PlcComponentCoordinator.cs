@@ -38,7 +38,8 @@ namespace TiaMcp.Openness.V21
             private readonly string _changes, _workspace;
             private readonly bool _production;
             internal NativePlcComponentOperations(OpennessSession session, LibraryChange plan, string workspace, bool production)
-            { _session = session; _plan = plan; _workspace = workspace; _changes = Path.Combine(workspace, "changes"); _production = production; }
+            // Production keeps its steps directly in its short workspace so their archive paths stay within TIA's 143 characters.
+            { _session = session; _plan = plan; _workspace = workspace; _changes = production ? workspace : Path.Combine(workspace, "changes"); _production = production; }
             public string SessionToken => _session._libraryGeneration;
 
             public JObject Prepare(JObject arguments)

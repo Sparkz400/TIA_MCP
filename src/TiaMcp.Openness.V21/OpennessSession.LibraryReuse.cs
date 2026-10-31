@@ -15,7 +15,9 @@ namespace TiaMcp.Openness.V21
         /// content; committed versions are immutable). A name match alone, a different GUID or version, or any other
         /// differing metadata is a conflict.
         /// </summary>
-        private JObject ProveInstalledLibraryDependency(LibraryChange change, PlcSelection plc, JToken node, LibraryTypeVersion source)
+        /// With <paramref name="versionCommentMayDiffer"/> a difference in the version comment alone is recorded instead: TIA reports it
+        /// in a de-DE-only project. The caller must then prove the exact installed content against the pinned source export itself.
+        private JObject ProveInstalledLibraryDependency(LibraryChange change, PlcSelection plc, JToken node, LibraryTypeVersion source, bool versionCommentMayDiffer = false)
         {
             string name = node.Value<string>("typeName");
             var installed = change.Project.ProjectLibrary.FindVersion(source.Guid);
@@ -29,11 +31,15 @@ namespace TiaMcp.Openness.V21
             // Siemens compares version metadata only. The default flag is library-local and the original library is never compared.
             var different = properties.Where(x => x.DetailCompareStatus != DetailCompareStatus.ObjectsIdentical && x.Description != "Is Default Version"
                 && !(x.DetailCompareStatus == DetailCompareStatus.NotCompared && x.Description == "Original Library")).ToList();
+            var ignored = versionCommentMayDiffer ? different.Where(x => x.Description == "Version comment" && x.DetailCompareStatus == DetailCompareStatus.ObjectsDifferent).ToList() : new List<DetailedCompareResultElement>();
+            different = different.Except(ignored).ToList();
             if (different.Count != 0 || !properties.Any(x => x.Description == "GUID of version object" && x.DetailCompareStatus == DetailCompareStatus.ObjectsIdentical))
                 throw new BridgeException("DependencyConflict", "The installed dependency has the requested identity but its native version metadata is not identical: " + name,
                     new JObject { ["typeName"] = name, ["versionGuid"] = source.Guid.ToString("D"), ["properties"] = new JArray(different.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString() })) });
             return new JObject { ["typeName"] = name, ["typeGuid"] = source.TypeObject.Guid.ToString("D"), ["versionGuid"] = source.Guid.ToString("D"), ["version"] = source.VersionNumber.ToString(),
                 ["object"] = LibraryObjectDescription(uses[0].LibraryTypeInstance), ["comparedProperties"] = properties.Count, ["properties"] = new JArray(properties.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString() })),
+                ["ignoredDifferences"] = new JArray(ignored.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString(),
+                    ["reason"] = "Version comment only; type/version GUIDs match, and the component readback proves the installed content against the pinned source export before any mutation." })),
                 ["proof"] = "Exact installed type/version GUID, one native link and identical native version metadata (default flag and uncompared original library excluded). Content is not compared; committed versions are immutable natively." };
         }
 

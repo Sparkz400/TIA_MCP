@@ -33,7 +33,7 @@ class OwnedScratch:
                  manifest_factory=binary_manifest, extra_tools=()):
         self.host, self.worker = pathlib.Path(host).resolve(), pathlib.Path(worker).resolve()
         self.artifacts, self.report, self.persist = pathlib.Path(artifacts).resolve(), report, persist
-        # The Host keeps the spelling given (a short subst drive for TIA's 143-character paths); guards compare resolved paths.
+        # The Host keeps the root as given; the guards compare resolved paths.
         self.host_artifacts = os.path.abspath(artifacts)
         self.timeout, self.client_factory, self.watcher_factory = timeout, client_factory, watcher_factory
         self.manifest_factory = manifest_factory

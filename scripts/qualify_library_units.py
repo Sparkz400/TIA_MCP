@@ -22,8 +22,9 @@ END_FUNCTION
 """
 # An OB in the unit's namespace that reaches every library use of the PLC, so a PLC-wide update can prove each one
 # reachable: the namespaced FB, the dependent FB (and through it its UDT), the un-namespaced UDT of the first
-# instantiation through a DB member, and the master-copy FC. V21 does not resolve a library instance whose namespace was
-# set after creation by its simple name inside the NAMESPACE source (31 October, artifacts/lu1), so those are qualified.
+# instantiation through a DB member, and the master-copy FC. V21 resolves unqualified names in a NAMESPACE SCL source
+# against the root namespace (31 October, artifacts/lu1 and lu2), so every namespaced type and block is qualified;
+# only the un-namespaced UDT keeps its simple name.
 CALLER_SOURCE = "NAMESPACE " + UNIT + """
 DATA_BLOCK "TiaMcpUnitNamespaced_Gate"
 { S7_Optimized_Access := 'TRUE' }
@@ -59,13 +60,13 @@ VAR_TEMP
     ComponentActive : Bool;
 END_VAR
 BEGIN
-    "TiaMcpUnitNamespaced_Gate"(Enable := TRUE, Active => #Active);
-    "TiaMcpUnitNamespaced_Component"(Enable := #Active, Active => #ComponentActive);
-    "TiaMcpUnitNamespaced_State".State.Active := #ComponentActive;
+    "%s.TiaMcpUnitNamespaced_Gate"(Enable := TRUE, Active => #Active);
+    "%s.TiaMcpUnitNamespaced_Component"(Enable := #Active, Active => #ComponentActive);
+    "%s.TiaMcpUnitNamespaced_State".State.Active := #ComponentActive;
     "%s"();
 END_ORGANIZATION_BLOCK
 END_NAMESPACE
-""" % (UNIT + "." + FB, UNIT + "." + DEPENDENT_FB, UDT, UNIT + "." + MASTER_FC)
+""" % (UNIT + "." + FB, UNIT + "." + DEPENDENT_FB, UDT, UNIT, UNIT, UNIT, UNIT + "." + MASTER_FC)
 CALLERS = ["TiaMcpUnitNamespaced_Gate", "TiaMcpUnitNamespaced_Component", "TiaMcpUnitNamespaced_State", "TiaMcpUnitNamespaced_Cycle"]
 
 

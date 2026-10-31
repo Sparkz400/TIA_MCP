@@ -191,11 +191,16 @@ class Candidates(unittest.TestCase):
         self.assertEqual({"reuse": "boundary", "fbCaller": "failed: x"},
                          subject.failed_candidates({"reuse": "boundary", "fbCaller": "failed: x", "multiInstance": "installed"}))
 
+    def test_runner_path_check_matches_the_worker_layout(self):
+        # PlcComponentQualificationGate.CombinedApplyArchivePathLength: 121 characters for a 51-character root.
+        self.assertEqual(121, 51 + subject.COMBINED_PATH_OVERHEAD)
+        self.assertNotEqual(2, subject.HOST_FB_NUMBER)
+
     def test_candidate_cases_name_only_gate_features(self):
         gate = {"ladCaller", "fbCaller", "multiInstance", "reusedComponent", "earlierPlacement"}
         for name, (overrides, features) in subject.CANDIDATES.items():
             with self.subTest(name=name):
-                self.assertTrue(set(features) <= gate)
+                self.assertTrue(set(features) <= gate and features)
                 self.assertIn(overrides["callerMode"], subject.MODES)
         for path in ("callers/TiaMcpComponentCaller.lad.s7dcl", "callers/TiaMcpComponentHost.s7dcl"):
             self.assertTrue((subject.FIXTURES / path).is_file(), path)

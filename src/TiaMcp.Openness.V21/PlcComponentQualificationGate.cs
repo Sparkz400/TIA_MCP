@@ -46,9 +46,7 @@ namespace TiaMcp.Openness.V21
         // that combination has its own native evidence and is listed in VerifiedShapes; a verified feature does not open its
         // untested combinations. Until then only a qualification Host (--component-qualification) runs it, on its own owned
         // scratch (candidates=true).
-        // ladCaller (new LAD FC, existing LAD FC after its last network) and earlierPlacement (existing FBD FC) passed natively
-        // on 31 October (local.library_integrate.candidate_shapes.20261031, per-case results).
-        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "ladCaller" };
+        internal static readonly string[] VerifiedShapes = { };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
@@ -101,6 +99,47 @@ namespace TiaMcp.Openness.V21
             return "No instance creation profile covers the FB, so the instance DB step would fail after the import: " +
                 (last?.Message ?? "no instance template exists for this CPU and route.");
         }
+        // The combined apply's steps live in a short workspace beside the plan's change directory, not nested inside it: TIA
+        // refuses an archive whose path (the step's change directory plus "\before") exceeds 143 characters.
+        internal const int TiaArchivePathLimit = 143;
+        internal static string CombinedApplyWorkspace(string planDirectory, string planId) =>
+            System.IO.Path.Combine(System.IO.Path.GetDirectoryName(planDirectory), "c", planId.Substring(planId.Length - 32, 8));
+        // The import step's directory change-lib-<32 hex> is the longest; the typed step's change-<32 hex> is shorter.
+        internal static int CombinedApplyArchivePathLength(string workspace) => System.IO.Path.Combine(workspace, "change-lib-" + new string('0', 32), "before").Length;
+        internal static JObject CombinedApplyPathRefusal(string workspace)
+        {
+            int length = CombinedApplyArchivePathLength(workspace);
+            return length <= TiaArchivePathLimit ? null : new JObject { ["code"] = "ComponentPathTooLong", ["length"] = length, ["limit"] = TiaArchivePathLimit,
+                ["message"] = "The step checkpoint archive path would be " + length + " characters, over TIA's " + TiaArchivePathLimit + "; start the Host with an artifact root at least " + (length - TiaArchivePathLimit) + " characters shorter." };
+        }
+
+        // CreateFrom keeps a library block's number only while it is free; an occupied number renumbers the imported block, and a
+        // captured instance profile compares the reference FB export with its number, so the typed step would fail after the import is saved.
+        internal static JObject CombinedApplyNumberRefusal(System.Collections.Generic.IEnumerable<XDocument> imported, System.Collections.Generic.IEnumerable<JObject> target,
+            string capturedFbName = null, int? capturedFbNumber = null)
+        {
+            foreach (var document in imported)
+            {
+                var block = document.Descendants().FirstOrDefault(e => e.Name.LocalName == "SW.Blocks.FB" || e.Name.LocalName == "SW.Blocks.FC");
+                if (block == null) continue; // PLC data types have no block number
+                string kind = block.Name.LocalName.Substring("SW.Blocks.".Length), name = (string)block.Element("AttributeList")?.Element("Name");
+                if (!int.TryParse((string)block.Element("AttributeList")?.Element("Number"), System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number))
+                    return Refusal("ComponentBlockNumberUnknown", kind + " " + name + " exports no block number, so the number its import takes cannot be checked before the claim.");
+                if (kind == "FB" && name == capturedFbName && number != capturedFbNumber)
+                    return Refusal("CapturedStorageProfileUnavailable", "The captured instance profile binds " + name + " as FB" + capturedFbNumber + ", but the library version exports FB" + number + ".");
+                var used = target.FirstOrDefault(t => t.Value<string>("kind") == kind && t.Value<int?>("number") == number);
+                if (used != null)
+                {
+                    var refusal = Refusal("ComponentBlockNumberOccupied", kind + number + " is already used by " + used.Value<string>("path") + ". Importing " + name +
+                        " would renumber it" + (name == capturedFbName ? ", which the captured instance profile does not cover" : "") + "; free or renumber that block first.");
+                    refusal["conflictingBlock"] = used.Value<string>("path"); refusal["number"] = number; refusal["kind"] = kind; refusal["importedBlock"] = name;
+                    return refusal;
+                }
+            }
+            return null;
+        }
+        private static JObject Refusal(string code, string message) => new JObject { ["code"] = code, ["message"] = message };
+
         internal static string CombinedApplyStep(string state, bool reusedFb = false) =>
             state == "created" ? (reusedFb ? "prepare_graphical_typed_edit" : "prepare_library_instantiate") : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
             state == "import_verified" ? "prepare_graphical_typed_edit" : state == "graphical_prepared" ? "apply_graphical_typed_edit" : state == "graphical_applied" ? "verify_installation_readback" : state;
