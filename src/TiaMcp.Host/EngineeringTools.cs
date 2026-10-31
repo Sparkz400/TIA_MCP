@@ -171,7 +171,7 @@ public sealed partial class TiaTools
         => Call("fixture_sources", new { language, blockName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "fixtures") }, cancellationToken);
 
     [McpServerTool(Name = "change_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved (change_restore it, or start a new instance). Source/XML must explicitly describe intended objects. Does not change the project; writes preview artifacts.")]
+    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved (change_restore it, or start a new instance). Source/XML must explicitly describe intended objects. Kind hmi_text_list_import takes {schemaVersion:1, target, expectedContentHash, recordId, outputId?}: the Host reopens that hmi_text_list_author/generate_set record and refuses content V21's import would change. Does not change the project; writes preview artifacts.")]
     public async Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
     {
         object request;
@@ -196,6 +196,11 @@ public sealed partial class TiaTools
             }
             catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException or UnauthorizedAccessException)
             { return Failure(error as BridgeException ?? new BridgeException("VciWorkflowFailed", "The reviewed VCI comparison could not be read.")); }
+        // The worker cannot read review records; the Host reopens the text-list record and hands over the exact candidate pair.
+        if (kind == "hmi_text_list_import")
+            try { request = new HmiComponentWorkflowStore(options.ArtifactsDirectory).TextListImportPayload(payload); }
+            catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
+            { return Failure(error as BridgeException ?? new BridgeException("HmiTextListCandidateUnavailable", error.Message)); }
         // The worker cannot read the upload store; only exact public DER of the committed upload is handed over.
         if (kind == "certificate_import")
             try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }

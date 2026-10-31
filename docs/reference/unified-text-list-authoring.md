@@ -192,3 +192,55 @@ content/consumer review and native preservation qualification are therefore stil
 required before importing a candidate. PyYAML is a test-only dependency; its
 [SafeLoader documentation](https://pyyaml.org/wiki/PyYAMLDocumentation) describes the
 non-executing parser used by the oracle. No parser dependency is added to the Host.
+
+## Importing a candidate into a project
+
+Change kind `hmi_text_list_import` imports one retained candidate pair through the shared
+`change_prepare`/`change_apply`/`change_restore` admission. It is the only Unified write
+the closed HMI preservation gate lets through (maintainer decision of 31 October 2026). It is
+admitted for the `unified-comfort` and `unified-pc` profiles, which passed native qualification
+on 31 October; any other profile needs a Host started with `--hmi-text-list-qualification
+<profile>`, which admits it only in a project its own worker retrieved or created.
+
+```json
+{ "kind": "hmi_text_list_import", "payload": { "schemaVersion": 1, "target": "<hmiDevice identity from hmi_inspect section=devices>",
+  "expectedContentHash": "<contentHash>", "recordId": "<author or set recordId>", "outputId": "<set output, sets only>" } }
+```
+
+- The Host reopens the record with full revalidation and applies the refusals above to it,
+  also to records published before they existed. The worker only receives the exact
+  candidate pair; a client-supplied candidate is refused.
+- Prepare captures the Unified scope of every HMI in the project. Only the capture's two
+  standing notes (tag-table export stability, no `Screen.Export`) are accepted; a typed read
+  error, a capture failure or a Classic HMI refuses. A first prepare with any
+  `expectedContentHash` returns `StaleRevision` with `details.baseline.contentHash`; review it
+  and prepare again with that hash. Every typed text-list node must be a list the export
+  holds, because V21 skips lists with formatted text (`HmiTextListExportIncomplete`). The
+  candidate's languages must equal the project's active languages
+  (`HmiTextListLanguageMismatch`). The preview lists the `created` and `replaced` lists; a
+  replaced list loses its old content. No other list is renamed or deleted.
+- Apply needs `compile=true` and `save=true`. It compiles the HMI device, imports the pair,
+  and reads the whole export back: the candidate lists must equal the candidate and every
+  other list must be unchanged, compared by meaning as the native oracle compares them. An
+  unresolved text reference refuses. Everything else in the HMI capture, apart from the
+  candidate lists' own typed nodes, must be unchanged, and the device's compiler errors and
+  warnings must be unchanged by the import. Then the project is saved.
+- `change_restore` retrieves the checkpoint into a new directory and requires the complete
+  HMI content of the pre-change capture.
+- An interrupted apply is never replayed. Worker loss before the save releases the unchanged
+  project; a lost save or a Host loss holds the admission for review
+  (`engineering_admission_reconcile`).
+- A project language that is not enabled for runtime is refused with
+  `HmiPreservationUnavailable`: V21 throws `EngineeringTargetInvocationException` from its
+  `HmiLanguageAndFont.Order`, which the capture records as a typed read error. Enable every
+  project language in the HMI's runtime settings before importing.
+- The compiler comparison counts problems by state, text and path; it does not compare which
+  object (tree container) a problem is listed under, because V21 nests the same problems
+  differently from one compile to the next.
+
+Native status (31 October): the route and interruption at every boundary passed on Unified
+Comfort and Unified PC ([record](../verification/hmi-text-list-route-20261031.md)).
+Native runners: [`qualify_hmi_text_list_route.py`](../../scripts/qualify_hmi_text_list_route.py)
+(apply, refusals, restore, fresh reopen per profile) and the `tl-*` scenarios of
+[`qualify_interruption.py`](../../scripts/qualify_interruption.py) (worker and Host loss at
+the checkpoint, import, readback and save).

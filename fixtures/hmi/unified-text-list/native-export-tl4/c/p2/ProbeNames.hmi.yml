@@ -1,0 +1,275 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "Plain_Name1":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Name with space":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Umlaut_Ä":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Unicode_日本語":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Имя Ελληνικά":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "اسم שם 이름":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Digits 0123 ٣":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P!Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P&Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P'Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P(Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P)Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P+Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P,Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P-Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P;Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P<Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P=Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P>Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P@Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P\\Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P^Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P{Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P|Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "P}Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"

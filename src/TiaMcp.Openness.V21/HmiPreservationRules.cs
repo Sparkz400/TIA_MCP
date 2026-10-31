@@ -14,6 +14,9 @@ namespace TiaMcp.Model
     internal static class HmiPreservationRules
     {
         internal const int PolicyVersion = 1;
+        // The two coverage notes every Unified capture records; hmi_text_list_import accepts exactly these (HmiTextListImportRules.ScopeAccepted).
+        internal const string UnifiedTagTableExportNote = "Unified tag tables were exported using their documented native composition export. Export stability, full dependency closure and unrelated-resource preservation remain unqualified.";
+        internal const string UnifiedTypedReadbackNote = "Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.";
         internal static string Hash(string value)
         {
             using (var sha = SHA256.Create())
@@ -150,6 +153,16 @@ namespace TiaMcp.Model
             foreach (var pair in before)
                 if (!changed.Contains(pair.Key) && !string.Equals(pair.Value, after[pair.Key], StringComparison.Ordinal))
                     throw new ArgumentException("PreservationMismatch: unrelated HMI content changed: " + pair.Key);
+        }
+
+        // Artifacts at or below the given roots may change, appear or disappear; every other artifact must stay identical.
+        internal static void RequireUnrelatedPreservedOutsideSubtrees(IDictionary<string, string> before, IDictionary<string, string> after, params string[] roots)
+        {
+            if (roots == null || roots.Length == 0 || roots.Any(r => string.IsNullOrEmpty(r) || r.EndsWith("/", StringComparison.Ordinal)))
+                throw new ArgumentException("The prepared preservation delta is contradictory.");
+            Func<KeyValuePair<string, string>, bool> outside = pair => !roots.Any(r => pair.Key == r || pair.Key.StartsWith(r + "/", StringComparison.Ordinal));
+            RequireUnrelatedPreserved(before.Where(outside).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
+                after.Where(outside).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal), Array.Empty<string>(), Array.Empty<string>());
         }
 
         // A created object may add only its own typed-readback subtree, which must appear and never pre-exist.

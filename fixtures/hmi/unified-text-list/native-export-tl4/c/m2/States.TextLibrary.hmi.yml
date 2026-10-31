@@ -1,0 +1,17 @@
+#Version: 2.0
+TextLibraries:
+  "StateLibrary":
+    Type: Text
+    Languages:
+      - "de-DE"
+      - "en-US"
+    DefaultLanguage: "de-DE"
+    Entries:
+      "FalseText":
+        Text:
+          - "Aus"
+          - "Off"
+      "TrueText":
+        Text:
+          - "Ein"
+          - "Ready 😀\u000aManual content stays separate"

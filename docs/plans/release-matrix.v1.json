@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "33d8312f0cc435814958889a1ecbdc0d2c9ee4d2e8b15056d84b2925d8e62ffc",
+    "catalogSha256": "a9c5db3b8202aaea631759f2808a22669ef8616da32bf6f5fe4cd8376e7b4939",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -12,17 +12,17 @@
     21
   ],
   "summary": {
-    "features": 476,
+    "features": 477,
     "support": {
       "deferred": 6,
-      "limited": 317,
+      "limited": 318,
       "shipped": 129,
       "unavailable_target": 5,
       "unqualified": 19
     },
     "cells": {
       "blocked": 31,
-      "bound": 2030,
+      "bound": 2037,
       "deferred": 18,
       "open": 108
     },
@@ -25204,6 +25204,90 @@
           ]
         }
       ]
+    },
+    {
+      "featureId": "change.hmi_text_list_import",
+      "domain": "hmi",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_text_list_import",
+      "support": "limited",
+      "owners": [
+        "X07"
+      ],
+      "evidenceIds": [
+        "local.hmi.text-list-import.route.20261031",
+        "local.hmi.text-list-import.interruption.20261031",
+        "local.hmi.text-list-import.interruption-pc.20261031"
+      ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preview",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        },
+        {
+          "gate": "AC-native",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hmi.text-list-import.route.20261031",
+            "local.hmi.text-list-import.interruption.20261031",
+            "local.hmi.text-list-import.interruption-pc.20261031"
+          ]
+        }
+      ]
     }
   ],
   "evidence": [
@@ -25711,6 +25795,63 @@
         {
           "path": "evidence/local.hmi.text-list-import.20261029.json",
           "sha256": "7c7042792dab344a28bf1ebc1f31d4393545d39c9d96d1043e4f3a9dac2e2e9e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption-pc.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "languages": [
+          "en-US",
+          "de-DE"
+        ]
+      },
+      "sourceCommit": "a84d2a53f38b1114c3e762599493b9c7754376e4",
+      "retained": [
+        {
+          "path": "evidence/local.hmi.text-list-import.interruption-pc.20261031.json",
+          "sha256": "b5fa91be0b22c93edd7a2f17b3a322b2be72152d008df6eb0cb2cf0fca606713"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "languages": [
+          "en-US",
+          "de-DE"
+        ]
+      },
+      "sourceCommit": "1121bb82d1f3aeb584c32f747888a4f220d166db",
+      "retained": [
+        {
+          "path": "evidence/local.hmi.text-list-import.interruption.20261031.json",
+          "sha256": "0a42b9caea26b4b5d4e862ef24ba32928b002a3f0ac15003c64a711ac49c2833"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hmi.text-list-import.route.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "languages": [
+          "en-US",
+          "de-DE"
+        ]
+      },
+      "sourceCommit": "a84d2a53f38b1114c3e762599493b9c7754376e4",
+      "retained": [
+        {
+          "path": "evidence/local.hmi.text-list-import.route.20261031.json",
+          "sha256": "be5f1f1f6a9b378a97ca3eaf15fa9207cd2d40d552546ea32ff95c89385cfade"
         }
       ],
       "notRetained": []

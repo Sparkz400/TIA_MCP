@@ -28,6 +28,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public bool SafetyFParameterDiscovery { get; init; }
     public string? WatchQualificationPoint { get; init; }
     public string? RuntimeQualificationPoint { get; init; }
+    public string? HmiTextListQualificationProfile { get; init; }
 
     public static HostOptions Parse(string[] args)
     {
@@ -63,6 +64,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var translationQualification = false;
         var safetyFParameterDiscovery = false;
         string? watchQualificationPoint = null;
+        string? hmiTextListQualification = null;
         string? runtimeQualificationPoint = null;
         IReadOnlySet<string>? toolsets = null;
         var toolsetsGiven = false;
@@ -104,6 +106,10 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                         throw new ArgumentException("--ua-client-identity requires one default or 32-lowercase-hex name.");
                     uaClientIdentity = args[i]; break;
                 case "--watch-qualification": watchQualificationPoint = args[i]; break;
+                case "--hmi-text-list-qualification":
+                    if (hmiTextListQualification is not null || args[i] is not ("unified-comfort" or "unified-pc"))
+                        throw new ArgumentException("--hmi-text-list-qualification takes one of unified-comfort or unified-pc, once.");
+                    hmiTextListQualification = args[i]; break;
                 case "--runtime-qualification":
                     if (runtimeQualificationPoint is not null || args[i] is not ("ua.write.afterSend" or "web.write.afterSend"))
                         throw new ArgumentException("--runtime-qualification takes one of ua.write.afterSend or web.write.afterSend.");
@@ -140,7 +146,9 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             throw new ArgumentException("Test Suite qualification requires its own sequential Host.");
         if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification || watchQualificationPoint is not null))
             throw new ArgumentException("Translation qualification requires its own sequential Host.");
-        if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery || watchQualificationPoint is not null))
+        if (hmiTextListQualification is not null && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || watchQualificationPoint is not null))
+            throw new ArgumentException("HMI text-list qualification requires its own sequential Host.");
+        if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery || watchQualificationPoint is not null || hmiTextListQualification is not null))
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
@@ -154,7 +162,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             try { remote = TiaMcp.Core.VersionControl.GitRemote.Parse(gitRemote, gitAllowNetworkRemote); }
             catch (BridgeException error) { throw new ArgumentException("--git-remote: " + error.Message); }
         }
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint, HmiTextListQualificationProfile = hmiTextListQualification };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

@@ -1,0 +1,75 @@
+#Version: 2.0
+
+TextListContainers:
+  DeviceTextList:
+    ResourceListType: TextList
+    ResourceLists:
+      QualificationStates:
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_0
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_1
+      EntryTypes:
+        Entries:
+          Text_list_entry_0:
+            Type: To
+            Value: -1
+            ToValue: -1
+            Text: MyTextLibrary.Text_2
+          Text_list_entry_1:
+            Type: Range
+            ToValue: 10
+            Text: MyTextLibrary.Text_3
+          Text_list_entry_2:
+            Type: From
+            Value: 11
+            FromValue: 11
+            Text: MyTextLibrary.Text_4
+      Int32Bounds:
+        Entries:
+          Text_list_entry_0:
+            Value: -2147483648
+            FromValue: -2147483648
+            ToValue: -2147483648
+            Text: MyTextLibrary.Text_5
+          Text_list_entry_1:
+            Value: 2147483647
+            FromValue: 2147483647
+            ToValue: 2147483647
+            Text: MyTextLibrary.Text_6
+      DefaultZero:
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_7
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_8
+      BoolNoDefault:
+        RangeType: Bool
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_9
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_10
+      BitDefault:
+        RangeType: BitNumber
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_11
+          Text_list_entry_1:
+            Value: 31
+            FromValue: 31
+            ToValue: 31
+            Text: MyTextLibrary.Text_12

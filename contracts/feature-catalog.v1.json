@@ -3445,6 +3445,74 @@
         "Local bare remote only; network remotes, credentials and remote-side hooks beyond the refusal checks are not exercised.",
         "Synthetic fixtures on PCNico only; no other Host build or scale beyond the runner's bounds is qualified."
       ]
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort 21.0.1.0",
+        "languages": [
+          "en-US",
+          "de-DE"
+        ],
+        "sourceCommit": "1121bb82d1f3aeb584c32f747888a4f220d166db",
+        "passedScope": "Change kind hmi_text_list_import on a qualification Host (--hmi-text-list-qualification unified-comfort, frozen artifacts/fw3f = 1121bb82, run artifacts/ti1): ten qualify_interruption.py tl-* scenarios on owned copies of the HmiSeeder textlist-fixture MTP700 Unified Comfort archive (artifacts/tx2/f1). Worker loss at the checkpoint (held, not persisted), during the baseline compile, the native import, the export readback and the compile/preservation stage (released unchanged, not persisted), and after the save (held, persisted); Host loss at the checkpoint, import, readback and save (the worker completed the apply and saved; held, persisted). Each reconciled once from a fresh Host and owned TIA without replay (journal bytes unchanged), one admission each, checkpoint recovery for released cases and an independent fresh read of the effect."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.interruption.20261031.json"
+      ],
+      "limitations": [
+        "Interruption only: the route runner (apply sequence, refusals, restore, fresh reopen) has not passed on this build; its runs tx1 and tx2 stopped before their first saved apply: the fixture was changed to enable every project language for runtime (c6191401) and the compiler-problem rule was fixed (1121bb82).",
+        "One Unified Comfort fixture with en-US/de-DE enabled for runtime; Unified PC, other devices and customer projects were not interrupted.",
+        "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
+      ]
+    },
+    {
+      "id": "local.hmi.text-list-import.route.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort and WinCC Unified PC RT, 21.0.1.0",
+        "languages": [
+          "en-US",
+          "de-DE"
+        ],
+        "sourceCommit": "a84d2a53f38b1114c3e762599493b9c7754376e4",
+        "passedScope": "Change kind hmi_text_list_import through change_prepare/change_apply/change_restore on a qualification Host (--hmi-text-list-qualification <profile>), frozen artifacts/fw3g = a84d2a53, run artifacts/tx3, for unified-comfort (MTP700 Unified Comfort 21.0.1.0) and unified-pc (WinCC Unified PC RT 21.0.1.0). Per profile: HmiSeeder textlist-fixture created and archived an owned seeded fixture (two screens with items, a tag, start screen, a discrete alarm, a Loaded script, the bilingual peer list, en-US/de-DE enabled for runtime); the production Host retrieved an owned copy. Refusals before any write: four actual prior records with content V21 changes (HmiTextListValueOutOfRange, HmiTextListNameUnsupported, HmiTextListTextUnsupported, HmiTextListDefaultEntryValue), an author record with outputId, an unknown record, a client-supplied candidate, an unknown set output, and a candidate missing a project language (HmiTextListLanguageMismatch). Nine imports in order (boundary values, texts and names, the v1 base replacing the peer list, the retained v2 author, the retained v3 author replacing it, both outputs of a retained v1 set, reordered languages): each prepared with the StaleRevision-bound content hash, applied with checkpoint, device compile and save, worker readback exact, the independent PyYAML oracle on hmi_inspect's export exact with every other list unchanged, same-key replay returning the recorded outcome and another key refused RecoveryRequired; a preview prepared before another saved import refused StaleRevision and left prepared; every typed HMI node outside the text lists unchanged; change_restore of the last import with HMI content equality and the previous lists; a fresh Host and owned TIA reopening the saved original with the last lists and unchanged typed nodes. 168 checks, no failures."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.route.20261031.json"
+      ],
+      "limitations": [
+        "Owned seeded fixtures only, one Unified HMI per project, en-US/de-DE both enabled for runtime; other devices, languages, customer projects, consumers of the imported lists, runtime and visual behavior were not run.",
+        "Compiler problems are compared by state, text and path; the fixtures keep their two encrypted-transfer password errors (no public setter), so no clean compile is shown.",
+        "A project language not enabled for runtime is refused (V21 throws from HmiLanguageAndFont.Order); formatted and system text lists, graphic lists and script modules are not imported."
+      ]
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption-pc.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "WinCC Unified PC RT 21.0.1.0",
+        "languages": [
+          "en-US",
+          "de-DE"
+        ],
+        "sourceCommit": "a84d2a53f38b1114c3e762599493b9c7754376e4",
+        "passedScope": "Change kind hmi_text_list_import on a qualification Host (--hmi-text-list-qualification unified-pc, frozen artifacts/fw3g = a84d2a53, run artifacts/ti2): ten qualify_interruption.py tl-* scenarios on owned copies of the HmiSeeder textlist-fixture WinCC Unified PC RT archive of run tx3 (artifacts/tx3/f2). Worker loss at the checkpoint (held, not persisted), during the baseline compile, the native import, the export readback and the compile/preservation stage (released unchanged, not persisted), and after the save (held, persisted); Host loss at the checkpoint, import, readback and save (held, persisted; the journal ended applied with every stage of a complete import). Each reconciled once from a fresh Host and owned TIA without replay (journal bytes unchanged), one admission each, checkpoint recovery for released cases and an independent fresh read of the effect."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.interruption-pc.20261031.json"
+      ],
+      "limitations": [
+        "One Unified PC fixture with en-US/de-DE enabled for runtime; other devices and customer projects were not interrupted.",
+        "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
+      ]
     }
   ],
   "features": [
@@ -12730,11 +12798,11 @@
         "limitations": [
           "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/screen/item/dynamization/event-handler/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
           "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, arrays, whole UDT values, software-unit tags and Classic external tags are not covered; global DB members and connection creation follow (27 October).",
-          "Unified HMI writes beyond screens (27 October): external_tag_create also accepts an exact root global DB identity (kind block) plus an unquoted memberPath; prepare exports the DB and requires exactly one declared member with no array on its path and an exactly matching scalar type, then writes the natively observed dotted spelling (DB.Member, as in the HmiSeeder LinkedDbValue fixture). Struct/UDT sub-members qualify only when the DB export declares them; arrays, quoted or indexed names, instance/array DBs and software-unit DBs are refused. connection_create (target the HMI as kind hmiDevice) calls HmiSoftware.Connections.Create(name) only when exactly one valid native CommunicationManagement HMI endpoint pair of that LocalConnectionName has exactly one partner PLC; Partner/Station/Node are read-only in V21, so apply requires the readback Partner to equal the proven PLC software name and a nonempty CommunicationDriver. Whether Create derives the partner from an existing endpoint pair (or the HMI already lists that connection) is unobserved; the Partner-to-PLC-name mapping is an assumption that fails closed. object_create (DiscreteAlarms, AnalogAlarms, DataLogs, AlarmLogs) uses the composition's Create(name) and object_properties_set edits an exact alarm (hmiAlarm), log or runtime settings (hmiModelNode at its hmi_inspect section=model path); both use per-family allowlists of documented typed setters (alarms: RaisedStateTag, RaisedStateTagBitNumber, TriggerMode, Condition, AlarmClass, Priority, Origin, Area; logs: Settings.LogMaxSize, Settings.StorageFolder; runtime settings: StartScreen, ScreenResolution) with exact typed readback, and require RaisedStateTag, AlarmClass and StartScreen to name an existing tag, alarm class or top-level screen of the same HMI. Faceplate explicit/existing_binding_set now also binds a PLC-backed HMI tag when its connection owner, SymbolicAccess, exact root tag or global DB member declaration and type are proven natively; other nonempty connections stay refused. The existing whole-HMI typed capture already covers connections, alarms, logs and runtime settings; creates may add only the created object's own subtree, edits only the target node. Gaps: text/graphic lists and script modules have no Create or writable typed property in V21 (only paired-file directory Import/Export, whose formats are unqualified), so no write is offered; AnalogAlarm.ConditionValue (System.Object), MultilingualText event/info texts, parameter tags and trigger addresses are not settable here; connection driver/InitialAddress authoring for non-integrated connections is not offered. All new operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Unified HMI writes beyond screens (27 October): external_tag_create also accepts an exact root global DB identity (kind block) plus an unquoted memberPath; prepare exports the DB and requires exactly one declared member with no array on its path and an exactly matching scalar type, then writes the natively observed dotted spelling (DB.Member, as in the HmiSeeder LinkedDbValue fixture). Struct/UDT sub-members qualify only when the DB export declares them; arrays, quoted or indexed names, instance/array DBs and software-unit DBs are refused. connection_create (target the HMI as kind hmiDevice) calls HmiSoftware.Connections.Create(name) only when exactly one valid native CommunicationManagement HMI endpoint pair of that LocalConnectionName has exactly one partner PLC; Partner/Station/Node are read-only in V21, so apply requires the readback Partner to equal the proven PLC software name and a nonempty CommunicationDriver. Whether Create derives the partner from an existing endpoint pair (or the HMI already lists that connection) is unobserved; the Partner-to-PLC-name mapping is an assumption that fails closed. object_create (DiscreteAlarms, AnalogAlarms, DataLogs, AlarmLogs) uses the composition's Create(name) and object_properties_set edits an exact alarm (hmiAlarm), log or runtime settings (hmiModelNode at its hmi_inspect section=model path); both use per-family allowlists of documented typed setters (alarms: RaisedStateTag, RaisedStateTagBitNumber, TriggerMode, Condition, AlarmClass, Priority, Origin, Area; logs: Settings.LogMaxSize, Settings.StorageFolder; runtime settings: StartScreen, ScreenResolution) with exact typed readback, and require RaisedStateTag, AlarmClass and StartScreen to name an existing tag, alarm class or top-level screen of the same HMI. Faceplate explicit/existing_binding_set now also binds a PLC-backed HMI tag when its connection owner, SymbolicAccess, exact root tag or global DB member declaration and type are proven natively; other nonempty connections stay refused. The existing whole-HMI typed capture already covers connections, alarms, logs and runtime settings; creates may add only the created object's own subtree, edits only the target node. Gaps: text/graphic lists and script modules have no Create or writable typed property in V21, only paired-file directory Import/Export; text lists import through the separate change kind hmi_text_list_import, graphic lists and script modules get no write; AnalogAlarm.ConditionValue (System.Object), MultilingualText event/info texts, parameter tags and trigger addresses are not settable here; connection driver/InitialAddress authoring for non-integrated connections is not offered. All new operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Classic classic_xml_import (27 October): imports a supplied or edited native export of one exact Classic object with ImportOptions.Override through its owning composition: ScreenComposition, ScreenTemplateComposition, ScreenPopupComposition, ScreenSlideinComposition, HmiTarget.ImportScreenGlobalElements/ImportScreenOverview, TagTableComposition, TextListComposition, GraphicListComposition, VBScriptComposition, CycleComposition and ConnectionComposition. Prepare requires one exported Hmi.* root of the same native type and Name, refuses library-linked screens/scripts and retains the current export as backup; apply re-exports the re-found object and requires equality with the supplied document apart from DocumentInfo/formatting, then the whole-HMI preservation check requires every other export unchanged. Cycles have no inspection kind and are addressed as kind hmiCycle by their preservation-capture path; the capture now keys slide-ins by SlideinType, matching inventory paths. The operation has its own unverified gate and stays refused for every profile. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Unified screen authoring (27 October, screens): four create-only operations. screen_create (target the HMI as kind hmiDevice) calls HmiSoftware.Screens.Create(name) and sets Width/Height, which must equal the size of an existing top-level screen of the same HMI (no device-resolution table is guessed), with exact typed readback; screen groups are neither searched nor targeted. item_create (target an exact hmiScreen) calls ScreenItems.Create<T>(name) for one of HmiRectangle, HmiText, HmiButton, HmiIOField, HmiBar, HmiGauge, HmiSlider or HmiToggleSwitch and sets Left/Top/Width/Height to an explicit integer rectangle wholly within the screen, with exact typed readback; item_place still only moves existing faceplate containers. dynamization_set (target an exact hmiScreenItem; one binding with property, exact same-HMI tagIdentity and dataType) creates one TagDynamization of ProcessValue, Visible or Enabled (the latter two only with a Bool tag) when the property has no dynamization yet, sets Tag and requires readback of PropertyName, DynamizationType Tag, the resolved tag name and no indirect addressing; the tag type must equal dataType and PLC-backed tags need the same proven connection owner and declaration as faceplate bindings. Script, resource-list, flashing and expression dynamizations and replacing existing dynamizations are not offered. event_handler_set (target an exact hmiScreen or hmiScreenItem; eventType, script) creates the handler through the object's most-derived EventHandlers composition Create(eventType) only when that event has no handler, and stores the script verbatim as Script.ScriptCode with exact readback. V21 documents no system-function list for Unified handlers, so the script is untrusted raw text: at most 16384 characters, no control characters other than tab/CR/LF, never executed, evaluated or syntax-checked (SyntaxCheck is not called); property-event handlers, custom web/widget container events, Async and the global definition area are not written. Each create may add only its own typed-readback subtree (<hmiPath>/screens/<name>, <screen>/items/<name>, <item>/dynamizations/<property>, <owner>/eventHandlers/<eventType>) to the whole-HMI capture; whether native creation also touches the owner node, start screen, tab order or line endings of script text is unobserved and fails closed. All four operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Incomplete HMI preservation blocks mutation before project writes; client-supplied evidence or a metadata hash cannot enable it.",
-          "The Unified preservation manifest adds a per-node SHA-256 of the same typed object-model readback as hmi_inspect section=model (keyed by hmi_inspect paths, bounded to 45000 nodes/64 MiB, typed-model.json retained) next to the tag-table exports, so unrelated-content comparison spans screens, items, dynamizations, events, parts, translations, tags, alarms, logs and runtime settings. tag_create may add only the created tag's subtree and binding operations only the bound interface entries. V21 has no Screen.Export; payloads without a public getter stay uncompared, so the manifest remains incomplete and the per-operation gates stay closed. Compiled against the V21 PublicAPI only; not natively qualified.",
+          "The Unified preservation manifest adds a per-node SHA-256 of the same typed object-model readback as hmi_inspect section=model (keyed by hmi_inspect paths, bounded to 45000 nodes/64 MiB, typed-model.json retained) next to the tag-table exports and (31 October) the complete paired text-list export, so unrelated-content comparison spans screens, items, dynamizations, events, parts, translations, tags, alarms, logs and runtime settings. tag_create may add only the created tag's subtree and binding operations only the bound interface entries. V21 has no Screen.Export; payloads without a public getter stay uncompared, so the manifest remains incomplete and the per-operation gates stay closed. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Library lifecycle stays in the library subsystem; HMI receives an exact source/destination/dependency/binding handoff.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
@@ -23354,7 +23422,7 @@
           "4 MiB request, 128 lists, 4096 total entries/texts, 32 languages, conservative 8 MiB per candidate and shared 512 MiB retention. Nonoverlapping ranges and unambiguous ASCII text identifiers only.",
           "Explicit v2 Bool binding generation uses exact v7 saved component/output evidence, declared translations and a retained previous candidate pair. Manual drift or relevant conflicts suppress candidates; selected retained peers stay unchanged. Original reviews and predecessor chains are revalidated; 16 predecessor and 128 MiB lineage-input limits. This does not establish native preservation or complete C01 generation.",
           "Explicit v3 integer/state generation covers exact captured SInt/USInt/Int/UInt/DInt/UDInt/LInt bindings and bounded disjoint state intervals. Missing type-domain coverage, original dependency contradictions and manual drift remain explicit; full-coverage requests with gaps suppress candidates. No native range, consumer-closure or preservation qualification.",
-          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; the production import route is change kind hmi_text_list_import (not natively qualified)."
         ]
       },
       "qualification": {
@@ -23577,7 +23645,7 @@
           "Exact predecessor/current/proposed comparisons, captured lineage, manual edits and cross-output collisions are checked before candidate publication. Conflicts suppress the whole proposed set; old records retain their semantics.",
           "Established plain TextLists/TextLibrary YAML only. Removal/rename effects are previews, not source deletion or native writes. No implicit type conversion, general SiVArc template engine, complete project coverage or native preservation qualification.",
           "V3 explicitly requests integer-value-preserving.v1 conversion for fixed-identity numeric outputs across captured 8/16/32-bit integer types. The unchanged prior state intervals must all fit the selected target type. Overflow, implicit conversion, unrelated source conflicts and manual current-file changes refuse; native import remains unqualified.",
-          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; no production route imports Unified text lists."
+          "Native import (29 October 2026, local.hmi.text-list-import.20261029): published candidates import exactly through V21 HmiTextListComposition.Import on MTP700 Unified Comfort (en-US/de-DE), with other lists and HMI content unchanged, a byte-identical no-change roundtrip, save/reopen, archive retrieval and checkpoint restore; compiler errors and warnings are unchanged but the fixture keeps its encrypted-transfer password errors. New candidates refuse, before anything is published and naming the list and entry, the content V21 imports but changes: HmiTextListValueOutOfRange (a bound outside signed 32-bit, including UDInt/LInt states), HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue (a default entry that is not SingleValue 0), HmiTextListTextUnsupported (a control character other than tab and LF), HmiTextListNameUnsupported (list names other than at most 128 letters, digits, inner spaces and !&'()+,-;<=>@\\^_{|}) and HmiTextListUnresolvedText; retained records keep their meaning and still reopen. Imported through the independent HmiSeeder; the production import route is change kind hmi_text_list_import (not natively qualified)."
         ]
       },
       "qualification": {
@@ -26291,6 +26359,63 @@
         "AC-native",
         "AC-recovery",
         "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hmi_text_list_import",
+      "domain": "hmi",
+      "title": "Import a reviewed Unified text-list candidate",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_text_list_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API (Siemens.Engineering.WinCCUnified.xml): HmiSoftware.HmiTextLists (HmiTextListComposition) Import(DirectoryInfo, String), Export(DirectoryInfo, String) and Count; Project.LanguageSettings.ActiveLanguages; Device.GetService<ICompilable>() (Unified HmiSoftware exposes no compiler service). The independent HmiSeeder import of tool-authored candidates passed natively (local.hmi.text-list-import.20261029)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "payload {schemaVersion: 1, target: the Unified hmiDevice identity from hmi_inspect section=devices, expectedContentHash, recordId, outputId (set records only)}. The Host reopens the hmi_text_list_author or hmi_text_list_generate_set record with full revalidation, refuses the content V21's import changes with the authoring codes (HmiTextListValueOutOfRange, HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue, HmiTextListTextUnsupported, HmiTextListNameUnsupported), also for records published before those refusals, and hands the worker only the exact hash-checked candidate pair; a client-supplied candidate is refused.",
+          "Prepare captures the Unified scope of every HMI in the project (tag-table and paired text-list exports, typed readback of every node). The capture is accepted only with the two standing Unified coverage notes (tag-table export stability, no Screen.Export); a typed read error, a capture failure or a Classic HMI refuses with HmiPreservationUnavailable, and the content hash is the observed-artifacts hash. expectedContentHash must equal it; a StaleRevision refusal returns it. Every typed text-list node must be a list the export holds (V21 skips lists with formatted text; HmiTextListExportIncomplete). The candidate's languages must be exactly the project's active languages (HmiTextListLanguageMismatch). The preview lists created and replaced lists; a replaced list loses its old content, no other list is renamed or deleted.",
+          "Apply requires compile=true and save=true. Both candidate files are re-hashed before the checkpoint. After it the HMI device is compiled and the scope captured again, then the pair is imported with HmiTextListComposition.Import (which must return true) and the complete export is read back: every candidate list must equal the candidate and every other list stay unchanged, compared by meaning (entries with defaults applied, texts per language; the rule of the native qualification oracle) by a strict YAML-subset reader that refuses any other construct and every unresolved text reference. Outside the candidate lists' own typed nodes and the export the capture must be unchanged, and the device's compiler errors and warnings unchanged by the import (Unified fixtures keep their encrypted-transfer password errors), compared by state, text and path; the tree container a problem sits under, empty-text container rows and the closing summary row's counts are not compared; then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
+          "Gate: this kind only (31 October maintainer decision), admitted in production on unified-comfort and unified-pc, the profiles whose native qualification passed; Classic, other profiles, screens and every hmi_engineering operation stay behind the closed preservation gate. --hmi-text-list-qualification <profile> admits a further candidate profile only in a project its own worker retrieved or created. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Consumers of an imported list are checked only by typed-readback equality of every other node; formatted and system text lists, graphic lists and script modules are not imported; runtime and visual behavior are not verified.",
+          "Native, 31 October: the route passed on MTP700 Unified Comfort and WinCC Unified PC RT (local.hmi.text-list-import.route.20261031, run tx3, 168 checks): refusals before any write, nine imports of every record kind with exact worker and independent PyYAML readback, recorded same-key replay and RecoveryRequired for another key, stale-preview refusal, unchanged typed nodes, change_restore and a fresh reopen. Interruption at the checkpoint, baseline compile, import, readback, compile/preservation and save, and Host loss at the checkpoint, import, readback and save, passed on both profiles (local.hmi.text-list-import.interruption.20261031, local.hmi.text-list-import.interruption-pc.20261031). Earlier runs tx1/tx2 led to the fixture runtime-language change (c6191401) and the compiler-problem rule fix (1121bb82).",
+          "A project language that is not enabled for runtime is refused with HmiPreservationUnavailable: V21 throws EngineeringTargetInvocationException from its HmiLanguageAndFont.Order, which the capture records as a typed read error (run artifacts/tx1). Enable every project language under the HMI's runtime settings before importing.",
+          "Qualified on owned seeded fixtures (one Unified HMI, en-US/de-DE enabled for runtime, two encrypted-transfer password errors kept); other devices, languages, customer projects, consumers of imported lists, runtime and visual behavior are not covered."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.text-list-import.route.20261031",
+          "local.hmi.text-list-import.interruption.20261031",
+          "local.hmi.text-list-import.interruption-pc.20261031"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an owned project with a Unified Comfort or Unified PC HMI whose capture shows only the two standing notes, every project language enabled for runtime, a retained candidate whose languages equal the project's active languages, and a worker-owned TIA instance for change_restore."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness with WinCC Unified",
+        "A retained hmi_text_list_author or hmi_text_list_generate_set record"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
       ]
     }
   ]

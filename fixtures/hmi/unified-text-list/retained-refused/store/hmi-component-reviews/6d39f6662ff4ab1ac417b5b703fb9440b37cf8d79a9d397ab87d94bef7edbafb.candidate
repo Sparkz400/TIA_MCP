@@ -1,0 +1,61 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "Unicode 日本語 quoted-name":
+        RangeType: Decimal
+        Entries:
+          "Low":
+            Type: To
+            Value: -1
+            ToValue: -1
+            IsDefaultEntry: true
+            Text: "QualificationText.Text_Off"
+          "Middle":
+            Type: Range
+            Value: 0
+            FromValue: 0
+            ToValue: 10
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Ready"
+          "High":
+            Type: From
+            Value: 11
+            FromValue: 11
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Ready"
+      "Bool":
+        RangeType: Bool
+        Entries:
+          "StateOff":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Off"
+          "StateReady":
+            Type: SingleValue
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Ready"
+      "BitNumber":
+        RangeType: BitNumber
+        Entries:
+          "StateOff":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: true
+            Text: "QualificationText.Text_Off"
+          "StateReady":
+            Type: SingleValue
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Ready"

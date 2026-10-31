@@ -54,7 +54,7 @@ SCENARIOS = {
 # Generic change_apply matrix: one fixture per reconciliation class, killed at each durable journal boundary.
 # Reconciliation depends on the kind only through its fingerprint route, so each class has one representative.
 # Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
-TARGET_KINDS = {"hmi_engineering", "hardware_attributes", "tag_set", "constant_set",
+TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hardware_attributes", "tag_set", "constant_set",
                 "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
                 "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
                 "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize", "vci_conflict_resolve",
@@ -86,13 +86,23 @@ POINTS = {
     "save": (lambda j: j.get("state") == "applying" and "changed_project_saved" in stages(j), "worker"),
     "host": (lambda j: j.get("state") == "applying", "host"),
 }
+# hmi_text_list_import journals the baseline compile, the native import and its readback separately: worker and Host loss
+# at each durable boundary (checkpoint, baseline compile, import, readback, compile/preservation, save).
+_COMPILING = lambda j: j.get("state") == "applying" and "hmi_baseline_compiled" not in stages(j) and "mutation_applied" not in stages(j)
+_IMPORTING = lambda j: j.get("state") == "applying" and "hmi_text_list_import_started" in stages(j) and "hmi_text_list_import_returned" not in stages(j)
+_READING = lambda j: j.get("state") == "applying" and "hmi_text_list_import_returned" in stages(j) and "mutation_applied" not in stages(j)
+TEXT_LIST_APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created", "hmi_baseline_compiled", "hmi_text_list_import_started",
+                            "hmi_text_list_import_returned", "hmi_text_lists_read_back_exactly", "mutation_applied", "compile_finished",
+                            "hmi_unrelated_content_preserved", "changed_project_saved"]  # As journaled by a complete apply (run artifacts/ti1).
+TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp": (_IMPORTING, "worker"), "read": (_READING, "worker"), "comp": POINTS["comp"],
+                    "save": POINTS["save"], "hckp": (POINTS["ckpt"][0], "host"), "himp": (_IMPORTING, "host"), "hred": (_READING, "host"), "hsav": (POINTS["save"][0], "host")}
 
 
 def expected_outcome(kind, point):
     """Exact reconciliation and the effect an independent fresh read must find in the original project."""
     if point == "ckpt":
         return {"released": False, "effectPersisted": False}  # No complete hash-recorded checkpoint.
-    if point in ("mut", "comp"):
+    if point in ("mut", "comp", "imp", "read"):
         return {"released": True, "project": "unchanged", "effectPersisted": False}  # Never saved after the checkpoint.
     if point == "save":
         return {"released": False, "effectPersisted": True}  # Saved, but no applied outcome was journaled.
@@ -139,11 +149,44 @@ def technology_present(client):
     return TO_NAME in {o["name"] for o in read["technologyObjects"]}
 
 
-# Short scenario prefix (TIA limits project paths): kind, fixture, independent effect oracle.
-KINDS = {"su": ("source_upsert", prepare_source, source_present),
-         "hw": ("hardware_plug", prepare_hardware, hardware_present),
-         "to": ("to_create", prepare_technology, technology_present)}
-KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix in KINDS for point in POINTS}
+HMI_FIXTURE = None  # --hmi-fixture: an HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios.
+HMI_FIXTURE_PROFILE = "unified-comfort"  # --hmi-fixture-profile: the fixture's profile, admitted by the qualification Host.
+TEXT_LIST = "EntryTypes"  # Created by the boundary-values candidate.
+
+
+def setup_scratch(scenario, client):
+    scenario.step("tia_create_scratch", client.tool("tia_create_scratch"))
+
+
+def setup_text_list(scenario, client):
+    require(HMI_FIXTURE is not None, "tl-* scenarios need --hmi-fixture (HmiSeeder textlist-fixture checkpoint.zap21)")
+    scenario.step("project_retrieve HMI fixture", client.tool("project_retrieve", {
+        "archivePath": str(HMI_FIXTURE), "expectedSha256": hashlib.sha256(HMI_FIXTURE.read_bytes()).hexdigest()}))
+
+
+def text_list_host_arguments():
+    """The qualification-only admission of the fixture's profile (the production gate ships with no profile)."""
+    return ["--hmi-text-list-qualification", HMI_FIXTURE_PROFILE]
+
+
+def prepare_text_list(scenario, client):
+    from qualify_hmi_text_list_import import boundary_requests
+    from qualify_hmi_text_list_route import author, prepare, unified_device
+    record = author(client, boundary_requests()["boundary-values"])
+    return scenario.step("change_prepare hmi_text_list_import", prepare(client, unified_device(client), record))
+
+
+def text_list_present(client):
+    from qualify_hmi_text_list_route import text_list_names
+    return TEXT_LIST in text_list_names(client)
+
+
+# Short scenario prefix (TIA limits project paths): kind, fixture preparation, independent effect oracle, fixture, boundaries.
+KINDS = {"su": ("source_upsert", prepare_source, source_present, setup_scratch, POINTS),
+         "hw": ("hardware_plug", prepare_hardware, hardware_present, setup_scratch, POINTS),
+         "to": ("to_create", prepare_technology, technology_present, setup_scratch, POINTS),
+         "tl": ("hmi_text_list_import", prepare_text_list, text_list_present, setup_text_list, TEXT_LIST_POINTS)}
+KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix, row in KINDS.items() for point in row[4]}
 
 
 def alive(pid):
@@ -209,9 +252,10 @@ class Scenario:
         self.root = base / name
         self.root.mkdir(parents=True)
         self.report = {"scenario": name, "artifactRoot": str(self.root), "steps": [], "passed": False, "toolCalls": []}
+        self.host_arguments = []
 
     def client(self):
-        return ReliabilityClient(self.host, self.worker, self.root, timeout=900, record=self.report["toolCalls"])
+        return ReliabilityClient(self.host, self.worker, self.root, timeout=900, record=self.report["toolCalls"], extra=self.host_arguments)
 
     def step(self, name, value):
         self.report["steps"].append({"name": name, "result": value})
@@ -276,15 +320,17 @@ class Scenario:
     def run_kind(self, prefix, point):
         """Interrupt one change kind at one journal boundary, reconcile once, then check the exact outcome,
         no replay and recovery from the checkpoint against independent fresh reads."""
-        kind, prepare, present = KINDS[prefix]
-        trigger, mode = POINTS[point]
+        kind, prepare, present, setup, points = KINDS[prefix]
+        trigger, mode = points[point]
+        if prefix == "tl":
+            self.host_arguments = text_list_host_arguments()
         expected = self.report["expected"] = expected_outcome(kind, point)
         self.report.update({"kind": kind, "point": point, "reconciliationClass": reconciliation_class(kind)})
         client = self.client()
         try:
             client.initialize()
             tia = self.start(client)
-            self.step("tia_create_scratch", client.tool("tia_create_scratch"))
+            setup(self, client)
             require(not present(client), "The fixture effect must be absent before the change")
             prepared = prepare(self, client)
             project = pathlib.Path(prepared["preview"]["project"]["path"])
@@ -340,6 +386,10 @@ class Scenario:
         require(persisted == expected["effectPersisted"], f"Independent read found effectPersisted={persisted}")
         self.report.update({"effectPersisted": persisted, "checkpointRecovered": bool(archive_hash) and expected["released"],
                             "journalStagesAtEnd": stages(final), "journalStateAtEnd": final.get("state")})
+        if prefix == "tl" and mode == "host":
+            # After Host loss the worker finishes alone: the journal must end applied with every stage of a complete import.
+            require(final.get("state") == "applied" and stages(final) == TEXT_LIST_APPLIED_STAGES,
+                    f"The worker did not complete the text-list apply after Host loss: {final.get('state')} {stages(final)}")
         self.report["passed"] = True
         return self.report
 
@@ -631,7 +681,12 @@ def main():
     parser.add_argument("--scenarios", nargs="*", choices=list(SCENARIOS) + list(KIND_SCENARIOS), default=[])
     parser.add_argument("--existing", nargs=2, action="append", default=[], metavar=("ARTIFACTS", "ADMISSION_ID"))
     parser.add_argument("--report", type=pathlib.Path, required=True)
+    parser.add_argument("--hmi-fixture", type=pathlib.Path, help="HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios")
+    parser.add_argument("--hmi-fixture-profile", choices=("unified-comfort", "unified-pc"), default="unified-comfort")
     args = parser.parse_args()
+    global HMI_FIXTURE, HMI_FIXTURE_PROFILE
+    HMI_FIXTURE = args.hmi_fixture.resolve(strict=True) if args.hmi_fixture else None
+    HMI_FIXTURE_PROFILE = args.hmi_fixture_profile
     host, worker = args.host.resolve(strict=True), args.worker.resolve(strict=True)
     args.base.mkdir(parents=True, exist_ok=False)
     report = {"schemaVersion": 1, "completed": False, "base": str(args.base), "hostSha256": hashlib.sha256(host.read_bytes()).hexdigest(),

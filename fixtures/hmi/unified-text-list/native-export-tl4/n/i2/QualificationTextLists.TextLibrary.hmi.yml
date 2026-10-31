@@ -1,0 +1,28 @@
+#Version: 2.0
+
+TextLibraries:
+  MyTextLibrary:
+    Type: Text
+    Languages:
+    - en-US
+    - de-DE
+    DefaultLanguage: en-US
+    Entries:
+      Text_0:
+        Text:
+        - Qualification off
+        - Qualifikation aus
+      Text_1:
+        Text:
+        - Qualification ready
+        - Qualifikation bereit
+      Text_2:
+        Text:
+        - Off
+        - Aus
+      Text_3:
+        Text:
+        - |-
+          Ready 😀
+          Manual content stays separate
+        - Ein

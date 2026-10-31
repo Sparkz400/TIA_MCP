@@ -1,0 +1,117 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "TextChars":
+        RangeType: Decimal
+        Entries:
+          "Quote":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Quote"
+          "Whitespace":
+            Type: SingleValue
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Whitespace"
+          "Unicode":
+            Type: SingleValue
+            Value: 2
+            FromValue: 2
+            ToValue: 2
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Unicode"
+          "Empty":
+            Type: SingleValue
+            Value: 3
+            FromValue: 3
+            ToValue: 3
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Empty"
+          "Yaml":
+            Type: SingleValue
+            Value: 4
+            FromValue: 4
+            ToValue: 4
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Yaml"
+          "Separators":
+            Type: SingleValue
+            Value: 5
+            FromValue: 5
+            ToValue: 5
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Separators"
+          "Long":
+            Type: SingleValue
+            Value: 6
+            FromValue: 6
+            ToValue: 6
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Long"
+      "Format_00AD":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.F00AD"
+      "Format_200B":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.F200B"
+      "Format_200D":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.F200D"
+      "Format_FEFF":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.FFEFF"
+      "Format_202E":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.F202E"
+      "Format_2060":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.F2060"

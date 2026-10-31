@@ -511,6 +511,17 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         catch (ArgumentException error) when (error.Message.Contains("Native diagnosis and qualification cannot run")) { continue; }
         throw new Exception("Native-disabled CLI accepted " + flag);
     }
+    // The text-list import qualification admits one named profile on its own native Host.
+    Equal("unified-pc", HostOptions.Parse(["--hmi-text-list-qualification", "unified-pc"]).HmiTextListQualificationProfile);
+    Equal(null, HostOptions.Parse([]).HmiTextListQualificationProfile);
+    foreach (var refused in new[] { new[] { "--hmi-text-list-qualification", "unified-comfort", "--no-native-workers" }, new[] { "--hmi-text-list-qualification", "classic-comfort" },
+        new[] { "--hmi-text-list-qualification", "unified-pc", "--translation-qualification" }, new[] { "--hmi-text-list-qualification", "unified-pc", "--component-qualification" },
+        new[] { "--hmi-text-list-qualification", "unified-pc", "--hmi-text-list-qualification", "unified-pc" } })
+    {
+        try { HostOptions.Parse(refused); }
+        catch (ArgumentException) { continue; }
+        throw new Exception("CLI accepted " + string.Join(" ", refused));
+    }
 });
 Test("CLI Git remote is local by default and needs an explicit option for credential-free https", work =>
 {

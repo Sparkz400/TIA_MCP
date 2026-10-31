@@ -1,0 +1,105 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "Plain_Name1":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Name with space":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Umlaut_Ä":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Unicode_日本語":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Dot.Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Colon:Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Hash#Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Quote\"Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Bracket[Name]":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
+      "Dash-Name":
+        RangeType: Decimal
+        Entries:
+          "Zero":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeNamesTexts.T"
