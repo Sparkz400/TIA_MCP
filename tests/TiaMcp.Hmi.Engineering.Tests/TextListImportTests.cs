@@ -95,9 +95,22 @@ static class TextListImportTests
             Assert(HmiTextListImportRules.Read(Nested(32)) != null, "32 nested levels read");
             Refuse(() => HmiTextListImportRules.Read(Nested(33)), "deeper nesting refuses cleanly");
         });
-        check("Compiler problems must be unchanged; Information rows and order do not matter", () => {
-            JObject Compile(params (string State, string Text)[] rows) => new JObject { ["targets"] = new JArray(new JObject { ["target"] = "/d", ["messagesTruncated"] = false,
-                ["messages"] = new JArray(rows.Select(r => new JObject { ["state"] = r.State, ["description"] = r.Text, ["path"] = "p", ["depth"] = 0 })) }) };
+        check("Compiler problems must be unchanged; Information rows, containers, summary and order do not matter", () => {
+            JObject Tree(params (int Depth, string State, string Text, string Path)[] rows) => new JObject { ["targets"] = new JArray(new JObject { ["target"] = "/d", ["messagesTruncated"] = false,
+                ["messages"] = new JArray(rows.Select(r => new JObject { ["state"] = r.State, ["description"] = r.Text, ["path"] = r.Path, ["depth"] = r.Depth })) }) };
+            const string confirm = "The entered password confirmation does not match the password. ", concept = "The entered password does not comply with the password security concept.";
+            // The two trees of run artifacts/tx2 (first compile of the retrieved fixture, compile after the import).
+            var flat = Tree((0, "Information", "", "HmiDevice_A"), (1, "Information", "", "Hardware configuration"), (1, "Information", "Software compilation started.", null),
+                (0, "Error", confirm, null), (0, "Error", concept, null), (0, "Success", "Compiling finished (errors: 0; warnings: 0)", null));
+            var nested = Tree((0, "Error", "", "HmiDevice_A"), (1, "Information", "Number of configured tags: 1", null), (1, "Error", "", "Runtime settings"),
+                (2, "Error", confirm, null), (2, "Error", concept, null), (0, "Error", "Compiling finished (errors: 2; warnings: 0)", null));
+            Assert(HmiTextListImportRules.CompileProblemsUnchanged(flat, nested), "same password errors in another tree shape");
+            var added = Tree((0, "Error", "", "HmiDevice_A"), (1, "Error", "", "Runtime settings"), (2, "Error", confirm, null), (2, "Error", concept, null),
+                (2, "Error", "Text list X is invalid.", "Text lists"), (0, "Error", "Compiling finished (errors: 3; warnings: 0)", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, added), "an added error refuses");
+            var noSummary = Tree((0, "Error", confirm, null), (0, "Error", concept, null), (1, "Information", "x", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, noSummary), "a tree without its closing summary row refuses");
+            JObject Compile(params (string State, string Text)[] rows) => Tree(rows.Select(r => (1, r.State, r.Text, "p")).Concat(new[] { (0, "Information", "Compiling finished", (string)null) }).ToArray());
             var baseline = Compile(("Error", "password"), ("Information", "a"), ("Warning", "w"));
             Assert(HmiTextListImportRules.CompileProblemsUnchanged(baseline, Compile(("Warning", "w"), ("Information", "b"), ("Error", "password"))), "same problems");
             Assert(!HmiTextListImportRules.CompileProblemsUnchanged(baseline, Compile(("Error", "password"), ("Warning", "w"), ("Warning", "new"))), "new warning");

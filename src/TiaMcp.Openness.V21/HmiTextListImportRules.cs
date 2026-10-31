@@ -141,7 +141,11 @@ namespace TiaMcp.Model
         }
 
         /// <summary>V21 fixtures keep encrypted-transfer password errors (no public setter), so the import must leave the HMI device's
-        /// complete Error/Warning diagnostics exactly as the compile before it found them; Information rows depend on the previous compile.</summary>
+        /// complete Error/Warning diagnostics exactly as the compile before it found them; Information rows depend on the previous compile.
+        /// Only problem rows with text count: the tree's container rows (empty text, state of their children) and the closing summary
+        /// row (last root row, "Compiling finished (errors: n; warnings: m)") change with the compile's shape. Run artifacts/tx2: the first
+        /// compile of a retrieved fixture lists the two password errors flat with a Success summary, the compile after the import nests
+        /// the same two errors under "Runtime settings" with an Error summary.</summary>
         internal static bool CompileProblemsUnchanged(JObject before, JObject after)
         {
             var b = Problems(before); var a = Problems(after);
@@ -156,8 +160,11 @@ namespace TiaMcp.Model
             foreach (var target in targets.OfType<JObject>())
             {
                 if (target["error"] != null || target["messagesTruncated"]?.Type != JTokenType.Boolean || target.Value<bool>("messagesTruncated") || !(target["messages"] is JArray messages)) return null;
-                foreach (var message in messages.OfType<JObject>())
-                    if (message.Value<string>("state") == "Error" || message.Value<string>("state") == "Warning")
+                var list = messages.OfType<JObject>().ToList();
+                int summary = list.FindLastIndex(m => m.Value<int?>("depth") == 0);
+                if (summary < 0 || summary != list.Count - 1) return null; // No closing summary row: unknown tree shape.
+                foreach (var message in list.Take(summary))
+                    if ((message.Value<string>("state") == "Error" || message.Value<string>("state") == "Warning") && !string.IsNullOrEmpty(message.Value<string>("description")))
                         rows.Add(new JArray(target.Value<string>("target"), message.Value<string>("state"), message.Value<string>("description"), message.Value<string>("path")).ToString(Formatting.None));
             }
             rows.Sort(StringComparer.Ordinal);
