@@ -81,7 +81,7 @@ internal static partial class Program
 
     // Both languages, two screens with items, a tag, the start screen, a discrete alarm, a Loaded script and the documented
     // peer list; walked twice, compiled, saved and archived as checkpoint.zap21. The caller closes the project.
-    private static Project SeedTextListFixture(TiaPortal portal, string typeName, string prefix, out Software sw)
+    private static Project SeedTextListFixture(TiaPortal portal, string typeName, string prefix, out Software sw, bool runtimeLanguages = false)
     {
         var project = portal.Projects.Create(new DirectoryInfo(Path.Combine(Output, "p")), prefix + Guid.NewGuid().ToString("N").Substring(0, 8));
         try
@@ -95,6 +95,7 @@ internal static partial class Program
             sw = Items(device.DeviceItems).Select(item => item.GetService<SoftwareContainer>()?.Software)
                 .Single(item => item != null && item.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified.", StringComparison.Ordinal));
             Report["seed"] = Seed(sw, Output); Persist();
+            if (runtimeLanguages) { Report["runtimeLanguages"] = EnableRuntimeLanguages(sw); Persist(); }
             Report["baseline"] = Inspect(sw, Output, "baseline");
             Report["baselineRepeat"] = Inspect(sw, Output, "repeat");
             Report["compileBaseline"] = Compile(new[] { sw }); Persist();
@@ -105,6 +106,26 @@ internal static partial class Program
             return project;
         }
         catch { project.Close(); throw; }
+    }
+
+    // A project language that is not enabled for runtime has no readable LanguageAndFonts Order (V21 throws
+    // EngineeringTargetInvocationException, run artifacts/tx1), which the import route's capture refuses as a typed read
+    // error. The route fixture therefore enables every project language for runtime, as a bilingual runtime project does.
+    private static JArray EnableRuntimeLanguages(Software sw)
+    {
+        var rows = new JArray();
+        foreach (var entry in ((IEnumerable)Get(Get(sw, "RuntimeSettings"), "LanguageAndFonts")).Cast<object>())
+        {
+            var row = new JObject { ["language"] = Get(entry, "Language").ToString(), ["enableBefore"] = (bool)Get(entry, "Enable") };
+            try
+            {
+                if (!(bool)Get(entry, "Enable")) Set(entry, "Enable", true);
+                row["enable"] = (bool)Get(entry, "Enable"); row["order"] = Convert.ToString(Get(entry, "Order"), System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex) { row["error"] = ErrorChain(ex); }
+            rows.Add(row);
+        }
+        return rows;
     }
 
     // textlist-fixture: only the seeded, archived baseline, for the production hmi_text_list_import runner
@@ -124,7 +145,7 @@ internal static partial class Program
             ["seederSha256"] = Hash(System.Reflection.Assembly.GetExecutingAssembly().Location),
             ["assembly"] = typeof(TiaPortal).Assembly.FullName, ["runtimeVerified"] = false, ["scriptsExecuted"] = false, ["portals"] = new JArray(), ["cleanup"] = "pending" };
         Persist();
-        OwnedPortal("fixture", portal => SeedTextListFixture(portal, typeName, "TiaMcpTf_", out _).Close());
+        OwnedPortal("fixture", portal => SeedTextListFixture(portal, typeName, "TiaMcpTf_", out _, runtimeLanguages: true).Close());
         Report["cleanup"] = "owned-portals-exited";
         Report["completed"] = Report["checkpoint"] != null && ((JArray)Report["portals"]).All(row => row.Value<bool?>("exitVerified") == true);
         Persist();
