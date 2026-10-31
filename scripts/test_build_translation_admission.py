@@ -93,6 +93,8 @@ class LedgerTests(unittest.TestCase):
         path, entry = self.provisional()
         for change in ({'admission__registry': {'sha256': '0' * 64}}, {'admission__qualificationMode': True},
                        {'admission__packages': {'host': [{'path': str(self.root / 'elsewhere' / 'TiaMcp.Host.exe')}], 'worker': []}},
+                       {'admission__packages': {'host': [], 'worker': []}},
+                       {'admission__packages': {'host': [{'path': str(self.deployment[0] / 'TiaMcp.Host.exe')}], 'worker': []}},
                        {'result__interruptions': []}, {'result__refusals': {}}):
             with self.subTest(change=list(change)), self.assertRaises(ValueError):
                 builder.finalize(path, self.default_packet(path, entry, **change))

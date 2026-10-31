@@ -72,7 +72,7 @@ namespace TiaMcp.Openness.V21
         private static void TranslationProductionScope(JObject selector, JObject context, JObject entry)
         {
             var key = (JObject)entry["profile"]["key"];
-            var admitted = key.Value<string>("contract") == TranslationRestrictedContract ? ((JArray)key["scope"]["categoryIds"]).Values<string>().ToArray() : new string[0];
+            var admitted = key.Value<string>("contract") == TranslationAdmissionLedger.RestrictedContract ? ((JArray)key["scope"]["categoryIds"]).Values<string>().ToArray() : new string[0];
             if (TranslationOwners(selector).Length != 1 || !TranslationCultures(selector).SequenceEqual(new[] { "de-DE", "en-GB" }) ||
                 context?.Value<bool?>("updateSourceLanguage") == true || !ProjectTextList(selector, "categoryIds", 256).SequenceEqual(admitted))
                 throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, de-DE/en-GB, target-only import and exactly the installed export scope.");

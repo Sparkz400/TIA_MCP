@@ -93,8 +93,9 @@ def verify_default_mode(packet, registry, entry):
             admission['profileId'] == entry['id'] and admission['registry']['sha256'] == ref(registry)['sha256'] and
             admission['contract'] == RESTRICTED_CONTRACT and admission['scope'] == entry['profile']['key']['scope'],
             'Default-mode packet is incomplete or ran on another registry or scope')
-    require(all(Path(f['path']).resolve().is_relative_to(Path(deployment[part])) for part, key in (('hostDirectory', 'host'), ('workerDirectory', 'worker'))
-                for f in admission['packages'][key]), 'Default-mode packet ran outside the bound qualification deployment')
+    # Both frozen packages must be recorded, every file inside its bound directory; an empty inventory proves nothing.
+    require(all(admission['packages'][key] and all(Path(f['path']).resolve().is_relative_to(Path(deployment[part])) for f in admission['packages'][key])
+                for part, key in (('hostDirectory', 'host'), ('workerDirectory', 'worker'))), 'Default-mode packet ran outside the bound qualification deployment')
     cases = {i['case']: i for i in result['interruptions']}
     require(len(cases) == len(result['interruptions']) and set(cases) == set(INTERRUPTIONS) and
             all(i['originalDisposition'] == 'unchanged' and i['replayRefusal'] == 'RecoveryRequired' for i in cases.values()),

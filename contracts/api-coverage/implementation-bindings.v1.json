@@ -2902,13 +2902,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationAdmission.cs",
-      "sha256": "013df0a7a99684496a649ddcf830798bfcb389e775a8f64379851f195939ac34",
-      "bytes": 8594
+      "sha256": "e00b732b479184975dad7b643292e69acd8c8026c73347c4fe5bc54e49573aa9",
+      "bytes": 7218
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationImport.cs",
-      "sha256": "104e421a4b1d8612208f50e9fbce727c130f191e28a66d620dbf708b9f89b116",
-      "bytes": 30423
+      "sha256": "2a705a9374923c05cd401bcc70335df4b247b901db2097db1451ef1294ded387",
+      "bytes": 30439
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
@@ -3099,6 +3099,11 @@
       "path": "src/TiaMcp.Openness.V21/TiaMcp.Openness.V21.csproj",
       "sha256": "257b7e7aa61d9deb5b74263ba2b97a6d4dee2d548f3a3d0fcfc5b2e3e03ecbd2",
       "bytes": 5920
+    },
+    {
+      "path": "src/TiaMcp.Openness.V21/TranslationAdmissionLedger.cs",
+      "sha256": "e81c06911d2fe5c23c1cf1e451b3fd992508f24c01cef7246b51bd8426947bdb",
+      "bytes": 3456
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphical.Native.cs",

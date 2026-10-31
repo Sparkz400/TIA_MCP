@@ -52,5 +52,6 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelRelationshipProviders.cs" Link="ProjectModelRelationshipProviders.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelTypedPreview.cs" Link="ProjectModelTypedPreview.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TranslationAdmissionLedger.cs" Link="TranslationAdmissionLedger.cs" />
   </ItemGroup>
 </Project>
