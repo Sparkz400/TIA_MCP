@@ -16,21 +16,26 @@ Offline checks only; the native round trip is pending.
   the existing cleared environment, pinned configuration and literal arguments,
   plus only the remote's protocol. Push is a compare-and-swap fast-forward;
   fetch validates the remote tree before a fast-forward checkout. A local
-  remote with active hooks, `hooksPath` or includes is refused before dispatch.
+  remote must pass the runner's own `[core]`-only config allowlist (bare) and
+  indirection checks with no active hooks, when read and again immediately
+  before dispatch. UNC paths are refused in every spelling, including `//server/share`.
 - Store records `vci:push:` and `vci:fetch:` with hash-linked journals; a
   fetched revision is accepted wherever a committed revision is
   ([`VciWorkspaceStore.Remote.cs`](../../src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Remote.cs)).
 - `vci_conflict_resolve` ([workflow](../reference/vci-package-workflow.md#two-sided-conflict-resolution)):
   the Host binds the request to one `divergentChange` row of a retained
-  comparison and its exact package bytes; the worker requires the reviewed
-  remote side in the workspace and runs `Synchronize` in the direction of the
-  chosen side, with checkpoint, compile, `Equal` readback and package readback.
+  comparison, its workspace and its exact package bytes; the worker requires the
+  reviewed remote side in the workspace and a live object export hashing to the
+  reviewed native side (`contentSha256`, now reported by `vci_workspace_inspect`),
+  then runs `Synchronize` in the direction of the chosen side, with checkpoint,
+  compile, `Equal` readback and package readback.
 
 ## Offline checks
 
 | Suite | Result | Covers |
 | --- | --- | --- |
-| `tests/TiaMcp.VersionControl.Workflow.Tests` (real Git) | 123 checks | Remote parsing; push, CAS refusal, restart reopen; fetch fast-forward, exact blobs, unchanged parent, history; non-fast-forward push and fetch refusals; hook, `hooksPath` and `.gitattributes` refusals; resolution payload for all three takes and eight refusals |
+| `tests/TiaMcp.VersionControl.Workflow.Tests` (real Git) | 138 checks | Remote parsing incl. `//server/share` and `\\server\share`; push, CAS refusal, restart reopen; fetch fast-forward, exact blobs, unchanged parent, history; non-fast-forward push and fetch refusals; remote hook, five config redirections (separate-line and same-line `hooksPath`, `[core][include]`, `alternateRefsCommand`, another section) for push and fetch, `objects/info/alternates`, `.gitattributes`; resolution payload for all three takes with the native hash and workspace, and nine refusals |
+| `tests/TiaMcp.HardwareEngineering.Tests` | 264 passed | Pure `VciResolutionRules`: package-file parsing (traversal, absolute, empty, short hash, tampered or missing content, length, repeats, non-objects, bound) and the live-mapping refusals (take/direction, missing native hash, no workspace change, foreign package, stale package, extra file, edited project object, write sets) |
 | `tests/TiaMcp.VersionControl.Tests` (real Git) | 124/124 | Existing runner, durability and repository-selection checks with the extended process signature |
 | `tests/TiaMcp.Library.Tests` | 98 passed | Host option parsing for `--git-remote` and `--git-allow-network-remote` |
 | `scripts/test_vci_host_mcp.py` (real Host, no workers) | 80 checks | `vci_push` and `vci_fetch` through MCP against a bare remote, schema-valid outputs, Host restart |
@@ -53,8 +58,10 @@ checkpoint. Until that run passes, `vci_push`, `vci_fetch` and
 ## Limits
 
 - V21 has no project-neutral VCI export, so the native side of the three-way
-  plan is supplied evidence (the object's native export hash on the base
-  package files); `take=native` exports the project only when applied.
+  plan is the base package files with the object's inspected `contentSha256`;
+  `take=native` exports the project package only when applied.
+- The remote is rechecked immediately before dispatch; a writer of the remote
+  after that check is outside the Host's control.
 - Whether `MappedObject.Synchronize` honours a directed synchronization while
   both sides changed is the open native question of the pending run.
 - Network remotes have no credential route and are not qualified.

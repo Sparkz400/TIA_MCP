@@ -23,6 +23,7 @@ namespace TiaMcp.Openness.V21
             var project = SelectProject(args);
             var service = project.GetService<VersionControlInterface>() ?? throw new BridgeException("UnsupportedCapability", "The VCI service is not available for this project.");
             var budget = new ScanBudget(Limit(args, 500)); var warnings = new JArray(); var groups = new JArray(); var workspaces = new JArray();
+            string exports = args.Value<string>("artifactDirectory") == null ? null : ArtifactDirectory(args);
             void Visit(WorkspaceGroup group, string parentPath, int depth)
             {
                 if (depth > 32) { budget.Truncated = true; return; }
@@ -58,6 +59,10 @@ namespace TiaMcp.Openness.V21
                             mapped["childMappingState"] = mapping.GetChildStatus()?.MappingState.ToString();
                             var formats = new JArray(); mapped["supportedFormats"] = formats;
                             foreach (string format in workspace.GetSupportedFileFormats(mapping.EngineeringObject)) { if (!budget.Take()) return; formats.Add(format); }
+                            // The native-side hash a three-way plan supplies and vci_conflict_resolve rechecks; null when V21 refuses the export.
+                            if (exports != null)
+                                try { mapped["contentSha256"] = VciObjectContentHash(mapping.EngineeringObject, exports); }
+                                catch (Exception exception) { mapped["contentSha256"] = null; warnings.Add(InspectionWarning(workspacePath + "/mapped/" + mappings.Count + "/content", exception)); }
                         }
                         catch (Exception exception) { warnings.Add(InspectionWarning(workspacePath + "/mapped/" + mappings.Count, exception)); }
                     }
@@ -70,7 +75,7 @@ namespace TiaMcp.Openness.V21
             result["groups"] = groups;
             result["workspaces"] = workspaces;
             result["warnings"] = warnings;
-            result["completeness"] = InspectionCoverage(budget, warnings, "VCI workspace groups, workspaces (root, language, library policy) and mapped objects with native compare/child mapping state and supported file formats.",
+            result["completeness"] = InspectionCoverage(budget, warnings, "VCI workspace groups, workspaces (root, language, library policy) and mapped objects with native compare/child mapping state, supported file formats and the SHA-256 of each object's SimaticML export without document info.",
                 "No workspace creation, mapping edit, export or synchronization", "Mapped-object identity is the native ancestor Name/Number chain, not a stable GUID",
                 "Compare state is a native observation, not preservation or import qualification");
             return result;
@@ -149,30 +154,25 @@ namespace TiaMcp.Openness.V21
                 {
                     // The Host bound this payload to one reviewed divergentChange row; the workspace must hold exactly its remote side.
                     string take = ChangeText(payload, "take", 16), direction = ChangeText(payload, "direction", 32);
-                    if (!(take == "native" && direction == "ProjectToWorkspace" || (take == "remote" || take == "merged") && direction == "WorkspaceToProject") || !(payload["plan"] is JObject))
-                        throw new BridgeException("InvalidRequest", "Prepare vci_conflict_resolve through the Host with a reviewed comparisonRef.");
+                    var plan = payload["plan"] as JObject ?? throw new BridgeException("InvalidRequest", "Prepare vci_conflict_resolve through the Host with a reviewed comparisonRef.");
                     var target = VciTarget(change);
                     if (direction == "WorkspaceToProject") VciRequireWritableTarget(target);
                     var mapping = workspace.MappedObjects.Find(target.Target) ?? throw new BridgeException("VciMappingNotFound", "The object is not mapped in this workspace.");
                     var status = mapping.GetStatus(); var details = status.IndividualObjectCompareDetails;
                     var row = VciMappingRow(mapping, root, true, status);
-                    if (!details.HasFlag(IndividualObjectCompareDetails.WorkspaceFileChanged))
-                        throw new BridgeException("VciResolutionNotNeeded", "The mapping reports no workspace-side change. Check the reviewed remote side out into the workspace first, or synchronize normally.", new JObject { ["mapping"] = row });
                     string directory = row.Value<string>("directory"), fileName = row.Value<string>("fileName");
                     var current = files.Where(f => VciInPackage(f.Value<string>("path"), directory, fileName)).ToDictionary(f => f.Value<string>("path"), f => f.Value<string>("sha256"), StringComparer.Ordinal);
-                    var reviewed = VciResolutionFiles(payload, "workspaceFiles", false);
-                    if (!reviewed.Keys.All(p => VciInPackage(p, directory, fileName)))
-                        throw new BridgeException("VciResolutionMismatch", "The reviewed package files are not the package of this mapping.", new JObject { ["mapping"] = row });
-                    if (current.Count != reviewed.Count || reviewed.Any(f => !current.TryGetValue(f.Key, out var sha) || sha != f.Value.Sha256))
-                        throw new BridgeException("VciResolutionStale", "The workspace package is not exactly the reviewed remote side. Check it out again or review a new comparison.",
-                            new JObject { ["mapping"] = row, ["packageFiles"] = JObject.FromObject(current) });
-                    var result = VciResolutionFiles(payload, "resultFiles", true);
-                    if (take == "native" ? result.Count != 0 : !result.Keys.OrderBy(p => p, StringComparer.Ordinal).SequenceEqual(reviewed.Keys.OrderBy(p => p, StringComparer.Ordinal)))
-                        throw new BridgeException("InvalidRequest", "A remote or merged resolution writes exactly the reviewed package files.");
+                    var reviewed = VciResolutionRules.Files(payload, "workspaceFiles", false, VciSafeName);
+                    var result = VciResolutionRules.Files(payload, "resultFiles", true, VciSafeName);
+                    // The same hash vci_workspace_inspect reports, so an edit after the reviewed comparison is never overwritten or exported unreviewed.
+                    string live = VciObjectContentHash(target.Target, change.Directory);
+                    var refusal = VciResolutionRules.Refusal(take, direction, details.HasFlag(IndividualObjectCompareDetails.WorkspaceFileChanged), live,
+                        plan.Value<string>("projectObjectContentSha256"), current, reviewed, result, p => VciInPackage(p, directory, fileName));
+                    if (refusal != null) throw new BridgeException(refusal[0], refusal[1], new JObject { ["mapping"] = row, ["packageFiles"] = JObject.FromObject(current), ["projectObjectContentSha256"] = live });
                     bool projectChanged = details.HasFlag(IndividualObjectCompareDetails.ProjectObjectChanged);
                     packages.Add(new JObject { ["directory"] = directory, ["fileName"] = fileName });
                     effect["action"] = "resolveConflict"; effect["take"] = take; effect["direction"] = direction; effect["object"] = target.Identity.DeepClone();
-                    effect["mapping"] = row; effect["plan"] = payload["plan"].DeepClone(); effect["nativeConflict"] = projectChanged;
+                    effect["mapping"] = row; effect["plan"] = plan.DeepClone(); effect["nativeConflict"] = projectChanged; effect["projectObjectContentSha256"] = live;
                     effect["resultFiles"] = new JArray(result.Select(f => new JObject { ["path"] = f.Key, ["sha256"] = f.Value.Sha256, ["bytes"] = f.Value.Content.Length }));
                     warnings.Add(take == "native" ? "Overwrites the reviewed remote package files with the project object (backed up first); the remote side stays in its Git revision."
                         : "Writes the reviewed " + take + " document into the package and imports it into the project; requires compile=true." +
@@ -280,7 +280,7 @@ namespace TiaMcp.Openness.V21
                 else if (change.Kind == "vci_conflict_resolve")
                 {
                     var mapping = workspace.MappedObjects.Find(VciTarget(change).Target) ?? throw new BridgeException("VciMappingNotFound", "The object is no longer mapped in this workspace.");
-                    var result = VciResolutionFiles(payload, "resultFiles", true);
+                    var result = VciResolutionRules.Files(payload, "resultFiles", true, VciSafeName);
                     foreach (var file in result)
                     {
                         string path = Path.Combine(root, file.Key.Replace('/', '\\'));
@@ -451,31 +451,17 @@ namespace TiaMcp.Openness.V21
             return string.Join("/", parts);
         }
 
-        // Package files of a Host-bound resolution: root-relative safe paths with exact SHA-256 and, when required, their bytes.
-        private static Dictionary<string, (string Sha256, byte[] Content)> VciResolutionFiles(JObject payload, string name, bool content)
+        // A mapped object's native content hash: SHA-256 of its SimaticML export without document info (no timestamps).
+        private static string VciObjectContentHash(IEngineeringObject target, string directory)
         {
-            var rows = payload[name] as JArray ?? throw new BridgeException("InvalidRequest", name + " must be an array bound by the Host.");
-            if (rows.Count > 16) throw new BridgeException("InvalidRequest", name + " holds at most 16 package files.");
-            var result = new Dictionary<string, (string, byte[])>(StringComparer.Ordinal);
-            foreach (var row in rows.OfType<JObject>())
-            {
-                string path = row.Value<string>("path") ?? "", sha = row.Value<string>("sha256") ?? "";
-                if (path.Length > 240 || !path.Split('/').All(VciSafeName) || !Regex.IsMatch(sha, "^[0-9a-f]{64}$"))
-                    throw new BridgeException("InvalidRequest", name + " paths must be safe and relative to the workspace root with exact SHA-256 values.");
-                byte[] bytes = null;
-                if (content)
-                {
-                    try { bytes = Convert.FromBase64String(row.Value<string>("contentBase64") ?? ""); }
-                    catch (FormatException) { throw new BridgeException("InvalidRequest", name + " content must be base64."); }
-                    using (var hash = System.Security.Cryptography.SHA256.Create())
-                        if (BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant() != sha || bytes.Length != row.Value<long>("bytes"))
-                            throw new BridgeException("ArtifactChanged", name + " content differs from its bound SHA-256.");
-                }
-                if (result.ContainsKey(path)) throw new BridgeException("InvalidRequest", name + " repeats a path.");
-                result.Add(path, (sha, bytes));
-            }
-            if (result.Count != rows.Count) throw new BridgeException("InvalidRequest", name + " rows must be objects.");
-            return result;
+            string path = Path.Combine(directory, "vci-object-" + Guid.NewGuid().ToString("N") + ".xml");
+            if (target is PlcBlock block) block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+            else if (target is PlcType type) type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+            else if (target is Siemens.Engineering.SW.Tags.PlcTagTable table) table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+            else if (target is Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDB technology) technology.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+            else throw new BridgeException("UnsupportedObjectKind", "The mapped object has no native export for a content hash.");
+            try { return ChangeFileHash(path); }
+            finally { File.Delete(path); }
         }
 
         private static bool VciSafeName(string name) => name.Length <= 128 && name.Trim(' ', '.') == name && name.Length != 0 && name.IndexOfAny(Path.GetInvalidFileNameChars()) < 0

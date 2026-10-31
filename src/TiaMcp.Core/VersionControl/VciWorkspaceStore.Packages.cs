@@ -82,10 +82,17 @@ public sealed partial class VciWorkspaceStore
             "); one-sided changes use vci_synchronize, and additions, deletions, identity, ownership, stale and incomplete rows stay refused.");
         var remoteSide = LoadManifest(receipt.WorkspaceRef); var nativeSide = LoadManifest(receipt.ProjectRef);
         var package = remoteSide.Manifest.Packages.Single(p => p.PackageId == packageId);
+        var native = nativeSide.Manifest.Packages.Single(p => p.PackageId == packageId);
         var paths = package.ExpectedFiles.Select(f => f.RelativePath).ToArray();
+        string workspacePath = Field("workspacePath");
+        // The comparison's workspace lineage names the exact vci_workspace_inspect workspace path.
+        Require(remoteSide.Manifest.WorkspaceId == workspacePath, "VciResolutionMismatch", "workspacePath differs from the reviewed comparison's workspace " + remoteSide.Manifest.WorkspaceId + ".");
         Require(package.Object.Object.ObjectPath == objectPath, "VciResolutionMismatch", "objectPath differs from the reviewed package object " + package.Object.Object.ObjectPath + ".");
-        Require(nativeSide.Manifest.Packages.Single(p => p.PackageId == packageId).ExpectedFiles.Select(f => f.RelativePath).SequenceEqual(paths),
+        Require(native.ExpectedFiles.Select(f => f.RelativePath).SequenceEqual(paths),
             "VciResolutionUnsupported", "The native and remote sides of the package differ in file layout.");
+        // The worker re-exports the live object and must find this reviewed native-side hash before anything is written.
+        Require(native.Object.ContentSha256 is not null, "VciResolutionUnsupported",
+            "The native side must carry object.contentSha256 as vci_workspace_inspect reports it for the mapped object.");
         Require(paths.Length is > 0 and <= MaxResolutionFiles, "VciInputLimit", "A resolved package holds 1..16 files.");
         var remoteFiles = PackageFiles(remoteSide.Receipt.SourceRecordRef, paths);
         var result = take switch { "native" => null, "remote" => remoteFiles, _ => PackageFiles(merged!, paths) };
@@ -97,11 +104,12 @@ public sealed partial class VciWorkspaceStore
         }).ToArray());
         return new JsonObject
         {
-            ["workspacePath"] = Field("workspacePath"), ["objectPath"] = objectPath, ["take"] = take,
+            ["workspacePath"] = workspacePath, ["objectPath"] = objectPath, ["take"] = take,
             ["direction"] = take == "native" ? "ProjectToWorkspace" : "WorkspaceToProject",
             ["plan"] = new JsonObject
             {
-                ["comparisonRef"] = comparisonRef, ["reportSha256"] = report.Sha256, ["packageId"] = packageId, ["state"] = row.State,
+                ["comparisonRef"] = comparisonRef, ["reportSha256"] = report.Sha256, ["workspaceId"] = remoteSide.Manifest.WorkspaceId,
+                ["packageId"] = packageId, ["state"] = row.State, ["projectObjectContentSha256"] = native.Object.ContentSha256,
                 ["baselineContentSha256"] = row.BaselineContentSha256, ["projectContentSha256"] = row.ProjectContentSha256,
                 ["workspaceContentSha256"] = row.WorkspaceContentSha256, ["mergedRecordRef"] = merged
             },

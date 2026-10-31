@@ -161,10 +161,17 @@ credential-free `https://` URL; user names, passwords, queries, SSH and every
 other transport are refused at startup, and no credential helper or prompt is
 ever used, so a remote that needs authentication fails. Each call runs the
 pinned executable with the same cleared environment and fixed configuration,
-literal arguments and only the remote's own protocol enabled. A local remote
-with active hooks, `hooksPath` or config includes is refused before any
-dispatch, because the remote's receive-pack would run them. Without
-`--git-remote` both tools return `GitRemoteNotConfigured`.
+literal arguments and only the remote's own protocol enabled. Because the
+remote's receive-pack runs its own hooks and configuration, a local remote must
+be a minimal bare repository: the same `[core]`-only configuration allowlist the
+runner applies to its own repositories (no includes, `hooksPath`,
+`alternateRefsCommand` or any other key; `GitUnsupportedConfiguration`), no
+active hooks (`GitExecutableCustomizationRefused`) and no alternates, grafts or
+replace refs (`GitUnsupportedRepository`). It is checked when the remote branch
+is read and again immediately before dispatch; a writer of the remote after
+that check is outside the Host's control. UNC and device paths are refused,
+including the `//server/share` spelling. Without `--git-remote` both tools
+return `GitRemoteNotConfigured`.
 
 - `vci_push` publishes the exact commit of a committed or fetched revision to
   `branchName`. The remote branch must equal `expectedRemoteCommit` (omit it

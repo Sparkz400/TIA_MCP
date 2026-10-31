@@ -378,6 +378,7 @@ public sealed class GitWorkspaceRunner
             (await git.RunAsync(root, ["merge-base", "--is-ancestor", expectedRemoteCommit, commit], cancellationToken, allowFailure: true)).ExitCode != 0)
             throw new BridgeException("GitNotFastForward", "The commit must descend from the expected remote commit; fetch the remote branch and build on it. No forced update is made.");
         string id = Guid.NewGuid().ToString("N"), binding = GitOperationBinding.Push(before, control, ExecutableSha256, remote.Location, branchName, commit, expectedRemoteCommit).Sha256;
+        remote.RequireSafeLocal(); // Again immediately before dispatch: the remote is not Host-owned.
         await Record(id, "push", root, "dispatchPrepared", cancellationToken, before.HeadCommit, before.Sha256, commit, resource: reference, snapshot: before, binding: binding);
         try
         {
@@ -410,6 +411,7 @@ public sealed class GitWorkspaceRunner
             throw new BridgeException("PreviewStale", "The remote branch moved; nothing was fetched.");
         string id = Guid.NewGuid().ToString("N"), binding = GitOperationBinding.Fetch(before, control, ExecutableSha256, remote.Location, branchName, remoteCommit).Sha256;
         string temporary = "refs/tia-mcp-fetch/" + id; var published = false;
+        remote.RequireSafeLocal(); // Again immediately before dispatch: the remote is not Host-owned.
         await Record(id, "fetch", root, "dispatchPrepared", cancellationToken, before.HeadCommit, before.Sha256, remoteCommit, resource: reference, snapshot: before, binding: binding);
         try
         {
@@ -513,35 +515,8 @@ public sealed class GitWorkspaceRunner
                         throw new BridgeException("GitUnsupportedRepository", "Symbolic or malformed loose references are unsupported; only HEAD may be symbolic.");
                 }
             }
-        foreach (var unsupported in new[] { "commondir", "gitdir", "shallow", "info/attributes", "info/grafts", "objects/info/alternates", "objects/info/http-alternates",
-            "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "BISECT_LOG", "rebase-apply", "rebase-merge", "refs/replace" })
-            if (File.Exists(Path.Combine(metadata, unsupported)) || Directory.Exists(Path.Combine(metadata, unsupported)))
-                throw new BridgeException("GitUnsupportedRepository", "Repository has unsupported indirection, attributes or an unfinished operation: " + unsupported);
-        var hooks = Path.Combine(metadata, "hooks");
-        if (Directory.Exists(hooks) && Directory.EnumerateFileSystemEntries(hooks).Any(x => !x.EndsWith(".sample", StringComparison.OrdinalIgnoreCase)))
-            throw new BridgeException("GitExecutableCustomizationRefused", "Repository hooks require a separate reviewed execution profile.");
-        var config = Path.Combine(metadata, "config");
-        if (!File.Exists(config) || new FileInfo(config).Length > 65536) throw new BridgeException("GitUnsupportedConfiguration", "Missing or oversized repository config.");
-        string section = "";
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var raw in File.ReadAllLines(config, GitSafety.Utf8))
-        {
-            var line = raw.Trim();
-            if (line.Length == 0 || line.StartsWith('#') || line.StartsWith(';')) continue;
-            if (line.Equals("[core]", StringComparison.OrdinalIgnoreCase)) { section = "core"; continue; }
-            if (line.StartsWith('[') || section != "core") throw new BridgeException("GitUnsupportedConfiguration", "Only the minimal local core config profile is supported; includes, drivers and remotes are refused.");
-            var pair = line.Split('=', 2, StringSplitOptions.TrimEntries);
-            if (pair.Length != 2 || !seen.Add(pair[0])) throw new BridgeException("GitUnsupportedConfiguration", "Ambiguous repository configuration.");
-            var valid = pair[0].ToLowerInvariant() switch
-            {
-                "repositoryformatversion" => pair[1] == "0",
-                "bare" => pair[1] == "false",
-                "filemode" or "logallrefupdates" or "symlinks" or "ignorecase" => pair[1] is "true" or "false",
-                _ => false
-            };
-            if (!valid) throw new BridgeException("GitUnsupportedConfiguration", "Repository config requires an unsupported behavior: " + pair[0]);
-        }
-        if (!seen.Contains("repositoryformatversion") || !seen.Contains("bare")) throw new BridgeException("GitUnsupportedConfiguration", "Repository format and non-bare configuration are required.");
+        GitSafety.RequireNoIndirection(metadata);
+        GitSafety.RequireMinimalConfig(metadata, false);
         return root;
     }
 

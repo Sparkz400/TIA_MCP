@@ -46,8 +46,10 @@ reads the open project's native VCI tree without changing it: system/user worksp
 groups, each workspace's root path, language and library policy (global library
 path, delete-unused-type-versions flag), and every mapped object with its native
 ancestor identity, directory, file name, format, `CompareState`,
-`IndividualObjectCompareDetails`, child `MappingState` and the formats
-`GetSupportedFileFormats` offers for it. Groups, workspaces, mappings and formats
+`IndividualObjectCompareDetails`, child `MappingState`, the formats
+`GetSupportedFileFormats` offers for it and `contentSha256`, the SHA-256 of the
+object's SimaticML export without document info (null with a warning when V21
+refuses the export; not covered by the read-contract evidence). Groups, workspaces, mappings and formats
 share the `maxItems` budget; `completeness.truncated` and per-item `warnings` are
 explicit. Use the result to write reviewed mapping evidence; it is an observation,
 not a manifest, and its states do not establish preservation or import support.
@@ -126,10 +128,12 @@ one explicit, reviewed resolution instead:
    Git is its path below the root.
 2. Capture three manifests and compare them with `vci_package_compare`: the
    baseline (the revision both sides last shared), the project side (the native
-   change) and the workspace side (the fetched remote revision). V21 has no
-   project-neutral VCI export, so the native side is supplied evidence, for
-   example the base package files with the object's changed native export hash
-   as `object.contentSha256`.
+   change) and the workspace side (the fetched remote revision). The mapping
+   evidence's `workspaceId` is the `vci_workspace_inspect` workspace path, and
+   each side's `object.contentSha256` is the mapped object's inspected
+   `contentSha256` at that point. V21 has no project-neutral VCI export, so the
+   native side is the base package files with the object's changed
+   `contentSha256`.
 3. Prepare `vci_conflict_resolve` with `comparisonRef`, `packageId`, `objectPath`,
    `workspacePath` and `take`:
    - `native` keeps the project: `Synchronize(ProjectToWorkspace)` overwrites the
@@ -146,14 +150,18 @@ The Host binds the request at preparation. It reloads the comparison and its
 whole input chain, accepts only a `divergentChange` row (`VciResolutionUnsupported`
 otherwise: one-sided changes use `vci_synchronize`, and additions, deletions,
 identity, ownership, stale or incomplete rows stay refused), requires the
-reviewed package object to be `objectPath` (`VciResolutionMismatch`) and the
-same file layout on both sides, and hands the worker the remote package hashes
-and, for `remote` and `merged`, the exact bytes to write (at most 16 files and
-4 MiB). Callers never supply hashes or bytes.
+comparison's workspace to be `workspacePath` and the reviewed package object to
+be `objectPath` (`VciResolutionMismatch`), the same file layout on both sides
+and a native-side `object.contentSha256`, and hands the worker that hash, the
+remote package hashes and, for `remote` and `merged`, the exact bytes to write
+(at most 16 files and 4 MiB). Callers never supply hashes or bytes.
 
 The worker requires `WorkspaceFileChanged` (`VciResolutionNotNeeded` before the
-checkout) and the workspace package to be exactly the reviewed remote side
-(`VciResolutionStale`); `ProjectObjectChanged` may also be set. `remote` and
+checkout), the workspace package to be exactly the reviewed remote side, and a
+fresh export of the live object to hash to the reviewed native side, so an
+object edited after the comparison is never overwritten or exported unreviewed
+(`VciResolutionStale` for both; the preview reports the live hash).
+`ProjectObjectChanged` may also be set. `remote` and
 `merged` require `compile=true`, keep the direct-mutation guards and overwrite
 the project's own unsynchronized changes to the object, with the checkpoint as
 the way back. The mapping must read back `Equal`, and for `remote` and `merged`

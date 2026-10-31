@@ -38,6 +38,8 @@ internal static class RemoteChecks
         Reject2("GitRemoteRefused", () => GitRemote.Parse("ssh://example.invalid/r.git", true));
         Reject2("GitRemoteRefused", () => GitRemote.Parse("git@example.invalid:r.git", true));
         Reject2("GitRemoteRefused", () => GitRemote.Parse("file://server/share/r.git", false));
+        Reject2("GitUnsafePath", () => GitRemote.Parse("//server/share/r.git", false));
+        Reject2("GitUnsafePath", () => GitRemote.Parse("\\\\server\\share\\r.git", false));
         Reject2("GitRemoteRefused", () => GitRemote.Parse("ext::sh -c touch% /tmp/pwned", true));
         Check(GitRemote.Parse("https://example.invalid/r.git", true).Protocol == "https", "credential-free https needs the explicit network option");
         var remote = GitRemote.Parse(new Uri(bare).AbsoluteUri, false);
@@ -118,9 +120,21 @@ internal static class RemoteChecks
         File.WriteAllText(hook, "#!/bin/sh\nexit 0\n");
         await Reject("GitExecutableCustomizationRefused", () => store.PushAsync(revL, "review/local"));
         File.Delete(hook);
-        File.AppendAllText(Path.Combine(bare, "config"), "[core]\n\thooksPath = elsewhere\n");
-        await Reject("GitExecutableCustomizationRefused", () => store.FetchAsync("main"));
-        File.WriteAllText(Path.Combine(bare, "config"), File.ReadAllText(Path.Combine(bare, "config")).Replace("[core]\n\thooksPath = elsewhere\n", ""));
+        // The remote must pass the runner's config allowlist; every spelling of a redirection is outside it.
+        string config = Path.Combine(bare, "config"), original = File.ReadAllText(config);
+        foreach (var redirect in new[] { "[core]\n\thooksPath = elsewhere\n", "[core] hooksPath = elsewhere\n", "[core][include]path = elsewhere\n",
+            "[core]\n\talternateRefsCommand = elsewhere\n", "[receive]\n\tdenyCurrentBranch = ignore\n" })
+        {
+            File.WriteAllText(config, original + redirect);
+            await Reject("GitUnsupportedConfiguration", () => store.PushAsync(revL, "review/local"));
+            await Reject("GitUnsupportedConfiguration", () => store.FetchAsync("main"));
+        }
+        File.WriteAllText(config, original);
+        string alternates = Path.Combine(bare, "objects", "info", "alternates");
+        Directory.CreateDirectory(Path.GetDirectoryName(alternates)!); File.WriteAllText(alternates, Path.Combine(root, "elsewhere") + "\n");
+        await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
+        File.Delete(alternates);
+        Check(Plain(fixtureRoot, "--git-dir=" + bare, "for-each-ref", "refs/heads/review/local") == "", "refused pushes never created the remote branch");
         File.WriteAllText(Path.Combine(clone, ".gitattributes"), "*.scl filter=evil\n"); Plain(clone, "add", ".gitattributes"); Plain(clone, "commit", "-m", "attributes"); Plain(clone, "push", "origin", "main");
         await Reject("GitExecutableCustomizationRefused", () => store.FetchAsync("main"));
 
@@ -129,7 +143,7 @@ internal static class RemoteChecks
         EngineeringObjectReference Object(char content, string path = "/PLC/blocks/VciFc") => new(new("D:/Fixture/P.ap21", "/PLC", null, path, "block"), snapshot, new string(content, 64));
         var profile = new VciProfileInput("vci-scl-fc", "nativeDocument", "block", "SCL", new string('b', 64), "nativeExport", [new(package, "document")]);
         string Capture(string source, char content, string path = "/PLC/blocks/VciFc") => Text(Json(store.CapturePackages(source, Upload(JsonSerializer.SerializeToUtf8Bytes(
-            new VciMappingEvidence("vci-mapping-evidence.v1", "roundtrip", snapshot, true, [new("VciFc", Object(content, path), profile, "Equal")]), BridgeProtocol.Json)))), "recordRef");
+            new VciMappingEvidence("vci-mapping-evidence.v1", "vci/Root/W", snapshot, true, [new("VciFc", Object(content, path), profile, "Equal")]), BridgeProtocol.Json)))), "recordRef");
         string Hash(string manifest) => Text(Json(store.Reopen(manifest)), "manifestSha256");
         string baseline = Capture(rev0, 'c'), native = Capture(rev0, 'd'), remoteSide = Capture(revF, 'c');
         string Compare(string b, string p, string w) => Text(Json(store.ComparePackages(b, p, w, new(Hash(b), Hash(p), Hash(w)))), "recordRef");
@@ -141,6 +155,9 @@ internal static class RemoteChecks
         Check(Text(takeRemote, "direction") == "WorkspaceToProject" && Text(reviewedFile, "path") == package && Text(reviewedFile, "sha256") == Convert.ToHexStringLower(SHA256.HashData(remoteDocument)) &&
             reviewedFile.GetProperty("contentBase64").ValueKind == JsonValueKind.Null && Convert.FromBase64String(Text(written, "contentBase64")).SequenceEqual(remoteDocument) &&
             Text(takeRemote.GetProperty("plan"), "state") == "divergentChange", "take=remote binds the reviewed remote bytes and imports them");
+        Check(Text(takeRemote.GetProperty("plan"), "projectObjectContentSha256") == new string('d', 64) && Text(takeRemote.GetProperty("plan"), "workspaceId") == "vci/Root/W",
+            "the plan carries the reviewed native object hash and workspace for the worker's live recheck");
+        await Reject("VciResolutionMismatch", () => Task.FromResult(Resolve(new Dictionary<string, object?>(request) { ["workspacePath"] = "vci/Root/Other" })));
         var takeNative = Resolve(new Dictionary<string, object?>(request) { ["take"] = "native" });
         Check(Text(takeNative, "direction") == "ProjectToWorkspace" && takeNative.GetProperty("resultFiles").GetArrayLength() == 0 &&
             Text(takeNative.GetProperty("workspaceFiles")[0], "sha256") == Text(reviewedFile, "sha256"), "take=native exports the project over the exact reviewed remote side");

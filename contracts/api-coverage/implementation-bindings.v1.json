@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "79ec5a9657990d8526159694e65c7ed94d87d228a7f11a38889e951cc56b34e6",
-      "bytes": 1439308
+      "sha256": "977a7c2fda48811c8a0f2c1965f41451ee938413010e1e0e688f31fdb111b02d",
+      "bytes": 1440883
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1612,13 +1612,13 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitProcess.cs",
-      "sha256": "fd14d6c48cc02dca684f6026c366a3615a114a1008dffbcc05e301808001926b",
-      "bytes": 12201
+      "sha256": "c2cabe204abc322231bf913e92c3c8bde0704e0f03fad96a6de3683dcd083e92",
+      "bytes": 15667
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitRemote.cs",
-      "sha256": "150e8c8798858a551ee2e7cf87a074ec5d0f3f71c3aeb45c53a6dd0536eb8a32",
-      "bytes": 4127
+      "sha256": "95ff0e41b6c0b9db866fa7ef8f758a4f4834fcf70096d0092855374bff758864",
+      "bytes": 3452
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceModels.cs",
@@ -1627,8 +1627,8 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceRunner.cs",
-      "sha256": "010ae58f5e4e0b65e7e634988be579349b4489377e333273c4114cba87c1db83",
-      "bytes": 52269
+      "sha256": "6b2b87f5a49660ba5a143c920dd87b60eb879c80287b7632b300a6dcb842e7ac",
+      "bytes": 49859
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciBlockCommentPreservation.cs",
@@ -1652,8 +1652,8 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Packages.cs",
-      "sha256": "0caee14a068695c9a3cb7cb494c002d48dfcf0af7b9f02c5e725b9a458259b38",
-      "bytes": 15829
+      "sha256": "0ddbf2e34afd4c4c9a2c60c90b465de8655aae1e1e8dbb083c365df372fce662",
+      "bytes": 16662
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Remote.cs",
@@ -1892,8 +1892,8 @@
     },
     {
       "path": "src/TiaMcp.Host/EngineeringTools.cs",
-      "sha256": "e31fe98aec1a422902d27b5a3b60fb0b40042721a01b69356b0880d31ec7812a",
-      "bytes": 38814
+      "sha256": "a629e09ee820f4fdf061e0a26eb10867f1a1ceb1e80b781646cfaf25f3ed73cd",
+      "bytes": 38993
     },
     {
       "path": "src/TiaMcp.Host/GraphTools.cs",
@@ -2162,8 +2162,8 @@
     },
     {
       "path": "src/TiaMcp.Host/VciTools.cs",
-      "sha256": "9db9084d114cc7e35f2c94c0baa94ba20066f13fddc566badf40c3054587a9ce",
-      "bytes": 12180
+      "sha256": "b7f8fe168a9cf615a305cf927f24f135e2edcb4ff2ce55274ea15561889a434f",
+      "bytes": 12372
     },
     {
       "path": "src/TiaMcp.Host/WatchAuthoringQualificationTools.cs",
@@ -2937,8 +2937,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
-      "sha256": "66d6dde561cf05b4767f9c69bc1a59879a7570859d6310da2e0a3148671528b7",
-      "bytes": 47082
+      "sha256": "024b13b0f2cd8a40268960d5e33c6bfc37076f313ed0c73266488871a5ae09cb",
+      "bytes": 46163
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchAuthoring.cs",
@@ -3164,6 +3164,11 @@
       "path": "src/TiaMcp.Openness.V21/UmacRoleRules.cs",
       "sha256": "9ccb51bf975939043a330a682e8051e41f770be13266d263934485eebc3376a9",
       "bytes": 6047
+    },
+    {
+      "path": "src/TiaMcp.Openness.V21/VciResolutionRules.cs",
+      "sha256": "8ba63d145ec0c778d9e7302c6630e4b4e5fc6794c0105cda9ae22aac3c59198b",
+      "bytes": 4938
     },
     {
       "path": "src/TiaMcp.Simulator.V8/Program.cs",
@@ -10885,8 +10890,8 @@
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Packages.cs",
           "name": "ConflictResolutionPayload",
           "line": 63,
-          "endLine": 111,
-          "sha256": "2c630bf0f3cfcb543fdc8f1d37fd77e368b182c018ce4e19d4421672ec82098a"
+          "endLine": 119,
+          "sha256": "cc347d733fc69aca7f4cd41766ebce9f73b92eee73dd40c07440a4fc1671e962"
         },
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
@@ -43461,8 +43466,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/GitProcess.cs",
           "name": "NoLinks",
-          "line": 70,
-          "endLine": 74,
+          "line": 111,
+          "endLine": 115,
           "sha256": "e104d60e73fff1c7fa83d8117d6391b8b008f46e27f32900afb5a86a65ca983d"
         },
         {
@@ -43923,8 +43928,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceRunner.cs",
           "name": "Acquire",
-          "line": 637,
-          "endLine": 642,
+          "line": 612,
+          "endLine": 617,
           "sha256": "261cf5bfc1e1c7b61d1727e73734dc59190ecc69a16950d9b7c2302e0928b4e8"
         },
         {
@@ -77566,9 +77571,9 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceRunner.cs",
           "name": "FetchAsync",
-          "line": 399,
-          "endLine": 453,
-          "sha256": "70b797be9ad18ec27aaea8bbaa2bf23a367ea21d652a3931335c667bf35b6827"
+          "line": 400,
+          "endLine": 455,
+          "sha256": "a4327cdf3a977ec194440662a2c2bc7f7fa74e60970f3d98984b63ead8fbe4bb"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Remote.cs",
@@ -79794,8 +79799,8 @@
           "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceRunner.cs",
           "name": "PushAsync",
           "line": 366,
-          "endLine": 393,
-          "sha256": "aadc3c915f36a05e26415b2a807237051499765ff3500013c0237685d541a91e"
+          "endLine": 394,
+          "sha256": "795f05bc10c803b7a79bce7ba5c40e47a788dac3d7f12de3a5189066e86ab6b1"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Remote.cs",
@@ -80632,7 +80637,7 @@
         "name": "VciWorkspaceInspect",
         "line": 242,
         "endLine": 243,
-        "sha256": "8147510cb8a6333162bba8555e07226a4ec1eea572792d22c1500634d483e7a3"
+        "sha256": "134981bcd3e7a67153b5837b6327dbf37dacffb002a7ec55c60c8d01e7b54d3d"
       },
       "bridgeOperations": [
         "vci_workspace_inspect"
@@ -80647,7 +80652,7 @@
           "name": "VciWorkspaceInspect",
           "line": 242,
           "endLine": 243,
-          "sha256": "8147510cb8a6333162bba8555e07226a4ec1eea572792d22c1500634d483e7a3"
+          "sha256": "134981bcd3e7a67153b5837b6327dbf37dacffb002a7ec55c60c8d01e7b54d3d"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -87423,9 +87428,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
@@ -87760,7 +87765,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.WebAccessChanges.cs",
@@ -93339,9 +93344,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             }
           ]
         },
@@ -93361,7 +93366,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             }
           ]
         }
@@ -93390,9 +93395,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             }
           ]
         },
@@ -93412,7 +93417,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             }
           ]
         }
@@ -93441,9 +93446,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             }
           ]
         },
@@ -93463,7 +93468,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             }
           ]
         }
@@ -93492,9 +93497,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             }
           ]
         },
@@ -93514,7 +93519,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             }
           ]
         }
@@ -93543,9 +93548,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             }
           ]
         },
@@ -93565,7 +93570,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             }
           ]
         }
@@ -93594,9 +93599,9 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
               "name": "PrepareVciChange",
-              "line": 86,
+              "line": 91,
               "endLine": 226,
-              "sha256": "c67b31cecd43d69b68aa0bb0500c012509a4978a6ec410e4788f8c0dfaa3e187"
+              "sha256": "65d2ce41d1738eec0d22e0363ce93642ba70050e1fd92a506fea9aec0ce6f5f6"
             }
           ]
         },
@@ -93616,7 +93621,7 @@
               "name": "ApplyVciChange",
               "line": 228,
               "endLine": 318,
-              "sha256": "378409c656b294558f488497c4652d15303e24b3b72cc3f39a4d0fe8510d9c57"
+              "sha256": "58fbe5f116ff2fdacec6e0bfdab28f4c51b1a10beed281b09c17255b5ffb6a3c"
             }
           ]
         }

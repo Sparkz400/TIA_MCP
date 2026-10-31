@@ -238,9 +238,9 @@ public sealed partial class TiaTools
         => Call("web_inspect", new { projectName, hardwarePath, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "vci_workspace_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state and supported file formats. Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, export or synchronization.")]
+    [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state, supported file formats and contentSha256 (SHA-256 of the object's SimaticML export without document info; the native-side hash vci_conflict_resolve rechecks). Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, workspace export or synchronization.")]
     public Task<CallToolResult> VciWorkspaceInspect(CancellationToken cancellationToken, string? projectName = null, int maxItems = 500)
-        => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
+        => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "safety_validation_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect one safety PLC like safety_inspect, plus Failsafe_* F-parameters of the CPU and its F-I/O modules (F-source/F-destination address, F-monitoring time, F-parameter signature) and Safety Validation Assistant activation tests, groups, safety functions, conditions, validity checks and recorded test states. exportArtifacts writes activation-test SimaticML and XLSX reports and the safety printout PDF to the export directory with SHA-256. The result is accepted by safety_evidence_review. Does not log in, execute activation tests, reset results, change F-parameters or approve the safety program.")]

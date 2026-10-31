@@ -60,7 +60,7 @@ def fc(name, value):
 def portable(value):
     """Mapping identities without project paths, which a recovered copy changes."""
     if isinstance(value, dict):
-        return {k: portable(v) for k, v in value.items() if k not in ("projectPath", "compareState", "compareDetails", "childMappingState", "supportedFormats")}
+        return {k: portable(v) for k, v in value.items() if k not in ("projectPath", "compareState", "compareDetails", "childMappingState", "supportedFormats", "contentSha256")}
     return [portable(v) for v in value] if isinstance(value, list) else value
 
 
@@ -318,7 +318,14 @@ def compare(run, label, baseline, native, remote):
     return h.stage("vci_package_compare " + label, check)
 
 
-def resolve(run, label, take, comparison, remote_files, result_files, merged=None, changed=(), restore=False, check=None):
+def content_hash(run, block):
+    """The native-side hash of the plan: vci_workspace_inspect's export hash of the mapped object, which the worker rechecks."""
+    content = (run.mapping(run.git["workspace"], block) or {}).get("contentSha256")
+    require(isinstance(content, str) and re.fullmatch("[0-9a-f]{64}", content), "vci_workspace_inspect reports no content hash for %s" % block)
+    return content
+
+
+def resolve(run, label, take, comparison, remote_files, result_files, native_content, merged=None, changed=(), restore=False, check=None):
     g, block = run.git, "VciGitFc"
     payload = {"workspacePath": g["workspace"], "objectPath": run.plc + "/blocks/" + block, "comparisonRef": comparison["recordRef"], "packageId": block,
                "take": take, **({"mergedRecordRef": merged} if merged else {})}
@@ -328,11 +335,13 @@ def resolve(run, label, take, comparison, remote_files, result_files, merged=Non
                 for name, data in sorted(files.items())]
     row = comparison["row"]
     shown = {"workspacePath": g["workspace"], "objectPath": payload["objectPath"], "take": take, "direction": direction,
-             "plan": {"comparisonRef": comparison["recordRef"], "reportSha256": comparison["reportSha256"], "packageId": block, "state": "divergentChange",
+             "plan": {"comparisonRef": comparison["recordRef"], "reportSha256": comparison["reportSha256"], "workspaceId": g["workspace"], "packageId": block,
+                      "state": "divergentChange", "projectObjectContentSha256": native_content,
                       "baselineContentSha256": row["baselineContentSha256"], "projectContentSha256": row["projectContentSha256"],
                       "workspaceContentSha256": row["workspaceContentSha256"], "mergedRecordRef": merged},
              "workspaceFiles": rows(remote_files, False), "resultFiles": rows(result_files, True) if take != "native" else []}
-    preview = {"effects": [{"action": "resolveConflict", "take": take, "direction": direction, "nativeConflict": True,
+    # The worker re-exports the block at prepare; its live hash must be the reviewed native side.
+    preview = {"effects": [{"action": "resolveConflict", "take": take, "direction": direction, "nativeConflict": True, "projectObjectContentSha256": native_content,
                             "resultFiles": [{k: v for k, v in r.items() if k != "contentBase64"} for r in shown["resultFiles"]]}]}
     def verify(applied, state):
         compare_state(run, g["workspace"], block, "Equal")
@@ -363,7 +372,7 @@ def git_setup(run):
     push(run, "baseline", base, None)
     refuse_tool(run, "a remote branch that already exists", "vci_push", {"revisionRef": base["recordRef"], "branchName": "main"}, "GitReferenceConflict")
     plain_git(run, Path(g["clone"]).parent, "clone", "--branch", "main", str(g["remote"]), str(g["clone"]))
-    g.update(base=base["recordRef"], head=base["commit"], basePayload=run.current["view"][block_key(run, block)]["payloadSha256"], commits=[base["commit"]])
+    g.update(base=base["recordRef"], head=base["commit"], baseContent=content_hash(run, block), commits=[base["commit"]])
 
 
 def git_round(run, take, value, family, restore=False):
@@ -373,7 +382,7 @@ def git_round(run, take, value, family, restore=False):
     first = not g["rounds"]
     remote_head = remote_commit(run, value)
     edit_in_project(run, g["workspace"], block, family)
-    native_payload = run.current["view"][block_key(run, block)]["payloadSha256"]
+    native_content = content_hash(run, block)
     require(family in block_xml(run, block), "The native edit %s is not in the block export" % family)
     if restore:
         run.b0 = run.current
@@ -383,8 +392,8 @@ def git_round(run, take, value, family, restore=False):
     require(fetched["commit"] == remote_head and fetched["previousCommit"] == g["head"], "The fetch did not fast-forward the base to the remote commit")
     remote_files = {name: download(h, "vci_file_read", fetched["recordRef"], relativePath=name) for name in g["files"]}
     require(b":= %d;" % value in remote_files[g["document"]], "The fetched document lacks the remote value")
-    comparison = compare(run, label, capture(run, label + " baseline", g["base"], g["basePayload"], block),
-                         capture(run, label + " native", g["base"], native_payload, block), capture(run, label + " remote", fetched["recordRef"], g["basePayload"], block))
+    comparison = compare(run, label, capture(run, label + " baseline", g["base"], g["baseContent"], block),
+                         capture(run, label + " native", g["base"], native_content, block), capture(run, label + " remote", fetched["recordRef"], g["baseContent"], block))
     request = {"workspacePath": g["workspace"], "objectPath": run.plc + "/blocks/" + block, "comparisonRef": comparison["recordRef"], "packageId": block, "take": "remote"}
     if first:
         run.refuse("vci_conflict_resolve", "a resolution before the remote side is checked out", request, "VciResolutionNotNeeded")
@@ -400,14 +409,14 @@ def git_round(run, take, value, family, restore=False):
     if take == "remote":
         def won(files):
             require(family not in block_xml(run, block), "The native edit survived take=remote")
-        resolve(run, label, take, comparison, remote_files, remote_files, changed=[block_key(run, block)], restore=restore, check=won)
+        resolve(run, label, take, comparison, remote_files, remote_files, native_content, changed=[block_key(run, block)], restore=restore, check=won)
         g.update(base=fetched["recordRef"], head=remote_head, value=value)
     elif take == "native":
         def kept(files):
             document = files[g["document"]]
             require(b":= %d;" % g["value"] in document and b":= %d;" % value not in document and family in block_xml(run, block),
                     "take=native did not keep the project's value and edit")
-        resolve(run, label, take, comparison, remote_files, {}, restore=restore, check=kept)
+        resolve(run, label, take, comparison, remote_files, {}, native_content, restore=restore, check=kept)
         files = package_files(g["root"], block)
         entry["familyInDocument"] = family.encode() in files[g["document"]]
         if not restore:
@@ -428,12 +437,12 @@ def git_round(run, take, value, family, restore=False):
         preview = prepare_files(run, "Resolve VciGitFc: merged", {g["document"]: merged}, parent=fetched["recordRef"])
         def combined(files):
             require((family in block_xml(run, block)) == merged_family, "The merged document's native edit is not what TIA imported")
-        resolve(run, label, take, comparison, remote_files, result, merged=preview["recordRef"], changed=[block_key(run, block)], restore=restore, check=combined)
+        resolve(run, label, take, comparison, remote_files, result, native_content, merged=preview["recordRef"], changed=[block_key(run, block)], restore=restore, check=combined)
         resolved = commit(run, "Resolve VciGitFc: merged", preview)
         push(run, label, resolved, remote_head)
         g.update(base=resolved["recordRef"], head=resolved["commit"], value=value if merged_family else value + 1)
         g["commits"].append(resolved["commit"])
-    g["basePayload"] = run.current["view"][block_key(run, block)]["payloadSha256"] if take != "native" else native_payload
+    g["baseContent"] = content_hash(run, block)
 
 
 def git_history(run, label):

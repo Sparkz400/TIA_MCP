@@ -31,21 +31,17 @@ public sealed class GitRemote
         return new(value, "https");
     }
 
-    // receive-pack runs the remote repository's own hooks and configuration, outside the Host's pinned -c profile.
+    // receive-pack runs the remote repository's own hooks and configuration, outside the Host's pinned -c profile, so a local
+    // remote must be a minimal bare repository: the runner's own config allowlist, no hooks, alternates or other indirection.
+    // Callers check again immediately before dispatch; a writer of the remote after that point is outside the Host's control.
     internal void RequireSafeLocal()
     {
         if (!IsLocal) return;
         var root = GitSafety.PathRoot(Location, true);
-        string config = Path.Combine(root, "config");
-        if (!File.Exists(Path.Combine(root, "HEAD")) || !File.Exists(config) || !Directory.Exists(Path.Combine(root, "objects")) ||
-            !Directory.Exists(Path.Combine(root, "refs")) || new FileInfo(config).Length > 65536)
+        if (!File.Exists(Path.Combine(root, "HEAD")) || !Directory.Exists(Path.Combine(root, "objects")) || !Directory.Exists(Path.Combine(root, "refs")))
             throw new BridgeException("GitRemoteRefused", "The configured local remote must be a bare Git repository.");
-        var hooks = Path.Combine(root, "hooks");
-        if (Directory.Exists(hooks) && Directory.EnumerateFileSystemEntries(hooks).Any(x => !x.EndsWith(".sample", StringComparison.OrdinalIgnoreCase)))
-            throw new BridgeException("GitExecutableCustomizationRefused", "The local remote has active hooks, which a push would run; remove them or use another remote.");
-        var lines = File.ReadAllLines(config, GitSafety.Utf8).Select(l => l.Trim().ToLowerInvariant().Replace(" ", "").Replace("\t", "")).ToArray();
-        if (lines.Any(l => l.StartsWith("[include", StringComparison.Ordinal) || l.StartsWith("hookspath=", StringComparison.Ordinal) || l.StartsWith("fsmonitor=", StringComparison.Ordinal)))
-            throw new BridgeException("GitExecutableCustomizationRefused", "The local remote's configuration includes files or redirects hooks.");
-        if (!lines.Contains("bare=true")) throw new BridgeException("GitRemoteRefused", "The configured local remote must be a bare Git repository.");
+        GitSafety.NoLinks(Path.Combine(root, "objects")); GitSafety.NoLinks(Path.Combine(root, "refs"));
+        GitSafety.RequireNoIndirection(root);
+        GitSafety.RequireMinimalConfig(root, true);
     }
 }
