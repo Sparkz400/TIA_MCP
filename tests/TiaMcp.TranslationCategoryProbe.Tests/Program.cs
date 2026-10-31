@@ -41,6 +41,19 @@ Check("changed peer target fails baseline equality", !TranslationCategoryWorkboo
 string changedMain = Mutate("changed-main-source", "xl/worksheets/sheet1.xml", xml => xml.Descendants(s + "c").Single(x => (string)x.Attribute("r") == "E3").Element(s + "v").Value = "0");
 var changedRecords = TranslationCategoryWorkbook.Read(changedMain);
 Check("changed Main source cannot satisfy populated gate", !TranslationCategoryWorkbook.PopulatedMainControl(changedRecords, selected, projectName, plcName));
+// 28 October shape: English UI view paths, empty de-DE default interface comments and the seeded Main block comment.
+Dictionary<string, TranslationCategoryWorkbook.Row> English(string commentView)
+{
+    string prefix = projectName + "\\" + plcName + "\\Program blocks\\";
+    TranslationCategoryWorkbook.Row Make(string key, string view, string source) => new() { Key = key, Category = "<BlockCommentCategoryData>", ViewPath = prefix + view,
+        Substitutions = "", Source = source, Target = source.Length == 0 ? "" : "Verification text Main {0}", Sheet = "User Texts", Part = "xl/worksheets/sheet1.xml" };
+    return new[] { Make("r", "Main\\Remanence", ""), Make("i", "Main\\Initial_Call", ""), Make("c", commentView, "Prueftext Main {0}") }.ToDictionary(row => row.Key);
+}
+var english = English("Main\\Block comment");
+Check("English-UI seeded Main comment makes the control conclusive", TranslationCategoryWorkbook.PopulatedMainControl(english, english, projectName, plcName));
+Check("English-UI empty default comments stay inconclusive", !TranslationCategoryWorkbook.PopulatedMainControl(english, english.Where(p => p.Key != "c").ToDictionary(p => p.Key, p => p.Value), projectName, plcName));
+var outside = English("TiaMcp_IsEnabled\\Block comment");
+Check("seeded comment outside Main cannot satisfy the control", !TranslationCategoryWorkbook.PopulatedMainControl(outside, outside, projectName, plcName));
 File.WriteAllText(Path.Combine(output, "verification.json"), JsonSerializer.Serialize(new { kind = "file-only-populated-category-gate-checks", allChecksPassed = true,
     checks = results, checkCount = results.Count, nativeExecuted = false, nativeImportAllowed = false, inputWorkbook = genuine,
     inputSha256 = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(genuine))), syntheticMutationsAreNotNativeEvidence = true }, new JsonSerializerOptions { WriteIndented = true }));

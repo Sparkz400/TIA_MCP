@@ -22,6 +22,8 @@ REPO = Path(__file__).resolve().parents[1]
 # The export sorts rows by source text, so a changed source can also move its row: the profile check then refuses first.
 STALE_CODES = ('StaleWorkbook', 'TranslationScopeMismatch')
 FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')
+# Rows per category on the seeded fixture's PLC (28 October): five block comments, one hardware comment, no alarm class.
+RESTRICTED = {'BlockCommentCategoryData': 5, 'HwcnCommentTextCategoryData': 1, 'AlarmClassDisplayNameCategory': 0}
 
 
 def portal_check(before, after, owned):
@@ -54,6 +56,8 @@ def category_verdict(result):
                          **compare(baseline, decoded['matrix:plc-' + suffix], category)})
     main_control = populated_control(decoded['main:plc-all-before'], decoded['main:main-all-before'], populated['projectName'], populated['plcName'])
     require(main_control == populated['populatedMainControlPassed'], 'Independent Main control differs')
+    # The fixture seeds the Main block comment, so an empty or foreign Main selection is a finding, never an inconclusive pass.
+    require(main_control, 'Populated Main control inconclusive on the seeded fixture')
     if main_control:
         require(decoded['main:main-all-before'] == decoded['main:main-all-after'] and
                 decoded['main:plc-all-before'] == decoded['main:plc-all-after'], 'Category baselines changed')
@@ -68,6 +72,26 @@ def category_verdict(result):
             'admittedScope': 'whole-project:legacy-bilingual', 'categoryFilteringReliedOn': False}
 
 
+def restricted_verdict(whole, captures):
+    """Host-filtered PLC category captures against the whole-project capture of the same fixture: each keeps exactly
+    that category's rows, and every other row the native export returned is listed as excluded, never dropped."""
+    rows = {r['nativeKey']: r for r in whole['rows']}
+    results = []
+    for category, expected in RESTRICTED.items():
+        capture, label = captures[category], '<' + category + '>'
+        kept = {r['nativeKey']: r for r in capture['rows']}
+        wanted = {k: r for k, r in rows.items() if r['category'] == label}
+        require(kept == wanted and len(kept) == expected, f'{category}: kept {len(kept)} rows; the whole-project capture has {len(wanted)}, the fixture {expected}')
+        excluded = capture['excludedRows']
+        require(excluded is not None and set(excluded) <= set(rows) - set(wanted) and all(e['category'] != label for e in excluded.values()),
+                category + ': excluded rows must be other-category whole-project rows')
+        require(capture['scope']['categoryIds'] == [category] and capture['scope']['objectSelections'] != ['whole-project:legacy-bilingual'],
+                category + ': restricted scope not recorded')
+        results.append({'category': category, 'expectedRows': expected, 'keptRows': len(kept), 'excludedRows': len(excluded),
+                        'nativeRows': len(kept) + len(excluded)})
+    return {'wholeProjectRows': len(rows), 'captures': results, 'productionAdmitted': False}
+
+
 class Run:
     def __init__(self, args):
         self.args, self.root = args, args.root.resolve()
@@ -75,7 +99,10 @@ class Run:
         self.same_instance = getattr(args, 'same_instance', False)
         self.before_checkpoint = getattr(args, 'interrupt_before_checkpoint', False)
         self.stop_after_noop = getattr(args, 'stop_after_noop', False)
+        self.restricted = getattr(args, 'restricted_lifecycle', False)
         self.forward_key = None
+        require(not self.restricted or not (self.same_instance or self.failure_case or self.before_checkpoint or args.resume_root),
+                'The restricted lifecycle runs on its own fresh fixture')
         require(not self.before_checkpoint or not (self.same_instance or self.failure_case or args.resume_root or self.stop_after_noop),
                 'The pre-checkpoint interruption needs its own fresh fixture; its resume run reconciles it')
         require(not self.same_instance or not self.failure_case and not args.resume_root, 'Same-instance qualification requires its own new fixture and bounded case list')
@@ -99,11 +126,14 @@ class Run:
             'sameInstance': self.same_instance,
             'interruptBeforeCheckpoint': self.before_checkpoint,
             'stopAfterNoop': self.stop_after_noop,
+            'restrictedLifecycle': self.restricted,
             'effects': ('One newly owned offline bilingual scratch; seven exact forward cases on the same full instance key, at most five explicitly reviewed reverse Main target operations, at most ten imports and twelve distinct checkpoint restorations, read-only reconciliation and exact cleanup.') if self.same_instance else
                 ('One newly owned offline bilingual scratch; one reviewed Main comment operation interrupted at ' + self.failure_case +
                 '; one checkpoint restoration to a distinct absent directory, read-only reconciliation and exact cleanup. Accepted no-op/edit trials are not repeated.')
                 if self.failure_case else ('One newly owned offline bilingual scratch; category probes and one no-op operation interrupted after acquisition, '
                 'before checkpoint and before any import; a later run reconciles it read-only.') if self.before_checkpoint else
+                ('One newly owned offline bilingual scratch; category probes, Host-filtered category captures, two reviewed imports of the filtered '
+                'BlockCommentCategoryData capture, separate checkpoint restorations and read-only reconciliation.') if self.restricted else
                 'One newly owned offline bilingual scratch; category probes, two reviewed imports, separate checkpoint restorations and read-only reconciliation.'})
 
     def failure_trial(self, selector, edit, project, report):
@@ -258,7 +288,13 @@ class Run:
                 self.save('fixture-identity', {**selector, 'processId': started['processId']})
                 if not self.failure_case and not self.same_instance:
                     categories = self.call('qualification_translation_categories', selector)
-                    self.save('category-verification', category_verdict(categories))
+                    verdict = category_verdict(categories)
+                    if self.restricted:
+                        verdict['restricted'] = restricted_verdict(self.call('qualification_translation_capture', selector),
+                            {c: self.call('qualification_translation_capture', {**selector, 'categoryIds': [c]}) for c in RESTRICTED})
+                        # Every following capture, plan, apply, recovery and reconciliation uses the Host-filtered block-comment scope.
+                        selector = {**selector, 'categoryIds': ['BlockCommentCategoryData']}
+                    self.save('category-verification', verdict)
                 capture = self.call('qualification_translation_capture', selector)
                 rows = [r for r in capture['rows'] if r['source']['text'] == 'Prueftext Main {0}' and r['target']['state'] == 'text' and r['target']['text'] == 'Verification text Main {0}']
                 require(len(rows) == 1, 'Exactly one actual populated seeded Main comment required')
@@ -271,6 +307,7 @@ class Run:
                     if any(t['name'] == label for t in report['trials']): continue
                     if label == 'edit' and self.stop_after_noop: break
                     prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'translation-' + self.root.name + '-' + label, **change})
+                    require(not self.restricted or prepared['admissionKey'] is None and prepared['admissionRefusal'], 'A restricted plan must stay outside production admission')
                     op = prepared['operation']
                     request = {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
                     self.call('qualification_translation_apply', {**request, 'planSha256': '0' * 64}, expect_error=True)
@@ -321,6 +358,8 @@ def main():
     parser.add_argument('--same-instance', action='store_true', help='One new fixture, seven exact forward cases, bounded reviewed reverse transitions, full unchanged-instance checks')
     parser.add_argument('--interrupt-before-checkpoint', action='store_true', help='Fresh fixture: interrupt one no-op after acquisition, before checkpoint; resume reconciles it')
     parser.add_argument('--stop-after-noop', action='store_true', help='Run only the no-op trial, so a later run can resume the closed fixture for the edit')
+    parser.add_argument('--restricted-lifecycle', action='store_true',
+                        help='Fresh fixture: check the Host-filtered category captures (5, 1 and 0 rows), then run the no-op and Main edit on the filtered BlockCommentCategoryData capture')
     parser.add_argument('--execute', action='store_true')
     args = parser.parse_args()
     require(args.execute, 'Explicit coordinator execution required')

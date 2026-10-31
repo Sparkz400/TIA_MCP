@@ -47,11 +47,11 @@ internal static class ProjectTextExportChecks
         });
     }
 
-    private static string[] Values(string key, string category, int targets) =>
+    internal static string[] Values(string key, string category, int targets) =>
         new[] { category, "Fixture\\PLC\\" + key, key, "", "Source " + key }.Concat(Enumerable.Range(1, targets).Select(i => "Target " + i + " " + key)).ToArray();
 
     // Shared-string layout as observed in V21 exports: User/System Texts, culture headers, then ref="0".."15".
-    private static byte[] Book(string[] cultures, string[][] rows)
+    internal static byte[] Book(string[] cultures, string[][] rows)
     {
         XNamespace s = Fixture.S, r = "http://schemas.openxmlformats.org/package/2006/relationships", d = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
         var strings = new List<string>();

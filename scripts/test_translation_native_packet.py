@@ -43,5 +43,46 @@ class PacketChecks(unittest.TestCase):
     def test_category_mutation_is_refused_before_interpretation(self):
         with self.assertRaisesRegex(ValueError, 'modified'): coordinator.category_verdict({'projectModified': True})
 
+    def restricted(self):
+        """The 28 October PLC: five block comments and one hardware comment; each native category export returned all six."""
+        labels = ['<BlockCommentCategoryData>'] * 5 + ['<HwcnCommentTextCategoryData>']
+        whole = {'rows': [{'nativeKey': f'K-{i}', 'category': c, 'source': {'state': 'text', 'text': f'S{i}'}, 'target': {'state': 'text', 'text': f'T{i}'}}
+                          for i, c in enumerate(labels)]}
+        captures = {}
+        for category in coordinator.RESTRICTED:
+            kept = [r for r in whole['rows'] if r['category'] == '<' + category + '>']
+            captures[category] = {'rows': kept, 'scope': {'categoryIds': [category], 'objectSelections': ['plc:/PLC_1/plc/PLC_1']},
+                                  'excludedRows': {r['nativeKey']: {'category': r['category']} for r in whole['rows'] if r not in kept}}
+        return whole, captures
+
+    def test_over_returned_rows_are_filtered_to_five_one_and_zero(self):
+        result = coordinator.restricted_verdict(*self.restricted())
+        self.assertEqual([(c['keptRows'], c['excludedRows'], c['nativeRows']) for c in result['captures']], [(5, 1, 6), (1, 5, 6), (0, 6, 6)])
+
+    def test_leaked_row_in_a_filtered_capture_is_refused(self):
+        whole, captures = self.restricted()
+        captures['HwcnCommentTextCategoryData']['rows'].append(whole['rows'][0])
+        with self.assertRaisesRegex(ValueError, 'kept 2 rows'): coordinator.restricted_verdict(whole, captures)
+
+    def test_changed_text_in_a_filtered_capture_is_refused(self):
+        whole, captures = self.restricted()
+        captures['BlockCommentCategoryData']['rows'][0] = dict(whole['rows'][0], target={'state': 'text', 'text': 'drift'})
+        with self.assertRaisesRegex(ValueError, 'BlockCommentCategoryData: kept'): coordinator.restricted_verdict(whole, captures)
+
+    def test_requested_category_in_the_excluded_rows_is_refused(self):
+        whole, captures = self.restricted()
+        captures['AlarmClassDisplayNameCategory']['excludedRows']['K-9'] = {'category': '<AlarmClassDisplayNameCategory>'}
+        with self.assertRaisesRegex(ValueError, 'excluded rows'): coordinator.restricted_verdict(whole, captures)
+
+    def test_whole_project_scope_cannot_pass_as_restricted(self):
+        whole, captures = self.restricted()
+        captures['BlockCommentCategoryData']['scope']['objectSelections'] = ['whole-project:legacy-bilingual']
+        with self.assertRaisesRegex(ValueError, 'restricted scope'): coordinator.restricted_verdict(whole, captures)
+
+    def test_fixture_drift_from_the_expected_counts_is_refused(self):
+        whole, captures = self.restricted()
+        whole['rows'].append({'nativeKey': 'K-6', 'category': '<AlarmClassDisplayNameCategory>', 'source': {}, 'target': {}})
+        with self.assertRaisesRegex(ValueError, 'AlarmClassDisplayNameCategory: kept 0 rows; the whole-project capture has 1'): coordinator.restricted_verdict(whole, captures)
+
 
 if __name__ == '__main__': unittest.main()

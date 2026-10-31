@@ -71,8 +71,8 @@ namespace TiaMcp.Openness.V21
         private static void TranslationProductionScope(JObject selector, JObject context)
         {
             if (TranslationOwners(selector).Length != 1 || !TranslationCultures(selector).SequenceEqual(new[] { "de-DE", "en-GB" }) ||
-                context?.Value<bool?>("updateSourceLanguage") == true)
-                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, de-DE/en-GB and target-only import.");
+                context?.Value<bool?>("updateSourceLanguage") == true || ProjectTextList(selector, "categoryIds", 256).Length != 0)
+                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, the whole-project de-DE/en-GB export and target-only import.");
         }
         private JObject TranslationFixture(JObject args)
         {
@@ -146,9 +146,18 @@ namespace TiaMcp.Openness.V21
             if (pair[0] == pair[1] || !cultures.SequenceEqual(pair.OrderBy(x => x, StringComparer.Ordinal)) || settings.ReferenceLanguage.Culture.Name != pair[0])
                 throw new BridgeException("TranslationScopeUnqualified", "Exactly the source/target pair must be active, with the source as reference language.");
             string workbook = Path.Combine(directory, "all.xlsx");
-            // This profile is explicitly whole-project. Restricted overloads are never substituted.
-            project.ExportProjectTexts(new FileInfo(workbook), CultureInfo.GetCultureInfo(pair[0]), CultureInfo.GetCultureInfo(pair[1]));
             var owners = TranslationOwners(args);
+            string[] categoryIds = ProjectTextList(args, "categoryIds", 256);
+            // Whole-project unless the qualification selector names categories; one never substitutes for the other.
+            if (categoryIds.Length == 0)
+                project.ExportProjectTexts(new FileInfo(workbook), CultureInfo.GetCultureInfo(pair[0]), CultureInfo.GetCultureInfo(pair[1]));
+            else
+            {
+                // V21 returns every row of the named PLCs here; the Host keeps exactly the requested categories by row identity.
+                var categories = categoryIds.Select(id => project.TextCategories.Find(id) ?? throw new BridgeException("CategoryUnavailable", "Unknown text category: " + id)).ToArray();
+                var plcs = owners.Select(path => { var owner = (JObject)args.DeepClone(); owner["plcPath"] = path; return (IEngineeringObject)SelectPlc(owner).Software; }).ToArray();
+                project.ExportProjectTexts(new FileInfo(workbook), ProjectTextLanguage(settings, pair[0]), new[] { ProjectTextLanguage(settings, pair[1]) }, categories, plcs);
+            }
             var peers = new JArray(); var receipts = new JArray(); JToken hardware = null;
             for (int index = 0; index < owners.Length; index++)
             {
@@ -170,6 +179,7 @@ namespace TiaMcp.Openness.V21
                 ["sessionEpoch"] = _translationEpoch, ["workerSha256"] = ChangeFileHash(typeof(OpennessSession).Assembly.Location),
                 ["hardwareIdentity"] = hardware, ["offline"] = true,
                 ["activeCultures"] = new JArray(cultures), ["categoryIds"] = new JArray(project.TextCategories.Select(x => x.Identifier).OrderBy(x => x, StringComparer.Ordinal)),
+                ["requestedCategoryIds"] = new JArray(categoryIds),
                 ["processId"] = _processId, ["modified"] = project.IsModified, ["nativeSnapshot"] = receipts.Count == 1 ? receipts[0] : receipts };
             TranslationWrite(Path.Combine(directory, "observation.json"), result); return result;
         }

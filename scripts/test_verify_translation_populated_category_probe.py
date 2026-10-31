@@ -147,6 +147,26 @@ class PopulatedCategoryEvidenceTests(unittest.TestCase):
         self.main["a"]["sheet"] = "System Texts"
         self.assertFalse(self.gate())
 
+    def english_ui(self, comment_view="Main\\Block comment"):
+        """28 October shape: English view paths, empty de-DE default interface comments, seeded Main block comment."""
+        prefix = self.progress["projectName"] + "\\ScratchPLC\\Program blocks\\"
+        row = dict(self.main["a"], source="", viewPath=prefix + "Main\\Remanence")
+        self.main = {"a": row, "b": dict(row, nativeKey="b", viewPath=prefix + "Main\\Initial_Call"),
+                     "c": dict(row, nativeKey="c", viewPath=prefix + comment_view, source="Prueftext Main {0}", target="Verification text Main {0}")}
+        self.plc = dict(copy.deepcopy(self.main), peer=self.plc["peer"])
+
+    def test_english_ui_seeded_main_comment_is_conclusive(self):
+        self.english_ui()
+        self.assertTrue(self.gate())
+
+    def test_english_ui_without_seeded_comment_stays_inconclusive(self):
+        self.english_ui(); del self.main["c"]; del self.plc["c"]
+        self.assertFalse(self.gate())
+
+    def test_seeded_comment_outside_main_is_refused(self):
+        self.english_ui("TiaMcp_IsEnabled\\Block comment")
+        self.assertFalse(self.gate())
+
     def test_main_disjoint_exclusion_reported_without_import_permission(self):
         report = compare(self.main, {}, HARDWARE)
         self.assertTrue(report["matchesIntersection"] and report["nonemptyBaselineExcludedByDisjointCategory"])

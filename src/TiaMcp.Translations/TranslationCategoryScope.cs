@@ -71,6 +71,39 @@ public static class TranslationCategoryScope
         return report;
     }
 
+    /// <summary>
+    /// V21 category exports return every row of the selected owners. Keeps exactly the rows whose observed
+    /// category label is requested, renumbered as a contiguous native layout. Every native row must first
+    /// carry a unique key and a label from the project inventory; otherwise the capture is refused. The
+    /// excluded rows' complete records are returned for preservation; the caller retains the native bytes.
+    /// </summary>
+    internal static (byte[] Workbook, byte[] ExcludedRows) Restrict(TranslationWorkbook native, string[] inventoryIds, string[] requestedIds)
+    {
+        Require(requestedIds is { Length: > 0 and <= 256 } && requestedIds.Distinct(StringComparer.Ordinal).Count() == requestedIds.Length &&
+            requestedIds.All(id => inventoryIds.Contains(id, StringComparer.Ordinal)),
+            "InvalidTranslationCategoryScope", "Requested categories must be distinct members of the project category inventory.");
+        var allowed = requestedIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal);
+        var rows = ReadCompleteObservedLayout(native, inventoryIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal)).Rows;
+        var kept = native.Mapping.Rows.Where(r => allowed.Contains(r.Category)).Select(r => r.KeyCell).ToHashSet();
+        var parts = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+        foreach (string part in new[] { "xl/worksheets/sheet1.xml", "xl/worksheets/sheet2.xml" })
+        {
+            var document = new System.Xml.Linq.XDocument(native.Package.Xml[part]);
+            int number = 1;
+            foreach (var row in document.Root!.Element(BoundedOpcPackage.Sheet + "sheetData")!.Elements(BoundedOpcPackage.Sheet + "row").Skip(1).ToArray())
+            {
+                if (!kept.Contains(new CellLocation(part, "C" + (string)row.Attribute("r")!))) { row.Remove(); continue; }
+                string r = (++number).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                row.SetAttributeValue("r", r);
+                foreach (var cell in row.Elements(BoundedOpcPackage.Sheet + "c"))
+                    cell.SetAttributeValue("r", System.Text.RegularExpressions.Regex.Replace((string)cell.Attribute("r")!, "[0-9]+$", r));
+            }
+            parts.Add(part, BoundedOpcPackage.XmlBytes(document));
+        }
+        var excluded = rows.Where(p => !allowed.Contains(p.Value.Category)).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+        return (native.Package.Repack(parts), System.Text.Encoding.UTF8.GetBytes(CanonicalJson.Serialize(Node(excluded))));
+    }
+
     private sealed record ObservedRow(string Worksheet, string Category, string ViewPath, string Substitutions,
         string SourceCulture, string SourceSha256, string TargetCulture, string TargetSha256);
     private sealed record ObservedLayout(string TargetCulture, Dictionary<string, ObservedRow> Rows);

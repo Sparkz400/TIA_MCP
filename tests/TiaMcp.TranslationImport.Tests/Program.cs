@@ -322,6 +322,8 @@ Test("actual managed process loss at flushed dispatch intent survives restart", 
     True(runner.MarkInterrupted(id, op.Revision).State == "outcomeUnknown");
 });
 
+RestrictedCaptureChecks.Register(Test, output);
+
 if (admissionOnly) tests.Clear();
 TranslationAdmissionChecks.Register(Test, () => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true));
 TranslationRegistryChecks.Register(Test, output);
