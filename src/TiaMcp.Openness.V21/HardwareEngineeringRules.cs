@@ -536,6 +536,18 @@ namespace TiaMcp.Openness.V21
         internal static JObject Profile(string typeIdentifier, string firmwareVersion) =>
             ProfileKey(typeIdentifier, firmwareVersion) is string key && BundledProfiles.Value.TryGetValue(key, out var profile) ? profile : null;
 
+        internal static IEnumerable<JObject> BundledProfileList => BundledProfiles.Value.Values;
+
+        // A write to a versionless (System:, GSD:) type that has profiles, but none for the item's firmware (unreadable, or in another
+        // format than the profile recorded), fails closed instead of skipping the profile check.
+        internal static void RequireVersionlessMatch(IEnumerable<JObject> profiles, string typeIdentifier, string firmwareVersion)
+        {
+            var known = profiles.Where(profile => profile.Value<string>("typeIdentifier") == typeIdentifier).Select(profile => profile.Value<string>("firmwareVersion")).ToArray();
+            if (known.Length != 0 && !known.Contains(firmwareVersion, StringComparer.Ordinal))
+                throw new BridgeException("AttributeNotWritable", "The capability profiles of " + typeIdentifier + " cover firmware " + string.Join(", ", known) +
+                    "; the item's FirmwareVersion (" + (firmwareVersion ?? "unreadable") + ") matches none, so the write is refused.");
+        }
+
         // Added, removed and changed configured rows by exact path, for review of a CAx import.
         internal static JObject Difference(JArray before, JArray after)
         {

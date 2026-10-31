@@ -432,6 +432,15 @@ count++; Console.WriteLine("PASS versionless identifiers select a profile only w
 if (HardwareEngineeringRules.ParseProfiles("{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"GSD:F/D\",\"firmwareVersion\":\"V1\"},{\"typeIdentifier\":\"GSD:F/D\",\"firmwareVersion\":\"V2\"}]}").Count != 2)
     throw new Exception("Two firmware profiles of one versionless type were not told apart.");
 count++;
+var gsdProfiles = new[] { new JObject { ["typeIdentifier"] = "GSD:F/D", ["firmwareVersion"] = "V1.0" } };
+HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", "V1.0");
+HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:Other/D", null);
+count += 2;
+foreach (var (label, firmware) in new[] { ("another firmware", "V2.0"), ("another firmware format", "1.0"), ("an unreadable firmware", (string)null) })
+{
+    try { HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", firmware); throw new Exception("Versionless profile mismatch accepted: " + label); }
+    catch (BridgeException error) when (error.Code == "AttributeNotWritable") { count++; Console.WriteLine("PASS versionless profile fails closed on " + label); }
+}
 foreach (var (label, json) in new[] { ("duplicate type", "{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"OrderNumber:A/V1\"},{\"typeIdentifier\":\"OrderNumber:A/V1\"}]}"), ("other schema", "{\"schemaVersion\":2,\"profiles\":[]}"),
     ("missing type", "{\"schemaVersion\":1,\"profiles\":[{}]}"), ("versionless type without firmware", "{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"System:Rail\"}]}") })
 {

@@ -103,8 +103,11 @@ namespace TiaMcp.Openness.V21
             for (int depth = 0; cursor is DeviceItem device && depth < 64; depth++, cursor = device.Parent)
             {
                 string type = device.TypeIdentifier;
-                // Only versionless (System:, GSD:) identifiers need the firmware to select a profile.
-                var profile = HardwareEngineeringRules.Profile(type, type == null || type.StartsWith("OrderNumber:", StringComparison.Ordinal) ? null : FirmwareVersion(device));
+                // Only versionless (System:, GSD:) identifiers need the firmware to select a profile; a firmware matching none of them refuses.
+                bool versionless = type != null && !type.StartsWith("OrderNumber:", StringComparison.Ordinal);
+                string firmware = versionless ? FirmwareVersion(device) : null;
+                var profile = HardwareEngineeringRules.Profile(type, firmware);
+                if (profile == null && versionless) HardwareEngineeringRules.RequireVersionlessMatch(HardwareEngineeringRules.BundledProfileList, type, firmware);
                 if (profile != null) { relativePath = HardwareEngineeringRules.ProfilePath(segments, Segment(device.Name)); return profile; }
                 segments.Insert(0, Segment(device.Name));
             }

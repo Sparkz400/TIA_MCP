@@ -251,7 +251,9 @@ probed value type, address lengths, channels with their attributes, interface no
 at slots 1-4 of each probed rack type. Values are never recorded. Row paths are relative to the module and write `{module}` for
 a segment equal to the module's own name (TIA names a built-in submodule after its module), so one profile serves every
 instance name. An `OrderNumber:` identifier names its firmware; a versionless `System:` or `GSD:` identifier has one profile per
-`firmwareVersion`, applied only when the item's `FirmwareVersion` attribute equals it. The hardware runner writes
+`firmwareVersion` (the runner records the item's own `FirmwareVersion` attribute value), applied only when the item's attribute
+equals it. A write to such a type whose firmware matches none of its profiles, or cannot be read, is refused
+(`AttributeNotWritable`) rather than left unchecked. The hardware runner writes
 `profiles.json` for every type its native run creates, merging every snapshot that shows a type (an attribute declared only in
 some states still enters); a curated run fills the contract, which holds none until then.
 

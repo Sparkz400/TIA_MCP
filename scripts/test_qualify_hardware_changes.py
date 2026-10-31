@@ -91,6 +91,31 @@ class HardwareChangeTests(unittest.TestCase):
         q.gsd_device(run)
         self.assertEqual({"gsdCatalog": [], "gsdNotInstalled": True}, run.h.report)
 
+    def test_installed_gsd_device_is_added_put_on_the_subnet_and_assigned(self):
+        class Fake:
+            def __init__(self):
+                self.report = {}
+            def stage(self, name, operation):
+                return operation()
+            def tool(self, name, arguments):
+                return {"entries": [{"typeIdentifier": "GSD:GSDML-V2.43-SIEMENS-TIAMCPIDEVICE.XML/D/DAP1", "typeName": "TiaMcpIDevice"}]}
+        run = q.Run.__new__(q.Run)
+        run.h, run.base, calls = Fake(), "/projects/P/devices/", []
+        interface = run.base + "HwGsd/items/HwGsdHead/items/PROFINET%20interface"
+        def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
+            calls.append((kind, payload))
+            if kind == "hardware_add":  # The added device shows its head and interface in the next state.
+                run.current = {"view": {"hw:" + run.base + "HwGsd/items/HwGsdHead": {"network": None},
+                                        "hw:" + interface: {"network": {"ioConnectors": [{}], "nodes": [{"name": "X1"}]}}}}
+        run.apply, run.current = apply, {"view": {}}
+        q.gsd_device(run)
+        self.assertEqual(["hardware_add", "network_configure", "network_io_assign"], [kind for kind, _ in calls])
+        self.assertEqual(interface, calls[1][1]["hardwarePath"])
+        self.assertEqual({"hardwarePath": interface, "connectorIndex": 0, "controllerIndex": 0,
+                          "controllerHardwarePath": run.base + "HwPeer/items/HwPeerCpu/items/PROFINET%20interface_1"}, calls[2][1])
+        self.assertNotIn("gsdNotInstalled", run.h.report)
+        self.assertEqual(interface, run.h.report["gsdDevice"]["hardwarePath"])
+
     def test_rack_is_the_one_root_item_beside_the_head(self):
         run = q.Run.__new__(q.Run)
         run.base = "/projects/P/devices/"

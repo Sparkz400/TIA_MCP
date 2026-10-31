@@ -80,3 +80,7 @@ minutes each:
 - Absolute `%I`/`%Q` accesses in program code on a replaced module's addresses (only tags are checked).
 - A second project's controller for `OutsideOfProject`; MRP domain attributes, MRP interconnection and MRPD.
 - Profiles of types the run does not create, and of HSP modules not installed here.
+- Native check for the discovery run: every type the run creates is an `OrderNumber:` identifier; a versionless (`System:`,
+  `GSD:`) profile (the installed I-device GSD) keys on the item's own `FirmwareVersion` value, and a write whose firmware matches
+  no profile of its type fails closed. Run 1 shows whether the GSD device reports a `FirmwareVersion` at all (else it is skipped
+  under `profilesSkipped`).

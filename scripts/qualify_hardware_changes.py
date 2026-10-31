@@ -180,7 +180,8 @@ class Run(StateRun):
             if identifier in self.profiled:
                 self.profiled[identifier]["items"] = hardware_profiles.merge(self.profiled[identifier]["items"], rows)
             else:
-                self.profiled[identifier] = {"path": path, "kind": "device" if identifier in DEVICES else "module", "items": rows}
+                firmware = next((a.get("value") for a in self.raw[path].get("attributes") or [] if a["name"] == "FirmwareVersion" and isinstance(a.get("value"), str)), None)
+                self.profiled[identifier] = {"path": path, "kind": "device" if identifier in DEVICES else "module", "items": rows, "firmware": firmware}
 
     def state(self):
         state = self.domains()
@@ -486,7 +487,7 @@ def gsd_device(run):
               {"effects": [{"createDevice": device, "typeIdentifier": identifier}]}, added=under(run.path(device)), deferred=True)
     prefix = run.path(device, "items", "")
     interface = next(key[3 + len(prefix):] for key, row in sorted(run.current["view"].items()) if key.startswith("hw:" + prefix) and (row.get("network") or {}).get("ioConnectors"))
-    node(run, device, tuple(interface.split("/items/")), "192.168.0.6", deferred=True)
+    node(run, device, tuple(interface.split("/")), "192.168.0.6", deferred=True)  # ("HwGsdHead", "items", "PROFINET%20interface"), as MP.interface.
     path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
@@ -677,9 +678,12 @@ def profiles(run):
                     run.expect(code in (None, "IncompatibleHardware"), "profiles", "Plug probe of %s at %s/%d: %s" % (identifier, rack_path, slot, code))
                     rules.append({"rack": rack_type, "positionNumber": slot, "canPlugNew": code is None,
                                   "occupiedBy": occupied.get((rack_path[len(run.base):].split("/items/")[0], slot))})
-            if not identifier.startswith("OrderNumber:") and not (entry or {}).get("version"):
-                run.h.report.setdefault("profilesSkipped", []).append(identifier)  # A versionless type needs its firmware as the profile key.
-                continue
+            if not identifier.startswith("OrderNumber:"):
+                # A versionless type's profile key is the firmware the worker compares: the item's own FirmwareVersion attribute value.
+                if not captured["firmware"]:
+                    run.h.report.setdefault("profilesSkipped", []).append(identifier)
+                    continue
+                entry = {**(entry or {}), "version": captured["firmware"]}
             rows.append(hardware_profiles.profile(identifier, captured["kind"], captured["items"], entry, rules, run.h.directory.name + "/qualification.json"))
         document = hardware_profiles.contract(rows)
         (run.h.directory / "profiles.json").write_text(json.dumps(document, indent=2), encoding="utf-8")
