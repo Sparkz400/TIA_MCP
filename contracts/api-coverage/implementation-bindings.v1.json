@@ -2062,8 +2062,8 @@
     },
     {
       "path": "src/TiaMcp.Host/SimulatorTools.cs",
-      "sha256": "fc475a2c8d2a1907c6717afe487fa034bc96f359dc4b41601ecd42ecd5945f30",
-      "bytes": 16911
+      "sha256": "22fab3b9850d354b0b36206ce6fdbb6cd340278393d953b832b7bba4197ded92",
+      "bytes": 16962
     },
     {
       "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -7071,7 +7071,7 @@
           "name": "Release",
           "line": 105,
           "endLine": 106,
-          "sha256": "0a204dca91f119fa3653522d6a68e34bd23e9dd9ced1565986ed3e567be7f9fb"
+          "sha256": "a0dc49698d0e595c16984d31f965b58a8de37d6f13c1020541995ebd2a8c5acf"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -29966,7 +29966,7 @@
           "name": "Release",
           "line": 105,
           "endLine": 106,
-          "sha256": "0a204dca91f119fa3653522d6a68e34bd23e9dd9ced1565986ed3e567be7f9fb"
+          "sha256": "a0dc49698d0e595c16984d31f965b58a8de37d6f13c1020541995ebd2a8c5acf"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -61457,7 +61457,7 @@
         "name": "Release",
         "line": 105,
         "endLine": 106,
-        "sha256": "0a204dca91f119fa3653522d6a68e34bd23e9dd9ced1565986ed3e567be7f9fb"
+        "sha256": "a0dc49698d0e595c16984d31f965b58a8de37d6f13c1020541995ebd2a8c5acf"
       },
       "bridgeOperations": [
         "sim_release"
@@ -61471,7 +61471,7 @@
           "name": "Release",
           "line": 105,
           "endLine": 106,
-          "sha256": "0a204dca91f119fa3653522d6a68e34bd23e9dd9ced1565986ed3e567be7f9fb"
+          "sha256": "a0dc49698d0e595c16984d31f965b58a8de37d6f13c1020541995ebd2a8c5acf"
         },
         {
           "path": "src/TiaMcp.Host/SimulatorTools.cs",

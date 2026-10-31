@@ -29,6 +29,9 @@ internal static class SimulatorToolChecks
         await Expect("NativeWorkersDisabled", 60, t => t.Observe(1, default, windowMs: 55000), "A fitting observation window is dispatched");
         await Expect("InvalidRequest", 104, t => t.Test(1, none, none, default), "sim_test needs room for its 90 s execution cap");
         await Expect("NativeWorkersDisabled", 105, t => t.Test(1, none, none, default), "sim_test is dispatched with a 105 s bridge timeout");
+        await Expect("InvalidRequest", 34, t => t.Release(1, default, true), "sim_release deleteOwned needs room for its 30 s power-off");
+        await Expect("NativeWorkersDisabled", 35, t => t.Release(1, default, true), "sim_release deleteOwned is dispatched with a 35 s bridge timeout");
+        await Expect("NativeWorkersDisabled", 5, t => t.Release(1, default), "sim_release without deleteOwned waits nothing");
         // The request token never reaches the bridge, so a cancelled request cannot fault it.
         using var cancelled = new CancellationTokenSource();
         cancelled.Cancel();

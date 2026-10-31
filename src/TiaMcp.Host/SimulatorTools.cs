@@ -101,9 +101,9 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_storage", new { instanceId, action, archivePath, expectedSha256, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
 
     [McpServerTool(Name = "sim_release", Destructive = true, OpenWorld = false)]
-    [Description("Release the adapter's simulation attachment; refused with SimulationCaptureModeActive while a cycle-synchronous capture holds the instance. deleteOwned additionally powers off and removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]
+    [Description("Release the adapter's simulation attachment; without deleteOwned it is refused with SimulationCaptureModeActive while a cycle-synchronous capture holds the instance. deleteOwned additionally powers off and removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]
     public Task<CallToolResult> Release(int instanceId, CancellationToken cancellationToken, bool deleteOwned = false)
-        => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken);
+        => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken, deleteOwned ? 30000 : 0);
 
     private static JsonElement Array(JsonElement value) => value.ValueKind == JsonValueKind.Array ? value : throw new McpException("An array is required.");
     // sim_test: the adapter's 90 s execution cap plus one interval and one sync-point wait it can still run after its last cap check.
