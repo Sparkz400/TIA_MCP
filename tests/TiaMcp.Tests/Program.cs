@@ -11,6 +11,7 @@ internal static partial class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        PackageStorage.LockWait = TimeSpan.FromMilliseconds(250); // Contention checks hold a store lock past this short bound.
         if (args.Contains("--fake-worker")) return await FakeWorker.RunAsync(args);
         if (args.Length == 2 && args[0] is "--handoff-server" or "--handoff-client") return await AddInReceiverTests.Child(args[0], args[1]);
         if (args.Length == 1 && args[0] == "--identity-child") { Console.WriteLine("ready"); Console.ReadLine(); return 0; }

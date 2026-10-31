@@ -103,10 +103,53 @@ internal static class MutationAdmissionChecks
             Check(Child("admission", root, scopeFile) == "IntakeBusy", "Admission contends on exact operation store OS lock across processes");
             Check(Child("operation", root, operation.Id) == "IntakeBusy", "Operation contends on same OS lock across processes");
         }
+        // A holder that lets go within the bound (a status poll, another Host) is waited out, so a returned dispatch is still recorded.
+        var waited = admissionStore.Acquire(Scope(Path.Combine(root, "waited.ap21")), new('4', 64));
+        var lockWait = PackageStorage.LockWait; PackageStorage.LockWait = TimeSpan.FromSeconds(5);
+        var briefHolder = new FileStream(Path.Combine(root, "engineering-operations", "store.lock"), FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+        try
+        {
+            var release = Task.Delay(200).ContinueWith(_ => briefHolder.Dispose());
+            Check(admissionStore.Returned(waited.Id, waited.Revision, response).State == "returned", "A store lock released within the bound is waited out instead of losing the outcome");
+            await release;
+        }
+        finally { briefHolder.Dispose(); PackageStorage.LockWait = lockWait; }
         string corrupt = Path.Combine(root, "engineering-admissions", record.Id, "00000001.json");
         var tampered = JsonNode.Parse(File.ReadAllText(corrupt))!.AsObject(); tampered["requestSha256"] = new string('0', 64); File.WriteAllText(corrupt, tampered.ToJsonString());
         Reject(() => admissionStore.Read(record.Id), "JournalInvalid");
         Reject(() => admissionStore.Acquire(Scope(Path.Combine(root, "third.ap21")), new('1', 64)), "JournalInvalid");
+
+        // A scan reads a finished admission for its chain only: a resource that can no longer prove its identity (here a new
+        // hard link; likewise a removed drive) and a deleted response no longer block every later mutation.
+        string scanRoot = Path.Combine(root, "finished"); Directory.CreateDirectory(scanRoot);
+        var scans = new EngineeringMutationAdmissionStore(scanRoot);
+        void KeepResponse() => File.Copy(Path.Combine(root, response.RelativePath), Path.Combine(scanRoot, response.RelativePath), true);
+        KeepResponse();
+        string linked = Path.Combine(scanRoot, "linked.ap21"); File.WriteAllText(linked, "finished synthetic project");
+        var finished = scans.Acquire(Scope(linked), new('5', 64)); finished = scans.Returned(finished.Id, finished.Revision, response);
+        File.Delete(Path.Combine(scanRoot, response.RelativePath));
+        if (OperatingSystem.IsWindows() && !EngineeringOperationChecks.CreateHardLink(Path.Combine(scanRoot, "alias.ap21"), linked, IntPtr.Zero))
+            throw new Exception("Could not create the isolated hard-link fixture.");
+        Check(scans.Acquire(Scope(Path.Combine(scanRoot, "later.ap21")), new('6', 64)).State == "dispatchIntent", "A finished admission whose resource and response are gone does not block unrelated mutations");
+        Reject(() => scans.Read(finished.Id), OperatingSystem.IsWindows() ? "InvalidResourceKey" : "ArtifactChanged");
+        string removed = Path.Combine(scanRoot, "removed", "project.ap21"); Directory.CreateDirectory(Path.GetDirectoryName(removed)!);
+        scans.Acquire(Scope(removed), new('7', 64)); Directory.Delete(Path.GetDirectoryName(removed)!);
+        Reject(() => scans.Acquire(Scope(removed), new('8', 64)), "ResourceBusy");
+        KeepResponse();
+        int bound = EngineeringOperationStore.ArchiveAbove; EngineeringOperationStore.ArchiveAbove = 0;
+        try
+        {
+            var archived = scans.Acquire(Scope(Path.Combine(scanRoot, "archived.ap21")), new('9', 64));
+            archived = scans.Returned(archived.Id, archived.Revision, response);
+            Check(!Directory.Exists(Path.Combine(scanRoot, "engineering-admissions", archived.Id)) && scans.Read(archived.Id).State == "returned" &&
+                scans.AdmittedAt(archived.Id) <= archived.RecordedAt, "A finished admission leaves the store the growth bound counts and still reads by id");
+        }
+        finally { EngineeringOperationStore.ArchiveAbove = bound; }
+        // A clock stepped back after the intent was stamped keeps the returned outcome valid.
+        var stamped = scans.Acquire(Scope(Path.Combine(scanRoot, "clock.ap21")), new('a', 64));
+        File.WriteAllText(Path.Combine(scanRoot, "engineering-admissions", stamped.Id, "00000000.json"),
+            JsonSerializer.Serialize(stamped with { RecordedAt = DateTimeOffset.UtcNow.AddDays(1) }, BridgeProtocol.Json));
+        Check(scans.Returned(stamped.Id, stamped.Revision, response).State == "returned", "A backward clock step does not turn a returned dispatch into JournalInvalid");
 
         string dispatcherRoot = Path.Combine(root, "dispatcher"); Directory.CreateDirectory(dispatcherRoot);
         var successfulNative = new AdmissionNative(Scope(Path.Combine(dispatcherRoot, "fixture.ap21")));

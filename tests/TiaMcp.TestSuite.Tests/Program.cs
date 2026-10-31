@@ -7,6 +7,7 @@ using TiaMcp.Core;
 using TiaMcp.Core.Engineering;
 using TiaMcp.Core.TestSuite;
 
+PackageStorage.LockWait = TimeSpan.FromMilliseconds(250); // Contention checks hold a store lock past this short bound.
 int checks = 0;
 void Check(bool yes, string message) { if (!yes) throw new Exception(message); checks++; }
 void Reject(Action action, string? code = null)

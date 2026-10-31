@@ -23,7 +23,7 @@ public static class EngineeringResourceKey
         return kind + ":" + (OperatingSystem.IsWindows() ? full.ToUpperInvariant() : full);
     }
 
-    internal static void Validate(EngineeringResourceEffect resource)
+    internal static void Validate(EngineeringResourceEffect resource, bool live = true)
     {
         if (resource.Kind == "external")
         {
@@ -35,7 +35,7 @@ public static class EngineeringResourceKey
         if (resource.External is not null) throw new BridgeException("InvalidResourceKey", "A local path resource cannot carry an external identity.");
         string prefix = resource.Kind + ":";
         if (!resource.ResourceKey.StartsWith(prefix, StringComparison.Ordinal) ||
-            ForPath(resource.Kind, resource.ResourceKey[prefix.Length..]) != resource.ResourceKey)
+            live && ForPath(resource.Kind, resource.ResourceKey[prefix.Length..]) != resource.ResourceKey)
             throw new BridgeException("InvalidResourceKey", "Use the shared canonical resource key factory.");
     }
 

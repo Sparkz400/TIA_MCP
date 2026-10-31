@@ -10,6 +10,7 @@ using TiaMcp.Core.EngineeringJobs;
 using TiaMcp.Core.WatchTables;
 
 // All native identities/artifacts below are explicitly synthetic. No Siemens assembly, worker, or Portal is loaded.
+PackageStorage.LockWait = TimeSpan.FromMilliseconds(250); // The contention child holds the store lock past this short bound.
 if (args.Length > 0)
 {
     try
@@ -150,6 +151,30 @@ var reconciled = Invoke(dispatcher, "qualification_component_window", reconcilia
 Check(reconciled["children"]![0]!["state"]!.GetValue<string>() == "reconciled" && dispatched == 1, "Exact retained native response reconciles without a second native dispatch");
 Reject(() => Invoke(dispatcher, "qualification_component_window", Control("start")), "ComponentReplayRefused");
 Check(dispatched == 1 && Child("compete", dispatchFixture.Root, dispatchManifest.ProjectPath) == "ResourceBusy", "Reconciled child stays reserved; replay never reaches native mutation");
+// A scan reads a finished window for its chain only: its deleted plan directory no longer blocks every later mutation.
+var finished = Fixture(Path.Combine(basis, "finished")); var finishedStore = new ComponentQualificationWindowStore(finished.Root);
+var window = finishedStore.Acquire(finished.Manifest).Reservation; var receipt = Evidence(finished.Root, "receipt.json", new JsonObject { ["synthetic"] = true });
+ComponentWindowReservation Next(ComponentWindowReservation prior, string transition, Func<ComponentWindowReservation, ComponentWindowReservation> change)
+{
+    var next = change(prior) with { Revision = prior.Revision + 1, PreviousSha256 = CanonicalJson.Sha256(JsonSerializer.SerializeToNode(prior, BridgeProtocol.Json)!), Transition = transition };
+    File.WriteAllText(Path.Combine(finished.Root, "engineering-component-windows", next.Id, next.Revision.ToString("D8") + ".json"), JsonSerializer.Serialize(next, BridgeProtocol.Json));
+    return next;
+}
+foreach (string step in new[] { "start", "applyLibrary", "recover", "observeRestored", "observeRecoveryOriginal" })
+{
+    if (step == "recover") window = Next(window, "ownerResume", p => p with { InstallationAllowed = false });
+    window = Next(window, "childIntent", p => p with { Children = p.Children.Append(new ComponentWindowChild(step, new('a', 64), "dispatchIntent", null, step == "applyLibrary" ? Digest(p.Manifest.ComponentId + ":library") : null)).ToArray() });
+    window = Next(window, "childReturned", p => p with { Children = p.Children.Take(p.Children.Count - 1).Append(p.Children.Last() with { State = "returned", Response = receipt }).ToArray() });
+}
+window = Next(window, "recoveryReconciled", p => p with { State = "recoveryReconciled", Completion = receipt });
+Directory.Delete(finished.Manifest.PlanDirectory, true);
+Check(new EngineeringMutationAdmissionStore(finished.Root).Acquire(Scope(Path.Combine(finished.Root, "unrelated")), new('c', 64)).State == "dispatchIntent", "A finished window whose plan is gone does not block unrelated mutations");
+Reject(() => finishedStore.Read(window.Id), "MutationScopeIncomplete");
+// A clock stepped back after the reservation was stamped keeps the next child valid.
+var clock = Fixture(Path.Combine(basis, "clock")); var clockStore = new ComponentQualificationWindowStore(clock.Root);
+var (stamped, clockToken) = clockStore.Acquire(clock.Manifest);
+File.WriteAllText(Path.Combine(clock.Root, "engineering-component-windows", stamped.Id, "00000000.json"), JsonSerializer.Serialize(stamped with { RecordedAt = DateTimeOffset.UtcNow.AddDays(1) }, BridgeProtocol.Json));
+Check(clockStore.BeginChild(stamped.Id, stamped.Revision, clockToken, "start", new('a', 64), clock.Manifest.Resources).Children.Count == 1, "A backward clock step does not turn a component child into JournalInvalid");
 Console.WriteLine($"PASS Component whole-window reservation: {passed} offline checks; no native execution. Evidence retained at {basis}");
 
 static EngineeringMutationScope Scope(string path) => new("change_apply", new('a', 64), new('b', 64), "synthetic", new('c', 64), 123, new('d', 64), [new("workspace", path, "synthetic competing owner")]);

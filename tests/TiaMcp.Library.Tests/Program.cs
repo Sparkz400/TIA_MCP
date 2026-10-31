@@ -7,6 +7,7 @@ using TiaMcp.Host;
 using LibraryReferenceEdge = TiaMcp.Openness.V21.LibraryReferenceEdge;
 using LibraryReferenceReachability = TiaMcp.Openness.V21.LibraryReferenceReachability;
 
+PackageStorage.LockWait = TimeSpan.FromMilliseconds(250); // Contention checks hold a store lock past this short bound.
 if (args.Length == 2 && args[0] == "--scale-qualification")
     return ScaleQualification.Run(args[1]);
 if (args.Length == 3 && args[0] == "--pagination-qualification")

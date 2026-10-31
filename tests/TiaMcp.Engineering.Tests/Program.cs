@@ -2,6 +2,8 @@ using System.Text.Json.Nodes;
 using TiaMcp.Core;
 using TiaMcp.Core.Engineering;
 
+// Contention checks (also in the probe children below) hold a store lock past this short bound; one check widens it.
+PackageStorage.LockWait = TimeSpan.FromMilliseconds(250);
 if (args.Length > 0 && args[0] == "--multiuser-only") { MultiuserReviewChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--teamcenter-only") { TeamcenterReviewChecks.Run(); return; }
 if (args.Length == 1 && args[0] == "--watch-authoring-only") { await WatchAuthoringChecks.Run(); return; }
