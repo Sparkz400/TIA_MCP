@@ -120,7 +120,11 @@ namespace TiaMcp.Openness.V21
         {
             var payload = change.Payload;
             // Only a Host launched with --safety-fparameter-discovery sets this; it admits declared-writable parameters the allowlist lacks.
+#if SAFETY_FPARAMETER_DISCOVERY
             bool discovery = change.Selector.Value<bool?>("fParameterDiscovery") == true;
+#else
+            const bool discovery = false; // a normal build never honours the key, whatever a reloaded journal holds
+#endif
             // An exact shape keeps anything else, such as a credential, out of the preview and journal.
             if (payload.Count != 2 || !(payload["parameters"] is JArray)) throw new BridgeException("InvalidRequest", "payload must contain exactly safetyAcknowledged and parameters.");
             RequireChangeBool(payload, "safetyAcknowledged");

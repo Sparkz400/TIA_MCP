@@ -669,11 +669,13 @@ namespace TiaMcp.Openness.V21
                 {
                     var plc = SelectPlc(change.Selector);
                     preview["parameterChanges"] = FParameterSet(change, project, false);
+#if SAFETY_FPARAMETER_DISCOVERY
                     if (change.Selector.Value<bool?>("fParameterDiscovery") == true)
                     {
                         preview["fParameterDiscovery"] = true;
                         ((JArray)preview["warnings"]).Add("F-parameter discovery Host: declared-writable F-parameters outside the qualified allowlist are admitted for qualification runs only.");
                     }
+#endif
                     preview["safetyBefore"] = ReadSafety(plc.Software);
                     effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("Changing F-parameters changes the F-parameter signature of each F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns a PROFIsafe address to the physical F-I/O, or downloads anything; that stays with the authorized safety workflow.");
