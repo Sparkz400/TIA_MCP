@@ -16,6 +16,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import traceback
@@ -192,7 +193,8 @@ class IntegrateApplyRun(ComponentRun):
         self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))
         self.base = copy.deepcopy(self.manifest)
         # Report, fixture documents and the Host's own artifacts share one fresh short run directory.
-        self.output = self.native = args.artifacts.resolve() / ("i" + uuid.uuid4().hex[:6])
+        # Not resolved: a short subst drive keeps the nested coordinator change paths within TIA's 143 characters.
+        self.output = self.native = Path(os.path.abspath(args.artifacts)) / ("i" + uuid.uuid4().hex[:6])
         require(len(str(self.native / "scratch" / ("TiaMcpScratch_" + "0" * 24) / ("TiaMcpScratch_" + "0" * 24))) <= 143,
                 "Choose a short native --artifacts path.")
         self.output.mkdir(parents=True, exist_ok=False)

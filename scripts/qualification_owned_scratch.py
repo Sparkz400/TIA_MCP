@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import json
+import os
 import pathlib
 import traceback
 
@@ -32,6 +33,8 @@ class OwnedScratch:
                  manifest_factory=binary_manifest, extra_tools=()):
         self.host, self.worker = pathlib.Path(host).resolve(), pathlib.Path(worker).resolve()
         self.artifacts, self.report, self.persist = pathlib.Path(artifacts).resolve(), report, persist
+        # The Host keeps the spelling given (a short subst drive for TIA's 143-character paths); guards compare resolved paths.
+        self.host_artifacts = os.path.abspath(artifacts)
         self.timeout, self.client_factory, self.watcher_factory = timeout, client_factory, watcher_factory
         self.manifest_factory = manifest_factory
         self.binaries = manifest_factory(self.host, self.worker)
@@ -59,7 +62,7 @@ class OwnedScratch:
         self.report.setdefault("sessions", []).append(self.session)
         self.persist()
         try:
-            self.client = self.client_factory(self.host, self.timeout, ["--worker", str(self.worker), "--artifacts", str(self.artifacts)])
+            self.client = self.client_factory(self.host, self.timeout, ["--worker", str(self.worker), "--artifacts", self.host_artifacts])
         except Exception as error:
             self.session["clientConstructionFailure"] = {"type": type(error).__name__, "message": str(error),
                 "traceback": traceback.format_exc(), "hostProcessId": None,
