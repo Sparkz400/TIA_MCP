@@ -26,7 +26,7 @@ internal static class GitRepositorySelectionChecks
         // has no metadata. A read-only command must not discover the outer HEAD.
         var process = typeof(GitWorkspaceRunner).GetField("git", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(runner)!;
         var method = process.GetType().GetMethod("RunAsync", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var task = (Task)method.Invoke(process, [child, new[] { "rev-parse", "--verify", "HEAD" }, CancellationToken.None, null, null, true])!;
+        var task = (Task)method.Invoke(process, [child, new[] { "rev-parse", "--verify", "HEAD" }, CancellationToken.None, null, null, true, null])!;
         await task;
         var result = task.GetType().GetProperty("Result")!.GetValue(task)!;
         int exit = (int)result.GetType().GetProperty("ExitCode")!.GetValue(result)!;

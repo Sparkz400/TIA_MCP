@@ -43,9 +43,16 @@ def main():
         if not condition: raise AssertionError(name)
         report['checks'].append(name)
 
+    remote = output / 'remote.git'
+    subprocess.run([str(args.git_executable), 'init', '--bare', '--initial-branch=main', str(remote)], check=True, capture_output=True, timeout=60,
+                   env={**os.environ, 'GIT_CONFIG_NOSYSTEM': '1', 'GIT_CONFIG_GLOBAL': os.devnull})
+    def remote_head():
+        return subprocess.run([str(args.git_executable), '--git-dir=' + str(remote), 'rev-parse', 'refs/heads/main'], capture_output=True, text=True, timeout=60,
+                              env={**os.environ, 'GIT_CONFIG_NOSYSTEM': '1', 'GIT_CONFIG_GLOBAL': os.devnull}).stdout.strip()
+
     def start(configured=True):
         extra = ['--worker', str(missing), '--sim-worker', str(missing), '--artifacts', str(artifacts)]
-        if configured: extra += ['--git-executable', str(args.git_executable.resolve())]
+        if configured: extra += ['--git-executable', str(args.git_executable.resolve()), '--git-remote', str(remote)]
         connection = Client(args.host.resolve(), 90, extra)
         connection.request('initialize', {'protocolVersion':'2025-11-25', 'capabilities':{},
                                           'clientInfo':{'name':'vci-offline-contract','version':'1'}})
@@ -131,6 +138,19 @@ def main():
         second = call('vci_commit',dict(previewRef=second['recordRef'],reviewedPlanSha256=second['planSha256']))
         history = call('vci_history',dict(revisionRef=second['recordRef']))
         check('descendant Git history retains both exact commits', first['commit'] in history['history'] and second['commit'] in history['history'])
+        pushed = call('vci_push',dict(revisionRef=first['recordRef'],branchName='main'))
+        check('push publishes the exact revision commit to the configured bare remote', pushed['commit']==first['commit'] and remote_head()==first['commit'])
+        reject('vci_push',dict(revisionRef=first['recordRef'],branchName='main'),'GitReferenceConflict')
+        fetched = call('vci_fetch',dict(branchName='main'))
+        check('parentless fetch reproduces the pushed revision bytes', fetched['commit']==first['commit'] and fetched['previousCommit'] is None and
+              download(fetched['recordRef'],path='PLC/Über Motor.s7dcl')==raw)
+        reject('vci_fetch',dict(branchName='main',parentRevisionRef=first['recordRef']),'GitNoChanges')
+        pushed = call('vci_push',dict(revisionRef=second['recordRef'],branchName='main',expectedRemoteCommit=first['commit']))
+        check('compare-and-swap push fast-forwards the remote branch', pushed['expectedRemoteCommit']==first['commit'] and remote_head()==second['commit'])
+        stop(); client = start()
+        refetched = call('vci_fetch',dict(branchName='main',parentRevisionRef=fetched['recordRef'],expectedRemoteCommit=second['commit']))
+        check('fetch fast-forwards a fetched parent after Host restart', refetched['previousCommit']==first['commit'] and refetched['commit']==second['commit'] and
+              call('vci_reopen',dict(recordRef=pushed['recordRef']))['state']=='complete')
         export = call('vci_materialize',dict(revisionRef=first['recordRef']))
         archive = download(export['recordRef'],name='revision.zip')
         with zipfile.ZipFile(io.BytesIO(archive)) as zip_file:

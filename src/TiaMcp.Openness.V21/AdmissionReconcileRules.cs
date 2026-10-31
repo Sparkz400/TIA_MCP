@@ -13,7 +13,7 @@ namespace TiaMcp.Openness.V21
             "hmi_engineering", "hardware_attributes", "tag_set", "constant_set",
             "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
             "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
-            "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize",
+            "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize", "vci_conflict_resolve",
             "webserver_page_set", "umac_role_set", "opcua_server_settings_set" }, StringComparer.Ordinal);
 
         internal static bool OutcomeRecomputable(string kind) => !TargetKinds.Contains(kind) && !kind.StartsWith("to_", StringComparison.Ordinal);

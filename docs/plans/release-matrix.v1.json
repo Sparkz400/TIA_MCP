@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "43b51a3a4ae478b7c3966110ea0be6cc8f9d0a5e8980e8b4b06a5b281e2fdd05",
+    "catalogSha256": "618ba10de0062b3822a6803689e67c67f63c54db48a8cadcb5fbd4847b10f187",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -12,17 +12,17 @@
     21
   ],
   "summary": {
-    "features": 473,
+    "features": 476,
     "support": {
       "deferred": 6,
-      "limited": 316,
-      "shipped": 127,
+      "limited": 317,
+      "shipped": 129,
       "unavailable_target": 5,
       "unqualified": 19
     },
     "cells": {
       "blocked": 31,
-      "bound": 2016,
+      "bound": 2030,
       "deferred": 18,
       "open": 108
     },
@@ -17222,49 +17222,56 @@
         "D01"
       ],
       "evidenceIds": [
-        "local.vci_mappings.20261028"
+        "local.vci_mappings.20261028",
+        "local.vci_git.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         }
       ]
@@ -17284,49 +17291,56 @@
         "D01"
       ],
       "evidenceIds": [
-        "local.vci_mappings.20261028"
+        "local.vci_mappings.20261028",
+        "local.vci_git.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         }
       ]
@@ -17346,49 +17360,56 @@
         "D01"
       ],
       "evidenceIds": [
-        "local.vci_mappings.20261028"
+        "local.vci_mappings.20261028",
+        "local.vci_git.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.vci_mappings.20261028"
+            "local.vci_mappings.20261028",
+            "local.vci_git.20261031"
           ]
         }
       ]
@@ -24989,6 +25010,158 @@
           ]
         }
       ]
+    },
+    {
+      "featureId": "vci_push",
+      "domain": "version_control",
+      "mcpTools": [
+        "vci_push"
+      ],
+      "changeKind": null,
+      "support": "shipped",
+      "owners": [
+        "D01"
+      ],
+      "evidenceIds": [
+        "local.hostonly.vci.git.20261031"
+      ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "vci_fetch",
+      "domain": "version_control",
+      "mcpTools": [
+        "vci_fetch"
+      ],
+      "changeKind": null,
+      "support": "shipped",
+      "owners": [
+        "D01"
+      ],
+      "evidenceIds": [
+        "local.hostonly.vci.git.20261031"
+      ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "bound",
+          "evidenceIds": [
+            "local.hostonly.vci.git.20261031"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "change.vci_conflict_resolve",
+      "domain": "version_control",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_conflict_resolve",
+      "support": "limited",
+      "owners": [
+        "D01"
+      ],
+      "evidenceIds": [
+        "local.vci_git.20261031"
+      ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "bound",
+          "evidenceIds": [
+            "local.vci_git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "bound",
+          "evidenceIds": [
+            "local.vci_git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preview",
+          "status": "bound",
+          "evidenceIds": [
+            "local.vci_git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-native",
+          "status": "bound",
+          "evidenceIds": [
+            "local.vci_git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "bound",
+          "evidenceIds": [
+            "local.vci_git.20261031"
+          ]
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "bound",
+          "evidenceIds": [
+            "local.vci_git.20261031"
+          ]
+        }
+      ]
     }
   ],
   "evidence": [
@@ -25841,6 +26014,21 @@
         {
           "path": "evidence/local.hostonly.translation.rerun.20261028.json",
           "sha256": "90edfa145b6c93242f52de2a918ed54049f71cf0264294cecb182ffab5921c47"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hostonly.vci.git.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "133a513afb220d9d377dc14476642b0dc75d203e",
+      "retained": [
+        {
+          "path": "evidence/local.hostonly.vci.git.20261031.json",
+          "sha256": "72446fe11036512cf61aff058cdbc1d5b72245200b1d69488989766759dceedf"
         }
       ],
       "notRetained": []
@@ -27588,6 +27776,23 @@
         {
           "path": "evidence/local.typed.wave9.runtime.20261029.json",
           "sha256": "bf7d1d6fb790cd0b07310c0e94ab3dd9e375ce413d6c7e340b2a328581fe30fa"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.vci_git.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1"
+      },
+      "sourceCommit": "133a513afb220d9d377dc14476642b0dc75d203e",
+      "retained": [
+        {
+          "path": "evidence/local.vci_git.20261031.json",
+          "sha256": "adac56e15a0e91125c618b73c35c6e274311c08c4a0d396b9c502bb6ba6384d3"
         }
       ],
       "notRetained": []

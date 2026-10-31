@@ -27,9 +27,12 @@ internal static partial class GitSafety
     internal static string PathRoot(string path, bool exists)
     {
         if (!Path.IsPathFullyQualified(path)) throw new BridgeException("GitUnsafePath", "An absolute resource path is required.");
-        if (OperatingSystem.IsWindows() && path.StartsWith("\\\\", StringComparison.Ordinal))
-            throw new BridgeException("GitUnsafePath", "The local Git profile does not accept UNC or device namespace paths.");
+        // Only a plain drive-letter root: this refuses \\server\share, //server/share, \\?\ and \??\ device spellings alike.
+        if (OperatingSystem.IsWindows() && !Regex.IsMatch(path, "^[A-Za-z]:[\\\\/]", RegexOptions.CultureInvariant))
+            throw new BridgeException("GitUnsafePath", "The local Git profile accepts only drive-letter paths, not UNC or device namespace paths.");
         var full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
+        if (OperatingSystem.IsWindows() && !Regex.IsMatch(full, "^[A-Za-z]:\\\\", RegexOptions.CultureInvariant))
+            throw new BridgeException("GitUnsafePath", "The local Git profile accepts only drive-letter paths, not UNC or device namespace paths.");
         if (full == Path.GetPathRoot(full)) throw new BridgeException("GitUnsafePath", "A filesystem root is not an owned Git resource.");
         foreach (var segment in full[Path.GetPathRoot(full)!.Length..].Split(Path.DirectorySeparatorChar))
             VciGuard.Path(segment, 255);
@@ -41,6 +44,68 @@ internal static partial class GitSafety
             }
         if (exists && !Directory.Exists(full)) throw new BridgeException("GitRepositoryMissing", "The exact repository directory does not exist.");
         return full;
+    }
+    // Every entry below root, bounded: a junction or link anywhere (refs/heads, objects/pack, logs, packed-refs) would let Git
+    // write or read outside the directory that passed the checks.
+    internal static void RequireNoLinksBelow(string root, int maximum = 100000)
+    {
+        int walked = 0;
+        var pending = new Stack<string>(); pending.Push(root);
+        while (pending.TryPop(out var directory))
+            foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+            {
+                if (++walked > maximum) throw new BridgeException("GitLimitExceeded", "Git metadata enumeration exceeded its safety bound.");
+                NoLinks(entry);
+                if (Directory.Exists(entry)) pending.Push(entry);
+            }
+    }
+    // Indirection, unfinished operations and active hooks that a Git process run against this metadata directory would honour.
+    internal static void RequireNoIndirection(string metadata)
+    {
+        // ".git": for a local path X, Git's non-strict lookup enters X/.git (directory or gitdir file) before X itself.
+        foreach (var unsupported in new[] { ".git", "commondir", "gitdir", "shallow", "info/attributes", "info/grafts", "objects/info/alternates", "objects/info/http-alternates",
+            "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "BISECT_LOG", "rebase-apply", "rebase-merge", "refs/replace" })
+            if (File.Exists(Path.Combine(metadata, unsupported)) || Directory.Exists(Path.Combine(metadata, unsupported)))
+                throw new BridgeException("GitUnsupportedRepository", "Repository has unsupported indirection, attributes or an unfinished operation: " + unsupported);
+        var packed = Path.Combine(metadata, "packed-refs");
+        if (File.Exists(packed))
+        {
+            if (new FileInfo(packed).Length > 16 << 20) throw new BridgeException("GitLimitExceeded", "packed-refs exceeds 16 MiB.");
+            if (File.ReadLines(packed, Utf8).Any(line => line.Length > 41 && line[40] == ' ' && line[41..].StartsWith("refs/replace/", StringComparison.Ordinal)))
+                throw new BridgeException("GitUnsupportedRepository", "Repository has unsupported indirection: packed refs/replace.");
+        }
+        var hooks = Path.Combine(metadata, "hooks");
+        if (Directory.Exists(hooks) && Directory.EnumerateFileSystemEntries(hooks).Any(x => !x.EndsWith(".sample", StringComparison.OrdinalIgnoreCase)))
+            throw new BridgeException("GitExecutableCustomizationRefused", "Repository hooks require a separate reviewed execution profile.");
+    }
+
+    // The only accepted configuration is what git init writes: [core] alone on its line with these keys. An allowlist, so
+    // includes, hooksPath, alternateRefsCommand, drivers, remotes and every other behavior stay outside it.
+    internal static void RequireMinimalConfig(string metadata, bool bare)
+    {
+        var config = Path.Combine(metadata, "config");
+        if (!File.Exists(config) || new FileInfo(config).Length > 65536) throw new BridgeException("GitUnsupportedConfiguration", "Missing or oversized repository config.");
+        string section = "";
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var raw in File.ReadAllLines(config, Utf8))
+        {
+            var line = raw.Trim();
+            if (line.Length == 0 || line.StartsWith('#') || line.StartsWith(';')) continue;
+            if (line.Equals("[core]", StringComparison.OrdinalIgnoreCase)) { section = "core"; continue; }
+            if (line.StartsWith('[') || section != "core") throw new BridgeException("GitUnsupportedConfiguration", "Only the minimal local core config profile is supported; includes, drivers and remotes are refused.");
+            var pair = line.Split('=', 2, StringSplitOptions.TrimEntries);
+            if (pair.Length != 2 || !seen.Add(pair[0])) throw new BridgeException("GitUnsupportedConfiguration", "Ambiguous repository configuration.");
+            var valid = pair[0].ToLowerInvariant() switch
+            {
+                "repositoryformatversion" => pair[1] == "0",
+                "bare" => pair[1] == (bare ? "true" : "false"),
+                "filemode" or "logallrefupdates" or "symlinks" or "ignorecase" => pair[1] is "true" or "false",
+                _ => false
+            };
+            if (!valid) throw new BridgeException("GitUnsupportedConfiguration", "Repository config requires an unsupported behavior: " + pair[0]);
+        }
+        if (!seen.Contains("repositoryformatversion") || !seen.Contains("bare"))
+            throw new BridgeException("GitUnsupportedConfiguration", "Repository format and " + (bare ? "bare" : "non-bare") + " configuration are required.");
     }
     internal static void RequireProcessDirectory(string path)
     {
@@ -102,9 +167,10 @@ internal sealed class GitProcess
 
     internal async Task<GitProcessResult> RunAsync(string directory, IEnumerable<string> arguments,
         CancellationToken cancellationToken, byte[]? input = null, IReadOnlyDictionary<string, string>? environment = null,
-        bool allowFailure = false)
+        bool allowFailure = false, string? protocol = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (protocol is not (null or "file" or "https")) throw new BridgeException("GitRemoteRefused", "Unsupported Git protocol.");
         GitSafety.RequireProcessDirectory(directory);
         GitSafety.NoLinks(executable);
         if (ExecutableSha256 != GitSafety.HashFile(executable)) throw new BridgeException("GitExecutableChanged", "The allowlisted Git executable changed.");
@@ -138,6 +204,8 @@ internal sealed class GitProcess
         {
             start.ArgumentList.Add("-c"); start.ArgumentList.Add("core.longpaths=true");
         }
+        // A remote operation enables exactly the configured remote's protocol; protocol.allow=never still covers every other one.
+        if (protocol is not null) { start.ArgumentList.Add("-c"); start.ArgumentList.Add("protocol." + protocol + ".allow=always"); }
         // Never let failed discovery select an enclosing, unrelated repository.
         start.ArgumentList.Add("--git-dir=.git"); start.ArgumentList.Add("--work-tree=.");
         foreach (var argument in arguments) start.ArgumentList.Add(argument);

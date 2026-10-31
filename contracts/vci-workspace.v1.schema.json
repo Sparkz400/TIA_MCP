@@ -29,6 +29,12 @@
     },
     {
       "$ref": "#/$defs/branches"
+    },
+    {
+      "$ref": "#/$defs/push"
+    },
+    {
+      "$ref": "#/$defs/fetch"
     }
   ],
   "$defs": {
@@ -38,7 +44,7 @@
     },
     "ref": {
       "type": "string",
-      "pattern": "^vci:(preview|revision|export|manifest|comparison):[a-f0-9]{32}:[a-f0-9]{64}$"
+      "pattern": "^vci:(preview|revision|export|manifest|comparison|fetch|push):[a-f0-9]{32}:[a-f0-9]{64}$"
     },
     "author": {
       "type": "object",
@@ -766,7 +772,7 @@
     },
     "revisionRef": {
       "type": "string",
-      "pattern": "^vci:revision:[a-f0-9]{32}:[a-f0-9]{64}$"
+      "pattern": "^vci:(revision|fetch):[a-f0-9]{32}:[a-f0-9]{64}$"
     },
     "exportRef": {
       "type": "string",
@@ -1148,6 +1154,233 @@
           }
         }
       ]
+    },
+    "vci_pushInput": {
+      "type": "object",
+      "properties": {
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        },
+        "branchName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "expectedRemoteCommit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The remote branch's current commit; omit when it must not exist yet."
+        }
+      },
+      "required": [
+        "revisionRef",
+        "branchName"
+      ],
+      "additionalProperties": false
+    },
+    "vci_fetchInput": {
+      "type": "object",
+      "properties": {
+        "branchName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180
+        },
+        "parentRevisionRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revisionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expectedRemoteCommit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "branchName"
+      ],
+      "additionalProperties": false
+    },
+    "push": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/ref"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "remote": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "branch": {
+          "type": "string",
+          "pattern": "^refs/heads/"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "executableSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "gitVersion": {
+          "type": "string"
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "kind": {
+          "const": "push"
+        },
+        "revisionRef": {
+          "$ref": "#/$defs/revisionRef"
+        },
+        "expectedRemoteCommit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "state",
+        "nativeQualified",
+        "revisionRef",
+        "remote",
+        "branch",
+        "commit",
+        "expectedRemoteCommit",
+        "executableSha256",
+        "gitVersion",
+        "receiptName"
+      ],
+      "additionalProperties": false
+    },
+    "fetch": {
+      "type": "object",
+      "properties": {
+        "recordRef": {
+          "$ref": "#/$defs/ref"
+        },
+        "state": {
+          "const": "complete"
+        },
+        "nativeQualified": {
+          "const": false
+        },
+        "remote": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "branch": {
+          "type": "string",
+          "pattern": "^refs/heads/"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "executableSha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "gitVersion": {
+          "type": "string"
+        },
+        "receiptName": {
+          "const": "receipt.json"
+        },
+        "kind": {
+          "const": "fetch"
+        },
+        "parentRevisionRef": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/revisionRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tree": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "previousCommit": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fileCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "maxItems": 1
+        }
+      },
+      "required": [
+        "recordRef",
+        "kind",
+        "state",
+        "nativeQualified",
+        "parentRevisionRef",
+        "remote",
+        "branch",
+        "commit",
+        "tree",
+        "previousCommit",
+        "fileCount",
+        "artifacts",
+        "executableSha256",
+        "gitVersion",
+        "receiptName"
+      ],
+      "additionalProperties": false
     }
   },
   "x-tool-contracts": {
@@ -1184,6 +1417,12 @@
           },
           {
             "$ref": "#/$defs/comparison"
+          },
+          {
+            "$ref": "#/$defs/push"
+          },
+          {
+            "$ref": "#/$defs/fetch"
           }
         ]
       }
@@ -1258,6 +1497,22 @@
       },
       "output": {
         "$ref": "#/$defs/branches"
+      }
+    },
+    "vci_push": {
+      "input": {
+        "$ref": "#/$defs/vci_pushInput"
+      },
+      "output": {
+        "$ref": "#/$defs/push"
+      }
+    },
+    "vci_fetch": {
+      "input": {
+        "$ref": "#/$defs/vci_fetchInput"
+      },
+      "output": {
+        "$ref": "#/$defs/fetch"
       }
     }
   }

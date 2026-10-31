@@ -64,6 +64,8 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--timeout-seconds <n>` | `120` (launcher: `300`) | Deadline of one native worker call; 5 to 900. Simulator waits must end 5 s before it ([simulation](simulation.md#operations)) | `-TimeoutSeconds` |
 | `--toolsets <groups>` | All tools | Comma-separated [tool groups](../reference/mcp-surface.md#tool-groups---toolsets), or `all`; once | `-Toolsets` |
 | `--git-executable <exe>` | None; VCI Git tools refuse with `GitNotConfigured` | Absolute path of an installed Git | `-GitExecutable` |
+| `--git-remote <repo>` | None; `vci_push` and `vci_fetch` refuse with `GitRemoteNotConfigured` | The one [Git remote](../reference/vci-host-workflow.md#remote-delivery): an absolute path or `file:///` URL of a bare repository; requires `--git-executable`; once | None |
+| `--git-allow-network-remote` | Off | Lets `--git-remote` be a credential-free `https://` URL; no credentials, user names or other transports | None |
 | `--ua-client-identity <name>` | None | `default` or a 32-character lowercase hex name of a [protected OPC UA client identity](../reference/opcua-runtime.md#protected-persistent-client-identity); once | `-UaClientIdentity` |
 | `--diagnose` | Off | Prints worker information and TIA discovery as JSON, then exits; no MCP server | `-Diagnose` (`Start-TiaMcp.ps1` only) |
 | `--no-native-workers` | Off; always on in the portable package | Native calls return `NativeWorkersDisabled` without starting a worker | None |

@@ -2596,6 +2596,18 @@
       ]
     },
     {
+      "featureId": "vci_push",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "vci_fetch",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
       "featureId": "vci_workspace_inspect",
       "obligations": [
         "D01"
@@ -2627,6 +2639,12 @@
     },
     {
       "featureId": "change.vci_synchronize",
+      "obligations": [
+        "D01"
+      ]
+    },
+    {
+      "featureId": "change.vci_conflict_resolve",
       "obligations": [
         "D01"
       ]
