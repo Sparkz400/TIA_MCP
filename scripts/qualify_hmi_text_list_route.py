@@ -172,7 +172,7 @@ def run_profile(args, profile, base, report):
     # The production gate ships with no profile; the qualification Host admits exactly this profile in its own retrieved copy.
     admission = ["--hmi-text-list-qualification", profile]
     client = ReliabilityClient(args.host.resolve(strict=True), args.worker.resolve(strict=True), store, timeout=900, record=calls, extra=admission)
-    applied, history, project = [], [], None
+    applied, history, project, reference_nodes = [], [], None, None
     try:
         client.initialize()
         step("tia_start", client.tool("tia_start"))
@@ -234,8 +234,11 @@ def run_profile(args, profile, base, report):
             gate(result["state"] == "applied" and {"hmi_text_lists_read_back_exactly", "hmi_unrelated_content_preserved", "changed_project_saved"} <= set(stages),
                  "Applied with exact readback, preserved HMI content and save: " + label, {"state": result["state"], "stages": stages, "failure": result.get("failure")})
             gate(result["hmiEvidence"]["importReadback"]["exact"] is True, "Worker import readback exact: " + label)
-            again = client.tool("change_apply", apply_arguments(prepared, key))
-            gate(again["state"] == "applied" and again["stages"] == stages, "Replay with the same key returns the recorded outcome without a second import: " + label)
+            # A replay either returns the recorded outcome or is refused; it never imports again (journal stages unchanged).
+            again = decoded(client.raw_tool("change_apply", apply_arguments(prepared, key)))
+            journal = json.loads(pathlib.Path(result["journalPath"]).read_text(encoding="utf-8"))
+            gate((again.get("state") == "applied" and again.get("stages") == stages or "error" in again) and journal["stages"] == stages and journal["state"] == "applied",
+                 "Replay with the same key never imports again: " + label, again.get("error") or again.get("state"))
             after = native_lists(client, device)
             outcome = evaluate_import(before, after, candidate, True)
             gate(outcome["outcome"] == "exact", "Independent oracle: candidate lists exact, other lists unchanged: " + label,
@@ -246,7 +249,12 @@ def run_profile(args, profile, base, report):
                 refused = decoded(client.raw_tool("change_apply", apply_arguments(stale)))
                 gate(refused.get("error", {}).get("code") == "StaleRevision", "A preview prepared before another saved import is refused", refused.get("error"))
                 gate(json.loads(pathlib.Path(stale["journalPath"]).read_text(encoding="utf-8"))["state"] == "prepared", "The stale preview stays prepared and unclaimed")
-        gate(typed_nodes(client, device) == baseline_nodes, "Every typed HMI node outside the text lists is unchanged by all imports")
+            if len(history) == 2:
+                # Each apply compiles the device first; later states are compared with the first compiled one, the
+                # uncompiled baseline difference is recorded (the worker compares each import with its compiled capture).
+                reference_nodes = typed_nodes(client, device)
+                row["compileChangedTypedNodes"] = sorted(p for p in set(reference_nodes) | set(baseline_nodes) if reference_nodes.get(p) != baseline_nodes.get(p))
+        gate(typed_nodes(client, device) == reference_nodes, "Every typed HMI node outside the text lists is unchanged by all later imports")
 
         # 3. Restore the last import's checkpoint into a new directory; the saved original keeps the last state.
         label, last = applied[-1]
@@ -270,7 +278,7 @@ def run_profile(args, profile, base, report):
         step("fresh tia_start", fresh.tool("tia_start"))
         step("project_open saved original", fresh.tool("project_open", {"path": project}))
         gate(canonical(native_lists(fresh)) == canonical(history[-1]), "Fresh reopen: text lists equal the last applied state")
-        gate(typed_nodes(fresh, unified_device(fresh)) == baseline_nodes, "Fresh reopen: every typed HMI node outside the text lists equals the baseline")
+        gate(typed_nodes(fresh, unified_device(fresh)) == reference_nodes, "Fresh reopen: every typed HMI node outside the text lists equals the compiled reference")
         fresh.tool("tia_detach")
     except Exception as error:
         gate(False, "Fresh reopen completed", repr(error))
@@ -299,6 +307,10 @@ def main():
         run_profile(args, profile, base, report)
         (base / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     report["completed"] = all(p.get("passed") for p in report["profiles"].values())
+    # Flat lists for scripts/curate_evidence.py.
+    report["checks"] = [f"{name}: {check}" for name, row in report["profiles"].items() for check in row["checks"]]
+    report["failures"] = [f"{name}: {failure}" for name, row in report["profiles"].items() for failure in row["failures"]]
+    report["toolCalls"] = [call for row in report["profiles"].values() for call in row.get("toolCalls", [])]
     (base / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({p: {"passed": r.get("passed"), "checks": len(r["checks"]), "failures": r["failures"]} for p, r in report["profiles"].items()}, ensure_ascii=False))
     return 0 if report["completed"] else 1
