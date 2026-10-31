@@ -59,6 +59,37 @@ repository's first-parent history. Phase B adds a fourth round restored from its
 checkpoint. Until that run passes, `vci_push`, `vci_fetch` and
 `change.vci_conflict_resolve` stay unverified.
 
+## Native attempts (31 October 2026, not curated)
+
+Two attempts in owned scratch projects (CPU 1511-1 PN V4.1), each on a frozen
+Debug build: `artifacts/vg-31` (build `74932b9`, 96 of 97 steps passed) and
+`artifacts/vg31b` (build `45921ef`, 96 of 97 steps passed). Both stopped at the
+runner's own no-replay assertion after the first resolution, so the runs are
+not evidence; take=native, take=merged, the reopen and the restored round did
+not run. What the first 96 steps established natively in both attempts:
+
+- Phase A as on 28 October; the second workspace, export mapping, baseline
+  commit and `vci_push` to the local bare remote; a second push without
+  `expectedRemoteCommit` refused (`GitReferenceConflict`).
+- Round 1: a plain-Git commit on the remote and a native header-family edit;
+  `vci_fetch` with the expected remote commit (stale pin refused,
+  `PreviewStale`); three captures and a `divergentChange` comparison;
+  `vci_conflict_resolve` before the checkout refused (`VciResolutionNotNeeded`);
+  after the checkout `vci_synchronize` refused `VciConflict` in both directions.
+- `vci_conflict_resolve` take=remote prepared with the live export hash equal
+  to the inspected `contentSha256` (the hash is stable between inspect and
+  prepare) and applied: V21 performed `Synchronize(WorkspaceToProject)` while
+  both `ProjectObjectChanged` and `WorkspaceFileChanged` were set, with
+  checkpoint, compile and save; the mapping read back `Equal`, the package kept
+  the remote bytes, the block export lost the native edit and the state
+  differed in exactly the block.
+- A second `change_apply` under a new idempotency key was refused, but by the
+  shared mutation admission with `RecoveryRequired` ("The earlier engineering
+  attempt cannot be replayed with this key/state."), not with the code the
+  runner expected (`InvalidChangeState` in the first attempt, `IdempotencyConflict`
+  in the second, the session-level codes behind that admission). The runner now
+  expects `RecoveryRequired`; the next native slot reruns the whole runner.
+
 ## Limits
 
 - V21 has no project-neutral VCI export, so the native side of the three-way
@@ -66,6 +97,7 @@ checkpoint. Until that run passes, `vci_push`, `vci_fetch` and
   `take=native` exports the project package only when applied.
 - The remote is rechecked immediately before dispatch; a writer of the remote
   after that check is outside the Host's control.
-- Whether `MappedObject.Synchronize` honours a directed synchronization while
-  both sides changed is the open native question of the pending run.
+- The directed `Synchronize(WorkspaceToProject)` with both sides changed was
+  observed natively (attempts above); the `ProjectToWorkspace` override
+  (take=native) is not yet observed.
 - Network remotes have no credential route and are not qualified.

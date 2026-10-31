@@ -167,7 +167,7 @@ the project's own unsynchronized changes to the object, with the checkpoint as
 the way back. The mapping must read back `Equal`, and for `remote` and `merged`
 the package must equal the written bytes; the root inventory, backups and
 fingerprint rules above apply unchanged. A change applies once; a repeated
-`change_apply` under another idempotency key refuses with `IdempotencyConflict` (the same key returns the recorded outcome without running again), and an interrupted apply is
+`change_apply` under another idempotency key refuses with `RecoveryRequired` from the shared mutation admission (the same key returns the recorded outcome without running again), and an interrupted apply is
 held for manual reconciliation.
 
 ## Conflict and preservation rules

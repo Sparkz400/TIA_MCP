@@ -354,11 +354,12 @@ def resolve(run, label, take, comparison, remote_files, result_files, native_con
     run.finish(label, "vci_conflict_resolve", prepared, changed=list(changed), check=verify, restore=restore)
     if not restore:
         def once():
-            # A second apply under a new idempotency key refuses; the change keeps its single recorded outcome.
+            # A second apply under a new idempotency key is refused by the shared mutation admission (native, 31 October 2026:
+            # RecoveryRequired) before the session; the change keeps its single recorded outcome.
             before = run.h.tool("change_status", {"changeId": prepared["changeId"]})
             error = run.h.call_error("change_apply", run.h.apply_args(prepared))
             after = run.h.tool("change_status", {"changeId": prepared["changeId"]})
-            require(error.get("code") == "IdempotencyConflict" and after["state"] == "applied" and after["stages"] == before["stages"]
+            require(error.get("code") == "RecoveryRequired" and after["state"] == "applied" and after["stages"] == before["stages"]
                     and after["afterFingerprint"] == before["afterFingerprint"], "A second apply was not refused: %s" % error)
             return error["code"]
         run.h.stage("an applied resolution is never applied again: " + label, once)
