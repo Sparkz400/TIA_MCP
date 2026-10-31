@@ -102,9 +102,10 @@ internal sealed class GitProcess
 
     internal async Task<GitProcessResult> RunAsync(string directory, IEnumerable<string> arguments,
         CancellationToken cancellationToken, byte[]? input = null, IReadOnlyDictionary<string, string>? environment = null,
-        bool allowFailure = false)
+        bool allowFailure = false, string? protocol = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (protocol is not (null or "file" or "https")) throw new BridgeException("GitRemoteRefused", "Unsupported Git protocol.");
         GitSafety.RequireProcessDirectory(directory);
         GitSafety.NoLinks(executable);
         if (ExecutableSha256 != GitSafety.HashFile(executable)) throw new BridgeException("GitExecutableChanged", "The allowlisted Git executable changed.");
@@ -138,6 +139,8 @@ internal sealed class GitProcess
         {
             start.ArgumentList.Add("-c"); start.ArgumentList.Add("core.longpaths=true");
         }
+        // A remote operation enables exactly the configured remote's protocol; protocol.allow=never still covers every other one.
+        if (protocol is not null) { start.ArgumentList.Add("-c"); start.ArgumentList.Add("protocol." + protocol + ".allow=always"); }
         // Never let failed discovery select an enclosing, unrelated repository.
         start.ArgumentList.Add("--git-dir=.git"); start.ArgumentList.Add("--work-tree=.");
         foreach (var argument in arguments) start.ArgumentList.Add(argument);

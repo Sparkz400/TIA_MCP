@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "3f9d9a8185e311e253632511266754d45ef56cb2b2d37408ddec666b7b404a09",
+    "catalogSha256": "79ec5a9657990d8526159694e65c7ed94d87d228a7f11a38889e951cc56b34e6",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -12,21 +12,25 @@
     21
   ],
   "summary": {
-    "features": 469,
+    "features": 472,
     "support": {
       "deferred": 8,
       "limited": 310,
       "shipped": 127,
       "unavailable_target": 5,
-      "unqualified": 19
+      "unqualified": 22
     },
     "cells": {
       "blocked": 31,
       "bound": 1995,
       "deferred": 24,
-      "open": 108
+      "open": 122
     },
     "openCellsByOwner": {
+      "D01": {
+        "role": "VCI",
+        "open": 14
+      },
       "D06": {
         "role": "Test Suite",
         "open": 72
@@ -16874,6 +16878,76 @@
       ]
     },
     {
+      "featureId": "vci_push",
+      "domain": "version_control",
+      "mcpTools": [
+        "vci_push"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D01"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "vci_fetch",
+      "domain": "version_control",
+      "mcpTools": [
+        "vci_fetch"
+      ],
+      "changeKind": null,
+      "support": "unqualified",
+      "owners": [
+        "D01"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
       "featureId": "vci_workspace_inspect",
       "domain": "version_control",
       "mcpTools": [
@@ -17218,6 +17292,54 @@
           "evidenceIds": [
             "local.vci_mappings.20261028"
           ]
+        }
+      ]
+    },
+    {
+      "featureId": "change.vci_conflict_resolve",
+      "domain": "version_control",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_conflict_resolve",
+      "support": "unqualified",
+      "owners": [
+        "D01"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },

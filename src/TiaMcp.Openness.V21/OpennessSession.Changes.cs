@@ -141,7 +141,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "The online download compiles the PLC itself before downloading; use compile=false and save=false so the applied PLCSIM route is never saved.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
-            if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
+            if (!compile && (change.Kind == "vci_synchronize" || change.Kind == "vci_conflict_resolve") && change.Payload.Value<string>("direction") == "WorkspaceToProject")
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             // network_configure kept its optional compile when it joined the hardware rules; remote-I/O fixtures defer it.
             if (!compile && ((HardwareEngineeringRules.Applies(change.Kind) && change.Kind != "network_configure") || IsPlcAlarmKind(change.Kind) || new[] { "block_rename", "block_delete", "to_delete", "hardware_delete", "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "tag_table_create", "tag_table_rename", "tag_table_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
@@ -798,6 +798,7 @@ namespace TiaMcp.Openness.V21
                 case "vci_mapping_add":
                 case "vci_mapping_remove":
                 case "vci_synchronize":
+                case "vci_conflict_resolve":
                     PrepareVciChange(change, project, preview);
                     break;
                 case "drive_parameter_set":
@@ -1133,6 +1134,7 @@ namespace TiaMcp.Openness.V21
                 case "vci_mapping_add":
                 case "vci_mapping_remove":
                 case "vci_synchronize":
+                case "vci_conflict_resolve":
                     ApplyVciChange(change, project);
                     break;
                 case "certificate_create":

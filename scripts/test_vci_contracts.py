@@ -15,7 +15,7 @@ class VciContracts(unittest.TestCase):
     def test_catalog_and_registry_cover_exact_tool_set_without_native_promotion(self):
         Draft202012Validator.check_schema(SCHEMA)
         expected = {'vci_prepare','vci_commit','vci_reconcile','vci_reopen','vci_history','vci_materialize','vci_list','vci_artifact_read','vci_file_read',
-                    'vci_package_capture','vci_package_compare','vci_branches'}
+                    'vci_package_capture','vci_package_compare','vci_branches','vci_push','vci_fetch'}
         self.assertEqual(expected, set(SCHEMA['x-tool-contracts']))
         catalog = json.loads((ROOT/'contracts/feature-catalog.v1.json').read_text(encoding='utf-8'))
         registry = json.loads((ROOT/'contracts/api-coverage/registry.v1.json').read_text(encoding='utf-8'))
@@ -67,6 +67,26 @@ class VciContracts(unittest.TestCase):
                       nativeQualified=False, scope='Fresh local refs in this exact revision repository; pin inventorySha256 across pages.')
         self.validate('branches', result)
         with self.assertRaises(ValidationError): self.validate('branches', dict(result, nativeQualified=True))
+
+    def test_remote_inputs_take_exact_revisions_and_commits_but_never_urls_or_credentials(self):
+        revision, fetched = 'vci:revision:'+'a'*32+':'+'b'*64, 'vci:fetch:'+'c'*32+':'+'d'*64
+        for value in ({'revisionRef':revision,'branchName':'main'}, {'revisionRef':fetched,'branchName':'main','expectedRemoteCommit':'e'*40}):
+            self.validate('vci_pushInput', value)
+        for value in ({'revisionRef':revision}, {'revisionRef':revision,'branchName':'main','remote':'https://example.invalid/r.git'},
+                      {'revisionRef':revision,'branchName':'main','expectedRemoteCommit':'HEAD'}, {'revisionRef':revision,'branchName':'main','force':True},
+                      {'revisionRef':revision.replace(':revision:',':preview:'),'branchName':'main'}):
+            with self.assertRaises(ValidationError): self.validate('vci_pushInput', value)
+        self.validate('vci_fetchInput', {'branchName':'main','parentRevisionRef':fetched,'expectedRemoteCommit':'e'*40})
+        for value in ({'branchName':'main','url':'file:///D:/r.git'}, {'branchName':'main','credential':'secret'}, {}):
+            with self.assertRaises(ValidationError): self.validate('vci_fetchInput', value)
+        push = dict(recordRef='vci:push:'+'a'*32+':'+'b'*64, kind='push', state='complete', nativeQualified=False, revisionRef=revision,
+                    remote='D:/remote.git', branch='refs/heads/main', commit='c'*40, expectedRemoteCommit=None, executableSha256='d'*64,
+                    gitVersion='git version 2', receiptName='receipt.json')
+        self.validate('push', push)
+        with self.assertRaises(ValidationError): self.validate('push', dict(push, nativeQualified=True))
+        catalog = json.loads((ROOT/'contracts/feature-catalog.v1.json').read_text(encoding='utf-8'))
+        resolve = next(row for row in catalog['features'] if row['featureId']=='change.vci_conflict_resolve')
+        self.assertEqual(('vci_conflict_resolve', 'unverified'), (resolve['changeKind'], resolve['qualification']['status']))
 
     def test_mapping_evidence_schema_is_explicit_and_cannot_claim_qualification(self):
         schema=json.loads((ROOT/'contracts/vci-mapping-evidence.v1.schema.json').read_text(encoding='utf-8'))

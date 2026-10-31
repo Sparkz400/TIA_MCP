@@ -9,6 +9,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
 {
     public PackageIntakeLimits LibraryLimits { get; init; } = new();
     public string? GitExecutable { get; init; }
+    // The one remote vci_push/vci_fetch use; local unless --git-allow-network-remote.
+    public TiaMcp.Core.VersionControl.GitRemote? GitRemote { get; init; }
     public string? UaClientIdentity { get; init; }
     public bool NoNativeWorkers { get; init; }
     // Selected --toolsets groups; null advertises every tool.
@@ -38,6 +40,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             : Path.Combine(root, "src", "TiaMcp.Simulator.V8", "bin", "Debug", "net48", "TiaMcp.Simulator.V8.exe");
         string? api = null;
         string? gitExecutable = null;
+        string? gitRemote = null;
+        var gitAllowNetworkRemote = false;
         string? uaClientIdentity = null;
         string? simulatorApi = null;
         var timeout = 120;
@@ -65,6 +69,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             var option = args[i];
             if (option == "--no-native-workers") { noNativeWorkers = true; continue; }
             if (option == "--addin-handoff") { addInHandoff = true; continue; }
+            if (option == "--git-allow-network-remote") { gitAllowNetworkRemote = true; continue; }
             if (option == "--enable-library-integrate-apply") { enableLibraryIntegrateApplyGiven = true; continue; } // the default; kept for existing launch configurations
             if (option == "--disable-library-integrate-apply") { libraryIntegrateApply = false; continue; }
             if (option == "--diagnose") { diagnose = true; continue; }
@@ -81,6 +86,9 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
                 case "--git-executable":
                     if (!Path.IsPathFullyQualified(args[i])) throw new ArgumentException("--git-executable requires an absolute local executable path.");
                     gitExecutable = Path.GetFullPath(args[i]); break;
+                case "--git-remote":
+                    if (gitRemote is not null) throw new ArgumentException("--git-remote may be given once.");
+                    gitRemote = args[i]; break;
                 case "--sim-worker": simulator = Path.GetFullPath(args[i]); break;
                 case "--sim-api-dir": simulatorApi = Path.GetFullPath(args[i]); break;
                 case "--artifacts": artifacts = Path.GetFullPath(args[i]); break;
@@ -131,7 +139,15 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
         if (enableLibraryIntegrateApplyGiven && !libraryIntegrateApply)
             throw new ArgumentException("--enable-library-integrate-apply and --disable-library-integrate-apply exclude each other.");
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
+        if (gitAllowNetworkRemote && gitRemote is null) throw new ArgumentException("--git-allow-network-remote requires --git-remote.");
+        TiaMcp.Core.VersionControl.GitRemote? remote = null;
+        if (gitRemote is not null)
+        {
+            if (gitExecutable is null) throw new ArgumentException("--git-remote requires --git-executable.");
+            try { remote = TiaMcp.Core.VersionControl.GitRemote.Parse(gitRemote, gitAllowNetworkRemote); }
+            catch (BridgeException error) { throw new ArgumentException("--git-remote: " + error.Message); }
+        }
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, GitRemote = remote, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

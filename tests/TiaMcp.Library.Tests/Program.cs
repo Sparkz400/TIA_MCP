@@ -508,6 +508,23 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         throw new Exception("Native-disabled CLI accepted " + flag);
     }
 });
+Test("CLI Git remote is local by default and needs an explicit option for credential-free https", work =>
+{
+    string git = Path.Combine(work, "git.exe"), bare = Path.Combine(work, "remote.git");
+    Equal(null, HostOptions.Parse([]).GitRemote);
+    Equal(bare, HostOptions.Parse(["--git-executable", git, "--git-remote", bare]).GitRemote!.Location);
+    Equal("https", HostOptions.Parse(["--git-executable", git, "--git-remote", "https://example.invalid/r.git", "--git-allow-network-remote"]).GitRemote!.Protocol);
+    foreach (var (arguments, message) in new (string[], string)[] {
+        (["--git-executable", git, "--git-remote", "https://example.invalid/r.git"], "--git-allow-network-remote"),
+        (["--git-executable", git, "--git-remote", "https://user:secret@example.invalid/r.git", "--git-allow-network-remote"], "credentials"),
+        (["--git-remote", bare], "requires --git-executable"), (["--git-allow-network-remote"], "requires --git-remote"),
+        (["--git-executable", git, "--git-remote", bare, "--git-remote", bare], "given once") })
+    {
+        try { HostOptions.Parse(arguments); }
+        catch (ArgumentException error) when (error.Message.Contains(message)) { continue; }
+        throw new Exception("Git remote options accepted " + string.Join(' ', arguments));
+    }
+});
 Test("CLI toolsets select named groups and refuse unknown, empty or repeated values", work =>
 {
     Equal(null, HostOptions.Parse([]).Toolsets);

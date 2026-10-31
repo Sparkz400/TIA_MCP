@@ -17463,7 +17463,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Prepare an offline local Git revision from 1..1000 explicitly selected files and committed uploads, at most 16 MiB/file and 64 MiB raw tree. Null uploadRef with delete=false creates an empty file; delete=true removes an exact parent file. Optional parentRevisionRef must be a Host-issued committed revision. Each candidate owns a separate repository. Retains raw bytes, tracked Git diff and file manifest; new files are reviewed through file reads. Returns planSha256 for explicit commit review. No native export/import, remote Git or user repository paths.",
+          "Prepare an offline local Git revision from 1..1000 explicitly selected files and committed uploads, at most 16 MiB/file and 64 MiB raw tree. Null uploadRef with delete=false creates an empty file; delete=true removes an exact parent file. Optional parentRevisionRef must be a Host-issued committed or fetched revision. Each candidate owns a separate repository. Retains raw bytes, tracked Git diff and file manifest; new files are reviewed through file reads. Returns planSha256 for explicit commit review. No native export/import or user repository paths; remote delivery uses vci_push and vci_fetch.",
           "No native VCI mapping, project reconstruction, engineering compatibility or remote publication.",
           "Optional branchName creates an initial branch or forks a private candidate at the exact parent commit. Inherits the parent branch when omitted; refuses existing different branch names. Parent revision repositories remain untouched."
         ]
@@ -18349,6 +18349,99 @@
       ]
     },
     {
+      "featureId": "vci_push",
+      "domain": "version_control",
+      "title": "Push a VCI revision to the configured Git remote",
+      "mcpTools": [
+        "vci_push"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Restricted Git push to the one administrator-configured remote; no Siemens service."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Push the exact commit of a Host-issued committed or fetched revision to branchName on the one Host-configured remote. The remote branch must equal expectedRemoteCommit (absent when omitted) and the commit must descend from it; the lease makes the update atomic and nothing is forced. The remote branch is read back.",
+          "One remote per Host (--git-remote): a local bare repository by default; --git-allow-network-remote admits credential-free https only. No credentials, user names, caller URLs, SSH or other transports; only that remote's protocol is enabled for the call.",
+          "A local remote with active hooks, hooksPath or config includes is refused before dispatch, because receive-pack runs the remote's own hooks and configuration.",
+          "A dispatched push without its receipt stays outcomeUnknown and is never replayed; inspect the remote branch before pushing again.",
+          "No native VCI mapping, project reconstruction or engineering compatibility; network remotes are not qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires administrator-selected --git-executable and --git-remote (a reachable bare repository), valid retained handles and available bounded Host storage."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET Host runtime",
+        "Explicit --git-executable path",
+        "Explicit --git-remote bare repository",
+        "Host-issued committed or fetched revision"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "vci_fetch",
+      "domain": "version_control",
+      "title": "Fetch a VCI branch from the configured Git remote",
+      "mcpTools": [
+        "vci_fetch"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Restricted Git fetch from the one administrator-configured remote; no Siemens service."
+        ]
+      },
+      "implementation": {
+        "status": "implemented",
+        "limitations": [
+          "Fetch branchName into a new fetched-revision record. With parentRevisionRef (checked out on the same branch name) the copied repository fast-forwards to the remote commit; divergent remote history is refused (GitNotFastForward). Without a parent a new repository takes the remote commit. Optional expectedRemoteCommit pins the reviewed remote commit.",
+          "The remote tree must hold only regular files without .gitattributes or .gitmodules; checkout runs with attributes, filters and conversion disabled and every working file must read back as its exact remote blob.",
+          "One remote per Host (--git-remote): a local bare repository by default; --git-allow-network-remote admits credential-free https only. No credentials, user names, caller URLs, SSH or other transports; only that remote's protocol is enabled for the call.",
+          "The record serves as parentRevisionRef and as source of history, branches, materialize, file reads and package capture. Prior records never change; a refused or interrupted fetch leaves only its own private record.",
+          "No native VCI mapping, project reconstruction or engineering compatibility; network remotes are not qualified."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires administrator-selected --git-executable and --git-remote (a reachable bare repository), valid retained handles and available bounded Host storage."
+        ]
+      },
+      "prerequisites": [
+        "Compatible .NET Host runtime",
+        "Explicit --git-executable path",
+        "Explicit --git-remote bare repository"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
       "featureId": "vci_workspace_inspect",
       "domain": "version_control",
       "title": "Inspect native VCI workspaces and mappings",
@@ -18660,6 +18753,62 @@
         "Open project exposing the VCI service",
         "Workspace root outside the project directory and the Host artifact store",
         "A verified recovery checkpoint"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.vci_conflict_resolve",
+      "domain": "version_control",
+      "title": "Resolve a two-sided VCI conflict from a reviewed three-way plan",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "vci_conflict_resolve",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.VersionControl: MappedObject.GetStatus() (IndividualObjectCompareDetails) before, MappedObject.Synchronize(SynchronizationMode.ProjectToWorkspace or SynchronizationMode.WorkspaceToProject) and GetStatus readback after."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Not natively qualified. Payload: workspacePath, objectPath, comparisonRef (a vci_package_compare record with baseline, project = native side, workspace = remote side), packageId and take native, remote or merged; take=merged also needs mergedRecordRef (a preview, committed or fetched revision holding every package file).",
+          "The Host binds the payload: it refuses rows other than divergentChange (VciResolutionUnsupported), an objectPath other than the reviewed package object (VciResolutionMismatch) and sides with different file layouts, and hands the worker the exact remote package hashes and, for remote or merged, the exact bytes (at most 16 files, 4 MiB). Callers never supply hashes or bytes.",
+          "The workspace package must be exactly the reviewed remote side (VciResolutionStale otherwise) and the mapping must report WorkspaceFileChanged (VciResolutionNotNeeded otherwise). ProjectObjectChanged may also be set: that is the native two-sided conflict vci_synchronize refuses as VciConflict.",
+          "take=native synchronizes ProjectToWorkspace and overwrites the remote package files (backed up first; the remote side stays in its Git revision). take=remote and take=merged write the bound bytes into the package, then synchronize WorkspaceToProject with compile=true and the guards of direct mutations; the project's own unsynchronized changes to the object are overwritten, with the project checkpoint as the way back.",
+          "The mapping must read back CompareState Equal and, for remote or merged, the package must equal the written bytes; only the package and .vci configuration may change. A change applies once (InvalidChangeState on repeat); an interrupted apply is held for manual reconciliation.",
+          "Package paths in the comparison are paths below the workspace root, so the revisions mirror the root. V21 has no project-neutral VCI export: the native side of the plan is supplied evidence, such as the object's native export hash on the base package files.",
+          "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
+          "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires the project's VersionControlInterface service, a writable workspace root and an object/format the native API accepts; not probed beyond service presence."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Open project exposing the VCI service",
+        "Workspace root outside the project directory and the Host artifact store",
+        "A verified recovery checkpoint",
+        "Host started with --git-executable, so it can read the reviewed comparison"
       ],
       "acceptanceCriteria": [
         "AC-identity",

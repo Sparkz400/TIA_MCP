@@ -4,7 +4,8 @@ using System.Text.RegularExpressions;
 namespace TiaMcp.Core.VersionControl;
 
 /// <summary>
-/// Restricted local Git profile. No shell, remote, checkout, merge, arbitrary config or user supplied command route.
+/// Restricted local Git profile. No shell, merge, arbitrary config or user supplied command route; the only remote is the
+/// administrator-configured <see cref="GitRemote"/>, reached by compare-and-swap push and fast-forward fetch.
 /// The caller owns resource admission; journal implementations must make pre-dispatch records durable.
 /// </summary>
 public sealed class GitWorkspaceRunner
@@ -316,27 +317,7 @@ public sealed class GitWorkspaceRunner
         var destination = NewDestination(newDestinationDirectory);
         if (Contained(destination, before.RepositoryRoot) || Contained(before.RepositoryRoot, destination))
             throw new BridgeException("GitUnsafePath", "Revision destination must be separate from the source repository.");
-        var output = (await git.RunAsync(before.RepositoryRoot, ["ls-tree", "-r", "-z", "-l", exactCommit], cancellationToken)).Text;
-        var entries = new List<(string Path, string Oid, long Bytes, string Mode)>();
-        var destinations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        long total = 0;
-        foreach (var row in output.Split('\0', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var tab = row.IndexOf('\t');
-            if (tab < 0) throw new BridgeException("GitInvalidOutput", "Invalid tree output.");
-            var fields = row[..tab].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            var path = row[(tab + 1)..]; GitSafety.RelativePath(path);
-            if (fields.Length != 4 || fields[0] is not ("100644" or "100755") || fields[1] != "blob" ||
-                !long.TryParse(fields[3], out var size) || size < 0)
-                throw new BridgeException("GitUnsupportedRepository", "Only regular raw file blobs can be materialized.");
-            if (!destinations.Add(path.Normalize(NormalizationForm.FormC))) throw new BridgeException("GitPathCollision", "Revision paths collide on the destination.");
-            entries.Add((path, GitSafety.ObjectId(fields[2]), size, fields[0])); total += size;
-            if (entries.Count > limits.MaxFiles || size > limits.MaxFileBytes || total > limits.MaxTotalBytes)
-                throw new BridgeException("GitLimitExceeded", "Revision exceeds the configured file or byte budget.");
-        }
-        foreach (var entry in entries)
-            if (VciGuard.Ancestors(entry.Path).Any(x => destinations.Contains(x.Normalize(NormalizationForm.FormC))))
-                throw new BridgeException("GitPathCollision", "A revision file collides with a directory.");
+        var entries = await TreeEntries(before.RepositoryRoot, exactCommit, cancellationToken);
         var id = Guid.NewGuid().ToString("N");
         var binding = GitOperationBinding.Materialize(before, control, ExecutableSha256, exactCommit, destination).Sha256;
         await Record(id, "materialize", before.RepositoryRoot, "dispatchPrepared", cancellationToken, before.HeadCommit, candidate: exactCommit, resource: destination, snapshot: before, binding: binding);
@@ -364,6 +345,139 @@ public sealed class GitWorkspaceRunner
             return new(id, before.RepositoryRoot, exactCommit, destination, immutable, digest);
         }
         catch (Exception ex) { await Unknown(id, "materialize", before.RepositoryRoot, before.HeadCommit, exactCommit, null, ex, binding); throw new GitOutcomeUnknownException(id, exactCommit, ex); }
+    }
+
+    /// <summary>The exact commit of one remote branch, or null when it is absent. Reads only; the remote's upload-pack runs no hooks.</summary>
+    public async Task<string?> RemoteHeadAsync(string repositoryDirectory, GitRemote remote, string branchName, CancellationToken cancellationToken = default)
+    {
+        string reference = GitSafety.Branch(branchName), root = Repository(repositoryDirectory, false);
+        remote.RequireSafeLocal();
+        // ls-remote patterns tail-match, so only the exact full reference counts.
+        var rows = (await git.RunAsync(root, ["ls-remote", remote.Location, reference], cancellationToken, protocol: remote.Protocol)).Text
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(r => r.TrimEnd('\r').Split('\t')).Where(f => f.Length == 2 && f[1] == reference).ToArray();
+        if (rows.Length > 1) throw new BridgeException("GitInvalidOutput", "The remote reported the branch more than once.");
+        return rows.Length == 0 ? null : GitSafety.ObjectId(rows[0][0]);
+    }
+
+    /// <summary>
+    /// Push one exact commit to one remote branch with compare-and-swap: the remote branch must equal expectedRemoteCommit
+    /// (absent when null) and the commit must descend from it. Never forces over unexpected remote history.
+    /// </summary>
+    public async Task<GitBranch> PushAsync(string repositoryDirectory, string expectedSnapshotSha256, GitRemote remote, string branchName,
+        string commit, string? expectedRemoteCommit, CancellationToken cancellationToken = default)
+    {
+        string reference = GitSafety.Branch(branchName), root = Repository(repositoryDirectory, false); GitSafety.ObjectId(commit);
+        if (expectedRemoteCommit is not null) GitSafety.ObjectId(expectedRemoteCommit);
+        using var lease = Acquire(root);
+        var before = await Fresh(root, expectedSnapshotSha256, cancellationToken);
+        await ExactCommit(root, commit, cancellationToken);
+        if (await RemoteHeadAsync(root, remote, branchName, cancellationToken) != expectedRemoteCommit)
+            throw new BridgeException("GitReferenceConflict", "The remote branch does not match its expected commit; fetch and review it first. Nothing was pushed.");
+        if (expectedRemoteCommit == commit) throw new BridgeException("GitNoChanges", "The remote branch already holds this commit.");
+        if (expectedRemoteCommit is not null &&
+            (await git.RunAsync(root, ["merge-base", "--is-ancestor", expectedRemoteCommit, commit], cancellationToken, allowFailure: true)).ExitCode != 0)
+            throw new BridgeException("GitNotFastForward", "The commit must descend from the expected remote commit; fetch the remote branch and build on it. No forced update is made.");
+        string id = Guid.NewGuid().ToString("N"), binding = GitOperationBinding.Push(before, control, ExecutableSha256, remote.Location, branchName, commit, expectedRemoteCommit).Sha256;
+        await Record(id, "push", root, "dispatchPrepared", cancellationToken, before.HeadCommit, before.Sha256, commit, resource: reference, snapshot: before, binding: binding);
+        try
+        {
+            // The lease makes the update atomic against the expected value; ancestry above keeps it a fast-forward.
+            await git.RunAsync(root, ["push", "--porcelain", "--no-verify", "--recurse-submodules=no", "--force-with-lease=" + reference + ":" + (expectedRemoteCommit ?? ""),
+                remote.Location, commit + ":" + reference], cancellationToken, protocol: remote.Protocol);
+            if (await RemoteHeadAsync(root, remote, branchName, CancellationToken.None) != commit) throw new BridgeException("GitReadbackMismatch", "The remote branch did not read back the pushed commit.");
+            if ((await InspectAsync(root, CancellationToken.None)).Sha256 != before.Sha256) throw new BridgeException("GitReadbackMismatch", "The local repository changed during the push.");
+            await Record(id, "push", root, "verified", CancellationToken.None, before.HeadCommit, before.Sha256, commit, resource: reference, snapshot: before, binding: binding);
+            return new(reference, commit);
+        }
+        catch (Exception ex) { await Unknown(id, "push", root, before.HeadCommit, commit, before.Sha256, ex, binding); throw new GitOutcomeUnknownException(id, commit, ex); }
+    }
+
+    /// <summary>
+    /// Fast-forward the clean checked-out branch to the exact commit of the remote branch of the same name, after validating
+    /// that its tree holds only regular files without attributes or submodules. An unborn branch takes the remote commit.
+    /// </summary>
+    public async Task<GitBranch> FetchAsync(string repositoryDirectory, string expectedSnapshotSha256, GitRemote remote, string branchName,
+        string remoteCommit, CancellationToken cancellationToken = default)
+    {
+        string reference = GitSafety.Branch(branchName), root = Repository(repositoryDirectory, false); GitSafety.ObjectId(remoteCommit);
+        using var lease = Acquire(root);
+        var before = await Fresh(root, expectedSnapshotSha256, cancellationToken);
+        await RequireCleanIndex(before, cancellationToken);
+        if (before.HeadReference != reference) throw new BridgeException("GitReferenceConflict", "Fetch updates only the checked-out branch of the same name.");
+        if (before.Status.Length != 0) throw new BridgeException("GitDirtyRepository", "Fetch requires a clean working tree.");
+        if (before.HeadCommit == remoteCommit) throw new BridgeException("GitNoChanges", "The branch already holds the remote commit.");
+        if (await RemoteHeadAsync(root, remote, branchName, cancellationToken) != remoteCommit)
+            throw new BridgeException("PreviewStale", "The remote branch moved; nothing was fetched.");
+        string id = Guid.NewGuid().ToString("N"), binding = GitOperationBinding.Fetch(before, control, ExecutableSha256, remote.Location, branchName, remoteCommit).Sha256;
+        string temporary = "refs/tia-mcp-fetch/" + id; var published = false;
+        await Record(id, "fetch", root, "dispatchPrepared", cancellationToken, before.HeadCommit, before.Sha256, remoteCommit, resource: reference, snapshot: before, binding: binding);
+        try
+        {
+            await git.RunAsync(root, ["fetch", "--no-tags", "--no-write-fetch-head", "--recurse-submodules=no", remote.Location, reference + ":" + temporary],
+                cancellationToken, protocol: remote.Protocol);
+            if ((await git.RunAsync(root, ["rev-parse", "--verify", temporary + "^{commit}"], cancellationToken)).Text.Trim() != remoteCommit)
+                throw new BridgeException("PreviewStale", "The remote branch moved during the fetch.");
+            var entries = await TreeEntries(root, remoteCommit, cancellationToken);
+            if (before.HeadCommit is not null &&
+                (await git.RunAsync(root, ["merge-base", "--is-ancestor", before.HeadCommit, remoteCommit], cancellationToken, allowFailure: true)).ExitCode != 0)
+                throw new BridgeException("GitNotFastForward", "The remote branch does not descend from this revision; fetch it without a parent to review it separately.");
+            string tree = GitSafety.ObjectId((await git.RunAsync(root, ["rev-parse", "--verify", remoteCommit + "^{tree}"], cancellationToken)).Text.Trim());
+            published = true;
+            // A copied repository carries stale index stat data, which a two-tree read-tree treats as local modification.
+            if (before.HeadCommit is not null) await git.RunAsync(root, ["update-index", "-q", "--refresh"], cancellationToken);
+            // Attributes, filters and conversion are disabled and the tree holds only regular blobs, so checkout writes exact blob bytes.
+            await git.RunAsync(root, before.HeadCommit is null ? ["read-tree", "--reset", "-u", remoteCommit] : ["read-tree", "-m", "-u", before.HeadCommit, remoteCommit], cancellationToken);
+            await git.RunAsync(root, ["update-ref", reference, remoteCommit, before.HeadCommit ?? new string('0', 40)], cancellationToken);
+            await git.RunAsync(root, ["update-ref", "-d", temporary, remoteCommit], cancellationToken);
+            var after = await InspectAsync(root, CancellationToken.None);
+            await RequireCleanIndex(after, CancellationToken.None);
+            var blobs = entries.ToDictionary(e => e.Path, e => e.Oid, StringComparer.Ordinal);
+            if (after.HeadReference != reference || after.HeadCommit != remoteCommit || after.HeadTree != tree || after.Status.Length != 0 ||
+                after.Files.Count != blobs.Count || after.Files.Any(f => !blobs.TryGetValue(f.RelativePath, out var oid) ||
+                    oid != GitSafety.BlobObjectId(ReadFile(Path.Combine(root, f.RelativePath), CancellationToken.None))))
+                throw new BridgeException("GitReadbackMismatch", "The fetched branch, index or working files do not read back the remote tree exactly.");
+            await Record(id, "fetch", root, "verified", CancellationToken.None, before.HeadCommit, before.Sha256, remoteCommit, tree, reference, before, binding);
+            return new(reference, remoteCommit);
+        }
+        catch (Exception ex)
+        {
+            await Unknown(id, "fetch", root, before.HeadCommit, remoteCommit, before.Sha256, ex, binding);
+            // Before publication only private objects and the temporary ref exist; the refusal is definite.
+            if (!published && ex is BridgeException { Code: not ("GitCancelled" or "GitTimedOut") } refusal)
+            {
+                await git.RunAsync(root, ["update-ref", "-d", temporary], CancellationToken.None, allowFailure: true);
+                throw refusal;
+            }
+            throw new GitOutcomeUnknownException(id, remoteCommit, ex);
+        }
+    }
+
+    private async Task<List<(string Path, string Oid, long Bytes, string Mode)>> TreeEntries(string root, string commit, CancellationToken token)
+    {
+        var output = (await git.RunAsync(root, ["ls-tree", "-r", "-z", "-l", commit], token)).Text;
+        var entries = new List<(string Path, string Oid, long Bytes, string Mode)>();
+        var destinations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        long total = 0;
+        foreach (var row in output.Split('\0', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var tab = row.IndexOf('\t');
+            if (tab < 0) throw new BridgeException("GitInvalidOutput", "Invalid tree output.");
+            var fields = row[..tab].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var path = row[(tab + 1)..]; GitSafety.RelativePath(path);
+            if (fields.Length != 4 || fields[0] is not ("100644" or "100755") || fields[1] != "blob" ||
+                !long.TryParse(fields[3], out var size) || size < 0)
+                throw new BridgeException("GitUnsupportedRepository", "Only regular raw file blobs can be materialized.");
+            if (Path.GetFileName(path).Equals(".gitattributes", StringComparison.OrdinalIgnoreCase) || Path.GetFileName(path).Equals(".gitmodules", StringComparison.OrdinalIgnoreCase))
+                throw new BridgeException("GitExecutableCustomizationRefused", "Attributes and submodule configuration require a separate reviewed profile.");
+            if (!destinations.Add(path.Normalize(NormalizationForm.FormC))) throw new BridgeException("GitPathCollision", "Revision paths collide on the destination.");
+            entries.Add((path, GitSafety.ObjectId(fields[2]), size, fields[0])); total += size;
+            if (entries.Count > limits.MaxFiles || size > limits.MaxFileBytes || total > limits.MaxTotalBytes)
+                throw new BridgeException("GitLimitExceeded", "Revision exceeds the configured file or byte budget.");
+        }
+        foreach (var entry in entries)
+            if (VciGuard.Ancestors(entry.Path).Any(x => destinations.Contains(x.Normalize(NormalizationForm.FormC))))
+                throw new BridgeException("GitPathCollision", "A revision file collides with a directory.");
+        return entries;
     }
 
     private string NewDestination(string path)

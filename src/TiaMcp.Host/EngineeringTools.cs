@@ -182,6 +182,15 @@ public sealed partial class TiaTools
             try { request = new DbSnapshotWorkflowStore(options.ArtifactsDirectory).LoadPayload(payload); }
             catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidDbSnapshot", error.Message)); }
+        // The worker cannot read Host VCI records, so the reviewed three-way row and its exact package bytes are bound here.
+        if (kind == "vci_conflict_resolve")
+            try
+            {
+                if (options.GitExecutable is null) throw new BridgeException("GitNotConfigured", "Start the Host with --git-executable to read the reviewed VCI comparison.");
+                request = new TiaMcp.Core.VersionControl.VciWorkspaceStore(options.ArtifactsDirectory, options.GitExecutable, options.LibraryLimits).ConflictResolutionPayload(payload);
+            }
+            catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException or UnauthorizedAccessException)
+            { return Failure(error as BridgeException ?? new BridgeException("VciWorkflowFailed", "The reviewed VCI comparison could not be read.")); }
         // The worker cannot read the upload store; only exact public DER of the committed upload is handed over.
         if (kind == "certificate_import")
             try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }
