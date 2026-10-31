@@ -21,7 +21,7 @@ require, save, ref, sha, utc, load = base.require, base.save, base.ref, base.sha
 
 # Exact direct-child collector used by production-host-20261016/startup-02.
 # Historical packets keep their frozen lifecycle04 source and original outcomes.
-REVIEWED_LIFECYCLE_SHA256 = "dff10491a60f497c7f0b96eac0d19f966390b0ea1269b5fb9d4b9f9c47a8c891"
+REVIEWED_LIFECYCLE_SHA256 = "3d4f9e622c60a151a7d46c90fe06460bd3e0abfef7f22a172e069251f0c9652c"
 
 
 def verify_lifecycle_source(scripts):

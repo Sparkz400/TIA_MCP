@@ -172,6 +172,15 @@ internal static class TextListSetEvolutionTests
                 numeric ? "numeric explicit member rebind" : "Bool explicit member rebind");
             Record(Request(rebound), "regenerate exact rebound member");
         }
+        // Host loss at every publication of a ready update (4 candidates, input, record) and of a conflict (input, record only).
+        var lossReady = Request(unchanged); lossReady["outputs"]![0]!["template"]!["trueText"]!["en-US"] = "Host loss sweep";
+        string lossReadyUpload = Input(lossReady);
+        PublishInterruptionSweep.Run("set-evolution-ready", root, ".text-set.json", 6, s => s.GenerateTextListSet(lossReadyUpload), (ok, label) => Check(ok, label));
+        Release();
+        var lossConflict = Request(unchanged); lossConflict["outputs"]![0]!["bindingAction"] = "rebind";
+        string lossConflictUpload = Input(lossConflict);
+        PublishInterruptionSweep.Run("set-evolution-conflict", root, ".text-set.json", 2, s => s.GenerateTextListSet(lossConflictUpload), (ok, label) => Check(ok, label));
+        Release();
         var swap = Choices(unchanged);
         foreach (var (index, other) in new[] { (0, 1), (1, 0) })
         {

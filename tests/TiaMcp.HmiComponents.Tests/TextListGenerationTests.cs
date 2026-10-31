@@ -90,6 +90,10 @@ internal static class TextListGenerationTests
         Check((string?)first["files"]![0]!["artifact"]!["sha256"] == (string?)second["files"]![0]!["artifact"]!["sha256"], "Translation change preserves configuration bytes");
         Check((string?)first["files"]![1]!["artifact"]!["sha256"] != (string?)second["files"]![1]!["artifact"]!["sha256"], "Translation change affects text-library bytes");
         Check(ProjectReviewStore.ReadArtifact(root, second["preservedFiles"]![0]!["artifact"]!.AsObject()).SequenceEqual(manual), "Opaque manual peer bytes retained exactly");
+        var lossRequest = Request(Packet(first), first); lossRequest["template"]!["trueText"]!["en-US"] = "Host loss sweep";
+        string lossUpload = Input(lossRequest);
+        PublishInterruptionSweep.Run("author-v2", root, ".author.json", 4, s => s.AuthorTextLists(lossUpload), Check);
+        ReleaseUploads();
         var renamedPacket = Packet(first); renamedPacket["afterComponent"] = Component(Snapshot("Bool", true, "Enabled"));
         renamedPacket["bindings"]![0]!["afterMember"]!["memberPath"] = new JsonArray("Enabled");
         var renameRequest = Request(renamedPacket, first); var renamedMember = Author(renameRequest);

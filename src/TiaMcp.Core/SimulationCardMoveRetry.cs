@@ -67,6 +67,9 @@ namespace TiaMcp.Simulation
             }
         }
 
+        // The first refusal and the expiry name the processes holding the card (SimulationCardLockHolders); retries in between do not re-query.
+        public static bool RecordsHolders(string outcome, int attempt) => outcome == "moveThrew" && attempt == 1 || outcome == "retryAdmissionExpired";
+
         private static bool RetryableMoveException(Exception exception)
         {
             if (!(exception is IOException) && !(exception is UnauthorizedAccessException)) return false;

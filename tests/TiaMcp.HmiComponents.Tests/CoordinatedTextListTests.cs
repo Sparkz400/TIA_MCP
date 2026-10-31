@@ -111,6 +111,10 @@ internal static class CoordinatedTextListTests
         update["outputs"]![1]!["template"]!["states"]![1]!["toValue"] = 20;
         var second = Record(update, "coordinated regeneration with state and translated Bool changes");
         Record(Request(Packet(first), first), "unchanged coordinated regeneration");
+        var loss = firstRequest.DeepClone().AsObject(); loss["outputs"]![0]!["template"]!["trueText"]!["en-US"] = "Host loss sweep";
+        string lossUpload = Input(loss);
+        PublishInterruptionSweep.Run("generate-set", root, ".text-set.json", 10, s => s.GenerateTextListSet(lossUpload), Check);
+        Release();
         foreach (var (label, edit) in new (string, Action<JsonObject>)[] {
             ("asymmetric language order", r => r["outputs"]![0]!["template"]!["languages"] = new JsonArray("de-DE", "en-US")),
             ("asymmetric default", r => r["outputs"]![1]!["template"]!["defaultLanguage"] = "de-DE"),

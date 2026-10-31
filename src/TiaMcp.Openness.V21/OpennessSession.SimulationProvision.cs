@@ -969,12 +969,12 @@ namespace TiaMcp.Openness.V21
                 (outcome, attempt, elapsed, exception) => checkpoint(new JObject {
                     ["source"] = source, ["destination"] = destination,
                     ["sourceKind"] = sourceIsOriginal ? "originalProtectedCard" : "opaqueRuntimeCard",
-                    ["outcome"] = outcome, ["attempt"] = attempt, ["retryElapsedMs"] = elapsed,
+                    ["outcome"] = outcome, ["attempt"] = attempt, ["retryElapsedMs"] = elapsed, ["atUtc"] = DateTime.UtcNow.ToString("O"),
                     ["retryAdmissionBudgetMs"] = SimulationCardMoveRetry.RetryAdmissionBudgetMs, ["maxMoveCalls"] = SimulationCardMoveRetry.MaximumMoveCalls,
                     ["exceptionType"] = exception?.GetType().FullName,
                     ["hresult"] = exception == null ? (int?)null : exception.HResult,
                     // An open file anywhere below refuses a directory move with 0x80070005; name its holders at the first refusal and at expiry.
-                    ["lockHolders"] = outcome == "moveThrew" && attempt == 1 || outcome == "retryAdmissionExpired" ? SimulationCardHolders(source) : null,
+                    ["lockHolders"] = SimulationCardMoveRetry.RecordsHolders(outcome, attempt) ? SimulationCardHolders(source) : null,
                     ["opaqueContentsRead"] = false }), () => timer.ElapsedMilliseconds, Thread.Sleep);
         }
 

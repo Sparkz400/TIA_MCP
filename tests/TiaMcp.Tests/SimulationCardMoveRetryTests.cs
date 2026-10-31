@@ -20,6 +20,27 @@ internal static class SimulationCardMoveRetryTests
         return Task.CompletedTask;
     }
 
+    // Access denied for the whole budget (the 23 October failure): the report rows carry attempt, timing and HRESULT, and only the
+    // first refusal and the expiry ask for the holders.
+    internal static Task AccessDeniedRowsCarryTimingHResultAndHolderQueries()
+    {
+        long now = 0; var rows = new List<(string Outcome, int Attempt, long Elapsed, int HResult, bool Holders)>();
+        var denied = new IOException("Injected access denial", unchecked((int)0x80070005));
+        Check.ThrowsAsync<IOException>(() => {
+            SimulationCardMoveRetry.Run(() => { }, () => throw denied, () => { }, () => false,
+                (outcome, attempt, elapsed, exception) => rows.Add((outcome, attempt, elapsed, exception?.HResult ?? 0, SimulationCardMoveRetry.RecordsHolders(outcome, attempt))),
+                () => now, delay => now += delay);
+            return Task.CompletedTask;
+        }).Wait();
+        Check.Equal(unchecked((int)0x80070005), rows.Last().HResult);
+        Check.Equal("retryAdmissionExpired", rows.Last().Outcome);
+        Check.Equal(true, rows.Last().Elapsed >= SimulationCardMoveRetry.RetryAdmissionBudgetMs);
+        Check.Equal(true, rows.Where(row => row.Outcome == "moveThrew").All(row => row.HResult == unchecked((int)0x80070005)));
+        Check.Equal(2, rows.Count(row => row.Holders));
+        Check.Equal(true, rows.First(row => row.Holders).Outcome == "moveThrew" && rows.First(row => row.Holders).Attempt == 1);
+        return Task.CompletedTask;
+    }
+
     internal static async Task BoundsAndNoNativeReplay()
     {
         long now = 0; int moves = 0;
