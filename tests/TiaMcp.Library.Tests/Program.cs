@@ -52,6 +52,8 @@ static byte[] Zip(params (string Name, byte[] Bytes, int? Attributes)[] files)
     return output.ToArray();
 }
 static byte[] Text(string value) => Encoding.UTF8.GetBytes(value);
+[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+static extern uint GetShortPathNameW(string longPath, StringBuilder shortPath, uint size);
 static PackageStatus StageZip(string work, byte[] zip, PackageIntakeLimits? limits = null) =>
     new PackageStore(Path.Combine(work, "artifacts"), limits).Stage(hostPath: Write(work, "source.zip", zip));
 
@@ -397,10 +399,43 @@ Test("host path accepts only library inputs and copies nothing otherwise", work 
     var store = new PackageStore(artifacts);
     var plain = Path.Combine(work, "plain"); Directory.CreateDirectory(Path.Combine(plain, "nested"));
     Write(plain, "notes.txt", Text("secret")); Write(Path.Combine(plain, "nested"), "Library.al21", [1]);
-    foreach (var path in new[] { Write(work, "id_ed25519", Text("key")), Write(work, "secrets.txt", Text("secret")), Write(work, "Block.scl", Text("x")), plain })
+    // An archive in a folder does not make it a library directory: only uncompressed .alXX/.apXX markers count.
+    var downloads = Path.Combine(work, "Downloads"); Write(downloads, "Vendor.zal21", [1]); Write(downloads, "notes.txt", Text("private"));
+    foreach (var path in new[] { Write(work, "id_ed25519", Text("key")), Write(work, "secrets.txt", Text("secret")), Write(work, "Block.scl", Text("x")), plain, downloads })
         Reject("PackageInvalid", () => store.Stage(hostPath: path));
     Equal(0, Directory.GetFiles(artifacts, "*", SearchOption.AllDirectories).Count(x => !x.EndsWith(".lock", StringComparison.Ordinal)));
     Equal("ready", store.Stage(hostPath: Write(work, "Library.zip", Zip(("Library.zal21", [1], null)))).State);
+});
+Test("host path is checked under its full on-disk name", work =>
+{
+    var artifacts = Path.Combine(work, "artifacts");
+    var store = new PackageStore(artifacts);
+    var zip = Zip(("Library.zal21", [1], null));
+    foreach (var path in new[] { Write(work, "secret.zipx", zip), Write(work, "Library.al2x", [1]), Path.Combine(work, "Missing.zip") })
+        Reject("PackageInvalid", () => store.Stage(hostPath: path));
+    // An 8.3 short name such as SECRET~1.ZIP carries an extension the long name lacks; the temp volume is tried when this one makes none.
+    string? ShortPath(string path)
+    {
+        var buffer = new StringBuilder(1024);
+        return GetShortPathNameW(path, buffer, (uint)buffer.Capacity) > 0 && Path.GetFileName(buffer.ToString()).Contains('~')
+            ? Path.Combine(Path.GetDirectoryName(path)!, Path.GetFileName(buffer.ToString())) : null;
+    }
+    var temp = Path.Combine(Path.GetTempPath(), "tiamcp-short-" + Guid.NewGuid().ToString("N"));
+    try
+    {
+        var shortPath = new[] { work, temp }.Select(folder => ShortPath(Write(folder, "secret.zipx", zip))).FirstOrDefault(path => path is not null);
+        if (shortPath is null) Console.WriteLine("NOTE no volume here generates 8.3 short names; only the long-extension cases ran.");
+        else Reject("PackageInvalid", () => store.Stage(hostPath: shortPath));
+    }
+    finally { if (Directory.Exists(temp)) Directory.Delete(temp, true); }
+    Equal(0, Directory.GetFiles(artifacts, "*", SearchOption.AllDirectories).Count(x => !x.EndsWith(".lock", StringComparison.Ordinal)));
+});
+Test("a failed directory stage keeps no partial copy", work =>
+{
+    var artifacts = Path.Combine(work, "artifacts");
+    var source = Path.Combine(work, "source"); Write(source, "Library.al21", [1]); Write(Path.Combine(source, "System"), "data.bin", [2, 3]);
+    Reject("PackageLimitExceeded", () => new PackageStore(artifacts, new PackageIntakeLimits { MaxInputBytes = 1 }).Stage(hostPath: source));
+    Equal(0, Directory.GetFiles(artifacts, "*", SearchOption.AllDirectories).Count(x => !x.EndsWith(".lock", StringComparison.Ordinal)));
 });
 Test("chunk response supplies exact accepted range and chunk digest", work =>
 {
@@ -414,23 +449,14 @@ Test("chunk response supplies exact accepted range and chunk digest", work =>
 Test("server-side upload slices chunks and aborts a failed upload", work =>
 {
     var bytes = Text("ten bytes!");
-    var store = new ArtifactUploadStore(Path.Combine(work, "ok"), new PackageIntakeLimits { MaxChunkBytes = 4 });
+    var store = new ArtifactUploadStore(work, new PackageIntakeLimits { MaxChunkBytes = 4, MaxUploads = 1 });
+    // A wrong digest lets all three chunks land and fails only the commit.
+    try { store.Upload(bytes, "wrong.bin", Hash(Text("other"))); throw new Exception("Expected the commit to refuse a wrong digest."); }
+    catch (BridgeException error) when (error.Code == "PackageChanged") { }
+    var record = Directory.GetFiles(work, "upload.json", SearchOption.AllDirectories).Single();
+    Equal("aborted", store.Status(Path.GetFileName(Path.GetDirectoryName(record))!).State);
+    // The aborted upload released its slot, so the one allowed upload still succeeds.
     Equal(Hash(bytes), store.ResolveCommitted(store.Upload(bytes, "multi.bin")).Sha256);
-    // A foreign handle on the upload data makes a later chunk write fail mid-upload.
-    var failing = Path.Combine(work, "failing");
-    var slow = new ArtifactUploadStore(failing, new PackageIntakeLimits { MaxChunkBytes = 1 });
-    var done = false; FileStream? held = null;
-    var holder = Task.Run(() =>
-    {
-        while (!Volatile.Read(ref done) && held is null)
-            foreach (var data in Directory.EnumerateFiles(failing, "data.bin", SearchOption.AllDirectories))
-                try { held = new FileStream(data, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete); break; } catch (IOException) { }
-    });
-    try { slow.Upload(new byte[4096], "fail.bin"); throw new Exception("Expected the held upload data to fail a chunk write."); }
-    catch (IOException) { }
-    finally { Volatile.Write(ref done, true); holder.Wait(); held?.Dispose(); }
-    var record = Directory.GetFiles(failing, "upload.json", SearchOption.AllDirectories).Single();
-    Equal("aborted", slow.Status(Path.GetFileName(Path.GetDirectoryName(record))!).State);
 });
 Test("committed release frees lifetime quota and preserves staged package", work =>
 {

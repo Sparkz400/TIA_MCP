@@ -312,7 +312,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('host', 'worker', 'root'): parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--store-root', action='append', required=True)
-    parser.add_argument('--resume-root', type=Path)
+    parser.add_argument('--resume-root', type=Path,
+                        help='Continue a prior run in a fresh worker. Since 31 October 2026 its capture is refused with ProjectIsolationRequired: a reopen no longer grants the fresh worker watch ownership of a fixture it did not create')
     parser.add_argument('--resume-operation')
     parser.add_argument('--prior-receipts', type=Path)
     parser.add_argument('--failure-case', choices=FAILURE_CASES,

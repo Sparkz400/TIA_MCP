@@ -7199,7 +7199,7 @@
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "InterfaceOperatingMode (added 28 October) is allowlisted as a set of InterfaceOperatingModes names ([Flags] enums take Enum.ToString's form, for example \"IoController, IoDevice\") but not natively qualified: on a CPU 1511-1 PN interface it applies, and the device compile then requires a transfer area that no change kind creates. Since apply requires compile=true, setting the mode without a transfer area fails the device compile into recovery_required; the uncompiled mode-then-area sequence of local.gsd_transfer_areas.20261028 is refused."
+          "InterfaceOperatingMode (added 28 October) is allowlisted as a set of InterfaceOperatingModes names ([Flags] enums take Enum.ToString's form, for example \"IoController, IoDevice\") but not natively qualified: on a CPU 1511-1 PN interface it applies, and the device compile then requires a transfer area that no change kind creates."
         ]
       },
       "qualification": {
@@ -7217,8 +7217,7 @@
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state",
-        "compile=true and a verified recovery checkpoint"
+        "Applicable native services and project protection state"
       ],
       "acceptanceCriteria": [
         "AC-identity",

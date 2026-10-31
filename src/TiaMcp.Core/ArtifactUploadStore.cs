@@ -86,9 +86,11 @@ public sealed class ArtifactUploadStore
     }
 
     /// <summary>Server-side upload of in-memory bytes in chunk-limit slices; a failed upload is aborted so it holds no quota.</summary>
-    public string Upload(byte[] bytes, string name)
+    public string Upload(byte[] bytes, string name) => Upload(bytes, name, Convert.ToHexStringLower(SHA256.HashData(bytes)));
+
+    internal string Upload(byte[] bytes, string name, string sha256)
     {
-        var begun = Begin(name, bytes.Length, Convert.ToHexStringLower(SHA256.HashData(bytes)));
+        var begun = Begin(name, bytes.Length, sha256);
         try
         {
             for (int offset = 0; offset < bytes.Length; offset += begun.MaxChunkBytes)

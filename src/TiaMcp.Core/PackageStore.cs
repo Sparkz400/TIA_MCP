@@ -46,10 +46,15 @@ public sealed class PackageStore
             source = Path.GetFullPath(hostPath!);
             PackageStorage.EnsureNoLinks(source);
             label = Path.GetFileName(Path.TrimEndingDirectorySeparator(source));
+            // GetFullPath expands an 8.3 alias (SECRET~1.ZIP for secret.zipx) only when it can; the extension rule below must see the
+            // name as stored, so the entry has to exist under exactly this name.
+            var parent = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(source));
+            if (parent is null || !new DirectoryInfo(parent).EnumerateFileSystemInfos(label).Any(entry => entry.Name.Equals(label, StringComparison.OrdinalIgnoreCase)))
+                throw new BridgeException("PackageInvalid", "hostPath must name an existing file or directory by its full name.");
             // Staged originals are readable through artifact_read, so a host path may only name a library input.
-            if (Directory.Exists(source) ? !Directory.EnumerateFiles(source).Any(IsNative)
+            if (Directory.Exists(source) ? !Directory.EnumerateFiles(source).Any(file => IsNative(file) && !Path.GetExtension(file).StartsWith(".z", StringComparison.OrdinalIgnoreCase))
                 : !Path.GetExtension(source).Equals(".zip", StringComparison.OrdinalIgnoreCase) && !IsNative(source))
-                throw new BridgeException("PackageInvalid", "hostPath must be a .zip, a native library/project file or archive (.alXX, .zalXX, .apXX, .zapXX), or a directory with such a native marker at its top level.");
+                throw new BridgeException("PackageInvalid", "hostPath must be a .zip, a native .alXX/.zalXX/.apXX/.zapXX file, or a native library or project directory with an .alXX/.apXX marker at its top level.");
         }
         if (Directory.EnumerateDirectories(_packages).Count() >= _limits.MaxPackages)
             throw new BridgeException("PackageLimitExceeded", "Package count limit reached; release unreferenced packages explicitly.");
@@ -105,12 +110,14 @@ public sealed class PackageStore
         }
         catch (Exception error)
         {
-            // Preserve the original bytes and failure evidence. Never publish a partial extraction as ready.
-            PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "failed", createdUtc = DateTimeOffset.UtcNow,
+            // A failed host directory leaves no partial copy of its files. Other sources keep their original bytes as failure
+            // evidence. Never publish a partial extraction as ready.
+            if (isDirectory) PackageStorage.DeleteOwned(_packages, directory);
+            else PackageStorage.Save(Path.Combine(directory, "state.json"), new { schemaVersion = 1, packageId = id, state = "failed", createdUtc = DateTimeOffset.UtcNow,
                 error = new { code = (error as BridgeException)?.Code ?? "PackageInvalid", message = error.Message } });
             if (error is OperationCanceledException) throw;
             throw new BridgeOperationException((error as BridgeException)?.Code ?? "PackageInvalid", error.Message,
-                JsonSerializer.SerializeToElement(new { packageId = id, state = "failed", recoveryPath = directory, retrySafe = true }, BridgeProtocol.Json));
+                JsonSerializer.SerializeToElement(new { packageId = id, state = "failed", recoveryPath = isDirectory ? null : directory, retrySafe = true }, BridgeProtocol.Json));
         }
     }
 
