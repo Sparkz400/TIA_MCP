@@ -3212,6 +3212,29 @@
         "One library transaction (library_create_master_copy into the project library) in one owned scratch CPU 1511-1 PN V4.1 with one G120C PN that is not on the CPU's IO system; other library kinds share the device compile and observation checks but were not run with a drive.",
         "The drive itself is never compiled: it exposes no compiler service and is listed under notCompiled, never counted as compiled."
       ]
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort 21.0.1.0",
+        "languages": [
+          "en-US",
+          "de-DE"
+        ],
+        "sourceCommit": "1121bb82d1f3aeb584c32f747888a4f220d166db",
+        "passedScope": "Change kind hmi_text_list_import on a qualification Host (--hmi-text-list-qualification unified-comfort, frozen artifacts/fw3f = 1121bb82, run artifacts/ti1): ten qualify_interruption.py tl-* scenarios on owned copies of the HmiSeeder textlist-fixture MTP700 Unified Comfort archive (artifacts/tx2/f1). Worker loss at the checkpoint (held, not persisted), during the baseline compile, the native import, the export readback and the compile/preservation stage (released unchanged, not persisted), and after the save (held, persisted); Host loss at the checkpoint, import, readback and save (the worker completed the apply and saved; held, persisted). Each reconciled once from a fresh Host and owned TIA without replay (journal bytes unchanged), one admission each, checkpoint recovery for released cases and an independent fresh read of the effect."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.interruption.20261031.json"
+      ],
+      "limitations": [
+        "Interruption only: the route runner (apply sequence, refusals, restore, fresh reopen) has not passed on this build; its runs tx1 and tx2 stopped before their first saved apply on defects fixed in c6191401 and 1121bb82.",
+        "One Unified Comfort fixture with en-US/de-DE enabled for runtime; Unified PC, other devices and customer projects were not interrupted.",
+        "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
+      ]
     }
   ],
   "features": [
@@ -12485,12 +12508,15 @@
           "Apply requires compile=true and save=true. Both candidate files are re-hashed before the checkpoint. After it the HMI device is compiled and the scope captured again, then the pair is imported with HmiTextListComposition.Import (which must return true) and the complete export is read back: every candidate list must equal the candidate and every other list stay unchanged, compared by meaning (entries with defaults applied, texts per language; the rule of the native qualification oracle) by a strict YAML-subset reader that refuses any other construct and every unresolved text reference. Outside the candidate lists' own typed nodes and the export the capture must be unchanged, and the device's compiler errors and warnings unchanged by the import (Unified fixtures keep their encrypted-transfer password errors); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
           "Gate: this kind only (31 October maintainer decision). The production profile list ships empty; the evidence-curation commit adds each profile whose native qualification passed (candidates unified-comfort and unified-pc). Until then only a Host started with --hmi-text-list-qualification <profile> admits that profile, in a project its own worker retrieved or created. Classic, other profiles, screens and every hmi_engineering operation stay behind the closed preservation gate. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Consumers of an imported list are checked only by typed-readback equality of every other node; formatted and system text lists, graphic lists and script modules are not imported; runtime and visual behavior are not verified.",
+          "Native, 31 October (local.hmi.text-list-import.interruption.20261031): worker loss at the checkpoint, baseline compile, import, readback, compile/preservation and after the save, and Host loss at the checkpoint, import, readback and save, each reconciled once without replay on Unified Comfort; the Host-loss cases show the worker completing a whole apply with save. The route runner (apply sequence, refusals, restore, fresh reopen) has not passed yet: runs tx1/tx2 stopped before the first saved apply on a fixture runtime language without readable Order and on compiler-tree shape differences, both fixed; no profile is admitted in production.",
           "Compiled against the V21 PublicAPI only; not natively qualified."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.hmi.text-list-import.interruption.20261031"
+        ]
       },
       "availability": {
         "status": "conditional",

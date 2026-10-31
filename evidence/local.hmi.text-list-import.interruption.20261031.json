@@ -1,0 +1,60 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.text-list-import.interruption.20261031",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-31T16:50:13+00:00",
+  "source": {
+    "commit": "1121bb82d1f3aeb584c32f747888a4f220d166db",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Change kind hmi_text_list_import on a qualification Host (--hmi-text-list-qualification unified-comfort, frozen artifacts/fw3f = 1121bb82, run artifacts/ti1): ten qualify_interruption.py tl-* scenarios on owned copies of the HmiSeeder textlist-fixture MTP700 Unified Comfort archive (artifacts/tx2/f1). Worker loss at the checkpoint (held, not persisted), during the baseline compile, the native import, the export readback and the compile/preservation stage (released unchanged, not persisted), and after the save (held, persisted); Host loss at the checkpoint, import, readback and save (the worker completed the apply and saved; held, persisted). Each reconciled once from a fresh Host and owned TIA without replay (journal bytes unchanged), one admission each, checkpoint recovery for released cases and an independent fresh read of the effect.",
+  "limitations": [
+    "Interruption only: the route runner (apply sequence, refusals, restore, fresh reopen) has not passed on this build; its runs tx1 and tx2 stopped before their first saved apply on defects fixed in c6191401 and 1121bb82.",
+    "One Unified Comfort fixture with en-US/de-DE enabled for runtime; Unified PC, other devices and customer projects were not interrupted.",
+    "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9ecd53c20dcb6c2608c92a358693144701eae1584e3956542e384c4f10170c02"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "28d78af58e336c628f161e89504894c21e52cafae50ca28bb74e78d57b527477"
+    }
+  ],
+  "runs": [
+    {
+      "report": "ti1.json",
+      "sha256": "e29c7c63c3ce6386ae4088b15cfdc42134c29375c006c4218da0593a4690b91a",
+      "bytes": 2426604,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_upload_begin",
+        "artifact_upload_chunk",
+        "artifact_upload_commit",
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "hmi_text_list_author",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    }
+  ]
+}

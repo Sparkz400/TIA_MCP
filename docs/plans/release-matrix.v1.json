@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "f9757e9b61af17f667eb57d1b38012662935cf1a10234ba4fd1fe74d4cc45f9a",
+    "catalogSha256": "c2c414fa38c801f6b6c33897354ef8bd6fbec4bce4b59098cd7bdca868a867e8",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -10168,7 +10168,9 @@
       "owners": [
         "X07"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.hmi.text-list-import.interruption.20261031"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -25228,6 +25230,25 @@
         {
           "path": "evidence/local.hmi.text-list-import.20261029.json",
           "sha256": "7c7042792dab344a28bf1ebc1f31d4393545d39c9d96d1043e4f3a9dac2e2e9e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "languages": [
+          "en-US",
+          "de-DE"
+        ]
+      },
+      "sourceCommit": "1121bb82d1f3aeb584c32f747888a4f220d166db",
+      "retained": [
+        {
+          "path": "evidence/local.hmi.text-list-import.interruption.20261031.json",
+          "sha256": "1047ac859f202845fc3b2758050469aca9521c7395d71f52be3f15d946f8801f"
         }
       ],
       "notRetained": []

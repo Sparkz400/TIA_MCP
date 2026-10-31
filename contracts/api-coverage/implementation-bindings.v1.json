@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f9757e9b61af17f667eb57d1b38012662935cf1a10234ba4fd1fe74d4cc45f9a",
-      "bytes": 1435517
+      "sha256": "c2c414fa38c801f6b6c33897354ef8bd6fbec4bce4b59098cd7bdca868a867e8",
+      "bytes": 1438146
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2402,8 +2402,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiTextListImportRules.cs",
-      "sha256": "c5235d54ad2c747bb1b9154f2816fae2cded1a11dba7a7d58745766099939c8e",
-      "bytes": 32999
+      "sha256": "43df7cf6a900707662617e89900ae96d10f0eb0274116a523d401c8305421626",
+      "bytes": 33819
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs",
@@ -98507,7 +98507,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.text-list-import.interruption.20261031",
+          "profileSha256": "385fe7712309b044a901fc1e539e2bd61167802c913fa54126981a4ae819a3aa",
+          "artifacts": [
+            "evidence/local.hmi.text-list-import.interruption.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -122355,6 +122363,11 @@
       "sha256": "7c7042792dab344a28bf1ebc1f31d4393545d39c9d96d1043e4f3a9dac2e2e9e"
     },
     {
+      "path": "evidence/local.hmi.text-list-import.interruption.20261031.json",
+      "state": "observed",
+      "sha256": "1047ac859f202845fc3b2758050469aca9521c7395d71f52be3f15d946f8801f"
+    },
+    {
       "path": "evidence/local.hostonly.access-review.rerun.20261028.json",
       "state": "observed",
       "sha256": "e4b0e34bc46b1f11aa18429146143e4ca1c911a8fcf7cde900c5c45276539212"
@@ -123173,6 +123186,10 @@
     {
       "id": "local.hmi.text-list-import.20261029",
       "profileSha256": "87410f19140d4e7f4ee513f744db565fc82eb41b59ef48682e34cc8b6ccd998a"
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption.20261031",
+      "profileSha256": "385fe7712309b044a901fc1e539e2bd61167802c913fa54126981a4ae819a3aa"
     },
     {
       "id": "local.hostonly.access-review.rerun.20261028",

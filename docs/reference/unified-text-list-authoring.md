@@ -231,6 +231,8 @@ or `unified-pc` admits that profile, in a project its own worker retrieved or cr
   project; a lost save or a Host loss holds the admission for review
   (`engineering_admission_reconcile`).
 
+Native status (31 October): interruption at every boundary passed on Unified Comfort; the route
+runner has not passed yet ([record](../verification/hmi-text-list-route-20261031.md)).
 Native runners: [`qualify_hmi_text_list_route.py`](../../scripts/qualify_hmi_text_list_route.py)
 (apply, refusals, restore, fresh reopen per profile) and the `tl-*` scenarios of
 [`qualify_interruption.py`](../../scripts/qualify_interruption.py) (worker and Host loss at
