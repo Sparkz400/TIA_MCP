@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "176a3392aab60c654be837490476549f0bf77bd4061a989e130a3ce9fff649ea",
-      "bytes": 1441177
+      "sha256": "dd1c57ab748f6cf9e4a9f578a7768520eabee5cee7cee8e2c6f4ba15b8b2a01f",
+      "bytes": 1441319
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1612,13 +1612,13 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitProcess.cs",
-      "sha256": "16bcbfd23122b5829711ca256b5ce643118b88ee826efd39d893e853a4f82b86",
-      "bytes": 16601
+      "sha256": "6ebb0bd23ce6be85a42f17dadc0e02a653acaa369d8328e322290b80bb27323f",
+      "bytes": 17376
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitRemote.cs",
-      "sha256": "95ff0e41b6c0b9db866fa7ef8f758a4f4834fcf70096d0092855374bff758864",
-      "bytes": 3452
+      "sha256": "2ef0e5799329c6da77438164a21f1cb826017a687434d5424226b9437cc29f76",
+      "bytes": 3392
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceModels.cs",
@@ -43466,8 +43466,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/GitProcess.cs",
           "name": "NoLinks",
-          "line": 121,
-          "endLine": 125,
+          "line": 135,
+          "endLine": 139,
           "sha256": "e104d60e73fff1c7fa83d8117d6391b8b008f46e27f32900afb5a86a65ca983d"
         },
         {

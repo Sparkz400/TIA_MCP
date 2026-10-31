@@ -137,19 +137,59 @@ internal static class RemoteChecks
         await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
         File.Delete(alternates);
         // Git's non-strict lookup enters <remote>/.git before <remote>: an inner bare repository with a hook, or a gitdir file.
-        string inner = Path.Combine(bare, ".git"), elsewhere = Path.Combine(fixtureRoot, "elsewhere.git");
+        // Each case first shows with plain Git that the indirection is live, then that the Host refuses it before any Git call.
+        string inner = Path.Combine(bare, ".git"), elsewhere = Path.Combine(fixtureRoot, "elsewhere.git"), marker = Path.Combine(fixtureRoot, "hook-ran");
+        string records = Path.Combine(root, "vci-workspaces", "records");
+        string Refs(string repository) => Plain(fixtureRoot, "--git-dir=" + repository, "for-each-ref", "--format=%(refname)");
+        async Task RefusedFetchReadsNothing(string code, string label)
+        {
+            var before = Directory.GetDirectories(records).ToHashSet(StringComparer.Ordinal);
+            await Reject(code, () => store.FetchAsync("main"));
+            var created = Directory.GetDirectories(records).Single(d => !before.Contains(d));
+            Check(!Directory.EnumerateFiles(Path.Combine(created, "repository", ".git", "objects"), "*", SearchOption.AllDirectories).Any() &&
+                !File.Exists(Path.Combine(created, "fetch-journal", "0001.json")), "a refused fetch dispatched nothing and read no object: " + label);
+        }
         Plain(fixtureRoot, "init", "--bare", inner);
-        File.WriteAllText(Path.Combine(inner, "hooks", "pre-receive"), "#!/bin/sh\necho ran > \"" + Path.Combine(fixtureRoot, "hook-ran").Replace('\\', '/') + "\"\n");
+        File.WriteAllText(Path.Combine(inner, "hooks", "pre-receive"), "#!/bin/sh\necho ran > \"" + marker.Replace('\\', '/') + "\"\n");
+        Plain(clone, "push", bare, "HEAD:refs/heads/control");
+        Check(File.Exists(marker) && Refs(inner).Contains("refs/heads/control") && !Refs(bare).Contains("refs/heads/control"),
+            "control: plain Git pushing to the remote path runs the inner repository's hook and updates only the inner repository");
+        File.Delete(marker);
         await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
-        await Reject("GitUnsupportedRepository", () => store.FetchAsync("main"));
+        await RefusedFetchReadsNothing("GitUnsupportedRepository", "inner .git repository");
+        Check(!File.Exists(marker) && !Refs(inner).Contains("refs/heads/review/local"), "the Host push never ran the inner hook or reached the inner repository");
+        foreach (var file in Directory.EnumerateFiles(inner, "*", SearchOption.AllDirectories)) File.SetAttributes(file, FileAttributes.Normal); // Git objects are read-only.
         Directory.Delete(inner, true);
         Plain(fixtureRoot, "init", "--bare", elsewhere);
         File.WriteAllText(inner, "gitdir: " + elsewhere.Replace('\\', '/') + "\n");
+        Plain(clone, "push", bare, "HEAD:refs/heads/control");
+        Check(Refs(elsewhere) == "refs/heads/control" && !Refs(bare).Contains("refs/heads/control"), "control: plain Git follows a gitdir file at <remote>/.git");
         await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
-        await Reject("GitUnsupportedRepository", () => store.FetchAsync("main"));
+        await RefusedFetchReadsNothing("GitUnsupportedRepository", "gitdir file");
         File.Delete(inner);
-        Check(!File.Exists(Path.Combine(fixtureRoot, "hook-ran")) && Plain(fixtureRoot, "--git-dir=" + elsewhere, "for-each-ref") == "",
-            "neither the inner repository's hook nor the gitdir target was reached");
+        Check(Refs(elsewhere) == "refs/heads/control", "the Host push never reached the gitdir target");
+        // A junction below refs or objects lets receive-pack write outside the checked remote (reproduced with plain Git first).
+        void Junction(string link, string target)
+        {
+            var start = new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "cmd.exe")) { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
+            foreach (var a in new[] { "/c", "mklink", "/J", link, target }) start.ArgumentList.Add(a);
+            using var process = Process.Start(start)!; process.StandardOutput.ReadToEnd(); process.WaitForExit();
+            if (process.ExitCode != 0) throw new Exception("mklink /J failed: " + process.StandardError.ReadToEnd());
+        }
+        foreach (var (relative, label) in new[] { ("refs/heads", "refs/heads"), ("objects/pack", "objects/pack") })
+        {
+            string link = Path.Combine(bare, relative.Replace('/', Path.DirectorySeparatorChar)), saved = link + ".saved", outside = Path.Combine(fixtureRoot, "outside-" + label.Replace('/', '-'));
+            Directory.Move(link, saved); Directory.CreateDirectory(outside); Junction(link, outside);
+            if (relative == "refs/heads")
+            {
+                Plain(clone, "push", bare, "HEAD:refs/heads/junctioned");
+                Check(File.Exists(Path.Combine(outside, "junctioned")), "control: plain Git writes a pushed ref through a nested refs/heads junction");
+            }
+            await Reject("GitUnsafePath", () => store.PushAsync(revL, "review/local"));
+            await RefusedFetchReadsNothing("GitUnsafePath", "nested " + label + " junction");
+            Directory.Delete(link); Directory.Move(saved, link);
+        }
+        Check(Refs(bare).Split('\n').All(r => r is "refs/heads/main"), "the remote keeps only its own branch after the indirection checks");
         string packed = Path.Combine(bare, "packed-refs"), packedOriginal = File.Exists(packed) ? File.ReadAllText(packed) : null;
         File.AppendAllText(packed, new string('a', 40) + " refs/replace/" + new string('b', 40) + "\n");
         await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));

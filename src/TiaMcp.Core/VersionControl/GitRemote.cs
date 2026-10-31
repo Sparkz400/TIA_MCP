@@ -40,7 +40,7 @@ public sealed class GitRemote
         var root = GitSafety.PathRoot(Location, true);
         if (!File.Exists(Path.Combine(root, "HEAD")) || !Directory.Exists(Path.Combine(root, "objects")) || !Directory.Exists(Path.Combine(root, "refs")))
             throw new BridgeException("GitRemoteRefused", "The configured local remote must be a bare Git repository.");
-        GitSafety.NoLinks(Path.Combine(root, "objects")); GitSafety.NoLinks(Path.Combine(root, "refs"));
+        GitSafety.RequireNoLinksBelow(root);
         GitSafety.RequireNoIndirection(root);
         GitSafety.RequireMinimalConfig(root, true);
     }

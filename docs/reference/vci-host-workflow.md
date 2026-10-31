@@ -168,7 +168,9 @@ runner applies to its own repositories (no includes, `hooksPath`,
 `alternateRefsCommand` or any other key; `GitUnsupportedConfiguration`), no
 active hooks (`GitExecutableCustomizationRefused`) and no alternates, grafts,
 loose or packed replace refs, or `.git` entry, which Git's local lookup would
-enter before the configured directory (`GitUnsupportedRepository`). It is
+enter before the configured directory (`GitUnsupportedRepository`), and no
+junction or symbolic link anywhere below it, such as at `refs/heads` or
+`objects/pack` (`GitUnsafePath`; at most 100,000 entries are walked). It is
 checked when the remote branch is read and again immediately before dispatch; a
 writer of the remote after that check is outside the Host's control. Only
 drive-letter paths are accepted: UNC and device spellings (`\\server\share`,

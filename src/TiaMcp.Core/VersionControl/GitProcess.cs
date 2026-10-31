@@ -45,6 +45,20 @@ internal static partial class GitSafety
         if (exists && !Directory.Exists(full)) throw new BridgeException("GitRepositoryMissing", "The exact repository directory does not exist.");
         return full;
     }
+    // Every entry below root, bounded: a junction or link anywhere (refs/heads, objects/pack, logs, packed-refs) would let Git
+    // write or read outside the directory that passed the checks.
+    internal static void RequireNoLinksBelow(string root, int maximum = 100000)
+    {
+        int walked = 0;
+        var pending = new Stack<string>(); pending.Push(root);
+        while (pending.TryPop(out var directory))
+            foreach (var entry in Directory.EnumerateFileSystemEntries(directory))
+            {
+                if (++walked > maximum) throw new BridgeException("GitLimitExceeded", "Git metadata enumeration exceeded its safety bound.");
+                NoLinks(entry);
+                if (Directory.Exists(entry)) pending.Push(entry);
+            }
+    }
     // Indirection, unfinished operations and active hooks that a Git process run against this metadata directory would honour.
     internal static void RequireNoIndirection(string metadata)
     {
