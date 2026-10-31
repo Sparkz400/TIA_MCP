@@ -1,7 +1,7 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). On `main`, 30 October 2026:
+simulators you own (see the [README](../README.md)). On `main`, 31 October 2026:
 
 | | |
 | --- | --- |
@@ -58,6 +58,9 @@ record is cited by a feature; records no feature cites any more are in the retir
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
+[31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed
+offline, among them simulator ownership on every write, a PLCSIM route check for runtime writes and
+stores that no longer block on a missing old path; the changed native paths await a native recheck. On
 [30 October](history/status-log.md#30-october-2026): software-unit rename and create-from, motion
 connections, five PLCSIM signal and observation tools, Test Suite application runs (TS-Q02), MCP
 resource templates, completions and logging, the block-protection credential route, the CPU

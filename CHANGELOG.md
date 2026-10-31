@@ -56,6 +56,24 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - Defects found in native runs across text-list import (V21 silently altered some content; those
   inputs are now refused), DB snapshots, OPC UA role mappings, TCP/IP provisioning, the Add-In
   sandbox, project translations and the read tools; each is recorded in the status log.
+- Code audit of 31 October ([status log](docs/history/status-log.md#31-october-2026)):
+  - `sim_write`, `sim_state` and `sim_test` with writes need an owned instance; `sim_state` and
+    `sim_release` refuse while a capture holds the instance, and a release retries a failed
+    capture-mode restore.
+  - Runtime writes, RUN/STOP and Test Suite system tests need Windows to route the endpoint through
+    the PLCSIM virtual adapter (`RuntimeTargetRouteUnverified`, `RuntimeTargetNotOwnedPlcsim`).
+  - Cancelling a `sim_*` call no longer breaks the simulator bridge; waits that cannot end inside
+    `--timeout-seconds` are refused.
+  - `library_package_stage` `hostPath` accepts only library archives and library folders.
+  - `translation_native_capture` uploads workbooks over 64 KiB in chunks.
+  - `db_snapshot_create` detects an unchanged snapshot by content; translation reopen no longer
+    grants scratch rights; generated-source reads take exclusive access.
+  - Change prepare and apply refuse while another change on the same project needs recovery;
+    `block_delete`, `block_rename`, `to_delete` and `hardware_delete` need `compile`.
+  - A missing or renamed old project path no longer blocks every change; store locks wait up to
+    5 s; finished records archive past 1,000; a clock step back no longer fails a dispatch.
+  - Release tooling: blocked rows need a disposition, verified features cannot rest on lost raw
+    reports only, the Explorer relationship checks run in CI, and a 1.x release tag is gated.
 
 ### Known limitations
 
