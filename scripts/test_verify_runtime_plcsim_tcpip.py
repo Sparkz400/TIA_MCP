@@ -120,8 +120,9 @@ def services():
     def conditions(*alarms):
         return {"refresh": {"startObserved": True, "endObserved": True},
                 "events": [{"kind": "refreshStart"}] + [{"kind": "condition", "conditionId": a, "activeState": True, "retain": True} for a in alarms] + [{"kind": "refreshEnd"}]}
-    alarm = {"identifier": "alarm"}
-    report["steps"] += [step(oracle.UA_CALL, {"state": "called", "dispatched": True, "outputs": [{"encoding": "decimalInteger", "value": "42"}, {"encoding": "boolean", "value": False}]}),
+    alarm, method = {"identifier": "alarm"}, {"identifier": '"ServerMethod_DB"."Method"'}
+    report["steps"] += [step(oracle.METHOD_BROWSE, method), step(oracle.METHOD_SET, {"methods": [{"method": method}], "complete": True}),
+                        step(oracle.UA_CALL, {"state": "called", "dispatched": True, "outputs": [{"encoding": "decimalInteger", "value": "42"}, {"encoding": "boolean", "value": False}]}),
                         step(oracle.CALL_UNACKNOWLEDGED, {"code": "RuntimeAcknowledgementRequired"}),
                         step(oracle.CALL_FAILED, {"state": "methodFailed", "dispatched": True, "statusCode": oracle.METHOD_BAD}),
                         step(oracle.HISTORY, {"product": {"code": "UaHistoryReadUnsupported"}, "historyReadRaw": {"statusCode": "0x80720000", "valueCount": None}}),
@@ -247,6 +248,8 @@ class Oracle(unittest.TestCase):
         self.assertTrue(any("HistoryRead" in issue for issue in self.issues(report)))
         report = services(); named(report, oracle.CONDITIONS[2])["result"] = named(report, oracle.CONDITIONS[1])["result"]
         self.assertTrue(any("still active" in issue for issue in self.issues(report)))
+        report = services(); named(report, oracle.METHOD_SET)["result"]["methods"] = []
+        self.assertTrue(any("method set" in issue for issue in self.issues(report)))
         report = services(); named(report, oracle.CONDITIONS[0])["result"]["refresh"]["endObserved"] = False
         self.assertTrue(any("ConditionRefresh boundaries" in issue for issue in self.issues(report)))
 

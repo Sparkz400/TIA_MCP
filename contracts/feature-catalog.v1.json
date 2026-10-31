@@ -23724,7 +23724,7 @@
     {
       "featureId": "runtime_ua_call",
       "domain": "runtime",
-      "title": "Call a user-program OPC UA server method on an owned PLCSIM instance",
+      "title": "Call a PLC-namespace OPC UA method on an owned PLCSIM instance",
       "mcpTools": [
         "runtime_ua_call"
       ],
@@ -23739,8 +23739,8 @@
         "status": "partial",
         "limitations": [
           "Same owned-PLCSIM gate as runtime_ua_write: the session endpoint must be a controller IPv4 address of a runtime_plcsim_bind binding, the simulator worker must still observe the same owned instance and Windows must route the address through the PLCSIM Virtual Ethernet Adapter (RuntimeTargetNotOwnedPlcsim / RuntimeTargetRouteUnverified before anything is sent). Requires acknowledgeCall and no running acquisition.",
-          "Only a Method that browse finds as a HasComponent child of the given object, both in the PLC namespace http://www.siemens.com/simatic-s7-opcua: standard server methods (ConditionRefresh, Acknowledge, GetMonitoredItems) and arbitrary NodeIds are refused (UaMethodNotServerMethod). Methods in custom server-interface or companion-specification namespaces are not reachable.",
-          "0..16 scalar inputs in runtime_ua_read encodings, checked against InputArguments in count and type before dispatch (Boolean, integers, Float/Double, String; DateTime, structures, arrays and enumerations refused); a non-executable method is refused. Refusals keep the session.",
+          "Only a method component of an object in the PLC namespace http://www.siemens.com/simatic-s7-opcua that browse finds (HasComponent, NodeClass Method); on an S7-1500 these are user-program server methods (OPC_UA_ServerMethodPre/Post), and the ua-services run records which methods the namespace exposes. Standard server methods (ConditionRefresh, Acknowledge, GetMonitoredItems), arbitrary NodeIds and a server without that namespace are refused (UaMethodNotServerMethod); the session check requires namespace index 0 to be the standard OPC UA namespace. Methods in custom server-interface or companion-specification namespaces are not reachable.",
+          "0..16 scalar inputs in runtime_ua_read encodings, checked against InputArguments in count and type before dispatch (Boolean, integers, Float/Double, String; DateTime, structures, arrays and enumerations refused); a non-executable method and duplicate or unreadable argument lists (UaMethodArgumentsUnreadable) are refused. Refusals keep the session.",
           "One Call service request; status code, per-input results and decoded outputs are returned. A lost response leaves the session remoteSessionUnknown and the call is never retried; no durable intent journal and no readback of the method's program effect.",
           "Qualified offline against the repository's encrypted OPC UA fixture server only (TiaMcp.OpcUa.Runtime.Tests); the owned-PLCSIM run (qualify_runtime_plcsim_tcpip.py --mode ua-services) has not run yet."
         ]
@@ -23784,9 +23784,9 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "One bounded snapshot per call: a temporary subscription with one event item on the Server object, ConditionRefresh, Publish for 500..5000 ms and at most 256 events, then DeleteSubscriptions (cleanup failure marks the session remoteSessionUnknown). Nothing is retained; runtime_ua_subscription_start keeps event timelines with the standard BaseEventType fields only.",
+          "One bounded snapshot per call: a temporary subscription with one event item on the Server object, ConditionRefresh, Publish for 500..5000 ms and at most 256 events, then DeleteSubscriptions, also after a failure or cancellation (cleanup failure marks the session remoteSessionUnknown); a Bad subscription status ends the window early and status changes are capped at 64. Nothing is retained; runtime_ua_subscription_start keeps event timelines with the standard BaseEventType fields only.",
           "Fields EventId, EventType, SourceName, Time, Message, Severity, ConditionId, Retain, ActiveState/Id and AckedState/Id; each event is classified refreshStart, refreshEnd, condition, overflow or event, and refresh boundaries, truncation and select-clause statuses stay explicit. No where clause, branches, comments, shelving or enabled-state fields.",
-          "Read-only: Acknowledge, Confirm, AddComment, enable/disable and shelving are not offered, and runtime_ua_call refuses the standard condition methods.",
+          "Read-only: one ConditionRefresh method call to the connected server, which re-sends condition events to this temporary subscription and writes no process data, so no owned target is needed. Acknowledge, Confirm, AddComment, enable/disable and shelving are not offered, and runtime_ua_call refuses the standard condition methods.",
           "On an S7-1500 the server needs Alarms and Conditions enabled (opcua_server_settings_set alarmsAndConditions) and central alarm management in the PLC; whether PLCSIM Advanced raises conditions is decided by the ua-services run.",
           "Qualified offline against the repository's encrypted OPC UA fixture server only (TiaMcp.OpcUa.Runtime.Tests); the owned-PLCSIM run (qualify_runtime_plcsim_tcpip.py --mode ua-services) has not run yet."
         ]

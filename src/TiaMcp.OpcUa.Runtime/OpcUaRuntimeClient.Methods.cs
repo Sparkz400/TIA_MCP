@@ -23,16 +23,20 @@ internal sealed partial class OpcUaRuntimeClient
             CheckOutput(refused); // Argument names come from the server.
             return refused;
         }
-        if (objectNode.NamespaceUri != PlcNamespace || methodNode.NamespaceUri != PlcNamespace) return Refused("UaMethodNotServerMethod");
+        // A server without the PLC namespace has no server method; refuse rather than fail to resolve.
+        if (objectNode.NamespaceUri != PlcNamespace || methodNode.NamespaceUri != PlcNamespace || Array.IndexOf(namespaces!, PlcNamespace) < 0)
+            return Refused("UaMethodNotServerMethod");
         NodeId objectId = Resolve(objectNode), methodId = Resolve(methodNode);
         var methods = await Children(objectId, ReferenceTypeIds.HasComponent, NodeClass.Method, ct);
         if (methods is null) return Refused("UaMethodSetLimit");
         if (!methods.Any(r => r.NodeId.ServerIndex == 0 && !r.NodeId.IsAbsolute && (NodeId)r.NodeId == methodId)) return Refused("UaMethodNotServerMethod");
         var properties = await Children(methodId, ReferenceTypeIds.HasProperty, NodeClass.Variable, ct);
         if (properties is null) return Refused("UaMethodSetLimit");
-        NodeId? Property(string name) => properties.Where(r => r.BrowseName == new QualifiedName(name, 0) && r.NodeId.ServerIndex == 0 && !r.NodeId.IsAbsolute)
-            .Select(r => (NodeId)r.NodeId).SingleOrDefault();
-        NodeId? inputProperty = Property("InputArguments"), outputProperty = Property("OutputArguments");
+        NodeId[] Property(string name) => properties.Where(r => r.BrowseName == new QualifiedName(name, 0) && r.NodeId.ServerIndex == 0 && !r.NodeId.IsAbsolute)
+            .Select(r => (NodeId)r.NodeId).ToArray();
+        NodeId[] inputProperties = Property("InputArguments"), outputProperties = Property("OutputArguments");
+        if (inputProperties.Length > 1 || outputProperties.Length > 1) return Refused("UaMethodArgumentsUnreadable");
+        NodeId? inputProperty = inputProperties.SingleOrDefault(), outputProperty = outputProperties.SingleOrDefault();
         var read = await Session.ReadAsync(null, 0, TimestampsToReturn.Neither, [
             new ReadValueId { NodeId = methodId, AttributeId = Attributes.Executable }, new ReadValueId { NodeId = methodId, AttributeId = Attributes.UserExecutable },
             new ReadValueId { NodeId = inputProperty ?? methodId, AttributeId = inputProperty is null ? Attributes.NodeClass : Attributes.Value },

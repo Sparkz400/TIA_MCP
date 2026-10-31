@@ -312,7 +312,7 @@ option registers or admits the tool only on a qualification Host.
 | `runtime_capture_stop` | Stop owned polling capture | limited | runtime |  |  |
 | `runtime_plcsim_bind` | Bind runtime endpoints to an owned PLCSIM instance | limited | runtime |  |  |
 | `runtime_ua_browse` | Browse bounded OPC UA references | limited | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_call` | Call a user-program OPC UA server method on an owned PLCSIM instance | unqualified | runtime |  |  |
+| `runtime_ua_call` | Call a PLC-namespace OPC UA method on an owned PLCSIM instance | unqualified | runtime |  |  |
 | `runtime_ua_capture_export` | Export exact retained OPC UA captures | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_capture_page` | Read a bounded OPC UA capture page | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_capture_start` | Start bounded OPC UA polling capture | limited | runtime |  | `runtime.physical_plc` |

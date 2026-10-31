@@ -821,6 +821,26 @@ def write_loss(r, channel):
     r.stage("close the deciding session", lambda: r.tool("runtime_%s_disconnect" % channel, {"attemptId": fresh_session})["state"])
 
 
+def plc_methods(r, ua, limit=300):
+    """Every Method the PLC namespace exposes below Objects, by a bounded walk over its Object nodes: runtime_ua_call admits any of
+    them, so the run shows whether system methods sit beside the user program's."""
+    queue, seen, found, browsed = [OBJECTS], set(), [], 0
+    while queue and browsed < limit:
+        parent = queue.pop(0)
+        browsed += 1
+        for ref in r.tool("runtime_ua_browse", {"attemptId": ua, "node": parent})["references"]:
+            node = ref.get("node")
+            key = json.dumps(node, sort_keys=True)
+            if not node or node.get("namespaceUri") != oracle.SIEMENS_NS or key in seen:
+                continue
+            seen.add(key)
+            if ref.get("nodeClass") == "Method":
+                found.append({"parent": parent, "method": node, "browseName": ref.get("browseName")})
+            elif ref.get("nodeClass") == "Object":
+                queue.append(node)
+    return {"methods": found, "browsed": browsed, "complete": not queue}
+
+
 def services(r):
     """Server-method Call, Alarms and Conditions and the HistoryRead boundary on the owned instance, through one UA session."""
     t = r.tool
@@ -828,6 +848,7 @@ def services(r):
     credentials(r)
     ua = connect(r, "ua", "runtime_ua_connect", ua_selection(r))
     r.stage(oracle.EVENT_MODEL, lambda: t("runtime_ua_browse", {"attemptId": ua, "node": SERVER})["references"])
+    r.report["plcMethods"] = r.stage(oracle.METHOD_SET, lambda: plc_methods(r, ua))
 
     def discover():
         references = t("runtime_ua_browse", {"attemptId": ua, "node": ua_node(block="ServerMethod_DB")})["references"]

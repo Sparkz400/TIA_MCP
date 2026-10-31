@@ -47,9 +47,9 @@ internal sealed partial class OpcUaRuntimeClient
             var events = new List<Dictionary<string, object?>>();
             var statuses = new List<string>();
             var acknowledgements = new SubscriptionAcknowledgementCollection();
-            bool truncated = false;
+            bool truncated = false, ended = false;
             int publishes = 0;
-            for (var clock = Stopwatch.StartNew(); clock.ElapsedMilliseconds < windowMilliseconds && !truncated; publishes++)
+            for (var clock = Stopwatch.StartNew(); clock.ElapsedMilliseconds < windowMilliseconds && !truncated && !ended; publishes++)
             {
                 var response = await Session.PublishAsync(new RequestHeader { TimeoutHint = TimeoutMs - 1000 }, acknowledgements, ct);
                 if (response.SubscriptionId != id || response.NotificationMessage.NotificationData.Count > 64) throw Error("UaResponseInvalid");
@@ -57,7 +57,13 @@ internal sealed partial class OpcUaRuntimeClient
                     [new SubscriptionAcknowledgement { SubscriptionId = id, SequenceNumber = response.NotificationMessage.SequenceNumber }];
                 foreach (var body in response.NotificationMessage.NotificationData.Select(x => x.Body))
                 {
-                    if (body is StatusChangeNotification change) { statuses.Add($"0x{change.Status.Code:x8}"); continue; }
+                    if (body is StatusChangeNotification change)
+                    {
+                        // A Bad status (timeout, closed) ends the subscription; nothing more will come.
+                        if (statuses.Count < 64) statuses.Add($"0x{change.Status.Code:x8}");
+                        ended |= StatusCode.IsBad(change.Status) || statuses.Count == 64;
+                        continue;
+                    }
                     if (body is not EventNotificationList list) throw Error("UaSubscriptionNotificationUnsupported");
                     foreach (var e in list.Events)
                     {
@@ -71,7 +77,7 @@ internal sealed partial class OpcUaRuntimeClient
                     created.RevisedMaxKeepAliveCount }, monitoredItem = new { statusCode = $"0x{item.StatusCode.Code:x8}", item.RevisedQueueSize, selectClauseResults = selectResults },
                 refresh = new { statusCode = $"0x{refresh.Results[0].StatusCode.Code:x8}", startObserved = events.Any(x => (string?)x["kind"] == "refreshStart"),
                     endObserved = events.Any(x => (string?)x["kind"] == "refreshEnd") },
-                events, truncated, overflow = events.Any(x => (string?)x["kind"] == "overflow"), statusChanges = statuses, publishes, windowMilliseconds,
+                events, truncated, subscriptionEnded = ended, overflow = events.Any(x => (string?)x["kind"] == "overflow"), statusChanges = statuses, publishes, windowMilliseconds,
                 note = "Read-only snapshot: ConditionRefresh re-sends retained conditions to this temporary subscription only. No Acknowledge, Confirm, AddComment, enable or shelving." };
         }
         finally { cleaned = await DeleteTemporarySubscription(id); }

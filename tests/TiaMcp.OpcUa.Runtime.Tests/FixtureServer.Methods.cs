@@ -52,6 +52,8 @@ internal sealed partial class FixtureServer
                     outputs[0] = (short)((short)inputs[0] + 1); outputs[1] = !(bool)inputs[1];
                     return ServiceResult.Good;
                 };
+            // A scalar type with an array rank: refused like any non-scalar argument.
+            Method(server, "Vector", true, [("Values", DataTypeIds.Int16)], []).InputArguments.Value[0].ValueRank = ValueRanks.OneDimension;
             var limits = Instance("Limits_DB");
             Method(limits, "Disabled", false, [("InInt", DataTypeIds.Int16)], []).OnCallMethod = (_, _, _, _) => { Interlocked.Increment(ref MethodCalls); return ServiceResult.Good; };
             Method(limits, "Dated", true, [("At", DataTypeIds.DateTime)], []).OnCallMethod = (_, _, _, _) => { Interlocked.Increment(ref MethodCalls); return ServiceResult.Good; };

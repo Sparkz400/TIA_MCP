@@ -33,6 +33,7 @@ START_BEFORE, START_AFTER = "server start time before the restart", "server star
 ACROSS, OLD_READ = "rows across the restart", "read on the old session after the restart"
 FINISHED = "acquisition status after the restart"
 EVENT_MODEL, METHOD_BROWSE = "runtime_ua_browse Server (event model)", "runtime_ua_browse ServerMethod_DB (server method)"
+METHOD_SET = "the PLC namespace's methods below Objects"
 UA_CALL, CALL_FAILED, METHOD_BAD = "runtime_ua_call", "runtime_ua_call whose method returns Bad", "0x80ab0000"
 CALL_UNACKNOWLEDGED = "runtime_ua_call without acknowledgement"
 CALL_STANDARD, CALL_ARGUMENTS = "runtime_ua_call of a standard server method", "runtime_ua_call with a wrong argument count"
@@ -208,6 +209,8 @@ def verify(root):
             passed = {c["name"] for c in report.get("toolCalls", []) if not c["isError"]}
             for tool in SERVICE_TOOLS:
                 need(tool in passed, "No successful call of " + tool)
+            methods = [m.get("method") for m in result(METHOD_SET).get("methods", [])]
+            need(result(METHOD_BROWSE) in methods, "The PLC namespace's method set does not contain the browsed server method")
             called = result(UA_CALL)
             need(called.get("state") == "called" and called.get("dispatched") is True and [(o.get("encoding"), o.get("value")) for o in called.get("outputs", [])]
                  == [("decimalInteger", "42"), ("boolean", False)], "The server method call did not answer 42 and false")

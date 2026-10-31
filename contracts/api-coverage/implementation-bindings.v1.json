@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "fd83df61564f43bc5715b43863c5557949d7a2e3e9bd68a4ae5cbdbbb782c17a",
-      "bytes": 1438902
+      "sha256": "fd624bf17ba234cf386a53a60856b0cc5162c1b264a3e2bce5a646240c511713",
+      "bytes": 1439545
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1932,8 +1932,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
-      "sha256": "2a02b521d1a469cfe305c24877ab7e42d813069d99f1da2a7fa4f9ce3075968d",
-      "bytes": 20936
+      "sha256": "d9acc907d372bad94ab7c63b192e2c9f354ae4c6aa6a8c9c97ce61b08aca34f3",
+      "bytes": 21299
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
@@ -2202,8 +2202,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Conditions.cs",
-      "sha256": "cebad881483ff486852c515b8f3bd72539879daa741a1e16bdbcbabe1c68ae8d",
-      "bytes": 8486
+      "sha256": "53c37116705ba47956af742a8d81cbc8011a99484c49dc4981d7b324ab15a035",
+      "bytes": 8846
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Events.cs",
@@ -2212,8 +2212,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Methods.cs",
-      "sha256": "fce18b3202065e47a71dd0a7288eb7d03d318866f76bb7772558f76f2d19838b",
-      "bytes": 11576
+      "sha256": "788965c8690de3791d9ccbd2edbc07d862eba27dab54b2221e13a422e6a052d8",
+      "bytes": 11976
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.Subscriptions.cs",
@@ -2227,8 +2227,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeClient.cs",
-      "sha256": "ff617f27f5b3f1ac612a631dc3c8676591d55679c5cc41bc633de3ebe77c73e3",
-      "bytes": 24378
+      "sha256": "8e8a4fe11629779ef5d5a5bb72e36e88e7059cdd13579881d350a6cde48b93cb",
+      "bytes": 24407
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",

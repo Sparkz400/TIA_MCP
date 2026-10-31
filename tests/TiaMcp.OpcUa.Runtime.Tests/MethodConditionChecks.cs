@@ -54,6 +54,11 @@ internal static class MethodConditionChecks
         await Refused(instance, method, [Arg("decimalInteger", "40000"), Arg("boolean", true)], "UaMethodArgumentInvalid", "An out-of-range Int16 is refused before dispatch");
         await Refused(limits, FixtureServer.PlcNode("\"Limits_DB\".Disabled"), [Arg("decimalInteger", "1")], "UaMethodNotExecutable", "A non-executable method is refused");
         await Refused(limits, FixtureServer.PlcNode("\"Limits_DB\".Dated"), [Arg("string", "2026-10-31T00:00:00Z")], "UaMethodArgumentUnsupported", "A method with an unsupported argument type is refused");
+        await Refused(instance, FixtureServer.PlcNode("\"ServerMethod_DB\".Vector"), [Arg("decimalInteger", "1")], "UaMethodArgumentUnsupported",
+            "A scalar-typed argument with an array ValueRank is refused");
+        server.Mode = "duplicateArguments";
+        await Refused(instance, method, [Arg("decimalInteger", "41"), Arg("boolean", true)], "UaMethodArgumentsUnreadable", "InputArguments listed twice is refused, not a failure");
+        server.Mode = "normal";
         int services = CallServices();
         await Throws(() => sessions.Call(attempt, instance, method, Enumerable.Repeat(Arg("boolean", true), 17).ToArray()), "UaRequestLimit", "More than 16 inputs refused before network");
         await Throws(() => sessions.Call(attempt, instance, method, [new("array", JsonSerializer.SerializeToElement(1))]), "UaRequestLimit", "Only scalar input encodings are accepted");
@@ -88,7 +93,46 @@ internal static class MethodConditionChecks
             "An inactive acknowledged condition is no longer retained");
         await Throws(() => sessions.Conditions(attempt, 100, 16), "UaRequestLimit", "The condition window is bounded");
         await Throws(() => sessions.Conditions(attempt, 1500, 0), "UaRequestLimit", "The condition count is bounded");
+        server.Mode = "conditionRefreshBad";
+        var badRefresh = Json(await sessions.Conditions(attempt, 1000, 16)); Save("conditions-refresh-bad", badRefresh);
+        server.Mode = "subscriptionStatus";
+        var ended = Json(await sessions.Conditions(attempt, 3000, 16)); Save("conditions-status-bad", ended);
+        server.Mode = "normal";
+        check(S(badRefresh.GetProperty("refresh"), "statusCode") == "0x80280000" && !badRefresh.GetProperty("refresh").GetProperty("startObserved").GetBoolean(),
+            "A Bad ConditionRefresh result is reported, not hidden");
+        check(ended.GetProperty("subscriptionEnded").GetBoolean() && ended.GetProperty("publishes").GetInt32() == 1 &&
+            ended.GetProperty("statusChanges").EnumerateArray().Select(x => x.GetString()).SequenceEqual(["0x800a0000"]), "A Bad subscription status ends the window");
         check((await sessions.Status(attempt)).State == "connected", "Condition snapshots leave the session connected");
+
+        // A cancelled snapshot still deletes its subscription before anything closes the session.
+        int audited = server.Audit.Count;
+        using (var cancel = new CancellationTokenSource(800))
+            await Throws(() => sessions.Conditions(attempt, 5000, 16, cancel.Token), "UaCancelled", "A cancelled condition snapshot reports UaCancelled");
+        await sessions.Disconnect(attempt, acknowledgeUnknown: true);
+        var operations = server.Audit.Skip(audited).Select(x => Json(x).TryGetProperty("operation", out var o) ? o.GetString() : null).ToList();
+        int deleted = operations.IndexOf("SubscriptionDeleteRequested"), closed = operations.IndexOf("CloseSession");
+        check(deleted >= 0 && closed > deleted, "A cancelled snapshot deletes its subscription before the session closes");
+
+        // Namespace guards: no PLC namespace is a refusal that keeps the session; a foreign namespace 0 is no session at all.
+        server.Mode = "noPlcNamespace";
+        attempt = Guid.NewGuid().ToString("N");
+        await sessions.Connect(attempt, server.Selection);
+        await Refused(instance, method, [Arg("decimalInteger", "41"), Arg("boolean", true)], "UaMethodNotServerMethod", "A server without the PLC namespace refuses the call");
+        check((await sessions.Status(attempt)).State == "connected", "The missing PLC namespace keeps the session usable");
+        await sessions.Disconnect(attempt);
+        server.Mode = "foreignNamespaceZero";
+        attempt = Guid.NewGuid().ToString("N");
+        check((await sessions.Connect(attempt, server.Selection)).State != "connected", "No session opens when namespace index 0 is not the standard namespace");
+        await sessions.Disconnect(attempt, acknowledgeUnknown: true);
+        server.Mode = "normal";
+        attempt = Guid.NewGuid().ToString("N");
+        await sessions.Connect(attempt, server.Selection);
+        server.Mode = "foreignNamespaceZero"; // Without the index-0 rule this would be UaSessionIdentityChanged.
+        await Throws(() => sessions.Read(attempt, [FixtureServer.Node("bool")]), "UaSessionIdentityMismatch", "The session check requires the standard namespace at index 0");
+        await sessions.Disconnect(attempt, acknowledgeUnknown: true);
+        server.Mode = "normal";
+        attempt = Guid.NewGuid().ToString("N");
+        await sessions.Connect(attempt, server.Selection);
 
         // A lost Call response: the session becomes unknown and the identical call is refused, never retried.
         server.CallDelayMs = 1500;

@@ -244,6 +244,8 @@ class Host:
         if tool in ("runtime_ua_write", "runtime_web_write"):
             return p.write(self, tool.split("_")[1], a)
         if tool == "runtime_ua_browse":
+            if a["node"] == runner.OBJECTS:
+                return {"references": [{"node": runner.ua_node(block="ServerMethod_DB"), "nodeClass": "Object"}, {"node": runner.SERVER, "nodeClass": "Object"}]}
             if a["node"] == runner.ua_node(block="ServerMethod_DB"):
                 return {"references": [{"node": runner.ua_node("Method", "ServerMethod_DB"), "nodeClass": "Method", "browseName": "Method"},
                                        {"node": runner.ua_node("UAMethod_InParameters", "ServerMethod_DB"), "nodeClass": "Variable"}]}

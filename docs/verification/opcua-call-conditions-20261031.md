@@ -24,17 +24,21 @@ Reference: [opcua-runtime.md](../reference/opcua-runtime.md#server-methods-condi
 
 ## Offline evidence
 
-`TiaMcp.OpcUa.Runtime.Tests --methods-only --output <fresh>`: 27 checks against the encrypted
+`TiaMcp.OpcUa.Runtime.Tests --methods-only --output <fresh>`: 37 checks against the encrypted
 fixture server, which now also hosts a synthetic `"ServerMethod_DB".Method` (InInt/InBool to
-OutInt/OutBool), two limit methods (not executable; DateTime argument) and one AlarmConditionState.
+OutInt/OutBool), limit methods (not executable; DateTime argument; Int16 with an array rank) and one
+AlarmConditionState.
 Covered: a call executes the method exactly once with exact typed outputs; a standard Server-object
 method, a method of another object, an object as method, wrong count, wrong encoding, out-of-range
-Int16, a non-executable method and an unsupported argument type are refused with no Call service
-sent; the method's own Bad result is `methodFailed`; a cancelled call leaves the session
+Int16, a non-executable method, an unsupported argument type, an array-rank argument, InputArguments
+listed twice and a server without the PLC namespace are refused with no Call service sent and the
+session kept; a namespace table whose index 0 is not the standard namespace ends the session; the method's own Bad result is `methodFailed`; a cancelled call leaves the session
 `remoteSessionUnknown`, the identical call is refused and the server executed it once; the history
 probe returns the fixture's `BadHistoryOperationUnsupported` (`0x80720000`) and no values; idle
 refresh shows only RefreshStart/End, an active unacknowledged alarm comes back with all ten fields,
-an inactive acknowledged one is no longer retained. The full suite passed (1,145 checks).
+an inactive acknowledged one is no longer retained; a Bad ConditionRefresh result is reported; a Bad
+subscription status ends the window; a cancelled snapshot deletes its subscription before the session
+closes (server audit order). The full suite passed (1,155 checks).
 `TiaMcp.Tests` (293) covers the new setting field and that `runtime_ua_call` checks the binding
 before its session call.
 
@@ -42,7 +46,8 @@ before its session call.
 
 `qualify_runtime_plcsim_tcpip.py --mode ua-services` (one Host, about 15 minutes): owned scratch with
 FB `ServerMethod` (the V21 help's OPC_UA_ServerMethodPre/Post V1.1 example), FB `AlarmGate` with a
-`Program_Alarm` on `RealServer.AlarmTrigger`, Alarms and Conditions on; then browse, call, three
+`Program_Alarm` on `RealServer.AlarmTrigger`, Alarms and Conditions on; then the PLC namespace's method set (bounded walk over its Object nodes, so
+the run shows whether system methods sit beside the user program's), browse, call, three
 refusals, the method's Bad result, the PLCSIM call counter, the history probe and three
 ConditionRefresh snapshots around a `sim_write` of the trigger. The oracle accepts a run in which
 PLCSIM raises no condition only as a recorded observation (`alarmCondition.raised: false`).
