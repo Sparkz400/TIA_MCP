@@ -58,8 +58,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   sandbox, project translations and the read tools; each is recorded in the status log.
 - Code audit of 31 October ([status log](docs/history/status-log.md#31-october-2026)):
   - `sim_write`, `sim_state` and `sim_test` with writes need an owned instance; `sim_state` and
-    `sim_release` without `deleteOwned` refuse while a capture holds the instance, and a release retries a failed
-    capture-mode restore.
+    `sim_release` without `deleteOwned` refuse while a capture holds the instance, and a release
+    retries a failed capture-mode restore.
   - Runtime writes, RUN/STOP and Test Suite system tests need Windows to route the endpoint through
     the PLCSIM virtual adapter (`RuntimeTargetRouteUnverified`, `RuntimeTargetNotOwnedPlcsim`).
   - Cancelling a `sim_*` call no longer breaks the simulator bridge; waits that cannot end inside
@@ -71,7 +71,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   - Change prepare and apply refuse while another change on the same project needs recovery;
     `block_delete`, `block_rename`, `to_delete` and `hardware_delete` need `compile`.
   - A missing or renamed old project path no longer blocks every change; store locks wait up to
-    5 s; finished records archive past 1,000 (Hosts older than this change refuse new admissions on a store that has an `.archive` folder); a clock step back no longer fails a dispatch.
+    5 s; finished records archive past 1,000 (Hosts older than this change refuse new admissions
+    on a store with an `.archive` folder); a clock step back no longer fails a dispatch.
   - Release tooling: blocked rows need a disposition, verified features cannot rest on lost raw
     reports only, the Explorer relationship checks run in CI, and a 1.x release tag is gated.
 
