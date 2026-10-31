@@ -1,17 +1,19 @@
 # PLC component candidate shapes and library instance namespaces — 31 October 2026
 
-Status: builders and offline tests done. A first native attempt on 31 October ran but is **not evidence** (both runs
-ended with a failed outcome); clean reruns are planned. Combined `library_integrate` apply stays limited to the verified
-shapes on production Hosts ([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
+Status: builders, offline tests and clean native reruns done. A first native attempt on 31 October is **not evidence**
+(both runs ended with a failed outcome); the [clean reruns](#clean-rerun--31-october-2026) passed. `ladCaller`,
+`fbCaller`, `earlierPlacement` and `reusedComponent` are verified shapes since then; `multiInstance` and every
+combination stay candidates ([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
 
 ## Component shapes
 
 `PlcComponentQualificationGate.UnverifiedFeatures` names every feature of a plan beyond the verified shape (fresh import,
 new global instance DB, FBD FC new or existing after its last network). The preview lists them in
-`combinedApply.candidateFeatures`. A production Host refuses each one with its earlier `PlcIntegrationNotQualified`
-wording. A `--component-qualification` Host admits them only in its own single owned scratch. A plan opens in
-production only when its exact sorted feature combination (`ShapeKey`, for example `fbCaller+multiInstance`) is listed in
-`VerifiedShapes`, which is empty; each combination needs its own native evidence.
+`combinedApply.candidateFeatures`. A production Host refuses the plan with `PlcIntegrationNotQualified`, naming the first
+feature that is not verified on its own, or else the unverified combination. A `--component-qualification` Host admits
+them only in its own single owned scratch. A plan opens in production only when its exact sorted feature combination
+(`ShapeKey`, for example `fbCaller+multiInstance`) is listed in `VerifiedShapes`; each combination needs its own native
+evidence. Since the clean rerun it lists `earlierPlacement`, `fbCaller`, `ladCaller` and `reusedComponent`.
 
 | Feature | Builder | Native case (`qualify_library_integrate_apply.py --candidates`) |
 |---|---|---|
@@ -85,3 +87,23 @@ their summaries (`evidence/local.library_integrate.candidate_shapes.20261031.jso
 - Library namespaces: a namespaced UDT root reused by a namespaced FB, and a namespaced master copy, passed per step.
   V21 imports a `NAMESPACE` SCL source into the unit but resolves unqualified names in it against the root namespace, so
   the OB-rooted caller failed. The runner now qualifies every namespaced reference.
+
+## Clean rerun — 31 October 2026
+
+Frozen Debug builds of the worker, Host and `LibraryUnitSeeder` under `artifacts/` (no subst drive), one owned TIA
+Portal V21 at a time, owned de-DE-only CPU 1511-1 PN V4.1 scratch projects, no PLCSIM, no Openness prompt.
+
+- The candidate run at 367daeb1 installed `ladStandalone`, `ladExisting`, `fbCaller` and `earlierPlacement` but failed
+  `reuse` at `change_apply`: the coordinator's contract check read the typed step as the plan's second step, and a
+  reused-FB plan has only one (`ArgumentOutOfRangeException`). 0130116e reads the last step; that run is not cited.
+- `qualify_library_integrate_apply.py --candidates` at 0130116e passed
+  (`local.library_integrate.candidate_shapes.rerun.20261031`): `ladStandalone`, `ladExisting`, `fbCaller`,
+  `earlierPlacement` and `reuse` installed with every gate (exact diff, caller insertion proof, call oracle, library
+  versions, reopen, 0-error compile, restore of the initial checkpoint); `multiInstance` ended at the expected boundary
+  (`InstanceCreationProfileUnavailable` before any dispatch, project unchanged).
+- `qualify_library_units.py` at 0130116e passed, 94/94 steps (`local.library_units.namespace.rerun.20261031`): the
+  namespaced UDT root reused by the namespaced FB, the namespaced master copy, the OB-rooted caller in the namespace, and
+  the PLC-wide update to FB 1.1.0 that keeps every namespaced path after the update and after a fresh reopen.
+- The regression of the verified shapes at 0130116e passed (`local.library_integrate.combined_apply.regression.20261031`):
+  the standalone and existing FBD FC installs, the OB and FB caller refusals, and the Host without the former flag. It
+  ran before `fbCaller` was verified; the runner's refusal cases now use an FB caller with a multi-instance.

@@ -105,15 +105,22 @@ internal static class BroadenedPlanTests
         test("combined apply admits the verified standalone FBD FC", () => { var f = new Fixture(); f.Standalone("FBD"); Equal(null, Refusal(f)); });
         const string Unit1 = "<SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>";
         test("combined apply admits insertion after the last network with shifted title IDs", () => Equal(null, Refusal(Titled(Unit1, 2))));
-        test("combined apply refuses insertion before another network", () => Equal(true, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3)).StartsWith("Only insertion after", StringComparison.Ordinal)));
+        test("combined apply admits the verified insertion before another network", () => Equal(null, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3))));
         test("combined apply refuses OB insertion by name", () => Equal(true, Refusal(Ob()).StartsWith("OB insertion is refused", StringComparison.Ordinal)));
         Func<Fixture> ladExisting = () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
         Func<Fixture> fbCaller = () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; };
+        Func<Fixture> ladFb = () => { var f = fbCaller(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
+        Func<Fixture> ladEarlier = () => { var f = Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
+        // Passed natively on 31 October (local.library_integrate.candidate_shapes.rerun.20261031): each exact single-feature shape runs in production.
+        foreach (var (name, shape) in new (string, Func<Fixture>)[] {
+            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }), ("existing LAD FC", ladExisting), ("FB caller", fbCaller),
+            ("reused FB", ReusedRoot), ("insertion before another network", () => Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3)) })
+        {
+            test("combined apply admits the verified " + name + " in production", () => { Equal(null, Refusal(shape())); Equal("", Features(shape())); });
+        }
         // Candidate shapes: each has a builder but no native evidence, so only a qualification Host's owned scratch admits it.
         foreach (var (name, shape, features) in new (string, Func<Fixture>, string)[] {
-            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }, "ladCaller"), ("existing LAD FC", ladExisting, "ladCaller"),
-            ("FB caller", fbCaller, "fbCaller"), ("multi-instance", Multi, "fbCaller,multiInstance"), ("reused FB", ReusedRoot, "reusedComponent"),
-            ("insertion before another network", () => Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3), "earlierPlacement") })
+            ("multi-instance", Multi, "fbCaller,multiInstance"), ("LAD FB caller", ladFb, "ladCaller,fbCaller"), ("LAD FC with an earlier placement", ladEarlier, "ladCaller,earlierPlacement") })
         {
             test("combined apply refuses candidate " + name + " in production", () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
             test("qualification Host admits candidate " + name, () => { Equal(null, Refusal(shape(), true)); Equal(features, Features(shape())); });
@@ -134,9 +141,10 @@ internal static class BroadenedPlanTests
             Equal(2, Unverified(Multi(), "multiInstance+fbCaller").Count);
         });
         test("verified shapes have no candidate features", () => { Equal("", Features(new Fixture())); var f = new Fixture(); f.Standalone("FBD"); Equal("", Features(f)); Equal("", Features(Titled(Unit1, 2))); });
-        test("candidate refusals keep their earlier wording", () => {
-            Equal(true, Refusal(ladExisting()).StartsWith("Only a new or existing FBD FC caller is verified; LAD FC callers", StringComparison.Ordinal));
-            Equal(true, Refusal(fbCaller()).StartsWith("Only a new or existing FBD FC caller is verified; FBD FB callers", StringComparison.Ordinal));
+        test("candidate refusals name the first unverified feature, else the unverified combination", () => {
+            Equal("Only new global instance DBs are verified; multi-instances stay plan-only.", Refusal(Multi()));
+            Equal("The combination fbCaller+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladFb()));
+            Equal("The combination earlierPlacement+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladEarlier()));
         });
         test("combined apply refuses PLC/HMI recipes and missing plans", () => {
             var f = new Fixture(); var preview = new JObject { ["payload"] = f.Payload.DeepClone(), ["integrationPlan"] = f.Build() };

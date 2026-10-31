@@ -200,7 +200,7 @@ class Candidates(unittest.TestCase):
         gate = {"ladCaller", "fbCaller", "multiInstance", "reusedComponent", "earlierPlacement"}
         for name, (overrides, features) in subject.CANDIDATES.items():
             with self.subTest(name=name):
-                self.assertTrue(set(features) <= gate and features)
+                self.assertTrue(set(features) <= gate)
                 self.assertIn(overrides["callerMode"], subject.MODES)
         for path in ("callers/TiaMcpComponentCaller.lad.s7dcl", "callers/TiaMcpComponentHost.s7dcl"):
             self.assertTrue((subject.FIXTURES / path).is_file(), path)

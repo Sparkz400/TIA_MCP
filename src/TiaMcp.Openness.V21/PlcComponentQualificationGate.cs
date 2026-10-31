@@ -46,7 +46,9 @@ namespace TiaMcp.Openness.V21
         // that combination has its own native evidence and is listed in VerifiedShapes; a verified feature does not open its
         // untested combinations. Until then only a qualification Host (--component-qualification) runs it, on its own owned
         // scratch (candidates=true).
-        internal static readonly string[] VerifiedShapes = { };
+        // Passed natively on 31 October (local.library_integrate.candidate_shapes.rerun.20261031): a new or existing LAD FC caller, an
+        // existing FBD FB caller, an existing FBD FC after an earlier network, and reuse of the installed FB with a new FBD FC caller.
+        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "ladCaller", "reusedComponent" };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
@@ -59,7 +61,10 @@ namespace TiaMcp.Openness.V21
                 return "Only a fresh FB/dependency import or the complete installed FB, each with new instance storage, has a builder; partial dependency reuse and reused instance DBs stay plan-only.";
             if (!(plan["blockers"] is JArray blockers) || blockers.Count != 0 || !(plan["steps"] is JArray steps) || steps.Any(s => s["planOnly"] != null))
                 return "Resolve every planner blocker and planOnly step first.";
-            return candidates ? null : (string)UnverifiedFeatures(plan, payload, callerExport).Properties().FirstOrDefault()?.Value;
+            var unverified = candidates ? new JObject() : UnverifiedFeatures(plan, payload, callerExport);
+            if (unverified.Count == 0) return null;
+            return (string)unverified.Properties().FirstOrDefault(p => !VerifiedShapes.Contains(p.Name, StringComparer.Ordinal))?.Value
+                ?? "The combination " + ShapeKey(unverified) + " of separately verified features has no native evidence; it stays plan-only.";
         }
 
         // The plan's features beyond the first verified shape, each with its refusal, when their exact combination is not verified.
@@ -74,13 +79,13 @@ namespace TiaMcp.Openness.V21
         {
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
-            if (language == "LAD") features["ladCaller"] = "Only a new or existing FBD FC caller is verified; LAD " + kind + " callers stay plan-only.";
-            if (kind == "FB") features["fbCaller"] = "Only a new or existing FBD FC caller is verified; " + language + " FB callers stay plan-only.";
-            if (plan["multiInstance"] != null) features["multiInstance"] = "Only a fresh FB/dependency import with a new global instance DB is verified; multi-instances stay plan-only.";
-            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Only a fresh FB/dependency import with a new global instance DB is verified; reuse of the installed FB stays plan-only.";
+            if (language == "LAD") features["ladCaller"] = "A LAD caller is verified only as a new or existing FC on its own; a LAD " + kind + " caller with further features stays plan-only.";
+            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB; a " + language + " FB caller with further features stays plan-only.";
+            if (plan["multiInstance"] != null) features["multiInstance"] = "Only new global instance DBs are verified; multi-instances stay plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB; reuse with further features stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
-                features["earlierPlacement"] = "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
+                features["earlierPlacement"] = "An earlier placement is verified only in an existing FBD FC on its own; an earlier placement with further features stays plan-only.";
             return features;
         }
         // Step 1 imports and saves before step 2 creates the instance DB, so what step 2 needs from the target is decided

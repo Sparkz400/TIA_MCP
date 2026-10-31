@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "671eeb4fb535afc71f3dd123ed2fb4cd079357113e5fb56731b23aeade9e1364",
-      "bytes": 1431358
+      "sha256": "2e898dd577c13bc532f7f20fdd7a96f6c2506246bf6fd17e989d94fd7dd0fef5",
+      "bytes": 1439885
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2632,8 +2632,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
-      "sha256": "2f6b75b2728855240a64ea8ccba2ed3cc9a91aa89cd799f4a665301afd5fa132",
-      "bytes": 127229
+      "sha256": "0946bdae91b31167caee2497dc5a9f604018f0d0308de37231ec663e8e844395",
+      "bytes": 127516
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs",
@@ -2717,8 +2717,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
-      "sha256": "9690dbbe4858e468bb0e68add8af894e5202b65a76a498b98905ade0a0870699",
-      "bytes": 28046
+      "sha256": "16dee2266cf69adf8eceb4f8710eae127e6a229700fb0ab6d758a2a9aecad2a3",
+      "bytes": 28163
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.TypedPreview.cs",
@@ -2987,8 +2987,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "0cca172ea1e4b1caa5ed970a1efa220cb2df054f64a3a73cad93ea2a49db0ad1",
-      "bytes": 14431
+      "sha256": "c023a361fa5d54211cdebd203bafc0d8997f6ee1f482d940d68d5f4d3969b11f",
+      "bytes": 15183
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -88142,7 +88142,7 @@
               "name": "PreparePlcCombinedApply",
               "line": 214,
               "endLine": 235,
-              "sha256": "3bbdce187bc28f81723af6337f341937ffa45bde9097cc5157ce4acba9109a39"
+              "sha256": "2168a47470f027f53096d494adf4d6518c80eb5785c1b25e1bcba41858b02b70"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -88319,7 +88319,7 @@
               "name": "PreparePlcCombinedApply",
               "line": 214,
               "endLine": 235,
-              "sha256": "3bbdce187bc28f81723af6337f341937ffa45bde9097cc5157ce4acba9109a39"
+              "sha256": "2168a47470f027f53096d494adf4d6518c80eb5785c1b25e1bcba41858b02b70"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -98169,6 +98169,13 @@
           "artifacts": [
             "evidence/local.library_units.namespace.20261029.json"
           ]
+        },
+        {
+          "id": "local.library_units.namespace.rerun.20261031",
+          "profileSha256": "a424fc4700b6fbe1555ae308a9536a877cbf158eac0d4b846d0e1d6dbff54b43",
+          "artifacts": [
+            "evidence/local.library_units.namespace.rerun.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -98220,6 +98227,20 @@
           "profileSha256": "c1a0cf27f9e08094899b449a8acd5df551c5767f797aa66162071b7156f77565",
           "artifacts": [
             "evidence/local.library_integrate.combined_apply.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.rerun.20261031",
+          "profileSha256": "d449438e2829a6f1d7769c580074d63c7be2c3b78b91ae80f5e66db7297b0f8c",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261031",
+          "profileSha256": "0836b1a4c42415508dd6d33c3c88330e7939cb2f12ca482b0d2a8e66bd6c13a4",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261031.json"
           ]
         }
       ],
@@ -98791,6 +98812,13 @@
           "profileSha256": "2f1abac401b7884c189c1249daa2ae9fec63876438bc2b781834512de5c415bb",
           "artifacts": [
             "evidence/local.library_units.namespace.20261029.json"
+          ]
+        },
+        {
+          "id": "local.library_units.namespace.rerun.20261031",
+          "profileSha256": "a424fc4700b6fbe1555ae308a9536a877cbf158eac0d4b846d0e1d6dbff54b43",
+          "artifacts": [
+            "evidence/local.library_units.namespace.rerun.20261031.json"
           ]
         }
       ],
@@ -106397,6 +106425,20 @@
           "profileSha256": "c1a0cf27f9e08094899b449a8acd5df551c5767f797aa66162071b7156f77565",
           "artifacts": [
             "evidence/local.library_integrate.combined_apply.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.rerun.20261031",
+          "profileSha256": "d449438e2829a6f1d7769c580074d63c7be2c3b78b91ae80f5e66db7297b0f8c",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.combined_apply.regression.20261031",
+          "profileSha256": "0836b1a4c42415508dd6d33c3c88330e7939cb2f12ca482b0d2a8e66bd6c13a4",
+          "artifacts": [
+            "evidence/local.library_integrate.combined_apply.regression.20261031.json"
           ]
         }
       ],
@@ -121199,6 +121241,16 @@
       "sha256": "90c46e1cba75cb9806b021e87ade9470975c0b0110cf9753a2f3bb3b6cde95e4"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json",
+      "state": "observed",
+      "sha256": "5451b5f1e33757b4a837aa5a94ce55052e3348c3587a52549e2e5ca527474e71"
+    },
+    {
+      "path": "evidence/local.library_integrate.combined_apply.regression.20261031.json",
+      "state": "observed",
+      "sha256": "8aa44c44b633c576c8b81b349cf72d803fd8a548c3b64ff582ef749a814652f1"
+    },
+    {
       "path": "evidence/local.library_integrate.combined_apply.rerun.20261028.json",
       "state": "observed",
       "sha256": "76011c55724c7c5b0906c1af998a32728b728caf31d8367bdcae9632f5e7ce95"
@@ -121247,6 +121299,11 @@
       "path": "evidence/local.library_units.namespace.20261029.json",
       "state": "observed",
       "sha256": "bd573e39b84a401821d52df2a033a864299401fe56a729153e0ff140dc2b48f4"
+    },
+    {
+      "path": "evidence/local.library_units.namespace.rerun.20261031.json",
+      "state": "observed",
+      "sha256": "d105510b8b29305381480aed07ff34cdccb109ac06a6b40182e6349dea6c70b3"
     },
     {
       "path": "evidence/local.library_units.rerun.20261029.json",
@@ -121985,6 +122042,14 @@
       "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f"
     },
     {
+      "id": "local.library_integrate.candidate_shapes.rerun.20261031",
+      "profileSha256": "d449438e2829a6f1d7769c580074d63c7be2c3b78b91ae80f5e66db7297b0f8c"
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261031",
+      "profileSha256": "0836b1a4c42415508dd6d33c3c88330e7939cb2f12ca482b0d2a8e66bd6c13a4"
+    },
+    {
       "id": "local.library_integrate.combined_apply.rerun.20261028",
       "profileSha256": "c1a0cf27f9e08094899b449a8acd5df551c5767f797aa66162071b7156f77565"
     },
@@ -122023,6 +122088,10 @@
     {
       "id": "local.library_units.namespace.20261029",
       "profileSha256": "2f1abac401b7884c189c1249daa2ae9fec63876438bc2b781834512de5c415bb"
+    },
+    {
+      "id": "local.library_units.namespace.rerun.20261031",
+      "profileSha256": "a424fc4700b6fbe1555ae308a9536a877cbf158eac0d4b846d0e1d6dbff54b43"
     },
     {
       "id": "local.library_units.rerun.20261029",

@@ -35,8 +35,8 @@ FLAG = "--enable-library-integrate-apply"
 CANDIDATE_FLAG = "--component-qualification"
 COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/before")
 REFUSED = "PlcIntegrationNotQualified"
-# An FB caller stays refused in production whichever further shapes are verified.
-FB_REFUSAL = "Only a new or existing FBD FC caller is verified; FBD FB callers"
+# FB callers are verified since 31 October, multi-instances are not: the refusal cases prepare an FB caller with a multi-instance.
+FB_REFUSAL = "Only new global instance DBs are verified; multi-instances stay plan-only."
 HOST_FB = "TiaMcpComponentHost"
 # The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
 # (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
@@ -58,12 +58,13 @@ def candidate_client(host, timeout, arguments):
     return Client(host, timeout, [*arguments, CANDIDATE_FLAG])
 
 
-# Candidate install cases: manifest overrides and the exact unverified features the preview must name.
+# Candidate install cases: manifest overrides and the exact unverified features the preview must name. ladCaller, fbCaller,
+# earlierPlacement and reusedComponent passed natively on 31 October and are verified shapes, so their previews name none.
 CANDIDATES = {
-    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, ["ladCaller"]),
-    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, ["ladCaller"]),
-    "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, ["fbCaller"]),
-    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, ["earlierPlacement"]),
+    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, []),
+    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, []),
+    "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, []),
+    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
 # The typed route's multi-instance profiles do not cover an FB with a structured (UDT) static; a refusal before any
@@ -380,7 +381,7 @@ class IntegrateApplyRun(ComponentRun):
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-        features = ["reusedComponent"] + (["fbCaller", "multiInstance"] if multi else [])
+        features = ["reusedComponent", "fbCaller", "multiInstance"] if multi else []
         try:
             applied, record = self.apply_combined(case, prepared, baseline, features)
         except NativeToolError as error:
@@ -444,7 +445,7 @@ class IntegrateApplyRun(ComponentRun):
         return {"mode": "existing", "blockPath": path, "insertAfterNetworkId": network}
 
     def refusals(self, archive, released):
-        """Flag on: an FBD OB caller and an existing FBD FB caller are refused at apply with no project change."""
+        """Flag on: an FBD OB caller and an existing FBD FB caller with a multi-instance are refused at apply with no project change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         case, out = self.case("refusals", True), self.output / "refusals"
         scratch, opened, plc = self.stage_consumer(archive, released)
@@ -456,9 +457,10 @@ class IntegrateApplyRun(ComponentRun):
         baseline = snapshot(self.call, out / "before")
         ob = plc + "/blocks/" + OB_NAME
         network, _ = terminal_network(Path(baseline["objects"]["block:" + ob]["file"]).read_text(encoding="utf-8-sig"), "FBD")
-        for name, caller, caller_recipe, reason in (
-                ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused"),
-                ("fbCaller", host, self.host_fb_recipe(baseline, host), FB_REFUSAL)):
+        for name, caller, caller_recipe, reason, multi in (
+                ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused", None),
+                ("fbMultiInstance", host, self.host_fb_recipe(baseline, host), FB_REFUSAL, MULTI_NAME)):
+            self.manifest["multiInstance"] = multi
             prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
             case[name] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=reason)}
             case[name]["refusal"] = self.refused_apply(prepared); self.persist()
@@ -468,7 +470,8 @@ class IntegrateApplyRun(ComponentRun):
 
     def default_host(self, archive, released):
         """Host without the former flag: combined apply is the default, so the standalone FBD plan previews eligible (the
-        install steps already applied it; it is not applied again) and an unverified FB caller plan is refused with no change."""
+        install steps already applied it; it is not applied again) and an FB caller plan with an unverified multi-instance is
+        refused with no change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         self.session.client_factory = host_client(False)
         case, out = self.case("defaultHost", False), self.output / "defaultHost"
@@ -479,8 +482,10 @@ class IntegrateApplyRun(ComponentRun):
         caller, caller_recipe, _ = self.select_caller(baseline, plc)
         prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
         case["combinedApply"] = require_combined_preview(prepared["preview"], eligible=True)
+        self.manifest["multiInstance"] = MULTI_NAME
         prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, host, self.host_fb_recipe(baseline, host))
-        case["fbCaller"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=FB_REFUSAL),
+        self.manifest["multiInstance"] = None
+        case["fbMultiInstance"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=FB_REFUSAL),
                             "refusal": self.refused_apply(prepared)}
         assert_snapshot(baseline, snapshot(self.call, out / "after"))
         case["projectUnchanged"] = True; self.persist()
