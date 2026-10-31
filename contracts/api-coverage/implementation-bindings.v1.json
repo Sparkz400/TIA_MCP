@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5289a51835ba9996b2345dd6a7c9f0195190cfb0f1af0f59f9a3c563e16a9aad",
-      "bytes": 1442038
+      "sha256": "911b8187be447499ecc7cc5fc9a10c33e3b766630de03a38c1b31a157d6f5249",
+      "bytes": 1442268
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2357,8 +2357,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
-      "sha256": "01144ce8b9aceb5334c4bec7a6e51632ad3e6045bcfe7b61868dfa54bc494621",
-      "bytes": 50449
+      "sha256": "1ccfa6d6b7100b2c5f7a4e99bb2a234b203f3468eec351b717a0183fcbf9d758",
+      "bytes": 51429
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs",
@@ -2572,8 +2572,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
-      "sha256": "c75856b1e9660d51bb67fcbee30713ecc1dbf12e546d169bc9c19a2b6342f1fa",
-      "bytes": 34865
+      "sha256": "5c2b091a81b883d5cb9e8ae01fb6c95e428619687d390da008cdc3e8925d2997",
+      "bytes": 35239
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Hmi.cs",
@@ -86115,8 +86115,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 306,
-              "endLine": 312,
+              "line": 310,
+              "endLine": 316,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             }
           ]
@@ -86147,8 +86147,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
               "line": 257,
-              "endLine": 297,
-              "sha256": "f273dd97cbd24be53bbd9d481a2e7ed34b939aa3dd23014e332f0a2ec081515d"
+              "endLine": 301,
+              "sha256": "7611d1554e7f69d18c5cc5e8f1d8d3ef122b65df177a0696e0a52899f1ebeb1c"
             }
           ]
         },
@@ -86166,8 +86166,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 299,
-              "endLine": 304,
+              "line": 303,
+              "endLine": 308,
               "sha256": "645d411940e897d6791f63473d07065d290019a267c8047c2dd85fd2bd563ab1"
             }
           ]
@@ -86197,8 +86197,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 331,
-              "endLine": 348,
+              "line": 335,
+              "endLine": 352,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             }
           ]
@@ -86217,8 +86217,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 350,
-              "endLine": 361,
+              "line": 354,
+              "endLine": 365,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             }
           ]
@@ -86248,8 +86248,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 331,
-              "endLine": 348,
+              "line": 335,
+              "endLine": 352,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             }
           ]
@@ -86268,8 +86268,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 350,
-              "endLine": 361,
+              "line": 354,
+              "endLine": 365,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             }
           ]
@@ -86702,8 +86702,8 @@
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareSharedDeviceAccess",
               "line": 257,
-              "endLine": 297,
-              "sha256": "f273dd97cbd24be53bbd9d481a2e7ed34b939aa3dd23014e332f0a2ec081515d"
+              "endLine": 301,
+              "sha256": "7611d1554e7f69d18c5cc5e8f1d8d3ef122b65df177a0696e0a52899f1ebeb1c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationOnlineDownload.cs",
@@ -86771,8 +86771,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "PrepareTransferArea",
-              "line": 331,
-              "endLine": 348,
+              "line": 335,
+              "endLine": 352,
               "sha256": "da76096b35537d4fe4b7cf4f644dc5403b95b5a40b49842ee88b962f39021a7a"
             },
             {
@@ -86994,8 +86994,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyHardwareReplace",
-              "line": 306,
-              "endLine": 312,
+              "line": 310,
+              "endLine": 316,
               "sha256": "402676cb876846a5180531705b73aa70b7caae3f5b645fd3a24dfbea1b7745e7"
             },
             {
@@ -87064,8 +87064,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplySharedDeviceAccess",
-              "line": 299,
-              "endLine": 304,
+              "line": 303,
+              "endLine": 308,
               "sha256": "645d411940e897d6791f63473d07065d290019a267c8047c2dd85fd2bd563ab1"
             },
             {
@@ -87127,8 +87127,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HardwareTopology.cs",
               "name": "ApplyTransferArea",
-              "line": 350,
-              "endLine": 361,
+              "line": 354,
+              "endLine": 365,
               "sha256": "85d825a19bb95dd6ad7e5ec8091c1cc19f888aefacf67871147ad113755340e3"
             },
             {

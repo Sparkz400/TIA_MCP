@@ -451,6 +451,8 @@ def ring(run):
     and the ring closure each run once with checkpoint restore first (a partly built ring), then for real."""
     link(run, "hardware_port_disconnect", 1, pair=family_ports(run)["Hw1200"], label="Hw1200 Port_1, which cannot join the ring")
     manager, *clients = interfaces(run)
+    # The worker refuses a ring role on an interface with fewer than two ports (a head whose ports sit on a BusAdapter would show it).
+    run.h.report["ringMemberPorts"] = {path: len(((run.current["view"].get("hw:" + path) or {}).get("network") or {}).get("ports") or []) for path in (manager, *clients)}
     # A named domain needs the subnet's MrpDomainOwner; without it the roles go to the subnet's default domain.
     domain = RING if mrp(run, manager, "Manager", RING, create=True) else None
     if domain is None and not mrp(run, manager, "Manager"):

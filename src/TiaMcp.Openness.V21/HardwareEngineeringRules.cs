@@ -32,6 +32,17 @@ namespace TiaMcp.Openness.V21
         // V21 SharedDeviceAccessType values a change may request (Unknown is the native unassigned state).
         internal static readonly string[] SharedDeviceAccessTypes = { "PLC", "OutsideOfProject" };
 
+        // NumberOfExternalIoControllers a shared-access change may set. V21 states no maximum in its metadata; 32 is a conservative
+        // ceiling well above the IO controllers a shared device admits (2 to 4 for ET 200SP/MP heads), and native validation still applies.
+        internal const int MaxExternalIoControllers = 32;
+
+        internal static int RequireExternalIoControllers(JToken value)
+        {
+            if (value?.Type != JTokenType.Integer || !int.TryParse(value.ToString(), out int count) || count < 1 || count > MaxExternalIoControllers)
+                throw new BridgeException("InvalidRequest", "externalIoControllers must be an integer from 1 to " + MaxExternalIoControllers + ".");
+            return count;
+        }
+
         // V21 MediaRedundancyRole names an MRP instance takes.
         internal static readonly string[] MediaRedundancyRoles = { "NotInRing", "Manager", "Client", "ManagerAuto" };
 
@@ -404,7 +415,11 @@ namespace TiaMcp.Openness.V21
                 var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
                 if (Target(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
                 // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
-                if (payload["externalIoControllers"] != null) Target(expected, payload.Value<string>("ioDeviceInterfacePath"))["attributes"]["NumberOfExternalIoControllers"] = payload["externalIoControllers"].DeepClone();
+                if (payload["externalIoControllers"] != null)
+                {
+                    var attributes = Target(expected, payload.Value<string>("ioDeviceInterfacePath"))["attributes"] as JObject ?? throw new BridgeException("MutationVerificationFailed", "The IO-device interface has no captured attributes.");
+                    attributes["NumberOfExternalIoControllers"] = payload["externalIoControllers"].DeepClone();
+                }
                 foreach (var row in expected.OfType<JObject>().Where(row => InTree(row, path)))
                 {
                     var now = Target(after, row.Value<string>("path"));

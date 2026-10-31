@@ -407,6 +407,17 @@ var accessExternal = (JObject)access.DeepClone(); accessExternal["externalIoCont
 Check("shared access with external controllers", "hardware_shared_device_access", accessExternal, rows => { Outside(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 1; }, true, AccessExternalBase);
 Check("shared access external count differing rejected", "hardware_shared_device_access", accessExternal, rows => { Outside(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 2; }, false, AccessExternalBase);
 Check("external count changing unasked rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 1; }, false, AccessExternalBase);
+Check("external count on an uncaptured interface row rejected", "hardware_shared_device_access", accessExternal, rows => { Outside(rows); ((JObject)rows[3]).Remove("attributes"); }, false, rows => { AccessExternalBase(rows); ((JObject)rows[3]).Remove("attributes"); });
+Check("count-only change of a module already outside the project", "hardware_shared_device_access", accessExternal, rows => rows[3]["attributes"]["NumberOfExternalIoControllers"] = 1,
+    true, rows => { AccessExternalBase(rows); Outside(rows); });
+if (HardwareEngineeringRules.RequireExternalIoControllers(1) != 1 || HardwareEngineeringRules.RequireExternalIoControllers(HardwareEngineeringRules.MaxExternalIoControllers) != 32) throw new Exception("External controller bounds differ.");
+count += 2;
+foreach (var token in new JToken[] { 0, -1, 33, int.MaxValue, 1.5, "2", JValue.CreateNull(), true })
+{
+    try { HardwareEngineeringRules.RequireExternalIoControllers(token); throw new Exception("externalIoControllers accepted: " + token); }
+    catch (BridgeException error) when (error.Code == "InvalidRequest") { count++; }
+}
+Console.WriteLine("PASS externalIoControllers takes an integer from 1 to 32");
 // Capability profiles: when the nearest profiled item has a profile, a write must be declared writable on the written item's row.
 JArray Declared(params (string name, string access)[] rows) => new JArray(rows.Select(row => new JObject { ["name"] = row.name, ["accessMode"] = row.access, ["type"] = "System.String" }));
 var profile = new JObject { ["typeIdentifier"] = "Catalog:DI", ["items"] = new JArray(

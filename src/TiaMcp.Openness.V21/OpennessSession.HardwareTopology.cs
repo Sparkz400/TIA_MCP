@@ -275,15 +275,19 @@ namespace TiaMcp.Openness.V21
             var owners = systems.Select(system => OwningPlcItem(system.Parent, plcs) ?? throw new BridgeException("UnresolvedIoOwnership", "An I/O system of the station resolves to no PLC of the project.")).Select(entry => entry.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal);
             HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, new[] { "SharedDeviceAccessType" });
             var changes = PrepareAttributes(item.Item, new JObject { ["SharedDeviceAccessType"] = access }, SharedAccessAttributes);
-            if (changes[0].Value<string>("before") == access) throw new BridgeException("InvalidRequest", "The item already has the requested SharedDeviceAccessType.");
+            // With externalIoControllers a module already outside the project may change only its station's external controller count.
+            bool accessUnchanged = changes[0].Value<string>("before") == access;
+            if (accessUnchanged && external == null) throw new BridgeException("InvalidRequest", "The item already has the requested SharedDeviceAccessType.");
             ioDevice = null;
             if (external != null)
             {
-                if (HardwareIndex(change.Payload, "externalIoControllers") < 1) throw new BridgeException("InvalidRequest", "externalIoControllers must be at least 1.");
+                int count = HardwareEngineeringRules.RequireExternalIoControllers(external);
                 if (assigned.Length != 1) throw new BridgeException("UnsupportedCapability", "externalIoControllers needs exactly one assigned IO-device interface on the station; it has " + assigned.Length + ".");
                 ioDevice = assigned[0].Item;
                 change.Payload["ioDeviceInterfacePath"] = assigned[0].Path;
-                foreach (var row in PrepareAttributes(ioDevice, new JObject { ["NumberOfExternalIoControllers"] = external.DeepClone() }, ExternalControllerAttributes)) changes.Add(row);
+                var countChange = PrepareAttributes(ioDevice, new JObject { ["NumberOfExternalIoControllers"] = count }, ExternalControllerAttributes);
+                if (accessUnchanged && countChange[0]["before"]?.ToString() == count.ToString()) throw new BridgeException("InvalidRequest", "The requested access and external controller count are unchanged.");
+                foreach (var row in countChange) changes.Add(row);
             }
             change.Payload["addressControllerOwnerPaths"] = new JArray(owners);
             if (preview != null)

@@ -209,9 +209,10 @@ V21 Openness exposes a shared device in two ways, and the bridge reviews both. N
   `SharedDeviceAccessType` (`PLC` or `OutsideOfProject`; `Unknown` is the native unassigned state) on one module or
   submodule of an assigned IO device. Stations holding PLC software are refused. The bridge records the PLC items of the
   station's I/O systems as `addressControllerOwnerPaths`; the module and its subitems may take the requested access, every
-  address range stays and may keep at most one owner among those PLCs. Optional `externalIoControllers` (with `OutsideOfProject`)
-  also sets `NumberOfExternalIoControllers` of the station's one assigned interface in the same change, which TIA may require once
-  a module is accessed outside the project. The other project and module copies (`SharedDeviceCopyOfModule`) are not configured.
+  address range stays and may keep at most one owner among those PLCs. Optional `externalIoControllers` (1 to 32, with
+  `OutsideOfProject`) also sets `NumberOfExternalIoControllers` of the station's one assigned interface in the same change, which
+  TIA may require once a module is accessed outside the project; with it, a module already outside the project may change only
+  that count. The other project and module copies (`SharedDeviceCopyOfModule`) are not configured.
 
 V21 has no per-module controller selection in one project beyond these attributes; which PLC owns a module after a second
 assignment is what TIA decides, and the readback reports it.
