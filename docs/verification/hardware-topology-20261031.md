@@ -85,7 +85,7 @@ Two `--discover` passes ran on 31 October in one owned TIA Portal V21 instance e
 
 Everything before these points matched the runner's expectations (S7-1500, S7-1200, ET 200MP families up to the
 ET 200SP steps). The runner now plugs the first ET 200SP module at slot 1, where TIA gives it a light BaseUnit, and expects
-the update-time change there (`2f…`, see the commit after `b7af3ee4`). No shared-device, MRP, shared-access,
+the update-time change there (`216f2984`). No shared-device, MRP, shared-access,
 address-change or GSD step has run natively yet.
 
 ## Still open
