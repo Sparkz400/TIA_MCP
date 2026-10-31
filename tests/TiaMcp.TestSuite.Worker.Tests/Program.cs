@@ -122,6 +122,12 @@ internal static class Program
         Reject(() => execute.Invoke(probeWorker, new object[] { "testsuite_style_begin", Context() }), "No native Test Suite profile");
         Reject(() => execute.Invoke(probeWorker, new object[] { "testsuite_scope_probe", new JObject { ["action"] = "prepare" } }), "Attach to or explicitly start");
         Check(!AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "Siemens.Engineering.TestSuite"), "Disabled production dispatch does not load optional Siemens TestSuite product");
+        // project_upgrade refuses an unsupported version before attachment: the unattached worker answers with the version refusal.
+        foreach (string path in new[] { "D:/x/p.ap13", "D:/x/a.zap21" })
+            Reject(() => execute.Invoke(worker, new object[] { "mutation_begin", new JObject { ["operation"] = "project_upgrade",
+                ["arguments"] = new JObject { ["path"] = path, ["expectedSha256"] = new string('a', 64) } } }), "V13 and older are refused before any native call");
+        Reject(() => execute.Invoke(worker, new object[] { "mutation_begin", new JObject { ["operation"] = "project_upgrade",
+            ["arguments"] = new JObject { ["path"] = "D:/x/p.ap16", ["expectedSha256"] = new string('a', 64) } } }), "Attach to or explicitly start");
         foreach (string stage in new[] { "observe", "checkpoint", "run", "verify", "restore", "reconcile", "end" })
             Reject(() => execute.Invoke(worker, new object[] { "testsuite_style_" + stage, new JObject() }), "No owning-worker Test Suite lease");
         boundary = new Fake(); session = new StyleWorkerSession(boundary, Context());

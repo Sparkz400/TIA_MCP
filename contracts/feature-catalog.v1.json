@@ -3212,6 +3212,26 @@
         "One library transaction (library_create_master_copy into the project library) in one owned scratch CPU 1511-1 PN V4.1 with one G120C PN that is not on the CPU's IO system; other library kinds share the device compile and observation checks but were not run with a drive.",
         "The drive itself is never compiled: it exposes no compiler service and is listed under notCompiled, never counted as compiled."
       ]
+    },
+    {
+      "id": "local.project_upgrade.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "02e34fed6581aaa95a506c23664c81a5415c6c64",
+        "passedScope": "scripts/qualify_project_upgrade.py on a Debug build of 02e34fe, 66/66 steps, owned copies of four public example projects, each upgrade in its own empty owned Portal. The V13 archive TinyMySQLClient.zap13 is refused before any native call (ProjectVersionUnsupported, no admission, no upgrade directory) and the same archive renamed to .zap14 is refused by its project file's release; a missing archive is ProjectNotFound; per example a wrong hash (SourceChanged) and a second upgrade while a project is open (ProjectIsolationRequired) are refused without an admission. TinyMySQLClient_V14_1.zap14 (RetrieveWithUpgrade) becomes TinyMySQLClient_V14_V21, TinyMySQLClient_V15.ap15 becomes TinyMySQLClient_V15_V21 and 109482675_TimeSyn_Project_V15.1_V16.ap16 becomes 109482675_TimeSyn_Project_V15.1_V16_V21 (OpenWithUpgrade; TIA reports this one modified), each at the observed V21 location, with a conversion log to 21.0.0.0 that records success, an unchanged source copy and a returned admission; each reopens in a fresh owned Portal with the pinned inventory (17 hardware items, one PLC, 7, 7 and 2 blocks, none inconsistent). V21 refuses DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 with MissingProductsException (its TP700 Comfort 15.0.0.0 panel is no longer supported): ProjectUpgradeFailed, source unchanged, no upgraded project, owned copy retained, admission returned. Every original is byte-identical before and after; the example copies are removed at the end and no run file names a folder above an example."
+      },
+      "artifacts": [
+        "evidence/local.project_upgrade.20261031.json"
+      ],
+      "limitations": [
+        "Four public example projects: one V14 SP1 archive, one V15 and two V16 project folders. V15.1 and V17-V20 sources are not exercised.",
+        "DigitalTwinAtEducation_TIAProject_Basic_V16 cannot be upgraded by V21 (TP700 Comfort 15.0.0.0 no longer supported, MissingProductsException); only that typed refusal is qualified for it.",
+        "The pinned inventory is device, PLC and block counts and PLC paths; content is not compared with the older version, which needs that TIA version.",
+        "Nothing is compiled: block consistency after the upgrade is recorded as TIA reports it.",
+        "Protected (UMAC) projects, locked sources and an interrupted upgrade (reconciliation) are not exercised natively."
+      ]
     }
   ],
   "features": [
@@ -3681,6 +3701,53 @@
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
         "A saved project open in a worker-owned instance started with tia_start",
+        "Short artifacts root for TIA's 143-character project directory limit"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "project_upgrade",
+      "domain": "project",
+      "title": "Upgrade a V14-V20 project or archive to V21 on an owned copy",
+      "mcpTools": [
+        "project_upgrade"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 ProjectComposition.OpenWithUpgrade(FileInfo) for a project file and ProjectComposition.RetrieveWithUpgrade(FileInfo, DirectoryInfo) for an archive, each called on the owned copy only; the UmacDelegate and ProjectOpenMode overloads are not used."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Accepts .ap14-.ap20 project files (V15.1: .ap15_1) and .zap14-.zap20 archives with their SHA-256. V13 and older, V21 and newer are refused by file name before any file read or native call (ProjectVersionUnsupported); after the hash check the release declared by the project marker (ProjectCompatibilityVersion; in an archive, its one top-level project file) must match, so a renamed older project is refused before the upgrade. A project folder holding another project or archive is refused; a locked source file is SourceLocked.",
+          "The source is never opened or written: the project file's whole folder (at most 20000 files and 4 GiB) is copied under its own name, or the archive (at most 1 GiB) byte for byte, into a new owned directory under the host's upgrades artifacts, and only that copy is upgraded. The source hash (the archive bytes, or a sorted manifest of every file in the folder) is checked before and after the copy and after the upgrade (sourceUnchanged). The upgraded project must be where V21 saves it: <destination>/<folder>_V21/<folder>_V21.ap21 for a project folder, <destination>/w/<project>_V21/<project>_V21.ap21 for an archive (UpgradeVerificationFailed otherwise).",
+          "Nothing is compiled or saved beyond what TIA's upgrade does. The upgraded project stays open with its isModified flag reported; TIA's ConversionLog_*_to_21 files are returned with their project success marker and error and warning counts; collecting that evidence never replaces TIA's outcome (evidenceFailure). Block consistency (the compile state) is read with project_inventory.",
+          "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile (source hash unchanged; destination absent, empty or holding the one V21 project its completed upgrade receipt names).",
+          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Protected (UMAC) projects, V15.1 and V17-V20 sources, locked sources and interrupted upgrades (reconciliation) are not exercised natively."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.project_upgrade.20261031"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "An empty worker-owned instance started with tia_start",
         "Short artifacts root for TIA's 143-character project directory limit"
       ],
       "acceptanceCriteria": [

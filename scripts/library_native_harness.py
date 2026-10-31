@@ -25,11 +25,12 @@ def identity(version):
 
 
 class Harness:
-    def __init__(self, args, prefix, profile, limitations, inputs):
+    def __init__(self, args, prefix, profile, limitations, inputs, scratch=True):
         require(args.run_native, "Explicit --run-native is required")
         self.directory = args.artifacts.resolve() / (prefix + uuid.uuid4().hex[:8])
-        scratch = "TiaMcpScratch_20000101_000000_12345678"
-        require(len(str(self.directory / "scratch" / scratch / scratch)) <= 143,
+        # Runners that create no scratch project check their own path limits.
+        name = "TiaMcpScratch_20000101_000000_12345678"
+        require(not scratch or len(str(self.directory / "scratch" / name / name)) <= 143,
                 "Choose a shorter --artifacts path (for example artifacts/lq)")
         self.directory.mkdir(parents=True, exist_ok=False)
         self.args = args

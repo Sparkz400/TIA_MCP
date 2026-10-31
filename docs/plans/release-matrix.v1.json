@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "3f9d9a8185e311e253632511266754d45ef56cb2b2d37408ddec666b7b404a09",
+    "catalogSha256": "f40eb7caa295a726f3c20f6dec3ad981cdc5995528622c3c91cd2f4edb6c1e26",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -12,17 +12,17 @@
     21
   ],
   "summary": {
-    "features": 469,
+    "features": 470,
     "support": {
       "deferred": 8,
-      "limited": 310,
+      "limited": 311,
       "shipped": 127,
       "unavailable_target": 5,
       "unqualified": 19
     },
     "cells": {
       "blocked": 31,
-      "bound": 1995,
+      "bound": 1998,
       "deferred": 24,
       "open": 108
     },
@@ -480,6 +480,44 @@
           "status": "bound",
           "evidenceIds": [
             "local.project_settings.20261028"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "project_upgrade",
+      "domain": "project",
+      "mcpTools": [
+        "project_upgrade"
+      ],
+      "changeKind": null,
+      "support": "limited",
+      "owners": [
+        "X01"
+      ],
+      "evidenceIds": [
+        "local.project_upgrade.20261031"
+      ],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "bound",
+          "evidenceIds": [
+            "local.project_upgrade.20261031"
+          ]
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "bound",
+          "evidenceIds": [
+            "local.project_upgrade.20261031"
+          ]
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "bound",
+          "evidenceIds": [
+            "local.project_upgrade.20261031"
           ]
         }
       ]
@@ -26205,6 +26243,21 @@
         {
           "path": "evidence/local.project_simulation.20261028.json",
           "sha256": "150e77d708ab5169d92140947885c1ad74a6f3ce3441e8339b29045c212d670e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.project_upgrade.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "02e34fed6581aaa95a506c23664c81a5415c6c64",
+      "retained": [
+        {
+          "path": "evidence/local.project_upgrade.20261031.json",
+          "sha256": "91086c812c8d2b528fb8fd8b242e594a9a6d10a2e30ad6fa0ef66a2038c1d11c"
         }
       ],
       "notRetained": []

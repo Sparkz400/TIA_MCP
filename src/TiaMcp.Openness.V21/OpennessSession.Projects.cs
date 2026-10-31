@@ -54,7 +54,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("ProjectIsolationRequired", "project_open requires an empty worker-owned instance started with tia_start.");
             string path = args.Value<string>("path");
             if (!ProjectPathIsAbsolute(path) || !string.Equals(Path.GetExtension(path), ".ap21", StringComparison.OrdinalIgnoreCase))
-                throw new BridgeException("InvalidRequest", "An absolute existing .ap21 project path on the TIA host is required. Automatic upgrades are not performed.");
+                throw new BridgeException("InvalidRequest", "An absolute existing .ap21 project path on the TIA host is required. Automatic upgrades are not performed; use project_upgrade for V14-V20 projects.");
             var file = new FileInfo(Path.GetFullPath(path));
             if (!file.Exists) throw new BridgeException("ProjectNotFound", "The .ap21 project file does not exist on this host.");
             bool readOnly = args.Value<bool?>("readOnly") == true;

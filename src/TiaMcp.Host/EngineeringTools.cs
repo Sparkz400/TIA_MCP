@@ -61,6 +61,11 @@ public sealed partial class TiaTools
         string? projectName = null, int maxItems = 500)
         => Call("plc_compare", new { projectName, plcPath, targetPlcPath, libraryId, maxItems = Limit(maxItems) }, cancellationToken);
 
+    [McpServerTool(Name = "project_upgrade", Destructive = false, OpenWorld = false)]
+    [Description("Upgrade an exact V14-V20 project file (.ap14-.ap20, V15.1 .ap15_1) or archive (.zap14-.zap20) with its required SHA-256 to V21, in an empty worker-owned TIA instance started with tia_start. The source is never opened or written: the project's whole folder, or the archive, is copied into a new unique directory under the host's upgrades artifacts and only that copy is upgraded (OpenWithUpgrade, RetrieveWithUpgrade). The source is hashed before and after. V13 and older, V21 and newer are refused before any native call (ProjectVersionUnsupported). Returns the source version, the upgraded project (left open), TIA's conversion logs with their success marker and error and warning counts, and sourceUnchanged. Nothing is compiled or saved beyond what TIA's upgrade does; read the compile state with project_inventory. Protected (UMAC) projects are not supported.")]
+    public Task<CallToolResult> ProjectUpgrade(string path, string expectedSha256, CancellationToken cancellationToken)
+        => Call("project_upgrade", new { path, expectedSha256, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "upgrades") }, cancellationToken);
+
     [McpServerTool(Name = "project_retrieve", Destructive = false, OpenWorld = false)]
     [Description("Retrieve an exact .zap21 archive with a required SHA-256 into a new unique directory in an empty worker-owned TIA instance. Supports explicit checkpoint recovery after a restart. Never overwrites an existing project.")]
     public Task<CallToolResult> ProjectRetrieve(string archivePath, string expectedSha256, CancellationToken cancellationToken)

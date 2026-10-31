@@ -1,0 +1,123 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.project_upgrade.20261031",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-31T11:17:52+00:00",
+  "source": {
+    "commit": "02e34fed6581aaa95a506c23664c81a5415c6c64",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_project_upgrade.py on a Debug build of 02e34fe, 66/66 steps, owned copies of four public example projects, each upgrade in its own empty owned Portal. The V13 archive TinyMySQLClient.zap13 is refused before any native call (ProjectVersionUnsupported, no admission, no upgrade directory) and the same archive renamed to .zap14 is refused by its project file's release; a missing archive is ProjectNotFound; per example a wrong hash (SourceChanged) and a second upgrade while a project is open (ProjectIsolationRequired) are refused without an admission. TinyMySQLClient_V14_1.zap14 (RetrieveWithUpgrade) becomes TinyMySQLClient_V14_V21, TinyMySQLClient_V15.ap15 becomes TinyMySQLClient_V15_V21 and 109482675_TimeSyn_Project_V15.1_V16.ap16 becomes 109482675_TimeSyn_Project_V15.1_V16_V21 (OpenWithUpgrade; TIA reports this one modified), each at the observed V21 location, with a conversion log to 21.0.0.0 that records success, an unchanged source copy and a returned admission; each reopens in a fresh owned Portal with the pinned inventory (17 hardware items, one PLC, 7, 7 and 2 blocks, none inconsistent). V21 refuses DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 with MissingProductsException (its TP700 Comfort 15.0.0.0 panel is no longer supported): ProjectUpgradeFailed, source unchanged, no upgraded project, owned copy retained, admission returned. Every original is byte-identical before and after; the example copies are removed at the end and no run file names a folder above an example.",
+  "limitations": [
+    "Four public example projects: one V14 SP1 archive, one V15 and two V16 project folders. V15.1 and V17-V20 sources are not exercised.",
+    "DigitalTwinAtEducation_TIAProject_Basic_V16 cannot be upgraded by V21 (TP700 Comfort 15.0.0.0 no longer supported, MissingProductsException); only that typed refusal is qualified for it.",
+    "The pinned inventory is device, PLC and block counts and PLC paths; content is not compared with the older version, which needs that TIA version.",
+    "Nothing is compiled: block consistency after the upgrade is recorded as TIA reports it.",
+    "Protected (UMAC) projects, locked sources and an interrupted upgrade (reconciliation) are not exercised natively."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "29aa2fe935c28d2c616d45d42b1a17a5940b8ee843ee6f1fb95d8f9fb02d4061"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "060b298d6d93ae3c1b27dca29c93af6abe0ec7c3285e3c0960604f2c3d55ecd3"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "68d9b6105216d101d9054538e5dbcc7d45981d7b4165c9c43b30581ee02a0bfe",
+      "bytes": 214399,
+      "completed": true,
+      "steps": [
+        "hash the original TinyMySQLClient_V14_1.zap14",
+        "hash the original TinyMySQLClient_V15.ap15",
+        "hash the original DigitalTwinAtEducation_TIAProject_Basic_V16.ap16",
+        "hash the original 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "hash the original TinyMySQLClient.zap13",
+        "copy TinyMySQLClient.zap13 into the run's inputs",
+        "start owned TIA refusal",
+        "refuse the V13 upgrade",
+        "refuse a missing archive",
+        "refuse the V13 archive renamed to .zap14",
+        "copy 109482675_TimeSyn_Project_V15.1_V16.ap16 into the run's inputs",
+        "close the session before upgrading 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "start owned TIA upgrade 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "refuse 109482675_TimeSyn_Project_V15.1_V16.ap16 with a wrong expectedSha256",
+        "project_upgrade 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "check the upgrade of 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "the input copy of 109482675_TimeSyn_Project_V15.1_V16.ap16 is unchanged",
+        "the admission of 109482675_TimeSyn_Project_V15.1_V16.ap16 returned",
+        "refuse a second upgrade while 109482675_TimeSyn_Project_V15.1_V16.ap16 is open",
+        "inventory after the upgrade of 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "close the upgrading session of 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "start owned TIA reopen 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "reopen the upgraded 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "inventory of the reopened 109482675_TimeSyn_Project_V15.1_V16.ap16",
+        "the reopened 109482675_TimeSyn_Project_V15.1_V16.ap16 has the pinned inventory",
+        "copy DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 into the run's inputs",
+        "close the session before upgrading DigitalTwinAtEducation_TIAProject_Basic_V16.ap16",
+        "start owned TIA upgrade DigitalTwinAtEducation_TIAProject_Basic_V16.ap16",
+        "refuse DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 with a wrong expectedSha256",
+        "project_upgrade DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 is refused by V21",
+        "check the refusal of DigitalTwinAtEducation_TIAProject_Basic_V16.ap16",
+        "the input copy of DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 is unchanged",
+        "the admission of DigitalTwinAtEducation_TIAProject_Basic_V16.ap16 returned",
+        "copy TinyMySQLClient_V14_1.zap14 into the run's inputs",
+        "close the session before upgrading TinyMySQLClient_V14_1.zap14",
+        "start owned TIA upgrade TinyMySQLClient_V14_1.zap14",
+        "refuse TinyMySQLClient_V14_1.zap14 with a wrong expectedSha256",
+        "project_upgrade TinyMySQLClient_V14_1.zap14",
+        "check the upgrade of TinyMySQLClient_V14_1.zap14",
+        "the input copy of TinyMySQLClient_V14_1.zap14 is unchanged",
+        "the admission of TinyMySQLClient_V14_1.zap14 returned",
+        "refuse a second upgrade while TinyMySQLClient_V14_1.zap14 is open",
+        "inventory after the upgrade of TinyMySQLClient_V14_1.zap14",
+        "close the upgrading session of TinyMySQLClient_V14_1.zap14",
+        "start owned TIA reopen TinyMySQLClient_V14_1.zap14",
+        "reopen the upgraded TinyMySQLClient_V14_1.zap14",
+        "inventory of the reopened TinyMySQLClient_V14_1.zap14",
+        "the reopened TinyMySQLClient_V14_1.zap14 has the pinned inventory",
+        "copy TinyMySQLClient_V15.ap15 into the run's inputs",
+        "close the session before upgrading TinyMySQLClient_V15.ap15",
+        "start owned TIA upgrade TinyMySQLClient_V15.ap15",
+        "refuse TinyMySQLClient_V15.ap15 with a wrong expectedSha256",
+        "project_upgrade TinyMySQLClient_V15.ap15",
+        "check the upgrade of TinyMySQLClient_V15.ap15",
+        "the input copy of TinyMySQLClient_V15.ap15 is unchanged",
+        "the admission of TinyMySQLClient_V15.ap15 returned",
+        "refuse a second upgrade while TinyMySQLClient_V15.ap15 is open",
+        "inventory after the upgrade of TinyMySQLClient_V15.ap15",
+        "close the upgrading session of TinyMySQLClient_V15.ap15",
+        "start owned TIA reopen TinyMySQLClient_V15.ap15",
+        "reopen the upgraded TinyMySQLClient_V15.ap15",
+        "inventory of the reopened TinyMySQLClient_V15.ap15",
+        "the reopened TinyMySQLClient_V15.ap15 has the pinned inventory",
+        "every original example is unchanged",
+        "every example upgraded and reopened or refused as pinned",
+        "no file under the run names a folder above an example"
+      ],
+      "toolsPassed": [
+        "project_inventory",
+        "project_open",
+        "project_upgrade",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_open",
+        "project_upgrade"
+      ]
+    }
+  ]
+}
