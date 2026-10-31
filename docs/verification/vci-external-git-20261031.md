@@ -30,7 +30,7 @@ Offline checks only; the native round trip is pending.
 
 | Suite | Result | Covers |
 | --- | --- | --- |
-| `tests/TiaMcp.VersionControl.Workflow.Tests` (real Git) | 123 checks | Remote parsing; push, CAS refusal, restart reopen; fetch fast-forward, exact blobs, unchanged parent, history; non-fast-forward push and fetch refusals; hook, `hooksPath` and `.gitattributes` refusals; resolution payload for all three takes and seven refusals |
+| `tests/TiaMcp.VersionControl.Workflow.Tests` (real Git) | 123 checks | Remote parsing; push, CAS refusal, restart reopen; fetch fast-forward, exact blobs, unchanged parent, history; non-fast-forward push and fetch refusals; hook, `hooksPath` and `.gitattributes` refusals; resolution payload for all three takes and eight refusals |
 | `tests/TiaMcp.VersionControl.Tests` (real Git) | 124/124 | Existing runner, durability and repository-selection checks with the extended process signature |
 | `tests/TiaMcp.Library.Tests` | 98 passed | Host option parsing for `--git-remote` and `--git-allow-network-remote` |
 | `scripts/test_vci_host_mcp.py` (real Host, no workers) | 80 checks | `vci_push` and `vci_fetch` through MCP against a bare remote, schema-valid outputs, Host restart |
