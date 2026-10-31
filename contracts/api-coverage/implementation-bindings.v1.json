@@ -3287,8 +3287,8 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationCategoryScope.cs",
-      "sha256": "671ad9a01a395fb89dad1a397aa8b9ad988358a88d5af0bf06d87c423558ea97",
-      "bytes": 17540
+      "sha256": "f1d479e7cd9054316f292d2d374f84aa8a117a082b89884e05898aaf28712ab3",
+      "bytes": 18640
     },
     {
       "path": "src/TiaMcp.Translations/TranslationContracts.cs",

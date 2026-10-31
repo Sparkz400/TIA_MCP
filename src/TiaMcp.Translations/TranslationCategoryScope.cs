@@ -84,6 +84,15 @@ public static class TranslationCategoryScope
             "InvalidTranslationCategoryScope", "Requested categories must be distinct members of the project category inventory.");
         var allowed = requestedIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal);
         var rows = ReadCompleteObservedLayout(native, inventoryIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal)).Rows;
+        // Removing rows must leave no reference behind. All 172 retained V21 exports have only these parts, a workbook
+        // with only <sheets> and worksheets with only <sheetData>: no merged cells, hyperlinks, formatting ranges,
+        // validations, defined names, comments or tables. Anything else is refused rather than rewritten.
+        string[] observedParts = ["[Content_Types].xml", "_rels/.rels", "docProps/custom.xml", "xl/_rels/workbook.xml.rels", "xl/sharedStrings.xml",
+            "xl/styles.xml", "xl/workbook.xml", "xl/worksheets/sheet1.xml", "xl/worksheets/sheet2.xml"];
+        Require(native.Package.Parts.Keys.All(observedParts.Contains) &&
+            native.Package.Xml["xl/workbook.xml"].Root!.Elements().All(e => e.Name == BoundedOpcPackage.Sheet + "sheets") &&
+            observedParts[^2..].All(part => native.Package.Xml[part].Root!.Elements().All(e => e.Name == BoundedOpcPackage.Sheet + "sheetData")),
+            "UnsupportedTranslationScopeLayout", "Row filtering requires the observed export layout; parts or elements that can reference rows are refused.");
         var kept = native.Mapping.Rows.Where(r => allowed.Contains(r.Category)).Select(r => r.KeyCell).ToHashSet();
         var parts = new Dictionary<string, byte[]>(StringComparer.Ordinal);
         foreach (string part in new[] { "xl/worksheets/sheet1.xml", "xl/worksheets/sheet2.xml" })

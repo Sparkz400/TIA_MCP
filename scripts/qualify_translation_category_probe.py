@@ -24,7 +24,7 @@ import native_dispatch_guard
 from smoke_mcp import Client
 import verify_watch_expansion as watch_oracle
 from verify_watch_workflow import canonical_sha, load
-from verify_translation_populated_category_probe import decode, populated_control
+from verify_translation_populated_category_probe import MAIN_BLOCK_LABELS, decode, main_prefix, populated_control
 
 REPO = Path(__file__).resolve().parents[1]
 LANE = REPO / "artifacts/startup-unblock-20261015/translations"
@@ -425,6 +425,12 @@ def verify_package(files):
     require(files and all(Path(f["path"]).is_file() and sha(f["path"]) == f["sha256"] and Path(f["path"]).stat().st_size == f["bytes"] for f in files), "Frozen executable package changed")
 
 
+def main_records(records, project_name, plc_name):
+    """Rows of a PLC export under Main OB1, with the view path in either TIA UI language."""
+    prefixes = tuple(main_prefix(project_name, plc_name, blocks) for blocks, _ in MAIN_BLOCK_LABELS)
+    return {k: v for k, v in records.items() if v["viewPath"].startswith(prefixes)}
+
+
 def source_control(capture, project):
     """The old PLC export proves source sentinels, not populated block selection."""
     from verify_translation_category_probe import validate_request_matrix
@@ -437,9 +443,9 @@ def source_control(capture, project):
     require(sha(workbook) == request["artifact"]["sha256"] and workbook.stat().st_size == request["artifact"]["bytes"], "Retained genuine PLC baseline changed")
     records, _, _ = decode(workbook)
     project_name = project.stem; plc_name = native["plcName"]
-    prefix = project_name + "\\" + plc_name + "\\Programmbausteine\\Main\\"
-    main = {k: v for k, v in records.items() if v["viewPath"].startswith(prefix)}
-    require(populated_control(records, main, project_name, plc_name), "Retained source lacks both genuine Main interface-comment sentinels")
+    main = main_records(records, project_name, plc_name)
+    require(populated_control(records, main, project_name, plc_name),
+            "Retained source lacks a populated Main control: the two default interface comments or the seeded Main block comment")
     return {"capture": str(capture), "receipt": ref(capture / "result.json"), "workbook": ref(workbook), "projectPath": str(project),
             "plcName": plc_name, "mainSourceRecords": list(main.values()), "exactSelectedBlockPopulationStillRequiresFreshNativeControl": True}
 
