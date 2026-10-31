@@ -58,11 +58,9 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         string[]? plcPaths = null, bool updateSourceLanguage = false, CancellationToken cancellationToken = default)
     {
         var (observation, profile) = await Adapter(projectPath, plcPath, sourceCulture, targetCulture, plcPaths).Capture(cancellationToken);
-        var workflow = new TranslationWorkflowStore(Root); var uploads = new ArtifactUploadStore(Root);
-        string Upload(byte[] bytes, string name)
-        { var item = uploads.Begin(name, bytes.Length, Sha256(bytes)); uploads.Write(item.UploadId, 0, Convert.ToBase64String(bytes)); return uploads.Commit(item.UploadId).ArtifactRef!; }
-        var capture = workflow.Capture(Upload(observation.Workbook, "original.xlsx"), Upload(TranslationWorkerAdapter.JsonBytes(profile), "profile.json"),
-            Upload(TranslationWorkerAdapter.JsonBytes(observation.Target.Reference), "project.json"));
+        var workflow = new TranslationWorkflowStore(Root); var uploads = new ArtifactUploadStore(Root, options.LibraryLimits);
+        var capture = workflow.Capture(uploads.Upload(observation.Workbook, "original.xlsx"), uploads.Upload(TranslationWorkerAdapter.JsonBytes(profile), "profile.json"),
+            uploads.Upload(TranslationWorkerAdapter.JsonBytes(observation.Target.Reference), "project.json"));
         var workbook = TranslationWorkbook.Open(observation.Workbook, profile, observation.Target.Reference, Sha256(observation.Workbook));
         TranslationEdit[] edits = [];
         if (nativeKey != null)
@@ -73,7 +71,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
             edits = [new(nativeKey, culture, TranslationEditKind.Set, replacement, pair.Source.Sha256, pair.Target.Sha256)];
         }
         else if (replacement != null) throw new BridgeException("InvalidEdit", "Exact native key required.");
-        var review = workflow.Prepare(capture["recordRef"]!.GetValue<string>(), Upload(TranslationWorkerAdapter.JsonBytes(
+        var review = workflow.Prepare(capture["recordRef"]!.GetValue<string>(), uploads.Upload(TranslationWorkerAdapter.JsonBytes(
             new TranslationProposalBatch(edits, updateSourceLanguage ? new TranslationReviewOptions(UpdateSourceLanguage: true) : null)), "proposals.json"));
         string reviewRef = review["recordRef"]!.GetValue<string>(), reviewHash = review["metadata"]!["reviewSha256"]!.GetValue<string>();
         var approval = workflow.Approve(reviewRef, reviewHash, "User-authorized disposable-fixture coordinator", true);

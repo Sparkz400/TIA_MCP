@@ -388,7 +388,19 @@ Test("empty native files are not usable packages", work => Reject("PackageInvali
 Test("source directory cannot recursively contain intake destination", work =>
 {
     var store = new PackageStore(Path.Combine(work, "artifacts"));
+    Write(work, "Library.al21", [1]);
     Reject("PackageInvalid", () => store.Stage(hostPath: work));
+});
+Test("host path accepts only library inputs and copies nothing otherwise", work =>
+{
+    var artifacts = Path.Combine(work, "artifacts");
+    var store = new PackageStore(artifacts);
+    var plain = Path.Combine(work, "plain"); Directory.CreateDirectory(Path.Combine(plain, "nested"));
+    Write(plain, "notes.txt", Text("secret")); Write(Path.Combine(plain, "nested"), "Library.al21", [1]);
+    foreach (var path in new[] { Write(work, "id_ed25519", Text("key")), Write(work, "secrets.txt", Text("secret")), Write(work, "Block.scl", Text("x")), plain })
+        Reject("PackageInvalid", () => store.Stage(hostPath: path));
+    Equal(0, Directory.GetFiles(artifacts, "*", SearchOption.AllDirectories).Count(x => !x.EndsWith(".lock", StringComparison.Ordinal)));
+    Equal("ready", store.Stage(hostPath: Write(work, "Library.zip", Zip(("Library.zal21", [1], null)))).State);
 });
 Test("chunk response supplies exact accepted range and chunk digest", work =>
 {
@@ -398,6 +410,27 @@ Test("chunk response supplies exact accepted range and chunk digest", work =>
     Equal((long?)0, accepted.AcceptedOffset);
     Equal((int?)2, accepted.AcceptedBytes);
     Equal(Hash([1, 2]), accepted.ChunkSha256);
+});
+Test("server-side upload slices chunks and aborts a failed upload", work =>
+{
+    var bytes = Text("ten bytes!");
+    var store = new ArtifactUploadStore(Path.Combine(work, "ok"), new PackageIntakeLimits { MaxChunkBytes = 4 });
+    Equal(Hash(bytes), store.ResolveCommitted(store.Upload(bytes, "multi.bin")).Sha256);
+    // A foreign handle on the upload data makes a later chunk write fail mid-upload.
+    var failing = Path.Combine(work, "failing");
+    var slow = new ArtifactUploadStore(failing, new PackageIntakeLimits { MaxChunkBytes = 1 });
+    var done = false; FileStream? held = null;
+    var holder = Task.Run(() =>
+    {
+        while (!Volatile.Read(ref done) && held is null)
+            foreach (var data in Directory.EnumerateFiles(failing, "data.bin", SearchOption.AllDirectories))
+                try { held = new FileStream(data, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete); break; } catch (IOException) { }
+    });
+    try { slow.Upload(new byte[4096], "fail.bin"); throw new Exception("Expected the held upload data to fail a chunk write."); }
+    catch (IOException) { }
+    finally { Volatile.Write(ref done, true); holder.Wait(); held?.Dispose(); }
+    var record = Directory.GetFiles(failing, "upload.json", SearchOption.AllDirectories).Single();
+    Equal("aborted", slow.Status(Path.GetFileName(Path.GetDirectoryName(record))!).State);
 });
 Test("committed release frees lifetime quota and preserves staged package", work =>
 {

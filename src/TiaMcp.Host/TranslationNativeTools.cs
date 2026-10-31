@@ -36,11 +36,9 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
     [Description("Capture complete bilingual texts and peers for an exact operator-admitted project. Missing installed admission refuses before native dispatch.")]
     public Task<CallToolResult> Capture(string profileId, CancellationToken cancellationToken) => Run(async () => {
         var (observation, profile) = await Worker(profileId).Capture(cancellationToken);
-        var uploads = new ArtifactUploadStore(Root);
-        string Upload(byte[] bytes, string name)
-        { var value = uploads.Begin(name, bytes.Length, Sha256(bytes)); uploads.Write(value.UploadId, 0, Convert.ToBase64String(bytes)); return uploads.Commit(value.UploadId).ArtifactRef!; }
-        var capture = new TranslationWorkflowStore(Root).Capture(Upload(observation.Workbook, "native-original.xlsx"),
-            Upload(TranslationWorkerAdapter.JsonBytes(profile), "native-profile.json"), Upload(TranslationWorkerAdapter.JsonBytes(observation.Target.Reference), "native-project.json"));
+        var uploads = new ArtifactUploadStore(Root, options.LibraryLimits);
+        var capture = new TranslationWorkflowStore(Root).Capture(uploads.Upload(observation.Workbook, "native-original.xlsx"),
+            uploads.Upload(TranslationWorkerAdapter.JsonBytes(profile), "native-profile.json"), uploads.Upload(TranslationWorkerAdapter.JsonBytes(observation.Target.Reference), "native-project.json"));
         return new { profileId, capture, nativeImportExecuted = false, requiresExactCandidateApproval = true };
     });
 

@@ -46,6 +46,10 @@ public sealed class PackageStore
             source = Path.GetFullPath(hostPath!);
             PackageStorage.EnsureNoLinks(source);
             label = Path.GetFileName(Path.TrimEndingDirectorySeparator(source));
+            // Staged originals are readable through artifact_read, so a host path may only name a library input.
+            if (Directory.Exists(source) ? !Directory.EnumerateFiles(source).Any(IsNative)
+                : !Path.GetExtension(source).Equals(".zip", StringComparison.OrdinalIgnoreCase) && !IsNative(source))
+                throw new BridgeException("PackageInvalid", "hostPath must be a .zip, a native library/project file or archive (.alXX, .zalXX, .apXX, .zapXX), or a directory with such a native marker at its top level.");
         }
         if (Directory.EnumerateDirectories(_packages).Count() >= _limits.MaxPackages)
             throw new BridgeException("PackageLimitExceeded", "Package count limit reached; release unreferenced packages explicitly.");
@@ -409,7 +413,7 @@ public sealed class PackageStore
     private static PackageCandidate? Classify(PackageFile file, PackageFile[] all)
     {
         var extension = Path.GetExtension(file.RelativePath).ToLowerInvariant();
-        var native = Regex.Match(extension, "^\\.(zal|al|zap|ap)([0-9]{1,2})(?:_[0-9]+)?$", RegexOptions.CultureInvariant);
+        var native = Regex.Match(extension, NativeExtension, RegexOptions.CultureInvariant);
         string kind;
         int? major = null;
         var ready = true;
@@ -441,6 +445,9 @@ public sealed class PackageStore
         var id = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(file.RelativePath + "\n" + file.Sha256)));
         return new PackageCandidate(id, file.RelativePath, kind, major, ready, completeness, notes.ToArray());
     }
+
+    private const string NativeExtension = "^\\.(zal|al|zap|ap)([0-9]{1,2})(?:_[0-9]+)?$";
+    private static bool IsNative(string path) => Regex.IsMatch(Path.GetExtension(path).ToLowerInvariant(), NativeExtension, RegexOptions.CultureInvariant);
 
     private static bool IsDocumentation(string path)
     {

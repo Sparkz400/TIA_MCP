@@ -34,7 +34,7 @@ public sealed class LibraryPackageTools(HostOptions options)
     public CallToolResult ReleaseUpload(string uploadId) => Run(() => Uploads().Release(uploadId));
 
     [McpServerTool(Name = "library_package_stage", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Copy a committed upload artifactRef OR explicit hostPath (file or complete library directory) into managed intake storage on this TIA host. Validate ZIP paths and bounded nested extraction, retain hashes and classify all candidates without starting TIA or executing package scripts. Paths refer to the host machine. sourceUrl is provenance only, never fetched. A lone .alXX is incomplete; native archives remain opaque until Siemens retrieval.")]
+    [Description("Copy a committed upload artifactRef OR explicit hostPath into managed intake storage on this TIA host. hostPath must be a .zip, a native .alXX/.zalXX/.apXX/.zapXX file, or a complete library/project directory with such a marker at its top level; other host files are refused before any byte is read. Validate ZIP paths and bounded nested extraction, retain hashes and classify all candidates without starting TIA or executing package scripts. Paths refer to the host machine. sourceUrl is provenance only, never fetched. A lone .alXX is incomplete; native archives remain opaque until Siemens retrieval.")]
     public CallToolResult Stage(string? artifactRef = null, string? hostPath = null, string? sourceUrl = null,
         CancellationToken cancellationToken = default) => Run(() => Packages().Stage(artifactRef, hostPath, sourceUrl, cancellationToken));
 

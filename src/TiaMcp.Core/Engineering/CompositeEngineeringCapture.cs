@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TiaMcp.Core.AutomationMl;
@@ -98,7 +97,7 @@ public static class CompositeEngineeringCapture
             string? upload = null;
             try
             {
-                upload = Upload(uploads, read(), name); string id = publish(upload);
+                upload = uploads.Upload(read(), name); string id = publish(upload);
                 capture["records"]!.AsArray().Add(new JsonObject { ["source"] = source, ["status"] = "retained", ["recordRef"] = id }); return id;
             }
             catch (BridgeException error) { Failed(capture, source, error); return null; }
@@ -110,18 +109,6 @@ public static class CompositeEngineeringCapture
     private static bool Absent(BridgeException error) => error.Code is "UnknownOperation" or "UnsupportedCapability";
     private static void Failed(JsonObject capture, string source, BridgeException error) =>
         capture["records"]!.AsArray().Add(new JsonObject { ["source"] = source, ["status"] = "failed", ["errorCode"] = error.Code, ["message"] = error.Message });
-
-    private static string Upload(ArtifactUploadStore uploads, byte[] bytes, string name)
-    {
-        var begun = uploads.Begin(name, bytes.Length, Convert.ToHexStringLower(SHA256.HashData(bytes)));
-        try
-        {
-            for (int offset = 0; offset < bytes.Length; offset += begun.MaxChunkBytes)
-                uploads.Write(begun.UploadId, offset, Convert.ToBase64String(bytes, offset, Math.Min(begun.MaxChunkBytes, bytes.Length - offset)));
-            return uploads.Commit(begun.UploadId).ArtifactRef!;
-        }
-        catch { uploads.Abort(begun.UploadId); throw; }
-    }
 
     /// <summary>technology_read output as one observed technology-profile-review-request.v1 state.</summary>
     private static JsonObject TechnologyRequest(string reviewId, string path, JsonObject read)
