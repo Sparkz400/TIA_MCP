@@ -100,7 +100,7 @@ class Run:
 
     def inspect(self):
         """{F-I/O path: {name: F-parameter row}} from safety_validation_inspect."""
-        inspected = self.h.tool("safety_validation_inspect", {"plcPath": self.plc, "maxItems": 5000})
+        inspected = self.h.tool("safety_validation_inspect", {"plcPath": self.plc, "maxItems": 2000})
         require(inspected["completeness"]["truncated"] is False, "safety_validation_inspect was truncated")
         return {m["path"]: {row["name"]: row for row in m["fParameters"]} for m in inspected["fIoModules"]}
 
