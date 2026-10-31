@@ -56,6 +56,14 @@ namespace TiaMcp.Openness.V21
                     check.NotWrittenSince(row, "The retained source snapshot was not written since admission.");
                 foreach (var row in check.Rows("createNewDestination"))
                     check.Destination(row, null, null, _ => false);
+                // A combined apply's step scratch resolves with the steps' own records; the project row proves the project.
+                foreach (var row in check.Rows("combinedApplyStepWorkspace"))
+                {
+                    var evidence = new JObject();
+                    string disposition = PlcComponentCoordinator.ReconcileWorkspace(row.Value<string>("path"), evidence, out string basis);
+                    check.Evidence(row, "stepWorkspace", evidence);
+                    if (disposition != null) check.Prove(row, disposition, basis); else check.Hold(row, basis);
+                }
                 return;
             }
             var attempts = (journal["recoveryAttempts"] as JArray)?.LastOrDefault()?["resources"] as JArray ?? new JArray();

@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "618ba10de0062b3822a6803689e67c67f63c54db48a8cadcb5fbd4847b10f187",
+    "catalogSha256": "33d8312f0cc435814958889a1ecbdc0d2c9ee4d2e8b15056d84b2925d8e62ffc",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -8024,7 +8024,8 @@
         "local.library_unit_relations.rerun.20261029",
         "local.library_protected.rerun.20261029",
         "local.library_scopes.rerun.20261029",
-        "local.library_units.namespace.20261029"
+        "local.library_units.namespace.20261029",
+        "local.library_units.namespace.rerun.20261031"
       ],
       "cells": [
         {
@@ -8043,7 +8044,8 @@
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8062,7 +8064,8 @@
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8081,7 +8084,8 @@
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8100,7 +8104,8 @@
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8119,7 +8124,8 @@
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8138,7 +8144,8 @@
             "local.library_unit_relations.rerun.20261029",
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         }
       ]
@@ -8169,7 +8176,8 @@
         "local.library_protected.rerun.20261029",
         "local.library_scopes.rerun.20261029",
         "local.library_scopes.forced.20261029",
-        "local.library_units.namespace.20261029"
+        "local.library_units.namespace.20261029",
+        "local.library_units.namespace.rerun.20261031"
       ],
       "cells": [
         {
@@ -8186,7 +8194,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8203,7 +8212,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8220,7 +8230,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8237,7 +8248,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8254,7 +8266,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         },
         {
@@ -8271,7 +8284,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
-            "local.library_units.namespace.20261029"
+            "local.library_units.namespace.20261029",
+            "local.library_units.namespace.rerun.20261031"
           ]
         }
       ]
@@ -8292,49 +8306,63 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_integrate.combined_apply.rerun.20261028"
+        "local.library_integrate.combined_apply.rerun.20261028",
+        "local.library_integrate.candidate_shapes.rerun.20261031",
+        "local.library_integrate.combined_apply.regression.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         }
       ]
@@ -8355,49 +8383,63 @@
         "L02"
       ],
       "evidenceIds": [
-        "local.library_integrate.combined_apply.rerun.20261028"
+        "local.library_integrate.combined_apply.rerun.20261028",
+        "local.library_integrate.candidate_shapes.rerun.20261031",
+        "local.library_integrate.combined_apply.regression.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.library_integrate.combined_apply.rerun.20261028"
+            "local.library_integrate.combined_apply.rerun.20261028",
+            "local.library_integrate.candidate_shapes.rerun.20261031",
+            "local.library_integrate.combined_apply.regression.20261031"
           ]
         }
       ]
@@ -26199,6 +26241,36 @@
       "notRetained": []
     },
     {
+      "id": "local.library_integrate.candidate_shapes.rerun.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json",
+          "sha256": "5451b5f1e33757b4a837aa5a94ce55052e3348c3587a52549e2e5ca527474e71"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.combined_apply.regression.20261031.json",
+          "sha256": "8aa44c44b633c576c8b81b349cf72d803fd8a548c3b64ff582ef749a814652f1"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.library_integrate.combined_apply.rerun.20261028",
       "status": "passed",
       "profile": {
@@ -26346,6 +26418,21 @@
         {
           "path": "evidence/local.library_units.namespace.20261029.json",
           "sha256": "bd573e39b84a401821d52df2a033a864299401fe56a729153e0ff140dc2b48f4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_units.namespace.rerun.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+      "retained": [
+        {
+          "path": "evidence/local.library_units.namespace.rerun.20261031.json",
+          "sha256": "d105510b8b29305381480aed07ff34cdccb109ac06a6b40182e6349dea6c70b3"
         }
       ],
       "notRetained": []

@@ -228,9 +228,8 @@ namespace TiaMcp.Openness.V21
 
             var reasons = new JArray();
             void PlanOnly(string code, string message) { if (!reasons.Any(r => r.Value<string>("code") == code)) reasons.Add(new JObject { ["code"] = code, ["message"] = message }); }
-            if (unit) PlanOnly("ComponentScopeUnqualified", "Component readback covers the standard PLC scope only, and the namespace of a library instance in a software unit is not natively qualified.");
-            if (fbReused) PlanOnly("ComponentRecoveryAnchorUnavailable", "The FB is reused, so no library import step exists whose checkpoint anchors component recovery; prepare this typed step on its own.");
-            if (multi) PlanOnly("ComponentMultiInstanceUnqualified", "Component readback proves a global instance DB and an interface-preserving caller insertion only; createMulti adds a caller Static member and regenerates the caller's dependents.");
+            if (unit) PlanOnly("ComponentScopeUnqualified", "Component readback covers the standard PLC scope only. In a unit no storage profile covers a structured FB's new instance (the captured one is standard-route), another unit's FB gets no new storage on the typed route, and unit tags are a V21 boundary.");
+            if (reusedDb != null) PlanOnly("ComponentInstanceReuseUnqualified", "Component readback proves new instance storage only; reusing an existing instance DB is prepared as this typed step on its own.");
             var operands = new JArray(); var connections = new JArray(); var observedMappings = new JArray(); var writers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var mapping in mappings.OrderBy(m => parameters.FindIndex(p => p.Value<string>("name") == m.Value<string>("parameter"))))
             {
@@ -296,14 +295,15 @@ namespace TiaMcp.Openness.V21
                 steps.Add(Step(new JObject { ["kind"] = "library_instantiate", ["prepareArguments"] = new JObject { ["kind"] = "library_instantiate", ["payload"] = new JObject { ["schemaVersion"] = 1, ["source"] = payload["source"].DeepClone(), ["selection"] = payload["selection"].DeepClone(), ["target"] = payload["target"].DeepClone() } }, ["requiresFreshPreparation"] = true },
                     new JArray(reasons.Where(r => r.Value<string>("code") == "ComponentScopeUnqualified").Select(r => r.DeepClone()))));
             steps.Add(Step(new JObject { ["kind"] = "graphical_typed_edit", ["prepareArguments"] = new JObject { ["kind"] = "graphical_typed_edit", ["projectName"] = payload["target"]["projectName"].DeepClone(), ["plcPath"] = plcPath, ["payload"] = graphical }, ["requiresFreshPreparation"] = true,
-                ["mustWaitFor"] = fbReused ? "Fresh typed preparation against the reused FB and the current caller." : "Exact imported FB/dependency identity and content readback; new native project fingerprint." }, reasons));
+                ["mustWaitFor"] = fbReused ? "Exact installed FB/dependency identity and content readback; its own checkpoint anchors recovery." : "Exact imported FB/dependency identity and content readback; new native project fingerprint." }, reasons));
             for (int i = 0; i < steps.Count; i++) ((JObject)steps[i]).AddFirst(new JProperty("order", i + 1));
             var plan = new JObject {
                 ["schemaVersion"] = 1, ["status"] = "planned_only", ["applySupported"] = false, ["applyError"] = ApplyError,
                 ["nativeMutationDispatched"] = false, ["qualification"] = "offline_planner_only_native_qualification_required",
                 ["versions"] = versions.DeepClone(), ["interface"] = new JArray(parameters), ["mappings"] = observedMappings,
                 ["fb"] = new JObject { ["name"] = fbName, ["namespace"] = fbNamespace, ["scopePath"] = scopePath, ["path"] = fbPath, ["reused"] = fbReused },
-                ["reuse"] = new JObject { ["versions"] = new JArray(versions.Cast<JObject>().Where(Reused).Select(v => new JObject { ["typeName"] = v["typeName"].DeepClone(), ["typeGuid"] = v["typeGuid"].DeepClone(), ["versionGuid"] = v["versionGuid"].DeepClone() })),
+                ["reuse"] = new JObject { ["versions"] = new JArray(versions.Cast<JObject>().Where(Reused).Select(v => new JObject { ["typeName"] = v["typeName"].DeepClone(), ["typeGuid"] = v["typeGuid"].DeepClone(), ["versionGuid"] = v["versionGuid"].DeepClone(),
+                        ["ignoredDifferences"] = proofs.First(r => SamePin(r, v))["ignoredDifferences"]?.DeepClone() ?? new JArray() })),
                     ["instanceDbPath"] = reusedDb?["path"].DeepClone(), ["duplicatesCreated"] = false },
                 ["caller"] = new JObject { ["mode"] = standalone ? "createStandaloneFc" : "existing", ["blockPath"] = callerPath,
                     ["initiallyAbsent"] = standalone, ["language"] = language, ["obCallAdded"] = callerKind == "OB", ["kind"] = callerKind, ["namespace"] = callerNamespace },

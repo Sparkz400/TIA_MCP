@@ -22,8 +22,9 @@ namespace TiaMcp.Openness.V21
         }
 
         /// <summary>Removes the one network inserted after <paramref name="insertAfterNetworkId"/>, reverses the following
-        /// ID shift and requires the complete original caller back. Throws PlcComponentException otherwise.</summary>
-        internal static JObject Verify(XDocument original, XDocument installed, string insertAfterNetworkId)
+        /// ID shift and requires the complete original caller back. A new multi-instance is the one direct Static member
+        /// <paramref name="addedStaticMember"/> of the caller FB, which is removed too. Throws PlcComponentException otherwise.</summary>
+        internal static JObject Verify(XDocument original, XDocument installed, string insertAfterNetworkId, string addedStaticMember = null)
         {
             if (original?.Root == null || installed?.Root == null) Fail("Both original and installed caller exports are required.");
             if (original.Root.Descendants("SW.Blocks.CompileUnit").Count(e => (string)e.Attribute("ID") == insertAfterNetworkId) != 1) Fail("The original caller lacks the exact insertion network.");
@@ -47,10 +48,25 @@ namespace TiaMcp.Openness.V21
             // Native exports are read with whitespace preserved; the inserted network brings its own indentation.
             if (inserted.PreviousNode is XText indent && string.IsNullOrWhiteSpace(indent.Value)) indent.Remove();
             inserted.Remove();
+            string memberType = null;
+            if (addedStaticMember != null)
+            {
+                var members = copy.Root.Elements("SW.Blocks.FB").Elements("AttributeList").Elements("Interface").Elements().Where(e => e.Name.LocalName == "Sections")
+                    .Elements().Where(e => e.Name.LocalName == "Section" && (string)e.Attribute("Name") == "Static").Elements().Where(e => e.Name.LocalName == "Member" && (string)e.Attribute("Name") == addedStaticMember).ToArray();
+                if (members.Length != 1) Fail("The installed caller FB must declare exactly one new Static member " + addedStaticMember + ".");
+                memberType = (string)members[0].Attribute("Datatype");
+                var section = members[0].Parent;
+                if (members[0].PreviousNode is XText space && string.IsNullOrWhiteSpace(space.Value)) space.Remove();
+                members[0].Remove();
+                // A Static section that held only the new member was an empty element before it.
+                if (!section.HasElements && section.Nodes().All(n => n is XText text && string.IsNullOrWhiteSpace(text.Value))) section.RemoveNodes();
+            }
             if (!XNode.DeepEquals(original.Root, copy.Root) || original.Declaration?.ToString() != copy.Declaration?.ToString())
                 Fail("Reversing the one following-ID shift does not recover the complete original caller.");
-            return new JObject { ["verified"] = true, ["policy"] = "insertion-following-id-shift-v1", ["insertAfterNetworkId"] = insertAfterNetworkId, ["insertedNetworkId"] = insertedId,
+            var proof = new JObject { ["verified"] = true, ["policy"] = "insertion-following-id-shift-v1", ["insertAfterNetworkId"] = insertAfterNetworkId, ["insertedNetworkId"] = insertedId,
                 ["insertedObjectIds"] = own.Length, ["shiftedObjectIds"] = new JArray(shifts) };
+            if (addedStaticMember != null) proof["addedStaticMember"] = new JObject { ["name"] = addedStaticMember, ["dataType"] = memberType };
+            return proof;
         }
 
         private static int Parse(string value)

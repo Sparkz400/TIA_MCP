@@ -65,7 +65,8 @@ internal static class TypedGraphicalCapturedStorageTemplate
         if (profile == null || profile.Id != ProfileId || profile.CpuIdentifier != Cpu || cpuIdentifier != Cpu ||
             profile.NativeRelease != "V21 Update 2" || nativeRelease != profile.NativeRelease ||
             profile.NativeApiFileVersion != "2100.0.121.1" || nativeApiFileVersion != profile.NativeApiFileVersion ||
-            profile.CallerLanguage != "FBD" || callerLanguage != profile.CallerLanguage ||
+            // The profile was captured beside an FBD caller; the instance DB itself is generated from the FB alone.
+            profile.CallerLanguage != "FBD" || !(callerLanguage is "FBD" or "LAD") ||
             profile.Route != "standard" || route != profile.Route)
             Fail("Only the exact captured release/CPU/standard-route profile is eligible.");
         if (string.IsNullOrWhiteSpace(plcPath) || !plcPath.StartsWith("/projects/", StringComparison.Ordinal) ||

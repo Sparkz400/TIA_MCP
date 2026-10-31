@@ -1,0 +1,124 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.20261031",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-10-31T15:10:45+00:00",
+  "source": {
+    "commit": "3e92b2be05142754aa884509e231800345c2c50f",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Candidate combined-apply shapes (scripts/qualify_library_integrate_apply.py --candidates) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. Run 1 (build a8819fa8 frozen at artifacts/w3b, --artifacts artifacts/ic1): all six cases stopped at the import step's checkpoint archive before any mutation, because the combined apply's nested change directories put the archive path at 164 characters, over TIA's 143. Run 2 (build 3e92b2be frozen at artifacts/w3b2, --artifacts Q:/ic2 with Q: a subst drive over artifacts/q): ladStandalone (new LAD FC, power rail), ladExisting (existing LAD FC after its last network; following IDs 8->D, 9->E) and earlierPlacement (existing FBD FC with two networks, insertion after the first; seven following IDs including the second network shifted by 5) each installed through change_apply: preview candidateFeatures exactly [ladCaller] or [earlierPlacement], coordinator installation_verified with one initial project checkpoint, an independent export/inventory diff showing exactly the FB, UDT, instance DB (first free number) and caller network, the native caller insertion proof, the independent call/instance/tag oracle, the project library holding exactly the released versions, a fresh reopen equal to the installed state, a 0-error compile, and change_restore of the initial checkpoint into a new location in a fresh owned Portal equal to the baseline after retrieval and after reopen.",
+  "limitations": [
+    "The summary outcome is failed: run 1 stopped every case at TIA's path limit and three run-2 cases failed; only the per-case results of ladStandalone, ladExisting and earlierPlacement are evidence.",
+    "fbCaller and multiInstance: the FB caller fixture TiaMcpComponentHost took block number FB2, so the component FB was imported as FB3, and the captured instance storage profile (bound to the exact reference FB export, Number 2) refused typed preparation after the import was saved (CapturedStorageProfileUnavailable, recovery_required in the owned scratch). In multiInstance this hit the verified standalone FBD FC first install: the verified shape also fails after import when FB2 is taken in the target.",
+    "reuse: the second plan reusing the installed FB was refused at change_prepare (DependencyConflict): the exact-reuse proof found the installed FB version's 'Version comment' different from the source version (ObjectsDifferent) in the de-DE-only project; nothing was claimed or changed.",
+    "multiInstance therefore never reached its typed multi-instance preparation; its expected storage-profile boundary is unexercised.",
+    "Combined apply needs a short Host artifact root: under the project's artifacts tree only a subst drive keeps the nested coordinator paths within 143 characters.",
+    "No runtime execution; owned scratch projects only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "bb1338d166dc9c5bee8e710a3697999821473cb8b613bd8892424542112f055b"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9bc2564015b11419a5f557f282f06867e28b95fa780c3cb652c25fcb72e2f3e0"
+    },
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c0f0f92c896b11e6567490e7be9e33fe6b430687bdc8369e145d0f14a272cc46"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "7312cb1b149a9a7a3c755443cb1c84837401af0bbcc00a36281961672ef6bec7"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "4bc10f632a802576759fefd85a0f28cb4219bed13f64d757cb4f22ca1744fc4d",
+      "bytes": 6054168,
+      "completed": false,
+      "steps": [
+        "author",
+        "candidate:ladStandalone",
+        "candidate:ladExisting",
+        "candidate:fbCaller",
+        "candidate:earlierPlacement",
+        "candidate:reuse",
+        "candidate:multiInstance"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    },
+    {
+      "report": "result.json",
+      "sha256": "64358e0c9e2b028a7c0768b656e5e61dece7d6fc2febb54572ad4e3f8e7a7fb0",
+      "bytes": 8861722,
+      "completed": false,
+      "steps": [
+        "author",
+        "candidate:ladStandalone",
+        "candidate:ladExisting",
+        "candidate:fbCaller",
+        "candidate:earlierPlacement",
+        "candidate:reuse",
+        "candidate:multiInstance"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

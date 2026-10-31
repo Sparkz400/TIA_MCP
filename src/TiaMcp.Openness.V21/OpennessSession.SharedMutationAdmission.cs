@@ -196,6 +196,8 @@ namespace TiaMcp.Openness.V21
                     {
                         if (!_libraryChanges.TryGetValue(id, out var change)) throw new BridgeException("OutcomeUnknown", "Prepared native library handles do not survive restart; inspect the legacy journal.");
                         add("workspace", change.Directory, "legacyJournalCheckpointOutput");
+                        if (change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload))
+                            add("workspace", PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id), "combinedApplyStepWorkspace");
                         if (ChangeText(args, "previewHash", 64) != change.PreviewHash) throw new BridgeException("PreviewMismatch", "Preview hash differs.");
                         string key = ChangeText(args, "idempotencyKey", 128);
                         bool returnedApply = change.IdempotencyKey == key && change.State == "applied";

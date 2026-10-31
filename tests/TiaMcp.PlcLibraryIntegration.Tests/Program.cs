@@ -134,18 +134,54 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
     // Flag off: the unchanged plan-only refusal (shared constant, not a duplicated literal). Flag on: the combined preconditions.
     int flag = source.IndexOf("if (component && !_libraryIntegrateApplyEnabled)", apply, StringComparison.Ordinal);
     int gate = source.IndexOf("PlcLibraryIntegrationPlanner.ApplyError, \"This PLC integration is a plan only.", apply, StringComparison.Ordinal);
-    int refusal = source.IndexOf("PlcCombinedApplyRefusal(change) is string refusal", apply, StringComparison.Ordinal);
+    int refusal = source.IndexOf("PlcCombinedApplyRefusal(change) is JObject refusal", apply, StringComparison.Ordinal);
     int combined = source.IndexOf("PlcComponentApplyCoordinator(change)", apply, StringComparison.Ordinal);
     int claim = source.IndexOf("LibraryJournalStore.Claim", apply, StringComparison.Ordinal);
     if (apply < 0 || flag < apply || gate <= flag || refusal <= gate || combined <= refusal || claim <= combined) throw new Exception("Guards must precede durable claim.");
+    // A same-key retry after a successful or uncertain combined apply must reach the idempotent replay or OutcomeUnknown,
+    // not a fresh target refusal (the installed FB occupies its own number): the refusal runs only for an unclaimed change.
+    const string unclaimed = "if (component && change.IdempotencyKey == null && ";
+    if (source.IndexOf(unclaimed + "PlcCombinedApplyRefusal(change) is JObject refusal)", apply, StringComparison.Ordinal) != refusal - unclaimed.Length)
+        throw new Exception("The combined-apply refusal must be limited to unclaimed changes.");
+    int replay = source.IndexOf("if (change.State == \"applied\") return LibraryChangeView(change);", refusal, StringComparison.Ordinal);
+    int unknown = source.IndexOf("throw new BridgeException(\"OutcomeUnknown\", \"This operation was already dispatched and cannot be replayed.\"", refusal, StringComparison.Ordinal);
+    if (replay < 0 || unknown < replay || unknown > claim) throw new Exception("The applied replay and OutcomeUnknown retry paths must stay unchanged before the claim.");
     // The target checks (languages, instance profile) are part of that pre-claim refusal, so a refused plan imports and saves nothing.
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
-    int shape = integration.IndexOf("private string PlcCombinedApplyRefusal(LibraryChange change)", StringComparison.Ordinal);
+    int shape = integration.IndexOf("private JObject PlcCombinedApplyRefusal(LibraryChange change)", StringComparison.Ordinal);
     int target = integration.IndexOf("PlcCombinedApplyTargetRefusal(change);", shape, StringComparison.Ordinal);
-    int end = integration.IndexOf("private string PlcCombinedApplyTargetRefusal(LibraryChange change)", shape, StringComparison.Ordinal);
+    int end = integration.IndexOf("private JObject PlcCombinedApplyTargetRefusal(LibraryChange change)", shape, StringComparison.Ordinal);
     if (shape < 0 || target < shape || end < target) throw new Exception("The pre-claim refusal must include the target checks.");
-    foreach (string check in new[] { "CombinedApplyLanguageRefusal(", "CombinedApplyInstanceRefusal(", "CapturedStorageContext(change, true)" })
+    // The block-number and archive-path checks are pre-claim target checks too, and apply throws each refusal's own code.
+    if (source.IndexOf("throw new BridgeException(refusal.Value<string>(\"code\")", apply, StringComparison.Ordinal) < 0) throw new Exception("Apply must throw the refusal's own code.");
+    foreach (string check in new[] { "CombinedApplyLanguageRefusal(", "CombinedApplyInstanceRefusal(", "CapturedStorageContext(change, true)", "CombinedApplyNumberRefusal(", "CombinedApplyPathRefusal(" })
         if (integration.IndexOf(check, end, StringComparison.Ordinal) < 0) throw new Exception("Target check missing: " + check);
+});
+// Candidate shapes stay out of production: only the exact shapes with passed native evidence are verified, and candidates
+// are admitted only on a --component-qualification worker in its own single owned scratch. Change these pins only together with native evidence.
+Test("candidate shapes run only on a qualification Host's owned scratch, and only natively passed shapes are verified", () => {
+    Equal("earlierPlacement,fbCaller,ladCaller,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
+    string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
+    foreach (string pinned in new[] {
+        "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change))",
+        "private bool PlcComponentCandidatesAdmitted(LibraryChange change) =>\n            _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;" })
+        if (integration.Replace("\r\n", "\n").IndexOf(pinned, StringComparison.Ordinal) < 0) throw new Exception("Candidate admission changed: " + pinned);
+    if (integration.Split(new[] { "PlcComponentCandidatesAdmitted(" }, StringSplitOptions.None).Length != 3) throw new Exception("Candidate admission must have exactly one use.");
+    string gate = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs"));
+    if (gate.IndexOf("internal static readonly string[] VerifiedShapes = { \"earlierPlacement\", \"fbCaller\", \"ladCaller\", \"reusedComponent\" };", StringComparison.Ordinal) < 0 ||
+        gate.IndexOf("local.library_integrate.candidate_shapes.rerun.20261031", StringComparison.Ordinal) < 0)
+        throw new Exception("VerifiedShapes changes only together with its cited native evidence.");
+    // A failed combined apply carries the coordinator's initial checkpoint, the typed one of a reused FB included, into the change journal.
+    if (integration.IndexOf("if (record?[\"initialCheckpoint\"] is JObject checkpoint && ((JArray)change.Journal[\"checkpoints\"]).Count == 0) ((JArray)change.Journal[\"checkpoints\"]).Add(checkpoint.DeepClone());", StringComparison.Ordinal) < 0)
+        throw new Exception("The failure path no longer records the initial checkpoint in the change journal.");
+});
+// The admitted step workspace of a combined apply needs its own reconcile rule, or a crash leaves the admission unreleasable.
+Test("the combined apply's admitted step workspace has a reconcile rule", () => {
+    string admission = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs"));
+    string reconcile = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.AdmissionReconcileLibrary.cs"));
+    if (!admission.Contains("PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id), \"combinedApplyStepWorkspace\")") ||
+        !reconcile.Contains("check.Rows(\"combinedApplyStepWorkspace\")") || !reconcile.Contains("PlcComponentCoordinator.ReconcileWorkspace(row.Value<string>(\"path\")"))
+        throw new Exception("The admitted combinedApplyStepWorkspace row must be proven by PlcComponentCoordinator.ReconcileWorkspace.");
 });
 TextBoundaryTests.Run(Test);
 CoordinatorTests.Run(Test);

@@ -1,6 +1,7 @@
 """Mock/offline safety and evidence checks; never starts a native process."""
 import copy
 import json
+import os
 import itertools
 import pathlib
 import tempfile
@@ -81,6 +82,19 @@ class LifetimeTests(unittest.TestCase):
             self.assertEqual(2, len(report["sessions"]))
             self.assertTrue(all(row["cleanup"]["tiaProcessExit"]["processExitVerified"] for row in report["sessions"]))
             self.assertEqual(1, sum(tool == "project_open" for tool, _ in calls))
+
+    def test_host_gets_the_artifact_root_as_given_while_guards_compare_resolved_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            arguments = []
+            session = owned.OwnedScratch(root / "host.exe", root / "worker.exe", root / "." / "run", {}, lambda: None,
+                client_factory=lambda host, timeout, args: arguments.append(args) or FakeClient(root, [], None), watcher_factory=FakeWatcher,
+                manifest_factory=lambda *args: {"immutable": True})
+            self.assertEqual(os.path.abspath(root / "." / "run"), session.host_artifacts)
+            self.assertEqual((root / "run").resolve(), session.artifacts)
+            session.start()
+            self.assertEqual(session.host_artifacts, arguments[0][arguments[0].index("--artifacts") + 1])
+            session.close()
 
     def test_wrong_project_prevents_mutation_dispatch(self):
         with tempfile.TemporaryDirectory() as directory:

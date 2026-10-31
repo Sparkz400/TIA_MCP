@@ -2072,6 +2072,41 @@
       ]
     },
     {
+      "id": "local.library_integrate.candidate_shapes.rerun.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+        "passedScope": "Candidate combined-apply shapes (scripts/qualify_library_integrate_apply.py --candidates at 0130116e, build 0130116e frozen at artifacts/w3c6, --artifacts artifacts/ic3r, no subst drive) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. ladStandalone (new LAD FC, power rail), ladExisting (existing LAD FC after its last network; following IDs 8->D, 9->E), fbCaller (existing FBD FB TiaMcpComponentHost, renumbered to FB30 so the component keeps FB2, new global instance DB; 8->D, 9->E), earlierPlacement (existing two-network FBD FC after its first network; seven following IDs including the second network shifted by 5) and reuse (after a verified standalone install, a second new FBD FC with TiaMcpComponentGate_2 reusing the installed FB and UDT: one typed step, no second import, the version-comment-only differences recorded as ignoredDifferences with both values, the typed step's own archive as the checkpoint) each installed through change_apply: preview candidateFeatures exactly [ladCaller], [fbCaller], [earlierPlacement] or [reusedComponent], coordinator installation_verified with one initial project checkpoint in the short step workspace changes/c/<8 hex>, an independent export/inventory diff showing exactly the planned additions, the native caller insertion proof, the independent call/instance/tag oracle, the project library holding exactly the released versions, a fresh reopen equal to the installed state, a 0-error compile, and change_restore of the initial checkpoint into a new location in a fresh owned Portal equal to the baseline after retrieval and after reopen (for reuse: the first installation). multiInstance (after a verified install, a multi-instance in TiaMcpComponentHost reusing the FB) ended at its recorded boundary before any dispatch: the typed route's multi-instance profiles refuse the component FB's structured UDT static (InstanceCreationProfileUnavailable, coordinator preparation_failed, both steps undispatched, project unchanged)."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json"
+      ],
+      "limitations": [
+        "multiInstance is not installed: no captured multi-instance profile covers an FB with a structured (UDT) static; it needs a captured profile or a scalar component fixture.",
+        "Candidate shapes ran on a --component-qualification Host in owned scratch; combinations of these features (for example LAD with an earlier placement) were not exercised.",
+        "Reuse accepted version-comment-only differences: the source global library versions had an empty en-US comment, the installed versions their de-DE release comment; the component readback proved the installed content against the pinned source exports.",
+        "Software units, OB insertion, reused instance DBs, partial dependency reuse and DB/UDT-tag member bindings stay plan-only. No runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+        "passedScope": "Regression of the verified combined-apply shapes (scripts/qualify_library_integrate_apply.py at 0130116e, build 0130116e frozen at artifacts/w3c6, --artifacts artifacts/ic4) after the 31 October changes: short step workspace changes/c/<8 hex>, prepare-time block-number and path-length refusals, refusals with their own codes. A new standalone FBD FC and an existing FBD FC caller installed through change_apply with an exact export/inventory diff, the native caller insertion proof, the call oracle, exact project library versions, fresh reopen, a 0-error compile and change_restore of the initial checkpoint; an FBD OB caller and an existing FBD FB caller were refused (PlcIntegrationNotQualified) with the plan still prepared and the project unchanged; a Host without the former flag reported combined apply and previewed the standalone plan as eligible."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.regression.20261031.json"
+      ],
+      "limitations": [
+        "Owned de-DE-only scratch projects on CPU 1511-1 PN V4.1; no runtime execution."
+      ]
+    },
+    {
       "id": "local.plc_component.install.rerun.20261028",
       "status": "passed",
       "profile": {
@@ -2852,6 +2887,25 @@
         "One software unit without unit relations; unit uses are conservatively unreachable for updates.",
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
         "The explicit namespace is exercised on one FB root whose UDT dependency is reused; created dependencies keep their type namespace, unexercised.",
+        "No runtime execution."
+      ]
+    },
+    {
+      "id": "local.library_units.namespace.rerun.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+        "passedScope": "Library instance namespaces in a software unit (qualify_library_units.py at 0130116e, build 0130116e frozen at artifacts/w3c6, --artifacts artifacts/lu3, 94/94 steps). Every stage of local.library_units.namespace.20261029 passed again. A UDT root instantiated with namespace=TiaMcp_LibUnit is reused by the FB TiaMcpComponentGate instantiated with the same namespace (preview reusedDependencies=[TiaMcpComponentState]); both sit under /namespaces/TiaMcp_LibUnit/ with one exact use each. A master copy of the FC TiaMcpUnitMasterFc instantiated with namespace=TiaMcp_LibUnit (instanceNamespace.masterCopies) sits under /namespaces/TiaMcp_LibUnit/. An SCL source wrapped in NAMESPACE TiaMcp_LibUnit, with every namespaced reference qualified, adds an OB with instance DBs of both namespaced FBs, a DB member of the un-namespaced UDT and a call of the master-copy FC; the PLC-wide library_update_project to FB 1.1.0 then proves every library use reachable from that OB, applies, and the updated FB keeps its path including the namespace, as do the dependent FB, its UDT and the master copy, after the update and after a fresh reopen. The instantiation's checkpoint restores the project with the UDT only into a fresh owned TIA."
+      },
+      "artifacts": [
+        "evidence/local.library_units.namespace.rerun.20261031.json"
+      ],
+      "limitations": [
+        "V21 resolves unqualified names in a NAMESPACE SCL source against the root namespace, so namespaced objects are referenced by their qualified names.",
+        "One software unit without relations, created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
+        "A dependency created alongside a namespaced root keeps its type namespace; unexercised.",
         "No runtime execution."
       ]
     },
@@ -10990,7 +11044,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 project with a second CPU and an owned user global library (local.library_preservation.20261028): exact independent PLC and library snapshot diffs around each change, stale-identity and wrong-previewHash refusals, fresh reopen and checkpoint restore of one change of this kind.",
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029).",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029), for a UDT root reused as the namespaced FB's dependency and for a master copy of an FC (instanceNamespace.masterCopies); a later PLC-wide library_update_project keeps every namespaced path (local.library_units.namespace.rerun.20261031). A dependency created alongside a namespaced root keeps its type namespace; unexercised.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -11017,7 +11071,8 @@
           "local.library_unit_relations.rerun.20261029",
           "local.library_protected.rerun.20261029",
           "local.library_scopes.rerun.20261029",
-          "local.library_units.namespace.20261029"
+          "local.library_units.namespace.20261029",
+          "local.library_units.namespace.rerun.20261031"
         ]
       },
       "availability": {
@@ -11060,7 +11115,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 project with a second CPU and an owned user global library (local.library_preservation.20261028): exact independent PLC and library snapshot diffs around each change, stale-identity and wrong-previewHash refusals, fresh reopen and checkpoint restore; the update of the second PLC is refused (LibraryUpdateCleanupRisk) while any library object there has no OB-rooted reference, is reachable only through the updated FB, or is an unrelated unreferenced type.",
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; namespaces remain unverified.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included. An update of a PLC with namespaced library instances in a software unit keeps the namespaced paths of the updated FB, its dependent FB, their UDT and a namespaced master copy (local.library_units.namespace.rerun.20261031); every unit use must be reachable from an OB.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -11083,7 +11138,8 @@
           "local.library_protected.rerun.20261029",
           "local.library_scopes.rerun.20261029",
           "local.library_scopes.forced.20261029",
-          "local.library_units.namespace.20261029"
+          "local.library_units.namespace.20261029",
+          "local.library_units.namespace.rerun.20261031"
         ]
       },
       "availability": {
@@ -11125,13 +11181,13 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
+          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "PLC plc_component_plan prepares an explicit one-FB recipe with exact dependencies, instance storage, caller and bindings (scope in the 27 October entry). Combined PLC apply runs on every Host, only for the verified shapes of library.integrate_combined_apply; otherwise the emitted separate steps require fresh preparation and native qualification.",
-          "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentRecoveryAnchorUnavailable, ComponentMultiInstanceUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
+          "Broadened PLC component plan (27 October, plan-only, offline planner tests only; not natively qualified): software-unit scopePath with FB/caller namespaces kept in every step; existing LAD/FBD OB callers (obCallAdded=true); multiInstance (createMulti in an existing FB caller); exact reuse of installed root/dependency versions (native type/version GUID, one link, identical metadata) and of an existing instance DB only when native cross-references show no other user (InstanceUseUnproven/InstanceAlreadyUsed otherwise); DB-member and UDT-typed tag-member bindings checked against exported declarations. A reused FB drops the import step. Steps the component coordinator cannot apply carry planOnly with planOnlyReasons (ComponentScopeUnqualified, ComponentInstanceReuseUnqualified, ComponentReadbackUnavailable, UnsupportedOperandRoute, UnsupportedScopeReference; since 31 October a reused FB and a multi-instance have coordinator builders; reuse of an installed root records a version-comment-only difference as ignoredDifferences, and the component readback still proves the exact installed content) and the coordinator refuses them. Existing multi-instance members are not reused (DeclarationCollision); nested UDT members stay opaque.",
           "Combined Unified recipes (27 October, plan-only): plc_hmi_component_plan adds HMI tag mappings, connection selection, screen placement and expected compiler outcomes to the PLC recipe; plc_hmi_update_plan previews every proven Unified binding through one selected UDT version and refuses breaking or unprovable bindings with HmiBindingWouldBreak/HmiImpactIncomplete and an impact report. Apply is refused; member-bound tags, screen items and the Unified preservation gate stay blocked. Classic HMIs, nested UDTs and script/alarm consumers are not analyzed. The native prepare-only probe passed on Unified Comfort (local.hmi.plc-hmi-recipe.20261027): blocked install plan with refused apply, and a Real -> LReal UDT update refused with exactly one breaking binding and its screen consumer.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -11141,7 +11197,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_integrate.combined_apply.rerun.20261028"
+          "local.library_integrate.combined_apply.rerun.20261028",
+          "local.library_integrate.candidate_shapes.rerun.20261031",
+          "local.library_integrate.combined_apply.regression.20261031"
         ]
       },
       "availability": {
@@ -11183,11 +11241,12 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.20261028).",
+          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031).",
           "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
-          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. OB insertion is refused; LAD and FB callers, earlier placements in an existing caller, reuse, multi-instances, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified.",
+          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single-feature shapes ladCaller, fbCaller, earlierPlacement and reusedComponent are verified (PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; combinations of these features (for example a LAD FB caller or a LAD FC with an earlier placement), multi-instances, partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Combinations and multi-instances with a reused FB have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. A multi-instance of the captured component ends before any dispatch: the typed multi-instance profiles refuse its structured UDT static (InstanceCreationProfileUnavailable).",
+          "Before any claim it also refuses with its own code: ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
           "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
-          "The import step's complete-project archive, taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
+          "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects."
         ]
@@ -11195,7 +11254,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.library_integrate.combined_apply.rerun.20261028"
+          "local.library_integrate.combined_apply.rerun.20261028",
+          "local.library_integrate.candidate_shapes.rerun.20261031",
+          "local.library_integrate.combined_apply.regression.20261031"
         ]
       },
       "availability": {

@@ -6,12 +6,17 @@ refusals, and without it to prove the default. Reuses the component qualificatio
 library, peer and existing FBD FC callers, mapped tags) and its independent oracles.
 Each eligible plan is applied once; a failed or uncertain apply is never replayed or
 restored automatically. A failed step is retained as failed, never converted to success.
+
+--candidates qualifies the shapes that have a builder but no native evidence yet (LAD and FB callers, an earlier
+placement, reuse of the installed FB and a multi-instance with it). Only a --component-qualification Host admits them,
+in its own owned scratch; each case is independent and stops only itself.
 """
 from __future__ import annotations
 import argparse
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import traceback
@@ -27,8 +32,15 @@ from smoke_mcp import Client
 from typed_graphical_transport import artifact_bytes
 
 FLAG = "--enable-library-integrate-apply"
+CANDIDATE_FLAG = "--component-qualification"
+COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/before")
 REFUSED = "PlcIntegrationNotQualified"
-LAD_REFUSAL = "Only a new or existing FBD FC caller is verified"
+# FB callers are verified since 31 October, multi-instances are not: the refusal cases prepare an FB caller with a multi-instance.
+FB_REFUSAL = "Only new global instance DBs are verified; multi-instances stay plan-only."
+HOST_FB = "TiaMcpComponentHost"
+# The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
+# (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
+HOST_FB_NUMBER = 30
 MODES = ("createStandaloneFc", "existing")
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "library_capabilities")
 OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
@@ -39,6 +51,52 @@ HARNESS = ("qualify_plc_component.py", "qualification_owned_scratch.py", "compil
 def host_client(enabled):
     """Client factory for the frozen Host, with or without the former opt-in flag."""
     return lambda host, timeout, arguments: Client(host, timeout, [*arguments, *([FLAG] if enabled else [])])
+
+
+def candidate_client(host, timeout, arguments):
+    """The qualification Host: it admits candidate shapes in its own owned scratch and makes each new scratch de-DE only."""
+    return Client(host, timeout, [*arguments, CANDIDATE_FLAG])
+
+
+# Candidate install cases: manifest overrides and the exact unverified features the preview must name. ladCaller, fbCaller,
+# earlierPlacement and reusedComponent passed natively on 31 October and are verified shapes, so their previews name none.
+CANDIDATES = {
+    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, []),
+    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, []),
+    "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, []),
+    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
+}
+REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
+# The typed route's multi-instance profiles do not cover an FB with a structured (UDT) static; a refusal before any
+# dispatch is then recorded as that boundary, never as a pass.
+MULTI_BOUNDARY = ("InstanceCreationProfileUnavailable", "GraphicalInstanceTemplateUnavailable")
+
+
+def multi_boundary_journal(journal):
+    """The recorded multi-instance boundary only: a listed storage-profile refusal at typed preparation with nothing dispatched."""
+    failure, summary = journal.get("failure") or {}, journal.get("combinedApply") or {}
+    return (failure.get("code") in MULTI_BOUNDARY and failure.get("failedStep") == "prepare_graphical_typed_edit"
+            and summary.get("libraryStepDispatched") is False and summary.get("typedStepDispatched") is False)
+
+
+def failed_candidates(outcomes):
+    """Every candidate case that did not install; only multiInstance may instead end at its recorded boundary."""
+    return {name: outcome for name, outcome in outcomes.items()
+            if not (outcome == "installed" or name == "multiInstance" and outcome == "boundary")}
+
+
+def two_network_fc(peer_xml, name, number):
+    """An FBD FC with two networks from the peer FC's native export: its one network twice, every object ID renumbered
+    consecutively in document order (V21's own numbering), renamed and renumbered."""
+    networks = re.findall(r"<SW\.Blocks\.CompileUnit .*?</SW\.Blocks\.CompileUnit>", peer_xml, re.S)
+    require(len(networks) == 1, "Peer caller must export exactly one network.")
+    xml = peer_xml.replace(networks[0], networks[0] + networks[0])
+    ids = iter(range(int(re.search(r'(?<![A-Za-z])ID="([0-9A-F]+)"', xml).group(1), 16), 1 << 24))
+    xml = re.sub(r'(?<![A-Za-z])ID="[0-9A-F]+"', lambda _: 'ID="' + format(next(ids), "X") + '"', xml)
+    for pattern, value in ((r"<Name>[^<]*</Name>", "<Name>" + name + "</Name>"), (r"<Number>\d+</Number>", "<Number>" + str(number) + "</Number>")):
+        xml, count = re.subn(pattern, value, xml, count=1)
+        require(count == 1, "Peer export lacks one block " + pattern)
+    return xml
 
 
 def german_only_scratch(apply):
@@ -66,8 +124,9 @@ def require_combined_preview(preview, eligible=False, refusal=None):
             and preview.get("applySupported") is eligible, "combinedApply eligibility differs: " + str(block))
     if eligible:
         steps = [e for e in preview.get("effects", []) if e.get("action") == "applyPlcComponentSteps"]
-        require(block.get("refusal") is None and steps == [{"action": "applyPlcComponentSteps", "nativeMutation": True, "steps": 2}],
-                "Eligible preview lacks its exact two-step combined effect.")
+        count = len(preview["integrationPlan"]["steps"])  # a reused FB has no import step
+        require(block.get("refusal") is None and steps == [{"action": "applyPlcComponentSteps", "nativeMutation": True, "steps": count}],
+                "Eligible preview lacks its exact combined effect.")
     else:
         require(isinstance(block.get("refusal"), str) and block["refusal"].startswith(refusal),
                 "Unexpected combined-apply refusal: " + str(block.get("refusal")))
@@ -102,8 +161,9 @@ def version_key(name, version):
 
 
 def planned_objects(plan, existing):
-    """Block keys the reviewed plan creates; the UDT is pinned by version, not path."""
-    return {"block:" + plan["fb"]["path"], "block:" + plan["instanceDb"]["path"]} | (set() if existing else {"block:" + plan["caller"]["blockPath"]})
+    """Block keys the reviewed plan creates; the UDT is pinned by version, not path. A reused FB and a multi-instance add neither."""
+    return (set() if plan["fb"]["reused"] else {"block:" + plan["fb"]["path"]}) | ({"block:" + plan["instanceDb"]["path"]} if "instanceDb" in plan else set()) \
+        | (set() if existing else {"block:" + plan["caller"]["blockPath"]})
 
 
 def verify_instance_db(xml, manifest, number):
@@ -138,8 +198,12 @@ class IntegrateApplyRun(ComponentRun):
     def __init__(self, args):
         require(args.run_native, "Explicit --run-native is required.")
         self.args, self.manifest = args, json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))
+        self.base = copy.deepcopy(self.manifest)
         # Report, fixture documents and the Host's own artifacts share one fresh short run directory.
-        self.output = self.native = args.artifacts.resolve() / ("i" + uuid.uuid4().hex[:6])
+        self.output = self.native = Path(os.path.abspath(args.artifacts)) / ("i" + uuid.uuid4().hex[:6])
+        # The worker refuses at prepare when a step archive would exceed TIA's 143 characters (ComponentPathTooLong);
+        # check the same length here, before any authoring: root + changes/c/<8 hex>/change-lib-<32 hex>/before.
+        require(len(str(self.native)) + COMBINED_PATH_OVERHEAD <= 143, "Choose a shorter --artifacts path for the combined apply's step archives.")
         require(len(str(self.native / "scratch" / ("TiaMcpScratch_" + "0" * 24) / ("TiaMcpScratch_" + "0" * 24))) <= 143,
                 "Choose a short native --artifacts path.")
         self.output.mkdir(parents=True, exist_ok=False)
@@ -148,6 +212,7 @@ class IntegrateApplyRun(ComponentRun):
             "startedAtUtc": utc_now(), "hostFlag": FLAG, "fixture": copy.deepcopy(self.manifest), "workspace": str(self.output),
             "steps": [], "cases": {}, "events": [], "fixtureChanges": [],
             "combinedApplyVerified": False, "refusalsVerified": False, "defaultHostVerified": False,
+            "candidates": bool(getattr(args, "candidates", False)), "candidateCases": {},
             "runtimeVerified": False, "automaticReplayAllowed": False,
             "harnessFiles": [{"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                              for path in (Path(__file__), *(Path(__file__).with_name(name) for name in HARNESS))]}
@@ -157,8 +222,21 @@ class IntegrateApplyRun(ComponentRun):
         result = super().call(tool, arguments)
         # The fixtures and captured storage references are de-DE only; only the qualification Host forces that itself.
         if tool == "tia_create_scratch":
-            german_only_scratch(self.apply)
+            if result.get("componentQualificationLanguages") is None: german_only_scratch(self.apply)
+            else: require(result["componentQualificationLanguages"] == {"active": ["de-DE"], "reference": "de-DE", "editing": "de-DE"},
+                          "Qualification Host scratch is not exactly de-DE.")
         return result
+
+    def use(self, overrides):
+        """This case's fixture manifest: the base manifest with the case's overrides."""
+        self.manifest = {**copy.deepcopy(self.base), **overrides}
+
+    def recipe(self, scratch, library, released, plc, baseline, caller_recipe):
+        payload = super().recipe(scratch, library, released, plc, baseline, caller_recipe)
+        if self.manifest.get("multiInstance"):
+            integration = payload["integration"]; del integration["instanceDb"]
+            integration["multiInstance"] = {"name": self.manifest["multiInstance"]}
+        return payload
 
     def step(self, name, operation):
         row = {"name": name, "status": "running", "startedAtUtc": utc_now()}
@@ -202,17 +280,33 @@ class IntegrateApplyRun(ComponentRun):
                 "A refused apply changed the plan's durable state.")
         return detail
 
-    def install(self, mode, archive, released):
-        self.manifest["callerMode"] = mode
-        existing, out = mode == "existing", self.output / mode
-        case = self.case(mode, True)
+    def install(self, name, archive, released, overrides=None, features=()):
+        self.use(overrides if overrides is not None else {"callerMode": name})
+        out, case = self.output / name, self.case(name, True)
         scratch, opened, plc = self.stage_consumer(archive, released)
+        if self.manifest["caller"] == HOST_FB: self.apply("block_number_set", {"blockName": HOST_FB, "number": HOST_FB_NUMBER})
+        if self.manifest.get("twoNetworks"):
+            peer = artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + self.manifest["unrelatedCaller"]})["artifact"]).decode("utf-8-sig")
+            self.apply("block_import_xml", {"xml": two_network_fc(peer, self.manifest["caller"], 77), "expectedBlockNames": [self.manifest["caller"]]})
         case["capabilities"] = require_capabilities(self.call("library_capabilities"))
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
+        after = self.installed(case, out, prepared, plan, baseline, plc, caller, network, released, features)
+        self.call("library_close", {"libraryId": opened["libraryId"]})
+        self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after, [])
+
+    def installed(self, case, out, prepared, plan, baseline, plc, caller, network, released, features=()):
+        """Apply one eligible plan once and verify the installation against its baseline; returns the after snapshot."""
+        applied, record = self.apply_combined(case, prepared, baseline, features)
+        return self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
+
+    def apply_combined(self, case, prepared, baseline, features):
+        """The one change_apply of an eligible plan, whose preview names exactly these candidate features."""
         case["plan"] = {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}
         case["combinedApply"] = require_combined_preview(prepared["preview"], eligible=True)
+        require(sorted(case["combinedApply"].get("candidateFeatures") or {}) == sorted(features),
+                "Preview names other candidate features: " + str(case["combinedApply"].get("candidateFeatures")))
         request = step_request(prepared)
         self.retain("combined_apply_dispatching", request)
         try:
@@ -227,32 +321,93 @@ class IntegrateApplyRun(ComponentRun):
         checkpoint = case["initialCheckpoint"] = verify_combined_receipt(applied, prepared, baseline["inventory"]["project"]["path"])
         record = json.loads(Path(applied["journal"]["combinedApply"]["coordinatorJournal"]).read_text(encoding="utf-8-sig"))["record"]
         require(record.get("state") == "installation_verified", "Coordinator journal is not at verified installation.")
+        return applied, record
+
+    def verify_installed(self, case, out, plan, baseline, plc, caller, network, released, record):
+        existing = self.manifest["callerMode"] == "existing"
         after = snapshot(self.call, out / "after")
-        added = installed_objects(after, self.manifest, plc, existing)
+        reused, multi = plan["fb"]["reused"], self.manifest.get("multiInstance")
+        # A reused FB adds only its new storage and a new caller; a multi-instance adds no block at all.
+        added = installed_objects(after, self.manifest, plc, existing) if not reused else \
+            (["block:" + plan["instanceDb"]["path"]] if "instanceDb" in plan else []) + ([] if existing else ["block:" + plan["caller"]["blockPath"]])
         require(planned_objects(plan, existing) == {key for key in added if key.startswith("block:")}, "Installed blocks differ from the reviewed plan.")
-        verify_preserved_installation(baseline, after, caller, added)
+        # The new network directly follows the selected one (the last by default).
+        verify_preserved_installation(baseline, after, caller, added, multi, self.manifest.get("insertNetworkIndex", -1) if existing else None)
         caller_xml = Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig")
         verify_component_call(caller_xml, self.manifest)
         if existing:
             proof = case["callerInsertion"] = record["installationEvidence"]["callerInsertion"]
             require(proof["verified"] is True and proof["insertAfterNetworkId"] == network, "Native caller insertion proof differs.")
+            require(not multi or proof.get("addedStaticMember", {}).get("name") == multi, "Native multi-instance member proof differs.")
         else:
             verify_standalone_caller(caller_xml, self.manifest)
-        verify_instance_db(Path(after["objects"]["block:" + plan["instanceDb"]["path"]]["file"]).read_text(encoding="utf-8-sig"),
-                           self.manifest, first_available_db_number(baseline["inventory"]["blocks"]))
+        if not multi:
+            verify_instance_db(Path(after["objects"]["block:" + plan["instanceDb"]["path"]]["file"]).read_text(encoding="utf-8-sig"),
+                               self.manifest, first_available_db_number(baseline["inventory"]["blocks"]))
+        # Reuse installs nothing twice: the project library keeps exactly the released versions.
         require(self.project_versions() == sorted(version_key(name, pin) for name, pin in released.items()),
                 "Project library does not hold exactly the released FB/UDT versions.")
+        require(not reused or (len(plan["steps"]) == 1 and record["library"].get("dispatch") is None and plan["reuse"]["duplicatesCreated"] is False
+                               and sorted(v["versionGuid"] for v in plan["reuse"]["versions"]) == sorted(v["versionGuid"] for v in released.values())),
+                "Reuse plan or journal differs: it must reuse every released version in one typed step.")
         case["installationVerified"] = True; self.persist()
-        self.call("library_close", {"libraryId": opened["libraryId"]})
+        return after
+
+    def finish(self, case, out, prepared, plc, checkpoint, baseline, after, restored_versions):
+        """Fresh reopen, a clean compile, then the single initial checkpoint into a new location in a fresh owned Portal."""
         self.session.reopen(self.session.current_project)
         assert_snapshot(after, snapshot(self.call, out / "reopened"))
         case["freshReopenVerified"] = True; self.persist()
         compile_prepared = self.call("change_prepare", {"kind": "plc_compile", "plcPath": plc, "payload": {}})
         require_compile_only(compile_prepared, self.call("change_apply", step_request(compile_prepared)), plc)
         case["compileVerified"] = True; self.persist()
-        self.restore(case, prepared, checkpoint, baseline, out)
+        self.restore(case, prepared, checkpoint, baseline, out, restored_versions)
 
-    def restore(self, case, prepared, checkpoint, baseline, out):
+    def reuse(self, name, archive, released, multi=False):
+        """Candidate: a first verified install, then a plan that reuses the installed FB (exact proofs, no import step), either
+        in a second new FBD FC with a new global DB or as a multi-instance in an existing FB caller."""
+        self.use({"callerMode": "createStandaloneFc"})
+        case, out = self.case(name, True), self.output / name
+        scratch, opened, plc = self.stage_consumer(archive, released)
+        if multi:
+            self.host_fb(plc)
+        baseline = snapshot(self.call, out / "before-first")
+        caller, caller_recipe, network = self.select_caller(baseline, plc)
+        first, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
+        case["first"] = {}
+        self.installed(case["first"], out / "first", first, plan, baseline, plc, caller, network, released)
+        self.use({"callerMode": "existing", "caller": "TiaMcpComponentHost", "multiInstance": MULTI_NAME} if multi else
+                 {"callerMode": "createStandaloneFc", "caller": REUSE_CALLER, "instance": REUSE_INSTANCE})
+        baseline = snapshot(self.call, out / "before")
+        caller, caller_recipe, network = self.select_caller(baseline, plc)
+        prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
+        features = ["reusedComponent", "fbCaller", "multiInstance"] if multi else []
+        try:
+            applied, record = self.apply_combined(case, prepared, baseline, features)
+        except NativeToolError as error:
+            if multi and self.multi_boundary(case, out, baseline, error): return
+            raise
+        after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
+        self.call("library_close", {"libraryId": opened["libraryId"]})
+        # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.
+        require(case["initialCheckpoint"]["archivePath"] != case["first"]["initialCheckpoint"]["archivePath"]
+                and case["initialCheckpoint"].get("changeId") == applied["journal"]["combinedApply"]["typedChangeId"],
+                "The reuse checkpoint is not the typed step's own archive.")
+        self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after, sorted(version_key(n, pin) for n, pin in released.items()))
+
+    def multi_boundary(self, case, out, baseline, error):
+        """True when the typed route's storage profiles refused the multi-instance before any dispatch: the recorded boundary,
+        with the project unchanged. Any other failure stays a failure."""
+        journal = (case.get("failureStatus") or {}).get("journal") or {}
+        case["boundary"] = {"error": str(error), "failure": journal.get("failure"), "combinedApply": journal.get("combinedApply")}; self.persist()
+        if not multi_boundary_journal(journal):
+            return False
+        assert_snapshot(baseline, snapshot(self.call, out / "after-refusal"))
+        case.update(outcome="boundary", projectUnchanged=True); self.persist()
+        self.session.close()
+        return True
+
+    def restore(self, case, prepared, checkpoint, baseline, out, restored_versions=()):
         self.session.close()
         self.session.start()
         status = self.session.audit("tia_session_status")
@@ -272,14 +427,25 @@ class IntegrateApplyRun(ComponentRun):
         self.session.remember(recovered)
         self.session.guard()
         assert_snapshot(baseline, snapshot(self.call, out / "restored"))
-        require(self.project_versions() == [], "Restored project library still holds component versions.")
+        require(self.project_versions() == list(restored_versions), "Restored project library holds other component versions.")
         self.session.reopen(recovered)
         assert_snapshot(baseline, snapshot(self.call, out / "restored-reopened"))
         case["restoreVerified"] = True; self.persist()
         self.session.close()
 
+    def host_fb(self, plc):
+        """The FBD FB caller fixture, imported before the baseline; returns its path and an insertion recipe after its network."""
+        source = (self.native / "documents" / "callers" / (HOST_FB + ".s7dcl")).read_text(encoding="utf-8-sig")
+        self.apply("source_upsert", {"language": "SIMATIC_SD", "source": source, "expectedBlockNames": [HOST_FB]})
+        self.apply("block_number_set", {"blockName": HOST_FB, "number": HOST_FB_NUMBER})
+        return plc + "/blocks/" + HOST_FB
+
+    def host_fb_recipe(self, baseline, path):
+        network, _ = terminal_network(Path(baseline["objects"]["block:" + path]["file"]).read_text(encoding="utf-8-sig"), "FBD")
+        return {"mode": "existing", "blockPath": path, "insertAfterNetworkId": network}
+
     def refusals(self, archive, released):
-        """Flag on: an FBD OB caller and a new LAD FC caller are refused at apply with no project change."""
+        """Flag on: an FBD OB caller and an existing FBD FB caller with a multi-instance are refused at apply with no project change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         case, out = self.case("refusals", True), self.output / "refusals"
         scratch, opened, plc = self.stage_consumer(archive, released)
@@ -287,13 +453,14 @@ class IntegrateApplyRun(ComponentRun):
                    for name in ("Main", self.manifest["unrelatedCaller"])]
         first, second = self.manifest["signals"]
         self.apply("block_import_xml", {"xml": fbd_ob(*exports, first["name"], second["name"]), "expectedBlockNames": [OB_NAME]})
+        host = self.host_fb(plc)
         baseline = snapshot(self.call, out / "before")
         ob = plc + "/blocks/" + OB_NAME
         network, _ = terminal_network(Path(baseline["objects"]["block:" + ob]["file"]).read_text(encoding="utf-8-sig"), "FBD")
-        for name, caller, caller_recipe, reason in (
-                ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused"),
-                ("ladCaller", plc + "/blocks/" + self.manifest["caller"], {"mode": "createStandaloneFc", "name": self.manifest["caller"],
-                    "language": "LAD", "numberPolicy": "firstAvailable"}, LAD_REFUSAL)):
+        for name, caller, caller_recipe, reason, multi in (
+                ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused", None),
+                ("fbMultiInstance", host, self.host_fb_recipe(baseline, host), FB_REFUSAL, MULTI_NAME)):
+            self.manifest["multiInstance"] = multi
             prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
             case[name] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=reason)}
             case[name]["refusal"] = self.refused_apply(prepared); self.persist()
@@ -303,22 +470,44 @@ class IntegrateApplyRun(ComponentRun):
 
     def default_host(self, archive, released):
         """Host without the former flag: combined apply is the default, so the standalone FBD plan previews eligible (the
-        install steps already applied it; it is not applied again) and an unverified LAD FC plan is refused with no change."""
+        install steps already applied it; it is not applied again) and an FB caller plan with an unverified multi-instance is
+        refused with no change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         self.session.client_factory = host_client(False)
         case, out = self.case("defaultHost", False), self.output / "defaultHost"
         scratch, opened, plc = self.stage_consumer(archive, released)
         case["capabilities"] = require_capabilities(self.call("library_capabilities"))
+        host = self.host_fb(plc)
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, _ = self.select_caller(baseline, plc)
         prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
         case["combinedApply"] = require_combined_preview(prepared["preview"], eligible=True)
-        prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, dict(caller_recipe, language="LAD"))
-        case["ladCaller"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=LAD_REFUSAL),
-                             "refusal": self.refused_apply(prepared)}
+        self.manifest["multiInstance"] = MULTI_NAME
+        prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, host, self.host_fb_recipe(baseline, host))
+        self.manifest["multiInstance"] = None
+        case["fbMultiInstance"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=FB_REFUSAL),
+                            "refusal": self.refused_apply(prepared)}
         assert_snapshot(baseline, snapshot(self.call, out / "after"))
         case["projectUnchanged"] = True; self.persist()
         self.session.close()
+
+    def candidates(self, archive, released):
+        """Every candidate case on the qualification Host, each in its own owned scratch; one failure stops only its case."""
+        self.session.client_factory = candidate_client
+        cases = [(name, lambda n=name: self.install(n, archive, released, *CANDIDATES[n])) for name in CANDIDATES]
+        cases += [("reuse", lambda: self.reuse("reuse", archive, released)), ("multiInstance", lambda: self.reuse("multiInstance", archive, released, True))]
+        for name, operation in cases:
+            try:
+                self.step("candidate:" + name, operation)
+                self.report["candidateCases"][name] = self.report["cases"][name].get("outcome", "installed")
+            except Exception as error:
+                self.report["candidateCases"][name] = "failed: " + str(error)
+                try: self.session.close()
+                except Exception as cleanup: self.report["candidateCases"][name] += "; cleanup: " + str(cleanup)
+            self.persist()
+        failed = failed_candidates(self.report["candidateCases"])
+        if failed: raise RuntimeError("Candidate cases failed: " + json.dumps(failed))
+        self.report["status"] = "passed"
 
     def run(self):
         primary = None
@@ -326,6 +515,9 @@ class IntegrateApplyRun(ComponentRun):
             self.session = OwnedScratch(self.args.host, self.args.worker, self.output, self.report, self.persist,
                                         timeout=self.args.timeout, client_factory=host_client(True), extra_tools=EXTRA_TOOLS)
             archive, released = self.step("author", self.author)
+            if self.args.candidates:
+                self.candidates(archive, released)
+                return
             for mode in MODES:
                 self.step("install:" + mode, lambda: self.install(mode, archive, released))
             self.report["combinedApplyVerified"] = True
@@ -357,6 +549,7 @@ def main():
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--run-native", action="store_true")
+    parser.add_argument("--candidates", action="store_true", help="Qualify the candidate shapes on a --component-qualification Host instead of the verified ones.")
     args = parser.parse_args()
     require(5 <= args.timeout <= 900, "Timeout must be 5..900 seconds.")
     IntegrateApplyRun(args).run()
