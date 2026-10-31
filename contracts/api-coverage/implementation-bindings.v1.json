@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "471c554dadf4b5fa3bc4b7a26ddad88296df89fb79c9da610eb63e138241fcea",
-      "bytes": 1433544
+      "sha256": "c170780116061b85fea502e55b66e8317a1397119221b24f9d74b88a4aff988c",
+      "bytes": 1436813
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -552,8 +552,8 @@
     },
     {
       "path": "contracts/technology-version-profiles.v1.json",
-      "sha256": "c6c697d049be54de4c5739db540da5f8975325dffca8394e7be9f2a0ca52d5d9",
-      "bytes": 1425
+      "sha256": "2f1d81c227adea06917c6221a099120e3031165889517f27bc6b9f90df0046eb",
+      "bytes": 18163
     },
     {
       "path": "contracts/test-result.schema.json",
@@ -100870,6 +100870,13 @@
           "artifacts": [
             "evidence/local.technology_changes.20261028.json"
           ]
+        },
+        {
+          "id": "local.technology.version_profiles.20261031",
+          "profileSha256": "603d00841971b70eb27809803cd000603a80a01d97d7489010c7528aeb8d6bfc",
+          "artifacts": [
+            "evidence/local.technology.version_profiles.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -116666,7 +116673,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.technology.version_profiles.20261031",
+          "profileSha256": "603d00841971b70eb27809803cd000603a80a01d97d7489010c7528aeb8d6bfc",
+          "artifacts": [
+            "evidence/local.technology.version_profiles.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -121539,6 +121554,11 @@
       "sha256": "2491ad37a803100d2fb7cf207186fa522fb176cbf5811c657d97f9a2af3824ef"
     },
     {
+      "path": "evidence/local.technology.version_profiles.20261031.json",
+      "state": "observed",
+      "sha256": "7448c23ed96dc432d92e862fff5a7b0001ebd37dcb32d8e013ed0ba34d590fbb"
+    },
+    {
       "path": "evidence/local.technology_changes.20261028.json",
       "state": "observed",
       "sha256": "3db4631a0fba28a3d95dcd25e2c2fa50ebf12060e4edd6aecac450368896d333"
@@ -122270,6 +122290,10 @@
     {
       "id": "local.technology.motion_connections.20261030",
       "profileSha256": "ede4f2479e17244c68576a8c492ebaed3d8ad372cf3ce0ece554f8b10dd0e8f4"
+    },
+    {
+      "id": "local.technology.version_profiles.20261031",
+      "profileSha256": "603d00841971b70eb27809803cd000603a80a01d97d7489010c7528aeb8d6bfc"
     },
     {
       "id": "local.technology_changes.20261028",

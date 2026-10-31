@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "471c554dadf4b5fa3bc4b7a26ddad88296df89fb79c9da610eb63e138241fcea",
+    "catalogSha256": "c170780116061b85fea502e55b66e8317a1397119221b24f9d74b88a4aff988c",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -15,16 +15,16 @@
     "features": 469,
     "support": {
       "deferred": 7,
-      "limited": 310,
+      "limited": 311,
       "shipped": 127,
       "unavailable_target": 5,
-      "unqualified": 20
+      "unqualified": 19
     },
     "cells": {
       "blocked": 31,
-      "bound": 1995,
+      "bound": 1998,
       "deferred": 21,
-      "open": 111
+      "open": 108
     },
     "openCellsByOwner": {
       "D06": {
@@ -34,10 +34,6 @@
       "D10": {
         "role": "Drives",
         "open": 15
-      },
-      "D13": {
-        "role": "Technology and drives",
-        "open": 3
       },
       "D16": {
         "role": "Physical runtime",
@@ -4192,7 +4188,8 @@
       ],
       "evidenceIds": [
         "local.engineering.interruption-matrix.20261027",
-        "local.technology_changes.20261028"
+        "local.technology_changes.20261028",
+        "local.technology.version_profiles.20261031"
       ],
       "cells": [
         {
@@ -4200,7 +4197,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.engineering.interruption-matrix.20261027",
-            "local.technology_changes.20261028"
+            "local.technology_changes.20261028",
+            "local.technology.version_profiles.20261031"
           ]
         },
         {
@@ -4208,7 +4206,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.engineering.interruption-matrix.20261027",
-            "local.technology_changes.20261028"
+            "local.technology_changes.20261028",
+            "local.technology.version_profiles.20261031"
           ]
         },
         {
@@ -4216,7 +4215,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.engineering.interruption-matrix.20261027",
-            "local.technology_changes.20261028"
+            "local.technology_changes.20261028",
+            "local.technology.version_profiles.20261031"
           ]
         },
         {
@@ -4224,7 +4224,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.engineering.interruption-matrix.20261027",
-            "local.technology_changes.20261028"
+            "local.technology_changes.20261028",
+            "local.technology.version_profiles.20261031"
           ]
         },
         {
@@ -4232,7 +4233,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.engineering.interruption-matrix.20261027",
-            "local.technology_changes.20261028"
+            "local.technology_changes.20261028",
+            "local.technology.version_profiles.20261031"
           ]
         },
         {
@@ -4240,7 +4242,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.engineering.interruption-matrix.20261027",
-            "local.technology_changes.20261028"
+            "local.technology_changes.20261028",
+            "local.technology.version_profiles.20261031"
           ]
         }
       ]
@@ -5283,26 +5286,34 @@
         "change_prepare"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D13"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.technology.version_profiles.20261031"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.technology.version_profiles.20261031"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.technology.version_profiles.20261031"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.technology.version_profiles.20261031"
+          ]
         }
       ]
     },
@@ -26504,6 +26515,21 @@
         {
           "path": "evidence/local.technology.motion_connections.20261030.json",
           "sha256": "2491ad37a803100d2fb7cf207186fa522fb176cbf5811c657d97f9a2af3824ef"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.technology.version_profiles.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "87c4d8b16a33c90828c941f8af9723b828342920",
+      "retained": [
+        {
+          "path": "evidence/local.technology.version_profiles.20261031.json",
+          "sha256": "7448c23ed96dc432d92e862fff5a7b0001ebd37dcb32d8e013ed0ba34d590fbb"
         }
       ],
       "notRetained": []

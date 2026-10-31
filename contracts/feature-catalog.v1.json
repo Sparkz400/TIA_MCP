@@ -3212,6 +3212,24 @@
         "One library transaction (library_create_master_copy into the project library) in one owned scratch CPU 1511-1 PN V4.1 with one G120C PN that is not on the CPU's IO system; other library kinds share the device compile and observation checks but were not run with a drive.",
         "The drive itself is never compiled: it exposes no compiler service and is listed under notCompiled, never counted as compiled."
       ]
+    },
+    {
+      "id": "local.technology.version_profiles.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "87c4d8b16a33c90828c941f8af9723b828342920",
+        "passedScope": "scripts/probe_technology_versions.py on a frozen Debug build of 87c4d8b1 (artifacts/w2bn2, git archive), 74/74 steps, in one owned scratch with CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 (scratch), CPU 1511C-1 PN 6ES7 511-1CK01-0AB0/V2.6 and CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0/V4.7 (both added from the installed catalog with configureScratchSecurity). 45 cells, each one to_create of TvProbe with unprofiledAcknowledged, applied with checkpoint and without compile or save, read back through technology_read and returned to the baseline (blocks, types, tag tables and technology objects of every PLC equal): 37 by change_restore into a new directory, 8 accepted motion creates by closing the owned Portal unsaved and reopening the checkpointed project, because the uncompiled first motion object leaves the generated MC_Servo inconsistent and the post-apply fingerprint refuses (FingerprintUnavailable). Accepted: CPU 1511-1 PN V4.1 PID_Compact 3.0, PID_3Step 2.3, PID_Temp 1.1, TO_PositioningAxis, TO_SpeedAxis, TO_SynchronousAxis, TO_ExternalEncoder 10.0, High_Speed_Counter 5.0; CPU 1511C-1 PN V2.6 PID_Compact 2.4, PID_3Step 2.3, PID_Temp 1.1, TO_PositioningAxis, TO_SpeedAxis, TO_SynchronousAxis, TO_ExternalEncoder 4.0, High_Speed_Counter 5.0; CPU 1214C V4.7 PID_Compact 2.3, PID_3Step 2.3, PID_Temp 1.1, TO_PositioningAxis 8.0, TO_CommandTable 8.0. Refused by V21 at Create with its native text: every newer candidate tried before an accepted version (type or version does not exist), TO_Cam at the CPU's motion version and TO_SpeedAxis 8.0 on the S7-1200 (does not exist), TO_MeasuringInput and TO_OutputCam on both S7-1500 (cannot be created by Openness)."
+      },
+      "artifacts": [
+        "evidence/local.technology.version_profiles.20261031.json"
+      ],
+      "limitations": [
+        "Three CPUs; versions tried newest first until one was accepted, so older versions a CPU may also accept stay unprofiled. Creation at the PLC root only: no compile, connection, parameters, children or behavior.",
+        "V21 refuses root creation of TO_MeasuringInput and TO_OutputCam (Technology objects of that type cannot be created by Openness); they are children of an axis or encoder (to_child_create, not probed here).",
+        "Engineering only; nothing downloaded."
+      ]
     }
   ],
   "features": [
@@ -7304,7 +7322,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact 3.0 and a virtual TO_PositioningAxis 10.0 (initial VirtualAxis.Mode = 1) created, with TIA's system-group instructions and generated protected motion OBs recorded; case-insensitive duplicates, non-numeric versions and technologyPath refused; fresh-Portal reopen and checkpoint restore. Real drives and encoders are not exercised; an unconnected TO_ExternalEncoder fails compile.",
-          "V21 exposes no CPU-specific type/version catalog, so preparation and apply admit the CPU/type/version cells recorded in the embedded contracts/technology-version-profiles.v1.json (keyed by the CPU's exact type identifier, order number and firmware): a recorded acceptance passes, a recorded refusal refuses with its native text (TechnologyVersionRefused), and any other pair refuses (TechnologyVersionUnprofiled) unless the payload sets unprofiledAcknowledged, which lets Siemens validate it during creation; a native refusal then requires checkpoint recovery. The shipped cells are the creations of local.technology_changes.20261028 and local.technology.motion_connections.20261030 on CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 (31 October 2026; the gate itself awaits its native run).",
+          "V21 exposes no CPU-specific type/version catalog, so preparation and apply admit the CPU/type/version cells recorded in the embedded contracts/technology-version-profiles.v1.json (keyed by the CPU's exact type identifier, order number and firmware): a recorded acceptance passes, a recorded refusal refuses with its native text (TechnologyVersionRefused), and any other pair refuses (TechnologyVersionUnprofiled) unless the payload sets unprofiledAcknowledged, which lets Siemens validate it during creation; a native refusal then requires checkpoint recovery. The cells are local.technology.version_profiles.20261031: 45 creates on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C V4.7.",
           "Optional parameters supplies up to 500 non-null scalar initial values. Sensitive names are rejected at prepare. Native parameter names, current value types and exposed write-access metadata can be checked only after creation.",
           "Initial values are applied and read back inside the creation checkpoint before the first compile. Configuration, dependency or readback failure may leave a partial object and requires checkpoint recovery.",
           "A virtual TO_PositioningAxis10.0 initial-parameter fixture passed on CPU1511 firmware4.1; external encoder compilation failed without telegram connections and recovered. This does not qualify connected motion hardware.",
@@ -7313,14 +7331,16 @@
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 17 October connection-service repair reports four independently probed services, explicit observed/not-exposed/failed/unvisited states, bounded sensor/field reads, exact technology-owner observation paths and field completeness. Null service observations are not capability or physical-absence proof. Native object projections remain incomplete identities; current source and changed qualification consumers have synthetic/offline evidence only. SDK and native endpoint/preservation qualification remain open; historical evidence IDs are retained.",
-          "Selected technology connection references require bounded project-provider roundtrips and verified-owner channel selectors. Synthetic offline checks do not qualify native SDK, channel ownership or persistence (17 October 2026)."
+          "Selected technology connection references require bounded project-provider roundtrips and verified-owner channel selectors. Synthetic offline checks do not qualify native SDK, channel ownership or persistence (17 October 2026).",
+          "Without compile, the first motion object of a PLC leaves MC_Servo inconsistent: change_apply fails after the create with FingerprintUnavailable and change_restore cannot recover in place (local.technology.version_profiles.20261031); apply motion objects with compile, or recover by reopening the saved project."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.technology.version_profiles.20261031"
         ]
       },
       "availability": {
@@ -8309,18 +8329,21 @@
         "status": "partial",
         "limitations": [
           "contracts/technology-version-profiles.v1.json records accepted and refused cells per CPU type identifier, technology type and version; the worker embeds it and change.to_create admits, refuses with the recorded native refusal, or refuses an unprofiled pair unless unprofiledAcknowledged is set.",
-          "scripts/probe_technology_versions.py captures the matrix in one owned scratch (CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6, CPU 1214C DC/DC/DC V4.7; a CPU missing from the installed catalog is recorded as notInCatalog; PID, motion and high-speed-counter families, newest version first until accepted), each create in its own checkpoint and restored; only a create TIA itself refuses becomes a refused cell. scripts/technology_version_profiles.py merges a curated run into the contract. The native run is pending; the shipped cells come from earlier CPU 1511-1 PN V4.1 creations only.",
-          "A cell covers creation at the PLC root only, not compile, connections, parameters, children (to_child_create) or behavior."
+          "31 October 2026 (local.technology.version_profiles.20261031): scripts/probe_technology_versions.py captured 45 cells on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7 (21 accepted, 24 refused with V21's native text), each create in its own checkpoint and returned to the baseline; scripts/technology_version_profiles.py merged them into the contract. Versions were tried newest first until one was accepted, so older versions a CPU may also accept stay unprofiled. The gate's admit path ran natively for the recorded cells; its TechnologyVersionRefused and TechnologyVersionUnprofiled refusals are covered offline only.",
+          "A cell covers creation at the PLC root only, not compile, connections, parameters, children (to_child_create) or behavior.",
+          "An uncompiled first motion object leaves the generated, know-how protected motion OBs (MC_Servo) inconsistent, so the engineering fingerprint and change_restore refuse (FingerprintUnavailable) until the PLC compiles; the probe recovered those creates by closing the owned Portal unsaved."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.technology.version_profiles.20261031"
+        ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Only the recorded CPU/type/version cells; other pairs need unprofiledAcknowledged and native validation at creation."
+          "Only the 45 recorded CPU/type/version cells; other pairs need unprofiledAcknowledged and native validation at creation."
         ]
       },
       "prerequisites": [

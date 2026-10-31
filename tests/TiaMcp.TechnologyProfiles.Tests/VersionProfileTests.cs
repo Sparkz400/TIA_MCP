@@ -18,7 +18,7 @@ internal static class VersionProfileTests
         var shipped = TechnologyVersionProfileRules.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "technology-version-profiles.v1.json")));
 
         var pid = TechnologyVersionProfileRules.Admit(shipped, Cpu, "PID_Compact", "3.0", false);
-        Check(pid.Value<bool>("admitted") && (string?)pid["profile"]!["outcome"] == "accepted" && (string?)pid["profile"]!["evidenceId"] == "local.technology_changes.20261028",
+        Check(pid.Value<bool>("admitted") && (string?)pid["profile"]!["outcome"] == "accepted" && (string?)pid["profile"]!["evidenceId"] == "local.technology.version_profiles.20261031",
               "The shipped scratch CPU admits PID_Compact 3.0 with its evidence");
         Check(TechnologyVersionProfileRules.Admit(shipped, Cpu, "PID_Compact", "3.00", false).Value<bool>("admitted"), "Versions compare as native Version values");
         var older = TechnologyVersionProfileRules.Admit(shipped, Cpu, "PID_Compact", "2.3", false);
@@ -26,7 +26,10 @@ internal static class VersionProfileTests
               "An unrecorded version on a profiled CPU refuses and names the accepted versions");
         var acknowledged = TechnologyVersionProfileRules.Admit(shipped, Cpu, "PID_Compact", "2.3", true);
         Check(acknowledged.Value<bool>("admitted") && (string?)acknowledged["profile"]!["outcome"] == "unprofiled", "unprofiledAcknowledged admits an unrecorded pair as unprofiled");
-        var otherCpu = TechnologyVersionProfileRules.Admit(shipped, "OrderNumber:6ES7 214-1AG40-0XB0/V4.7", "PID_Compact", "3.0", false);
+        var s71200 = TechnologyVersionProfileRules.Admit(shipped, "OrderNumber:6ES7 214-1AG40-0XB0/V4.7", "PID_Compact", "3.0", true);
+        Check(!s71200.Value<bool>("admitted") && (string?)s71200["code"] == "TechnologyVersionRefused" && ((string?)s71200["message"])!.Contains("\"PID_Compact.3.0\" does not exist")
+              && s71200["details"]!["acceptedVersions"]!.ToObject<string[]>()!.SequenceEqual(["2.3"]), "The shipped S7-1200 profile refuses PID_Compact 3.0 with V21's recorded text, acknowledged or not");
+        var otherCpu = TechnologyVersionProfileRules.Admit(shipped, "OrderNumber:6ES7 516-3AP03-0AB0/V4.1", "PID_Compact", "3.0", false);
         Check(!otherCpu.Value<bool>("admitted") && (string?)otherCpu["code"] == "TechnologyVersionUnprofiled" && otherCpu["details"]!.Value<bool>("cpuProfiled") == false,
               "A CPU without cells refuses even a version accepted elsewhere");
         Check(!TechnologyVersionProfileRules.Admit(shipped, Cpu, "pid_compact", "3.0", false).Value<bool>("admitted"), "Type identifiers match ordinally");

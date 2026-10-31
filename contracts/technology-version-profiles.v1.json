@@ -4,13 +4,387 @@
   "rule": "change.to_create admits an accepted cell, refuses a refused cell with its recorded native refusal (TechnologyVersionRefused) and refuses every other CPU/type/version pair (TechnologyVersionUnprofiled) unless the payload sets unprofiledAcknowledged. Accepted means V21 created exactly that type and version at the PLC root of that CPU type identifier (order number and firmware); it does not qualify compile, connections, parameters or behavior. Cells come from native runs only: scripts/probe_technology_versions.py writes them, scripts/technology_version_profiles.py merges a curated run.",
   "cpus": [
     {
+      "cpuTypeIdentifier": "OrderNumber:6ES7 214-1AG40-0XB0/V4.7",
+      "cpuTypeName": "CPU 1214C DC/DC/DC",
+      "cells": [
+        {
+          "typeIdentifier": "PID_3Step",
+          "version": "2.3",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_3Step",
+          "version": "3.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_3Step.3.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "PID_Compact",
+          "version": "2.3",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_Compact",
+          "version": "2.4",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_Compact.2.4\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "PID_Compact",
+          "version": "3.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_Compact.3.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "PID_Temp",
+          "version": "1.1",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_Temp",
+          "version": "1.2",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_Temp.1.2\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_CommandTable",
+          "version": "8.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "8.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "9.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.9.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.10.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_SpeedAxis",
+          "version": "8.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_SpeedAxis.8.0\" does not exist or is not a valid technology object."
+          }
+        }
+      ]
+    },
+    {
       "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
       "cpuTypeName": "CPU 1511-1 PN",
       "cells": [
-        { "typeIdentifier": "PID_Compact", "version": "3.0", "outcome": "accepted", "evidenceId": "local.technology_changes.20261028" },
-        { "typeIdentifier": "TO_ExternalEncoder", "version": "10.0", "outcome": "accepted", "evidenceId": "local.technology.motion_connections.20261030" },
-        { "typeIdentifier": "TO_PositioningAxis", "version": "10.0", "outcome": "accepted", "evidenceId": "local.technology_changes.20261028" },
-        { "typeIdentifier": "TO_SpeedAxis", "version": "10.0", "outcome": "accepted", "evidenceId": "local.technology.motion_connections.20261030" }
+        {
+          "typeIdentifier": "High_Speed_Counter",
+          "version": "5.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_3Step",
+          "version": "2.3",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_3Step",
+          "version": "3.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_3Step.3.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "PID_Compact",
+          "version": "3.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_Temp",
+          "version": "1.1",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_Temp",
+          "version": "1.2",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_Temp.1.2\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_Cam",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_Cam.10.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_ExternalEncoder",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_MeasuringInput",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. Technology objects of the 'TO_MeasuringInput' type cannot be created by Openness."
+          }
+        },
+        {
+          "typeIdentifier": "TO_OutputCam",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. Technology objects of the 'TO_OutputCam' type cannot be created by Openness."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_SpeedAxis",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_SynchronousAxis",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        }
+      ]
+    },
+    {
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1CK01-0AB0/V2.6",
+      "cpuTypeName": "CPU 1511C-1 PN",
+      "cells": [
+        {
+          "typeIdentifier": "High_Speed_Counter",
+          "version": "5.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_3Step",
+          "version": "2.3",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_3Step",
+          "version": "3.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_3Step.3.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "PID_Compact",
+          "version": "2.4",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_Compact",
+          "version": "3.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_Compact.3.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "PID_Temp",
+          "version": "1.1",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "PID_Temp",
+          "version": "1.2",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"PID_Temp.1.2\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_Cam",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_Cam.4.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_ExternalEncoder",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_MeasuringInput",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. Technology objects of the 'TO_MeasuringInput' type cannot be created by Openness."
+          }
+        },
+        {
+          "typeIdentifier": "TO_OutputCam",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. Technology objects of the 'TO_OutputCam' type cannot be created by Openness."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "5.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.5.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "6.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.6.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "7.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.7.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "8.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.8.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "9.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.9.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_PositioningAxis",
+          "version": "10.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "refused",
+          "nativeRefusal": {
+            "code": "EngineeringError",
+            "message": "Error when calling method 'Create' of type 'Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDBComposition'. The type or version of the library element \"TO_PositioningAxis.10.0\" does not exist or is not a valid technology object."
+          }
+        },
+        {
+          "typeIdentifier": "TO_SpeedAxis",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        },
+        {
+          "typeIdentifier": "TO_SynchronousAxis",
+          "version": "4.0",
+          "evidenceId": "local.technology.version_profiles.20261031",
+          "outcome": "accepted"
+        }
       ]
     }
   ]
