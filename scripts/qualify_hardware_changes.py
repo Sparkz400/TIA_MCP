@@ -252,7 +252,7 @@ def constant(run, station, name):
 
 def timing(run, station):
     """An IO device's interface recomputes its connector's update and watchdog times when its first module arrives or its last one goes;
-    an ET 200SP station already holds its generated server module, so its DI modules are never its first or last module."""
+    the ET 200SP family modules join and leave beside SpDi3, its first DI module, which stays."""
     return ["hw:" + run.path(station.device, "items", *station.interface)] if station.interface and station.device != SP.device else []
 
 
@@ -326,10 +326,13 @@ def sp_station(run):
                "expectedServerModule": {"name": name, "typeIdentifier": SERVER, "containerHardwarePath": rail, "positionNumber": 1,
                                         "attributes": {"AdditionalInformation": "", "Author": author, "Comment": "", "LocationIdentifier": "", "Name": name, "PlantDesignation": ""}}}
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, SP, SP.prefix))] + under(server)(applied, state)
+    # The ports of the head's interface sit on the BusAdapter beside it (observed hw2); they take SharedDeviceAccessType PLC as well.
+    adapter = [key for key in run.current["view"] if key.startswith(run.hw(SP.device, "items", "")) and "/items/Port_" in key and "/HwSpHead/" not in key]
+    # The second effect is the declared generated server contract.
     run.apply("assign %s to HwPeerCpu" % SP.device, "network_io_assign", payload,
-              {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
+              {"effects": [{"hardwarePath": device, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}, {}]},
               shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
-              changed=lambda applied, state: head_items(run, SP.device, "HwSpHead")(applied, state) + ["hw:" + controller], added=generated)
+              changed=lambda applied, state: head_items(run, SP.device, "HwSpHead")(applied, state) + adapter + ["hw:" + controller], added=generated)
     run.apply("move %s's server module to slot 4" % SP.device, "hardware_move", {"hardwarePath": server, "positionNumber": 4},
               {"effects": [{"hardwarePath": server, "positionBefore": 1, "positionAfter": 4}]}, changed=["hw:" + server, "inv:" + server],
               rows={"hw:" + server: {"positionNumber": 4}})
@@ -590,12 +593,14 @@ def phase_a(run):
     sp = sp_station(run)
     older, newer = sp_modules(run, sp)
     run.families = FAMILIES + ((sp, ("SpDi", "SpDi2"), older, newer),)
+    # The first ET 200SP module needs a new potential group (light BaseUnit), which TIA gives a module at slot 1 (hw2), and it
+    # sets the IO device's update time; SpDi3 holds that slot, so the family modules at 2 and 3 continue its potential group.
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
     for station_, (first, second), module, after in run.families:
         plug(run, first, 2, station_, module, changed=timing(run, station_))
         plug(run, second, 3, station_, module)
         attributes(run, first, {"Comment": "HwComment", "Author": "HwAuthor"}, station=station_)
         replace(run, first, module, after, station=station_)
-    plug(run, "SpDi3", 1, sp, older)  # The module handed outside the project below; ET 200SP racks take gaps.
     plug(run, "HwDi", 2)
     module = run.hw("ScratchStation", "items", "HwDi")
     stale = run.prepare("comment HwDi (made stale below)", "hardware_attributes", {"hardwarePath": module[3:], "attributes": {"Comment": "HwStale"}})

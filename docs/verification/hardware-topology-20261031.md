@@ -74,6 +74,20 @@ minutes each:
 2. **Qualification**: the same command without `--discover`, after the expectations are fixed from run 1. Its
    `profiles.json` fills `contracts/hardware-catalog-profiles.v1.json` once curated.
 
+## Discovery passes (not evidence)
+
+Two `--discover` passes ran on 31 October in one owned TIA Portal V21 instance each, from frozen Debug builds (no PLCSIM):
+
+| Pass | Build | Stopped at | Finding |
+| --- | --- | --- | --- |
+| `artifacts/hw1/hw_9fefba84` | `artifacts/hf1` (`743daa3f`) | snapshot after adding the ET 200SP station (55 steps) | The IM 155-6 PN ST V6.4 interface's ports sit on its BusAdapter `BA 2xRJ45` (`6ES7 193-6AR00-0AA0/V0.0`, slot 127), a sibling of the head; the profile builder refused them. Fixed in `b7af3ee4` (ports named `device:items/...`). The station's rack is `Rack_0` (`System:Rack.ET200SP`). |
+| `artifacts/hw2/hw_28ac766e` | `artifacts/hf2` (`b7af3ee4`) | apply of the first ET 200SP DI at slot 2 (114 steps) | V21 device compile: "The module 'SpDi' in slot 2 requires a new potential group (light-colored BaseUnit)", and "On IO device HwSpHead, the update time has changed from 128 ms to 2 ms". Before that, the ET 200SP assignment to the second CPU (with the declared generated server module, moved to slot 4) applied and compiled; its preview carries the companion as a second effect, and the BusAdapter's `Port_1`/`Port_2` take `SharedDeviceAccessType` `PLC` like the head's items. |
+
+Everything before these points matched the runner's expectations (S7-1500, S7-1200, ET 200MP families up to the
+ET 200SP steps). The runner now plugs the first ET 200SP module at slot 1, where TIA gives it a light BaseUnit, and expects
+the update-time change there (`2f…`, see the commit after `b7af3ee4`). No shared-device, MRP, shared-access,
+address-change or GSD step has run natively yet.
+
 ## Still open
 
 - I-devices under a higher-level controller; HMI and drive devices (D10).
