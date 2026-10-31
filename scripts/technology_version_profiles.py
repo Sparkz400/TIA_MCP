@@ -21,6 +21,13 @@ def version_key(text):
     return tuple(int(x) for x in text.split("."))
 
 
+def native_message(row):
+    """TIA's own words from one journaled exception row: its message data text and every detail text (the reason, such as
+    'The type or version of the library element ... does not exist', sits in the details), else the exception message."""
+    texts = [row.get("text"), row.get("detail")] + [t for d in row.get("details") or [] for t in (d.get("text"), d.get("detail"))]
+    return " ".join(t.strip() for t in texts if t and t.strip()) or row.get("message")
+
+
 def observed_cells(report, evidence_id):
     """(cpuTypeIdentifier, cpuTypeName, cell) for every native observation of a completed run."""
     if report.get("completed") is not True:
@@ -31,7 +38,10 @@ def observed_cells(report, evidence_id):
         if row["outcome"] == "accepted":
             cell["outcome"] = "accepted"
         elif row["outcome"] == "refused":
-            cell.update(outcome="refused", nativeRefusal=row["nativeRefusal"])
+            # Recomputed from the journaled chain, so a report written before native_message existed merges TIA's reason too.
+            siemens = [chain[0] for chain in row.get("native") or [] if chain and str(chain[0].get("type") or "").startswith("Siemens.Engineering.")]
+            message = native_message(siemens[0]) if siemens else row["nativeRefusal"]["message"]
+            cell.update(outcome="refused", nativeRefusal={"code": row["nativeRefusal"]["code"], "message": message})
         elif row["outcome"] == "substituted":
             cell.update(outcome="refused", nativeRefusal={"code": "VersionSubstituted", "message": "V21 created %s %s instead." % (row["observed"]["typeIdentifier"], row["observed"]["version"])})
         else:

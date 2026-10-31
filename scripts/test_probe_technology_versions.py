@@ -46,7 +46,8 @@ class PlannerTests(unittest.TestCase):
 class ApplyFailureTests(unittest.TestCase):
     error = {"code": "EngineeringError", "message": "Error when calling method 'Create'."}
     native = {"role": "native-exception", "chain": [{"type": "Siemens.Engineering.EngineeringTargetInvocationException", "message": "Error when calling method 'Create'.",
-                                                     "text": "The version 9.0 is not supported.", "detail": "Use 10.0."}]}
+                                                     "text": "Error when calling method 'Create'.", "detail": None,
+                                                     "details": [{"text": "The type or version of the library element \"TO_Cam.9.0\" does not exist.", "detail": None}]}]}
 
     def status(self, stages, *readbacks):
         return {"stages": stages, "readbacks": list(readbacks)}
@@ -54,7 +55,8 @@ class ApplyFailureTests(unittest.TestCase):
     def test_only_tia_refusing_the_create_is_a_refused_cell(self):
         refused = p.apply_failure(self.error, self.status(["prechange_project_saved", "recovery_archive_created"], self.native))
         self.assertEqual("refused", refused["outcome"])
-        self.assertEqual({"code": "EngineeringError", "message": "The version 9.0 is not supported. Use 10.0."}, refused["nativeRefusal"])
+        self.assertEqual({"code": "EngineeringError", "message": "Error when calling method 'Create'. The type or version of the library element \"TO_Cam.9.0\" does not exist."},
+                         refused["nativeRefusal"])
 
     def test_other_apply_failures_are_failed_at_apply(self):
         worker = {"role": "native-exception", "chain": [{"type": "TiaMcp.Openness.V21.BridgeException", "message": "Technology object already exists."}]}
@@ -96,6 +98,15 @@ class MergeTests(unittest.TestCase):
                          [(c["typeIdentifier"], c["version"], c["outcome"]) for c in cells])
         self.assertEqual("VersionSubstituted", cells[1]["nativeRefusal"]["code"])
         self.assertEqual({"code": "EngineeringError", "message": "No."}, cells[2]["nativeRefusal"])
+
+    def test_the_merge_takes_tias_reason_from_the_journaled_chain(self):
+        chain = [[{"type": "Siemens.Engineering.EngineeringTargetInvocationException", "message": "m", "text": "Error when calling method 'Create'.",
+                   "details": [{"text": "The type or version of the library element \"PID_3Step.3.0\" does not exist or is not a valid technology object."}]}]]
+        report = self.report({"typeIdentifier": "PID_3Step", "version": "3.0", "outcome": "refused", "native": chain,
+                              "nativeRefusal": {"code": "EngineeringError", "message": "Error when calling method 'Create'."}})
+        cell = t.observed_cells(report, "local.x")[0][2]
+        self.assertEqual("Error when calling method 'Create'. The type or version of the library element \"PID_3Step.3.0\" does not exist or is not a valid technology object.",
+                         cell["nativeRefusal"]["message"])
 
     def test_a_later_run_replaces_the_same_cell(self):
         first = t.merge({"cpus": []}, t.observed_cells(self.report({"typeIdentifier": "PID_Compact", "version": "3.0", "outcome": "accepted"}), "local.a"))

@@ -31,6 +31,7 @@ import shutil
 
 from library_native_harness import Harness, require
 from qualify_drives import outcome
+from technology_version_profiles import native_message
 
 NAME = "TvProbe"
 # Each cell leaves a checkpoint and a pre-recovery archive; the matrix stops with a recorded boundary below this free space.
@@ -92,8 +93,7 @@ def apply_failure(error, status):
     result = {"error": {k: error.get(k) for k in ("code", "message")}, "stages": stages, "native": chains}
     if "recovery_archive_created" not in stages or "mutation_applied" in stages or not native:
         return {"outcome": "failedAtApply", **result}
-    text = " ".join(t for t in (native[0].get("text"), native[0].get("detail")) if t) or native[0].get("message")
-    return {"outcome": "refused", "nativeRefusal": {"code": error.get("code"), "message": text}, **result}
+    return {"outcome": "refused", "nativeRefusal": {"code": error.get("code"), "message": native_message(native[0])}, **result}
 
 
 def recovery_copy(root, project):
@@ -131,10 +131,22 @@ class Run:
                                   for o in self.h.tool("technology_read", {"plcPath": plc, "maxItems": 500})["technologyObjects"]) for plc in self.plcs()}
         return {"program": self.h.inventory(), "technology": technology}
 
-    def restore(self, label, prepared):
+    def restore(self, label, prepared, unsaved=False):
+        """change_restore into a new directory. unsaved: the change was applied without save, so when change_restore cannot
+        fingerprint the changed project (FingerprintUnavailable, or StaleRevision after the post-apply fingerprint failed),
+        closing the owned Portal discards it and the saved project, checkpointed just before, is reopened."""
         h = self.h
-        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
-        require(restored["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in restored["stages"], "Checkpoint recovery of %s failed: %s" % (label, restored))
+        error, restored = outcome(h, "change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+        if error and unsaved and error.get("code") in ("FingerprintUnavailable", "StaleRevision"):
+            path = h.tool("tia_session_status")["projects"][0]["path"]
+            h.report.setdefault("discarded", []).append({"label": label, "restoreError": {k: error.get(k) for k in ("code", "message")}, "project": path})
+            h.stage("discard %s: close the owned Portal without saving" % label, lambda: h.tool("tia_detach"))
+            h.owned_portal("after " + label)
+            h.stage("reopen the saved project after " + label, lambda: h.reopen_project(path))
+            require(self.state() == self.baseline, "The reopened project differs from the baseline after %s" % label)
+            return "discardedAndReopened"
+        require(not error and restored["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in restored["stages"],
+                "Checkpoint recovery of %s failed: %s" % (label, error or restored))
         if self.baseline is not None:
             require(self.state() == self.baseline, "The restored project differs from the baseline after %s" % label)
         self.supersede(restored["recoveredProject"]["path"])
@@ -196,17 +208,23 @@ class Run:
             if error:
                 return {"outcome": "refusedByProfile" if error.get("code") == "TechnologyVersionRefused" else "refusedAtPrepare", "error": error}
             error, applied = outcome(h, "change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
+            status = applied
             if error:
                 if h.unresolved_admissions():
                     h.reconcile_admission("release the refused " + label)
-                result = apply_failure(error, h.tool("change_status", {"changeId": prepared["changeId"]}))
+                status = h.tool("change_status", {"changeId": prepared["changeId"]})
+            if error and "mutation_applied" not in (status.get("stages") or []):
+                result = apply_failure(error, status)
             else:
+                # TIA created the object; a failure after that (an uncompiled first motion object leaves its generated motion OBs
+                # inconsistent, so the post-apply fingerprint fails) is recorded but does not decide the cell.
                 created = [o for o in h.tool("technology_read", {"plcPath": cpu["plcPath"], "maxItems": 500})["technologyObjects"] if o["name"] == NAME]
                 require(len(created) == 1, "Expected one created %s: %s" % (NAME, created))
                 observed = {"typeIdentifier": created[0].get("systemLibraryType"), "version": str(created[0].get("systemLibraryVersion"))}
                 exact = observed["typeIdentifier"] == family and same_version(observed["version"], version)
-                result = {"outcome": "accepted" if exact else "substituted", "observed": observed, "stages": applied["stages"]}
-            result["restored"] = self.restore(label, prepared)
+                result = {"outcome": "accepted" if exact else "substituted", "observed": observed, "stages": status["stages"],
+                          **({"applyError": {k: error.get(k) for k in ("code", "message")}} if error else {})}
+            result["restored"] = self.restore(label, prepared, unsaved=True)
             return result
         row.update(h.stage("probe " + label, probe))
         return row["outcome"]
