@@ -165,7 +165,13 @@
       "attribute": "OpcUaPurchasedLicense",
       "type": "System.UInt64"
     },
-    "guestAccess": null
+    "guestAccess": null,
+    "alarmsAndConditions": {
+      "item": "opcua",
+      "attribute": "OpcUaAlarmsAndConditionsEnable",
+      "type": "System.Boolean",
+      "exposed": "while the server is on"
+    }
   },
   "serverOn": {
     "source": {

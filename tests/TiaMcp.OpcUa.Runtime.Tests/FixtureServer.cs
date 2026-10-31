@@ -179,9 +179,22 @@ internal sealed partial class FixtureServer : StandardServer
         if(AdvertisedEndpoint is not null)foreach(var endpoint in result.ServerEndpoints)endpoint.EndpointUrl=AdvertisedEndpoint;
         return result;
     }
-    public override Task<BrowseResponse> BrowseAsync(SecureChannelContext channel, RequestHeader header, ViewDescription view,
-        uint maximum, BrowseDescriptionCollection nodes, CancellationToken ct) =>
-        base.BrowseAsync(channel, header, view, Math.Min(maximum, 3), nodes, ct);
+    public override async Task<BrowseResponse> BrowseAsync(SecureChannelContext channel, RequestHeader header, ViewDescription view,
+        uint maximum, BrowseDescriptionCollection nodes, CancellationToken ct)
+    {
+        var result = await base.BrowseAsync(channel, header, view, Math.Min(maximum, 3), nodes, ct);
+        if (Mode == "duplicateArguments")
+            foreach (var page in result.Results)
+                if (page.References.FirstOrDefault(r => r.BrowseName.Name == BrowseNames.InputArguments) is { } input) page.References.Add(input);
+        return result;
+    }
+    public override Task<CallResponse> CallAsync(SecureChannelContext channel, RequestHeader header, CallMethodRequestCollection methods, CancellationToken ct)
+    {
+        // An unknown subscription makes the server's own ConditionRefresh answer Bad.
+        if (Mode == "conditionRefreshBad")
+            foreach (var method in methods.Where(m => m.MethodId == MethodIds.ConditionType_ConditionRefresh)) method.InputArguments[0] = new Variant(uint.MaxValue);
+        return base.CallAsync(channel, header, methods, ct);
+    }
     public override async Task<BrowseNextResponse> BrowseNextAsync(SecureChannelContext channel, RequestHeader header,
         bool releaseContinuationPoints, ByteStringCollection continuationPoints, CancellationToken ct)
     {
@@ -222,6 +235,10 @@ internal sealed partial class FixtureServer : StandardServer
         for (int i = 0; i < nodes.Count; i++)
         {
             var request = nodes[i];
+            if (Mode == "noPlcNamespace" && request.NodeId == VariableIds.Server_NamespaceArray)
+                result.Results[i].Value = ((string[])result.Results[i].Value).Where(x => x != PlcNamespace).ToArray();
+            if (Mode == "foreignNamespaceZero" && request.NodeId == VariableIds.Server_NamespaceArray)
+                result.Results[i].Value = ((string[])result.Results[i].Value).Reverse().ToArray();
             if (Mode == "changedNamespace" && request.NodeId == VariableIds.Server_NamespaceArray)
                 result.Results[i].Value = new[] { Opc.Ua.Namespaces.OpcUa, Application, "urn:changed:namespace" };
             if (Mode == "changedStart" && request.NodeId == VariableIds.Server_ServerStatus_StartTime)
@@ -264,7 +281,7 @@ internal sealed partial class FixtureServer : StandardServer
     }
     internal async Task RestartFixture() {await StopAsync();await StartAsync(fixtureConfiguration!);}
     private sealed partial class FixtureNodes(IServerInternal server, ApplicationConfiguration configuration)
-        : CustomNodeManager2(server, configuration, Namespace)
+        : CustomNodeManager2(server, configuration, Namespace, PlcNamespace)
     {
         public override void CreateAddressSpace(IDictionary<NodeId, IList<IReference>> external)
         {
@@ -289,6 +306,7 @@ internal sealed partial class FixtureServer : StandardServer
             }
             AddPredefinedNode(SystemContext, folder);
             AddRootNotifier(folder);
+            CreateMethodsAndAlarm(refs);
         }
     }
 }

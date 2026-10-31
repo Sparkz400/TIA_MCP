@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.86",
+  "catalogVersion": "0.4.87",
   "targetTiaVersions": [
     21
   ],
@@ -2873,6 +2873,25 @@
         "Guest access and operator seeds were not used; guest access is not settable through V21 Openness.",
         "plc_online_compare, plc_station_upload and the discovery baseline stay Softbus-only.",
         "Earlier runs of the same window on 6c6701d and 029c347 found the defects fixed up to 1181f33 (vault contention between a UA subscription and a web capture); they are not curated."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-ua-services.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "bf6615af2822eae045c9d2be2917849e174c4a90",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py --mode ua-services (run rs_013a5a7a) on frozen build bf6615a, in a fresh owned TIA V21 scratch (CPU 1511-1 PN V4.1 at 192.168.0.1) with FB ServerMethod (OPC_UA_ServerMethodPre/Post V1.1, instance ServerMethod_DB), FB AlarmGate (Program_Alarm on RealServer.AlarmTrigger) and Alarms and Conditions switched on through opcua_server_settings_set alarmsAndConditions (compiled, central alarm management on by default), provisioned over TCP/IP to a fresh owned PLCSIM Advanced V8 instance (Online Access: PLCSIM Virtual Ethernet Adapter at 192.168.0.10/24), logged in to OPC UA as the scratch's generated runtime user. A bounded walk of the PLC namespace below Objects (28 browses, complete) found exactly one Method, \"ServerMethod_DB\".Method. runtime_ua_call: (41, true) answered (42, false) and the PLCSIM API call counter rose by exactly one; the method's own BadInvalidArgument (0x80ab0000) came back as methodFailed without a count; a standard Server method (GetMonitoredItems), a wrong argument count and a missing acknowledgement were refused before dispatch. runtime_ua_conditions: ConditionRefresh start and end in every snapshot; a PLCSIM API write of the trigger raised one new active retained condition, no longer active after the trigger fell. runtime_ua_history_probe: the server answered HistoryRead with BadServiceUnsupported (0x800b0000), the HistoryServerCapabilities nodes are absent (BadNodeIdUnknown) and the read node has no HistoryRead access bit. The independent oracle scripts/verify_runtime_plcsim_tcpip.py found no issue; every Host and worker has an exit proof and the owned instance was stopped, powered off and released."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-ua-services.20261031.json"
+      ],
+      "limitations": [
+        "Owned PLCSIM Advanced V8 on this machine only; runtime.physical_plc and other CPUs or firmware stay unqualified.",
+        "One user-program server method with Int/Bool scalar arguments; methods of custom server interfaces or companion namespaces, structured or array arguments and a lost Call response on the real server were not exercised (the lost-response path is the shared session path qualified by ua-write-loss and tested offline).",
+        "One Program_Alarm with TIA's default text and alarm class (no acknowledgement required: AckedState true) beside a CPU system-diagnostics condition present throughout; acknowledgeable alarms, Acknowledge, AddComment and shelving were not exercised, and SourceName is null on this server.",
+        "HistoryRead is a recorded S7-1500 boundary, not a supported service; the probe returns no values."
       ]
     },
     {
@@ -23789,6 +23808,148 @@
       ]
     },
     {
+      "featureId": "runtime_ua_call",
+      "domain": "runtime",
+      "title": "Call a PLC-namespace OPC UA method on an owned PLCSIM instance",
+      "mcpTools": [
+        "runtime_ua_call"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Public OPC UA Call service through the isolated pinned SDK; method membership by Browse (HasComponent, NodeClass Method) and argument declarations by Read of the method's InputArguments/OutputArguments properties. S7-1500 user-program server methods (OPC_UA_ServerMethodPre/Post) from firmware V2.5 (V21 help, Useful information about server methods)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Same owned-PLCSIM gate as runtime_ua_write: the session endpoint must be a controller IPv4 address of a runtime_plcsim_bind binding, the simulator worker must still observe the same owned instance and Windows must route the address through the PLCSIM Virtual Ethernet Adapter (RuntimeTargetNotOwnedPlcsim / RuntimeTargetRouteUnverified before anything is sent). Requires acknowledgeCall and no running acquisition.",
+          "Only a method component of an object in the PLC namespace http://www.siemens.com/simatic-s7-opcua that browse finds (HasComponent, NodeClass Method); on an S7-1500 these are user-program server methods (OPC_UA_ServerMethodPre/Post), and the ua-services run records which methods the namespace exposes. Standard server methods (ConditionRefresh, Acknowledge, GetMonitoredItems), arbitrary NodeIds and a server without that namespace are refused (UaMethodNotServerMethod); the session check requires namespace index 0 to be the standard OPC UA namespace. Methods in custom server-interface or companion-specification namespaces are not reachable.",
+          "0..16 scalar inputs in runtime_ua_read encodings, checked against InputArguments in count and type before dispatch (Boolean, integers, Float/Double, String; DateTime, structures, arrays and enumerations refused); a non-executable method and duplicate or unreadable argument lists (UaMethodArgumentsUnreadable) are refused. Refusals keep the session.",
+          "One Call service request; status code, per-input results and decoded outputs are returned. A lost response leaves the session remoteSessionUnknown and the call is never retried; no durable intent journal and no readback of the method's program effect.",
+          "Qualified against the OPC UA server of an owned PLCSIM Advanced V8 CPU 1511-1 PN V4.1 (local.runtime.plcsim-ua-services.20261031): the PLC namespace below Objects exposes exactly the user program's \"ServerMethod_DB\".Method; (41, true) answered (42, false) with the PLCSIM call counter up by one, the method's own BadInvalidArgument returned as methodFailed, and a standard Server method, a wrong argument count and a missing acknowledgement were refused before dispatch. Lost responses are tested against the fixture server only."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-ua-services.20261031"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Current owned connected UA session to a bound owned PLCSIM endpoint whose program provides the server method and whose server grants the call."
+        ]
+      },
+      "prerequisites": [
+        "runtime_plcsim_bind binding of the session endpoint",
+        "Explicit endpoint, server certificate pin and application URI",
+        "A user-program server method (OPC_UA_ServerMethodPre/Post instance) downloaded to the owned instance"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preview",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_conditions",
+      "domain": "runtime",
+      "title": "Read current OPC UA Alarms and Conditions with ConditionRefresh",
+      "mcpTools": [
+        "runtime_ua_conditions"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Public OPC UA event subscription and the standard ConditionType ConditionRefresh method (i=3875) through the isolated pinned SDK. The S7-1500 server profile lists the A & C Base Condition and A & C Acknowledgeable Alarm facets from firmware V2.9 (V21 help, Activating Alarms and Conditions)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "One bounded snapshot per call: a temporary subscription with one event item on the Server object, ConditionRefresh, Publish for 500..5000 ms and at most 256 events, then DeleteSubscriptions, also after a failure or cancellation (cleanup failure marks the session remoteSessionUnknown); a Bad subscription status ends the window early and status changes are capped at 64. Nothing is retained; runtime_ua_subscription_start keeps event timelines with the standard BaseEventType fields only.",
+          "Fields EventId, EventType, SourceName, Time, Message, Severity, ConditionId, Retain, ActiveState/Id and AckedState/Id; each event is classified refreshStart, refreshEnd, condition, overflow or event, and refresh boundaries, truncation and select-clause statuses stay explicit. No where clause, branches, comments, shelving or enabled-state fields.",
+          "Read-only: one ConditionRefresh method call to the connected server, which re-sends condition events to this temporary subscription and writes no process data, so no owned target is needed. Acknowledge, Confirm, AddComment, enable/disable and shelving are not offered, and runtime_ua_call refuses the standard condition methods.",
+          "On an S7-1500 the server needs Alarms and Conditions enabled (opcua_server_settings_set alarmsAndConditions) and central alarm management in the PLC; whether PLCSIM Advanced raises conditions is decided by the ua-services run.",
+          "Qualified against the OPC UA server of an owned PLCSIM Advanced V8 CPU 1511-1 PN V4.1 with Alarms and Conditions on (local.runtime.plcsim-ua-services.20261031): ConditionRefresh start/end in every snapshot, a Program_Alarm raised by a PLCSIM write appeared as one new active retained condition and was gone after the trigger fell; a CPU system-diagnostics condition was present throughout. That alarm used TIA's default class (AckedState true) and the server sends SourceName null; acknowledgeable alarms were not exercised."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-ua-services.20261031"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Current owned connected UA session without a running acquisition, on a server whose Server object is an event notifier."
+        ]
+      },
+      "prerequisites": [
+        "Explicit endpoint, independently obtained server certificate pin and application URI for network operations",
+        "Configured server trust and identity policy; Windows protected local credential reference for username authentication",
+        "Separate physical target qualification; no local TIA installation is needed for the UA client"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-recovery"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_history_probe",
+      "domain": "runtime",
+      "title": "Probe the OPC UA HistoryRead boundary",
+      "mcpTools": [
+        "runtime_ua_history_probe"
+      ],
+      "changeKind": null,
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Public OPC UA HistoryRead service (ReadRawModifiedDetails) and the standard HistoryServerCapabilities nodes through the isolated pinned SDK. The S7-1500 server profile has no historical-access facet (docs/verification/opcua-history-read-feasibility-20261031.md)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "Boundary probe, not a history service: reads AccessHistoryDataCapability and AccessHistoryEventsCapability, the node's AccessLevel, UserAccessLevel and Historizing, and sends one HistoryReadRaw (last hour, one value, continuation released) whose status is returned and whose values never are.",
+          "The product refuses HistoryRead (product.code UaHistoryReadUnsupported); a service-level refusal is recorded as evidence, transport and session failures still mark the session remoteSessionUnknown. Local polling and subscription captures are the history this Host keeps.",
+          "Run against the OPC UA server of an owned PLCSIM Advanced V8 CPU 1511-1 PN V4.1 (local.runtime.plcsim-ua-services.20261031): HistoryRead answered BadServiceUnsupported (0x800b0000), the HistoryServerCapabilities nodes are absent (BadNodeIdUnknown) and the read node has no HistoryRead access bit, confirming the boundary. HistoryRead itself stays a recorded boundary, not a supported service."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.runtime.plcsim-ua-services.20261031"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Current owned connected UA session and an explicit node; no history values are ever returned."
+        ]
+      },
+      "prerequisites": [
+        "Explicit endpoint, independently obtained server certificate pin and application URI for network operations",
+        "Configured server trust and identity policy; Windows protected local credential reference for username authentication",
+        "Separate physical target qualification; no local TIA installation is needed for the UA client"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-recovery"
+      ]
+    },
+    {
       "featureId": "runtime_ua_status",
       "domain": "runtime",
       "title": "Inspect retained OPC UA session state",
@@ -25341,7 +25502,7 @@
     {
       "featureId": "change.opcua_server_settings_set",
       "domain": "opc_ua",
-      "title": "Set the CPU OPC UA server state, port, certificate acceptance and purchased runtime license from exact expected values",
+      "title": "Set the CPU OPC UA server state, port, certificate acceptance, purchased runtime license and Alarms and Conditions from exact expected values",
       "mcpTools": [
         "change_prepare",
         "change_apply",
@@ -25352,15 +25513,16 @@
       "api": {
         "status": "available",
         "reasons": [
-          "V21 public API: DeviceItem.GetAttribute/SetAttribute on the CPU's OPC UA sub-item (OpcUaServer; while the server is on also OpcUaPort and OpcUaAutoAcceptAllClientCertificates) and on the CPU (OpcUaPurchasedLicense, UInt64 0..3 NoLicense/SimaticOpcUaS71500Small/Medium/Large per the V21 hardware parameter description). Names pinned from native captures on CPU 1511-1 PN V4.1 (fixtures/opcua/server-settings-v21-1511-v41.json)."
+          "V21 public API: DeviceItem.GetAttribute/SetAttribute on the CPU's OPC UA sub-item (OpcUaServer; while the server is on also OpcUaPort, OpcUaAutoAcceptAllClientCertificates and OpcUaAlarmsAndConditionsEnable) and on the CPU (OpcUaPurchasedLicense, UInt64 0..3 NoLicense/SimaticOpcUaS71500Small/Medium/Large per the V21 hardware parameter description). Names pinned from native captures on CPU 1511-1 PN V4.1 (fixtures/opcua/server-settings-v21-1511-v41.json)."
         ]
       },
       "implementation": {
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 (V21 Update 3) (local.opcua.server-settings.20261028): activation with the Small license, port and automatic certificate acceptance, each with checkpoint, device compile, save, native readback, fresh-Portal reopen, and change_restore of the activation to the exact attribute state.",
-          "Payload fields serverEnabled, port (1..65535), autoAcceptClientCertificates, runtimeLicense and guestAccess, each optional and each { expected, value }; expected must equal the current native value at prepare (ExpectedValueMismatch otherwise). Any other field is refused; passwords, certificates and users are never accepted.",
-          "port and autoAcceptClientCertificates exist natively only while the server is on, so they are set in a later change than the activation; otherwise UnsupportedCapability. guestAccess is always refused: V21 models guest access as the UMAC anonymous user holding the OPCUAServerAccess device right, which neither this kind nor umac_role_set changes.",
+          "Payload fields serverEnabled, port (1..65535), autoAcceptClientCertificates, runtimeLicense, alarmsAndConditions and guestAccess, each optional and each { expected, value }; expected must equal the current native value at prepare (ExpectedValueMismatch otherwise). Any other field is refused; passwords, certificates and users are never accepted.",
+          "port, autoAcceptClientCertificates and alarmsAndConditions exist natively only while the server is on, so they are set in a later change than the activation; otherwise UnsupportedCapability. guestAccess is always refused: V21 models guest access as the UMAC anonymous user holding the OPCUAServerAccess device right, which neither this kind nor umac_role_set changes.",
+          "alarmsAndConditions (OpcUaAlarmsAndConditionsEnable) was applied natively beside autoAcceptClientCertificates with checkpoint, device compile, save and readback in local.runtime.plcsim-ua-services.20261031, and the server then served Alarms and Conditions; restore and fresh-Portal reopen were not exercised for this field. Conditions also need central alarm management in the PLC (on by default in that scratch), and the separate client-acknowledgment option is never set.",
           "V21 refuses to compile an active OPC UA server unless a user holds the OPCUAServerAccess device right; grant it first with umac_role_set. Enabling the server makes TIA assign a server certificate at compile.",
           "runtimeLicense records the purchased license in the project; it neither verifies nor activates an entitlement.",
           "Apply writes serverEnabled first when enabling and last when disabling, then reads every requested attribute back. compile=true is mandatory and compiles all project devices. The change fingerprint adds every device item's pinned OPC UA server attribute values; interruption reconciliation holds the outcome for review.",
@@ -25370,7 +25532,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.opcua.server-settings.20261028"
+          "local.opcua.server-settings.20261028",
+          "local.runtime.plcsim-ua-services.20261031"
         ]
       },
       "availability": {

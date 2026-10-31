@@ -34,7 +34,7 @@ class Plc:
 
     def __init__(self, root):
         self.root, self.state, self.started, self.clock = root, "Off", 0, 0
-        self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "Enable": False, "Active": False}
+        self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "MethodCalls": 0, "AlarmTrigger": False, "Enable": False, "Active": False}
         self.inspections, self.sessions, self.captures, self.host, self.stale = 0, {}, {}, None, False
 
     def cert(self, channel, argument):
@@ -104,6 +104,26 @@ class Plc:
             host.exit_code = 74
             raise RuntimeError("MCP host exited: fault point")
         return {"state": "written", "readbackMatches": [True]} if channel == "ua" else {"state": "written", "items": [{"readbackMatches": True}]}
+
+    def call(self, a):
+        """The ServerMethod instance only; anything else is refused before dispatch, like the product."""
+        self.live(a["attemptId"])
+        if not a["acknowledgeCall"]:
+            raise Fail("RuntimeAcknowledgementRequired")
+        refused = ("UaMethodNotServerMethod" if a["objectNode"] != runner.ua_node(block="ServerMethod_DB") else
+                   "UaMethodArgumentInvalid" if len(a["inputs"]) != 2 else None)
+        if refused:
+            return {"state": "refused", "dispatched": False, "refusal": refused}
+        if a["inputs"][0]["value"] == "32767":
+            return {"state": "methodFailed", "dispatched": True, "statusCode": oracle.METHOD_BAD, "outputs": []}
+        self.memory["MethodCalls"] += 1
+        return {"state": "called", "dispatched": True, "statusCode": "0x00000000", "outputs": [
+            {"encoding": "decimalInteger", "value": str(int(a["inputs"][0]["value"]) + 1)}, {"encoding": "boolean", "value": not a["inputs"][1]["value"]}]}
+
+    def conditions(self, a):
+        self.live(a["attemptId"])
+        alarm = [{"kind": "condition", "conditionId": {"identifier": "alarm"}, "activeState": True, "retain": True}] if self.memory["AlarmTrigger"] else []
+        return {"refresh": {"startObserved": True, "endObserved": True}, "events": [{"kind": "refreshStart"}] + alarm + [{"kind": "refreshEnd"}]}
 
     def acquisition(self, tool, arguments):
         verb = tool.rsplit("_", 1)[1]
@@ -194,7 +214,8 @@ class Host:
             if a["hardwarePath"].endswith("PROFINET%20interface_1"):
                 return {"items": [{"network": {"nodes": [{"name": "X1", "attributes": [{"name": "Address", "value": "192.168.0.1"}]}]}}]}
             return {"items": [{"attributes": [{"name": k, "value": v} for k, v in (("OpcUaServer", True), ("OpcUaAutoAcceptAllClientCertificates", True),
-                                                                                  ("OpcUaPort", 4840), ("OpcUaApplicationUri", URI))]}]}
+                                                                                  ("OpcUaPort", 4840), ("OpcUaApplicationUri", URI),
+                                                                                  ("OpcUaAlarmsAndConditionsEnable", True), ("CentralAlarmManagement", True))]}]}
         if tool in ("sim_state", "sim_select", "sim_create"):
             if tool == "sim_state":
                 p.power(a["action"])
@@ -223,7 +244,24 @@ class Host:
         if tool in ("runtime_ua_write", "runtime_web_write"):
             return p.write(self, tool.split("_")[1], a)
         if tool == "runtime_ua_browse":
+            if a["node"] == runner.OBJECTS:
+                return {"references": [{"node": runner.ua_node(block="ServerMethod_DB"), "nodeClass": "Object"}, {"node": runner.SERVER, "nodeClass": "Object"}]}
+            if a["node"] == runner.ua_node(block="ServerMethod_DB"):
+                return {"references": [{"node": runner.ua_node("Method", "ServerMethod_DB"), "nodeClass": "Method", "browseName": "Method"},
+                                       {"node": runner.ua_node("UAMethod_InParameters", "ServerMethod_DB"), "nodeClass": "Variable"}]}
             return {"references": [{"browseName": m, "displayName": m} for m in ("Marker", "Cycles", "UaValue")]}
+        if tool == "runtime_ua_call":
+            return p.call(a)
+        if tool == "runtime_ua_conditions":
+            return p.conditions(a)
+        if tool == "runtime_ua_history_probe":
+            p.live(a["attemptId"])
+            return {"product": {"historyRead": "refused", "code": "UaHistoryReadUnsupported"},
+                    "historyReadRaw": {"serviceStatusCode": None, "statusCode": "0x80720000", "valueCount": None}}
+        if tool == "sim_write":
+            for w in a["writes"]:
+                p.memory[w["symbol"].split(".")[-1]] = w["value"]
+            return {"written": len(a["writes"])}
         if tool == "runtime_web_browse":
             p.live(a["attemptId"])
             return {"selectionId": a["symbol"], "metadata": []} if a.get("children") is False else {"metadata": []}

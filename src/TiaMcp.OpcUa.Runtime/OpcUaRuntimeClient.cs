@@ -123,7 +123,7 @@ internal sealed partial class OpcUaRuntimeClient : IAsyncDisposable
             new ReadValueId { NodeId = VariableIds.Server_ServerArray, AttributeId = Attributes.Value },
             new ReadValueId { NodeId = VariableIds.Server_ServerStatus_StartTime, AttributeId = Attributes.Value }], ct);
         if (response.Results.Count != 3 || response.Results.Any(v => !StatusCode.IsGood(v.StatusCode)) ||
-            response.Results[0].Value is not string[] ns || ns.Length is < 1 or > 256 ||
+            response.Results[0].Value is not string[] ns || ns.Length is < 1 or > 256 || ns[0] != Namespaces.OpcUa ||
             ns.Distinct(StringComparer.Ordinal).Count() != ns.Length || ns.Any(x => x.Length > 4096) ||
             response.Results[1].Value is not string[] servers || servers.Length is < 1 or > 256 ||
             servers[0] != selection.ApplicationUri || response.Results[2].Value is not DateTime started)
