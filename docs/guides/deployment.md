@@ -85,6 +85,7 @@ Qualification-only options register gated test tools and interruption points for
 | `--testsuite-scope-probe` | Its own sequential Host |
 | `--testsuite-qualification` | Its own sequential Host; only in builds with the `TESTSUITE_QUALIFICATION` constant |
 | `--translation-qualification` | Its own sequential Host |
+| `--safety-fparameter-discovery` | `safety_fparameter_set` also writes declared-writable F-parameters outside the [qualified allowlist](engineering-workflows.md#f-parameter-allowlist), for `scripts/probe_safety_fparameters.py` |
 
 As the first argument, `--credential-store` and `--ua-identity-store` run the [protected credential](../reference/protected-credentials.md) and OPC UA identity commands instead of the server. `--session-relay-server` and `--session-relay-client` are internal to `Start-TiaMcp.ps1 -InteractiveSession`.
 

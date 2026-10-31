@@ -187,6 +187,9 @@ public sealed partial class TiaTools
             try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }
             catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidCertificateImport", "The certificate upload could not be read.")); }
+        // Only the launch option widens safety_fparameter_set beyond the qualified allowlist; no client argument can.
+        if (kind == "safety_fparameter_set" && options.SafetyFParameterDiscovery)
+            return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), fParameterDiscovery = true }, cancellationToken);
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
     }
 

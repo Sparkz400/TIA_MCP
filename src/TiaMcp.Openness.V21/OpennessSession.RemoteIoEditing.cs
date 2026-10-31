@@ -247,10 +247,10 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("MutationVerificationFailed", "The previous I/O system still contains the moved or disconnected connector.");
         }
 
-        private JArray CaptureHardwareEngineering(Project project, string kind = null)
+        private JArray CaptureHardwareEngineering(Project project, string kind = null, IEnumerable<string> fParameters = null)
         {
             bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind);
-            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes : HardwareWriteAttributes;
+            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? new HashSet<string>(HardwareFParameterPreservedAttributes.Concat(fParameters ?? Enumerable.Empty<string>()), StringComparer.Ordinal) : HardwareWriteAttributes;
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
@@ -312,7 +312,7 @@ namespace TiaMcp.Openness.V21
         private void PrepareHardwarePreservation(EngineeringChange change, Project project, JObject preview)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind);
+            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind, FParameterNames(change));
             string path = Path.Combine(change.Directory, "hardware-before.json");
             File.WriteAllText(path, change.HardwareBeforeManifest.ToString(Formatting.Indented));
             change.Backups.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
@@ -320,14 +320,14 @@ namespace TiaMcp.Openness.V21
                 ["covered"] = "All observed hardware identities/slots, reviewed hardware/channel attributes, configured address ranges/owners, node configuration and exact I/O-system assignments; fail closed on capture failure.",
                 ["limitations"] = "Unexposed vendor payloads, non-allowlisted parameters, physical wiring, shared-device/multi-controller behavior and runtime are not qualified." };
             if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
-            if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress and Failsafe_FMonitoringtime of every device item are included.";
+            if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress, Failsafe_FMonitoringtime and every written F-parameter of every device item are included.";
             if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));
         }
 
         private void VerifyHardwarePreservation(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var after = CaptureHardwareEngineering(project, change.Kind);
+            var after = CaptureHardwareEngineering(project, change.Kind, FParameterNames(change));
             string path = Path.Combine(change.Directory, "hardware-after.json");
             File.WriteAllText(path, after.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
@@ -341,7 +341,7 @@ namespace TiaMcp.Openness.V21
         private void VerifyHardwareRecovery(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var restored = CaptureHardwareEngineering(project, change.Kind);
+            var restored = CaptureHardwareEngineering(project, change.Kind, FParameterNames(change));
             string path = Path.Combine(change.Directory, "hardware-restored.json");
             File.WriteAllText(path, restored.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-recovery", ["artifact"] = ChangeArtifact(path) });

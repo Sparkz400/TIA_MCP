@@ -7304,7 +7304,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact 3.0 and a virtual TO_PositioningAxis 10.0 (initial VirtualAxis.Mode = 1) created, with TIA's system-group instructions and generated protected motion OBs recorded; case-insensitive duplicates, non-numeric versions and technologyPath refused; fresh-Portal reopen and checkpoint restore. Real drives and encoders are not exercised; an unconnected TO_ExternalEncoder fails compile.",
-          "Siemens validates the explicitly requested native technology type/version on the selected CPU; a complete CPU-specific type/version catalog is not exposed.",
+          "V21 exposes no CPU-specific type/version catalog, so preparation and apply admit the CPU/type/version cells recorded in the embedded contracts/technology-version-profiles.v1.json (keyed by the CPU's exact type identifier, order number and firmware): a recorded acceptance passes, a recorded refusal refuses with its native text (TechnologyVersionRefused), and any other pair refuses (TechnologyVersionUnprofiled) unless the payload sets unprofiledAcknowledged, which lets Siemens validate it during creation; a native refusal then requires checkpoint recovery. The shipped cells are the creations of local.technology_changes.20261028 and local.technology.motion_connections.20261030 on CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 (31 October 2026; the gate itself awaits its native run).",
           "Optional parameters supplies up to 500 non-null scalar initial values. Sensitive names are rejected at prepare. Native parameter names, current value types and exposed write-access metadata can be checked only after creation.",
           "Initial values are applied and read back inside the creation checkpoint before the first compile. Configuration, dependency or readback failure may leave a partial object and requires checkpoint recovery.",
           "A virtual TO_PositioningAxis10.0 initial-parameter fixture passed on CPU1511 firmware4.1; external encoder compilation failed without telegram connections and recovered. This does not qualify connected motion hardware.",
@@ -7690,7 +7690,7 @@
       "api": {
         "status": "available",
         "reasons": [
-          "V21 HardwareObject.GetAttributeInfos/GetAttribute/SetAttribute (EngineeringAttributeInfo.Name/AccessMode Read and Write) on F-I/O DeviceItems for Failsafe_FDestinationAddress and Failsafe_FMonitoringtime; Failsafe_FSourceAddress, the PLC's Failsafe_CentralFSourceAddress and every readable Failsafe_*Signature* attribute are only read.",
+          "V21 HardwareObject.GetAttributeInfos/GetAttribute/SetAttribute (EngineeringAttributeInfo.Name/AccessMode Read and Write) on F-I/O DeviceItems for the Failsafe_* F-parameters a module declares readable and writable; Failsafe_FSourceAddress, the PLC's Failsafe_CentralFSourceAddress and every readable Failsafe_*Signature* attribute are only read.",
           "V21 SafetyAdministration.IsSafetyOfflineProgramPasswordSet/IsLoggedOnToSafetyOfflineProgram/ProgramSignatures on the PLC DeviceItem, DeviceItem.Addresses with Address.AddressControllers for ownership, and Device.GetService<ICompilable>().Compile() for the whole-project device compile. V21 exposes no separate safety-program compile; the device compile covers hardware and software including the F-program.",
           "The Failsafe_* attribute names come from the V21 Openness F-I/O documentation, not from the installed PublicAPI XML (which lists only Failsafe_* enum types); each name's presence and Read/Write access is probed natively before preview."
         ]
@@ -7700,8 +7700,8 @@
         "limitations": [
           "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
-          "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
-          "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
+          "Writes only F-parameters the embedded contracts/safety-fparameter-allowlist.v1.json lists for the F-I/O's module catalog type (the nearest device item with a type identifier) and the module declares readable and writable; the shipped row is Failsafe_FDestinationAddress of the F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0 (local.safety_changes.20261028). F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. Preservation captures every written F-parameter on every device item. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
+          "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. A Host started with --safety-fparameter-discovery (qualification only) also admits declared-writable F-parameters outside the allowlist, marked fParameterDiscovery in the preview; a native refusal there requires checkpoint recovery.",
           "A new F-destination address must differ from the current and planned address of every other F-I/O whose F-source is this PLC's or unreadable, so swaps and chained moves are refused; an unreadable F-destination address refuses as DependencyCoverageIncomplete.",
           "A password-protected safety program must already be logged in through the authorized TIA workflow; no password is accepted, stored or passed to a login API.",
           "Apply requires compile=true (whole-project device compile) and checkpointSave; configured-hardware preservation covers the two attributes on every device item plus the existing hardware manifest. Readback reports the written values and the F-I/O Failsafe_*Signature* attributes right after the write; safetyAfter reports PLC program signatures after compile."
@@ -8295,18 +8295,22 @@
       "featureId": "technology.version_profiles",
       "domain": "technology",
       "title": "CPU-specific technology type/version compatibility profiles",
-      "mcpTools": [],
+      "mcpTools": [
+        "change_prepare"
+      ],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 TechnologicalObjectComposition.Create(name, type, Version) validates a pair natively and exposes no CPU-specific type/version catalog; a profile is therefore a create-and-refuse capture per CPU type identifier."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "contracts/technology-version-profiles.v1.json records accepted and refused cells per CPU type identifier, technology type and version; the worker embeds it and change.to_create admits, refuses with the recorded native refusal, or refuses an unprofiled pair unless unprofiledAcknowledged is set.",
+          "scripts/probe_technology_versions.py captures the matrix in one owned scratch (CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6, CPU 1214C DC/DC/DC V4.7; PID, motion and high-speed-counter families, newest version first until accepted), each create in its own checkpoint and restored; scripts/technology_version_profiles.py merges a curated run into the contract. The native run is pending; the shipped cells come from earlier CPU 1511-1 PN V4.1 creations only.",
+          "A cell covers creation at the PLC root only, not compile, connections, parameters, children (to_child_create) or behavior."
         ]
       },
       "qualification": {
@@ -8314,9 +8318,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Only the recorded CPU/type/version cells; other pairs need unprofiledAcknowledged and native validation at creation."
         ]
       },
       "prerequisites": [
@@ -8344,7 +8348,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py probes changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8 (import, device compile, simulation_download, RUN, F-DI input through sim_area_write, the F-logic's outputs read back) and records a V8 or V21 refusal as the boundary; its native run is pending."
         ]
       },
       "qualification": {
@@ -8382,7 +8386,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog beyond change.safety_fparameter_set (Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only); no other typed F-I/O parameter operation is exposed."
+          "change.safety_fparameter_set writes the per-module allowlist of contracts/safety-fparameter-allowlist.v1.json, which scripts/safety_fparameter_allowlist.py derives from a scripts/probe_safety_fparameters.py run: discovery of every Failsafe_* F-parameter an F-I/O declares ReadWrite (ET 200SP F-DI, F-DQ, F-AI, F-PM-E and ET 200MP F-modules on an F-CPU 1511F-1 PN), then batched write, readback and checkpoint restore with preservation, split until each failing parameter stands alone. The discovery run is pending; only the F-DI's Failsafe_FDestinationAddress is qualified."
         ]
       },
       "qualification": {

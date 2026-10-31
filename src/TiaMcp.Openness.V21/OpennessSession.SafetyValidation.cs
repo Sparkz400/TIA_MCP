@@ -101,16 +101,29 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        // The reviewed F-I/O write subset: V21 Openness documents both as read/write F-I/O F-parameters. F-source addresses (set by
-        // the CPU's central F-source address), F-parameter signatures, SIL/CRC/version and F-I/O DB assignment stay read-only here.
-        private static readonly HashSet<string> FParameterWriteAttributes = new HashSet<string>(new[] { "Failsafe_FDestinationAddress", "Failsafe_FMonitoringtime" }, StringComparer.Ordinal);
-        // A property: partial-class static initializer order across files is not guaranteed.
-        private static HashSet<string> HardwareFParameterPreservedAttributes => new HashSet<string>(HardwareWriteAttributes.Concat(FParameterWriteAttributes), StringComparer.Ordinal);
+        // Preserved on every device item by safety_fparameter_set besides the written names: both are documented read/write
+        // F-I/O F-parameters. A property: partial-class static initializer order across files is not guaranteed.
+        private static HashSet<string> HardwareFParameterPreservedAttributes => new HashSet<string>(HardwareWriteAttributes.Concat(new[] { "Failsafe_FDestinationAddress", "Failsafe_FMonitoringtime" }), StringComparer.Ordinal);
+
+        // The written F-parameter names of a safety_fparameter_set payload, which preservation also captures on every device item.
+        private static IEnumerable<string> FParameterNames(EngineeringChange change) => change.Kind != "safety_fparameter_set" ? Enumerable.Empty<string>()
+            : (change.Payload["parameters"] as JArray ?? new JArray()).OfType<JObject>().Select(row => row["name"]?.Type == JTokenType.String ? row.Value<string>("name") : null)
+                .Where(name => !FParameterAllowlistRules.Denied(name)).ToArray();
+
+        // The catalog type of an F-I/O: the F-I/O device item itself often has none, its module does.
+        private static string FIoModuleTypeIdentifier(DeviceItem item)
+        {
+            for (IEngineeringInstance owner = item; owner is DeviceItem device; owner = device.Parent)
+                if (!string.IsNullOrEmpty(device.TypeIdentifier)) return device.TypeIdentifier;
+            throw new BridgeException("UnresolvedHardware", "The F-I/O's module catalog type identifier cannot be resolved.");
+        }
 
         // Prepare (write=false) returns the preview rows; apply (write=true) rechecks ownership, expected values and collisions, writes, then reads back.
         private JArray FParameterSet(EngineeringChange change, Project project, bool write)
         {
             var payload = change.Payload;
+            // Only a Host launched with --safety-fparameter-discovery sets this; it admits declared-writable parameters the allowlist lacks.
+            bool discovery = change.Selector.Value<bool?>("fParameterDiscovery") == true;
             // An exact shape keeps anything else, such as a credential, out of the preview and journal.
             if (payload.Count != 2 || !(payload["parameters"] is JArray)) throw new BridgeException("InvalidRequest", "payload must contain exactly safetyAcknowledged and parameters.");
             RequireChangeBool(payload, "safetyAcknowledged");
@@ -135,7 +148,7 @@ namespace TiaMcp.Openness.V21
                 var row = token as JObject;
                 if (row == null || row.Count != 4 || row["expected"] == null || row["value"] == null) throw new BridgeException("InvalidRequest", "Each F-parameter write needs exactly hardwarePath, name, expected and value.");
                 string path = ChangeText(row, "hardwarePath", 4096), name = ChangeText(row, "name", 128);
-                if (!FParameterWriteAttributes.Contains(name)) throw new BridgeException("UnsupportedAttribute", "F-parameter is outside the reviewed write subset (Failsafe_FDestinationAddress, Failsafe_FMonitoringtime): " + name);
+                if (FParameterAllowlistRules.Denied(name)) throw new BridgeException("UnsupportedAttribute", "F-source addresses, signatures, SIL/CRC/version, F-I/O DB assignment and non-F-parameters are never written: " + name);
                 if (targets.Any(target => target.Entry.Path == path && target.Name == name)) throw new BridgeException("InvalidRequest", "Duplicate F-parameter write: " + path + " " + name);
                 var entry = fIo.FirstOrDefault(item => item.Path == path) ?? throw new BridgeException("HardwareNotFound", "hardwarePath does not select an F-I/O device item on this safety PLC's F-source address: " + path);
                 if (!JToken.DeepEquals(FailsafeValue(entry.Item, "Failsafe_FSourceAddress"), central)) throw new BridgeException("UnresolvedSafetyOwnership", "The F-source address of the F-I/O is unreadable: " + path);
@@ -145,6 +158,11 @@ namespace TiaMcp.Openness.V21
                 var infos = entry.Item.GetAttributeInfos().Where(info => info.Name == name).Take(2).ToArray();
                 if (infos.Length != 1 || (infos[0].AccessMode & EngineeringAttributeAccessMode.Read) == 0 || (infos[0].AccessMode & EngineeringAttributeAccessMode.Write) == 0)
                     throw new BridgeException("AttributeNotWritable", "The F-I/O must declare " + name + " once as readable and writable: " + path);
+                string module = FIoModuleTypeIdentifier(entry.Item);
+                var qualification = FParameterAllowlistRules.Qualification(FParameterAllowlist.Value, module, name);
+                if (qualification == null && !discovery)
+                    throw new BridgeException("UnsupportedAttribute", "F-parameter " + name + " is not in the qualified allowlist (safety-fparameter-allowlist.v1) for module type " + module + ": " + path,
+                        new JObject { ["hardwarePath"] = path, ["name"] = name, ["moduleTypeIdentifier"] = module });
                 object before = entry.Item.GetAttribute(name) ?? throw new BridgeException("AttributeTypeUnknown", "F-parameter has no native value: " + name);
                 if (!JToken.DeepEquals(ChangeScalar(before), row["expected"]))
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.",
@@ -155,6 +173,7 @@ namespace TiaMcp.Openness.V21
                 row["value"] = ChangeScalar(value);
                 targets.Add((entry, name, value));
                 result.Add(new JObject { ["hardwarePath"] = path, ["name"] = name, ["type"] = before.GetType().FullName, ["before"] = ChangeScalar(before), ["after"] = row["value"].DeepClone(),
+                    ["moduleTypeIdentifier"] = module, ["qualification"] = qualification ?? new JObject { ["discovery"] = true },
                     ["fParameterSignatures"] = FParameterSignatures(entry.Item) });
             }
             foreach (var target in targets.Where(target => target.Name == "Failsafe_FDestinationAddress"))

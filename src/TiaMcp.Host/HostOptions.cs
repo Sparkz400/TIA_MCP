@@ -22,6 +22,8 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
     public bool TestSuiteScopeProbe { get; init; }
     public bool TestSuiteQualification { get; init; }
     public bool TranslationQualification { get; init; }
+    // safety_fparameter_set may write declared-writable F-parameters the qualified allowlist lacks; for discovery runs only.
+    public bool SafetyFParameterDiscovery { get; init; }
     public string? WatchQualificationPoint { get; init; }
     public string? RuntimeQualificationPoint { get; init; }
 
@@ -55,6 +57,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
         var testSuiteScopeProbe = false;
         var testSuiteQualification = false;
         var translationQualification = false;
+        var safetyFParameterDiscovery = false;
         string? watchQualificationPoint = null;
         string? runtimeQualificationPoint = null;
         IReadOnlySet<string>? toolsets = null;
@@ -71,6 +74,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             if (option == "--component-qualification") { componentQualification = true; continue; }
             if (option == "--testsuite-scope-probe") { testSuiteScopeProbe = true; continue; }
             if (option == "--translation-qualification") { translationQualification = true; continue; }
+            if (option == "--safety-fparameter-discovery") { safetyFParameterDiscovery = true; continue; }
 #if TESTSUITE_QUALIFICATION
             if (option == "--testsuite-qualification") { testSuiteQualification = true; continue; }
 #endif
@@ -125,13 +129,13 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             throw new ArgumentException("Test Suite qualification requires its own sequential Host.");
         if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification || watchQualificationPoint is not null))
             throw new ArgumentException("Translation qualification requires its own sequential Host.");
-        if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || watchQualificationPoint is not null))
+        if (noNativeWorkers && (diagnose || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || safetyFParameterDiscovery || watchQualificationPoint is not null))
             throw new ArgumentException("Native diagnosis and qualification cannot run with native workers disabled.");
         if (diagnose && addInHandoff) throw new ArgumentException("Add-In handoff requires the long-running Host, not diagnosis mode.");
         if (addInEnrollment is not null && !addInHandoff) throw new ArgumentException("--addin-enrollment requires --addin-handoff.");
         if (enableLibraryIntegrateApplyGiven && !libraryIntegrateApply)
             throw new ArgumentException("--enable-library-integrate-apply and --disable-library-integrate-apply exclude each other.");
-        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
+        return new HostOptions(worker, artifacts, api, timeout, diagnose, simulator, simulatorApi) { UaClientIdentity = uaClientIdentity, AddInHandoff = addInHandoff, LibraryIntegrateApply = libraryIntegrateApply, AddInEnrollment = addInEnrollment, NoNativeWorkers = noNativeWorkers, Toolsets = toolsets, GitExecutable = gitExecutable, LibraryLimits = libraryLimits, ComponentQualification = componentQualification, TestSuiteScopeProbe = testSuiteScopeProbe, TestSuiteQualification = testSuiteQualification, TranslationQualification = translationQualification, SafetyFParameterDiscovery = safetyFParameterDiscovery, WatchQualificationPoint = watchQualificationPoint, RuntimeQualificationPoint = runtimeQualificationPoint };
     }
 
     private static PackageIntakeLimits ReadLibraryLimits(string path)

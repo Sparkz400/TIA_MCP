@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj" />
+    <EmbeddedResource Include="../../contracts/technology-version-profiles.v1.json;../../contracts/safety-fparameter-allowlist.v1.json" LogicalName="TiaMcp.Contracts.%(Filename)%(Extension)" />
     <Compile Include="../TiaMcp.Core/WatchTables/WatchTableDocument.cs" Link="WatchTableDocument.cs" />
     <Compile Include="../TiaMcp.Core/WatchTables/WatchGroupManifest.cs" Link="WatchGroupManifest.cs" />
     <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="WorkerPipeWriter.cs" />

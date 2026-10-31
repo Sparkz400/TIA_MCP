@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "technology-version-profiles.v1",
+  "tiaVersion": 21,
+  "rule": "change.to_create admits an accepted cell, refuses a refused cell with its recorded native refusal (TechnologyVersionRefused) and refuses every other CPU/type/version pair (TechnologyVersionUnprofiled) unless the payload sets unprofiledAcknowledged. Accepted means V21 created exactly that type and version at the PLC root of that CPU type identifier (order number and firmware); it does not qualify compile, connections, parameters or behavior. Cells come from native runs only: scripts/probe_technology_versions.py writes them, scripts/technology_version_profiles.py merges a curated run.",
+  "cpus": [
+    {
+      "cpuTypeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "cpuTypeName": "CPU 1511-1 PN",
+      "cells": [
+        { "typeIdentifier": "PID_Compact", "version": "3.0", "outcome": "accepted", "evidenceId": "local.technology_changes.20261028" },
+        { "typeIdentifier": "TO_ExternalEncoder", "version": "10.0", "outcome": "accepted", "evidenceId": "local.technology.motion_connections.20261030" },
+        { "typeIdentifier": "TO_PositioningAxis", "version": "10.0", "outcome": "accepted", "evidenceId": "local.technology_changes.20261028" },
+        { "typeIdentifier": "TO_SpeedAxis", "version": "10.0", "outcome": "accepted", "evidenceId": "local.technology.motion_connections.20261030" }
+      ]
+    }
+  ]
+}

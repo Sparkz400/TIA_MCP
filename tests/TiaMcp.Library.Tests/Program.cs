@@ -500,7 +500,9 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
     Equal(true, File.Exists(Path.Combine(Path.GetDirectoryName(HostOptions.Parse([]).ArtifactsDirectory)!, "TiaMcp.slnx")));
     Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith(Path.Combine("src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe")));
     Equal(true, HostOptions.Parse(["--no-native-workers", "--worker", Path.Combine(work, "worker.exe")]).NoNativeWorkers);
-    foreach (var flag in new[] { "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification" })
+    Equal(false, HostOptions.Parse([]).SafetyFParameterDiscovery);
+    Equal(true, HostOptions.Parse(["--safety-fparameter-discovery"]).SafetyFParameterDiscovery);
+    foreach (var flag in new[] { "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification", "--safety-fparameter-discovery" })
     {
         Equal(false, HostOptions.Parse([flag]).NoNativeWorkers);
         try { HostOptions.Parse([flag, "--no-native-workers"]); }
