@@ -400,7 +400,8 @@ namespace TiaMcp.Openness.V21
             if (PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload))
             {
                 if (plan["caller"]?.Value<bool?>("initiallyAbsent") != true || plan["caller"]?.Value<string>("blockPath") != PlcLibraryIntegrationPlanner.CallerPath(payload) || plan["callerArtifact"] != null ||
-                    plan["steps"][1]["prepareArguments"]["payload"]["model"]?.Value<string>("operation") != "createBlock")
+                    // The typed edit is the last step: the second one, or the only one for a reused FB.
+                    ((JArray)plan["steps"]).Last["prepareArguments"]["payload"]["model"]?.Value<string>("operation") != "createBlock")
                     Fail("InvalidComponentContract", "Standalone caller contract requires exact initial absence and typed creation.");
             }
             else RequireHash(plan["callerArtifact"]?.Value<string>("sha256"));

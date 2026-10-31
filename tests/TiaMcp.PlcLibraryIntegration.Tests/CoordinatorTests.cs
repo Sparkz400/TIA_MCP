@@ -283,6 +283,12 @@ internal static class CoordinatorTests
             Equal(s.Ops.TypedCheckpoint, installed["initialCheckpoint"].Value<string>("archivePath")); Equal("typed-step", installed["initialCheckpoint"].Value<string>("changeId"));
             Equal("typed-step", installed["recovery"].Value<string>("initialTypedChangeId")); Equal(null, installed["library"]["dispatch"]);
         });
+        // 31 October native run: a reused FB with a new standalone caller failed contract validation, which read steps[1].
+        test("reused FB installs a new standalone caller through its one typed step", () => {
+            var s = new Scenario(standalone: true, reused: true); Equal("graphical_prepared", s.Next().Value<string>("state"));
+            Equal("graphical_applied", s.Apply("graphical").Value<string>("state")); Equal("installation_verified", s.Next().Value<string>("state"));
+            Equal(s.Ops.TypedCheckpoint, s.Coordinator.Status()["initialCheckpoint"].Value<string>("archivePath")); Equal(1, s.Ops.Applies);
+        });
         test("reused FB receipt with its archive after the mutation is not an initial checkpoint", () => {
             var s = new Scenario(reused: true); s.Next(); s.Ops.ResultMutation = r => r["stages"] = new JArray("prechange_project_saved", "mutation_applied", "recovery_archive_created");
             Reject("ComponentCheckpointOrderInvalid", () => s.Apply("graphical")); Equal(true, s.Coordinator.Status()["initialCheckpoint"] == null);
