@@ -199,4 +199,4 @@ A push or fetch that was dispatched but has no receipt is listed as
 and fetch into a new record. Prior records never change. The
 [conflict workflow](vci-package-workflow.md#two-sided-conflict-resolution) uses
 these tools to bring a remote change into a native workspace and to publish its
-resolution. Network remotes are not qualified. [Record](../verification/vci-external-git-20261031.md).
+resolution. Verified against a local bare remote: `local.hostonly.vci.git.20261031` (Host-only) and `local.vci_git.20261031` (native round trip). Network remotes are not qualified. [Record](../verification/vci-external-git-20261031.md).

@@ -3212,6 +3212,46 @@
         "One library transaction (library_create_master_copy into the project library) in one owned scratch CPU 1511-1 PN V4.1 with one G120C PN that is not on the CPU's IO system; other library kinds share the device compile and observation checks but were not run with a drive.",
         "The drive itself is never compiled: it exposes no compiler service and is listed under notCompiled, never counted as compiled."
       ]
+    },
+    {
+      "id": "local.vci_git.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "133a513afb220d9d377dc14476642b0dc75d203e",
+        "passedScope": "scripts/qualify_vci_mappings.py on a frozen Debug build of 133a513 (artifacts/vgd, git archive), 202/202 steps, in one owned scratch CPU 1511-1 PN V4.1. Phase A as local.vci_mappings.20261028 (vci_mapping_add by export, vci_synchronize both directions, vci_mapping_remove). Phase C: a second VCI workspace with an SCL FC exported, committed and pushed with vci_push to a run-owned local bare remote (the Host's --git-remote); three rounds in which a plain-Git clone commits a value change and the FC's header family is edited in TIA; vci_fetch fast-forwards to the pinned remote commit; the fetched package is checked out into the workspace; vci_synchronize refuses VciConflict both ways and vci_package_compare reports divergentChange; vci_conflict_resolve resolves take=remote, take=native and take=merged (the native family merged into the remote document). Each resolution runs with checkpoint, PLC compile and save, an asserted Host-bound payload and preview, the worker's live export hash equal to the inspected contentSha256, CompareState Equal, exact package bytes, an exact state diff, and a refused second apply (RecoveryRequired). The native and merged results are committed on top of the fetched commit and pushed with compare-and-swap, and the bare remote's first-parent history and vci_history hold every commit. A fresh owned Portal reopen shows the identical state. Phase B restores one change per kind from its checkpoint, including a fourth take=remote resolution, each equal to the pre-change project state. Typed refusals change nothing."
+      },
+      "artifacts": [
+        "evidence/local.vci_git.20261031.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1, workspaces in the root workspace group and SCL FCs mapped by export; connect mode, library types, nested directories, companion files and global library policies are not exercised.",
+        "The Git remote is a run-owned local bare repository and the other engineer is plain Git in a runner-owned clone; network remotes and credentials are not exercised.",
+        "V21 has no project-neutral VCI export, so the native side of the three-way plan is the base package files with the object's inspected contentSha256.",
+        "Workspace files, including the checkout of each fetched revision, are written by the runner; change_restore never restores them, so restore equality covers the project state only.",
+        "V21 performed the directed Synchronize in both directions while ProjectObjectChanged and WorkspaceFileChanged were both set; this is one observation on one FC."
+      ]
+    },
+    {
+      "id": "local.hostonly.vci.git.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "133a513afb220d9d377dc14476642b0dc75d203e",
+        "passedScope": "scripts/test_vci_host_mcp.py on the frozen Debug Host of 133a513 (artifacts/vgd) with absent native workers (80 recorded checks), adding vci_push and vci_fetch against a run-owned local bare remote given as --git-remote: a first push creating the branch, a compare-and-swap refusal, a parentless fetch reproducing the exact bytes, an unchanged fetch refused, a compare-and-swap fast-forward push, and a fetch from a fetched parent after a Host restart, with every output validated against contracts/vci-workspace.v1."
+      },
+      "artifacts": [
+        "evidence/local.hostonly.vci.git.20261031.json"
+      ],
+      "limitations": [
+        "Host-only: native engineering and simulator workers are deliberately absent; no TIA Portal, Openness, PLCSIM or device is involved and none is qualified.",
+        "Local bare remote only; network remotes, credentials and remote-side hooks beyond the refusal checks are not exercised.",
+        "Synthetic fixtures on PCNico only; no other Host build or scale beyond the runner's bounds is qualified."
+      ]
     }
   ],
   "features": [
@@ -18373,8 +18413,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.git.20261031"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18421,8 +18463,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hostonly.vci.git.20261031"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -18631,7 +18675,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.vci_mappings.20261028"
+          "local.vci_mappings.20261028",
+          "local.vci_git.20261031"
         ]
       },
       "availability": {
@@ -18685,7 +18730,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.vci_mappings.20261028"
+          "local.vci_mappings.20261028",
+          "local.vci_git.20261031"
         ]
       },
       "availability": {
@@ -18741,7 +18787,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.vci_mappings.20261028"
+          "local.vci_mappings.20261028",
+          "local.vci_git.20261031"
         ]
       },
       "availability": {
@@ -18785,7 +18832,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Not natively qualified. Payload: workspacePath, objectPath, comparisonRef (a vci_package_compare record with baseline, project = native side, workspace = remote side), packageId and take native, remote or merged; take=merged also needs mergedRecordRef (a preview, committed or fetched revision holding every package file).",
+          "Natively qualified (local.vci_git.20261031): take=remote, take=native and take=merged each resolved a native two-sided conflict (VciConflict both ways) of one SCL FC against a commit fetched from a local bare remote, with reopen and checkpoint restore. Payload: workspacePath, objectPath, comparisonRef (a vci_package_compare record with baseline, project = native side, workspace = remote side), packageId and take native, remote or merged; take=merged also needs mergedRecordRef (a preview, committed or fetched revision holding every package file).",
           "The Host binds the payload: it refuses rows other than divergentChange (VciResolutionUnsupported), a workspacePath other than the comparison's workspace lineage or an objectPath other than the reviewed package object (VciResolutionMismatch), a native side without object.contentSha256 and sides with different file layouts, and hands the worker the exact remote package hashes and, for remote or merged, the exact bytes (at most 16 files, 4 MiB). Callers never supply hashes or bytes.",
           "The workspace package must be exactly the reviewed remote side (VciResolutionStale otherwise) and the mapping must report WorkspaceFileChanged (VciResolutionNotNeeded otherwise). ProjectObjectChanged may also be set: that is the native two-sided conflict vci_synchronize refuses as VciConflict. At prepare the worker exports the live object and its hash must equal the native side's object.contentSha256 (the vci_workspace_inspect contentSha256), so an object edited after the comparison is never overwritten or exported unreviewed (VciResolutionStale); the preview reports the live hash.",
           "take=native synchronizes ProjectToWorkspace and overwrites the remote package files (backed up first; the remote side stays in its Git revision). take=remote and take=merged write the bound bytes into the package, then synchronize WorkspaceToProject with compile=true and the guards of direct mutations; the project's own unsynchronized changes to the object are overwritten, with the project checkpoint as the way back.",
@@ -18796,8 +18843,10 @@
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.vci_git.20261031"
+        ]
       },
       "availability": {
         "status": "conditional",

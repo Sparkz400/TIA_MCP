@@ -1,6 +1,6 @@
 # VCI and external Git — implementation and qualification plan
 
-**Implementation update — 31 October 2026:** [Remote delivery](../../reference/vci-host-workflow.md#remote-delivery) (`vci_push`, `vci_fetch` against one Host-configured remote) and [two-sided conflict resolution](../../reference/vci-package-workflow.md#two-sided-conflict-resolution) (`vci_conflict_resolve`) implement workflow B below and the remote part of VCI-06; native qualification is pending ([record](../../verification/vci-external-git-20261031.md)).
+**Implementation update — 31 October 2026:** [Remote delivery](../../reference/vci-host-workflow.md#remote-delivery) (`vci_push`, `vci_fetch` against one Host-configured remote) and [two-sided conflict resolution](../../reference/vci-package-workflow.md#two-sided-conflict-resolution) (`vci_conflict_resolve`) implement workflow B below and the remote part of VCI-06; natively qualified by `local.vci_git.20261031` against a local bare remote ([record](../../verification/vci-external-git-20261031.md)).
 
 **Implementation update — 16 October 2026:** The [offline local Git Host workflow](../../reference/vci-host-workflow.md)
 now implements uploaded raw-file review, independent local revisions, history,

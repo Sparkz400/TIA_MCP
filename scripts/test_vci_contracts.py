@@ -86,7 +86,10 @@ class VciContracts(unittest.TestCase):
         with self.assertRaises(ValidationError): self.validate('push', dict(push, nativeQualified=True))
         catalog = json.loads((ROOT/'contracts/feature-catalog.v1.json').read_text(encoding='utf-8'))
         resolve = next(row for row in catalog['features'] if row['featureId']=='change.vci_conflict_resolve')
-        self.assertEqual(('vci_conflict_resolve', 'unverified'), (resolve['changeKind'], resolve['qualification']['status']))
+        # The resolution changes TIA, so only native evidence may verify it.
+        self.assertEqual('vci_conflict_resolve', resolve['changeKind'])
+        self.assertEqual('verified' if resolve['qualification']['evidenceIds'] else 'unverified', resolve['qualification']['status'])
+        self.assertTrue(all('.hostonly.' not in e for e in resolve['qualification']['evidenceIds']))
 
     def test_mapping_evidence_schema_is_explicit_and_cannot_claim_qualification(self):
         schema=json.loads((ROOT/'contracts/vci-mapping-evidence.v1.schema.json').read_text(encoding='utf-8'))

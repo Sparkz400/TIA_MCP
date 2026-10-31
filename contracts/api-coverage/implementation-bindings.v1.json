@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c20dd87ecd04ed1dc8512c781481457f4a483cb8039a3271ccc481555be76f67",
-      "bytes": 1441437
+      "sha256": "58e9779d07c0e1468afdf5626045c5288070f98742cb9eec82f8b08ba9f9bbec",
+      "bytes": 1446150
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -102194,7 +102194,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.vci_git.20261031",
+          "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
+          "artifacts": [
+            "evidence/local.vci_git.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -102238,6 +102246,13 @@
           "profileSha256": "82d860ab0d4d3f5a60a756c76f315cced00fa60d8d3c3cb612a1da319879d513",
           "artifacts": [
             "evidence/local.vci_mappings.20261028.json"
+          ]
+        },
+        {
+          "id": "local.vci_git.20261031",
+          "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
+          "artifacts": [
+            "evidence/local.vci_git.20261031.json"
           ]
         }
       ],
@@ -102285,6 +102300,13 @@
           "artifacts": [
             "evidence/local.vci_mappings.20261028.json"
           ]
+        },
+        {
+          "id": "local.vci_git.20261031",
+          "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
+          "artifacts": [
+            "evidence/local.vci_git.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102330,6 +102352,13 @@
           "profileSha256": "82d860ab0d4d3f5a60a756c76f315cced00fa60d8d3c3cb612a1da319879d513",
           "artifacts": [
             "evidence/local.vci_mappings.20261028.json"
+          ]
+        },
+        {
+          "id": "local.vci_git.20261031",
+          "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
+          "artifacts": [
+            "evidence/local.vci_git.20261031.json"
           ]
         }
       ],
@@ -120594,7 +120623,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.vci.git.20261031",
+          "profileSha256": "1a2990bb9dea3cbb3fd12a86bfb85f157b12b4ed566e7ea77ef5905e74531fde",
+          "artifacts": [
+            "evidence/local.hostonly.vci.git.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -121058,7 +121095,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hostonly.vci.git.20261031",
+          "profileSha256": "1a2990bb9dea3cbb3fd12a86bfb85f157b12b4ed566e7ea77ef5905e74531fde",
+          "artifacts": [
+            "evidence/local.hostonly.vci.git.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -122321,6 +122366,11 @@
       "sha256": "90edfa145b6c93242f52de2a918ed54049f71cf0264294cecb182ffab5921c47"
     },
     {
+      "path": "evidence/local.hostonly.vci.git.20261031.json",
+      "state": "observed",
+      "sha256": "72446fe11036512cf61aff058cdbc1d5b72245200b1d69488989766759dceedf"
+    },
+    {
       "path": "evidence/local.hostonly.vci.rerun.20261028.json",
       "state": "observed",
       "sha256": "707f8919626b95a9e43069987854b540476336c6053ee7963a3a1270b7c64fbc"
@@ -122851,6 +122901,11 @@
       "sha256": "bf7d1d6fb790cd0b07310c0e94ab3dd9e375ce413d6c7e340b2a328581fe30fa"
     },
     {
+      "path": "evidence/local.vci_git.20261031.json",
+      "state": "observed",
+      "sha256": "adac56e15a0e91125c618b73c35c6e274311c08c4a0d396b9c502bb6ba6384d3"
+    },
+    {
       "path": "evidence/local.vci_mappings.20261028.json",
       "state": "observed",
       "sha256": "3d85e1cb639255382159d670644184e182311e62e58e1be12225ed1cfb9a2252"
@@ -123116,6 +123171,10 @@
     {
       "id": "local.hostonly.translation.rerun.20261028",
       "profileSha256": "e4248604fe9157c6a1f446bd95e10a09915baafdf775bfa5d353c4135da50e9f"
+    },
+    {
+      "id": "local.hostonly.vci.git.20261031",
+      "profileSha256": "1a2990bb9dea3cbb3fd12a86bfb85f157b12b4ed566e7ea77ef5905e74531fde"
     },
     {
       "id": "local.hostonly.vci.rerun.20261028",
@@ -123540,6 +123599,10 @@
     {
       "id": "local.typed.wave9.runtime.20261029",
       "profileSha256": "2ee887f05226362e4439c2c4f30203922b62f49caaf091f56d016cb605ea1f56"
+    },
+    {
+      "id": "local.vci_git.20261031",
+      "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5"
     },
     {
       "id": "local.vci_mappings.20261028",

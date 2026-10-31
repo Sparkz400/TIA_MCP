@@ -480,7 +480,7 @@ option registers or admits the tool only on a qualification Host.
 | `vci_artifact_read` | Vci artifact read | shipped | vci | `--git-executable` |  |
 | `vci_branches` | Inspect local Git branches | shipped | vci | `--git-executable` |  |
 | `vci_commit` | Vci commit | shipped | vci | `--git-executable` |  |
-| `vci_fetch` | Fetch a VCI branch from the configured Git remote | unqualified | vci | `--git-allow-network-remote`, `--git-executable`, `--git-remote` |  |
+| `vci_fetch` | Fetch a VCI branch from the configured Git remote | shipped | vci | `--git-allow-network-remote`, `--git-executable`, `--git-remote` |  |
 | `vci_file_read` | Vci file read | shipped | vci | `--git-executable` |  |
 | `vci_history` | Vci history | shipped | vci | `--git-executable` |  |
 | `vci_list` | Vci list | shipped | vci | `--git-executable` |  |
@@ -488,7 +488,7 @@ option registers or admits the tool only on a qualification Host.
 | `vci_package_capture` | Vci package capture | shipped | vci | `--git-executable` |  |
 | `vci_package_compare` | Vci package compare | shipped | vci | `--git-executable` |  |
 | `vci_prepare` | Vci prepare | shipped | vci | `--git-executable` |  |
-| `vci_push` | Push a VCI revision to the configured Git remote | unqualified | vci | `--git-allow-network-remote`, `--git-executable`, `--git-remote` |  |
+| `vci_push` | Push a VCI revision to the configured Git remote | shipped | vci | `--git-allow-network-remote`, `--git-executable`, `--git-remote` |  |
 | `vci_reconcile` | Vci reconcile | shipped | vci | `--git-executable` |  |
 | `vci_reopen` | Vci reopen | shipped | vci | `--git-executable` |  |
 | `vci_workspace_inspect` | Inspect native VCI workspaces and mappings | limited | vci |  |  |

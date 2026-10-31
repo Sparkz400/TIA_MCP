@@ -112,7 +112,7 @@ absolute path below the root, because the
 a relative `DirectoryInfo`. The first five kinds are verified: workspace create/delete by
 `local.access.qualify.rerun.20261028`, mapping add/remove and synchronize by
 `local.vci_mappings.20261028` (export mode, one workspace in the root group).
-`vci_conflict_resolve` is not natively qualified yet.
+`vci_conflict_resolve` is verified by `local.vci_git.20261031` (take=remote, native and merged on one SCL FC, with reopen and checkpoint restore).
 
 ## Two-sided conflict resolution
 
@@ -206,7 +206,7 @@ available in the complete report artifact.
 This delivery exposes the existing portable comparison model. The native mapping
 lifecycle is verified as described under [native workspace changes](#native-workspace-changes);
 connect mode, native companion/language preservation and library policies remain unexecuted.
-Remote delivery and two-sided resolution are implemented but not natively
-qualified ([external Git record](../verification/vci-external-git-20261031.md)); larger
+Remote delivery and two-sided resolution are verified against a local bare
+remote ([external Git record](../verification/vci-external-git-20261031.md)); network remotes and larger
 measured performance remains separate work, and this does not complete all of D01 or the release.
 See [verification](../verification/vci-package-workflow-20261016.md).

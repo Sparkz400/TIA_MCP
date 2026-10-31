@@ -3,7 +3,8 @@
 Scope: D01 remote delivery of Host VCI revisions (`vci_push`, `vci_fetch`) to
 one Host-configured remote, and the prepared change kind `vci_conflict_resolve`
 that resolves a native two-sided conflict from a reviewed three-way plan.
-Offline checks only; the native round trip is pending.
+Offline checks, then a passed native round trip (`local.vci_git.20261031`) and
+Host-only remote evidence (`local.hostonly.vci.git.20261031`), both on build `133a513`.
 
 ## What was built
 
@@ -45,9 +46,24 @@ Offline checks only; the native round trip is pending.
 | `scripts/test_vci_host_mcp.py` (real Host, no workers) | 80 checks | `vci_push` and `vci_fetch` through MCP against a bare remote, schema-valid outputs, Host restart |
 | `scripts/test_vci_contracts.py`, `scripts/test_qualify_vci_mappings.py` | passed | Input and output contracts; the runner's other-engineer Git steps against a real bare repository |
 
-## Pending native run
+## Native round trip
 
-`scripts/qualify_vci_mappings.py` gains phase C: a second workspace and SCL FC,
+Passed on 31 October 2026: `scripts/qualify_vci_mappings.py` on a frozen Debug
+build of `133a513` (`artifacts/vgd`), 202 of 202 steps, report
+`artifacts/vg31c/vc_0f598d0c/qualification.json`, curated as
+`local.vci_git.20261031`. Every kind (`vci_mapping_add`, `vci_synchronize`,
+`vci_mapping_remove`, `vci_conflict_resolve`) has applied, persisted, refused and
+restored evidence. V21 performed the directed `Synchronize` in both directions
+(take=remote and take=merged `WorkspaceToProject`, take=native
+`ProjectToWorkspace`) while the mapping reported both sides changed; the
+export hash was stable between inspect and prepare in all four resolutions. The
+merged round kept the remote value with the native header family in one
+document. The bare remote's first-parent history ends with the baseline, five
+other-engineer commits and the take=native and merged resolution commits, in
+order. `vci_push`/`vci_fetch` are verified by the Host-only run on the same
+Host build (`artifacts/w3c-hostonly-133a513a`, 80 checks).
+
+The runner's phase C: a second workspace and SCL FC,
 a baseline pushed to a run-owned bare remote, and three rounds of a remote
 commit by a plain-Git clone plus a native edit of the same FC. Each round
 fetches, checks the fetched package out into the workspace, detects the
@@ -56,10 +72,9 @@ every round) and resolves it `remote`, `native` and `merged`, then commits and
 pushes the result over the remote commit. TIA is checked through the block
 export, the workspace through package hashes and Git through the bare
 repository's first-parent history. Phase B adds a fourth round restored from its
-checkpoint. Until that run passes, `vci_push`, `vci_fetch` and
-`change.vci_conflict_resolve` stay unverified.
+checkpoint.
 
-## Native attempts (31 October 2026, not curated)
+## Earlier native attempts (31 October 2026, not curated)
 
 Two attempts in owned scratch projects (CPU 1511-1 PN V4.1), each on a frozen
 Debug build: `artifacts/vg-31` (build `74932b9`, 96 of 97 steps passed) and
@@ -88,7 +103,7 @@ not run. What the first 96 steps established natively in both attempts:
   attempt cannot be replayed with this key/state."), not with the code the
   runner expected (`InvalidChangeState` in the first attempt, `IdempotencyConflict`
   in the second, the session-level codes behind that admission). The runner now
-  expects `RecoveryRequired`; the next native slot reruns the whole runner.
+  expects `RecoveryRequired`; the third run above passed with it.
 
 ## Limits
 
@@ -97,7 +112,7 @@ not run. What the first 96 steps established natively in both attempts:
   `take=native` exports the project package only when applied.
 - The remote is rechecked immediately before dispatch; a writer of the remote
   after that check is outside the Host's control.
-- The directed `Synchronize(WorkspaceToProject)` with both sides changed was
-  observed natively (attempts above); the `ProjectToWorkspace` override
-  (take=native) is not yet observed.
+- The directed `Synchronize` with both sides changed was observed in both
+  directions on one SCL FC in one scratch project; other object families,
+  companion files and connect-mode mappings are not exercised.
 - Network remotes have no credential route and are not qualified.
