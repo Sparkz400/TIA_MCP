@@ -1222,8 +1222,8 @@
     },
     {
       "path": "src/TiaMcp.Core/HmiComponentWorkflowStore.cs",
-      "sha256": "05cea0f2f2128284c4ad47efc8c493432762bcb81810007d9764712b54f107c8",
-      "bytes": 16117
+      "sha256": "fd912d3320b00e5b418f9ed4f7a3f4c8fd99cd72f1ad76e0a5009423451c54f8",
+      "bytes": 16139
     },
     {
       "path": "src/TiaMcp.Core/HmiComponents/HmiComponentConsumers.cs",

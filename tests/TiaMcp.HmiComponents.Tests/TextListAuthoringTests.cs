@@ -28,7 +28,7 @@ internal static class TextListAuthoringTests
         byte[] lossRaw = JsonSerializer.SerializeToUtf8Bytes(lossPacket, BridgeProtocol.Json);
         var lossUpload = uploads.Begin("intent.json", lossRaw.Length, Convert.ToHexStringLower(SHA256.HashData(lossRaw)));
         uploads.Write(lossUpload.UploadId, 0, Convert.ToBase64String(lossRaw)); string lossRef = uploads.Commit(lossUpload.UploadId).ArtifactRef!;
-        PublishInterruptionSweep.Run("author-v1", root, ".author.json", s => s.AuthorTextLists(lossRef), Check);
+        PublishInterruptionSweep.Run("author-v1", root, ".author.json", 4, s => s.AuthorTextLists(lossRef), Check);
         uploads.Release(lossUpload.UploadId);
         foreach (string flag in new[] { "nativeQualified", "nativeExecutable", "preservationVerified", "consumerCoverageComplete" }) Check(!(bool)receipt[flag]!, "No promotion: " + flag);
         foreach (var artifact in receipt["files"]!.AsArray().Select(f => f!["artifact"]!.AsObject()).Concat(new[] { receipt["input"]!.AsObject(), receipt["recordArtifact"]!.AsObject() }))

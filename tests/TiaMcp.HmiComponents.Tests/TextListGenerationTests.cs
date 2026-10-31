@@ -92,7 +92,7 @@ internal static class TextListGenerationTests
         Check(ProjectReviewStore.ReadArtifact(root, second["preservedFiles"]![0]!["artifact"]!.AsObject()).SequenceEqual(manual), "Opaque manual peer bytes retained exactly");
         var lossRequest = Request(Packet(first), first); lossRequest["template"]!["trueText"]!["en-US"] = "Host loss sweep";
         string lossUpload = Input(lossRequest);
-        PublishInterruptionSweep.Run("author-v2", root, ".author.json", s => s.AuthorTextLists(lossUpload), Check);
+        PublishInterruptionSweep.Run("author-v2", root, ".author.json", 4, s => s.AuthorTextLists(lossUpload), Check);
         ReleaseUploads();
         var renamedPacket = Packet(first); renamedPacket["afterComponent"] = Component(Snapshot("Bool", true, "Enabled"));
         renamedPacket["bindings"]![0]!["afterMember"]!["memberPath"] = new JsonArray("Enabled");
