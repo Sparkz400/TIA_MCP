@@ -22,7 +22,8 @@ END_FUNCTION
 """
 # An OB in the unit's namespace that reaches every library use of the PLC, so a PLC-wide update can prove each one
 # reachable: the namespaced FB, the dependent FB (and through it its UDT), the un-namespaced UDT of the first
-# instantiation through a DB member, and the master-copy FC.
+# instantiation through a DB member, and the master-copy FC. V21 does not resolve a library instance whose namespace was
+# set after creation by its simple name inside the NAMESPACE source (31 October, artifacts/lu1), so those are qualified.
 CALLER_SOURCE = "NAMESPACE " + UNIT + """
 DATA_BLOCK "TiaMcpUnitNamespaced_Gate"
 { S7_Optimized_Access := 'TRUE' }
@@ -64,7 +65,7 @@ BEGIN
     "%s"();
 END_ORGANIZATION_BLOCK
 END_NAMESPACE
-""" % (FB, DEPENDENT_FB, UDT, MASTER_FC)
+""" % (UNIT + "." + FB, UNIT + "." + DEPENDENT_FB, UDT, UNIT + "." + MASTER_FC)
 CALLERS = ["TiaMcpUnitNamespaced_Gate", "TiaMcpUnitNamespaced_Component", "TiaMcpUnitNamespaced_State", "TiaMcpUnitNamespaced_Cycle"]
 
 
