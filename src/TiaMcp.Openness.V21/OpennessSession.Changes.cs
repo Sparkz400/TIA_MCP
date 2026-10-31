@@ -714,7 +714,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var item = ChangeHardware(project, payload);
                     change.AttributeTarget = item.Item;
-                    HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(item.Item.TypeIdentifier), null, ChangeObject(payload, "attributes").Properties().Select(property => property.Name));
+                    HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, ChangeObject(payload, "attributes").Properties().Select(property => property.Name));
                     preview["attributeChanges"] = PrepareAttributes(item.Item, ChangeObject(payload, "attributes"), HardwareWriteAttributes);
                     effects.Add(new JObject { ["hardwarePath"] = item.Path });
                     break;

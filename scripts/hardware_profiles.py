@@ -20,11 +20,15 @@ def attributes(rows):
 
 
 def items(raw, root):
-    """Profile rows of the module at root and its subtree, from raw hardware_inspect items keyed by exact path."""
+    """Profile rows of the module at root and its subtree, from raw hardware_inspect items keyed by exact path. A row path names a
+    segment equal to the module's own name {module} (TIA names a built-in submodule after its module), as the worker's lookup does."""
+    module = root.rsplit("/", 1)[1]
+
     def relative(path):
         if path != root and not path.startswith(root + "/"):
             raise ValueError("%s is outside the profiled module %s" % (path, root))
-        return path[len(root) + 1:] if path != root else ""
+        parts = path[len(root) + 1:].split("/") if path != root else []
+        return "/".join("{module}" if index % 2 and part == module else part for index, part in enumerate(parts))
     rows = []
     for path in sorted(path for path in raw if path == root or path.startswith(root + "/")):
         item, network = raw[path], raw[path].get("network")
@@ -40,6 +44,35 @@ def items(raw, root):
     return rows
 
 
+def merge(rows, more):
+    """Rows of one type from two snapshots: every item, channel and attribute either shows; an attribute writable in one is writable."""
+    def union(old, new):
+        named = {row["name"]: row for row in old}
+        for row in new:
+            if row["name"] not in named or ("Write" in (row.get("accessMode") or "") and "Write" not in (named[row["name"]].get("accessMode") or "")):
+                named[row["name"]] = row
+        return sorted(named.values(), key=lambda row: row["name"])
+    merged = {row["relativePath"]: dict(row) for row in rows}
+    for row in more:
+        if row["relativePath"] not in merged:
+            merged[row["relativePath"]] = dict(row)
+            continue
+        target = merged[row["relativePath"]]
+        target["attributes"] = union(target["attributes"], row["attributes"])
+        channels = {(c["type"], c["ioType"], c["number"]): dict(c) for c in target["channels"]}
+        for channel in row["channels"]:
+            key = (channel["type"], channel["ioType"], channel["number"])
+            channels[key] = {**channel, "attributes": union(channels[key]["attributes"], channel["attributes"])} if key in channels else dict(channel)
+        target["channels"] = [channels[key] for key in sorted(channels)]
+    return [merged[path] for path in sorted(merged)]
+
+
+def key(profile):
+    """The worker's ProfileKey: an OrderNumber: identifier alone, a versionless (System:, GSD:) one with its firmware."""
+    identifier = profile["typeIdentifier"]
+    return identifier if identifier.startswith("OrderNumber:") else "%s|%s" % (identifier, profile["firmwareVersion"])
+
+
 def profile(type_identifier, kind, rows, entry, plug_rules, report):
     """One contract profile; entry is the module's exact hardware_catalog_search entry (None when the catalog did not list it)."""
     entry = entry or {}
@@ -52,7 +85,7 @@ def contract(profiles):
     """The contract document, validated against its schema; type identifiers must be unique."""
     document = {"schemaVersion": 1, "profiles": sorted(profiles, key=lambda row: row["typeIdentifier"])}
     jsonschema.Draft202012Validator(json.loads(SCHEMA.read_text(encoding="utf-8"))).validate(document)
-    identifiers = [row["typeIdentifier"] for row in document["profiles"]]
-    if len(identifiers) != len(set(identifiers)):
-        raise ValueError("Duplicate profile type identifiers")
+    keys = [key(row) for row in document["profiles"]]
+    if len(keys) != len(set(keys)) or any(not row["typeIdentifier"].startswith("OrderNumber:") and not row["firmwareVersion"] for row in document["profiles"]):
+        raise ValueError("Duplicate profile keys, or a versionless type without firmwareVersion")
     return document

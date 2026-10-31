@@ -384,6 +384,17 @@ namespace TiaMcp.Openness.V21
                     now.Value<string>("name") != old.Value<string>("name") || !JToken.DeepEquals(now["ringPorts"], old["ringPorts"]))
                     Fail("The selected interface's MRP instance differs from the requested role and domain, or its name or ring ports changed.");
                 selected["mrp"][0] = now.DeepClone();
+                // Only createDomain adds a domain name, to every interface row of the selected interface's subnet.
+                if (payload.Value<bool?>("createDomain") == true)
+                {
+                    string subnet = selected["mrpDomains"]?.Value<string>("subnet") ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured subnet MRP domains.");
+                    foreach (var row in expected.OfType<JObject>().Where(row => row["mrpDomains"]?.Value<string>("subnet") == subnet))
+                    {
+                        var names = row["mrpDomains"]["domains"].Values<string>().ToList();
+                        if (names.Contains(payload.Value<string>("domainName"))) Fail("The created MRP domain already existed.");
+                        row["mrpDomains"]["domains"] = new JArray(names.Concat(new[] { payload.Value<string>("domainName") }).OrderBy(name => name, StringComparer.Ordinal));
+                    }
+                }
             }
             else if (kind == "hardware_shared_device_access")
             {
@@ -478,22 +489,28 @@ namespace TiaMcp.Openness.V21
             return referenced.Select(tag => tag.Value<string>("path")).OrderBy(tag => tag, StringComparer.Ordinal).SequenceEqual(given, StringComparer.Ordinal);
         }
 
-        // A module capability profile (contracts/hardware-catalog-profiles.v1.json) declares every attribute of the module item and
-        // its channels with its native access mode. When one exists for the item's type, a write must be declared writable there.
-        // channel: null for the module item's own attributes, else the {type, ioType, number} selector.
-        internal static void RequireProfileWritable(JObject profile, JObject channel, IEnumerable<string> names)
+        // A module capability profile (contracts/hardware-catalog-profiles.v1.json) declares every item of the module's subtree with
+        // each attribute's native access mode. When the nearest profiled item at or above the written one has a profile, the write must
+        // be declared writable on the row at its relative path. channel: null for the item's own attributes, else {type, ioType, number}.
+        internal static void RequireProfileWritable(JObject profile, string relativePath, JObject channel, IEnumerable<string> names)
         {
             if (profile == null) return;
-            var item = (profile["items"] as JArray ?? new JArray()).OfType<JObject>().SingleOrDefault(row => row.Value<string>("relativePath") == "");
+            var item = (profile["items"] as JArray ?? new JArray()).OfType<JObject>().SingleOrDefault(row => row.Value<string>("relativePath") == relativePath);
             var scope = channel == null ? item : (item?["channels"] as JArray ?? new JArray()).OfType<JObject>().SingleOrDefault(row => row.Value<string>("type") == channel.Value<string>("type") &&
                 row.Value<string>("ioType") == channel.Value<string>("ioType") && row.Value<int>("number") == channel.Value<int>("number"));
             foreach (string name in names)
             {
                 var declared = (scope?["attributes"] as JArray ?? new JArray()).OfType<JObject>().Where(row => row.Value<string>("name") == name).ToArray();
                 if (declared.Length != 1 || (declared[0].Value<string>("accessMode") ?? "").IndexOf("Write", StringComparison.Ordinal) < 0)
-                    throw new BridgeException("AttributeNotWritable", "The capability profile of " + profile.Value<string>("typeIdentifier") + " does not declare " + name + " writable" + (channel == null ? "" : " on this channel") + ".");
+                    throw new BridgeException("AttributeNotWritable", "The capability profile of " + profile.Value<string>("typeIdentifier") + " does not declare " + name + " writable on " +
+                        (relativePath == "" ? "the module" : relativePath) + (channel == null ? "" : ", this channel") + ".");
             }
         }
+
+        // A profile row's path below its module: item segments joined as in hardware paths, with {module} for a segment equal to the
+        // module's own name (TIA names a built-in submodule after its module), so a profile serves every instance name.
+        internal static string ProfilePath(IEnumerable<string> segments, string moduleSegment) =>
+            string.Join("/", segments.Select(segment => "items/" + (segment == moduleSegment ? "{module}" : segment)));
 
         internal const string ProfileContract = "contracts/hardware-catalog-profiles.v1.json";
         private static readonly Lazy<Dictionary<string, JObject>> BundledProfiles = new Lazy<Dictionary<string, JObject>>(() =>
@@ -502,15 +519,22 @@ namespace TiaMcp.Openness.V21
             using (var reader = new System.IO.StreamReader(stream)) return ParseProfiles(reader.ReadToEnd());
         });
 
-        // Profiles by exact typeIdentifier; a duplicate identifier or another schema version refuses the whole contract.
+        // An OrderNumber: identifier names its firmware; System: and GSD: identifiers do not, so their profiles are told apart by
+        // firmwareVersion, which must equal the item's FirmwareVersion attribute.
+        internal static string ProfileKey(string typeIdentifier, string firmwareVersion) =>
+            typeIdentifier == null ? null : typeIdentifier.StartsWith("OrderNumber:", StringComparison.Ordinal) ? typeIdentifier : firmwareVersion == null ? null : typeIdentifier + "|" + firmwareVersion;
+
+        // Profiles by ProfileKey; a duplicate key or another schema version refuses the whole contract.
         internal static Dictionary<string, JObject> ParseProfiles(string json)
         {
             var root = JObject.Parse(json);
             if (root.Value<int?>("schemaVersion") != 1 || !(root["profiles"] is JArray profiles)) throw new InvalidOperationException("Hardware catalog profiles need schemaVersion 1 and a profiles array.");
-            return profiles.OfType<JObject>().ToDictionary(profile => profile.Value<string>("typeIdentifier") ?? throw new InvalidOperationException("A hardware catalog profile has no typeIdentifier."), StringComparer.Ordinal);
+            return profiles.OfType<JObject>().ToDictionary(profile => ProfileKey(profile.Value<string>("typeIdentifier") ?? throw new InvalidOperationException("A hardware catalog profile has no typeIdentifier."),
+                profile.Value<string>("firmwareVersion")) ?? throw new InvalidOperationException("A versionless hardware catalog profile needs firmwareVersion."), StringComparer.Ordinal);
         }
 
-        internal static JObject Profile(string typeIdentifier) => typeIdentifier != null && BundledProfiles.Value.TryGetValue(typeIdentifier, out var profile) ? profile : null;
+        internal static JObject Profile(string typeIdentifier, string firmwareVersion) =>
+            ProfileKey(typeIdentifier, firmwareVersion) is string key && BundledProfiles.Value.TryGetValue(key, out var profile) ? profile : null;
 
         // Added, removed and changed configured rows by exact path, for review of a CAx import.
         internal static JObject Difference(JArray before, JArray after)

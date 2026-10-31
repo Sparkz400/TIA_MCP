@@ -201,7 +201,7 @@ V21 Openness exposes a shared device in two ways, and the bridge reviews both. N
 - **Several PLCs of one project.** An IO-device interface has several `IoConnector`s (four on the IM 155-6 PN ST V6.4).
   `network_io_assign` with `sharedDevice: true` connects a further, unassigned connector to another PLC's I/O system while
   the other connectors stay assigned; one connector per PLC. The bridge records the PLC items of the other assigned
-  connectors as `sharedAddressControllerOwnerPaths` (a caller-supplied value is refused). Preservation lets each station
+  connectors as `sharedAddressControllerOwnerPaths` (refused when supplied without `sharedDevice`, overwritten with it). Preservation lets each station
   address have at most one owner among those PLCs and the selected one; the other connectors must stay exact.
   `disconnect: true` with `sharedDevice` removes one PLC again. Without `sharedDevice`, a further assigned connector is
   `UnsupportedCapability`; the generated server contract (`expectedServerModule`) belongs to the first assignment only.
@@ -221,26 +221,26 @@ assignment is what TIA decides, and the readback reports it.
 (`NotInRing`, `Manager`, `Client`, `ManagerAuto`), optional `domainName` and optional `createDomain: true`. It writes the
 instance's `MediaRedundancyRole` and, with `domainName`, adds the interface to that MRP domain of its subnet
 (`MrpDomainOwner.MrpDomains`, `MrpDomain.DomainParticipants.Add`); `createDomain` creates it first and refuses an existing
-name, an absent one without it is `ObjectNotFound`. An unchanged role and domain is refused. V21 offers no participant
-removal, so an interface leaves a domain only by joining another one.
+name, an absent one without it is `ObjectNotFound`. An unchanged role and domain is refused, and so is a role other than
+`NotInRing` on an instance without both `RingPort1` and `RingPort2` (`UnsupportedCapability`; a single-port device such as the
+CPU 1214C). V21 offers no participant removal, so an interface leaves a domain only by joining another one.
 
 `RingPort1`/`RingPort2` are read-only in V21 and stay the TIA defaults (Port_1 and Port_2). The ring itself is the port
 topology: set the roles first, then close the ring with `hardware_port_connect`; a ring without one manager fails the device
-compile. Preservation adds every interface's MRP instances (name, domain, role, ring ports) to the manifest; only the selected
-instance's role and domain may change. MRP domain attributes (`IsDefault`, `ManagerOutsideOfProjectActive`), domain
-deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed. A single-port device (CPU 1214C)
-cannot be a ring member.
+compile. Preservation adds every interface's MRP instances (name, domain, role, ring ports) and its subnet's MRP domain names to
+the manifest; only the selected instance's role and domain may change, and only `createDomain` adds its domain name. MRP domain attributes (`IsDefault`, `ManagerOutsideOfProjectActive`), domain
+deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed.
 
 ## Address-changing replacement
 
 `hardware_replace` with `acceptAddressChange: true` admits a new type whose address ranges move or resize. Because V21
-reveals the new addresses only after `ChangeType`, preparation lists every tag of the owning PLCs' root tag tables whose
-absolute address overlaps one of the module's current ranges (`addressImpact.referencedTags` in the preview) and refuses
+reveals the new addresses only after `ChangeType`, preparation lists every tag in every software scope (PLC root, software
+units, safety units) of the owning PLCs whose absolute address overlaps one of the module's current ranges (`addressImpact.referencedTags` in the preview) and refuses
 with `AddressReferenced` unless `acknowledgedTags` names exactly those tag paths. After the write each address must keep its
 item, I/O type and owners (`acceptLoss` still governs lost addresses and children); the readback
 `hardware-replace-inventory` adds `addressMap` (old and new range per item and I/O type) and `changedReferencedTags` (the
-referenced tags whose range moved, with the new range). Tag addresses are not rewritten, software-unit tags are not read and
-program references are checked only by the mandatory device compile.
+referenced tags whose range moved, with the new range). Tag addresses are not rewritten. Absolute `%I`/`%Q` accesses in program
+code are not searched, and the device compile does not flag one that now points elsewhere.
 
 ## Module capability profiles
 
@@ -248,17 +248,26 @@ program references are checked only by the mandatory device compile.
 ([schema](../../contracts/hardware-catalog-profiles.v1.schema.json)) holds one profile per exact `typeIdentifier`: catalog
 article, firmware, type name and path, module kind, every item of its subtree with each attribute's native access mode and
 probed value type, address lengths, channels with their attributes, interface nodes and ports, and the `CanPlugNew` outcome
-at slots 1-4 of each probed rack type. Values are never recorded. The hardware runner writes `profiles.json` for every type
-its native run creates; a curated run fills the contract, which holds none until then.
+at slots 1-4 of each probed rack type. Values are never recorded. Row paths are relative to the module and write `{module}` for
+a segment equal to the module's own name (TIA names a built-in submodule after its module), so one profile serves every
+instance name. An `OrderNumber:` identifier names its firmware; a versionless `System:` or `GSD:` identifier has one profile per
+`firmwareVersion`, applied only when the item's `FirmwareVersion` attribute equals it. The hardware runner writes
+`profiles.json` for every type its native run creates, merging every snapshot that shows a type (an attribute declared only in
+some states still enters); a curated run fills the contract, which holds none until then.
 
 `hardware_catalog_search` names an entry's profile in `profile` (`contracts/hardware-catalog-profiles.v1.json#<typeIdentifier>`,
-else null). When a profile exists for an item's type, `hardware_attributes`, `hardware_channel_attributes` and
-`hardware_shared_device_access` refuse an attribute it does not declare writable (`AttributeNotWritable`; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check), on top of native
+else null). When the nearest item at or above the written one has a profile, `hardware_attributes`,
+`hardware_channel_attributes` and `hardware_shared_device_access` refuse an attribute that profile does not declare writable on
+the written item's row (`AttributeNotWritable`; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check), on top of native
 access and the bridge allowlists. Plug rules are observations in the run's final configuration, not a placement rule set.
 
 GSD devices need a GSD file installed in the TIA hardware catalog. V21 Openness offers no installation route (only
 `HardwareCatalog.Find` and the I-device `GsdExportProvider.Export`), so a GSD device enters only after an operator installs
-the file in TIA (Options > Manage general station description files); `hardware_add` then takes its `GSD:` type identifier.
+the file in TIA; `hardware_add` then takes its `GSD:` type identifier and the other kinds apply. One-time manual step for the
+hardware runner: export the I-device GSD with `scripts/qualify_gsd_export.py` (designation `TiaMcpIDevice`; the run's
+`hardware_gsd_export` artifact holds the GSDML file), then in TIA Portal open Options > Manage general station description
+files (GSD), select that folder and install it. The runner then adds the device, assigns it to the second CPU and compiles; without
+it the run records `gsdNotInstalled`.
 
 ## Preservation manifest identity checks
 

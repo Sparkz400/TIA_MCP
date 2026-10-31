@@ -48,6 +48,27 @@ class ProfileTests(unittest.TestCase):
         document = json.loads((hp.ROOT / "contracts" / "hardware-catalog-profiles.v1.json").read_text(encoding="utf-8"))
         self.assertEqual(document, hp.contract(document["profiles"]))
 
+    def test_module_segment_is_canonical(self):
+        raw_items = {DI: raw(DI, "Di", "OrderNumber:X/V1.0"), DI + "/items/Di": raw(DI + "/items/Di", "Di"), DI + "/items/Di/items/Di_P": raw(DI + "/items/Di/items/Di_P", "Di_P")}
+        self.assertEqual(["", "items/{module}", "items/{module}/items/Di_P"], [row["relativePath"] for row in hp.items(raw_items, DI)])
+
+    def test_merge_unions_rows_and_prefers_writable(self):
+        first = hp.items(self.items(), DI)
+        second = [dict(row, attributes=[{"name": "Comment", "accessMode": "Read", "type": None}, {"name": "Flag", "accessMode": "ReadWrite", "type": "System.Boolean"}])
+                  if row["relativePath"] == "" else row for row in first] + [{**first[1], "relativePath": "items/New"}]
+        merged = hp.merge(first, second)
+        self.assertEqual(["", "items/New", "items/Sub"], [row["relativePath"] for row in merged])
+        self.assertEqual({"Comment": "ReadWrite", "Flag": "ReadWrite"}, {a["name"]: a["accessMode"] for a in merged[0]["attributes"]})
+
+    def test_versionless_profiles_are_keyed_by_firmware(self):
+        rows = hp.items(self.items(), DI)
+        gsd = lambda version: hp.profile("GSD:F/D", "device", rows, {"version": version}, [], "r")
+        self.assertEqual(2, len(hp.contract([gsd("V1"), gsd("V2")])["profiles"]))
+        with self.assertRaises(ValueError):
+            hp.contract([gsd(None)])
+        with self.assertRaises(ValueError):
+            hp.contract([gsd("V1"), gsd("V1")])
+
     def test_runner_profiles_modules_and_heads_not_racks(self):
         run = q.Run.__new__(q.Run)
         run.base, run.profiled = BASE, {}
@@ -56,6 +77,10 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual({DI, BASE + "St/items/Di2", BASE + "St/items/Cpu"}, set(run.modules()))
         run.collect()
         self.assertEqual({"OrderNumber:X/V1.0": "module", q.CPU: "device"}, {key: row["kind"] for key, row in run.profiled.items()})
+        # A later snapshot's attributes join the type's profile.
+        run.raw[DI] = {**run.raw[DI], "attributes": [{"name": "Later", "accessMode": "ReadWrite", "type": "System.String"}]}
+        run.collect()
+        self.assertEqual(["Comment", "Later"], [a["name"] for a in run.profiled["OrderNumber:X/V1.0"]["items"][0]["attributes"]])
 
 
 if __name__ == "__main__":

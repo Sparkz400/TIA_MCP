@@ -53,18 +53,18 @@ namespace TiaMcp.Openness.V21
                 if (!HardwareEngineeringRules.TagsAcknowledged(referenced, change.Payload["acknowledgedTags"]))
                     throw new BridgeException("AddressReferenced", "PLC tags use addresses of this module, which an address-changing replacement may move. Prepare again with acknowledgedTags listing exactly these tag paths.", new JObject { ["referencedTags"] = referenced });
                 if (preview != null) preview["addressImpact"] = new JObject { ["referencedTags"] = referenced,
-                    ["basis"] = "Tags of the root tag tables of every PLC owning an address of the module whose absolute address overlaps it before the change; software-unit tags are not read. The readback maps every old range to its new one and lists the referenced tags whose range changed." };
+                    ["basis"] = "Tags in every software scope (PLC root, software units, safety units) of each PLC owning an address of the module whose absolute address overlaps it before the change. Absolute %I/%Q accesses in program code are not searched. The readback maps every old range to its new one and lists the referenced tags whose range changed." };
             }
             if (preview != null)
             {
                 ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["typeIdentifierBefore"] = item.Item.TypeIdentifier, ["typeIdentifierAfter"] = identifier, ["acceptLoss"] = acceptLoss, ["acceptAddressChange"] = addressChange });
                 ((JArray)preview["warnings"]).Add("V21 exposes no native compatibility check before DeviceItem.ChangeType. Lost addresses or child items are found after the write by comparing inventoryBefore with the readback; without acceptLoss: true that fails with MutationVerificationFailed and the checkpoint must be restored. Lost port interconnections always fail." +
-                    (addressChange ? " With acceptAddressChange, an address may move or resize but must keep its item, I/O type and owners; the device compile checks program references." : ""));
+                    (addressChange ? " With acceptAddressChange, an address may move or resize but must keep its item, I/O type and owners. Only tags are checked: absolute %I/%Q accesses in program code are not found, and the device compile does not flag one that now points elsewhere." : ""));
             }
             return item.Item;
         }
 
-        // Root-table tags of the PLCs owning the module subtree's addresses, whose absolute address overlaps one of those ranges.
+        // Tags of every software scope of the PLCs owning the module subtree's addresses, whose absolute address overlaps one of those ranges.
         private JArray TagsOnAddresses(Project project, HardwareEntry module)
         {
             var budget = new ScanBudget(50000);
@@ -79,7 +79,9 @@ namespace TiaMcp.Openness.V21
             foreach (var plc in owners)
             {
                 var software = (PlcSoftware)plc.Item.GetService<SoftwareContainer>().Software;
-                foreach (var table in TagTables(software.TagTableGroup, plc.Path + "/plc/" + Segment(software.Name) + "/tags", budget))
+                // Every software scope: the PLC root, its software units and safety units.
+                foreach (var scope in SoftwareScopes(new PlcSelection { Project = project, Software = software, Path = plc.Path + "/plc/" + Segment(software.Name) }, budget))
+                foreach (var table in TagTables(scope.Tags, scope.Path + "/tags", budget))
                     foreach (var tag in table.Item.Tags)
                     {
                         if (!budget.Take()) throw new BridgeException("TraversalLimit", "PLC tag lookup for the address impact is incomplete.");
@@ -91,6 +93,30 @@ namespace TiaMcp.Openness.V21
             }
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "PLC tag lookup for the address impact is incomplete.");
             return tags;
+        }
+
+        // The capability profile of the nearest item at or above `item` whose type has one, and the item's row path in that profile.
+        private static JObject ItemProfile(DeviceItem item, out string relativePath)
+        {
+            var segments = new System.Collections.Generic.List<string>();
+            IEngineeringInstance cursor = item;
+            for (int depth = 0; cursor is DeviceItem device && depth < 64; depth++, cursor = device.Parent)
+            {
+                string type = device.TypeIdentifier;
+                // Only versionless (System:, GSD:) identifiers need the firmware to select a profile.
+                var profile = HardwareEngineeringRules.Profile(type, type == null || type.StartsWith("OrderNumber:", StringComparison.Ordinal) ? null : FirmwareVersion(device));
+                if (profile != null) { relativePath = HardwareEngineeringRules.ProfilePath(segments, Segment(device.Name)); return profile; }
+                segments.Insert(0, Segment(device.Name));
+            }
+            relativePath = null;
+            return null;
+        }
+
+        // An item's FirmwareVersion attribute; null when it declares none or the read fails (then no versionless profile applies).
+        private static string FirmwareVersion(DeviceItem item)
+        {
+            try { return item.GetAttributeInfos().Any(info => info.Name == "FirmwareVersion" && (info.AccessMode & EngineeringAttributeAccessMode.Read) != 0) ? item.GetAttribute("FirmwareVersion") as string : null; }
+            catch (Exception) { return null; }
         }
 
         private static HardwareEntry[] PlcItems(HardwareEntry[] hardware) => hardware.Where(entry => entry.Item.GetService<SoftwareContainer>()?.Software is PlcSoftware).ToArray();
@@ -129,6 +155,14 @@ namespace TiaMcp.Openness.V21
                 ["ringPorts"] = new JArray(new[] { instance.RingPort1, instance.RingPort2 }.Select(ring => ring == null ? JValue.CreateNull() : port(ring))) }));
         }
 
+        // The MRP domain names of the subnet an interface's one connected node joins, null without one.
+        private static JObject MrpDomainNames(NetworkInterface network)
+        {
+            var subnets = network.Nodes.Select(node => node.ConnectedSubnet).Where(subnet => subnet != null).ToArray();
+            var owner = subnets.Length == 1 ? subnets[0].GetService<MrpDomainOwner>() : null;
+            return owner == null ? null : new JObject { ["subnet"] = subnets[0].Name, ["domains"] = new JArray(owner.MrpDomains.Select(domain => domain.Name).OrderBy(name => name, StringComparer.Ordinal)) };
+        }
+
         // One interface's MRP instance takes a MediaRedundancyRole and optionally joins (or first creates) a named MRP domain of its subnet.
         private MrpInstance PrepareMrp(EngineeringChange change, Project project, JObject preview, out MrpDomainComposition domains)
         {
@@ -137,6 +171,8 @@ namespace TiaMcp.Openness.V21
             var item = ChangeHardware(project, change.Payload);
             var network = item.Item.GetService<NetworkInterface>() ?? throw new BridgeException("UnsupportedCapability", "Media redundancy needs a PROFINET interface; the selected item exposes no NetworkInterface.");
             var instance = MrpInstanceOf(item.Item);
+            if (role != "NotInRing" && (instance.RingPort1 == null || instance.RingPort2 == null))
+                throw new BridgeException("UnsupportedCapability", "A ring role needs two ring ports; this interface's MRP instance lacks RingPort1 or RingPort2 (a single-port device such as the CPU 1214C).");
             var changes = PrepareAttributes(instance, new JObject { ["MediaRedundancyRole"] = role }, MrpWriteAttributes);
             string name = change.Payload["domainName"] == null ? null : ChangeText(change.Payload, "domainName", 128);
             bool create = change.Payload.Property("createDomain") != null && ExplicitChangeBool(change.Payload, "createDomain");
@@ -200,7 +236,7 @@ namespace TiaMcp.Openness.V21
             var systems = members.Select(entry => entry.Item.GetService<NetworkInterface>()).Where(network => network != null).SelectMany(network => network.IoConnectors).Select(connector => connector.ConnectedToIoSystem).Where(system => system != null).ToArray();
             if (systems.Length == 0) throw new BridgeException("UnsupportedCapability", "Shared-device access applies to a module of an IO device assigned to an I/O system; assign the station first (network_io_assign).");
             var owners = systems.Select(system => OwningPlcItem(system.Parent, plcs) ?? throw new BridgeException("UnresolvedIoOwnership", "An I/O system of the station resolves to no PLC of the project.")).Select(entry => entry.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal);
-            HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(item.Item.TypeIdentifier), null, new[] { "SharedDeviceAccessType" });
+            HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, new[] { "SharedDeviceAccessType" });
             var changes = PrepareAttributes(item.Item, new JObject { ["SharedDeviceAccessType"] = access }, SharedAccessAttributes);
             if (changes[0].Value<string>("before") == access) throw new BridgeException("InvalidRequest", "The item already has the requested SharedDeviceAccessType.");
             change.Payload["addressControllerOwnerPaths"] = new JArray(owners);
@@ -208,7 +244,7 @@ namespace TiaMcp.Openness.V21
             {
                 ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["accessBefore"] = changes[0]["before"].DeepClone(), ["accessAfter"] = access });
                 preview["attributeChanges"] = changes;
-                ((JArray)preview["warnings"]).Add("TIA moves the module's address ownership with its access (OutsideOfProject: an IO controller outside this project); its subitems may follow. The mandatory device compile checks program references to the released addresses.");
+                ((JArray)preview["warnings"]).Add("TIA moves the module's address ownership with its access (OutsideOfProject: an IO controller outside this project); its subitems may follow. Tags and absolute program accesses on the released addresses are not checked, and the device compile does not flag them.");
             }
             return item.Item;
         }

@@ -83,7 +83,7 @@ namespace TiaMcp.Openness.V21
             if (attributes.Count == 0 || attributes.Count > ChannelWriteAttributes.Count) throw new BridgeException("InvalidRequest", "At least one reviewed channel attribute is required.");
             var scalars = ChannelScalars(attributes);
             // The OB link is declared only while its flag is on, so a profile captured with the flag off cannot list it; its native check follows.
-            HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(module.Item.TypeIdentifier),
+            HardwareEngineeringRules.RequireProfileWritable(ItemProfile(module.Item, out string profilePath), profilePath,
                 new JObject { ["type"] = channel.Type.ToString(), ["ioType"] = channel.IoType.ToString(), ["number"] = channel.Number }, scalars.Properties().Select(property => property.Name));
             var changes = PrepareAttributes(channel, scalars, ChannelWriteAttributes, out var converted);
             // Store native scalar representations so the preservation comparison
@@ -322,6 +322,7 @@ namespace TiaMcp.Openness.V21
                 if (ports && item.GetService<NetworkPort>() is NetworkPort port)
                     row["port"] = new JObject { ["connectedPorts"] = new JArray(port.ConnectedPorts.Select(partner => Owner(partner.OwnedBy)).OrderBy(value => value, StringComparer.Ordinal)) };
                 if (mrp && MrpRows(item, ring => Owner(ring.OwnedBy)) is JArray instances) row["mrp"] = instances;
+                if (mrp && network != null && MrpDomainNames(network) is JObject domains) row["mrpDomains"] = domains;
                 rows.Add(row);
             }
             return rows;
@@ -338,7 +339,7 @@ namespace TiaMcp.Openness.V21
                 ["covered"] = "All observed hardware identities/slots, reviewed hardware/channel attributes, configured address ranges/owners, node configuration and exact I/O-system assignments; fail closed on capture failure.",
                 ["limitations"] = "Unexposed vendor payloads, non-allowlisted parameters, physical wiring, shared-device/multi-controller behavior and runtime are not qualified." };
             if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
-            if (HardwareEngineeringRules.CapturesMrp(change.Kind)) preview["preservation"]["covered"] += " Every interface's MRP instances (domain, MediaRedundancyRole, ring ports) are included.";
+            if (HardwareEngineeringRules.CapturesMrp(change.Kind)) preview["preservation"]["covered"] += " Every interface's MRP instances (domain, MediaRedundancyRole, ring ports) and its subnet's MRP domain names are included.";
             if (change.Kind == "hardware_shared_device_access") preview["preservation"]["covered"] += " SharedDeviceAccessType of every device item is included.";
             if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress and Failsafe_FMonitoringtime of every device item are included.";
             if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));

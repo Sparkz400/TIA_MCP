@@ -28,7 +28,7 @@
       "additionalProperties": false,
       "required": ["relativePath", "name", "typeIdentifier", "positionNumber", "isBuiltIn", "classification", "attributes", "addresses", "channels", "interface"],
       "properties": {
-        "relativePath": { "type": "string", "maxLength": 1024, "description": "Path below the profiled module; empty for the module itself." },
+        "relativePath": { "type": "string", "maxLength": 1024, "description": "Path below the profiled module (items/<segment>/...), with {module} for a segment equal to the module's own name; empty for the module itself." },
         "name": { "type": "string", "maxLength": 1024 },
         "typeIdentifier": { "$ref": "#/$defs/optionalText" },
         "positionNumber": { "type": ["integer", "null"] },
@@ -72,7 +72,7 @@
       "properties": {
         "typeIdentifier": { "$ref": "#/$defs/text" },
         "orderNumber": { "$ref": "#/$defs/optionalText" },
-        "firmwareVersion": { "$ref": "#/$defs/optionalText" },
+        "firmwareVersion": { "$ref": "#/$defs/optionalText", "description": "Required for a versionless (System:, GSD:) typeIdentifier: the profile applies only to items whose FirmwareVersion attribute equals it." },
         "typeName": { "$ref": "#/$defs/optionalText" },
         "catalogPath": { "$ref": "#/$defs/optionalText" },
         "moduleKind": { "enum": ["device", "module"], "description": "device: created with hardware_add; module: plugged with hardware_plug." },

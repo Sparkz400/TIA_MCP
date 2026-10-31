@@ -63,6 +63,34 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual(1, len(managers))
         self.assertEqual({d for link in devices for d in link}, {path[len(run.base):].split("/")[0] for path in q.interfaces(run)})
 
+    def test_ring_restores_the_first_join_and_the_closure_once(self):
+        run = q.Run.__new__(q.Run)
+        run.base, run.current, calls = "/projects/P/devices/", {"view": {}}, []
+        saved = q.mrp, q.link
+        q.mrp = lambda run_, interface, role, domain=None, create=False, restore=False: calls.append(("mrp", interface.split("/")[4], role, create, restore))
+        q.link = lambda run_, kind, number, restore=False, pair=None, label=None: calls.append((kind, number, restore))
+        try:
+            q.ring(run)
+        finally:
+            q.mrp, q.link = saved
+        self.assertEqual([("hardware_port_disconnect", 1, False), ("mrp", "ScratchStation", "Manager", True, False), ("mrp", "HwPeer", "Client", False, True),
+                          ("mrp", "HwPeer", "Client", False, False), ("mrp", "HwMp", "Client", False, False),
+                          ("hardware_port_connect", 2, True), ("hardware_port_connect", 2, False)], calls)
+
+    def test_gsd_device_not_installed_is_recorded_not_failed(self):
+        class Fake:
+            def __init__(self):
+                self.report = {}
+            def stage(self, name, operation):
+                return operation()
+            def tool(self, name, arguments):
+                return {"entries": [{"typeIdentifier": "OrderNumber:6ES7 999/V1.0"}]}  # A catalog hit that is no GSD device.
+        run = q.Run.__new__(q.Run)
+        run.h = Fake()
+        run.apply = lambda *a, **k: self.fail("A missing GSD must not change the project")
+        q.gsd_device(run)
+        self.assertEqual({"gsdCatalog": [], "gsdNotInstalled": True}, run.h.report)
+
     def test_rack_is_the_one_root_item_beside_the_head(self):
         run = q.Run.__new__(q.Run)
         run.base = "/projects/P/devices/"

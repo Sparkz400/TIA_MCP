@@ -49,7 +49,8 @@ def run(path):
              or ["%s: %s=%s" % (p["profile"], gate, row.get("status")) for p in report.get("profiles", []) if isinstance(p, dict)
                  for gate, row in (p.get("gates") or {}).items()])
     return {"report": path.name, "sha256": file_sha256(path), "bytes": path.stat().st_size,
-            "completed": report.get("completed") is True or report.get("status") == "passed",
+            # A key-discovery pass (--discover) records differences instead of failing; it is never a passed run.
+            "completed": (report.get("completed") is True or report.get("status") == "passed") and not report.get("discovery"),
             "steps": steps,
             "toolsPassed": sorted({c["name"] for c in calls if not c["isError"]}),
             "toolsRejected": sorted({c["name"] for c in calls if c["isError"]})}

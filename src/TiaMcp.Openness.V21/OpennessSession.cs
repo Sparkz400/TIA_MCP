@@ -473,7 +473,7 @@ namespace TiaMcp.Openness.V21
             result["entries"] = new JArray(entries.Take(max).Select(entry => new JObject { ["typeIdentifier"] = entry.TypeIdentifier,
                 ["articleNumber"] = entry.ArticleNumber, ["typeName"] = entry.TypeName, ["description"] = entry.Description,
                 ["version"] = entry.Version?.ToString(), ["catalogPath"] = entry.CatalogPath,
-                ["profile"] = HardwareEngineeringRules.Profile(entry.TypeIdentifier) == null ? null : HardwareEngineeringRules.ProfileContract + "#" + entry.TypeIdentifier }));
+                ["profile"] = HardwareEngineeringRules.Profile(entry.TypeIdentifier, entry.Version) == null ? null : HardwareEngineeringRules.ProfileContract + "#" + entry.TypeIdentifier }));
             result["completeness"] = new JObject { ["complete"] = entries.Count <= max, ["truncated"] = entries.Count > max, ["totalMatches"] = entries.Count };
             return result;
         }

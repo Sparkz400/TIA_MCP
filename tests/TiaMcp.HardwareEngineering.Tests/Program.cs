@@ -382,6 +382,14 @@ Check("MRP collateral interface rejected", "network_mrp_set", mrp, rows => { row
 Check("MRP role keeps the domain when none is named", "network_mrp_set", new JObject { ["hardwarePath"] = controller, ["role"] = "Client" }, rows => rows[2]["mrp"] = Mrp("Client", "mrpdomain-1"), true, MrpCaptured);
 Check("MRP role moving the domain unasked rejected", "network_mrp_set", new JObject { ["hardwarePath"] = controller, ["role"] = "Client" }, rows => rows[2]["mrp"] = Mrp("Client", "Ring"), false, MrpCaptured);
 Check("MRP without a captured instance rejected", "network_mrp_set", mrp, _ => { }, false);
+// The subnet's MRP domain names: only createDomain adds one, on every interface row of that subnet.
+void Domains(JArray rows, params string[] names) { foreach (int i in new[] { 2, 3 }) rows[i]["mrpDomains"] = new JObject { ["subnet"] = "PN", ["domains"] = new JArray(names) }; }
+var mrpCreate = (JObject)mrp.DeepClone(); mrpCreate["createDomain"] = true;
+Check("MRP createDomain adds the domain name", "network_mrp_set", mrpCreate, rows => { rows[2]["mrp"] = Mrp("Manager", "Ring"); Domains(rows, "Ring", "mrpdomain-1"); }, true, rows => { MrpCaptured(rows); Domains(rows, "mrpdomain-1"); });
+Check("MRP domain appearing without createDomain rejected", "network_mrp_set", mrp, rows => { rows[2]["mrp"] = Mrp("Manager", "Ring"); Domains(rows, "Ring", "mrpdomain-1"); }, false, rows => { MrpCaptured(rows); Domains(rows, "mrpdomain-1"); });
+Check("MRP createDomain adding another domain rejected", "network_mrp_set", mrpCreate, rows => { rows[2]["mrp"] = Mrp("Manager", "Ring"); Domains(rows, "Other", "Ring", "mrpdomain-1"); }, false, rows => { MrpCaptured(rows); Domains(rows, "mrpdomain-1"); });
+Check("MRP createDomain of an existing name rejected", "network_mrp_set", mrpCreate, rows => rows[2]["mrp"] = Mrp("Manager", "Ring"), false, rows => { MrpCaptured(rows); Domains(rows, "Ring"); });
+Check("MRP createDomain without captured domains rejected", "network_mrp_set", mrpCreate, rows => rows[2]["mrp"] = Mrp("Manager", "Ring"), false, MrpCaptured);
 // Shared-device access: the module takes the access, subitems may follow, ranges stay and owners stay among the station's I/O-system PLCs.
 var access = new JObject { ["hardwarePath"] = module, ["accessType"] = "OutsideOfProject", ["addressControllerOwnerPaths"] = new JArray("/cpu1") };
 void AccessBase(JArray rows) { WithChild(rows); rows[1]["attributes"]["SharedDeviceAccessType"] = "PLC"; rows[4]["attributes"]["SharedDeviceAccessType"] = "PLC"; rows[1]["addresses"][0]["owners"] = new JArray("/cpu1"); }
@@ -393,29 +401,57 @@ Check("shared access without readback rejected", "hardware_shared_device_access"
 Check("shared access moving an address rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"][0]["startAddress"] = 8; }, false, AccessBase);
 Check("shared access foreign owner rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu9"); }, false, AccessBase);
 Check("shared access collateral rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[0]["attributes"]["Comment"] = "lost"; }, false, AccessBase);
-// Capability profiles: when one exists for the item's type, a write must be declared writable there.
-var profile = new JObject { ["typeIdentifier"] = "Catalog:DI", ["items"] = new JArray(new JObject { ["relativePath"] = "",
-    ["attributes"] = new JArray(new JObject { ["name"] = "Comment", ["accessMode"] = "ReadWrite", ["type"] = "System.String" }, new JObject { ["name"] = "Author", ["accessMode"] = "Read", ["type"] = "System.String" }),
-    ["channels"] = new JArray(new JObject { ["type"] = "Analog", ["ioType"] = "Input", ["number"] = 0, ["attributes"] = new JArray(new JObject { ["name"] = "Smoothing", ["accessMode"] = "ReadWrite", ["type"] = "Siemens.Engineering.HW.Smoothing" }) }) }) };
+// Capability profiles: when the nearest profiled item has a profile, a write must be declared writable on the written item's row.
+JArray Declared(params (string name, string access)[] rows) => new JArray(rows.Select(row => new JObject { ["name"] = row.name, ["accessMode"] = row.access, ["type"] = "System.String" }));
+var profile = new JObject { ["typeIdentifier"] = "Catalog:DI", ["items"] = new JArray(
+    new JObject { ["relativePath"] = "", ["attributes"] = Declared(("Comment", "ReadWrite"), ("Author", "Read")),
+        ["channels"] = new JArray(new JObject { ["type"] = "Analog", ["ioType"] = "Input", ["number"] = 0, ["attributes"] = Declared(("Smoothing", "Read, Write")) }) },
+    new JObject { ["relativePath"] = "items/{module}", ["attributes"] = Declared(("Comment", "Read, Write")),
+        ["channels"] = new JArray(new JObject { ["type"] = "Digital", ["ioType"] = "Input", ["number"] = 0, ["attributes"] = Declared(("HardwareInterruptRisingEdgeActive", "ReadWrite")) }) }) };
 var channel0 = new JObject { ["type"] = "Analog", ["ioType"] = "Input", ["number"] = 0 };
-HardwareEngineeringRules.RequireProfileWritable(null, null, new[] { "Anything" });
-HardwareEngineeringRules.RequireProfileWritable(profile, null, new[] { "Comment" });
-HardwareEngineeringRules.RequireProfileWritable(profile, channel0, new[] { "Smoothing" });
-count += 3; Console.WriteLine("PASS profile admits declared writable attributes and an absent profile admits all");
-foreach (var (label, selector, name) in new[] { ("read-only attribute", (JObject)null, "Author"), ("undeclared attribute", null, "Name"), ("channel attribute on the module", null, "Smoothing"),
-    ("another channel", new JObject { ["type"] = "Analog", ["ioType"] = "Input", ["number"] = 1 }, "Smoothing"), ("undeclared channel attribute", channel0, "OperatingType") })
+var digital0 = new JObject { ["type"] = "Digital", ["ioType"] = "Input", ["number"] = 0 };
+HardwareEngineeringRules.RequireProfileWritable(null, null, null, new[] { "Anything" });
+HardwareEngineeringRules.RequireProfileWritable(profile, "", null, new[] { "Comment" });
+HardwareEngineeringRules.RequireProfileWritable(profile, "", channel0, new[] { "Smoothing" });
+HardwareEngineeringRules.RequireProfileWritable(profile, "items/{module}", null, new[] { "Comment" });
+HardwareEngineeringRules.RequireProfileWritable(profile, "items/{module}", digital0, new[] { "HardwareInterruptRisingEdgeActive" });
+count += 5; Console.WriteLine("PASS profile admits declared writable attributes on the module and its submodule rows; an absent profile admits all");
+foreach (var (label, path, selector, name) in new[] { ("read-only attribute", "", (JObject)null, "Author"), ("undeclared attribute", "", null, "Name"), ("channel attribute on the module", "", null, "Smoothing"),
+    ("another channel", "", new JObject { ["type"] = "Analog", ["ioType"] = "Input", ["number"] = 1 }, "Smoothing"), ("undeclared channel attribute", "", channel0, "OperatingType"),
+    ("a submodule row the profile does not list", "items/Other", null, "Comment"), ("a submodule attribute declared only on the module", "items/{module}", null, "Author") })
 {
-    try { HardwareEngineeringRules.RequireProfileWritable(profile, selector, new[] { name }); throw new Exception("Profile accepted " + label); }
+    try { HardwareEngineeringRules.RequireProfileWritable(profile, path, selector, new[] { name }); throw new Exception("Profile accepted " + label); }
     catch (BridgeException error) when (error.Code == "AttributeNotWritable") { count++; Console.WriteLine("PASS profile refuses " + label); }
 }
-foreach (var (label, json) in new[] { ("duplicate type", "{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"A\"},{\"typeIdentifier\":\"A\"}]}"), ("other schema", "{\"schemaVersion\":2,\"profiles\":[]}"),
-    ("missing type", "{\"schemaVersion\":1,\"profiles\":[{}]}") })
+if (HardwareEngineeringRules.ProfilePath(new string[0], "Di") != "" || HardwareEngineeringRules.ProfilePath(new[] { "Di", "PROFINET%20interface", "Port_1" }, "Di") != "items/{module}/items/PROFINET%20interface/items/Port_1")
+    throw new Exception("Profile row paths differ.");
+count++; Console.WriteLine("PASS profile row paths name the module's own segment {module}");
+if (HardwareEngineeringRules.ProfileKey("OrderNumber:X/V1.0", "V9") != "OrderNumber:X/V1.0" || HardwareEngineeringRules.ProfileKey("System:Rail", null) != null || HardwareEngineeringRules.ProfileKey("GSD:F/D", "V1.0") != "GSD:F/D|V1.0")
+    throw new Exception("Profile keys differ.");
+count++; Console.WriteLine("PASS versionless identifiers select a profile only with the item's firmware");
+if (HardwareEngineeringRules.ParseProfiles("{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"GSD:F/D\",\"firmwareVersion\":\"V1\"},{\"typeIdentifier\":\"GSD:F/D\",\"firmwareVersion\":\"V2\"}]}").Count != 2)
+    throw new Exception("Two firmware profiles of one versionless type were not told apart.");
+count++;
+foreach (var (label, json) in new[] { ("duplicate type", "{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"OrderNumber:A/V1\"},{\"typeIdentifier\":\"OrderNumber:A/V1\"}]}"), ("other schema", "{\"schemaVersion\":2,\"profiles\":[]}"),
+    ("missing type", "{\"schemaVersion\":1,\"profiles\":[{}]}"), ("versionless type without firmware", "{\"schemaVersion\":1,\"profiles\":[{\"typeIdentifier\":\"System:Rail\"}]}") })
 {
     try { HardwareEngineeringRules.ParseProfiles(json); throw new Exception("Profile contract accepted: " + label); }
     catch (Exception error) when (error is InvalidOperationException || error is ArgumentException) { count++; Console.WriteLine("PASS profile contract refuses " + label); }
 }
-if (HardwareEngineeringRules.Profile("OrderNumber:6ES7 999-9XX99-9XX9/V9.9") != null || HardwareEngineeringRules.Profile(null) != null) throw new Exception("Bundled profiles answer an unknown type.");
+if (HardwareEngineeringRules.Profile("OrderNumber:6ES7 999-9XX99-9XX9/V9.9", null) != null || HardwareEngineeringRules.Profile(null, null) != null) throw new Exception("Bundled profiles answer an unknown type.");
 count++; Console.WriteLine("PASS bundled profile contract loads");
+// Every attribute write that verified evidence performed must stay admitted once its type has a bundled profile.
+foreach (var (type, path, channelSelector, name, proof) in new[] {
+    ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "", (JObject)null, "Comment", "local.hardware_changes.20261028"), ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "", null, "Author", "local.hardware_changes.20261028"),
+    ("OrderNumber:6ES7 521-1BH00-0AB0/V2.0", "", null, "Comment", "local.hardware_changes.20261028"),
+    ("OrderNumber:6ES7 221-1BH30-0XB0/V1.0", "", null, "Comment", "local.hardware_changes.families.20261029"), ("OrderNumber:6ES7 221-1BH30-0XB0/V1.0", "", null, "Author", "local.hardware_changes.families.20261029"),
+    ("OrderNumber:6ES7 511-1AL03-0AB0/V4.1", "items/PROFINET%20interface_1", null, "InterfaceOperatingMode", "local.gsd_transfer_areas.20261028"),
+    ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "items/{module}", digital0, "HardwareInterruptRisingEdgeActive", "local.plcsim_gaps.ob40.20261030") })
+{
+    try { HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(type, null), path, channelSelector, new[] { name }); count++; }
+    catch (BridgeException error) { throw new Exception("The bundled profile of " + type + " refuses " + name + ", which " + proof + " wrote: " + error.Message); }
+}
+Console.WriteLine("PASS bundled profiles admit every attribute write of the verified hardware evidence");
 // Interrupted-apply project disposition: an equal fingerprint releases only when nothing was saved after the checkpoint.
 var archived = new DateTime(2026, 10, 27, 13, 0, 0, DateTimeKind.Utc);
 void Disposition(string name, bool equal, double savedSeconds, bool applied, string expected, string reason = null)

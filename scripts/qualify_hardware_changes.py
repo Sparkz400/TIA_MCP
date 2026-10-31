@@ -22,9 +22,10 @@ The topology gates follow: the ET 200SP station becomes a shared device (its con
 CPU, sharedDevice), one of its modules is handed outside the project (hardware_shared_device_access), and the line of port
 links becomes a ring with media redundancy: the single-port CPU 1214C leaves the line, an MRP domain takes the scratch CPU as
 manager and the second CPU and the ET 200MP head as clients (network_mrp_set), and the head's free Port_2 closes the ring on
-the scratch CPU's Port_1. Phase B restores one change
-of each new kind, a tag-referenced module replacement that moves its addresses (acceptAddressChange with acknowledgedTags) and
-records whether the installed catalog holds any GSD device (V21 Openness cannot install one).
+the scratch CPU's Port_1. When an operator has installed the project's own exported I-device GSD in TIA (V21 Openness cannot
+install one), that GSD device is added, assigned to the second CPU and compiled; otherwise the run records gsdNotInstalled. Phase B
+restores one change of each new kind and a tag-referenced module replacement that changes its addresses (acceptAddressChange with
+acknowledgedTags).
 
 --discover runs the same sequence but records every unexpected state difference, preview and refusal under discovered
 instead of failing: a key-discovery pass that fixes the expectations, never evidence.
@@ -66,6 +67,7 @@ IM_SP, SERVER = "OrderNumber:6ES7 155-6AU02-0BN0/V6.4", "OrderNumber:6ES7 193-6P
 SP = Station("HwSp", None, "HwPeer", "HwPeerCpu", "HwSpHead~", ("HwSpHead", "items", "PROFINET%20interface"))
 SP_DI, WIDE_DI = ("DI 8x24VDC ST", "6ES7 131-6BF"), ("DI 32x24VDC HF", "6ES7 521-1BL")
 SHARED_IO, RING = "HwScratchIo", "HwRing"
+GSD_DESIGNATION = "TiaMcpIDevice"  # The I-device designation scripts/qualify_gsd_export.py exports; an operator installs that GSD in TIA.
 DEVICES = (CPU, S7_1200, IM, IM_SP)  # Types the run creates with hardware_add; every other profiled type is plugged or generated.
 # An IO controller's cyclic IO bandwidth is computed at the device compile and not saved (a fresh open reads 0), so it is not compared.
 DERIVED = ("CalculatedBandwidthForCyclicIoData",)
@@ -82,7 +84,8 @@ CRITERIA = {
 LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1, an added CPU 1511-1 PN V4.1 and an added CPU 1214C DC/DC/DC V4.7 (both configureScratchSecurity) on one subnet, one "
     "ET 200MP IM 155-5 PN ST V4.1 station and one ET 200SP IM 155-6 PN ST V6.4 station assigned to the added CPU 1511-1 PN; HMI and drive devices are not added, "
-    "and no GSD device is installed (V21 Openness has no GSD installation API; the catalog is only searched for one).",
+    "and a GSD device only when an operator has installed the I-device GSD that scripts/qualify_gsd_export.py exports (designation TiaMcpIDevice); "
+    "V21 Openness has no GSD installation API, so otherwise the run records gsdNotInstalled.",
     "Shared device: the ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with the added CPU 1511-1 PN, in one "
     "project; one ET 200SP DI module is set to SharedDeviceAccessType OutsideOfProject. A second project's controller is not configured.",
     "Media redundancy: one MRP domain on the subnet with the scratch CPU as manager and the added CPU 1511-1 PN and the IM 155-5 PN ST as clients; the "
@@ -170,11 +173,14 @@ class Run(StateRun):
                 and "/" not in path[len(self.base):].split("/items/")[1] and not (item["positionNumber"] == 0 and item["classification"] == "None")]
 
     def collect(self):
-        """Profile rows of each module or head type the first time a snapshot shows it."""
+        """Profile rows of each module or head type, merged over every snapshot that shows it: an attribute declared only in some
+        states (a channel's interrupt OB link while its flag is on) still enters its profile."""
         for path in self.modules():
-            identifier = self.raw[path]["typeIdentifier"]
-            if identifier not in self.profiled:
-                self.profiled[identifier] = {"path": path, "kind": "device" if identifier in DEVICES else "module", "items": hardware_profiles.items(self.raw, path)}
+            identifier, rows = self.raw[path]["typeIdentifier"], hardware_profiles.items(self.raw, path)
+            if identifier in self.profiled:
+                self.profiled[identifier]["items"] = hardware_profiles.merge(self.profiled[identifier]["items"], rows)
+            else:
+                self.profiled[identifier] = {"path": path, "kind": "device" if identifier in DEVICES else "module", "items": rows}
 
     def state(self):
         state = self.domains()
@@ -401,11 +407,19 @@ def mrp(run, interface, role, domain=None, create=False, restore=False):
 
 def ring(run):
     """The CPU 1214C has one port, so it leaves the line; an MRP domain on HwNet takes the scratch CPU as manager and HwPeerCpu and
-    the IM 155-5 PN ST as clients, then the scratch CPU's Port_1 and the IM's Port_2 close the ring."""
+    the IM 155-5 PN ST as clients, then the scratch CPU's Port_1 and the IM's Port_2 close the ring. The first client's domain join
+    and the ring closure each run once with checkpoint restore first (a partly built ring), then for real."""
     link(run, "hardware_port_disconnect", 1, pair=family_ports(run)["Hw1200"], label="Hw1200 Port_1, which cannot join the ring")
-    for index, interface in enumerate(interfaces(run)):
-        mrp(run, interface, "Manager" if index == 0 else "Client", RING, create=index == 0)
-    link(run, "hardware_port_connect", 2, pair=ring_ports(run), label="the ring (HwMp Port_2 and ScratchPLC Port_1)")
+    manager, *clients = interfaces(run)
+    mrp(run, manager, "Manager", RING, create=True)
+    run.b0 = run.current
+    mrp(run, clients[0], "Client", RING, restore=True)
+    for interface in clients:
+        mrp(run, interface, "Client", RING)
+    run.b0 = run.current
+    label = "the ring (HwMp Port_2 and ScratchPLC Port_1)"
+    link(run, "hardware_port_connect", 2, pair=ring_ports(run), label=label + ", restored", restore=True)
+    link(run, "hardware_port_connect", 2, pair=ring_ports(run), label=label)
 
 
 def topology_refusals(run):
@@ -418,6 +432,8 @@ def topology_refusals(run):
     run.refuse("network_mrp_set", "an unknown role", {"hardwarePath": scratch, "role": "Master"}, "InvalidRequest")
     run.refuse("network_mrp_set", "a module without a network interface", {"hardwarePath": module, "role": "Client"}, "UnsupportedCapability")
     run.refuse("network_mrp_set", "an absent domain without createDomain", {"hardwarePath": peer, "role": "Client", "domainName": "HwNoRing"}, "ObjectNotFound")
+    run.refuse("network_mrp_set", "a ring role on the single-port CPU 1214C", {"hardwarePath": run.path("Hw1200", "items", "Hw1200Cpu", "items", "PROFINET%20interface_1"), "role": "Client"},
+               "UnsupportedCapability")
     run.refuse("hardware_shared_device_access", "the native unassigned access", {"hardwarePath": run.path(SP.device, "items", "SpDi3"), "accessType": "Unknown"}, "InvalidRequest")
     run.refuse("hardware_shared_device_access", "a module of a CPU station", {"hardwarePath": module, "accessType": "OutsideOfProject"}, "UnsupportedCapability")
 
@@ -451,14 +467,34 @@ def address_change(run):
               added=lambda applied, state: [key for key in under(module)(applied, state) if key not in run.b0["view"]], check=mapped, restore=True)
 
 
-def gsd_probe(run):
-    """V21 Openness has no GSD installation route; record whether the installed catalog holds any GSD device (GSD: identifiers)."""
+def gsd_device(run):
+    """The project's own exported I-device GSD (designation GSD_DESIGNATION), once an operator installed it in TIA: added as an IO
+    device, put on HwNet and assigned to HwPeerIo with compile. V21 Openness cannot install a GSD file, so without it the run records
+    gsdNotInstalled, which is not a failure."""
     def search():
-        found = {text: [e for e in run.h.tool("hardware_catalog_search", {"filter": text, "maxItems": 500})["entries"] if (e.get("typeIdentifier") or "").startswith("GSD:")]
-                 for text in ("GSDML", "TiaMcpIDevice")}
-        run.h.report["gsdCatalog"] = found
-        return {text: len(rows) for text, rows in found.items()}
-    run.h.stage("search the catalog for GSD devices", search)
+        rows = [e for e in run.h.tool("hardware_catalog_search", {"filter": GSD_DESIGNATION, "maxItems": 500})["entries"] if (e.get("typeIdentifier") or "").startswith("GSD:")]
+        run.h.report["gsdCatalog"] = rows
+        return {"entries": len(rows)}
+    run.h.stage("search the catalog for the installed I-device GSD", search)
+    rows = run.h.report["gsdCatalog"]
+    if not rows:
+        run.h.report["gsdNotInstalled"] = True
+        return
+    run.expect(len(rows) == 1, "gsd", "Expected one installed I-device GSD entry: %s" % rows)
+    identifier, device, head = rows[0]["typeIdentifier"], "HwGsd", "HwGsdHead"
+    run.apply("add GSD device " + device, "hardware_add", {"typeIdentifier": identifier, "deviceName": device, "itemName": head},
+              {"effects": [{"createDevice": device, "typeIdentifier": identifier}]}, added=under(run.path(device)), deferred=True)
+    prefix = run.path(device, "items", "")
+    interface = next(key[3 + len(prefix):] for key, row in sorted(run.current["view"].items()) if key.startswith("hw:" + prefix) and (row.get("network") or {}).get("ioConnectors"))
+    node(run, device, tuple(interface.split("/items/")), "192.168.0.6", deferred=True)
+    path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
+    payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
+    generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
+    run.apply("assign %s to HwPeerCpu" % device, "network_io_assign", payload,
+              {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
+              shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
+              changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated)
+    run.h.report["gsdDevice"] = {"typeIdentifier": identifier, "hardwarePath": path}
 
 
 def network(run):
@@ -583,6 +619,7 @@ def phase_a(run):
     shared_access(run, "SpDi3", "OutsideOfProject")
     topology_refusals(run)
     ring(run)
+    gsd_device(run)
 
 
 def reopen(run):
@@ -613,7 +650,6 @@ def phase_b(run):
     mrp(run, interfaces(run)[0], "ManagerAuto", restore=True)
     shared_access(run, "SpDi3", "PLC", restore=True)
     unshare(run)
-    gsd_probe(run)
     # Last: its tag stays in the project, so the pre-change state of the replacement includes it.
     address_change(run)
 
@@ -641,6 +677,9 @@ def profiles(run):
                     run.expect(code in (None, "IncompatibleHardware"), "profiles", "Plug probe of %s at %s/%d: %s" % (identifier, rack_path, slot, code))
                     rules.append({"rack": rack_type, "positionNumber": slot, "canPlugNew": code is None,
                                   "occupiedBy": occupied.get((rack_path[len(run.base):].split("/items/")[0], slot))})
+            if not identifier.startswith("OrderNumber:") and not (entry or {}).get("version"):
+                run.h.report.setdefault("profilesSkipped", []).append(identifier)  # A versionless type needs its firmware as the profile key.
+                continue
             rows.append(hardware_profiles.profile(identifier, captured["kind"], captured["items"], entry, rules, run.h.directory.name + "/qualification.json"))
         document = hardware_profiles.contract(rows)
         (run.h.directory / "profiles.json").write_text(json.dumps(document, indent=2), encoding="utf-8")
