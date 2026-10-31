@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using System.Xml;
 using TiaMcp.Core;
 using TiaMcp.Core.DbSnapshots;
+using TiaMcp.Openness.V21;
 
 if (args.Length != 1 || Directory.Exists(args[0])) throw new ArgumentException("Fresh evidence directory required.");
 string root = Path.GetFullPath(args[0]); Directory.CreateDirectory(root); var checks = new List<string>();
@@ -38,6 +39,15 @@ Check(!(bool)DbSnapshotReview.Build(id, review, path, before, null)["summary"]![
 byte[] Utf16(string text) => Encoding.Unicode.GetPreamble().Concat(Encoding.Unicode.GetBytes(text.Replace("utf-8", "utf-16"))).ToArray();
 Check(JsonNode.DeepEquals(DbSnapshotReview.Parse(Utf16(xml)), DbSnapshotReview.Parse(before)), "UTF-16 BOM and declared encoding supported");
 Check((bool)Build(b: before)["summary"]!["originalBytesEqual"]!, "Exact byte equality reported");
+string Export(string created, string flag)
+{
+    string file = Path.Combine(root, "export-" + Guid.NewGuid().ToString("N") + ".xml");
+    File.WriteAllText(file, xml.Replace("<Engineering version=\"V21\"/>", "<Engineering version=\"V21\"/><DocumentInfo><Created>" + created + "</Created></DocumentInfo>").Replace("TRUE", flag));
+    return file;
+}
+string firstExport = Export("2026-10-31T10:00:00.0000000Z", "TRUE");
+Check(DbSnapshotXml.SameSnapshot(firstExport, Export("2026-10-31T10:00:05.0000000Z", "TRUE")), "Exports differing only in DocumentInfo/Created hold the same stored snapshot");
+Check(!DbSnapshotXml.SameSnapshot(firstExport, Export("2026-10-31T10:00:05.0000000Z", "FALSE")), "A changed stored snapshot value is detected across exports");
 Check(!(bool)Build(b: Utf16(xml))["summary"]!["originalBytesEqual"]! && (int)Build(b: Utf16(xml))["summary"]!["changedPathCount"]! == 0, "Encoding differences remain separate from values");
 var opaque = Build(b: Encoding.UTF8.GetBytes(xml.Replace("untouched", "different")));
 Check(!(bool)opaque["summary"]!["originalBytesEqual"]! && (int)opaque["summary"]!["changedPathCount"]! == 0, "Opaque changes never become whole-document equality");
