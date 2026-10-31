@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c170780116061b85fea502e55b66e8317a1397119221b24f9d74b88a4aff988c",
-      "bytes": 1436813
+      "sha256": "dc1081b4a738be96b5e2e412086660f8d5794accc56cadbabf5897ae97544961",
+      "bytes": 1443674
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -532,8 +532,8 @@
     },
     {
       "path": "contracts/safety-fparameter-allowlist.v1.json",
-      "sha256": "a44ce9c6bb82442a88334943c02bd3322b69e34a6d3e8c6ae9624948bd8a5e91",
-      "bytes": 1329
+      "sha256": "b7bc1a4bfb0102e58734726e6ce2177237dadcc1bd8a6e96c613343bfd6d7f16",
+      "bytes": 15900
     },
     {
       "path": "contracts/software-unit-review.v1.schema.json",
@@ -99890,6 +99890,20 @@
           "artifacts": [
             "evidence/local.safety_changes.20261028.json"
           ]
+        },
+        {
+          "id": "local.safety.fparameter_discovery.20261031",
+          "profileSha256": "56236e8bd2d02db2ef7b4f260d2f3ae179016775a3bb8e054e6af16e29123e01",
+          "artifacts": [
+            "evidence/local.safety.fparameter_discovery.20261031.json"
+          ]
+        },
+        {
+          "id": "local.safety_changes.allowlist.20261031",
+          "profileSha256": "6b0561e1428903b093224e1251f8685bb7df7c556d6dd743b27c3890159f35fc",
+          "artifacts": [
+            "evidence/local.safety_changes.allowlist.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -99935,6 +99949,13 @@
           "profileSha256": "f1225b9257fcb8b2ce3331799ef96fe18213fa119654a04d6606b493ad23a946",
           "artifacts": [
             "evidence/local.safety_import.device-compile.20261028.json"
+          ]
+        },
+        {
+          "id": "local.safety_changes.allowlist.20261031",
+          "profileSha256": "6b0561e1428903b093224e1251f8685bb7df7c556d6dd743b27c3890159f35fc",
+          "artifacts": [
+            "evidence/local.safety_changes.allowlist.20261031.json"
           ]
         }
       ],
@@ -115083,7 +115104,15 @@
       "sourceDependencies": [],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.safety.fparameter_discovery.20261031",
+          "profileSha256": "56236e8bd2d02db2ef7b4f260d2f3ae179016775a3bb8e054e6af16e29123e01",
+          "artifacts": [
+            "evidence/local.safety.fparameter_discovery.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -121504,9 +121533,19 @@
       "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
     },
     {
+      "path": "evidence/local.safety.fparameter_discovery.20261031.json",
+      "state": "observed",
+      "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
+    },
+    {
       "path": "evidence/local.safety_changes.20261028.json",
       "state": "observed",
       "sha256": "be47f77d600843111308847056c93bb78df683d22625890221a2315cdb6dcd8a"
+    },
+    {
+      "path": "evidence/local.safety_changes.allowlist.20261031.json",
+      "state": "observed",
+      "sha256": "f1a299e8680ab8c2900864e5ffc745636c18e4e71a507cbc4e31540c7022c2b7"
     },
     {
       "path": "evidence/local.safety_import.device-compile.20261028.json",
@@ -122252,8 +122291,16 @@
       "profileSha256": "619abb75a6897820c6e846289f62af816f4201c253e31585815bc0f764899ce8"
     },
     {
+      "id": "local.safety.fparameter_discovery.20261031",
+      "profileSha256": "56236e8bd2d02db2ef7b4f260d2f3ae179016775a3bb8e054e6af16e29123e01"
+    },
+    {
       "id": "local.safety_changes.20261028",
       "profileSha256": "7d5551c6fb3888fe5a5f92e4a27cc3687984d10f117d31af4ce97e17a5ddfa5e"
+    },
+    {
+      "id": "local.safety_changes.allowlist.20261031",
+      "profileSha256": "6b0561e1428903b093224e1251f8685bb7df7c556d6dd743b27c3890159f35fc"
     },
     {
       "id": "local.safety_import.device-compile.20261028",

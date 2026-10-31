@@ -3248,6 +3248,24 @@
         "The deny rule refuses any name containing SIL, so Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd stays unwritable by design.",
         "No safety login, password, acceptance or download; the scratch user's fail-safe access exists in the owned scratch only."
       ]
+    },
+    {
+      "id": "local.safety_changes.allowlist.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1837333015669bfb6ec260c1a0c4756dcdf51921",
+        "passedScope": "scripts/qualify_safety_changes.py on a frozen normal Debug build of 18373330 (artifacts/w2bn3, git archive; its worker embeds the allowlist derived from local.safety.fparameter_discovery.20261031), 67/67 steps, in a fresh owned scratch under TIA Portal V21: a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess (Full access including fail-safe, owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0. safety_inspect and safety_validation_inspect named the F-PLC, Main_Safety_RTG1, signatures and both F-DI, reported gaps and truncation at maxItems 1 and refused the standard PLC; safety_printout wrote a PDF matching its size and SHA-256 and refused the absent XPS printer and a bad layout. safety_fparameter_set moved one F-DI's allowlisted Failsafe_FDestinationAddress, whose preview resolved the module type to the plugged F-DI catalog entry, with checkpoint, device compile, configured-hardware preservation and save, change_status and an exact state diff limited to that F-DI; it refused a never-written attribute, a wrong expected value, a missing acknowledgement, the other F-DI's address, the read-only Failsafe_FMonitoringtime and the only declared-writable F-DI parameter the allowlist lacks (Failsafe_ManualAssignmentFIODBNumber, a never-written class) and a wrong previewHash, persisted across a fresh Portal reopen and was restored from its checkpoint into a new directory equal to the reopened state. safety_import_xml re-imported Main_Safety_RTG1 with a comment under STEP 7 Safety (device compile left every F-block consistent), refused a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash, persisted and was restored."
+      },
+      "artifacts": [
+        "evidence/local.safety_changes.allowlist.20261031.json"
+      ],
+      "limitations": [
+        "One F-CPU 1511F-1 PN with two ET 200SP F-DI 8x24VDC HF; the scratch user's fail-safe access exists in the owned scratch only.",
+        "safety_fparameter_set writes Failsafe_FDestinationAddress here; the other 76 allowlisted F-parameters rest on local.safety.fparameter_discovery.20261031 (discovery Host).",
+        "No F-logic behavior, acceptance, login, password or download; a printout or signature read does not validate or approve a safety program."
+      ]
     }
   ],
   "features": [
@@ -7691,7 +7709,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety_import.device-compile.20261028"
+          "local.safety_import.device-compile.20261028",
+          "local.safety_changes.allowlist.20261031"
         ]
       },
       "availability": {
@@ -7737,6 +7756,7 @@
         "status": "partial",
         "limitations": [
           "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
+          "2026-10-31: requalified on the allowlist build (local.safety_changes.allowlist.20261031): the F-DI's allowlisted Failsafe_FDestinationAddress moved with the preview naming the plugged F-DI catalog type, persisted across a fresh reopen and restored; the only declared-writable F-DI parameter the allowlist lacks (Failsafe_ManualAssignmentFIODBNumber, a never-written class) refused with UnsupportedAttribute.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
           "Writes only F-parameters the embedded contracts/safety-fparameter-allowlist.v1.json lists as qualified for the F-I/O's module catalog type (the F-I/O's own type identifier, else its direct parent's, and only an order number with firmware or a GSD identity; a rack never keys a row, an F-I/O without one refuses UnresolvedHardware) and the module declares readable and writable; any other declared-writable F-parameter refuses with UnsupportedAttribute naming the module type. The rows are the 77 round trips of local.safety.fparameter_discovery.20261031 over seven ET 200SP and ET 200MP module types. F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. Preservation captures every written F-parameter on every device item. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
           "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. A Host and worker built with -p:SafetyFParameterDiscovery=true (never packaged) and started with --safety-fparameter-discovery also admit declared-writable F-parameters outside the allowlist or pending in it, marked fParameterDiscovery in the preview; a native refusal there requires checkpoint recovery.",
@@ -7749,7 +7769,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.safety_changes.20261028",
-          "local.safety.fparameter_discovery.20261031"
+          "local.safety.fparameter_discovery.20261031",
+          "local.safety_changes.allowlist.20261031"
         ]
       },
       "availability": {

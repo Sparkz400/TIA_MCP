@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "341a5ff2055365052dfc1f5a465811ea7ab4d59bdbc3246f1c63b6a9bcc6faf7",
+    "catalogSha256": "dc1081b4a738be96b5e2e412086660f8d5794accc56cadbabf5897ae97544961",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -4595,49 +4595,56 @@
         "D14"
       ],
       "evidenceIds": [
-        "local.safety_import.device-compile.20261028"
+        "local.safety_import.device-compile.20261028",
+        "local.safety_changes.allowlist.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.device-compile.20261028"
+            "local.safety_import.device-compile.20261028",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.device-compile.20261028"
+            "local.safety_import.device-compile.20261028",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.device-compile.20261028"
+            "local.safety_import.device-compile.20261028",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.device-compile.20261028"
+            "local.safety_import.device-compile.20261028",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.device-compile.20261028"
+            "local.safety_import.device-compile.20261028",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_import.device-compile.20261028"
+            "local.safety_import.device-compile.20261028",
+            "local.safety_changes.allowlist.20261031"
           ]
         }
       ]
@@ -4658,7 +4665,8 @@
       ],
       "evidenceIds": [
         "local.safety_changes.20261028",
-        "local.safety.fparameter_discovery.20261031"
+        "local.safety.fparameter_discovery.20261031",
+        "local.safety_changes.allowlist.20261031"
       ],
       "cells": [
         {
@@ -4666,7 +4674,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.safety_changes.20261028",
-            "local.safety.fparameter_discovery.20261031"
+            "local.safety.fparameter_discovery.20261031",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
@@ -4674,7 +4683,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.safety_changes.20261028",
-            "local.safety.fparameter_discovery.20261031"
+            "local.safety.fparameter_discovery.20261031",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
@@ -4682,7 +4692,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.safety_changes.20261028",
-            "local.safety.fparameter_discovery.20261031"
+            "local.safety.fparameter_discovery.20261031",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
@@ -4690,7 +4701,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.safety_changes.20261028",
-            "local.safety.fparameter_discovery.20261031"
+            "local.safety.fparameter_discovery.20261031",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
@@ -4698,7 +4710,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.safety_changes.20261028",
-            "local.safety.fparameter_discovery.20261031"
+            "local.safety.fparameter_discovery.20261031",
+            "local.safety_changes.allowlist.20261031"
           ]
         },
         {
@@ -4706,7 +4719,8 @@
           "status": "bound",
           "evidenceIds": [
             "local.safety_changes.20261028",
-            "local.safety.fparameter_discovery.20261031"
+            "local.safety.fparameter_discovery.20261031",
+            "local.safety_changes.allowlist.20261031"
           ]
         }
       ]
@@ -26406,6 +26420,21 @@
         {
           "path": "evidence/local.safety_changes.20261028.json",
           "sha256": "be47f77d600843111308847056c93bb78df683d22625890221a2315cdb6dcd8a"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety_changes.allowlist.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "1837333015669bfb6ec260c1a0c4756dcdf51921",
+      "retained": [
+        {
+          "path": "evidence/local.safety_changes.allowlist.20261031.json",
+          "sha256": "f1a299e8680ab8c2900864e5ffc745636c18e4e71a507cbc4e31540c7022c2b7"
         }
       ],
       "notRetained": []
