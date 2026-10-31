@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c2c414fa38c801f6b6c33897354ef8bd6fbec4bce4b59098cd7bdca868a867e8",
-      "bytes": 1438146
+      "sha256": "10b5a721de1442e2d30022b7aee60c17308f3b20c51c0370c1cce453381c5243",
+      "bytes": 1438761
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2402,8 +2402,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiTextListImportRules.cs",
-      "sha256": "43df7cf6a900707662617e89900ae96d10f0eb0274116a523d401c8305421626",
-      "bytes": 33819
+      "sha256": "66c07f20374a99e73ab2ec6b3f7a6034e1760296ee9daa953c8c4cd30634913e",
+      "bytes": 34685
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs",
@@ -122365,7 +122365,7 @@
     {
       "path": "evidence/local.hmi.text-list-import.interruption.20261031.json",
       "state": "observed",
-      "sha256": "1047ac859f202845fc3b2758050469aca9521c7395d71f52be3f15d946f8801f"
+      "sha256": "0a42b9caea26b4b5d4e862ef24ba32928b002a3f0ac15003c64a711ac49c2833"
     },
     {
       "path": "evidence/local.hostonly.access-review.rerun.20261028.json",
