@@ -204,7 +204,10 @@ class Run(StateRun):
             return {"keys": len(taken["view"])}
         self.h.stage("snapshot " + label, take)
         (destination / "state.json").write_text(json.dumps(taken["view"], indent=1), encoding="utf-8")
-        self.collect()
+        try:
+            self.collect()
+        except ValueError as error:  # A profile-capture gap fails the run, or is recorded by a discovery pass.
+            self.expect(False, "profiles", "Profile capture after %s: %s" % (label, error))
         return {"view": taken["view"]}
 
     def path(self, *parts):

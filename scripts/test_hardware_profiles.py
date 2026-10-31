@@ -52,6 +52,12 @@ class ProfileTests(unittest.TestCase):
         raw_items = {DI: raw(DI, "Di", "OrderNumber:X/V1.0"), DI + "/items/Di": raw(DI + "/items/Di", "Di"), DI + "/items/Di/items/Di_P": raw(DI + "/items/Di/items/Di_P", "Di_P")}
         self.assertEqual(["", "items/{module}", "items/{module}/items/Di_P"], [row["relativePath"] for row in hp.items(raw_items, DI)])
 
+    def test_ports_on_a_sibling_item_are_named_below_the_device(self):
+        head = BASE + "Sp/items/Head"
+        raw_items = {head: raw(head, "Head", "OrderNumber:IM/V6.4"), head + "/items/PN": raw(head + "/items/PN", "PN", network={"interfaceType": "Ethernet", "nodes": [],
+                     "ports": [{"port": {"ownerHardwarePath": BASE + "Sp/items/BA%202xRJ45/items/Port_1"}}, {"port": {"resolution": "unresolved"}}]})}
+        self.assertEqual(["device:items/BA%202xRJ45/items/Port_1", "unresolved"], hp.items(raw_items, head)[1]["interface"]["ports"])
+
     def test_merge_unions_rows_and_prefers_writable(self):
         first = hp.items(self.items(), DI)
         second = [dict(row, attributes=[{"name": "Comment", "accessMode": "Read", "type": None}, {"name": "Flag", "accessMode": "ReadWrite", "type": "System.Boolean"}])

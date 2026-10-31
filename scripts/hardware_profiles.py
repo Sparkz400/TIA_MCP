@@ -29,6 +29,12 @@ def items(raw, root):
             raise ValueError("%s is outside the profiled module %s" % (path, root))
         parts = path[len(root) + 1:].split("/") if path != root else []
         return "/".join("{module}" if index % 2 and part == module else part for index, part in enumerate(parts))
+
+    def port(path):
+        # An interface's ports may sit on a sibling item (the ET 200SP head's BusAdapter): those are named below the device.
+        if not path:
+            return "unresolved"
+        return relative(path) if path == root or path.startswith(root + "/") else "device:" + path.split("/devices/", 1)[1].split("/", 1)[1]
     rows = []
     for path in sorted(path for path in raw if path == root or path.startswith(root + "/")):
         item, network = raw[path], raw[path].get("network")
@@ -38,7 +44,7 @@ def items(raw, root):
                      "channels": [{"type": channel["type"], "ioType": channel["ioType"], "number": channel["number"], "attributes": attributes(channel.get("attributes"))}
                                   for channel in item.get("channels") or []],
                      "interface": None if not network else {"interfaceType": network.get("interfaceType"), "nodes": [node.get("name") for node in network.get("nodes", [])],
-                                                            "ports": [relative(row["port"]["ownerHardwarePath"]) for row in network.get("ports", [])]}})
+                                                            "ports": [port((row.get("port") or {}).get("ownerHardwarePath")) for row in network.get("ports", [])]}})
     if not rows or rows[0]["relativePath"] != "":
         raise ValueError("No raw hardware_inspect item for the profiled module " + root)
     return rows
