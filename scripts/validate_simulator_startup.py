@@ -57,7 +57,8 @@ def main():
         extra = ['--artifacts', str(workspace)]
         if args.sim_worker:
             extra += ['--sim-worker', str(args.sim_worker.resolve())]
-        client = Client(args.host, 120, extra)
+        # The Host refuses a powerOn whose 60 s timeout and failure powerOff cannot end inside its bridge timeout.
+        client = Client(args.host, 300, extra)
         audit = StartupAudit(client, report['steps'], persist)
         client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "tia-simulator-startup-validation", "version": "0.2.0"}})
         client.notify("notifications/initialized")

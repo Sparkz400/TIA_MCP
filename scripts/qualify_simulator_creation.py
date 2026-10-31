@@ -29,7 +29,8 @@ def main():
         save_json(args.report, report)
 
     def connect():
-        client = Client(args.host.resolve(), 60, ['--sim-worker', str(args.sim_worker.resolve()),
+        # The Host refuses a powerOn whose 60 s timeout and failure powerOff cannot end inside its bridge timeout.
+        client = Client(args.host.resolve(), 300, ['--sim-worker', str(args.sim_worker.resolve()),
                         '--artifacts', str(args.artifacts.resolve())])
         clients.append(client)
         client.request('initialize', {'protocolVersion': '2025-11-25', 'capabilities': {},

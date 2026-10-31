@@ -1227,7 +1227,7 @@ namespace TiaMcp.Openness.V21
         {
             var mode = configuration.Modes.Find("PN/IE");
             if (mode == null || network != "TCPIP") return mode?.PcInterfaces.Find("PLCSIM", 1);
-            var adapters = mode.PcInterfaces.Where(pc => (pc.Name ?? "").IndexOf("PLCSIM Virtual Ethernet Adapter", StringComparison.OrdinalIgnoreCase) >= 0).Take(2).ToArray();
+            var adapters = mode.PcInterfaces.Where(pc => SimulationNetworkAdmission.PlcsimAdapter(pc.Name)).Take(2).ToArray();
             return adapters.Length == 1 ? adapters[0] : null;
         }
 

@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using TiaMcp.Simulation;
 
 namespace TiaMcp.Core.PhysicalRuntime;
 
@@ -97,12 +98,18 @@ public static class PlcsimTargetBindings
     public static bool Covers(PlcsimTargetBinding binding, string endpoint) => binding.CommunicationInterface == "TCPIP" &&
         Uri.TryCreate(endpoint, UriKind.Absolute, out var uri) && uri.HostNameType == UriHostNameType.IPv4 && binding.ControllerAddresses.Contains(uri.Host, StringComparer.Ordinal);
 
-    public static void RequireEndpoint(PlcsimTargetBinding binding, string endpoint)
+    /// <summary>The address alone is not the target: a physical PLC with the same address behind another network card would receive it.
+    /// routeAdapter describes the interface Windows' best route to the endpoint address leaves through, null when undetermined.</summary>
+    public static void RequireEndpoint(PlcsimTargetBinding binding, string endpoint, string? routeAdapter)
     {
         if (binding.CommunicationInterface != "TCPIP") throw new BridgeException("PlcsimEndpointUnreachable",
             "The bound owned PLCSIM instance is not on PLCSIM's TCP/IP network (Softbus, or a binding retained before the interface was recorded), so no network endpoint reaches it. Bind a TCPIP instance; nothing was sent.");
         if (!Covers(binding, endpoint)) throw new BridgeException("RuntimeTargetNotOwnedPlcsim",
             "The connected endpoint is not a controller address of the bound owned PLCSIM instance. Writes and control are refused for physical PLCs and unbound targets; nothing was sent.");
+        if (routeAdapter is null) throw new BridgeException("RuntimeTargetRouteUnverified",
+            "The network adapter Windows routes the endpoint address through could not be determined. Writes and control are refused; nothing was sent.");
+        if (!SimulationNetworkAdmission.PlcsimAdapter(routeAdapter)) throw new BridgeException("RuntimeTargetNotOwnedPlcsim",
+            "Windows routes the endpoint address through a network adapter other than the PLCSIM Virtual Ethernet Adapter, where a physical PLC can hold the same address. Writes and control are refused; nothing was sent.");
     }
 
     public static void RequireSameInstance(PlcsimTargetBinding recorded, PlcsimTargetBinding current)

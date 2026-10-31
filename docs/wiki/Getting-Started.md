@@ -25,7 +25,9 @@ Requirements:
   The default Softbus mode needs no network setup and covers simulation, download, online compare and upload.
   - Only the runtime OPC UA and web tools against PLCSIM need TCP/IP: set PLCSIM *Online Access* to the
     PLCSIM Virtual Ethernet Adapter with a static address, and create the instance with
-    `communicationInterface: "TCPIP"` at `sim_create` ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md#loading-an-engineering-program))
+    `communicationInterface: "TCPIP"` at `sim_create` ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md#loading-an-engineering-program)).
+    Runtime writes and RUN/STOP also need Windows to route the instance's address through that adapter, so give
+    it an address in the instance's subnet ([owned PLCSIM writes](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-runtime-sessions.md#owned-plcsim-writes-and-runstop))
 - .NET 10 SDK and .NET Framework 4.8 reference assemblies
 - PowerShell 7, Python 3.13 and Node.js 24 for the development checks
 

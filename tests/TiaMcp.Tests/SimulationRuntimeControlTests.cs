@@ -148,18 +148,29 @@ internal static class SimulationRuntimeControlTests
             Check.Equal(true, start >= 0 && guard > start && call > guard);
         }
         string session = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Simulator.V8", "SimulatorSession.cs"));
-        Check.Equal(true, System.Text.RegularExpressions.Regex.IsMatch(session, @"case ""memoryReset"": RequireOwned\(selected\); EnsureAdmitted\(selected\); selected\.Instance\.MemoryReset\("));
-        // Batch and area writes: owned and admitted before the write; reads and observation call no write, state or mode change.
         string signals = File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Simulator.V8", "SimulatorSession.Signals.cs"));
-        string Body(string method) { int start = signals.IndexOf(method, StringComparison.Ordinal); Check.Equal(true, start >= 0); int end = signals.IndexOf("\n        private ", start + 1, StringComparison.Ordinal); return signals[start..(end < 0 ? signals.Length : end)]; }
+        string Body(string text, string method) { int start = text.IndexOf(method, StringComparison.Ordinal); Check.Equal(true, start >= 0); int end = text.IndexOf("\n        private ", start + 1, StringComparison.Ordinal); return text[start..(end < 0 ? text.Length : end)]; }
+        // Every sim_state action and sim_write: owned first; state changes also wait for a held capture mode to end.
+        string state = Body(session, "JObject State(");
+        int stateGuard = state.IndexOf("RequireOwned(selected);\n            RequireNoCapture(selected);", StringComparison.Ordinal);
+        foreach (string call in new[] { "Instance.PowerOn(", "Instance.PowerOff(", "Instance.Run(", "Instance.Stop(", "Instance.MemoryReset(" })
+            Check.Equal(true, stateGuard > 0 && state.IndexOf(call, StringComparison.Ordinal) > stateGuard);
+        string writer = Body(session, "JObject Write(");
+        Check.Equal(true, writer.IndexOf("RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var writeGuard && writer.IndexOf("ApplyWrites(", StringComparison.Ordinal) > writeGuard);
+        // sim_test: any step with writes demands ownership before the first runtime call; a non-delete release never ends a held capture.
+        string scenario = Body(session, "JObject Test(");
+        Check.Equal(true, scenario.IndexOf("item[\"writes\"] != null) == true) RequireOwned(selected);", StringComparison.Ordinal) is > 0 and var first &&
+            first < scenario.IndexOf("EnsureAdmitted(selected)", StringComparison.Ordinal) && first < scenario.IndexOf("ApplyWrites(", StringComparison.Ordinal));
+        Check.Equal(true, Body(session, "JObject Release(").Contains("else RequireNoCapture(selected);", StringComparison.Ordinal));
+        // Batch and area writes: owned and admitted before the write; reads and observation call no write, state or mode change.
         foreach (var (method, write) in new[] { ("JObject SignalsWrite(", "Instance.WriteSignals("), ("JObject AreaWrite(", "area.WriteBytes("), ("JObject AreaWrite(", "area.WriteBit(") })
         {
-            string body = Body(method);
+            string body = Body(signals, method);
             int owned = body.IndexOf("RequireOwned(selected);\n            EnsureAdmitted(selected);", StringComparison.Ordinal), call = body.IndexOf(write, StringComparison.Ordinal);
             Check.Equal(true, owned > 0 && call > owned);
         }
         foreach (string method in new[] { "JObject SignalsRead(", "JObject AreaRead(", "JObject Observe(" })
-            Check.Equal(false, System.Text.RegularExpressions.Regex.IsMatch(Body(method), @"\.Write|\.Run\(|\.Stop\(|\.Power|OperatingMode\s*=|MemoryReset"));
+            Check.Equal(false, System.Text.RegularExpressions.Regex.IsMatch(Body(signals, method), @"\.Write|\.Run\(|\.Stop\(|\.Power|OperatingMode\s*=|MemoryReset"));
         return Task.CompletedTask;
     }
 }

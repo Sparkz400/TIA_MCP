@@ -204,6 +204,8 @@ namespace TiaMcp.Simulator.V8
         private JObject State(JObject args)
         {
             var selected = Get(args);
+            RequireOwned(selected);
+            RequireNoCapture(selected);
             string action = RequiredString(args, "action", 16);
             uint timeout = (uint)OptionalInteger(args, "timeoutMs", 30000, 1000, 60000);
             string resultCode = null;
@@ -223,15 +225,15 @@ namespace TiaMcp.Simulator.V8
                     if (status != ERuntimeErrorCode.OK && status != ERuntimeErrorCode.WarningAlreadyExists)
                     {
                         // Do not continue after a rejected power-on result, including protection or license warnings.
-                        if (selected.Owned) { try { selected.Instance.PowerOff(timeout); } catch { } }
+                        try { selected.Instance.PowerOff(timeout); } catch { }
                         throw SimulationPowerOnFailure.Create(resultCode, Info(selected));
                     }
                     break;
                 case "powerOff": selected.Instance.PowerOff(timeout); break;
                 case "run": EnsureAdmitted(selected); selected.Instance.Run(timeout); break;
                 case "stop": selected.Instance.Stop(timeout); break;
-                // Restarts the virtual controller with its loaded program; only an owned instance.
-                case "memoryReset": RequireOwned(selected); EnsureAdmitted(selected); selected.Instance.MemoryReset(timeout); break;
+                // Restarts the virtual controller with its loaded program.
+                case "memoryReset": EnsureAdmitted(selected); selected.Instance.MemoryReset(timeout); break;
                 default: throw new SimulatorException("InvalidRequest", "action must be powerOn, powerOff, run, stop or memoryReset.");
             }
             var observed = selected.Instance.OperatingState;
@@ -278,6 +280,7 @@ namespace TiaMcp.Simulator.V8
         private JObject Write(JObject args)
         {
             var selected = Get(args);
+            RequireOwned(selected);
             EnsureAdmitted(selected);
             var writes = Signals(args["writes"], true);
             var result = Envelope(selected);
@@ -439,7 +442,7 @@ namespace TiaMcp.Simulator.V8
                     SimulationCreationJournal.Save(selected.CreationRoot, selected.CreationReceipt);
                 }
             }
-            else RestoreCaptureMode(selected);
+            else RequireNoCapture(selected);
             selected.Instance.Dispose();
             _instances.Remove(selected.Id);
             return new JObject { ["instanceId"] = selected.Id, ["instanceName"] = selected.Name, ["unregistered"] = remove,
@@ -449,6 +452,8 @@ namespace TiaMcp.Simulator.V8
         private JObject Test(JObject args)
         {
             var selected = Get(args);
+            // Scenario writes change the instance: only an owned one, refused before any other check.
+            if ((args["steps"] as JArray)?.Any(step => step is JObject item && item["writes"] != null) == true) RequireOwned(selected);
             EnsureAdmitted(selected);
             if (selected.Instance.OperatingState != EOperatingState.Run)
                 throw new SimulatorException("SimulationNotRunning", "Start the selected simulated CPU before running a scenario.");

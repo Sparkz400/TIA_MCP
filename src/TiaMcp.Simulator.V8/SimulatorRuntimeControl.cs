@@ -27,7 +27,7 @@ namespace TiaMcp.Simulator.V8
             {
                 RequireOwned(selected);
                 EnsureAdmitted(selected);
-                if (selected.CaptureRestoreMode != null) throw new SimulatorException("SimulationCaptureModeActive", "A cycle-synchronous capture or virtual-time scenario holds this instance.");
+                RequireNoCapture(selected);
                 if (factor != null) selected.Instance.ScaleFactor = factor.Value;
                 if (time != null) selected.Instance.SystemTime = time.Value;
             }
@@ -184,6 +184,12 @@ namespace TiaMcp.Simulator.V8
         private static void RequireOwned(Selection selected)
         {
             if (!selected.Owned) throw new SimulatorException("OwnedInstanceRequired", "Only an instance this worker created or adopted can be changed by this operation.");
+        }
+
+        // A held operating mode is restored only by its capture's end or the worker's shutdown, never from under it.
+        private static void RequireNoCapture(Selection selected)
+        {
+            if (selected.CaptureRestoreMode != null) throw new SimulatorException("SimulationCaptureModeActive", "A cycle-synchronous capture or virtual-time scenario holds this instance.");
         }
 
         private static T Control<T>(Func<T> parse)
