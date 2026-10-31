@@ -147,7 +147,11 @@ internal static partial class Program
         Persist();
         OwnedPortal("fixture", portal => SeedTextListFixture(portal, typeName, "TiaMcpTf_", out _, runtimeLanguages: true).Close());
         Report["cleanup"] = "owned-portals-exited";
-        Report["completed"] = Report["checkpoint"] != null && ((JArray)Report["portals"]).All(row => row.Value<bool?>("exitVerified") == true);
+        // Every project language must be enabled for runtime with a readable Order, or the route fixture is unusable.
+        bool languagesReady = Report["runtimeLanguages"] is JArray languages && languages.Count > 0 &&
+            languages.All(row => row.Value<bool?>("enable") == true && !string.IsNullOrEmpty(row.Value<string>("order")) && row["error"] == null);
+        Report["runtimeLanguagesReady"] = languagesReady;
+        Report["completed"] = languagesReady && Report["checkpoint"] != null && ((JArray)Report["portals"]).All(row => row.Value<bool?>("exitVerified") == true);
         Persist();
         Console.WriteLine(new JObject { ["report"] = Path.Combine(Output, "native-report.json"), ["completed"] = Report["completed"] }.ToString(Newtonsoft.Json.Formatting.None));
         return Report.Value<bool>("completed") ? 0 : 1;

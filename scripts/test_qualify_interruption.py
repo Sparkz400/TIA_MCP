@@ -63,6 +63,15 @@ class InterruptionMatrixTests(unittest.TestCase):
         for terminal in ({"state": "applied", "stages": ["changed_project_saved"]}, {"state": "prepared"}, {}):
             self.assertFalse(any(trigger(terminal) for trigger, _ in q.TEXT_LIST_POINTS.values()), terminal)
 
+    def test_text_list_applied_stages_pass_every_boundary_once(self):
+        stages = q.TEXT_LIST_APPLIED_STAGES
+        hit = set()
+        for n in range(len(stages) + 1):
+            journal = {"state": "applying", "stages": stages[:n]}
+            hit |= {p for p, (trigger, m) in q.TEXT_LIST_POINTS.items() if m == "worker" and trigger(journal)}
+        self.assertEqual({"mut", "imp", "read", "comp", "save"}, hit)
+        self.assertFalse(any(trigger({"state": "applied", "stages": stages}) for trigger, _ in q.TEXT_LIST_POINTS.values()))
+
     def test_text_list_scenarios_run_on_the_qualification_host(self):
         self.assertEqual(["--hmi-text-list-qualification", "unified-comfort"], q.text_list_host_arguments())
 

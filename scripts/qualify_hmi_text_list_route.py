@@ -234,11 +234,16 @@ def run_profile(args, profile, base, report):
             gate(result["state"] == "applied" and {"hmi_text_lists_read_back_exactly", "hmi_unrelated_content_preserved", "changed_project_saved"} <= set(stages),
                  "Applied with exact readback, preserved HMI content and save: " + label, {"state": result["state"], "stages": stages, "failure": result.get("failure")})
             gate(result["hmiEvidence"]["importReadback"]["exact"] is True, "Worker import readback exact: " + label)
-            # A replay either returns the recorded outcome or is refused; it never imports again (journal stages unchanged).
+            # The worker admits a same-key replay of an applied change as an idempotent readback (SharedMutationResolve
+            # returnedApply) and returns the recorded view; any other key is refused RecoveryRequired before admission.
             again = decoded(client.raw_tool("change_apply", apply_arguments(prepared, key)))
+            other = decoded(client.raw_tool("change_apply", apply_arguments(prepared)))
             journal = json.loads(pathlib.Path(result["journalPath"]).read_text(encoding="utf-8"))
-            gate((again.get("state") == "applied" and again.get("stages") == stages or "error" in again) and journal["stages"] == stages and journal["state"] == "applied",
-                 "Replay with the same key never imports again: " + label, again.get("error") or again.get("state"))
+            row.setdefault("replays", []).append({"label": label, "sameKey": "recordedOutcome" if "error" not in again else again["error"].get("code"),
+                                                  "otherKey": (other.get("error") or {}).get("code") or other.get("state")})
+            gate("error" not in again and again.get("state") == "applied" and again.get("stages") == stages and journal["stages"] == stages and journal["state"] == "applied",
+                 "Replay with the same key returns the recorded outcome without a second import: " + label, again.get("error") or again.get("state"))
+            gate((other.get("error") or {}).get("code") == "RecoveryRequired", "Another key for the applied change is refused RecoveryRequired: " + label, other.get("error") or other.get("state"))
             after = native_lists(client, device)
             outcome = evaluate_import(before, after, candidate, True)
             gate(outcome["outcome"] == "exact", "Independent oracle: candidate lists exact, other lists unchanged: " + label,
@@ -254,6 +259,9 @@ def run_profile(args, profile, base, report):
                 # uncompiled baseline difference is recorded (the worker compares each import with its compiled capture).
                 reference_nodes = typed_nodes(client, device)
                 row["compileChangedTypedNodes"] = sorted(p for p in set(reference_nodes) | set(baseline_nodes) if reference_nodes.get(p) != baseline_nodes.get(p))
+                if result["hmiEvidence"].get("baselineCompileChangedCapture") is False:
+                    gate(row["compileChangedTypedNodes"] == [], "The compile left the capture unchanged, so no typed node outside the text lists changed",
+                         row["compileChangedTypedNodes"])
         gate(typed_nodes(client, device) == reference_nodes, "Every typed HMI node outside the text lists is unchanged by all later imports")
 
         # 3. Restore the last import's checkpoint into a new directory; the saved original keeps the last state.

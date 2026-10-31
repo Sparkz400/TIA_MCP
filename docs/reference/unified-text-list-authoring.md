@@ -230,6 +230,13 @@ or `unified-pc` admits that profile, in a project its own worker retrieved or cr
 - An interrupted apply is never replayed. Worker loss before the save releases the unchanged
   project; a lost save or a Host loss holds the admission for review
   (`engineering_admission_reconcile`).
+- A project language that is not enabled for runtime is refused with
+  `HmiPreservationUnavailable`: V21 throws `EngineeringTargetInvocationException` from its
+  `HmiLanguageAndFont.Order`, which the capture records as a typed read error. Enable every
+  project language in the HMI's runtime settings before importing.
+- The compiler comparison counts problems by state, text and path; it does not compare which
+  object (tree container) a problem is listed under, because V21 nests the same problems
+  differently from one compile to the next.
 
 Native status (31 October): interruption at every boundary passed on Unified Comfort; the route
 runner has not passed yet ([record](../verification/hmi-text-list-route-20261031.md)).

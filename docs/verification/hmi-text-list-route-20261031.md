@@ -40,13 +40,15 @@ seeded fixtures are created natively: `MTP700 Unified Comfort` and `WinCC Unifie
 - `tx1` (`eaf282c`): both profiles stopped at the first prepare with `HmiPreservationUnavailable`. In the
   fixture, de-DE is a project language but is not enabled for runtime. V21 then throws
   `EngineeringTargetInvocationException` from `HmiLanguageAndFont.Order` (`runtimeSettings/languageAndFonts/German (Germany)`).
-  The capture correctly refuses this as a typed read error. Fix `c619140`: the route fixture enables every
-  project language for runtime (Order 0 and 1 read back).
+  The capture correctly refuses this as a typed read error. Fixture change `c619140`: the route fixture
+  enables every project language for runtime (Order 0 and 1 read back). Projects in that state stay refused;
+  the code was not changed for it.
 - `tx2` (`c619140`): both profiles imported the first candidate and read it back exactly. Apply then failed
   `CompileFailed`. The first compile of the retrieved fixture lists the two encrypted-transfer password errors
   flat, under a `Success` summary row. The compile after the import nests the same errors under
-  `Runtime settings`, with container rows and an `Error` summary row. Fix `1121bb8`: only problem rows with text
-  are compared, and the closing summary row is excluded. The Host-loss scenarios of `ti1` ran this build through
+  `Runtime settings`, with container rows and an `Error` summary row. Compile rule fixed in `1121bb8`: only
+  problem rows with text are compared, and the closing summary row is excluded. A later offline revision also
+  requires both summary rows to match (digits ignored) and refuses an empty-text row that is no container. The Host-loss scenarios of `ti1` ran this build through
   the save.
 
 ## Still open

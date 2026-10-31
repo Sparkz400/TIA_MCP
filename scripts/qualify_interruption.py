@@ -91,6 +91,9 @@ POINTS = {
 _COMPILING = lambda j: j.get("state") == "applying" and "hmi_baseline_compiled" not in stages(j) and "mutation_applied" not in stages(j)
 _IMPORTING = lambda j: j.get("state") == "applying" and "hmi_text_list_import_started" in stages(j) and "hmi_text_list_import_returned" not in stages(j)
 _READING = lambda j: j.get("state") == "applying" and "hmi_text_list_import_returned" in stages(j) and "mutation_applied" not in stages(j)
+TEXT_LIST_APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created", "hmi_baseline_compiled", "hmi_text_list_import_started",
+                            "hmi_text_list_import_returned", "hmi_text_lists_read_back_exactly", "mutation_applied", "compile_finished",
+                            "hmi_unrelated_content_preserved", "changed_project_saved"]  # As journaled by a complete apply (run artifacts/ti1).
 TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp": (_IMPORTING, "worker"), "read": (_READING, "worker"), "comp": POINTS["comp"],
                     "save": POINTS["save"], "hckp": (POINTS["ckpt"][0], "host"), "himp": (_IMPORTING, "host"), "hred": (_READING, "host"), "hsav": (POINTS["save"][0], "host")}
 
@@ -383,6 +386,10 @@ class Scenario:
         require(persisted == expected["effectPersisted"], f"Independent read found effectPersisted={persisted}")
         self.report.update({"effectPersisted": persisted, "checkpointRecovered": bool(archive_hash) and expected["released"],
                             "journalStagesAtEnd": stages(final), "journalStateAtEnd": final.get("state")})
+        if prefix == "tl" and mode == "host":
+            # After Host loss the worker finishes alone: the journal must end applied with every stage of a complete import.
+            require(final.get("state") == "applied" and stages(final) == TEXT_LIST_APPLIED_STAGES,
+                    f"The worker did not complete the text-list apply after Host loss: {final.get('state')} {stages(final)}")
         self.report["passed"] = True
         return self.report
 

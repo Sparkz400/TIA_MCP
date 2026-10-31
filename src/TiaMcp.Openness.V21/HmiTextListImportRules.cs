@@ -142,33 +142,44 @@ namespace TiaMcp.Model
 
         /// <summary>V21 fixtures keep encrypted-transfer password errors (no public setter), so the import must leave the HMI device's
         /// complete Error/Warning diagnostics exactly as the compile before it found them; Information rows depend on the previous compile.
-        /// Only problem rows with text count: the tree's container rows (empty text, state of their children) and the closing summary
-        /// row (last root row, "Compiling finished (errors: n; warnings: m)") change with the compile's shape. Run artifacts/tx2: the first
-        /// compile of a retrieved fixture lists the two password errors flat with a Success summary, the compile after the import nests
-        /// the same two errors under "Runtime settings" with an Error summary.</summary>
+        /// The tree's shape changes with the compile (run artifacts/tx2: the first compile of a retrieved fixture lists the two password
+        /// errors flat under a Success summary, the compile after the import nests them under "Runtime settings" under an Error summary).
+        /// So problem rows count by state, text and path only; which container (object) a problem sits under is not compared. An
+        /// empty-text row is skipped only as a container (the next row is deeper); the closing summary row (last root row) must match
+        /// with every digit run replaced by '#', so a trailing root error cannot pass as the summary. Anything else refuses.</summary>
         internal static bool CompileProblemsUnchanged(JObject before, JObject after)
         {
             var b = Problems(before); var a = Problems(after);
             return b != null && a != null && b.SequenceEqual(a, StringComparer.Ordinal);
         }
 
+        // Sorted problem rows plus one normalized summary row per target; null for an incomplete or unknown tree.
         private static string[] Problems(JObject compilation)
         {
             var targets = compilation?["targets"] as JArray;
             if (compilation?["error"] != null || targets == null || targets.Count == 0) return null;
-            var rows = new List<string>();
+            var rows = new List<string>(); var summaries = new List<string>();
             foreach (var target in targets.OfType<JObject>())
             {
                 if (target["error"] != null || target["messagesTruncated"]?.Type != JTokenType.Boolean || target.Value<bool>("messagesTruncated") || !(target["messages"] is JArray messages)) return null;
                 var list = messages.OfType<JObject>().ToList();
                 int summary = list.FindLastIndex(m => m.Value<int?>("depth") == 0);
-                if (summary < 0 || summary != list.Count - 1) return null; // No closing summary row: unknown tree shape.
-                foreach (var message in list.Take(summary))
-                    if ((message.Value<string>("state") == "Error" || message.Value<string>("state") == "Warning") && !string.IsNullOrEmpty(message.Value<string>("description")))
-                        rows.Add(new JArray(target.Value<string>("target"), message.Value<string>("state"), message.Value<string>("description"), message.Value<string>("path")).ToString(Formatting.None));
+                if (summary < 0 || summary != list.Count - 1 || string.IsNullOrEmpty(list[summary].Value<string>("description"))) return null;
+                summaries.Add(new JArray(target.Value<string>("target"), Regex.Replace(list[summary].Value<string>("description"), "[0-9]+", "#")).ToString(Formatting.None));
+                for (int i = 0; i < summary; i++)
+                {
+                    var message = list[i];
+                    if (message.Value<string>("state") != "Error" && message.Value<string>("state") != "Warning") continue;
+                    if (string.IsNullOrEmpty(message.Value<string>("description")))
+                    {
+                        if (list[i + 1].Value<int?>("depth") > message.Value<int?>("depth")) continue; // A container: its state mirrors its children.
+                        return null;
+                    }
+                    rows.Add(new JArray(target.Value<string>("target"), message.Value<string>("state"), message.Value<string>("description"), message.Value<string>("path")).ToString(Formatting.None));
+                }
             }
             rows.Sort(StringComparer.Ordinal);
-            return rows.ToArray();
+            return rows.Concat(summaries).ToArray();
         }
 
         private static JToken EntryValue(string field, object node)

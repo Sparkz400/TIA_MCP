@@ -110,6 +110,20 @@ static class TextListImportTests
             Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, added), "an added error refuses");
             var noSummary = Tree((0, "Error", confirm, null), (0, "Error", concept, null), (1, "Information", "x", null));
             Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, noSummary), "a tree without its closing summary row refuses");
+            var trailing = Tree((0, "Error", confirm, null), (0, "Error", concept, null), (0, "Error", "Text list X is invalid.", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, trailing), "a trailing root error cannot pass as the summary");
+            var promoted = Tree((0, "Error", "", "HmiDevice_A"), (1, "Error", "", "Runtime settings"), (2, "Warning", confirm, null), (2, "Error", concept, null),
+                (0, "Error", "Compiling finished (errors: 1; warnings: 1)", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, promoted) && !HmiTextListImportRules.CompileProblemsUnchanged(promoted, nested), "Warning and Error with the same text differ");
+            var duplicated = Tree((0, "Error", "", "HmiDevice_A"), (1, "Error", "", "Runtime settings"), (2, "Error", confirm, null), (2, "Error", confirm, null), (2, "Error", concept, null),
+                (0, "Error", "Compiling finished (errors: 3; warnings: 0)", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, duplicated), "a duplicated problem row refuses");
+            var emptyLeaf = Tree((0, "Error", "", "HmiDevice_A"), (1, "Error", "", "Runtime settings"), (2, "Error", confirm, null), (2, "Error", concept, null), (1, "Error", "", "Text lists"),
+                (0, "Error", "Compiling finished (errors: 2; warnings: 0)", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, emptyLeaf), "an Error row without text that is no container refuses");
+            var otherSummary = Tree((0, "Error", "", "HmiDevice_A"), (1, "Error", "", "Runtime settings"), (2, "Error", confirm, null), (2, "Error", concept, null),
+                (0, "Error", "Compilation aborted (errors: 2)", null));
+            Assert(!HmiTextListImportRules.CompileProblemsUnchanged(flat, otherSummary), "a different summary row refuses");
             JObject Compile(params (string State, string Text)[] rows) => Tree(rows.Select(r => (1, r.State, r.Text, "p")).Concat(new[] { (0, "Information", "Compiling finished", (string)null) }).ToArray());
             var baseline = Compile(("Error", "password"), ("Information", "a"), ("Warning", "w"));
             Assert(HmiTextListImportRules.CompileProblemsUnchanged(baseline, Compile(("Warning", "w"), ("Information", "b"), ("Error", "password"))), "same problems");
