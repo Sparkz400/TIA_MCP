@@ -4,10 +4,430 @@
   "rule": "change.safety_fparameter_set writes an F-parameter only when it is listed here as qualified for the F-I/O's module catalog type (the F-I/O's own type identifier, else its direct parent's; an order number with firmware or a GSD identity) and the module declares it readable and writable; F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. A qualified row means one native write, readback and checkpoint restore passed with configured-hardware preservation; it does not validate, accept or approve a safety program. A pending row refuses until a native run re-curates it. Rows come from native runs only: scripts/probe_safety_fparameters.py discovers and round-trips, scripts/safety_fparameter_allowlist.py merges a curated run.",
   "modules": [
     {
+      "moduleTypeIdentifier": "OrderNumber:6ES7 136-6AB00-0CA1/V1.0",
+      "moduleTypeName": "F-AI 4xU 0..10V HF",
+      "parameters": [
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_InterferenceFrequencySuppression",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
+      ]
+    },
+    {
       "moduleTypeIdentifier": "OrderNumber:6ES7 136-6BA01-0CA0/V2.0",
       "moduleTypeName": "F-DI 8x24VDC HF",
       "parameters": [
-        { "name": "Failsafe_FDestinationAddress", "status": "pending", "reason": "Written natively in local.safety_changes.20261028, whose report records no worker-resolved moduleTypeIdentifier for the write; refused until a probe_safety_fparameters.py round trip on this module type is merged." }
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_2",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_3",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_4",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_5",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_6",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_7",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_2",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_3",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_4",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_5",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_6",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_7",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_2",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_3",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_4",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_5",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_6",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_7",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
+      ]
+    },
+    {
+      "moduleTypeIdentifier": "OrderNumber:6ES7 136-6DB00-0CA0/V2.0",
+      "moduleTypeName": "F-DQ 4x24VDC/2A PM HF",
+      "parameters": [
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_MaximumTestPeriod",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
+      ]
+    },
+    {
+      "moduleTypeIdentifier": "OrderNumber:6ES7 136-6PA00-0BC0/V2.0",
+      "moduleTypeName": "F-PM-E 24VDC/8A PPM ST",
+      "parameters": [
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_MaximumTestPeriod",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
+      ]
+    },
+    {
+      "moduleTypeIdentifier": "OrderNumber:6ES7 526-1BH00-0AB0/V1.0",
+      "moduleTypeName": "F-DI 16x24V DC",
+      "parameters": [
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_2",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ShortCircuitTest_3",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_2",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_StartupTimeOfSensorAfterShortCircuitTest_3",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_0",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_1",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_2",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_TimeForShortCircuitTest_3",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
+      ]
+    },
+    {
+      "moduleTypeIdentifier": "OrderNumber:6ES7 526-2BF00-0AB0/V1.0",
+      "moduleTypeName": "F-DQ 8x24V DC/2A PPM",
+      "parameters": [
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_MaximumTestPeriod",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_OutputType",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
+      ]
+    },
+    {
+      "moduleTypeIdentifier": "OrderNumber:6ES7 536-1MF00-0AB0/V2.0",
+      "moduleTypeName": "F-AI 8xI 0(4)..20mA",
+      "parameters": [
+        {
+          "name": "Failsafe_BehaviorAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_FDestinationAddress",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_HartGate",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_InterferenceFrequencySuppression",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ManualAssignmentFMonitoringtime",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        },
+        {
+          "name": "Failsafe_ReintegrationAfterChannelFault",
+          "status": "qualified",
+          "evidenceId": "local.safety.fparameter_discovery.20261031"
+        }
       ]
     }
   ]

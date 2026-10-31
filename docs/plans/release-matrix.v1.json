@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "c170780116061b85fea502e55b66e8317a1397119221b24f9d74b88a4aff988c",
+    "catalogSha256": "341a5ff2055365052dfc1f5a465811ea7ab4d59bdbc3246f1c63b6a9bcc6faf7",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -14,16 +14,16 @@
   "summary": {
     "features": 469,
     "support": {
-      "deferred": 7,
-      "limited": 311,
+      "deferred": 6,
+      "limited": 312,
       "shipped": 127,
       "unavailable_target": 5,
       "unqualified": 19
     },
     "cells": {
       "blocked": 31,
-      "bound": 1998,
-      "deferred": 21,
+      "bound": 2001,
+      "deferred": 18,
       "open": 108
     },
     "openCellsByOwner": {
@@ -4657,49 +4657,56 @@
         "D14"
       ],
       "evidenceIds": [
-        "local.safety_changes.20261028"
+        "local.safety_changes.20261028",
+        "local.safety.fparameter_discovery.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_changes.20261028"
+            "local.safety_changes.20261028",
+            "local.safety.fparameter_discovery.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_changes.20261028"
+            "local.safety_changes.20261028",
+            "local.safety.fparameter_discovery.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_changes.20261028"
+            "local.safety_changes.20261028",
+            "local.safety.fparameter_discovery.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_changes.20261028"
+            "local.safety_changes.20261028",
+            "local.safety.fparameter_discovery.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_changes.20261028"
+            "local.safety_changes.20261028",
+            "local.safety.fparameter_discovery.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.safety_changes.20261028"
+            "local.safety_changes.20261028",
+            "local.safety.fparameter_discovery.20261031"
           ]
         }
       ]
@@ -5350,26 +5357,34 @@
       "domain": "safety",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "limited",
       "owners": [
         "D14"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.safety.fparameter_discovery.20261031"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.safety.fparameter_discovery.20261031"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.safety.fparameter_discovery.20261031"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.safety.fparameter_discovery.20261031"
+          ]
         }
       ]
     },
@@ -26359,6 +26374,21 @@
         {
           "path": "evidence/local.runtime.timers.20261029.json",
           "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety.fparameter_discovery.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "b76f761e7a4a8d7b32dc68e931929a9c13dec725",
+      "retained": [
+        {
+          "path": "evidence/local.safety.fparameter_discovery.20261031.json",
+          "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
         }
       ],
       "notRetained": []

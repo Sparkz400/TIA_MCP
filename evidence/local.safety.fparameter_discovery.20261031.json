@@ -1,0 +1,119 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety.fparameter_discovery.20261031",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-31T13:13:59+00:00",
+  "source": {
+    "commit": "b76f761e7a4a8d7b32dc68e931929a9c13dec725",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/probe_safety_fparameters.py on a frozen Debug build of b76f761e compiled with -p:SafetyFParameterDiscovery=true (artifacts/w2bd2, git archive), Host started with --safety-fparameter-discovery, 58/58 steps, in an owned scratch with a CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (failsafeRuntimeAccess, scratch only), an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0, F-DQ 4x24VDC/2A PM HF 6ES7 136-6DB00-0CA0/V2.0, F-AI 4xU 0..10V HF 6ES7 136-6AB00-0CA1/V1.0 and F-PM-E 24VDC/8A PPM ST 6ES7 136-6PA00-0BC0/V2.0 (server module at slot 8), and ET 200MP F-DI 16x24V DC 6ES7 526-1BH00-0AB0/V1.0, F-DQ 8x24VDC/2A PPM 6ES7 526-2BF00-0AB0/V1.0 and F-AI 6ES7 536-1MF00-0AB0/V2.0 in the F-CPU's central rack. safety_validation_inspect listed each F-I/O's Failsafe_* access modes; every ReadWrite F-parameter of one F-I/O per module type was prepared alone, written in batches with checkpoint, device compile including the safety program, configured-hardware preservation and save, read back, and restored from the checkpoint into a new directory with every F-I/O's F-parameters equal to the baseline; failing batches were split until each failing name stood alone (35 batches). The worker resolved every module type to the plugged catalog entry (the ET 200SP F-I/O items have none of their own). Passed: 77 F-parameters over 7 module types, including Failsafe_FDestinationAddress on each. Refused: Failsafe_ManualAssignmentFIODBNumber on every module and Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd on the ET 200SP F-DQ (never-written classes, UnsupportedAttribute at prepare), Failsafe_SuppliedChannels_0..3 of the ET 200MP F-DI (writing one changes the unwritten Failsafe_ShortCircuitTest of its channel pair; V21 also refuses some combinations with 'set_Failsafe_... is not supported').",
+  "limitations": [
+    "One candidate value per F-parameter, written in batches: a row means that batch wrote, compiled, preserved and restored it, not that every value or every single write is valid. Dependent access modes are recorded, not chased (Failsafe_ManualAssignmentFMonitoringtime makes Failsafe_FMonitoringtime writable; a disabled short-circuit test makes its timing parameters read-only).",
+    "The deny rule refuses any name containing SIL, so Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd stays unwritable by design.",
+    "No safety login, password, acceptance or download; the scratch user's fail-safe access exists in the owned scratch only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b12a8d30583de27a1993303e558396f22402a319b7eda50671fc793bf6d6a8bd"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "39796189dca72dda6e717f239315df36c5fbab5af20331fe210bd729a2880d84"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "b209f740d706765975566dff4ce2a66876b353779d1de593305672b1cedc1a79",
+      "bytes": 1388590,
+      "completed": true,
+      "steps": [
+        "start owned TIA safety F-parameter discovery",
+        "create owned scratch safety F-parameter discovery",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_move",
+        "apply hardware_move",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "discover every F-I/O's F-parameters",
+        "round trip TiaMcpMpFai (6)",
+        "round trip TiaMcpMpFdi (20)",
+        "round trip TiaMcpMpFdi (10)",
+        "round trip TiaMcpMpFdi (5)",
+        "round trip TiaMcpMpFdi (5)",
+        "round trip TiaMcpMpFdi (2)",
+        "round trip TiaMcpMpFdi (3)",
+        "round trip TiaMcpMpFdi (10)",
+        "round trip TiaMcpMpFdi (5)",
+        "round trip TiaMcpMpFdi (2)",
+        "round trip TiaMcpMpFdi (3)",
+        "round trip TiaMcpMpFdi (1)",
+        "round trip TiaMcpMpFdi (2)",
+        "round trip TiaMcpMpFdi (1)",
+        "round trip TiaMcpMpFdi (1)",
+        "round trip TiaMcpMpFdi (5)",
+        "round trip TiaMcpMpFdi (2)",
+        "round trip TiaMcpMpFdi (1)",
+        "round trip TiaMcpMpFdi (1)",
+        "round trip TiaMcpMpFdi (3)",
+        "round trip TiaMcpMpFdq (6)",
+        "round trip TiaMcpFai (5)",
+        "round trip TiaMcpFdi1 (28)",
+        "round trip TiaMcpFdi1 (14)",
+        "round trip TiaMcpFdi1 (7)",
+        "round trip TiaMcpFdi1 (7)",
+        "round trip TiaMcpFdi1 (14)",
+        "round trip TiaMcpFdq (5)",
+        "round trip TiaMcpFpm (11)",
+        "round trip TiaMcpFpm (5)",
+        "round trip TiaMcpFpm (6)",
+        "round trip TiaMcpFpm (3)",
+        "round trip TiaMcpFpm (1)",
+        "round trip TiaMcpFpm (2)",
+        "round trip TiaMcpFpm (3)"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "safety_validation_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

@@ -3230,6 +3230,24 @@
         "V21 refuses root creation of TO_MeasuringInput and TO_OutputCam (Technology objects of that type cannot be created by Openness); they are children of an axis or encoder (to_child_create, not probed here).",
         "Engineering only; nothing downloaded."
       ]
+    },
+    {
+      "id": "local.safety.fparameter_discovery.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b76f761e7a4a8d7b32dc68e931929a9c13dec725",
+        "passedScope": "scripts/probe_safety_fparameters.py on a frozen Debug build of b76f761e compiled with -p:SafetyFParameterDiscovery=true (artifacts/w2bd2, git archive), Host started with --safety-fparameter-discovery, 58/58 steps, in an owned scratch with a CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (failsafeRuntimeAccess, scratch only), an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0, F-DQ 4x24VDC/2A PM HF 6ES7 136-6DB00-0CA0/V2.0, F-AI 4xU 0..10V HF 6ES7 136-6AB00-0CA1/V1.0 and F-PM-E 24VDC/8A PPM ST 6ES7 136-6PA00-0BC0/V2.0 (server module at slot 8), and ET 200MP F-DI 16x24V DC 6ES7 526-1BH00-0AB0/V1.0, F-DQ 8x24VDC/2A PPM 6ES7 526-2BF00-0AB0/V1.0 and F-AI 6ES7 536-1MF00-0AB0/V2.0 in the F-CPU's central rack. safety_validation_inspect listed each F-I/O's Failsafe_* access modes; every ReadWrite F-parameter of one F-I/O per module type was prepared alone, written in batches with checkpoint, device compile including the safety program, configured-hardware preservation and save, read back, and restored from the checkpoint into a new directory with every F-I/O's F-parameters equal to the baseline; failing batches were split until each failing name stood alone (35 batches). The worker resolved every module type to the plugged catalog entry (the ET 200SP F-I/O items have none of their own). Passed: 77 F-parameters over 7 module types, including Failsafe_FDestinationAddress on each. Refused: Failsafe_ManualAssignmentFIODBNumber on every module and Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd on the ET 200SP F-DQ (never-written classes, UnsupportedAttribute at prepare), Failsafe_SuppliedChannels_0..3 of the ET 200MP F-DI (writing one changes the unwritten Failsafe_ShortCircuitTest of its channel pair; V21 also refuses some combinations with 'set_Failsafe_... is not supported')."
+      },
+      "artifacts": [
+        "evidence/local.safety.fparameter_discovery.20261031.json"
+      ],
+      "limitations": [
+        "One candidate value per F-parameter, written in batches: a row means that batch wrote, compiled, preserved and restored it, not that every value or every single write is valid. Dependent access modes are recorded, not chased (Failsafe_ManualAssignmentFMonitoringtime makes Failsafe_FMonitoringtime writable; a disabled short-circuit test makes its timing parameters read-only).",
+        "The deny rule refuses any name containing SIL, so Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd stays unwritable by design.",
+        "No safety login, password, acceptance or download; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
     }
   ],
   "features": [
@@ -7720,7 +7738,7 @@
         "limitations": [
           "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
-          "Writes only F-parameters the embedded contracts/safety-fparameter-allowlist.v1.json lists as qualified for the F-I/O's module catalog type (the F-I/O's own type identifier, else its direct parent's, and only an order number with firmware or a GSD identity; a rack never keys a row, an F-I/O without one refuses UnresolvedHardware) and the module declares readable and writable. The shipped row, Failsafe_FDestinationAddress of the F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0, is pending because local.safety_changes.20261028 records no worker-resolved module type, so every write refuses (UnsupportedAttribute with moduleTypeIdentifier) until a scripts/probe_safety_fparameters.py run is merged (31 October 2026). F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. Preservation captures every written F-parameter on every device item. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
+          "Writes only F-parameters the embedded contracts/safety-fparameter-allowlist.v1.json lists as qualified for the F-I/O's module catalog type (the F-I/O's own type identifier, else its direct parent's, and only an order number with firmware or a GSD identity; a rack never keys a row, an F-I/O without one refuses UnresolvedHardware) and the module declares readable and writable; any other declared-writable F-parameter refuses with UnsupportedAttribute naming the module type. The rows are the 77 round trips of local.safety.fparameter_discovery.20261031 over seven ET 200SP and ET 200MP module types. F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. Preservation captures every written F-parameter on every device item. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
           "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. A Host and worker built with -p:SafetyFParameterDiscovery=true (never packaged) and started with --safety-fparameter-discovery also admit declared-writable F-parameters outside the allowlist or pending in it, marked fParameterDiscovery in the preview; a native refusal there requires checkpoint recovery.",
           "A new F-destination address must differ from the current and planned address of every other F-I/O whose F-source is this PLC's or unreadable, so swaps and chained moves are refused; an unreadable F-destination address refuses as DependencyCoverageIncomplete.",
           "A password-protected safety program must already be logged in through the authorized TIA workflow; no password is accepted, stored or passed to a login API.",
@@ -7730,7 +7748,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety_changes.20261028"
+          "local.safety_changes.20261028",
+          "local.safety.fparameter_discovery.20261031"
         ]
       },
       "availability": {
@@ -8401,25 +8420,29 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 HardwareObject.GetAttributeInfos (EngineeringAttributeInfo.AccessMode) declares each Failsafe_* F-parameter's access per F-I/O; GetAttribute/SetAttribute read and write it. Some declared-writable parameters refuse SetAttribute natively ('set_Failsafe_... is not supported')."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "change.safety_fparameter_set writes the per-module allowlist of contracts/safety-fparameter-allowlist.v1.json, which scripts/safety_fparameter_allowlist.py derives from a scripts/probe_safety_fparameters.py run: discovery of every Failsafe_* F-parameter an F-I/O declares ReadWrite (ET 200SP F-DI, F-DQ, F-AI, F-PM-E and ET 200MP F-modules on an F-CPU 1511F-1 PN), then batched write, readback and checkpoint restore with preservation, split until each failing parameter stands alone. The discovery run is pending; no row is qualified yet (the F-DI's Failsafe_FDestinationAddress row is pending re-curation)."
+          "change.safety_fparameter_set writes the per-module-type allowlist contracts/safety-fparameter-allowlist.v1.json, derived by scripts/safety_fparameter_allowlist.py from local.safety.fparameter_discovery.20261031: 77 F-parameters over the ET 200SP F-DI 8x24VDC HF, F-DQ 4x24VDC/2A PM HF, F-AI 4xU 0..10V HF, F-PM-E 24VDC/8A PPM ST and the ET 200MP F-DI 16x24V DC, F-DQ 8x24V DC/2A PPM and F-AI 8xI, including Failsafe_FDestinationAddress, behavior and reintegration after channel faults, the manual F-monitoring-time assignment and the short-circuit test settings.",
+          "Rows come from batched round trips with one candidate value each; dependent access modes are recorded, not chased: Failsafe_ManualAssignmentFMonitoringtime makes Failsafe_FMonitoringtime writable, which is not yet qualified; a disabled short-circuit test makes its timing parameters read-only. Failsafe_SuppliedChannels_0..3 of the ET 200MP F-DI change their channel pair's short-circuit test and stay unlisted.",
+          "F-I/O DB assignment and any name containing SourceAddress, Signature, SIL, CRC, Version, FCheck or FBlockID are never written, so Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd of the F-DQ stays unwritable. Other F-I/O families and firmware are unprofiled."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety.fparameter_discovery.20261031"
+        ]
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Only the allowlisted F-parameters of the seven discovered module types."
         ]
       },
       "prerequisites": [

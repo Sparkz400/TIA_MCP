@@ -29,7 +29,9 @@ internal static class FParameterAllowlistChecks
 
         var shipped = FParameterAllowlistRules.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "safety-fparameter-allowlist.v1.json")));
         var destination = FParameterAllowlistRules.Row(shipped, Fdi, "Failsafe_FDestinationAddress");
-        Check(destination != null && !FParameterAllowlistRules.Qualified(destination), "the shipped F-DI F-destination row is pending, so it refuses until re-curated");
+        Check(FParameterAllowlistRules.Qualified(destination) && (string)destination["evidenceId"] == "local.safety.fparameter_discovery.20261031",
+              "the shipped F-DI F-destination row is qualified by the discovery run");
+        Check(FParameterAllowlistRules.Row(shipped, Fdi, "Failsafe_ManualAssignmentFIODBNumber") == null, "the F-I/O DB assignment is never listed");
         Check(FParameterAllowlistRules.Row(shipped, Fdi, "Failsafe_FMonitoringtime") == null, "the F-DI's F-monitoring time is not listed");
         Check(FParameterAllowlistRules.Row(shipped, "OrderNumber:6ES7 136-6DB00-0CA0/V1.0", "Failsafe_FDestinationAddress") == null, "another module type lists nothing by default");
 
