@@ -54,7 +54,7 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
         => Call("project_properties", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "block_read", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its SCL/STL/DB external source file without dependencies. Writes uniquely named, SHA-256 hashed local artifacts only; no project changes.")]
+    [Description("Export an offline block as original Siemens XML and inspect its metadata. Use qualified paths from project_inventory when names are ambiguous. Optional format: simaticSd exports native SIMATIC SD documents; generatedSource generates its SCL/STL/DB external source file without dependencies and needs a writable offline project, because any external source the generation leaves is deleted. Writes uniquely named, SHA-256 hashed local artifacts only; no project changes.")]
     public Task<CallToolResult> BlockRead(CancellationToken cancellationToken, string? blockPath = null, string? blockName = null,
         string? plcPath = null, string? projectName = null, string? scopePath = null, string? format = null)
     {

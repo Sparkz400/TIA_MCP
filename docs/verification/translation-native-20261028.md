@@ -32,6 +32,8 @@ reference and en-GB target). Nothing touched a user project, a PLC or PLCSIM.
 
 Evidence: `local.translation.qualification.20261028` (the first four runs) and `local.translation.native.20261028` (`p2`).
 
+The two `continuation` rows predate the 31 October 2026 rule that a translation reopen keeps, never grants, scratch and watch ownership: a `--resume-root` continuation in a fresh worker is now refused with `ProjectIsolationRequired` at its capture.
+
 ### Default-mode lifecycle
 
 The registry was built by [`build_translation_admission.py`](../../scripts/build_translation_admission.py) from

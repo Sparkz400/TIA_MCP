@@ -96,7 +96,7 @@ internal static class ScaleQualification
                 manifestBytes = manifestBytes.Length, manifestSha256 = Hash(manifestBytes), inputSha256 = Hash(archive), sourceUnchanged = true,
                 retentionRefusalPassed = true, packageCountQuotaPassed = true, explicitReleasePassed = true, fullPaginationPassed = true };
 
-            string small = Path.Combine(output, "small.scl"); File.WriteAllBytes(small, new byte[3000]);
+            string small = Path.Combine(output, "small.zal21"); File.WriteAllBytes(small, new byte[3000]);
             var replacement = store.Stage(hostPath: small); // Release makes the one-package quota available again.
             Require(replacement.State == "ready", "Release did not free package count quota.");
             var quotaStore = new PackageStore(Path.Combine(output, "quota-store"), new PackageIntakeLimits { MaxInputBytes = 4096, MaxStoredBytes = 4096 });

@@ -4016,7 +4016,7 @@
         "limitations": [
           "Omitting format keeps the existing SimaticML XML export unchanged; the format path returns hashed files only, no parsed members or inline XML.",
           "generatedSource is limited to SCL/STL blocks (.scl/.awl), DBs (.db) and PLC data types (.udt), without dependencies; other languages are refused before the native call.",
-          "The V21 API documents GenerateSource as writing a file. Any external source it leaves at the root of the scope's external-source group is deleted by exact new name and the group is re-verified, otherwise ProjectSideEffect is raised; user subgroups are not compared.",
+          "The V21 API documents GenerateSource as writing a file. Any external source it leaves at the root of the scope's external-source group is deleted by exact new name and the group is re-verified, otherwise ProjectSideEffect is raised; user subgroups are not compared. Because of that cleanup, generatedSource requires a primary, offline project and runs under exclusive TIA access; the export reports projectModifiedBefore/After.",
           "Know-how protected objects are refused; F-blocks, generated system objects and language eligibility are decided by Siemens. Component-window readback refuses a format.",
           "Identity and completeness natively qualified in one owned scratch project (CPU 1511-1 PN V4.1 with one software unit, plus an added CPU 1518-4 PN/DP) by local.read_contracts.20261028; content families absent from that fixture were observed only as empty, complete results."
         ]
@@ -6573,7 +6573,8 @@
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state"
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -6785,7 +6786,8 @@
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state"
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -7160,7 +7162,8 @@
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state"
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint"
       ],
       "acceptanceCriteria": [
         "AC-identity",
@@ -7439,7 +7442,8 @@
       },
       "prerequisites": [
         "TIA V21 and authorized Windows user for native operations",
-        "Applicable native services and project protection state"
+        "Applicable native services and project protection state",
+        "compile=true and a verified recovery checkpoint"
       ],
       "acceptanceCriteria": [
         "AC-identity",

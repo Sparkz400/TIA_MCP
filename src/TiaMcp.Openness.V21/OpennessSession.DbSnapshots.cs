@@ -49,15 +49,11 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("DbSnapshotUnavailable", "The selected DB has no stored snapshot: InterfaceSnapshot.Export returned no snapshot values.");
         }
 
-        // Each export has a new DocumentInfo/Created, so a fresh export equals the reviewed capture (the Host-bound file with
-        // the reviewed hash) when their InterfaceSnapshot elements are equal.
+        // A fresh export equals the reviewed capture (the Host-bound file with the reviewed hash) by stored snapshot content.
         private static bool SameStoredSnapshot(JObject payload, string current)
         {
             string reviewed = ChangeText(payload, "snapshotPath", 4096);
-            if (!File.Exists(reviewed) || ChangeFileHash(reviewed) != ChangeText(payload, "snapshotSha256", 64)) return false;
-            Func<string, XElement> snapshot = path => XDocument.Load(path).Root?.Elements().SingleOrDefault(e => e.Name.LocalName == "SW.Blocks.InterfaceSnapshot");
-            var expected = snapshot(reviewed);
-            return expected != null && XNode.DeepEquals(expected, snapshot(current));
+            return File.Exists(reviewed) && ChangeFileHash(reviewed) == ChangeText(payload, "snapshotSha256", 64) && DbSnapshotXml.SameSnapshot(reviewed, current);
         }
 
         private void PrepareDbSnapshotChange(EngineeringChange change, JObject preview)
@@ -129,7 +125,7 @@ namespace TiaMcp.Openness.V21
             DbSnapshotExportTo(target, after);
             var readback = ChangeArtifact(after);
             change.Readbacks.Add(new JObject { ["role"] = "db-snapshot-readback", ["artifact"] = readback });
-            if (change.Backups.Any(backup => backup.Value<string>("role") == "previous-snapshot" && backup["artifact"].Value<string>("sha256") == readback.Value<string>("sha256")))
+            if (change.Backups.Any(backup => backup.Value<string>("role") == "previous-snapshot" && DbSnapshotXml.SameSnapshot(backup["artifact"].Value<string>("path"), after)))
                 throw new BridgeException("MutationVerificationFailed", "The exported DB snapshot is unchanged after CreateSnapshot.");
         }
     }

@@ -105,8 +105,10 @@ namespace TiaMcp.Openness.V21
                 var compile = ChangeCompilation(plc.GetService<ICompilable>().Compile(), args.Value<string>("plcPath"));
                 TranslationWrite(Path.Combine(directory, "compile.json"), compile);
                 if (!CompilationEvidenceRules.IsSuccessfulTarget(compile)) throw new BridgeException("CompileFailed", "Fixture compile failed.");
-                project.Save(); string path = project.Path.FullName; project.Close();
-                project = _portal.Projects.Open(new FileInfo(path)); _scratchProject = project;
+                bool scratch = _scratchProject != null && project.Equals(_scratchProject);
+                project.Save(); string path = project.Path.FullName; if (scratch) _scratchProject = null; project.Close();
+                project = _portal.Projects.Open(new FileInfo(path)); if (scratch) _scratchProject = project;
+                // TranslationOwned admitted only watch-owned scratch here, so this keeps, never grants, ownership.
                 _watchOwnedScratchPaths.Add(path); _translationEpoch = Guid.NewGuid().ToString("N");
                 var result = new JObject { ["completed"] = true, ["projectPath"] = path, ["seedMarker"] = FileArtifact(new FileInfo(marker)),
                     ["checkpoint"] = FileArtifact(new FileInfo(Path.Combine(directory, "before-seed.zap21"))), ["savedAndReopened"] = true };
@@ -199,6 +201,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var opened = _portal.Projects.First();
                     if (opened.Path.FullName != selector.Value<string>("projectPath")) throw new BridgeException("IdentityMismatch", "Unrelated project is open.");
+                    if (_scratchProject != null && opened.Equals(_scratchProject)) _scratchProject = null;
                     opened.Close();
                 }
                 _translationProject = null;
@@ -285,10 +288,14 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "save": _translationProject.Save(); value = new JObject { ["saved"] = true, ["modified"] = _translationProject.IsModified }; break;
                 case "reopen":
-                if (_translationProject != null) { _translationProject.Close(); _scratchProject = null; }
+                    // Scratch status and watch ownership survive the reopen only if the closed project held them; an admitted project never gains them.
+                    bool wasScratch = _translationProject != null && _scratchProject != null && _translationProject.Equals(_scratchProject);
+                    bool wasOwned = _translationProject != null && WatchOwnsScratch(_translationProject);
+                    if (_translationProject != null) { _translationProject.Close(); _scratchProject = null; }
                     _translationProject = _portal.Projects.Open(new FileInfo(selector.Value<string>("projectPath")));
-                    _scratchProject = _translationProject; _translationEpoch = Guid.NewGuid().ToString("N");
-                    _watchOwnedScratchPaths.Add(_translationProject.Path.FullName);
+                    if (wasScratch) _scratchProject = _translationProject;
+                    if (wasOwned) _watchOwnedScratchPaths.Add(_translationProject.Path.FullName);
+                    _translationEpoch = Guid.NewGuid().ToString("N");
                     value = TranslationObserve(_translationProject, selector); break;
                 case "restore":
                     if (state != "recoveryIntent" || _translationRestoreAttempted || _portal.Projects.Count != 0)
