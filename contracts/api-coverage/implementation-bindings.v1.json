@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "fd624bf17ba234cf386a53a60856b0cc5162c1b264a3e2bce5a646240c511713",
-      "bytes": 1439545
+      "sha256": "9386bba3e235992733adbe464115f1d2c6208978b01ec9d36ed6af92275e9da3",
+      "bytes": 1443743
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -101641,6 +101641,13 @@
           "artifacts": [
             "evidence/local.opcua.server-settings.20261028.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-ua-services.20261031",
+          "profileSha256": "fa118f8b885c4754dce4558dfa5788b28ed8e56fbeb347a280696abbb0bd3edb",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-ua-services.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -115176,7 +115183,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.plcsim-ua-services.20261031",
+          "profileSha256": "fa118f8b885c4754dce4558dfa5788b28ed8e56fbeb347a280696abbb0bd3edb",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-ua-services.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -115893,7 +115908,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.plcsim-ua-services.20261031",
+          "profileSha256": "fa118f8b885c4754dce4558dfa5788b28ed8e56fbeb347a280696abbb0bd3edb",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-ua-services.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -116123,7 +116146,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.runtime.plcsim-ua-services.20261031",
+          "profileSha256": "fa118f8b885c4754dce4558dfa5788b28ed8e56fbeb347a280696abbb0bd3edb",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-ua-services.20261031.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -124099,6 +124130,11 @@
       "sha256": "1e07b43e2efd5a4cac3c520dd652c1b419d382853ee8ac506a71e9c94632449c"
     },
     {
+      "path": "evidence/local.runtime.plcsim-ua-services.20261031.json",
+      "state": "observed",
+      "sha256": "fada8ebdec9415ffe67f6c3683f4236294a8769851d888aaf112a1cdb45687f4"
+    },
+    {
       "path": "evidence/local.runtime.timers.20261029.json",
       "state": "observed",
       "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
@@ -124841,6 +124877,10 @@
     {
       "id": "local.runtime.plcsim-tcpip.20261029",
       "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47"
+    },
+    {
+      "id": "local.runtime.plcsim-ua-services.20261031",
+      "profileSha256": "fa118f8b885c4754dce4558dfa5788b28ed8e56fbeb347a280696abbb0bd3edb"
     },
     {
       "id": "local.runtime.timers.20261029",

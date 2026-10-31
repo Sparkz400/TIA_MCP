@@ -312,18 +312,18 @@ option registers or admits the tool only on a qualification Host.
 | `runtime_capture_stop` | Stop owned polling capture | limited | runtime |  |  |
 | `runtime_plcsim_bind` | Bind runtime endpoints to an owned PLCSIM instance | limited | runtime |  |  |
 | `runtime_ua_browse` | Browse bounded OPC UA references | limited | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_call` | Call a PLC-namespace OPC UA method on an owned PLCSIM instance | unqualified | runtime |  |  |
+| `runtime_ua_call` | Call a PLC-namespace OPC UA method on an owned PLCSIM instance | limited | runtime |  |  |
 | `runtime_ua_capture_export` | Export exact retained OPC UA captures | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_capture_page` | Read a bounded OPC UA capture page | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_capture_start` | Start bounded OPC UA polling capture | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_capture_status` | Inspect retained OPC UA capture status | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_capture_stop` | Stop an owned OPC UA polling capture | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_client_identity` | Inspect the owned OPC UA client application identity | limited | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_conditions` | Read current OPC UA Alarms and Conditions with ConditionRefresh | unqualified | runtime |  |  |
+| `runtime_ua_conditions` | Read current OPC UA Alarms and Conditions with ConditionRefresh | limited | runtime |  |  |
 | `runtime_ua_connect` | Connect an owned secure OPC UA session | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_credential_binding` | Build an OPC UA protected credential binding | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_disconnect` | Disconnect an owned OPC UA session | limited | runtime |  | `runtime.physical_plc` |
-| `runtime_ua_history_probe` | Probe the OPC UA HistoryRead boundary | unqualified | runtime |  |  |
+| `runtime_ua_history_probe` | Probe the OPC UA HistoryRead boundary | limited | runtime |  |  |
 | `runtime_ua_read` | Read selected OPC UA typed values | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_status` | Inspect retained OPC UA session state | limited | runtime |  | `runtime.physical_plc` |
 | `runtime_ua_subscription_export` | Export retained OPC UA subscription acquisition | limited | runtime |  | `runtime.physical_plc` |

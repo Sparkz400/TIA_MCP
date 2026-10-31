@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "fd624bf17ba234cf386a53a60856b0cc5162c1b264a3e2bce5a646240c511713",
+    "catalogSha256": "9386bba3e235992733adbe464115f1d2c6208978b01ec9d36ed6af92275e9da3",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -15,22 +15,18 @@
     "features": 472,
     "support": {
       "deferred": 8,
-      "limited": 310,
+      "limited": 313,
       "shipped": 127,
       "unavailable_target": 5,
-      "unqualified": 22
+      "unqualified": 19
     },
     "cells": {
       "blocked": 31,
-      "bound": 1995,
+      "bound": 2007,
       "deferred": 24,
-      "open": 120
+      "open": 108
     },
     "openCellsByOwner": {
-      "C03": {
-        "role": "UA security and runtime integration",
-        "open": 12
-      },
       "D06": {
         "role": "Test Suite",
         "open": 72
@@ -41,11 +37,7 @@
       },
       "D16": {
         "role": "Physical runtime",
-        "open": 15
-      },
-      "L03": {
-        "role": "Runtime",
-        "open": 4
+        "open": 3
       },
       "L05": {
         "role": "Qualification and libraries",
@@ -66,10 +58,6 @@
       "X10": {
         "role": "Hardware and remote IO",
         "open": 6
-      },
-      "X13": {
-        "role": "SDK feasibility",
-        "open": 12
       }
     }
   },
@@ -22722,34 +22710,44 @@
         "runtime_ua_call"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D16",
         "C03",
         "L03",
         "X13"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.runtime.plcsim-ua-services.20261031"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         }
       ]
     },
@@ -22760,33 +22758,43 @@
         "runtime_ua_conditions"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D16",
         "C03",
         "X13"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.runtime.plcsim-ua-services.20261031"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         }
       ]
     },
@@ -22797,33 +22805,43 @@
         "runtime_ua_history_probe"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D16",
         "C03",
         "X13"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.runtime.plcsim-ua-services.20261031"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.runtime.plcsim-ua-services.20261031"
+          ]
         }
       ]
     },
@@ -24425,49 +24443,56 @@
         "D04"
       ],
       "evidenceIds": [
-        "local.opcua.server-settings.20261028"
+        "local.opcua.server-settings.20261028",
+        "local.runtime.plcsim-ua-services.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua.server-settings.20261028"
+            "local.opcua.server-settings.20261028",
+            "local.runtime.plcsim-ua-services.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua.server-settings.20261028"
+            "local.opcua.server-settings.20261028",
+            "local.runtime.plcsim-ua-services.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua.server-settings.20261028"
+            "local.opcua.server-settings.20261028",
+            "local.runtime.plcsim-ua-services.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua.server-settings.20261028"
+            "local.opcua.server-settings.20261028",
+            "local.runtime.plcsim-ua-services.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua.server-settings.20261028"
+            "local.opcua.server-settings.20261028",
+            "local.runtime.plcsim-ua-services.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.opcua.server-settings.20261028"
+            "local.opcua.server-settings.20261028",
+            "local.runtime.plcsim-ua-services.20261031"
           ]
         }
       ]
@@ -26451,6 +26476,21 @@
         {
           "path": "evidence/local.runtime.plcsim-tcpip.20261029.json",
           "sha256": "1e07b43e2efd5a4cac3c520dd652c1b419d382853ee8ac506a71e9c94632449c"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.runtime.plcsim-ua-services.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "bf6615af2822eae045c9d2be2917849e174c4a90",
+      "retained": [
+        {
+          "path": "evidence/local.runtime.plcsim-ua-services.20261031.json",
+          "sha256": "fada8ebdec9415ffe67f6c3683f4236294a8769851d888aaf112a1cdb45687f4"
         }
       ],
       "notRetained": []

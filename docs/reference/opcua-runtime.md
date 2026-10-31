@@ -72,7 +72,7 @@ These refusals return `state: refused`, `dispatched: false` and keep the session
 
 `runtime_ua_history_probe` is a boundary probe, not a history service. It reads `AccessHistoryDataCapability` and `AccessHistoryEventsCapability`, the node's `AccessLevel`, `UserAccessLevel` and `Historizing`, and sends one `HistoryReadRaw` for the last hour with at most one value. It returns the server's status codes and never the values. `product.code` is always `UaHistoryReadUnsupported`: the S7-1500 server profile has no historical-access facet ([record](../verification/opcua-history-read-feasibility-20261031.md)). Local [captures](opcua-runtime-capture.md) and subscriptions are the history this Host keeps.
 
-The three tools are tested against the encrypted fixture server (`TiaMcp.OpcUa.Runtime.Tests --methods-only --output <fresh>`); the owned-PLCSIM run is `qualify_runtime_plcsim_tcpip.py --mode ua-services` ([record](../verification/opcua-call-conditions-20261031.md)).
+The three tools are tested against the encrypted fixture server (`TiaMcp.OpcUa.Runtime.Tests --methods-only --output <fresh>`) and against the OPC UA server of an owned PLCSIM Advanced V8 instance (`qualify_runtime_plcsim_tcpip.py --mode ua-services`, `local.runtime.plcsim-ua-services.20261031`, [record](../verification/opcua-call-conditions-20261031.md)). On that CPU the PLC namespace held only the user program's server method, a Program_Alarm came and went through ConditionRefresh, and HistoryRead was refused as `BadServiceUnsupported`.
 
 ## Controlled acquisition reconnect
 

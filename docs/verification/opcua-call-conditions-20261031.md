@@ -1,8 +1,8 @@
 # OPC UA method calls, conditions and the HistoryRead boundary — 31 October 2026
 
 Follows the [feasibility note](feasibility-checks-20261031.md) and the
-[HistoryRead record](opcua-history-read-feasibility-20261031.md). Offline only: nothing here ran
-against TIA Portal or PLCSIM.
+[HistoryRead record](opcua-history-read-feasibility-20261031.md). Offline evidence first, then the
+native run against an owned PLCSIM Advanced V8 instance (`local.runtime.plcsim-ua-services.20261031`).
 
 ## What exists
 
@@ -42,7 +42,7 @@ closes (server audit order). The full suite passed (1,155 checks).
 `TiaMcp.Tests` (293) covers the new setting field and that `runtime_ua_call` checks the binding
 before its session call.
 
-## Native run still needed
+## Native run
 
 `qualify_runtime_plcsim_tcpip.py --mode ua-services` (one Host, about 15 minutes): owned scratch with
 FB `ServerMethod` (the V21 help's OPC_UA_ServerMethodPre/Post V1.1 example), FB `AlarmGate` with a
@@ -51,3 +51,31 @@ the run shows whether system methods sit beside the user program's), browse, cal
 refusals, the method's Bad result, the PLCSIM call counter, the history probe and three
 ConditionRefresh snapshots around a `sim_write` of the trigger. The oracle accepts a run in which
 PLCSIM raises no condition only as a recorded observation (`alarmCondition.raised: false`).
+
+Run `rs_013a5a7a` on frozen build `bf6615a` (Debug Host, worker and simulator worker built from a
+`git archive`; TIA V21 Update 3, PLCSIM Advanced V8, Online Access *PLCSIM Virtual Eth. Adapter*,
+adapter `192.168.0.10/24`, CPU `192.168.0.1`) passed on the first attempt; the oracle found no issue.
+Curated as `local.runtime.plcsim-ua-services.20261031`.
+
+- Setup: the help's `VAR DB_SPECIFIC` server-method FB and the `Program_Alarm` FB imported and
+  compiled; `alarmsAndConditions` applied with the automatic certificate acceptance; the CPU's
+  `CentralAlarmManagement` was already `true`.
+- PLC namespace below Objects: 28 browses, complete, exactly one Method,
+  `"ServerMethod_DB".Method`, a `HasComponent` child of the instance DB object, with InputArguments
+  InInt (Int16) and InBool (Boolean), both scalar. No system methods sit in that namespace.
+- Call: `(41, true)` answered `(42, false)`, status Good; the PLCSIM API read `MethodCalls` 1 (from 0)
+  and UA read the same. InInt 32767 returned the method's own `0x80ab0000` as `methodFailed`; the
+  counter stayed 1. `GetMonitoredItems` on the Server object (`UaMethodNotServerMethod`), one input
+  instead of two (`UaMethodArgumentInvalid`) and `acknowledgeCall=false`
+  (`RuntimeAcknowledgementRequired`) were refused before anything was sent.
+- Conditions: the server revised the publishing interval to 1000 ms and the queue to 5000; all ten
+  select clauses were Good. Every snapshot had RefreshStart and RefreshEnd. A CPU system-diagnostics
+  condition (retentive data lost) was active in all three. After `sim_write` of
+  `RealServer.AlarmTrigger` the Program_Alarm appeared as a new condition (opaque ConditionId in the
+  PLC namespace, active, retained, severity 1, AckedState true because TIA's default class needs no
+  acknowledgement, empty message, SourceName null); after the trigger fell it was gone.
+- HistoryRead: `BadServiceUnsupported` for the service, no HistoryServerCapabilities nodes, no
+  HistoryRead access bit; see the [HistoryRead record](opcua-history-read-feasibility-20261031.md#native-confirmation-31-october-2026).
+
+Not covered natively: acknowledgeable alarms (and Acknowledge, which stays out), methods of custom
+server interfaces, structured or array arguments, and a lost Call response on the real server.

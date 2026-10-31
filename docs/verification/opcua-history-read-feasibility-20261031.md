@@ -53,3 +53,20 @@ as its own run: `runtime_ua_browse` the node `Server > ServerCapabilities > Hist
 `AccessHistoryDataCapability` child and assert `false`. `runtime_ua_read` reads `Value`, `DataType`,
 `ValueRank` and `ArrayDimensions` only, so the `AccessLevel` attribute (whose `0x04` bit marks a
 historizing variable) cannot be read without new client code; this note argues against building that.
+
+## Native confirmation (31 October 2026)
+
+Captured by `runtime_ua_history_probe` in the `ua-services` run `rs_013a5a7a` of
+[`qualify_runtime_plcsim_tcpip.py`](../../scripts/qualify_runtime_plcsim_tcpip.py) on build `bf6615a`, against
+the OPC UA server of an owned PLCSIM Advanced V8 CPU 1511-1 PN V4.1 in TCP/IP mode (`local.runtime.plcsim-ua-services.20261031`,
+[record](opcua-call-conditions-20261031.md)):
+
+| Probe | Answer |
+| --- | --- |
+| `HistoryReadRaw` on `"RealServer"."Marker"` (last hour, one value) | the whole service refused: `BadServiceUnsupported` (`0x800b0000`); no values |
+| `AccessHistoryDataCapability` (`i=11193`), `AccessHistoryEventsCapability` (`i=11242`) | absent: `BadNodeIdUnknown` (`0x80340000`); the `HistoryServerCapabilities` object does not exist |
+| `AccessLevel` / `UserAccessLevel` / `Historizing` of the node | `3` / `3` (CurrentRead and CurrentWrite, no `0x04` HistoryRead bit) / `false` |
+
+The boundary holds: the server does not implement the service at all. The product keeps refusing
+`HistoryRead` (`UaHistoryReadUnsupported`); `runtime_ua_history_probe` is the recorded proof, not a
+history route.
