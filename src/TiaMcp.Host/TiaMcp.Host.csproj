@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DefineConstants Condition="'$(TestSuiteQualification)' == 'true'">$(DefineConstants);TESTSUITE_QUALIFICATION</DefineConstants>
+    <DefineConstants Condition="'$(SafetyFParameterDiscovery)' == 'true'">$(DefineConstants);SAFETY_FPARAMETER_DISCOVERY</DefineConstants>
     <DefineConstants Condition="'$(OfflinePackage)' == 'true'">$(DefineConstants);OFFLINE_PACKAGE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>

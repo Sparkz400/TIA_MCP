@@ -500,6 +500,10 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
     Equal(true, File.Exists(Path.Combine(Path.GetDirectoryName(HostOptions.Parse([]).ArtifactsDirectory)!, "TiaMcp.slnx")));
     Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith(Path.Combine("src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe")));
     Equal(true, HostOptions.Parse(["--no-native-workers", "--worker", Path.Combine(work, "worker.exe")]).NoNativeWorkers);
+    // F-parameter discovery exists only in -p:SafetyFParameterDiscovery=true builds; this (and every packaged) build refuses it.
+    Equal(false, HostOptions.Parse([]).SafetyFParameterDiscovery);
+    try { HostOptions.Parse(["--safety-fparameter-discovery"]); throw new Exception("A normal build accepted --safety-fparameter-discovery"); }
+    catch (ArgumentException) { }
     foreach (var flag in new[] { "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification" })
     {
         Equal(false, HostOptions.Parse([flag]).NoNativeWorkers);

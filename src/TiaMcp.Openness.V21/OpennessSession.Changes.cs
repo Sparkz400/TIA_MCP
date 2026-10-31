@@ -61,6 +61,9 @@ namespace TiaMcp.Openness.V21
                 State = "preparing", Journal = Path.Combine(directory, "journal.json"),
                 PreparedProcessId = _processId, CapturedStorageQualification = capturedStorage
             };
+#if SAFETY_FPARAMETER_DISCOVERY
+            if (kind == "safety_fparameter_set" && args.Value<bool?>("fParameterDiscovery") == true) change.Selector["fParameterDiscovery"] = true;
+#endif
             if (string.IsNullOrWhiteSpace(change.Selector.Value<string>("plcPath")))
                 change.Selector["plcPath"] = ObjectIdentity.PlcPath(payload.Value<string>("scopePath") ?? args.Value<string>("scopePath"))
                     ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath")
@@ -666,6 +669,11 @@ namespace TiaMcp.Openness.V21
                 {
                     var plc = SelectPlc(change.Selector);
                     preview["parameterChanges"] = FParameterSet(change, project, false);
+                    if (change.Selector.Value<bool?>("fParameterDiscovery") == true)
+                    {
+                        preview["fParameterDiscovery"] = true;
+                        ((JArray)preview["warnings"]).Add("F-parameter discovery Host: declared-writable F-parameters outside the qualified allowlist are admitted for qualification runs only.");
+                    }
                     preview["safetyBefore"] = ReadSafety(plc.Software);
                     effects.Add(new JObject { ["plcPath"] = plc.Path, ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("Changing F-parameters changes the F-parameter signature of each F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns a PROFIsafe address to the physical F-I/O, or downloads anything; that stays with the authorized safety workflow.");
@@ -743,6 +751,9 @@ namespace TiaMcp.Openness.V21
                     if (FindTechnologyEntry(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new JObject { ["name"] = name }, false) != null) throw new BridgeException("ObjectExists", "Technology object already exists.");
                     ChangeText(payload, "typeIdentifier", 128);
                     if (!Version.TryParse(ChangeText(payload, "version", 32), out _)) throw new BridgeException("InvalidRequest", "version must be a dotted numeric version supported by this CPU.");
+                    preview["technologyProfile"] = AdmitTechnologyVersion(plc, payload);
+                    if (preview["technologyProfile"].Value<string>("outcome") == "unprofiled")
+                        ((JArray)preview["warnings"]).Add("No recorded technology version profile covers this CPU/type/version; unprofiledAcknowledged lets Siemens validate it at creation, and a native refusal requires checkpoint recovery.");
                     if (payload["parameters"] != null)
                     {
                         var initial = ChangeObject(payload, "parameters");
@@ -1092,6 +1103,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var plc = SelectPlc(change.Selector);
                     if (FindTechnologyEntry(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new JObject { ["name"] = payload["name"].DeepClone() }, false) != null) throw new BridgeException("ObjectExists", "Technology object already exists.");
+                    AdmitTechnologyVersion(plc, payload);
                     var created = plc.Software.TechnologicalObjectGroup.TechnologicalObjects.Create(payload.Value<string>("name"), payload.Value<string>("typeIdentifier"), new Version(payload.Value<string>("version")));
                     if (payload["parameters"] != null) ApplyTechnologyParameters(created, ChangeObject(payload, "parameters"));
                     break;
@@ -1339,7 +1351,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
             if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
             if (change.Kind.StartsWith("connection_", StringComparison.Ordinal)) snapshot["connections"] = ConnectionFingerprint(project, change.Payload);
-            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);
+            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind, FParameterNames(change));
             if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);

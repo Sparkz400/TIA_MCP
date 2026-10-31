@@ -7,6 +7,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <DefineConstants Condition="'$(TestSuiteQualification)' == 'true'">$(DefineConstants);TESTSUITE_QUALIFICATION</DefineConstants>
+    <DefineConstants Condition="'$(SafetyFParameterDiscovery)' == 'true'">$(DefineConstants);SAFETY_FPARAMETER_DISCOVERY</DefineConstants>
     <ImplicitUsings>disable</ImplicitUsings>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -16,6 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../TiaMcp.TestSuite.V21/TiaMcp.TestSuite.V21.csproj" />
+    <EmbeddedResource Include="../../contracts/technology-version-profiles.v1.json;../../contracts/safety-fparameter-allowlist.v1.json" LogicalName="TiaMcp.Contracts.%(Filename)%(Extension)" />
     <Compile Include="../TiaMcp.Core/WatchTables/WatchTableDocument.cs" Link="WatchTableDocument.cs" />
     <Compile Include="../TiaMcp.Core/WatchTables/WatchGroupManifest.cs" Link="WatchGroupManifest.cs" />
     <Compile Include="../TiaMcp.Core/WorkerPipeWriter.cs" Link="WorkerPipeWriter.cs" />

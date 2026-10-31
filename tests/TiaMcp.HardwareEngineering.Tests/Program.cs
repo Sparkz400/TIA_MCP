@@ -354,4 +354,5 @@ if (chain.Count != 2 || (string)chain[0]["text"] != "Import failed." || ((string
     throw new Exception("Native failure chain differs: " + chain);
 count++; Console.WriteLine("PASS native failure chain keeps Siemens message data, bounded");
 count += RuntimeRouteChecks.Run();
+count += FParameterAllowlistChecks.Run();
 Console.WriteLine($"{count} hardware preservation checks passed.");

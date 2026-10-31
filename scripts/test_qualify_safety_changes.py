@@ -13,5 +13,14 @@ class SafetyRunnerTests(unittest.TestCase):
         self.assertNotEqual(q.comparable(before), q.comparable(after))
 
 
+    def test_unlisted_writable_parameters_get_a_different_value(self):
+        allowlist = {"modules": [{"moduleTypeIdentifier": "T", "parameters": [{"name": "Failsafe_A", "status": "qualified"}, {"name": "Failsafe_P", "status": "pending"}]}]}
+        rows = [{"name": "Failsafe_A", "accessMode": "ReadWrite", "value": True}, {"name": "Failsafe_P", "accessMode": "ReadWrite", "value": True},
+                {"name": "Failsafe_N", "accessMode": "ReadWrite", "value": 0}, {"name": "Failsafe_R", "accessMode": "Read", "value": 1},
+                {"name": "Failsafe_S", "accessMode": "ReadWrite", "value": "x"}]
+        self.assertEqual({"Failsafe_P": (True, False), "Failsafe_N": (0, 1)}, q.unlisted_writable(rows, "T", allowlist))
+        self.assertEqual({"Failsafe_A": (True, False), "Failsafe_P": (True, False), "Failsafe_N": (0, 1)}, q.unlisted_writable(rows, "Other", allowlist))
+
+
 if __name__ == "__main__":
     unittest.main()

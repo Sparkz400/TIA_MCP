@@ -3251,6 +3251,60 @@
         "Nothing is compiled: block consistency after the upgrade is recorded as TIA reports it.",
         "Protected (UMAC) projects, locked sources and an interrupted upgrade (reconciliation) are not exercised natively."
       ]
+    },
+    {
+      "id": "local.technology.version_profiles.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "87c4d8b16a33c90828c941f8af9723b828342920",
+        "passedScope": "scripts/probe_technology_versions.py on a frozen Debug build of 87c4d8b1 (artifacts/w2bn2, git archive), 74/74 steps, in one owned scratch with CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 (scratch), CPU 1511C-1 PN 6ES7 511-1CK01-0AB0/V2.6 and CPU 1214C DC/DC/DC 6ES7 214-1AG40-0XB0/V4.7 (both added from the installed catalog with configureScratchSecurity). 45 cells, each one to_create of TvProbe with unprofiledAcknowledged, applied with checkpoint and without compile or save, read back through technology_read and returned to the baseline (blocks, types, tag tables and technology objects of every PLC equal): 37 by change_restore into a new directory, 8 accepted motion creates by closing the owned Portal unsaved and reopening the checkpointed project, because the uncompiled first motion object leaves the generated MC_Servo inconsistent and the post-apply fingerprint refuses (FingerprintUnavailable). Accepted: CPU 1511-1 PN V4.1 PID_Compact 3.0, PID_3Step 2.3, PID_Temp 1.1, TO_PositioningAxis, TO_SpeedAxis, TO_SynchronousAxis, TO_ExternalEncoder 10.0, High_Speed_Counter 5.0; CPU 1511C-1 PN V2.6 PID_Compact 2.4, PID_3Step 2.3, PID_Temp 1.1, TO_PositioningAxis, TO_SpeedAxis, TO_SynchronousAxis, TO_ExternalEncoder 4.0, High_Speed_Counter 5.0; CPU 1214C V4.7 PID_Compact 2.3, PID_3Step 2.3, PID_Temp 1.1, TO_PositioningAxis 8.0, TO_CommandTable 8.0. Refused by V21 at Create with its native text: every newer candidate tried before an accepted version (type or version does not exist), TO_Cam at the CPU's motion version and TO_SpeedAxis 8.0 on the S7-1200 (does not exist), TO_MeasuringInput and TO_OutputCam on both S7-1500 (cannot be created by Openness)."
+      },
+      "artifacts": [
+        "evidence/local.technology.version_profiles.20261031.json"
+      ],
+      "limitations": [
+        "Three CPUs; versions tried newest first until one was accepted, so older versions a CPU may also accept stay unprofiled. Creation at the PLC root only: no compile, connection, parameters, children or behavior.",
+        "V21 refuses root creation of TO_MeasuringInput and TO_OutputCam (Technology objects of that type cannot be created by Openness); they are children of an axis or encoder (to_child_create, not probed here).",
+        "Engineering only; nothing downloaded."
+      ]
+    },
+    {
+      "id": "local.safety.fparameter_discovery.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "b76f761e7a4a8d7b32dc68e931929a9c13dec725",
+        "passedScope": "scripts/probe_safety_fparameters.py on a frozen Debug build of b76f761e compiled with -p:SafetyFParameterDiscovery=true (artifacts/w2bd2, git archive), Host started with --safety-fparameter-discovery, 58/58 steps, in an owned scratch with a CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (failsafeRuntimeAccess, scratch only), an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0, F-DQ 4x24VDC/2A PM HF 6ES7 136-6DB00-0CA0/V2.0, F-AI 4xU 0..10V HF 6ES7 136-6AB00-0CA1/V1.0 and F-PM-E 24VDC/8A PPM ST 6ES7 136-6PA00-0BC0/V2.0 (server module at slot 8), and ET 200MP F-DI 16x24V DC 6ES7 526-1BH00-0AB0/V1.0, F-DQ 8x24VDC/2A PPM 6ES7 526-2BF00-0AB0/V1.0 and F-AI 6ES7 536-1MF00-0AB0/V2.0 in the F-CPU's central rack. safety_validation_inspect listed each F-I/O's Failsafe_* access modes; every ReadWrite F-parameter of one F-I/O per module type was prepared alone, written in batches with checkpoint, device compile including the safety program, configured-hardware preservation and save, read back, and restored from the checkpoint into a new directory with every F-I/O's F-parameters equal to the baseline; failing batches were split until each failing name stood alone (35 batches). The worker resolved every module type to the plugged catalog entry (the ET 200SP F-I/O items have none of their own). Passed: 77 F-parameters over 7 module types, including Failsafe_FDestinationAddress on each. Refused: Failsafe_ManualAssignmentFIODBNumber on every module and Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd on the ET 200SP F-DQ (never-written classes, UnsupportedAttribute at prepare), Failsafe_SuppliedChannels_0..3 of the ET 200MP F-DI (writing one changes the unwritten Failsafe_ShortCircuitTest of its channel pair; V21 also refuses some combinations with 'set_Failsafe_... is not supported')."
+      },
+      "artifacts": [
+        "evidence/local.safety.fparameter_discovery.20261031.json"
+      ],
+      "limitations": [
+        "One candidate value per F-parameter, written in batches: a row means that batch wrote, compiled, preserved and restored it, not that every value or every single write is valid. Dependent access modes are recorded, not chased (Failsafe_ManualAssignmentFMonitoringtime makes Failsafe_FMonitoringtime writable; a disabled short-circuit test makes its timing parameters read-only).",
+        "The deny rule refuses any name containing SIL, so Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd stays unwritable by design.",
+        "No safety login, password, acceptance or download; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
+    },
+    {
+      "id": "local.safety_changes.allowlist.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1837333015669bfb6ec260c1a0c4756dcdf51921",
+        "passedScope": "scripts/qualify_safety_changes.py on a frozen normal Debug build of 18373330 (artifacts/w2bn3, git archive; its worker embeds the allowlist derived from local.safety.fparameter_discovery.20261031), 67/67 steps, in a fresh owned scratch under TIA Portal V21: a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess (Full access including fail-safe, owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0. safety_inspect and safety_validation_inspect named the F-PLC, Main_Safety_RTG1, signatures and both F-DI, reported gaps and truncation at maxItems 1 and refused the standard PLC; safety_printout wrote a PDF matching its size and SHA-256 and refused the absent XPS printer and a bad layout. safety_fparameter_set moved one F-DI's allowlisted Failsafe_FDestinationAddress, whose preview resolved the module type to the plugged F-DI catalog entry, with checkpoint, device compile, configured-hardware preservation and save, change_status and an exact state diff limited to that F-DI; it refused a never-written attribute, a wrong expected value, a missing acknowledgement, the other F-DI's address, the read-only Failsafe_FMonitoringtime and the only declared-writable F-DI parameter the allowlist lacks (Failsafe_ManualAssignmentFIODBNumber, a never-written class) and a wrong previewHash, persisted across a fresh Portal reopen and was restored from its checkpoint into a new directory equal to the reopened state. safety_import_xml re-imported Main_Safety_RTG1 with a comment under STEP 7 Safety (device compile left every F-block consistent), refused a missing acknowledgement, a scope mismatch, a standard block and a wrong previewHash, persisted and was restored."
+      },
+      "artifacts": [
+        "evidence/local.safety_changes.allowlist.20261031.json"
+      ],
+      "limitations": [
+        "One F-CPU 1511F-1 PN with two ET 200SP F-DI 8x24VDC HF; the scratch user's fail-safe access exists in the owned scratch only.",
+        "safety_fparameter_set writes Failsafe_FDestinationAddress here; the other 76 allowlisted F-parameters rest on local.safety.fparameter_discovery.20261031 (discovery Host).",
+        "No F-logic behavior, acceptance, login, password or download; a printout or signature read does not validate or approve a safety program."
+      ]
     }
   ],
   "features": [
@@ -7390,7 +7444,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 (local.technology_changes.20261028): PID_Compact 3.0 and a virtual TO_PositioningAxis 10.0 (initial VirtualAxis.Mode = 1) created, with TIA's system-group instructions and generated protected motion OBs recorded; case-insensitive duplicates, non-numeric versions and technologyPath refused; fresh-Portal reopen and checkpoint restore. Real drives and encoders are not exercised; an unconnected TO_ExternalEncoder fails compile.",
-          "Siemens validates the explicitly requested native technology type/version on the selected CPU; a complete CPU-specific type/version catalog is not exposed.",
+          "V21 exposes no CPU-specific type/version catalog, so preparation and apply admit the CPU/type/version cells recorded in the embedded contracts/technology-version-profiles.v1.json (keyed by the CPU's exact type identifier, order number and firmware): a recorded acceptance passes, a recorded refusal refuses with its native text (TechnologyVersionRefused), and any other pair refuses (TechnologyVersionUnprofiled) unless the payload sets unprofiledAcknowledged, which lets Siemens validate it during creation; a native refusal then requires checkpoint recovery. The cells are local.technology.version_profiles.20261031: 45 creates on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C V4.7.",
           "Optional parameters supplies up to 500 non-null scalar initial values. Sensitive names are rejected at prepare. Native parameter names, current value types and exposed write-access metadata can be checked only after creation.",
           "Initial values are applied and read back inside the creation checkpoint before the first compile. Configuration, dependency or readback failure may leave a partial object and requires checkpoint recovery.",
           "A virtual TO_PositioningAxis10.0 initial-parameter fixture passed on CPU1511 firmware4.1; external encoder compilation failed without telegram connections and recovered. This does not qualify connected motion hardware.",
@@ -7399,14 +7453,16 @@
           "The 17 October child-discovery extension includes OutputCamMeasuringInputContainer.OutputCams and MeasuringInputs under owner-relative paths, with explicit ownerPath/composition, shared object/depth bounds and failed-discovery refusal. Existing root paths are unchanged. Other service compositions/associations are not expanded. Current linked-routine and portable store tests use synthetic native shapes; native SDK compilation, child ownership/alias behavior, complete preservation and lifecycle qualification remain open. Historical evidence references do not qualify this expanded source.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 17 October connection-service repair reports four independently probed services, explicit observed/not-exposed/failed/unvisited states, bounded sensor/field reads, exact technology-owner observation paths and field completeness. Null service observations are not capability or physical-absence proof. Native object projections remain incomplete identities; current source and changed qualification consumers have synthetic/offline evidence only. SDK and native endpoint/preservation qualification remain open; historical evidence IDs are retained.",
-          "Selected technology connection references require bounded project-provider roundtrips and verified-owner channel selectors. Synthetic offline checks do not qualify native SDK, channel ownership or persistence (17 October 2026)."
+          "Selected technology connection references require bounded project-provider roundtrips and verified-owner channel selectors. Synthetic offline checks do not qualify native SDK, channel ownership or persistence (17 October 2026).",
+          "Without compile, the first motion object of a PLC leaves MC_Servo inconsistent: change_apply fails after the create with FingerprintUnavailable and change_restore cannot recover in place (local.technology.version_profiles.20261031); apply motion objects with compile, or recover by reopening the saved project."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
-          "local.technology_changes.20261028"
+          "local.technology_changes.20261028",
+          "local.technology.version_profiles.20261031"
         ]
       },
       "availability": {
@@ -7739,7 +7795,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety_import.device-compile.20261028"
+          "local.safety_import.device-compile.20261028",
+          "local.safety_changes.allowlist.20261031"
         ]
       },
       "availability": {
@@ -7776,7 +7833,7 @@
       "api": {
         "status": "available",
         "reasons": [
-          "V21 HardwareObject.GetAttributeInfos/GetAttribute/SetAttribute (EngineeringAttributeInfo.Name/AccessMode Read and Write) on F-I/O DeviceItems for Failsafe_FDestinationAddress and Failsafe_FMonitoringtime; Failsafe_FSourceAddress, the PLC's Failsafe_CentralFSourceAddress and every readable Failsafe_*Signature* attribute are only read.",
+          "V21 HardwareObject.GetAttributeInfos/GetAttribute/SetAttribute (EngineeringAttributeInfo.Name/AccessMode Read and Write) on F-I/O DeviceItems for the Failsafe_* F-parameters a module declares readable and writable; Failsafe_FSourceAddress, the PLC's Failsafe_CentralFSourceAddress and every readable Failsafe_*Signature* attribute are only read.",
           "V21 SafetyAdministration.IsSafetyOfflineProgramPasswordSet/IsLoggedOnToSafetyOfflineProgram/ProgramSignatures on the PLC DeviceItem, DeviceItem.Addresses with Address.AddressControllers for ownership, and Device.GetService<ICompilable>().Compile() for the whole-project device compile. V21 exposes no separate safety-program compile; the device compile covers hardware and software including the F-program.",
           "The Failsafe_* attribute names come from the V21 Openness F-I/O documentation, not from the installed PublicAPI XML (which lists only Failsafe_* enum types); each name's presence and Read/Write access is probed natively before preview."
         ]
@@ -7785,9 +7842,10 @@
         "status": "partial",
         "limitations": [
           "2026-10-28: natively qualified on a CPU 1511F-1 PN with an ET 200SP station and two F-DI in an owned scratch under TIA Portal V21 Update 3 (local.safety_changes.20261028); the scratch's generated user holds Full access including fail-safe (failsafeRuntimeAccess). Failsafe_FDestinationAddress moved with checkpoint, device compile, configured-hardware preservation and save, an exact diff limited to the F-DI, fresh reopen and checkpoint restore; six refusals including the duplicate address and the non-writable Failsafe_FMonitoringtime of this F-DI.",
+          "2026-10-31: requalified on the allowlist build (local.safety_changes.allowlist.20261031): the F-DI's allowlisted Failsafe_FDestinationAddress moved with the preview naming the plugged F-DI catalog type, persisted across a fresh reopen and restored; the only declared-writable F-DI parameter the allowlist lacks (Failsafe_ManualAssignmentFIODBNumber, a never-written class) refused with UnsupportedAttribute.",
           "Changing F-parameters changes the F-parameter signature of the F-I/O and the safety program signatures. Nothing here validates, accepts or approves the safety program, assigns the PROFIsafe address to the physical F-I/O (DIP switch or address assignment), or downloads anything.",
-          "Write subset is Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only; F-source addresses, the CPU's central F-source address, signatures, SIL/CRC/version and F-I/O DB assignment are refused. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
-          "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. Writing Failsafe_FMonitoringtime can still fail natively when the module derives it from the CPU default; apply then requires checkpoint recovery.",
+          "Writes only F-parameters the embedded contracts/safety-fparameter-allowlist.v1.json lists as qualified for the F-I/O's module catalog type (the F-I/O's own type identifier, else its direct parent's, and only an order number with firmware or a GSD identity; a rack never keys a row, an F-I/O without one refuses UnresolvedHardware) and the module declares readable and writable; any other declared-writable F-parameter refuses with UnsupportedAttribute naming the module type. The rows are the 77 round trips of local.safety.fparameter_discovery.20261031 over seven ET 200SP and ET 200MP module types. F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. Preservation captures every written F-parameter on every device item. Payload is exactly safetyAcknowledged true and parameters (1..64) of exactly hardwarePath, name, expected and value; expected must equal the current native value at prepare and apply.",
+          "Target F-I/O must expose Failsafe_FDestinationAddress, carry the selected PLC's central F-source address, and every I/O address of its subtree must be owned by the selected PLC only; I-device, shared-device and unreadable ownership are refused. A Host and worker built with -p:SafetyFParameterDiscovery=true (never packaged) and started with --safety-fparameter-discovery also admit declared-writable F-parameters outside the allowlist or pending in it, marked fParameterDiscovery in the preview; a native refusal there requires checkpoint recovery.",
           "A new F-destination address must differ from the current and planned address of every other F-I/O whose F-source is this PLC's or unreadable, so swaps and chained moves are refused; an unreadable F-destination address refuses as DependencyCoverageIncomplete.",
           "A password-protected safety program must already be logged in through the authorized TIA workflow; no password is accepted, stored or passed to a login API.",
           "Apply requires compile=true (whole-project device compile) and checkpointSave; configured-hardware preservation covers the two attributes on every device item plus the existing hardware manifest. Readback reports the written values and the F-I/O Failsafe_*Signature* attributes right after the write; safetyAfter reports PLC program signatures after compile."
@@ -7796,7 +7854,9 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.safety_changes.20261028"
+          "local.safety_changes.20261028",
+          "local.safety.fparameter_discovery.20261031",
+          "local.safety_changes.allowlist.20261031"
         ]
       },
       "availability": {
@@ -8381,28 +8441,35 @@
       "featureId": "technology.version_profiles",
       "domain": "technology",
       "title": "CPU-specific technology type/version compatibility profiles",
-      "mcpTools": [],
+      "mcpTools": [
+        "change_prepare"
+      ],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 TechnologicalObjectComposition.Create(name, type, Version) validates a pair natively and exposes no CPU-specific type/version catalog; a profile is therefore a create-and-refuse capture per CPU type identifier."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "contracts/technology-version-profiles.v1.json records accepted and refused cells per CPU type identifier, technology type and version; the worker embeds it and change.to_create admits, refuses with the recorded native refusal, or refuses an unprofiled pair unless unprofiledAcknowledged is set.",
+          "31 October 2026 (local.technology.version_profiles.20261031): scripts/probe_technology_versions.py captured 45 cells on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7 (21 accepted, 24 refused with V21's native text), each create in its own checkpoint and returned to the baseline; scripts/technology_version_profiles.py merged them into the contract. Versions were tried newest first until one was accepted, so older versions a CPU may also accept stay unprofiled. The gate's admit path ran natively for the recorded cells; its TechnologyVersionRefused and TechnologyVersionUnprofiled refusals are covered offline only.",
+          "A cell covers creation at the PLC root only, not compile, connections, parameters, children (to_child_create) or behavior.",
+          "An uncompiled first motion object leaves the generated, know-how protected motion OBs (MC_Servo) inconsistent, so the engineering fingerprint and change_restore refuse (FingerprintUnavailable) until the PLC compiles; the probe recovered those creates by closing the owned Portal unsaved."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.technology.version_profiles.20261031"
+        ]
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Only the 45 recorded CPU/type/version cells; other pairs need unprofiledAcknowledged and native validation at creation."
         ]
       },
       "prerequisites": [
@@ -8430,7 +8497,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py probes changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8 (import, device compile, simulation_download, RUN, F-DI input through sim_area_write, the F-logic's outputs read back) and records a V8 or V21 refusal as the boundary; its native run is pending."
         ]
       },
       "qualification": {
@@ -8460,25 +8527,29 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 HardwareObject.GetAttributeInfos (EngineeringAttributeInfo.AccessMode) declares each Failsafe_* F-parameter's access per F-I/O; GetAttribute/SetAttribute read and write it. Some declared-writable parameters refuse SetAttribute natively ('set_Failsafe_... is not supported')."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog beyond change.safety_fparameter_set (Failsafe_FDestinationAddress and Failsafe_FMonitoringtime only); no other typed F-I/O parameter operation is exposed."
+          "change.safety_fparameter_set writes the per-module-type allowlist contracts/safety-fparameter-allowlist.v1.json, derived by scripts/safety_fparameter_allowlist.py from local.safety.fparameter_discovery.20261031: 77 F-parameters over the ET 200SP F-DI 8x24VDC HF, F-DQ 4x24VDC/2A PM HF, F-AI 4xU 0..10V HF, F-PM-E 24VDC/8A PPM ST and the ET 200MP F-DI 16x24V DC, F-DQ 8x24V DC/2A PPM and F-AI 8xI, including Failsafe_FDestinationAddress, behavior and reintegration after channel faults, the manual F-monitoring-time assignment and the short-circuit test settings.",
+          "Rows come from batched round trips with one candidate value each; dependent access modes are recorded, not chased: Failsafe_ManualAssignmentFMonitoringtime makes Failsafe_FMonitoringtime writable, which is not yet qualified; a disabled short-circuit test makes its timing parameters read-only. Failsafe_SuppliedChannels_0..3 of the ET 200MP F-DI change their channel pair's short-circuit test and stay unlisted.",
+          "F-I/O DB assignment and any name containing SourceAddress, Signature, SIL, CRC, Version, FCheck or FBlockID are never written, so Failsafe_DisableDarkTestMaxSIL2_CAT3_PLd of the F-DQ stays unwritable. Other F-I/O families and firmware are unprofiled."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.safety.fparameter_discovery.20261031"
+        ]
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Only the allowlisted F-parameters of the seven discovered module types."
         ]
       },
       "prerequisites": [
