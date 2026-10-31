@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tia-mcp.local/contracts/hardware-catalog-profiles.v1.schema.json",
+  "title": "Module capability profiles captured from the installed V21 hardware catalog; observations, not write authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profiles"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "profiles": { "type": "array", "items": { "$ref": "#/$defs/profile" } }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "optionalText": { "type": ["string", "null"], "maxLength": 1024 },
+    "attribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "accessMode", "type"],
+      "properties": {
+        "name": { "$ref": "#/$defs/text" },
+        "accessMode": { "type": ["string", "null"], "maxLength": 64, "description": "EngineeringAttributeInfo.AccessMode as V21 names it, null when not declared." },
+        "type": { "$ref": "#/$defs/optionalText", "description": "CLR type of the value read in the probe, null when unreadable." }
+      }
+    },
+    "attributes": { "type": "array", "items": { "$ref": "#/$defs/attribute" } },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relativePath", "name", "typeIdentifier", "positionNumber", "isBuiltIn", "classification", "attributes", "addresses", "channels", "interface"],
+      "properties": {
+        "relativePath": { "type": "string", "maxLength": 1024, "description": "Path below the profiled module; empty for the module itself." },
+        "name": { "type": "string", "maxLength": 1024 },
+        "typeIdentifier": { "$ref": "#/$defs/optionalText" },
+        "positionNumber": { "type": ["integer", "null"] },
+        "isBuiltIn": { "type": ["boolean", "null"] },
+        "classification": { "$ref": "#/$defs/optionalText" },
+        "attributes": { "$ref": "#/$defs/attributes" },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ioType", "lengthBits"],
+            "properties": { "ioType": { "$ref": "#/$defs/text" }, "lengthBits": { "type": "integer" } }
+          }
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "ioType", "number", "attributes"],
+            "properties": { "type": { "$ref": "#/$defs/text" }, "ioType": { "$ref": "#/$defs/text" }, "number": { "type": "integer" }, "attributes": { "$ref": "#/$defs/attributes" } }
+          }
+        },
+        "interface": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["interfaceType", "nodes", "ports"],
+          "properties": {
+            "interfaceType": { "$ref": "#/$defs/optionalText" },
+            "nodes": { "type": "array", "items": { "type": "string", "maxLength": 1024 } },
+            "ports": { "type": "array", "items": { "type": "string", "maxLength": 1024, "description": "relativePath of each port item." } }
+          }
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["typeIdentifier", "orderNumber", "firmwareVersion", "typeName", "catalogPath", "moduleKind", "items", "plugRules", "evidenceId", "capture"],
+      "properties": {
+        "typeIdentifier": { "$ref": "#/$defs/text" },
+        "orderNumber": { "$ref": "#/$defs/optionalText" },
+        "firmwareVersion": { "$ref": "#/$defs/optionalText" },
+        "typeName": { "$ref": "#/$defs/optionalText" },
+        "catalogPath": { "$ref": "#/$defs/optionalText" },
+        "moduleKind": { "enum": ["device", "module"], "description": "device: created with hardware_add; module: plugged with hardware_plug." },
+        "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/item" } },
+        "plugRules": {
+          "type": "array",
+          "description": "CanPlugNew of this module at each probed rack slot in the run's final configuration (change_prepare hardware_plug: prepared or IncompatibleHardware); an occupied slot names its module.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rack", "positionNumber", "canPlugNew", "occupiedBy"],
+            "properties": {
+              "rack": { "$ref": "#/$defs/text", "description": "The rack's typeIdentifier." },
+              "positionNumber": { "type": "integer" },
+              "canPlugNew": { "type": "boolean" },
+              "occupiedBy": { "$ref": "#/$defs/optionalText", "description": "typeIdentifier of the module in that slot, null when free." }
+            }
+          }
+        },
+        "evidenceId": { "$ref": "#/$defs/optionalText" },
+        "capture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tiaVersion", "runner", "report"],
+          "properties": { "tiaVersion": { "$ref": "#/$defs/text" }, "runner": { "$ref": "#/$defs/text" }, "report": { "$ref": "#/$defs/text" } }
+        }
+      }
+    }
+  }
+}

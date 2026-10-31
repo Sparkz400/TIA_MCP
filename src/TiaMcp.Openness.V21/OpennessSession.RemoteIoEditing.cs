@@ -82,6 +82,9 @@ namespace TiaMcp.Openness.V21
             var attributes = ChangeObject(change.Payload, "attributes");
             if (attributes.Count == 0 || attributes.Count > ChannelWriteAttributes.Count) throw new BridgeException("InvalidRequest", "At least one reviewed channel attribute is required.");
             var scalars = ChannelScalars(attributes);
+            // The OB link is declared only while its flag is on, so a profile captured with the flag off cannot list it; its native check follows.
+            HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(module.Item.TypeIdentifier),
+                new JObject { ["type"] = channel.Type.ToString(), ["ioType"] = channel.IoType.ToString(), ["number"] = channel.Number }, scalars.Properties().Select(property => property.Name));
             var changes = PrepareAttributes(channel, scalars, ChannelWriteAttributes, out var converted);
             // Store native scalar representations so the preservation comparison
             // matches native numeric/enum values rather than JSON input spelling.
@@ -150,29 +153,42 @@ namespace TiaMcp.Openness.V21
             var connectors = network.IoConnectors.ToArray();
             if (index >= connectors.Length) throw new BridgeException("ConnectorNotFound", "connectorIndex is outside the observed native connector collection.");
             var connector = connectors[index];
-            if (connectors.Where((row, i) => i != index).Any(row => row.ConnectedToIoSystem != null))
-                throw new BridgeException("UnsupportedCapability", "Shared-device and multi-controller assignments require separate qualification; all other interface connectors must be unassigned.");
+            bool disconnect = payload.Value<bool?>("disconnect") == true;
+            // A shared device: a further connector of the same interface joins (or leaves) another controller's I/O system.
+            bool shared = payload.Property("sharedDevice") != null && ExplicitChangeBool(payload, "sharedDevice");
+            var others = connectors.Where((row, i) => i != index && row.ConnectedToIoSystem != null).ToArray();
+            if (!shared && others.Length != 0)
+                throw new BridgeException("UnsupportedCapability", "Another connector of this interface is assigned; adding or removing a further controller is a shared-device assignment (sharedDevice: true).");
+            if (!shared && payload["sharedAddressControllerOwnerPaths"] != null) throw new BridgeException("InvalidRequest", "sharedAddressControllerOwnerPaths is recorded by the bridge for sharedDevice only.");
+            if (shared && others.Length == 0) throw new BridgeException("InvalidRequest", "sharedDevice needs another connector of this interface assigned to another controller's I/O system.");
+            if (shared && !disconnect && connector.ConnectedToIoSystem != null) throw new BridgeException("InvalidRequest", "A shared-device assignment connects an unassigned connector; disconnect this one first.");
+            if (shared && payload["expectedServerModule"] != null) throw new BridgeException("InvalidRequest", "The generated server module belongs to the first assignment; omit expectedServerModule.");
             var plc = SelectPlc(change.Selector);
             payload["addressControllerOwnerPath"] = plc.Path.Substring(0, plc.Path.LastIndexOf("/plc/", StringComparison.Ordinal));
             string station = item.Path.Substring(0, item.Path.IndexOf("/items/", StringComparison.Ordinal));
             var stationBudget = new ScanBudget(50000);
-            foreach (var peer in DeviceItems(project, stationBudget).Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal)))
+            var hardware = DeviceItems(project, stationBudget).ToArray();
+            if (stationBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish complete remote-station assignment ownership.");
+            var plcItems = PlcItems(hardware);
+            var peers = others.Select(other => OwningPlcItem(other.ConnectedToIoSystem.Parent, plcItems) ?? throw new BridgeException("UnresolvedIoOwnership", "Another connector's I/O system resolves to no PLC of the project.")).ToArray();
+            var allowed = new[] { plc.Software }.Concat(peers.Select(peer => (PlcSoftware)peer.Item.GetService<SoftwareContainer>().Software)).ToArray();
+            if (allowed.Skip(1).Any(software => software.Equals(plc.Software))) throw new BridgeException("InvalidRequest", "The selected PLC already controls this IO device through another connector of the interface.");
+            if (shared) payload["sharedAddressControllerOwnerPaths"] = new JArray(peers.Select(peer => peer.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal));
+            foreach (var peer in hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal)))
             {
                 var peerNetwork = peer.Item.GetService<NetworkInterface>();
-                if (peerNetwork != null && peerNetwork.IoConnectors.Any(other => !Equals(other, connector) && other.ConnectedToIoSystem != null))
-                    throw new BridgeException("UnsupportedCapability", "Another connector on this remote station is assigned. Shared-device/multi-interface assignment changes are excluded from this route.");
+                if (peerNetwork != null && !(shared && Equals(peer.Item, item.Item)) && peerNetwork.IoConnectors.Any(other => !Equals(other, connector) && other.ConnectedToIoSystem != null))
+                    throw new BridgeException("UnsupportedCapability", "Another interface on this remote station is assigned. Multi-interface assignment changes are excluded from this route.");
                 foreach (var address in peer.Item.Addresses)
                 {
                     var owners = address.AddressControllers.ToArray();
-                    if (owners.Length > 1 || owners.Any(owner => ControllerMatchesSelectedPlc(owner, plc.Software) != true))
-                        throw new BridgeException("UnresolvedIoOwnership", "Every existing remote-station address must be unassigned or owned solely by the selected PLC.");
+                    if (owners.Length > 1 || owners.Any(owner => !allowed.Any(software => ControllerMatchesSelectedPlc(owner, software) == true)))
+                        throw new BridgeException("UnresolvedIoOwnership", "Every existing remote-station address must be unassigned or owned solely by the selected PLC" + (shared ? " or by the PLC of another assigned connector." : "."));
                 }
             }
-            if (stationBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish complete remote-station assignment ownership.");
             if (connector.ConnectedToIoSystem != null && ControllerMatchesSelectedPlc(connector.ConnectedToIoSystem.Parent, plc.Software) != true)
                 throw new BridgeException("UnresolvedIoOwnership", "The existing I/O system must belong to the selected PLC.");
             controller = null;
-            bool disconnect = payload.Value<bool?>("disconnect") == true;
             if (disconnect)
             {
                 if (payload["controllerHardwarePath"] != null || payload["controllerIndex"] != null || payload["createIoSystemName"] != null) throw new BridgeException("InvalidRequest", "Disconnect cannot also select or create an I/O controller/system.");
@@ -197,7 +213,7 @@ namespace TiaMcp.Openness.V21
             }
             if (preview != null) ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["connectorIndex"] = index, ["beforeIoSystem"] = connector.ConnectedToIoSystem?.Name,
                 ["controllerHardwarePath"] = payload["controllerHardwarePath"]?.DeepClone(), ["controllerIndex"] = payload["controllerIndex"]?.DeepClone(),
-                ["afterIoSystem"] = controller?.IoSystem?.Name ?? payload.Value<string>("createIoSystemName"), ["disconnect"] = disconnect });
+                ["afterIoSystem"] = controller?.IoSystem?.Name ?? payload.Value<string>("createIoSystemName"), ["disconnect"] = disconnect, ["sharedDevice"] = shared });
             ValidateExpectedServerModule(change, project, item, preview);
             return connector;
         }
@@ -249,8 +265,9 @@ namespace TiaMcp.Openness.V21
 
         private JArray CaptureHardwareEngineering(Project project, string kind = null)
         {
-            bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind);
-            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes : HardwareWriteAttributes;
+            bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind), mrp = HardwareEngineeringRules.CapturesMrp(kind);
+            var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes
+                : kind == "hardware_shared_device_access" ? new HashSet<string>(HardwareWriteAttributes.Concat(SharedAccessAttributes), StringComparer.Ordinal) : HardwareWriteAttributes;
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
@@ -304,6 +321,7 @@ namespace TiaMcp.Openness.V21
                 if (network != null && IsIDeviceInterface(item)) row["network"]["transferAreas"] = TransferAreas(network);
                 if (ports && item.GetService<NetworkPort>() is NetworkPort port)
                     row["port"] = new JObject { ["connectedPorts"] = new JArray(port.ConnectedPorts.Select(partner => Owner(partner.OwnedBy)).OrderBy(value => value, StringComparer.Ordinal)) };
+                if (mrp && MrpRows(item, ring => Owner(ring.OwnedBy)) is JArray instances) row["mrp"] = instances;
                 rows.Add(row);
             }
             return rows;
@@ -320,6 +338,8 @@ namespace TiaMcp.Openness.V21
                 ["covered"] = "All observed hardware identities/slots, reviewed hardware/channel attributes, configured address ranges/owners, node configuration and exact I/O-system assignments; fail closed on capture failure.",
                 ["limitations"] = "Unexposed vendor payloads, non-allowlisted parameters, physical wiring, shared-device/multi-controller behavior and runtime are not qualified." };
             if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
+            if (HardwareEngineeringRules.CapturesMrp(change.Kind)) preview["preservation"]["covered"] += " Every interface's MRP instances (domain, MediaRedundancyRole, ring ports) are included.";
+            if (change.Kind == "hardware_shared_device_access") preview["preservation"]["covered"] += " SharedDeviceAccessType of every device item is included.";
             if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress and Failsafe_FMonitoringtime of every device item are included.";
             if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));
         }
@@ -331,8 +351,15 @@ namespace TiaMcp.Openness.V21
             string path = Path.Combine(change.Directory, "hardware-after.json");
             File.WriteAllText(path, after.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
-            if (change.Kind == "hardware_replace") change.Readbacks.Add(new JObject { ["role"] = "hardware-replace-inventory",
-                ["before"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath")), ["after"] = HardwareEngineeringRules.ReplaceInventory(after, change.Payload.Value<string>("hardwarePath")) });
+            if (change.Kind == "hardware_replace")
+            {
+                string module = change.Payload.Value<string>("hardwarePath");
+                var inventoryBefore = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, module);
+                var inventoryAfter = HardwareEngineeringRules.ReplaceInventory(after, module);
+                var map = HardwareEngineeringRules.ReplaceAddressMap(inventoryBefore, inventoryAfter);
+                change.Readbacks.Add(new JObject { ["role"] = "hardware-replace-inventory", ["before"] = inventoryBefore, ["after"] = inventoryAfter, ["addressMap"] = map,
+                    ["changedReferencedTags"] = HardwareEngineeringRules.ChangedReferencedTags(change.Preview?["addressImpact"]?["referencedTags"] as JArray ?? new JArray(), map) });
+            }
             if (change.Kind == "cax_import") RecordCaxHardwareDifference(change, after);
             HardwareEngineeringRules.RequirePreserved(change.Kind, change.Payload, change.HardwareBeforeManifest, after);
             change.Stages.Add(change.Kind == "cax_import" && change.Payload.Value<string>("importOption") == "OverwriteTiaDevice" ? "configured_hardware_difference_recorded" : "configured_hardware_preservation_verified");

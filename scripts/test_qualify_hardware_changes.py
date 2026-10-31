@@ -48,6 +48,46 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMpHead~MpDi",
                          q.constant(run, q.MP, q.MP.prefix + "MpDi"))
 
+    def test_ring_link_closes_the_line_into_one_ring(self):
+        run = q.Run.__new__(q.Run)
+        run.base = "/projects/P/devices/"
+        # The CPU 1214C (one port) leaves the line; the IM 155-5's Port_2 then takes the scratch CPU's freed Port_1.
+        links = [q.family_ports(run)["HwMp"], tuple(q.ports(run, 2)), q.ring_ports(run)]
+        ends = [port for link in links for port in link]
+        self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
+        self.assertIn(q.family_ports(run)["Hw1200"][1], q.ring_ports(run))
+        devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
+        degree = {d: sum(link.count(d) for link in devices) for link in devices for d in link}
+        self.assertEqual({"ScratchStation": 2, "HwPeer": 2, "HwMp": 2}, degree)  # Three devices, three links, two each: one ring.
+        managers = [path for path in q.interfaces(run) if path.startswith(run.base + "ScratchStation/")]
+        self.assertEqual(1, len(managers))
+        self.assertEqual({d for link in devices for d in link}, {path[len(run.base):].split("/")[0] for path in q.interfaces(run)})
+
+    def test_rack_is_the_one_root_item_beside_the_head(self):
+        run = q.Run.__new__(q.Run)
+        run.base = "/projects/P/devices/"
+        row = lambda slot, kind="None": {"positionNumber": slot, "classification": kind}
+        run.current = {"view": {"hw:/projects/P/devices/HwSp/items/Rail_0": row(0), "hw:/projects/P/devices/HwSp/items/HwSpHead": row(0),
+                                "hw:/projects/P/devices/HwSp/items/Rail_0/items/X": row(0), "hw:/projects/P/devices/HwSp/items/Srv": row(4)}}
+        self.assertEqual("Rail_0", q.rack(run, "HwSp", "HwSpHead"))
+        run.current["view"]["hw:/projects/P/devices/HwSp/items/Rail_1"] = row(0)
+        with self.assertRaises(AssertionError):
+            q.rack(run, "HwSp", "HwSpHead")
+
+    def test_discovery_records_instead_of_failing(self):
+        class Fake:
+            def __init__(self, discover):
+                self.args, self.report = type("Args", (), {"discover": discover})(), {"certificateIdentity": {}, "notQualified": {}}
+        for discover in (False, True):
+            run = q.Run(Fake(discover))
+            self.assertEqual(discover, run.h.report["discovery"])
+            if discover:
+                run.expect(False, "step", "differs", {"changed": {}})
+                self.assertEqual([{"message": "differs", "detail": {"changed": {}}}], run.h.report["discovered"]["step"])
+            else:
+                with self.assertRaises(AssertionError):
+                    run.expect(False, "step", "differs")
+
     def test_deferred_apply_skips_compile_and_save_only(self):
         class Fake:
             def __init__(self, stages, compile=None):

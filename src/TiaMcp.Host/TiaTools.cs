@@ -35,7 +35,7 @@ public sealed partial class TiaTools(IBridgeClient bridge, HostOptions options)
     public Task<CallToolResult> Start(CancellationToken cancellationToken) => Call("start", null, cancellationToken);
 
     [McpServerTool(Name = "hardware_catalog_search", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Search the installed TIA hardware catalog in an attached session. Returns exact type identifiers for subsequent scratch creation; does not scan the network.")]
+    [Description("Search the installed TIA hardware catalog in an attached session. Returns exact type identifiers for subsequent scratch creation; an entry with a captured module capability profile names it in profile (contracts/hardware-catalog-profiles.v1.json#typeIdentifier). Does not scan the network.")]
     public Task<CallToolResult> Catalog(string filter, CancellationToken cancellationToken, int maxItems = 100)
         => Call("catalog_query", new { filter, maxItems = Limit(maxItems) }, cancellationToken);
 

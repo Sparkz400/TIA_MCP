@@ -7,6 +7,7 @@
 - `network.ioConnectors`: native connected I/O-system reference and exposed connector attributes. `notAssigned` and `notConnected` are distinct from unavailable getters.
 - `network.ports`: each port of the interface (`portIndex`, the port's own hardware path) with the hardware paths of its configured partner ports (`NetworkPort.ConnectedPorts`).
 - `network.transferAreas`: on an interface in I-device mode only (`InterfaceOperatingMode` includes `IoDevice`), each transfer area by name with its type, direction, position number, both lengths and its local and partner addresses (`NetworkInterface.TransferAreas`).
+- `network.mrp`: on an interface exposing `MrpInstancesOwner`, each MRP instance with its name, connected MRP domain, `MediaRedundancyRole` and the owners of `RingPort1`/`RingPort2`.
 - `gsd` / `gsdDevice`: `GsdId`, `GsdName`, `GsdType` and the PROFINET/PROFIBUS flags of a GSD device item, and of its GSD device on root items. `gsdExportAvailable` tells whether the item exposes the I-device `GsdExportProvider`.
 
 Owner paths come from native engineering-object equality and bounded native ancestry. Names and address overlaps are never ownership proof. Individual getter failures retain earlier metadata and appear in warnings. `network.scopeComplete` becomes false on truncation, failed getters or unresolved association owners. Hardware lookup is capped at 50,000 items; global subnet resolution examines at most 5,000 subnets. The public `maxItems` budget still applies to emitted rows, attributes and associations.
@@ -31,11 +32,11 @@ The 12 October implementation adds three prepared change kinds alongside the exi
 |---|---|
 | `hardware_move` | `hardwarePath`, `positionNumber`. Moves an eligible pluggable module within its existing native rack, after `CanPlugMove` succeeds. Built-in and software-bearing items are excluded. Cross-rack movement is not implemented. |
 | `hardware_channel_attributes` | `hardwarePath`, `channelType`, `channelIoType`, `channelNumber`, `attributes`. All four selectors must identify one native channel. Every field must be in the reviewed allowlist and expose native read/write access. |
-| `network_io_assign` | `hardwarePath`, `connectorIndex`, `controllerHardwarePath`, `controllerIndex`, and `createIoSystemName` only when the selected controller has no system. Both interfaces must already expose one node on the same native subnet. To disconnect, supply `hardwarePath`, `connectorIndex`, `disconnect: true`, without controller/create selectors. |
+| `network_io_assign` | `hardwarePath`, `connectorIndex`, `controllerHardwarePath`, `controllerIndex`, and `createIoSystemName` only when the selected controller has no system. Both interfaces must already expose one node on the same native subnet. To disconnect, supply `hardwarePath`, `connectorIndex`, `disconnect: true`, without controller/create selectors. `sharedDevice: true` adds or removes a further controller on another connector of the same interface ([shared devices](#shared-devices)). |
 
 `hardware_inspect` reports native `controllerIndex` and `connectorIndex` values. These indexes identify the observed collection, not a guessed controller by name. Preparation binds them to the project fingerprint. Channel inspection reports the bridge allowlist separately from native access and exposes native enum values when available; a symbolic enum's existence does not establish that every member is accepted by every module.
 
-Controller assignments require the selected PLC's native ownership. A second assigned connector anywhere on the remote station, shared/foreign address ownership, unresolved ownership and same-system no-ops are rejected. The bridge verifies the selected forward association, the new system's reverse association and removal from the previous system's reverse association. Shared-device and multi-controller changes require separate implementation/qualification.
+Controller assignments require the selected PLC's native ownership. Without `sharedDevice`, a second assigned connector anywhere on the remote station, shared/foreign address ownership, unresolved ownership and same-system no-ops are rejected. The bridge verifies the selected forward association, the new system's reverse association and removal from the previous system's reverse association. Shared devices follow their own rule ([below](#shared-devices)).
 
 All five module/slot/channel/address/controller operations require compilation and a whole-project checkpoint. Their preservation manifest captures all observed hardware paths/type identifiers/slots, reviewed hardware and channel fields, configured address ranges/owners, node settings and exact I/O-system assignments. An operation-specific comparison permits only the reviewed change and its explicitly bounded dependent effects. Unrelated changes fail with `MutationVerificationFailed` and retain the archive. Archive retrieval must match the exact prechange configured manifest before recovery reports success. Unknown vendor payloads and parameters outside the reviewed allowlist are outside this metadata contract.
 
@@ -146,7 +147,7 @@ generated-server companion. The following stay outside the advertised route, eac
 needing its own scope and evidence:
 
 - other module families and other companion layouts;
-- shared devices and multi-controller assignments;
+- shared devices and multi-controller assignments (since then `sharedDevice` and `hardware_shared_device_access`, [below](#shared-devices));
 - cross-rack moves;
 - channel settings other than `Smoothing`.
 
@@ -159,7 +160,7 @@ native qualification is recorded per feature in the catalog.
 |---|---|
 | `hardware_port_connect` | `hardwarePath`, `partnerHardwarePath`: two exact port device items from `network.ports`. Both ports must be free; `NetworkPort.ConnectToPort`, then forward and reverse `ConnectedPorts` must show the link. Alternative partners (tool changers) are not supported. |
 | `hardware_port_disconnect` | Same payload; the two ports must be linked. `NetworkPort.DisconnectFromPort`, then neither side may list the other. |
-| `hardware_replace` | `hardwarePath`, exact installed catalog `typeIdentifier`, optional `acceptLoss: true`. `DeviceItem.ChangeType` on one pluggable module in a rack; built-in and software-bearing items are refused. |
+| `hardware_replace` | `hardwarePath`, exact installed catalog `typeIdentifier`, optional `acceptLoss: true`, optional `acceptAddressChange: true` with `acknowledgedTags` ([below](#address-changing-replacement)). `DeviceItem.ChangeType` on one pluggable module in a rack; built-in and software-bearing items are refused. |
 | `hardware_transfer_area_create` | `hardwarePath` (an I-device interface), `name`. `TransferAreaComposition.Create(name, TransferAreaType.CD)`: one controller-device transfer area; TIA chooses its direction, lengths and local addresses, which the readback and `network.transferAreas` report. A name already used on the interface (ignoring case) is refused as `ObjectExists`, a non-I-device item as `UnsupportedCapability`. |
 | `hardware_transfer_area_delete` | Same payload; `TransferArea.Delete` on the area with that exact name (`ObjectNotFound` otherwise). Program references to its addresses are checked only by the device compile. |
 | `hardware_gsd_export` | `hardwarePath`, `designation`, optional `description`. The item must be a PROFINET interface whose `InterfaceOperatingMode` includes `IoDevice` (set `"IoController, IoDevice"` with `hardware_attributes`); V21 offers `GsdExportProvider` on every device item but exports only from an I-device interface, so other items are refused as `UnsupportedCapability` and only I-device interfaces report `gsdExportAvailable`. Calls `GsdExportProvider.Export` into a fresh directory under the export artifacts and returns every produced file (up to 32) with its SHA-256. The GSD content is not validated. |
@@ -191,6 +192,73 @@ byte in each direction, the next free output byte as local address and position 
 interface back to `IoController` with `hardware_attributes` removes its transfer areas and these
 constants; that kind has no transfer-area preservation check. The interface's
 `CalculatedBandwidthForCyclicIoData` is computed at the device compile and not saved.
+
+## Shared devices
+
+V21 Openness exposes a shared device in two ways, and the bridge reviews both. Neither is natively qualified yet; the
+[hardware runner](../../scripts/qualify_hardware_changes.py) covers them ([record](../verification/hardware-topology-20261031.md)).
+
+- **Several PLCs of one project.** An IO-device interface has several `IoConnector`s (four on the IM 155-6 PN ST V6.4).
+  `network_io_assign` with `sharedDevice: true` connects a further, unassigned connector to another PLC's I/O system while
+  the other connectors stay assigned; one connector per PLC. The bridge records the PLC items of the other assigned
+  connectors as `sharedAddressControllerOwnerPaths` (a caller-supplied value is refused). Preservation lets each station
+  address have at most one owner among those PLCs and the selected one; the other connectors must stay exact.
+  `disconnect: true` with `sharedDevice` removes one PLC again. Without `sharedDevice`, a further assigned connector is
+  `UnsupportedCapability`; the generated server contract (`expectedServerModule`) belongs to the first assignment only.
+- **A controller outside the project.** `hardware_shared_device_access` writes the device item attribute
+  `SharedDeviceAccessType` (`PLC` or `OutsideOfProject`; `Unknown` is the native unassigned state) on one module or
+  submodule of an assigned IO device. Stations holding PLC software are refused. The bridge records the PLC items of the
+  station's I/O systems as `addressControllerOwnerPaths`; the module and its subitems may take the requested access, every
+  address range stays and may keep at most one owner among those PLCs. The other project, `NumberOfExternalIoControllers`
+  and module copies (`SharedDeviceCopyOfModule`) are not configured.
+
+V21 has no per-module controller selection in one project beyond these attributes; which PLC owns a module after a second
+assignment is what TIA decides, and the readback reports it.
+
+## Media redundancy (MRP)
+
+`network_mrp_set` takes `hardwarePath` (a PROFINET interface with exactly one MRP instance, `MrpInstancesOwner`), `role`
+(`NotInRing`, `Manager`, `Client`, `ManagerAuto`), optional `domainName` and optional `createDomain: true`. It writes the
+instance's `MediaRedundancyRole` and, with `domainName`, adds the interface to that MRP domain of its subnet
+(`MrpDomainOwner.MrpDomains`, `MrpDomain.DomainParticipants.Add`); `createDomain` creates it first and refuses an existing
+name, an absent one without it is `ObjectNotFound`. An unchanged role and domain is refused. V21 offers no participant
+removal, so an interface leaves a domain only by joining another one.
+
+`RingPort1`/`RingPort2` are read-only in V21 and stay the TIA defaults (Port_1 and Port_2). The ring itself is the port
+topology: set the roles first, then close the ring with `hardware_port_connect`; a ring without one manager fails the device
+compile. Preservation adds every interface's MRP instances (name, domain, role, ring ports) to the manifest; only the selected
+instance's role and domain may change. MRP domain attributes (`IsDefault`, `ManagerOutsideOfProjectActive`), domain
+deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed. A single-port device (CPU 1214C)
+cannot be a ring member.
+
+## Address-changing replacement
+
+`hardware_replace` with `acceptAddressChange: true` admits a new type whose address ranges move or resize. Because V21
+reveals the new addresses only after `ChangeType`, preparation lists every tag of the owning PLCs' root tag tables whose
+absolute address overlaps one of the module's current ranges (`addressImpact.referencedTags` in the preview) and refuses
+with `AddressReferenced` unless `acknowledgedTags` names exactly those tag paths. After the write each address must keep its
+item, I/O type and owners (`acceptLoss` still governs lost addresses and children); the readback
+`hardware-replace-inventory` adds `addressMap` (old and new range per item and I/O type) and `changedReferencedTags` (the
+referenced tags whose range moved, with the new range). Tag addresses are not rewritten, software-unit tags are not read and
+program references are checked only by the mandatory device compile.
+
+## Module capability profiles
+
+[`contracts/hardware-catalog-profiles.v1.json`](../../contracts/hardware-catalog-profiles.v1.json)
+([schema](../../contracts/hardware-catalog-profiles.v1.schema.json)) holds one profile per exact `typeIdentifier`: catalog
+article, firmware, type name and path, module kind, every item of its subtree with each attribute's native access mode and
+probed value type, address lengths, channels with their attributes, interface nodes and ports, and the `CanPlugNew` outcome
+at slots 1-4 of each probed rack type. Values are never recorded. The hardware runner writes `profiles.json` for every type
+its native run creates; a curated run fills the contract, which holds none until then.
+
+`hardware_catalog_search` names an entry's profile in `profile` (`contracts/hardware-catalog-profiles.v1.json#<typeIdentifier>`,
+else null). When a profile exists for an item's type, `hardware_attributes`, `hardware_channel_attributes` and
+`hardware_shared_device_access` refuse an attribute it does not declare writable (`AttributeNotWritable`; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check), on top of native
+access and the bridge allowlists. Plug rules are observations in the run's final configuration, not a placement rule set.
+
+GSD devices need a GSD file installed in the TIA hardware catalog. V21 Openness offers no installation route (only
+`HardwareCatalog.Find` and the I-device `GsdExportProvider.Export`), so a GSD device enters only after an operator installs
+the file in TIA (Options > Manage general station description files); `hardware_add` then takes its `GSD:` type identifier.
 
 ## Preservation manifest identity checks
 

@@ -185,6 +185,13 @@ class Run:
     def mark(self, kind, need, label):
         self.coverage.setdefault(kind, {}).setdefault(need, []).append(label)
 
+    def expect(self, ok, label, message, detail=None):
+        """require(); with --discover the difference is recorded under discovered and the run goes on (a key-discovery pass, never evidence)."""
+        if not ok and not getattr(getattr(self.h, "args", None), "discover", False):
+            require(False, message)
+        if not ok:
+            self.h.report.setdefault("discovered", {}).setdefault(label, []).append({"message": message, "detail": detail})
+
     def domains(self):
         t = self.h.tool
         return domains(t("certificate_inspect"), t("access_inspect"), t("web_inspect"), t("vci_workspace_inspect"))
@@ -213,9 +220,9 @@ class Run:
         prepared = self.h.stage("prepare " + label, lambda: self.h.tool("change_prepare", self.args(kind, payload)))
         actual = prepared["preview"]
         expected = {"changeId": prepared["changeId"], "kind": kind, "project": {"path": self.project}, **(preview or {})}
-        require(prepared["state"] == "prepared" and actual["payload"] == (shown or payload) and matches(expected, actual)
-                and all(actual.get(key) == value for key, value in (exact or {}).items()),
-                "Preview of %s differs: %s" % (label, {key: actual.get(key) for key in [*expected, *(exact or {}), "payload"]}))
+        require(prepared["state"] == "prepared", "Preparation of %s did not reach prepared" % label)
+        self.expect(actual["payload"] == (shown or payload) and matches(expected, actual) and all(actual.get(key) == value for key, value in (exact or {}).items()),
+                    label, "Preview of %s differs: %s" % (label, {key: actual.get(key) for key in [*expected, *(exact or {}), "payload"]}))
         return prepared
 
     def prepare_store(self, label, kind, payload, shown=None, **effect):
@@ -256,9 +263,10 @@ class Run:
             observed = diff(before["view"], state)
             side, unexpected = split(observed, wanted, tolerated or (lambda category, key: False))
             missing = {c: sorted(set(keys) - set(observed[c])) for c, keys in wanted.items() if set(keys) - set(observed[c])}
-            require(not missing and not unexpected, "Native effect of %s differs: missing %s, unexpected %s" % (label, missing, unexpected))
+            self.expect(not missing and not unexpected, label, "Native effect of %s differs: missing %s, unexpected %s" % (label, missing, unexpected),
+                        {c: {k: {"before": before["view"].get(k), "after": state.get(k)} for k in keys} for c, keys in unexpected.items()})
             for key, row in (rows(applied, state) if callable(rows) else rows or {}).items():
-                require(matches(row, state.get(key)), "Readback of %s differs: %s" % (key, state.get(key)))
+                self.expect(matches(row, state.get(key)), label, "Readback of %s differs: %s" % (key, state.get(key)))
             if check:
                 check(applied, state)
             if side:
@@ -275,7 +283,7 @@ class Run:
         def check():
             before = self.state()
             error = self.h.call_error("change_prepare", self.args(kind, payload, **top))
-            require(error.get("code") == code, "Expected %s, observed %s: %s" % (code, error.get("code"), error.get("message")))
+            self.expect(error.get("code") == code, "refuse " + label, "Expected %s, observed %s: %s" % (code, error.get("code"), error.get("message")))
             require(self.state() == before, "Refused preparation changed the project")
             return error
         error = self.h.stage("refuse %s: %s" % (kind, label), check)

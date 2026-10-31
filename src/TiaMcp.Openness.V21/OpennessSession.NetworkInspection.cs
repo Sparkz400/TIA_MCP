@@ -143,6 +143,8 @@ namespace TiaMcp.Openness.V21
                 try { result["transferAreas"] = TransferAreas(network); }
                 catch (Exception error) { warnings.Add(InspectionWarning(owner.Path + "/network/transferAreas", error)); }
             }
+            try { if (MrpRows(owner.Item, ring => NetworkOwnerReference(ring, hardware)) is JArray mrp) result["mrp"] = mrp; }
+            catch (Exception error) { warnings.Add(InspectionWarning(owner.Path + "/network/mrp", error)); }
             bool unresolved = result.Descendants().OfType<JProperty>().Any(property => property.Name == "resolution" && (string)property.Value != "resolved");
             result["scopeComplete"] = !budget.Truncated && warnings.Count == failuresBefore && !unresolved;
             result["associationBasis"] = "Native controller/connector associations and engineering-object equality; names and address overlap never establish ownership.";

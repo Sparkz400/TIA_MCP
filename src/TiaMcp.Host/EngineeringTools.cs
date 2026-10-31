@@ -97,7 +97,7 @@ public sealed partial class TiaTools
         => Call("block_interface", new { blockName, blockPath, projectName, plcPath, scopePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "hardware_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect configured hardware attributes, addresses, exposed channels, subnet memberships, native I/O-controller/connector associations and port interconnections with exact hardware owners or explicit unresolved coverage, plus GSD identities. Bounded offline observations; no physical wiring inference, network scan or PLC connection.")]
+    [Description("Inspect configured hardware attributes, addresses, exposed channels, subnet memberships, native I/O-controller/connector associations, port interconnections and MRP instances (domain, role, ring ports) with exact hardware owners or explicit unresolved coverage, plus GSD identities. Bounded offline observations; no physical wiring inference, network scan or PLC connection.")]
     public Task<CallToolResult> HardwareInspect(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
         => Call("hardware_inspect", new { hardwarePath, projectName, maxItems = Limit(maxItems) }, cancellationToken);
 

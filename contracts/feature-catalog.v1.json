@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.86",
+  "catalogVersion": "0.4.87",
   "targetTiaVersions": [
     21
   ],
@@ -4786,7 +4786,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "Each entry names its module capability profile (contracts/hardware-catalog-profiles.v1.json#typeIdentifier) when the bundled contract has one, else null; see hardware.catalog_profiles."
         ]
       },
       "qualification": {
@@ -8172,18 +8173,23 @@
       "featureId": "hardware.catalog_profiles",
       "domain": "hardware",
       "title": "Qualified catalog and HSP module capability profiles",
-      "mcpTools": [],
+      "mcpTools": [
+        "hardware_catalog_search"
+      ],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "Installed V21 Siemens.Engineering.Base: HardwareCatalog.Find (CatalogEntry TypeIdentifier, ArticleNumber, Version, TypeName, CatalogPath), DeviceItem.GetAttributeInfos (EngineeringAttributeInfo access mode), Addresses, Channels, NetworkInterface/NetworkPort services and DeviceItem.CanPlugNew; a module must exist in a project to expose its attributes."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "contracts/hardware-catalog-profiles.v1.json (schema hardware-catalog-profiles.v1.schema.json) holds one profile per exact typeIdentifier: catalog article, firmware, type name and path, module kind, every item of its subtree with each attribute's access mode and probed value type, address lengths, channels with their attributes, interface nodes and ports, and the CanPlugNew outcome at slots 1-4 of each probed rack type. Values are never recorded.",
+          "scripts/qualify_hardware_changes.py captures the profiles of every type its native run creates (CPU 1511-1 PN, CPU 1214C, IM 155-5 PN ST, IM 155-6 PN ST, their DI/SM modules, the generated ET 200SP server module) into profiles.json; the contract holds none until such a run is curated. Types the run does not create, and HSP modules not installed on the qualification PC, have no profile.",
+          "hardware_catalog_search names an entry's profile (contracts/hardware-catalog-profiles.v1.json#typeIdentifier) when one exists. change.hardware_attributes, change.hardware_channel_attributes and change.hardware_shared_device_access refuse an attribute the item type's profile does not declare writable (AttributeNotWritable; a channel's hardware interrupt OB link, declared only while its flag is on, keeps its native check); without a profile only native access and the bridge allowlists apply.",
+          "Plug rules are observations in the run's final configuration (an occupied slot names its module), not a complete placement rule set."
         ]
       },
       "qualification": {
@@ -8191,9 +8197,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No implemented adapter."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -8210,19 +8216,26 @@
       "featureId": "hardware.distributed_io",
       "domain": "hardware",
       "title": "Distributed I/O creation and topology configuration",
-      "mcpTools": [],
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore",
+        "hardware_inspect"
+      ],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "Composed of the typed V21 hardware routes of change.hardware_add, change.network_configure, change.network_io_assign (including sharedDevice), change.hardware_plug, change.hardware_move, change.hardware_port_connect, change.network_mrp_set and change.hardware_shared_device_access."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "The reviewed single-controller ET 200SP route (one CPU 1511-1 PN, one IM 155-6 PN ST V6.4, one DI/AI module) is qualified through change.hardware_move, change.network_io_assign and change.hardware_channel_attributes. The complete or shared distributed-I/O topology workflow remains unimplemented; narrower configured module, slot, address, reviewed channel and controller-association operations are tracked separately under change.hardware_plug, change.hardware_move, change.hardware_address_set, change.hardware_channel_attributes and change.network_io_assign.",
-          "Those routes do not establish shared-device/multi-controller topology, arbitrary module/channel support, or runtime qualification."
+          "The aggregate distributed-I/O workflow is a sequence of reviewed changes, each with its own preview, checkpoint, device compile and preservation: add IO devices (hardware_add), connect nodes (network_configure), assign controllers (network_io_assign, with the explicit generated ET 200SP server contract), plug and move modules, share an IO device between PLCs of one project (network_io_assign sharedDevice) or hand modules to a controller outside the project (hardware_shared_device_access), link ports and configure media redundancy (network_mrp_set). There is no single-call topology import.",
+          "The single-controller ET 200SP route (one CPU 1511-1 PN, one IM 155-6 PN ST V6.4, one DI/AI module) is qualified (local.remote-io.full-route.rerun.20261028); two controllers with S7-1200 and ET 200MP families passed the hardware gates (local.hardware_changes.families.20261029). ET 200SP under a second controller, the shared device and the MRP ring are covered by scripts/qualify_hardware_changes.py and not yet natively qualified.",
+          "I-devices under a higher-level controller, GSD devices (V21 Openness has no GSD installation API), drive devices, arbitrary module families and runtime behaviour are not covered."
         ]
       },
       "qualification": {
@@ -8230,9 +8243,9 @@
         "evidenceIds": []
       },
       "availability": {
-        "status": "unsupported",
+        "status": "conditional",
         "reasons": [
-          "No complete adapter covers this aggregate topology scope; availability and qualification of narrower configured operations are defined by their separate feature entries."
+          "Catalog entry is not a current-target authorization or availability result."
         ]
       },
       "prerequisites": [
@@ -13117,9 +13130,10 @@
           "One pluggable module in an existing rack; built-in and software-bearing items are refused. typeIdentifier must be an exact installed catalog identifier different from the current one.",
           "SM 1221 DI16x24VDC 6ES7 221-1BH30-0XB0 V1.0 replaced by its successor article 6ES7 221-1BH32-0XB0 V2.0 and back in a CPU 1214C rack, and DI 16x24VDC HF firmware V1.0/V2.0 in an ET 200MP rack (local.hardware_changes.families.20261029).",
           "V21 exposes no compatibility pre-check (no CanChangeType). The preview records the subtree's addresses and child items; after the write an address must keep its ioType, start, owners and at least its length, and every child path must remain. Otherwise MutationVerificationFailed requires checkpoint restore unless the payload sets acceptLoss: true.",
+          "acceptAddressChange: true admits a replacement whose addresses move or resize: each address must keep its item, I/O type and owners (an address map pairs old and new ranges per item and I/O type). Preparation lists the tags of the owning PLCs' root tag tables whose absolute address overlaps the module's ranges (preview addressImpact) and refuses with AddressReferenced unless acknowledgedTags names exactly those tag paths; the readback records the address map and the referenced tags whose range changed. Tag addresses are not rewritten and software-unit tags are not read. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Name, slot and container must stay; the subtree's channels, attributes and children may follow the new type. Everything outside the subtree, including port interconnections, must stay exact even with acceptLoss.",
           "Siemens decides whether the replacement keeps the item name; a renamed item fails verification and requires checkpoint restore.",
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): DI 16x24VDC HF between firmware V1.0 and V2.0 with configured_hardware_preservation_verified and unchanged addresses; unchanged identifiers, CPUs and identifiers missing from the catalog refused; reopen and checkpoint restore. acceptLoss and address-changing replacements are not exercised."
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): DI 16x24VDC HF between firmware V1.0 and V2.0 with configured_hardware_preservation_verified and unchanged addresses; unchanged identifiers, CPUs and identifiers missing from the catalog refused; reopen and checkpoint restore. acceptLoss is not exercised."
         ]
       },
       "qualification": {
@@ -13128,6 +13142,55 @@
           "local.hardware_changes.20261028",
           "local.hardware_changes.families.20261029"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.hardware_shared_device_access",
+      "domain": "hardware",
+      "title": "Set the shared-device access of one IO-device module",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hardware_shared_device_access",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: device item attribute SharedDeviceAccessType (enum SharedDeviceAccessType: Unknown, OutsideOfProject, PLC), written through the generic attribute route with native access checks."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "hardwarePath selects one module or submodule of an IO device whose station has at least one connector assigned to an I/O system; accessType is PLC or OutsideOfProject (Unknown, the native unassigned state, is refused). Stations holding PLC software are refused. The attribute must be declared readable and writable, and writable in the module's capability profile when one exists.",
+          "The bridge records the PLC items of the station's I/O systems as addressControllerOwnerPaths. Preservation lets the module and its subitems take the requested access, keeps every address range and lets each one have at most one owner among those PLCs; everything else stays exact.",
+          "OutsideOfProject marks a module accessed by an IO controller in another project (the shared device of several projects); the other project, NumberOfExternalIoControllers and module copies (SharedDeviceCopyOfModule) are not configured.",
+          "Compiled against the V21 PublicAPI only; not natively qualified (the hardware families and topology run of scripts/qualify_hardware_changes.py covers it)."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",
@@ -13272,9 +13335,10 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract; shared-device and multi-controller assignments remain excluded.",
+          "Qualified for one CPU 1511-1 PN controller assigning or disconnecting connector 0 of one IM 155-6 PN ST V6.4 with the explicit generated server-module contract.",
           "A second S7-1500 CPU (not the scratch CPU, selected by its plcPath) assigning an ET 200MP IM 155-5 PN ST V4.1 to a new IO system passed with exact state deltas, reopen and restore (local.hardware_changes.families.20261029); the assignment sets SharedDeviceAccessType PLC on the head's items and adds the IO-system and station system constants to the controller's PLC.",
-          "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation. Shared-device/multi-controller configurations remain excluded.",
+          "sharedDevice: true (shared device in one project): a further, unassigned connector of the same IO-device interface joins another PLC's I/O system while the other connectors stay assigned, one connector per PLC; disconnect: true with sharedDevice removes one again. The bridge records the other connectors' PLC items as sharedAddressControllerOwnerPaths (a caller-supplied value is refused); every station address may have at most one owner among those PLCs and the selected one. Without sharedDevice a further assigned connector is UnsupportedCapability. Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Exact native controller/connector indexes, selected-PLC ownership and same-subnet prerequisite. Optional explicit I/O-system creation.",
           "Preservation covers observed identities, slots, reviewed attributes, address ranges/owners and configured network associations; unexposed native data and runtime are not qualified.",
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
@@ -13288,6 +13352,56 @@
           "local.remote-io.lifecycle.rerun.20261028",
           "local.hardware_changes.families.20261029"
         ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Catalog entry is not a current-target authorization or availability result."
+        ]
+      },
+      "prerequisites": [
+        "TIA V21 and authorized Windows user for native operations",
+        "Applicable native services and project protection state"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-preserve",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-evidence"
+      ]
+    },
+    {
+      "featureId": "change.network_mrp_set",
+      "domain": "hardware",
+      "title": "Set the media redundancy role and MRP domain of a PROFINET interface",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "network_mrp_set",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Siemens.Engineering.Base: DeviceItem.GetService<MrpInstancesOwner>().MrpInstances (MrpInstance.ConnectedMrpDomain, RingPort1/RingPort2, attribute MediaRedundancyRole of enum MediaRedundancyRole), Subnet.GetService<MrpDomainOwner>().MrpDomains.Find/Create(String) and MrpDomain.DomainParticipants.Add(NetworkInterface); MrpDomain has no participant removal."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "hardwarePath selects one PROFINET interface with exactly one MRP instance; role is NotInRing, Manager, Client or ManagerAuto. Optional domainName joins an existing MRP domain of the interface's subnet, createDomain: true creates it first (ObjectExists when present); an absent domain is ObjectNotFound. An unchanged role and domain is refused.",
+          "Ring ports are not changed: RingPort1/RingPort2 are read-only in V21 and stay the TIA defaults. A ring is formed with change.hardware_port_connect; a closed ring without one manager fails the device compile.",
+          "Configured-hardware preservation adds every interface's MRP instances (name, domain, MediaRedundancyRole, ring ports) to the manifest; only the selected instance's role and domain may change. hardware_inspect lists them under network.mrp. Device compile and the whole-project checkpoint are required.",
+          "MRP domain attributes (IsDefault, ManagerOutsideOfProjectActive), domain deletion, MRP interconnection and MRPD are not reviewed; no MRP telegram or ring recovery is observed.",
+          "Compiled against the V21 PublicAPI only; not natively qualified (the hardware families and topology run of scripts/qualify_hardware_changes.py covers it)."
+        ]
+      },
+      "qualification": {
+        "status": "unverified",
+        "evidenceIds": []
       },
       "availability": {
         "status": "conditional",

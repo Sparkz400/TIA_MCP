@@ -690,6 +690,12 @@ namespace TiaMcp.Openness.V21
                 case "hardware_transfer_area_delete":
                     PrepareTransferArea(change, project, preview);
                     break;
+                case "network_mrp_set":
+                    PrepareMrp(change, project, preview, out _);
+                    break;
+                case "hardware_shared_device_access":
+                    PrepareSharedDeviceAccess(change, project, preview);
+                    break;
                 case "cax_import":
                     PrepareCaxImport(change, project, preview);
                     break;
@@ -708,6 +714,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var item = ChangeHardware(project, payload);
                     change.AttributeTarget = item.Item;
+                    HardwareEngineeringRules.RequireProfileWritable(HardwareEngineeringRules.Profile(item.Item.TypeIdentifier), null, ChangeObject(payload, "attributes").Properties().Select(property => property.Name));
                     preview["attributeChanges"] = PrepareAttributes(item.Item, ChangeObject(payload, "attributes"), HardwareWriteAttributes);
                     effects.Add(new JObject { ["hardwarePath"] = item.Path });
                     break;
@@ -1063,6 +1070,12 @@ namespace TiaMcp.Openness.V21
                 case "hardware_transfer_area_delete":
                     ApplyTransferArea(change, project);
                     break;
+                case "network_mrp_set":
+                    ApplyMrp(change, project);
+                    break;
+                case "hardware_shared_device_access":
+                    ApplySharedDeviceAccess(change, project);
+                    break;
                 case "cax_import":
                     ApplyCaxImport(change, project);
                     break;
@@ -1175,7 +1188,7 @@ namespace TiaMcp.Openness.V21
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
             if (IsCompileOnlyKind(change.Kind) && change.Kind != "plc_compile") return CompileOnly(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "network_mrp_set" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
