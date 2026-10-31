@@ -24,6 +24,8 @@ STALE_CODES = ('StaleWorkbook', 'TranslationScopeMismatch')
 FAILURE_CASES = ('before-dispatch', 'source-drift', 'import-reply', 'compile-reply', 'save-reply', 'reopen-reply', 'restore-reply')
 # Rows per category on the seeded fixture's PLC (28 October): five block comments, one hardware comment, no alarm class.
 RESTRICTED = {'BlockCommentCategoryData': 5, 'HwcnCommentTextCategoryData': 1, 'AlarmClassDisplayNameCategory': 0}
+# TranslationProductionAdmission.RestrictedContract: the Host-filtered block-comment scope of one PLC.
+RESTRICTED_CONTRACT = 'translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1'
 
 
 def portal_check(before, after, owned):
@@ -101,8 +103,8 @@ class Run:
         self.stop_after_noop = getattr(args, 'stop_after_noop', False)
         self.restricted = getattr(args, 'restricted_lifecycle', False)
         self.forward_key = None
-        require(not self.restricted or not (self.same_instance or self.failure_case or self.before_checkpoint or args.resume_root),
-                'The restricted lifecycle runs on its own fresh fixture')
+        require(not self.restricted or not (self.failure_case or self.before_checkpoint or args.resume_root),
+                'The restricted lifecycle runs on its own fresh fixture, alone or with --same-instance')
         require(not self.before_checkpoint or not (self.same_instance or self.failure_case or args.resume_root or self.stop_after_noop),
                 'The pre-checkpoint interruption needs its own fresh fixture; its resume run reconciles it')
         require(not self.same_instance or not self.failure_case and not args.resume_root, 'Same-instance qualification requires its own new fixture and bounded case list')
@@ -127,7 +129,8 @@ class Run:
             'interruptBeforeCheckpoint': self.before_checkpoint,
             'stopAfterNoop': self.stop_after_noop,
             'restrictedLifecycle': self.restricted,
-            'effects': ('One newly owned offline bilingual scratch; seven exact forward cases on the same full instance key, at most five explicitly reviewed reverse Main target operations, at most ten imports and twelve distinct checkpoint restorations, read-only reconciliation and exact cleanup.') if self.same_instance else
+            'effects': ('One newly owned offline bilingual scratch; ' + ('category probes, Host-filtered category captures and, on the filtered BlockCommentCategoryData capture, ' if self.restricted else '') +
+                'seven exact forward cases on the same full instance key, at most five explicitly reviewed reverse Main target operations, at most ten imports and twelve distinct checkpoint restorations, read-only reconciliation and exact cleanup.') if self.same_instance else
                 ('One newly owned offline bilingual scratch; one reviewed Main comment operation interrupted at ' + self.failure_case +
                 '; one checkpoint restoration to a distinct absent directory, read-only reconciliation and exact cleanup. Accepted no-op/edit trials are not repeated.')
                 if self.failure_case else ('One newly owned offline bilingual scratch; category probes and one no-op operation interrupted after acquisition, '
@@ -141,6 +144,7 @@ class Run:
         prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'failure-' + self.root.name + '-' + self.failure_case, **edit})
         if getattr(self, 'same_instance', False):
             require(prepared['admissionKeySha256'] == canonical_sha(prepared['admissionKey']), 'Admission key digest differs')
+            require(not getattr(self, 'restricted', False) or prepared['admissionKey']['contract'] == RESTRICTED_CONTRACT, 'The restricted packet must carry the restricted admission contract')
             if self.forward_key is None:
                 self.forward_key = prepared['admissionKey']; self.save('forward-instance-key', {'key': self.forward_key, 'sha256': prepared['admissionKeySha256']})
             require(prepared['admissionKey'] == self.forward_key, 'Exact forward project/key/source/target/peer/binary instance drift; no identity normalization permitted')
@@ -286,7 +290,7 @@ class Run:
                     self.call('qualification_translation_fixture', selector)
                 require(Path(project).is_relative_to(self.artifacts), 'Scratch escaped admitted workspace')
                 self.save('fixture-identity', {**selector, 'processId': started['processId']})
-                if not self.failure_case and not self.same_instance:
+                if not self.failure_case and (not self.same_instance or self.restricted):
                     categories = self.call('qualification_translation_categories', selector)
                     verdict = category_verdict(categories)
                     if self.restricted:
@@ -307,7 +311,7 @@ class Run:
                     if any(t['name'] == label for t in report['trials']): continue
                     if label == 'edit' and self.stop_after_noop: break
                     prepared = self.call('qualification_translation_prepare', {**selector, 'idempotencyKey': 'translation-' + self.root.name + '-' + label, **change})
-                    require(not self.restricted or prepared['admissionKey'] is None and prepared['admissionRefusal'], 'A restricted plan must stay outside production admission')
+                    require(not self.restricted or (prepared['admissionKey'] or {}).get('contract') == RESTRICTED_CONTRACT, 'A restricted plan must carry the restricted admission contract')
                     op = prepared['operation']
                     request = {'operationId': op['id'], 'planSha256': op['planSha256'], 'revision': op['revision']}
                     self.call('qualification_translation_apply', {**request, 'planSha256': '0' * 64}, expect_error=True)
@@ -359,7 +363,8 @@ def main():
     parser.add_argument('--interrupt-before-checkpoint', action='store_true', help='Fresh fixture: interrupt one no-op after acquisition, before checkpoint; resume reconciles it')
     parser.add_argument('--stop-after-noop', action='store_true', help='Run only the no-op trial, so a later run can resume the closed fixture for the edit')
     parser.add_argument('--restricted-lifecycle', action='store_true',
-                        help='Fresh fixture: check the Host-filtered category captures (5, 1 and 0 rows), then run the no-op and Main edit on the filtered BlockCommentCategoryData capture')
+                        help='Fresh fixture: check the Host-filtered category captures (5, 1 and 0 rows), then run the no-op and Main edit, or with --same-instance its '
+                             'seven forward cases, on the filtered BlockCommentCategoryData capture')
     parser.add_argument('--execute', action='store_true')
     args = parser.parse_args()
     require(args.execute, 'Explicit coordinator execution required')

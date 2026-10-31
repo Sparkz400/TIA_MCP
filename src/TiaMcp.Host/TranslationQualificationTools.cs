@@ -55,7 +55,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
             excludedRows = excluded is null ? null : JsonNode.Parse(new TranslationImportArtifacts(Root).ReadBytes(excluded.Evidence)), nativeImportExecuted = false };
     }
     [McpServerTool(Name = "qualification_translation_prepare", Destructive = false, OpenWorld = false)]
-    [Description("Explicit qualification runtime only: bind fresh capture to an explicit no-op or single edit and exact durable review. updateSourceLanguage=true edits the source cell under the separately approved source-text mode; otherwise the target cell. Optional categoryIds bind the Host-filtered restricted capture, which has no production admission.")]
+    [Description("Explicit qualification runtime only: bind fresh capture to an explicit no-op or single edit and exact durable review. updateSourceLanguage=true edits the source cell under the separately approved source-text mode; otherwise the target cell. Optional categoryIds bind the Host-filtered restricted capture; only one PLC's BlockCommentCategoryData has an admission contract.")]
     public async Task<object> Prepare(string projectPath, string plcPath, string idempotencyKey,
         string? nativeKey = null, string? replacement = null, string? sourceCulture = null, string? targetCulture = null,
         string[]? plcPaths = null, bool updateSourceLanguage = false, string[]? categoryIds = null, CancellationToken cancellationToken = default)
@@ -86,7 +86,7 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath, TranslationNativeTools.ApiDirectory(options)).Binaries();
         var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(operation.Plan.Inputs[0]);
         TranslationAdmissionKey? admissionKey = null; string? admissionRefusal = null;
-        // Generalized cultures, owners, restricted categories and source mode are qualification evidence only; no production key exists for them.
+        // Generalized cultures, owners, other category selections and source mode have no production key; one PLC's block comments has its own contract.
         try { admissionKey = TranslationProductionAdmission.Describe(new(Root, operation, binding.CandidateRef, binding.CandidateReceiptSha256,
             binding.Candidate.Sha256, binding.Baseline.Scope), binaries); }
         catch (BridgeException error) when (error.Code == "TranslationAdmissionScopeUnqualified") { admissionRefusal = error.Message; }

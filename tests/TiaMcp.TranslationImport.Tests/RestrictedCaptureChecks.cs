@@ -70,7 +70,8 @@ internal static class RestrictedCaptureChecks
                 b => Fixture.Modify(b, sheet, x => x.Add(new XElement(Fixture.S + "conditionalFormatting", new XAttribute("sqref", "F2:F7")))),
                 b => Fixture.Modify(b, sheet, x => x.Add(new XElement(Fixture.S + "dataValidations", new XElement(Fixture.S + "dataValidation", new XAttribute("sqref", "F2"))))),
                 b => Fixture.Modify(b, "xl/workbook.xml", x => x.Add(new XElement(Fixture.S + "definedNames", new XElement(Fixture.S + "definedName", "'User Texts'!$A$2:$F$7")))),
-                b => { var parts = Fixture.Parts(b); parts["xl/comments1.xml"] = Encoding.UTF8.GetBytes("<comments/>"); return Fixture.Pack(parts); }
+                b => { var parts = Fixture.Parts(b); parts["xl/comments1.xml"] = Encoding.UTF8.GetBytes("<comments/>"); return Fixture.Pack(parts); },
+                b => Fixture.Modify(b, sheet, x => x.AddFirst(new XElement(Fixture.S + "dimension", new XAttribute("ref", "A1:V9"))))
             };
             foreach (var shape in shapes)
             {
@@ -79,6 +80,19 @@ internal static class RestrictedCaptureChecks
             }
             // The same content in the plain observed layout is filtered: the refusal comes from the referencing element alone.
             True((await new Native(output, Over()) { Shape = b => Fixture.Pack(Fixture.Parts(b)) }.Capture([Comments])).Item2.Rows.Length == 5, "Plain layout refused");
+        });
+        test("row filtering keeps cell-free worksheet elements and rewrites a matching dimension", async () => {
+            static XElement[] Extras(string extent) => [new(Fixture.S + "dimension", new XAttribute("ref", extent)),
+                new(Fixture.S + "sheetViews", new XElement(Fixture.S + "sheetView", new XAttribute("workbookViewId", "0"))),
+                new(Fixture.S + "sheetFormatPr", new XAttribute("defaultRowHeight", "15")), new(Fixture.S + "cols", new XElement(Fixture.S + "col",
+                    new XAttribute("min", "1"), new XAttribute("max", "1"), new XAttribute("width", "20")))];
+            byte[] Shape(byte[] b) => Fixture.Modify(Fixture.Modify(Fixture.Modify(b, "xl/worksheets/sheet1.xml", x => x.AddFirst(Extras("A1:V7"))),
+                "xl/worksheets/sheet2.xml", x => x.AddFirst(Extras("A1:V1"))), "xl/workbook.xml", x => x.AddFirst(new XElement(Fixture.S + "workbookPr")));
+            var (observation, profile) = await new Native(output, Over()) { Shape = Shape }.Capture([Comments]);
+            var parts = Fixture.Parts(observation.Workbook);
+            string Dimension(string part) => (string)XDocument.Parse(Encoding.UTF8.GetString(parts[part])).Descendants(Fixture.S + "dimension").Single().Attribute("ref")!;
+            True(profile.Rows.Length == 5 && Dimension("xl/worksheets/sheet1.xml") == "A1:V6" && Dimension("xl/worksheets/sheet2.xml") == "A1:V1" &&
+                XDocument.Parse(Encoding.UTF8.GetString(parts["xl/worksheets/sheet1.xml"])).Descendants(Fixture.S + "cols").Count() == 1, "Cell-free elements or dimension differ");
         });
         test("Host-filtered capture reviews, approves and prepares only its admitted category rows", async () => {
             var native = new Native(output, Over());

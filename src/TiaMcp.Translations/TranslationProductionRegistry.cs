@@ -56,6 +56,10 @@ internal sealed class TranslationProductionRegistry(string installationDirectory
             !string.IsNullOrWhiteSpace(selected.PlcPath) && selected.PlcPath.Length <= 8192 && !selected.PlcPath.Any(char.IsControl),
             "TranslationAdmissionInvalid", "Installed selector differs from its exact project instance key.");
         TranslationProductionAdmission.RequireComplete(selected.Profile, selected.Profile.Key);
+        // A restricted key names its one PLC; the installed selector must be that PLC.
+        Require(selected.Profile.Key.Scope.ObjectSelections is ["whole-project:legacy-bilingual"] ||
+            selected.Profile.Key.Scope.ObjectSelections.SequenceEqual(["plc:" + selected.PlcPath]),
+            "TranslationAdmissionInvalid", "Installed selector differs from its exact project instance key.");
         Require(HashJson(selected.Profile.Key.Binaries) == HashJson(Binaries()), "TranslationAdmissionMismatch", "Installed admission pins different executable dependencies or Siemens API.");
         Require(selected.Evidence is { Length: > 0 and <= 128 } && selected.Evidence.All(file => file is not null) &&
             selected.Evidence.Select(file => file.Path).Distinct(StringComparer.Ordinal).Count() == selected.Evidence.Length &&

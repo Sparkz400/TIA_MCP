@@ -13,6 +13,7 @@ namespace TiaMcp.Openness.V21
         // supply this path. Host validates the full executable package and exact
         // normalized content key; the worker independently pins its image,
         // exact selector and original evidence bytes before opening a lease.
+        private const string TranslationRestrictedContract = "translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1";
         private JObject TranslationInstalledEntry(string projectPath)
         {
             string root = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "translation-admission");
@@ -38,12 +39,14 @@ namespace TiaMcp.Openness.V21
                     "profileSha256", "scope", "baselineContentSha256", "candidateContentSha256", "rows", "peers");
                 var binaries = key["binaries"] as JObject;
                 TranslationAdmissionFields(binaries, "hostPackageSha256", "translationAssemblySha256", "workerSha256", "siemensApiSha256");
+                bool restricted = key.Value<string>("contract") == TranslationRestrictedContract;
                 if (binaries.Value<string>("workerSha256") != ChangeFileHash(typeof(OpennessSession).Assembly.Location) ||
-                    key.Value<string>("contract") != "translation.whole-project-de-DE-en-GB-main-ob1.exact.v1" || key.Value<int>("tiaVersion") != 21 ||
+                    !restricted && key.Value<string>("contract") != "translation.whole-project-de-DE-en-GB-main-ob1.exact.v1" || key.Value<int>("tiaVersion") != 21 ||
                     profile.Value<string>("id") != entry.Value<string>("id"))
                     throw new BridgeException("TranslationAdmissionMismatch", "Installed worker/profile identity changed.");
                 var proofs = profile["proofs"] as JArray; var evidence = entry["evidence"] as JArray;
-                if (proofs == null || proofs.Count != 20 || evidence == null || evidence.Count == 0 || evidence.Count > 128)
+                // 14 native and 6 portable cases; the restricted ledger adds its category-filter case.
+                if (proofs == null || proofs.Count != (restricted ? 21 : 20) || evidence == null || evidence.Count == 0 || evidence.Count > 128)
                     throw new BridgeException("TranslationAdmissionIncomplete", "Complete reviewed native and portable proof ledger required.");
                 foreach (JObject proof in proofs) TranslationAdmissionFields(proof, "case", "keySha256", "sourcePackageSha256", "evidenceSha256", "mode");
                 foreach (JObject file in evidence)

@@ -27,8 +27,10 @@ public sealed class TranslationNativeTools(IBridgeClient bridge, HostOptions opt
     }
     private TranslationWorkerAdapter Worker(string profileId)
     {
-        var entry = Registry.Resolve(profileId);
-        return new(bridge, Root, entry.ProjectPath, entry.PlcPath, (context, _) => Registry.RequireAdmission(profileId, context));
+        var entry = Registry.Resolve(profileId); var scope = entry.Profile.Key.Scope;
+        // A restricted profile captures its admitted categories only; the worker checks them against its own installed copy.
+        return new(bridge, Root, entry.ProjectPath, entry.PlcPath, (context, _) => Registry.RequireAdmission(profileId, context),
+            categoryIds: scope.ObjectSelections is ["whole-project:legacy-bilingual"] ? null : scope.CategoryIds);
     }
     private TranslationProductionImportAdapter Adapter(string profileId) => new(Registry, Worker(profileId), profileId);
 

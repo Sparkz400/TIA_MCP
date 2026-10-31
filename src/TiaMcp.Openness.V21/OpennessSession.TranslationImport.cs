@@ -48,7 +48,7 @@ namespace TiaMcp.Openness.V21
                 (_translationQualification ? !WatchOwnsScratch(project) : TranslationInstalledEntry(args.Value<string>("projectPath")) == null) ||
                 project.Path.FullName != args.Value<string>("projectPath") || (saved && project.IsModified))
                 throw new BridgeException("ProjectIsolationRequired", "Exact saved worker-owned translation fixture required.");
-            EnsureProjectOffline(project); if (!_translationQualification) TranslationProductionScope(args, null);
+            EnsureProjectOffline(project); if (!_translationQualification) TranslationProductionScope(args, null, TranslationInstalledEntry(args.Value<string>("projectPath")));
             var budget = new ScanBudget(10000);
             var owners = DeviceItems(project, budget).Select(x => new { x.Path, Software = x.Item.GetService<SoftwareContainer>()?.Software }).Where(x => x.Software != null)
                 .Select(x => x.Software is PlcSoftware ? x.Path + "/plc/" + Segment(x.Software.Name) : null).OrderBy(x => x, StringComparer.Ordinal).ToArray();
@@ -67,12 +67,15 @@ namespace TiaMcp.Openness.V21
         }
         private static string[] TranslationCultures(JObject args) =>
             new[] { args.Value<string>("sourceCulture") ?? "de-DE", args.Value<string>("targetCulture") ?? "en-GB" };
-        // The installed admission contract is whole-project de-DE/en-GB, one PLC, target-only; generalized selectors stay qualification-only.
-        private static void TranslationProductionScope(JObject selector, JObject context)
+        // Installed admission contracts are de-DE/en-GB, one PLC, target-only, and either the whole-project export or exactly the
+        // installed entry's restricted categories; other generalized selectors stay qualification-only.
+        private static void TranslationProductionScope(JObject selector, JObject context, JObject entry)
         {
+            var key = (JObject)entry["profile"]["key"];
+            var admitted = key.Value<string>("contract") == TranslationRestrictedContract ? ((JArray)key["scope"]["categoryIds"]).Values<string>().ToArray() : new string[0];
             if (TranslationOwners(selector).Length != 1 || !TranslationCultures(selector).SequenceEqual(new[] { "de-DE", "en-GB" }) ||
-                context?.Value<bool?>("updateSourceLanguage") == true || ProjectTextList(selector, "categoryIds", 256).Length != 0)
-                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, the whole-project de-DE/en-GB export and target-only import.");
+                context?.Value<bool?>("updateSourceLanguage") == true || !ProjectTextList(selector, "categoryIds", 256).SequenceEqual(admitted))
+                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, de-DE/en-GB, target-only import and exactly the installed export scope.");
         }
         private JObject TranslationFixture(JObject args)
         {
@@ -196,7 +199,7 @@ namespace TiaMcp.Openness.V21
                 if (entry.Value<string>("plcPath") != selector.Value<string>("plcPath") ||
                     op["plan"]["target"].Value<string>("adapterSha256") != ChangeFileHash(typeof(OpennessSession).Assembly.Location))
                     throw new BridgeException("TranslationAdmissionMismatch", "Installed native selector or owning worker changed.");
-                TranslationProductionScope(selector, context);
+                TranslationProductionScope(selector, context, entry);
             }
             if (op.Value<string>("state") == "acquired")
             {

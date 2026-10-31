@@ -15,11 +15,13 @@ from qualify_translation_category_probe import ref, require
 from verify_watch_workflow import canonical_sha
 
 CONTRACT = 'translation.whole-project-de-DE-en-GB-main-ob1.exact.v1'
+RESTRICTED_CONTRACT = 'translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1'
 # Same order and names as TranslationProductionAdmission.NativeCases / PortableCases.
 NATIVE_CASES = ['complete-inventory', 'native-import-readback', 'preservation', 'compile-save-fresh-reopen',
                 'distinct-recovery-fresh-reopen', 'lost-restore-response-reconciliation', 'lost-import-response-reconciliation',
                 'lost-compile-response-reconciliation', 'lost-save-response-reconciliation', 'lost-reopen-response-reconciliation',
                 'interruption-before-dispatch', 'stale-source-refusal', 'existing-recovery-destination-refusal', 'exact-process-cleanup']
+CASES = {CONTRACT: NATIVE_CASES, RESTRICTED_CONTRACT: NATIVE_CASES + ['restricted-category-filter']}
 PORTABLE_CASES = ['exact-key-and-binary-refusal', 'stale-plan-revision-replay-refusal', 'source-clear-empty-richtext-refusal',
                   'key-source-target-culture-peer-drift-refusal', 'artifact-tampering-refusal', 'lost-cleanup-response-reservation']
 
@@ -31,7 +33,13 @@ def canonical(value): return json.dumps(value, sort_keys=True, separators=(',', 
 def build(packet, verification, portable, manifest, profile_id):
     packet = Path(packet).resolve()
     forward = load(packet / 'forward-instance-key.json'); key = forward['key']; key_sha = canonical_sha(key)
-    require(forward['sha256'] == key_sha and key['contract'] == CONTRACT, 'Forward key digest or contract differs')
+    require(forward['sha256'] == key_sha and key['contract'] in CASES, 'Forward key digest or contract differs')
+    native_cases = CASES[key['contract']]; restricted = key['contract'] == RESTRICTED_CONTRACT
+    categories = load(packet / 'category-verification.json') if restricted else None
+    require(not restricted or categories['populatedMainControl'] is True and key['scope']['categoryIds'] == ['BlockCommentCategoryData'] and
+            [(c['category'], c['keptRows'], c['expectedRows']) for c in categories['restricted']['captures']] ==
+            [('BlockCommentCategoryData', 5, 5), ('HwcnCommentTextCategoryData', 1, 1), ('AlarmClassDisplayNameCategory', 0, 0)],
+            'A restricted key needs its packet\'s conclusive Main control and exact Host-filtered captures')
     checked, tests = load(verification), load(portable)
     require(checked['completed'] and checked['nativeExecuted'] and checked['sameInstance'] and checked['forwardKeySha256'] == key_sha and
             checked['pendingResources'] == 0, 'Independent same-instance verification incomplete or for another key')
@@ -40,15 +48,16 @@ def build(packet, verification, portable, manifest, profile_id):
     require(tests['failed'] == 0 and tests['passed'] > 0, 'Portable suite did not pass')
     source = hashlib.sha256(Path(manifest).read_bytes()).hexdigest()
     fixture = load(packet / 'fixture-identity.json')
-    native = canonical({'kind': 'translation-admission-native-evidence', 'contract': CONTRACT, 'keySha256': key_sha, 'sourcePackageSha256': source,
+    native = canonical({'kind': 'translation-admission-native-evidence', 'contract': key['contract'], 'keySha256': key_sha, 'sourcePackageSha256': source,
                         'packet': str(packet), 'result': ref(packet / 'result.json'), 'admission': ref(packet / 'admission.json'),
                         'exactClose': ref(packet / 'exact-close.json'), 'forwardKey': ref(packet / 'forward-instance-key.json'),
-                        'independentVerification': checked, 'cases': NATIVE_CASES})
-    port = canonical({'kind': 'translation-admission-portable-evidence', 'contract': CONTRACT, 'keySha256': key_sha, 'sourcePackageSha256': source,
+                        'independentVerification': checked, 'cases': native_cases,
+                        **({'categoryVerification': ref(packet / 'category-verification.json'), 'categoryControls': categories} if restricted else {})})
+    port = canonical({'kind': 'translation-admission-portable-evidence', 'contract': key['contract'], 'keySha256': key_sha, 'sourcePackageSha256': source,
                       'suite': 'tests/TiaMcp.TranslationImport.Tests', 'receipt': tests, 'cases': PORTABLE_CASES})
     files = {hashlib.sha256(data).hexdigest(): data for data in (native, port)}
     native_sha, port_sha = (hashlib.sha256(data).hexdigest() for data in (native, port))
-    proofs = [{'case': c, 'keySha256': key_sha, 'sourcePackageSha256': source, 'evidenceSha256': native_sha, 'mode': 'native'} for c in NATIVE_CASES] + \
+    proofs = [{'case': c, 'keySha256': key_sha, 'sourcePackageSha256': source, 'evidenceSha256': native_sha, 'mode': 'native'} for c in native_cases] + \
              [{'case': c, 'keySha256': key_sha, 'sourcePackageSha256': source, 'evidenceSha256': port_sha, 'mode': 'portable'} for c in PORTABLE_CASES]
     entry = {'id': profile_id, 'projectPath': fixture['projectPath'], 'plcPath': fixture['plcPath'],
              'profile': {'id': profile_id, 'key': key, 'sourcePackageSha256': source, 'proofs': proofs},

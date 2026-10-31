@@ -2137,13 +2137,13 @@
     },
     {
       "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
-      "sha256": "9632874ac56790acaa3a16967ed7690073cb23406c3c20af14cdba60a94d136d",
-      "bytes": 8621
+      "sha256": "215b091e66fd0b1f03749709932d783de616db24f25053375d529d8771a52e10",
+      "bytes": 8898
     },
     {
       "path": "src/TiaMcp.Host/TranslationQualificationTools.cs",
-      "sha256": "281438dd4fc0b2ae4b8a8c5ccfa5b69e748e27dbc50733b5e910661bf9fd5242",
-      "bytes": 17232
+      "sha256": "1025fcacd90d526a5c6a62384b5fd526231800ddad4d53a03a83774121865eec",
+      "bytes": 17271
     },
     {
       "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -2902,13 +2902,13 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationAdmission.cs",
-      "sha256": "da151344972a050b7fc5698d21d8b0eb4133a29010129fca6c1f8d2c1b40799f",
-      "bytes": 6765
+      "sha256": "77c904af1f6e3c9f68ddf4f5dca9fe9437e4e79f3cb5cdb0774428d2fa1fda52",
+      "bytes": 7127
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationImport.cs",
-      "sha256": "c9a4b7a205629bea6af3732bf87ca0e4dcf9f63547a3f7e3049689c524184dc5",
-      "bytes": 29992
+      "sha256": "104e421a4b1d8612208f50e9fbce727c130f191e28a66d620dbf708b9f89b116",
+      "bytes": 30423
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
@@ -3287,8 +3287,8 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationCategoryScope.cs",
-      "sha256": "f1d479e7cd9054316f292d2d374f84aa8a117a082b89884e05898aaf28712ab3",
-      "bytes": 18640
+      "sha256": "e8f0c47d61a478ab6e6a323782161c42b7b57a8a2f744afb4cfcc6d9d25a7374",
+      "bytes": 20032
     },
     {
       "path": "src/TiaMcp.Translations/TranslationContracts.cs",
@@ -3322,13 +3322,13 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationProductionAdmission.cs",
-      "sha256": "3a27bc806d068010f044003ccfadf086adc28cfe3ae5e2cfa34706a5af8bc64e",
-      "bytes": 9117
+      "sha256": "3c4ff9e43505a0db39708cac3a83d1c6f7fc36dbda5a4681bc532bea55b7647f",
+      "bytes": 9991
     },
     {
       "path": "src/TiaMcp.Translations/TranslationProductionRegistry.cs",
-      "sha256": "29096a4acfeda41c1c641348a884a7adca36994ccaa51ae31ca79e35950eb6b0",
-      "bytes": 10085
+      "sha256": "ec841526deb71c27ee9da2324ed3b094c713d88a1b4f6e1d9d6d0de2b365e096",
+      "bytes": 10485
     },
     {
       "path": "src/TiaMcp.Translations/TranslationReconciliation.cs",
@@ -3925,8 +3925,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -4426,8 +4426,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -4927,8 +4927,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -5407,8 +5407,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -5525,8 +5525,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
@@ -5978,8 +5978,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -6263,8 +6263,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -6534,8 +6534,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -6952,8 +6952,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -7258,8 +7258,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -7529,8 +7529,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -7662,8 +7662,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -7953,8 +7953,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -8307,8 +8307,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -8647,8 +8647,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -8987,8 +8987,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -9320,8 +9320,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -9604,8 +9604,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -10872,8 +10872,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
@@ -11359,8 +11359,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -11476,8 +11476,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -11844,8 +11844,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -12352,8 +12352,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -12622,8 +12622,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -12962,8 +12962,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -13449,8 +13449,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -14034,8 +14034,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -14535,8 +14535,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -14695,8 +14695,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -15052,8 +15052,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -15531,8 +15531,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -16032,8 +16032,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -16222,8 +16222,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -16299,8 +16299,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
@@ -16355,8 +16355,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
@@ -16707,8 +16707,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -16749,8 +16749,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
@@ -16805,8 +16805,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
@@ -17345,8 +17345,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
@@ -17401,8 +17401,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
@@ -17684,8 +17684,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
@@ -17740,8 +17740,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
@@ -18182,8 +18182,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -19372,8 +19372,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -19463,36 +19463,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -20133,8 +20133,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -20397,8 +20397,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -21078,8 +21078,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -21391,8 +21391,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -21938,8 +21938,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -22669,8 +22669,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -23170,8 +23170,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -24062,8 +24062,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -24416,8 +24416,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -24686,8 +24686,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -25007,8 +25007,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -25346,8 +25346,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -25686,8 +25686,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -26019,8 +26019,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -26303,8 +26303,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -27174,8 +27174,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -27675,8 +27675,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -28148,8 +28148,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -28411,8 +28411,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -29847,8 +29847,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -30153,8 +30153,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -30424,8 +30424,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -30709,8 +30709,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -30842,8 +30842,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -31683,8 +31683,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -32163,8 +32163,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -32566,8 +32566,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -32927,8 +32927,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -33204,8 +33204,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -33467,8 +33467,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -34261,8 +34261,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -34608,8 +34608,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -34948,8 +34948,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -35239,8 +35239,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -37945,8 +37945,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "ProjectTextExport",
-        "line": 82,
-        "endLine": 85,
+        "line": 84,
+        "endLine": 87,
         "sha256": "98cacb553058fed56715f67d0b767e0095baa23008ade220effbe5d88e203374"
       },
       "bridgeOperations": [
@@ -37963,36 +37963,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "ProjectTextExport",
-          "line": 82,
-          "endLine": 85,
+          "line": 84,
+          "endLine": 87,
           "sha256": "98cacb553058fed56715f67d0b767e0095baa23008ade220effbe5d88e203374"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         }
       ],
@@ -38430,8 +38430,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -38507,36 +38507,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -38995,8 +38995,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -39496,8 +39496,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -39797,8 +39797,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -39867,36 +39867,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -40041,8 +40041,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -40050,7 +40050,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -40377,36 +40377,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -40493,8 +40493,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Reconcile",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -40584,36 +40584,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -40732,8 +40732,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Recover",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
@@ -40851,8 +40851,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -40921,36 +40921,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -41383,8 +41383,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -41425,8 +41425,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Apply",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
@@ -41558,8 +41558,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -41740,36 +41740,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -41825,8 +41825,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -41895,8 +41895,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -42254,7 +42254,7 @@
         "name": "Prepare",
         "line": 59,
         "endLine": 94,
-        "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+        "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
       },
       "bridgeOperations": [],
       "localCallNames": [
@@ -42296,7 +42296,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         }
       ],
       "workerRoutes": [],
@@ -42311,8 +42311,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -42409,8 +42409,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -42486,8 +42486,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -42495,7 +42495,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -43134,8 +43134,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -43197,8 +43197,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Reconcile",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -43275,8 +43275,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -43357,8 +43357,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -43399,8 +43399,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Recover",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
@@ -43460,8 +43460,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -43645,8 +43645,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -43999,8 +43999,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -44008,7 +44008,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -44778,8 +44778,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -45118,8 +45118,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -45620,8 +45620,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -45869,8 +45869,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -46146,8 +46146,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -46279,8 +46279,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -46514,8 +46514,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -46840,8 +46840,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -47180,8 +47180,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -47436,8 +47436,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -47937,8 +47937,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -48270,8 +48270,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -48750,8 +48750,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -49020,8 +49020,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -49312,8 +49312,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -49389,36 +49389,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -49743,8 +49743,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -50252,8 +50252,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -50508,8 +50508,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -50792,8 +50792,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -50925,8 +50925,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -51167,8 +51167,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -51459,8 +51459,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -51744,8 +51744,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -51821,36 +51821,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -52105,8 +52105,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -52383,8 +52383,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -52460,36 +52460,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -52906,8 +52906,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -52983,36 +52983,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -53247,8 +53247,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -53380,8 +53380,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -53443,36 +53443,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -53797,8 +53797,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -54306,8 +54306,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -54562,8 +54562,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -54846,8 +54846,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -54979,8 +54979,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -55221,8 +55221,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -55650,8 +55650,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -55783,8 +55783,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -55965,36 +55965,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -56263,8 +56263,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -56548,8 +56548,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -56625,36 +56625,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -56909,8 +56909,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -57180,8 +57180,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -57257,36 +57257,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -57542,8 +57542,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -57619,36 +57619,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -57912,8 +57912,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -57989,36 +57989,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -58260,8 +58260,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -58337,36 +58337,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -58601,8 +58601,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -58734,8 +58734,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -58797,36 +58797,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -59084,8 +59084,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -59280,36 +59280,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -59788,8 +59788,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -60425,8 +60425,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -63575,8 +63575,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -64076,8 +64076,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -64863,8 +64863,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -65343,8 +65343,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -65844,8 +65844,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -66324,8 +66324,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -67333,8 +67333,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -67342,7 +67342,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -67724,8 +67724,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Reconcile",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -67865,8 +67865,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Recover",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
@@ -68141,8 +68141,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -70467,8 +70467,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -70476,7 +70476,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -70829,8 +70829,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -71134,8 +71134,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -71397,8 +71397,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -71520,8 +71520,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -71723,8 +71723,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -72070,8 +72070,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -72417,8 +72417,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -72454,8 +72454,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "Apply",
-        "line": 58,
-        "endLine": 59,
+        "line": 60,
+        "endLine": 61,
         "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
       },
       "bridgeOperations": [],
@@ -72469,51 +72469,51 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Apply",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         }
       ],
       "workerRoutes": [],
@@ -72528,8 +72528,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -72570,8 +72570,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Apply",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
@@ -72766,8 +72766,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -72843,36 +72843,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -72887,8 +72887,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "Capture",
-        "line": 37,
-        "endLine": 43,
+        "line": 39,
+        "endLine": 45,
         "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
       },
       "bridgeOperations": [],
@@ -72907,43 +72907,43 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         }
       ],
@@ -73008,8 +73008,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -73211,8 +73211,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -73254,8 +73254,8 @@
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         },
         {
           "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
@@ -73309,36 +73309,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -73353,8 +73353,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "Prepare",
-        "line": 47,
-        "endLine": 54,
+        "line": 49,
+        "endLine": 56,
         "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
       },
       "bridgeOperations": [],
@@ -73373,43 +73373,43 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         }
       ],
@@ -73467,8 +73467,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Capture",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
@@ -73530,8 +73530,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -73539,7 +73539,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -73740,8 +73740,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -73769,8 +73769,8 @@
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         },
         {
           "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
@@ -73824,36 +73824,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -74120,8 +74120,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "Reconcile",
-        "line": 77,
-        "endLine": 78,
+        "line": 79,
+        "endLine": 80,
         "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
       },
       "bridgeOperations": [],
@@ -74135,51 +74135,51 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Reconcile",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         }
       ],
       "workerRoutes": [],
@@ -74194,8 +74194,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -74257,8 +74257,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Reconcile",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -74474,8 +74474,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -74551,36 +74551,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -74595,8 +74595,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "Recover",
-        "line": 71,
-        "endLine": 73,
+        "line": 73,
+        "endLine": 75,
         "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
       },
       "bridgeOperations": [],
@@ -74610,51 +74610,51 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Recover",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Worker",
           "line": 28,
-          "endLine": 32,
-          "sha256": "9fa94371516637f6144a72fa8acd5f7ee98f060ba68efaec671664b7e7888252"
+          "endLine": 34,
+          "sha256": "842485dd971758243d3972ea963f9e4fc8243638a1979086ed6b4618abc770a8"
         }
       ],
       "workerRoutes": [],
@@ -74669,8 +74669,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Adapter",
-          "line": 33,
-          "endLine": 33,
+          "line": 35,
+          "endLine": 35,
           "sha256": "1075b2163e5671851d887eab263963ee912ed09e603f5325dfa3bebd503f8c38"
         },
         {
@@ -74711,8 +74711,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Recover",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
@@ -74907,8 +74907,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -74984,36 +74984,36 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 37,
-          "endLine": 43,
+          "line": 39,
+          "endLine": 45,
           "sha256": "a4f988a4c157dc3b9e861aa640d62cfabbda1659dc2a0dafba3648220f364c30"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 58,
-          "endLine": 59,
+          "line": 60,
+          "endLine": 61,
           "sha256": "02efc0a42a02ef01aa68462606fa51cd19a8e1e6ee559e9becb2ebd8e14a0214"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 71,
-          "endLine": 73,
+          "line": 73,
+          "endLine": 75,
           "sha256": "127628b13bf57110addb849182e5af523fef269c88c7298b0001e12a416d4330"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "async",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         }
       ],
@@ -75028,8 +75028,8 @@
       "host": {
         "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
         "name": "Status",
-        "line": 63,
-        "endLine": 67,
+        "line": 65,
+        "endLine": 69,
         "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
       },
       "bridgeOperations": [],
@@ -75044,29 +75044,29 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         }
       ],
@@ -75096,8 +75096,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Failure",
-          "line": 96,
-          "endLine": 100,
+          "line": 98,
+          "endLine": 102,
           "sha256": "3622c6fe9735aff87de4e5d69898a18550ad38ed70bf3a5783596dffcc51f03e"
         },
         {
@@ -75152,8 +75152,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Format",
-          "line": 102,
-          "endLine": 107,
+          "line": 104,
+          "endLine": 109,
           "sha256": "6ff46e73880a52a907bb09f055b221a3049d17fcad8414a46d9d14ad7fad98dc"
         },
         {
@@ -75173,8 +75173,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Handled",
-          "line": 93,
-          "endLine": 94,
+          "line": 95,
+          "endLine": 96,
           "sha256": "7e8aa57b54d3b8a96509909c8fdd50b2420322a5aff6cb429412258078a2ba13"
         },
         {
@@ -75285,8 +75285,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Status",
-          "line": 63,
-          "endLine": 67,
+          "line": 65,
+          "endLine": 69,
           "sha256": "c03b1942837d9dde79f60d859cfa5b154a575467537b55e948c40033dcd98393"
         },
         {
@@ -75387,8 +75387,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Prepare",
-          "line": 47,
-          "endLine": 54,
+          "line": 49,
+          "endLine": 56,
           "sha256": "361320b9d6d62a3ebca5579aee912198567be038f32db7119cda021e8e212815"
         },
         {
@@ -75396,7 +75396,7 @@
           "name": "Prepare",
           "line": 59,
           "endLine": 94,
-          "sha256": "6c95693f5db82cb6a65ab109f0e27cfd2ae23194fc7fd91336c665dedd15bde5"
+          "sha256": "b413c9e0768698c8ab1af1a163b6a8042afbee7018320d54555e94ced59c3dba"
         },
         {
           "path": "src/TiaMcp.Host/TranslationTools.cs",
@@ -75597,8 +75597,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -75713,8 +75713,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Reconcile",
-          "line": 77,
-          "endLine": 78,
+          "line": 79,
+          "endLine": 80,
           "sha256": "15302c71d4a23d3e44663102091f61d06b00ebb9255c5c28940790d523f64a10"
         },
         {
@@ -75930,8 +75930,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -76270,8 +76270,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -76533,8 +76533,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -76944,8 +76944,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -77214,8 +77214,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -77484,8 +77484,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -77748,8 +77748,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -78018,8 +78018,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -78366,8 +78366,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -78636,8 +78636,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -78907,8 +78907,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -79178,8 +79178,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -79441,8 +79441,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -79704,8 +79704,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -80045,8 +80045,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -80808,8 +80808,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -82127,8 +82127,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {
@@ -82628,8 +82628,8 @@
         {
           "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
           "name": "Run",
-          "line": 87,
-          "endLine": 91,
+          "line": 89,
+          "endLine": 93,
           "sha256": "b2430d41ed47889873ea9e422c1d2f34f358d399437ad2e43d3ed51aaddaebe4"
         },
         {

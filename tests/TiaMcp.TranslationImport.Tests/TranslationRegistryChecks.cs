@@ -10,7 +10,7 @@ internal static class TranslationRegistryChecks
     {
         static void Refuse(string code, Action action)
         { try { action(); } catch (BridgeException error) when (error.Code == code) { return; } throw new Exception("Expected " + code); }
-        (TranslationProductionRegistry Registry, string Installation, string Worker, string Config, TranslationImportContext Context) FixtureRegistry()
+        (TranslationProductionRegistry Registry, string Installation, string Worker, string Config, TranslationImportContext Context) FixtureRegistry(bool restricted = false)
         {
             string root = Path.Combine(output, "registry-" + Guid.NewGuid().ToString("N"));
             string host = Path.Combine(root, "host"), worker = Path.Combine(root, "worker"), api = Path.Combine(root, "api");
@@ -20,13 +20,14 @@ internal static class TranslationRegistryChecks
             string executable = Path.Combine(worker, "TiaMcp.Openness.V21.exe"); File.WriteAllText(executable, "Synthetic worker, never executable");
             File.WriteAllText(Path.Combine(worker, "Newtonsoft.Json.dll"), "Synthetic worker dependency");
             File.WriteAllText(Path.Combine(api, "Siemens.Engineering.Base.dll"), "Synthetic installed API identity");
-            var fixture = new Fixture(Path.Combine(root, "store"), adapterHash: Sha256(File.ReadAllBytes(executable)), exactAdmission: true);
+            var fixture = new Fixture(Path.Combine(root, "store"), adapterHash: Sha256(File.ReadAllBytes(executable)), exactAdmission: true,
+                exactObjects: restricted ? ["plc:synthetic/PLC"] : null);
             var op = fixture.Prepare(); var candidate = new TranslationWorkflowStore(fixture.Root).NativeCandidate(fixture.CandidateRef, fixture.CandidateReceipt);
             var context = new TranslationImportContext(fixture.Root, op, fixture.CandidateRef, fixture.CandidateReceipt, candidate.Candidate.WorkbookSha256, fixture.Scope);
             var registry = new TranslationProductionRegistry(host, executable, api);
             var key = TranslationProductionAdmission.Describe(context, registry.Binaries());
             byte[] receipt = Encoding.UTF8.GetBytes("{\"syntheticTestOnly\":true,\"nativeExecuted\":false}"); string digest = Sha256(receipt), source = new('4', 64);
-            var proofs = TranslationProductionAdmission.NativeCases.Select(name => new TranslationAdmissionProof(name, HashJson(key), source, digest, "native"))
+            var proofs = TranslationProductionAdmission.NativeCasesFor(key.Contract).Select(name => new TranslationAdmissionProof(name, HashJson(key), source, digest, "native"))
                 .Concat(TranslationProductionAdmission.PortableCases.Select(name => new TranslationAdmissionProof(name, HashJson(key), source, digest, "portable"))).ToArray();
             var profile = new TranslationAdmissionProfile("synthetic-loader-check-never-installed", key, source, proofs);
             var entry = new TranslationAdmissionEntry(profile.Id, op.Plan.Target.ProjectFilePath, "synthetic/PLC", profile, [new("evidence/" + digest + ".json", digest)]);
@@ -43,6 +44,11 @@ internal static class TranslationRegistryChecks
             if (HashJson(before) != HashJson(f.Registry.Binaries()) || TranslationProductionImportAdapter.QualifiedProfiles.Length != 0)
                 throw new Exception("Registry data changed binaries or enabled compiled production profiles");
             return Task.CompletedTask;
+        });
+        test("installed restricted admission resolves only for its own PLC selector", () => {
+            var f = FixtureRegistry(restricted: true); f.Registry.RequireAdmission(id, f.Context);
+            var json = JsonNode.Parse(File.ReadAllText(f.Config))!; json["entries"]![0]!["plcPath"] = "synthetic/OtherPLC"; File.WriteAllText(f.Config, json.ToJsonString());
+            Refuse("TranslationAdmissionInvalid", () => f.Registry.Resolve(id)); return Task.CompletedTask;
         });
         foreach (string field in new[] { "Host DLL", "Host dependency", "worker dependency" }) test("installed admission refuses changed " + field + " with unchanged apphost", () => {
             var f = FixtureRegistry(); string apphost = Sha256(File.ReadAllBytes(Path.Combine(f.Installation, "TiaMcp.Host.exe")));

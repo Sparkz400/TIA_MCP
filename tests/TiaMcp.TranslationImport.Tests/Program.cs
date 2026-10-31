@@ -345,7 +345,8 @@ Test("restricted scope refuses an out-of-scope recovered copy and keeps both res
 RestrictedCaptureChecks.Register(Test, output);
 
 if (admissionOnly) tests.Clear();
-TranslationAdmissionChecks.Register(Test, () => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true));
+TranslationAdmissionChecks.Register(Test, () => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true),
+    (objects, categories) => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true, exactObjects: objects, exactCategories: categories));
 TranslationRegistryChecks.Register(Test, output);
 ProjectTextExportChecks.Register(Test, output);
 var results = new JsonArray(); int failed = 0;
@@ -372,10 +373,11 @@ internal sealed class Fixture
     internal byte[] Original { get; }
     internal string CandidateRef { get; }
     internal string CandidateReceipt { get; }
-    internal Fixture(string root, bool edit = true, string? shape = null, string? adapterHash = null, bool exactAdmission = false)
+    internal Fixture(string root, bool edit = true, string? shape = null, string? adapterHash = null, bool exactAdmission = false,
+        string[]? exactObjects = null, string[]? exactCategories = null)
     {
         Root = root; Directory.CreateDirectory(root);
-        if (exactAdmission) Scope = new("de-DE", "en-GB", ["de-DE", "en-GB"], ["whole-project:legacy-bilingual"], ["BlockCommentCategoryData"]);
+        if (exactAdmission) Scope = new("de-DE", "en-GB", ["de-DE", "en-GB"], exactObjects ?? ["whole-project:legacy-bilingual"], exactCategories ?? ["BlockCommentCategoryData"]);
         var nativeArtifacts = new TranslationImportArtifacts(root);
         var nativePeers = new[] { ("all-other-project-content", "Synthetic complete unaffected export"), ("untouched:nl-NL", "Synthetic original Dutch text") };
         Peers = nativePeers.Select(p => { var evidence = nativeArtifacts.RetainBytes(Encoding.UTF8.GetBytes(p.Item2)); return new TranslationImportPeer(p.Item1, evidence.Sha256, evidence); }).ToArray();
