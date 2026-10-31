@@ -857,8 +857,8 @@
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInHandoff.cs",
-      "sha256": "8c88019c15167a9fcd36b1f60cdb6cbe3dae86b77575abf88d81e5565b319543",
-      "bytes": 17591
+      "sha256": "b5621c823ed5849e1358d15375562fe254e0cc63c016a9fec3e5181b80fb938d",
+      "bytes": 17606
     },
     {
       "path": "src/TiaMcp.Core/AddIns/AddInHandoffReceiver.cs",
@@ -1147,8 +1147,8 @@
     },
     {
       "path": "src/TiaMcp.Core/Engineering/NativeTargetObservation.cs",
-      "sha256": "8f0b4f4d4b344d4b0a5e81b927db2663ab66c4b4277d6e2885196ae135400c6f",
-      "bytes": 4644
+      "sha256": "b898ce6950eeff0b4c80f5837923a9ecfe920b809bc80e619ba43c6c26242422",
+      "bytes": 4821
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/AdmissionReconciliation.cs",
@@ -1157,8 +1157,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
-      "sha256": "b1e78da958fc50a880899f66ab43c9e639398bcd9d17ac3ea265f9b179d59897",
-      "bytes": 29100
+      "sha256": "3a6d5d48a30f72a4209bc997da5c6529859488d8a61e4cb224152e6b4ddb4d75",
+      "bytes": 29832
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -1172,8 +1172,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
-      "sha256": "d0afc3a3e1844e73db7e3abf26387699cfb21296dbe54264e714105f43b055c6",
-      "bytes": 14412
+      "sha256": "e00cdd4c0b8b997755fdf56bef719837d059b3f56389bd0517edf269b1de0711",
+      "bytes": 16074
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationModels.cs",
@@ -1182,13 +1182,13 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
-      "sha256": "c621d3c98d577bb7706205968daa9de85ea912e677c7117d0b39da81e208a9af",
-      "bytes": 37075
+      "sha256": "2cbc76805b7fc4a79fd9ea36e6a7f9e981e7fe75c43818d64e6fc9c735a691cd",
+      "bytes": 40626
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringResourceKey.cs",
-      "sha256": "4660ed9efdadc8a24233d49f8d61769ff4a4374b380fe54dd393e2b03595bab0",
-      "bytes": 7892
+      "sha256": "6e384b0188d8c6be80de274916aad8ff9b33f1cb3164b7268c64da927f6ba8d4",
+      "bytes": 7918
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
@@ -1327,8 +1327,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PackageStorage.cs",
-      "sha256": "0e3a1cc7b6f67d17353f70875d2f79af72f0812f51af9ca9a1d01435601f2f90",
-      "bytes": 10087
+      "sha256": "e8f1f850908a2ccdbe78d6503c04a00b78130c11e0e93d6ae8703a4d424d51ac",
+      "bytes": 11038
     },
     {
       "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -1572,8 +1572,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
-      "sha256": "58735c7e1370d956e5db4dd7e9a12750b494ad5593b2b38875993ccdf77452d8",
-      "bytes": 29000
+      "sha256": "2acb349c170071b39c50ccd25bd8d12615367a0b9bb3fb4f07e63ebd387139da",
+      "bytes": 29015
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleOperation.cs",
@@ -1597,8 +1597,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TiaMcp.Core.csproj",
-      "sha256": "2255deab90b219b938647c1da756e2f190cf9a7ed181eda2513939dbc9ec3031",
-      "bytes": 929
+      "sha256": "15567090037e71e15afd8a331678880c8b87c631ca69fdf67370bc602c4147f0",
+      "bytes": 1175
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/EngineeringGitOperationJournal.cs",
@@ -1737,8 +1737,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WebApplicationWorkflowStore.cs",
-      "sha256": "bc55f285c2fc41a05119eca2cf46b964daa8481c2760ec74bc9fada7739575d2",
-      "bytes": 11485
+      "sha256": "80535b71e2bca6e5458e55833802574f8b35f51c8ed02c2ec0edf8a23cffea25",
+      "bytes": 11500
     },
     {
       "path": "src/TiaMcp.Core/WebApplications/WebApplicationReview.cs",
@@ -2047,8 +2047,8 @@
     },
     {
       "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
-      "sha256": "be2f98c2b1719964138ae779e1421529ad884731f22c4b5a0c20457b64e66364",
-      "bytes": 18034
+      "sha256": "a0e620d29e8021a862efffa7363edcdcb9613c3262f6bef03b290f97986189d8",
+      "bytes": 18183
     },
     {
       "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
@@ -5616,15 +5616,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -6597,23 +6597,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 337,
-          "endLine": 337,
+          "line": 343,
+          "endLine": 343,
           "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 185,
-          "endLine": 192,
+          "line": 203,
+          "endLine": 210,
           "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 472,
-          "endLine": 483,
-          "sha256": "007705b6021577eafc4930ad760b236a592b1873939b7436438d9c1d72a04ae8"
+          "line": 517,
+          "endLine": 527,
+          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -10296,15 +10296,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -17155,15 +17155,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -17464,23 +17464,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 337,
-          "endLine": 337,
+          "line": 343,
+          "endLine": 343,
           "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 185,
-          "endLine": 192,
+          "line": 203,
+          "endLine": 210,
           "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 472,
-          "endLine": 483,
-          "sha256": "007705b6021577eafc4930ad760b236a592b1873939b7436438d9c1d72a04ae8"
+          "line": 517,
+          "endLine": 527,
+          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -21644,15 +21644,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -37283,8 +37283,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Contains",
-          "line": 331,
-          "endLine": 332,
+          "line": 337,
+          "endLine": 338,
           "sha256": "13851655d4cf2a55d9aed6c4b667c53b284e6c9aec81cfeb5697dbed072b5777"
         },
         {
@@ -40006,9 +40006,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -40451,15 +40451,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Reconcile",
-          "line": 70,
-          "endLine": 75,
+          "line": 72,
+          "endLine": 77,
           "sha256": "30e65509731f7f9076c0994dcdc93138b65bfe6721b686b35fd33d4c9c06adb6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Reconcile",
-          "line": 144,
-          "endLine": 154,
+          "line": 159,
+          "endLine": 169,
           "sha256": "8aea856807fb9068518325adcf71b57d915c98a6509ca94102c9d5e0c7348722"
         },
         {
@@ -41600,23 +41600,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 337,
-          "endLine": 337,
+          "line": 343,
+          "endLine": 343,
           "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 185,
-          "endLine": 192,
+          "line": 203,
+          "endLine": 210,
           "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 472,
-          "endLine": 483,
-          "sha256": "007705b6021577eafc4930ad760b236a592b1873939b7436438d9c1d72a04ae8"
+          "line": 517,
+          "endLine": 527,
+          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -42293,9 +42293,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -42426,15 +42426,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -42594,23 +42594,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 337,
-          "endLine": 337,
+          "line": 343,
+          "endLine": 343,
           "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 185,
-          "endLine": 192,
+          "line": 203,
+          "endLine": 210,
           "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 472,
-          "endLine": 483,
-          "sha256": "007705b6021577eafc4930ad760b236a592b1873939b7436438d9c1d72a04ae8"
+          "line": 517,
+          "endLine": 527,
+          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -42997,15 +42997,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Reconcile",
-          "line": 70,
-          "endLine": 75,
+          "line": 72,
+          "endLine": 77,
           "sha256": "30e65509731f7f9076c0994dcdc93138b65bfe6721b686b35fd33d4c9c06adb6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Reconcile",
-          "line": 144,
-          "endLine": 154,
+          "line": 159,
+          "endLine": 169,
           "sha256": "8aea856807fb9068518325adcf71b57d915c98a6509ca94102c9d5e0c7348722"
         },
         {
@@ -43771,15 +43771,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Acquire",
-          "line": 29,
-          "endLine": 44,
+          "line": 31,
+          "endLine": 46,
           "sha256": "d92a5aa1d55b92aac91844d8f4acbdb44edb5b0d692a581f2cabd1c86521d55a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Acquire",
-          "line": 61,
-          "endLine": 71,
+          "line": 76,
+          "endLine": 86,
           "sha256": "937bc637eb094294cfc086c7a0e611cb50b369ad7cf982c9b5f8cab67bd01fda"
         },
         {
@@ -43792,9 +43792,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "EngineeringOperationStore",
-          "line": 18,
-          "endLine": 24,
-          "sha256": "8a2519b403f453e0da067debcb8414b7a3fde310e90216854d3ac8f423612eee"
+          "line": 22,
+          "endLine": 29,
+          "sha256": "cdfeac4e0c0a91ba6e5d616b59cef5f1acb172d86afd6e0528c3861d25d3d423"
         },
         {
           "path": "src/TiaMcp.Core/Diagnostics/TracePlanning.cs",
@@ -43806,9 +43806,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -43939,15 +43939,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -44079,8 +44079,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Stop",
-          "line": 138,
-          "endLine": 142,
+          "line": 153,
+          "endLine": 157,
           "sha256": "f3f501a3245089f663955991d8679abd1046c4858f8ad87f162c10ee1b84ffe0"
         },
         {
@@ -46384,8 +46384,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Stop",
-          "line": 138,
-          "endLine": 142,
+          "line": 153,
+          "endLine": 157,
           "sha256": "f3f501a3245089f663955991d8679abd1046c4858f8ad87f162c10ee1b84ffe0"
         },
         {
@@ -51037,8 +51037,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Stop",
-          "line": 138,
-          "endLine": 142,
+          "line": 153,
+          "endLine": 157,
           "sha256": "f3f501a3245089f663955991d8679abd1046c4858f8ad87f162c10ee1b84ffe0"
         },
         {
@@ -52454,15 +52454,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Read",
-          "line": 46,
-          "endLine": 47,
+          "line": 48,
+          "endLine": 49,
           "sha256": "08a45e106fec33beee219a5e6200359d73b6f4259748fb131f180250916a5d40"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Read",
-          "line": 51,
-          "endLine": 54,
+          "line": 66,
+          "endLine": 69,
           "sha256": "a8a3f08ff33525636ddfa2bde15975e42ef6bb0ddbd47debe8fa5e57361fdc00"
         },
         {
@@ -55091,8 +55091,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Stop",
-          "line": 138,
-          "endLine": 142,
+          "line": 153,
+          "endLine": 157,
           "sha256": "f3f501a3245089f663955991d8679abd1046c4858f8ad87f162c10ee1b84ffe0"
         },
         {
@@ -55667,23 +55667,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 337,
-          "endLine": 337,
+          "line": 343,
+          "endLine": 343,
           "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 185,
-          "endLine": 192,
+          "line": 203,
+          "endLine": 210,
           "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 472,
-          "endLine": 483,
-          "sha256": "007705b6021577eafc4930ad760b236a592b1873939b7436438d9c1d72a04ae8"
+          "line": 517,
+          "endLine": 527,
+          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -58982,23 +58982,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 337,
-          "endLine": 337,
+          "line": 343,
+          "endLine": 343,
           "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 185,
-          "endLine": 192,
+          "line": 203,
+          "endLine": 210,
           "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 472,
-          "endLine": 483,
-          "sha256": "007705b6021577eafc4930ad760b236a592b1873939b7436438d9c1d72a04ae8"
+          "line": 517,
+          "endLine": 527,
+          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -67140,9 +67140,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -67524,15 +67524,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Reconcile",
-          "line": 70,
-          "endLine": 75,
+          "line": 72,
+          "endLine": 77,
           "sha256": "30e65509731f7f9076c0994dcdc93138b65bfe6721b686b35fd33d4c9c06adb6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Reconcile",
-          "line": 144,
-          "endLine": 154,
+          "line": 159,
+          "endLine": 169,
           "sha256": "8aea856807fb9068518325adcf71b57d915c98a6509ca94102c9d5e0c7348722"
         },
         {
@@ -70274,9 +70274,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -73337,9 +73337,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -74057,15 +74057,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Reconcile",
-          "line": 70,
-          "endLine": 75,
+          "line": 72,
+          "endLine": 77,
           "sha256": "30e65509731f7f9076c0994dcdc93138b65bfe6721b686b35fd33d4c9c06adb6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Reconcile",
-          "line": 144,
-          "endLine": 154,
+          "line": 159,
+          "endLine": 169,
           "sha256": "8aea856807fb9068518325adcf71b57d915c98a6509ca94102c9d5e0c7348722"
         },
         {
@@ -75194,9 +75194,9 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Prepare",
-          "line": 26,
-          "endLine": 49,
-          "sha256": "91b307c0d2683c524e2aaad0ed798fbf795ccfed7c373fafedeb4dbf190dd07a"
+          "line": 39,
+          "endLine": 64,
+          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -75513,15 +75513,15 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Reconcile",
-          "line": 70,
-          "endLine": 75,
+          "line": 72,
+          "endLine": 77,
           "sha256": "30e65509731f7f9076c0994dcdc93138b65bfe6721b686b35fd33d4c9c06adb6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Reconcile",
-          "line": 144,
-          "endLine": 154,
+          "line": 159,
+          "endLine": 169,
           "sha256": "8aea856807fb9068518325adcf71b57d915c98a6509ca94102c9d5e0c7348722"
         },
         {
