@@ -216,16 +216,42 @@ class Run(StateRun):
     def hw(self, *parts):
         return "hw:" + self.path(*parts)
 
-    def apply(self, label, kind, payload, preview=None, shown=None, plc=None, **expected):
+    def apply(self, label, kind, payload, preview=None, shown=None, plc=None, boundary=False, **expected):
+        """boundary marks a step V21 may refuse. A --discover pass records its refusal under boundaries, restores the checkpoint after a
+        failed apply and returns None, so later steps still run; a qualification run fails as for any step."""
+        discovering, before = boundary and getattr(getattr(self.h, "args", None), "discover", False), self.current
         self.selected = plc
         try:
             prepared = self.prepare(label, kind, payload, preview, shown)
+        except Exception as error:
+            if not discovering:
+                raise
+            self.h.report.setdefault("boundaries", {})[label] = {"stage": "prepare", "error": str(error)[:4000]}
+            return None
         finally:
             self.selected = None
-        applied = self.finish(label, kind, prepared, **expected)
-        require(("configured_hardware_preservation_verified" in applied["stages"]) == (kind in CONFIGURED),
-                "Configured-hardware preservation stage differs for %s: %s" % (kind, applied["stages"]))
+        try:
+            applied = self.finish(label, kind, prepared, **expected)
+            require(("configured_hardware_preservation_verified" in applied["stages"]) == (kind in CONFIGURED),
+                    "Configured-hardware preservation stage differs for %s: %s" % (kind, applied["stages"]))
+        except Exception as error:
+            if not discovering:
+                raise
+            self.h.report.setdefault("boundaries", {})[label] = {"stage": "apply", "error": str(error)[:4000]}
+            self.recover(label, prepared, before)
+            return None
         return prepared
+
+    def recover(self, label, prepared, before):
+        """A failed boundary change's checkpoint restored into a new directory (the documented recovery); the run goes on from it."""
+        h = self.h
+        if prepared["changeId"] in self.applied:
+            self.applied.remove(prepared["changeId"])
+        recovered = h.stage("restore the checkpoint after " + label, lambda: h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}))
+        require(recovered["state"] == "restored", "Checkpoint recovery after %s failed: %s" % (label, recovered.get("state")))
+        self.project = recovered["recoveredProject"]["path"]
+        self.current = self.snap("recovered " + label)
+        self.expect(self.current["view"] == before["view"], label, "State recovered after %s differs: %s" % (label, diff(before["view"], self.current["view"])))
 
 
 def coupled_comment(module):
@@ -345,7 +371,8 @@ def sp_modules(run, station_):
     def select():
         rail, fitting = run.path(station_.device, "items", station_.rack), []
         entries = run.h.tool("hardware_catalog_search", {"filter": SP_DI[0], "maxItems": 500})["entries"]
-        for entry in sorted((e for e in entries if (e.get("articleNumber") or "").startswith(SP_DI[1])), key=lambda e: e["typeIdentifier"], reverse=True):
+        # The exact type name keeps BA variants (DI 8x24VDC BA) out.
+        for entry in sorted((e for e in entries if (e.get("articleNumber") or "").startswith(SP_DI[1]) and e.get("typeName") == SP_DI[0]), key=lambda e: e["typeIdentifier"], reverse=True):
             payload = {"hardwarePath": rail, "typeIdentifier": entry["typeIdentifier"], "name": "SpProbe", "positionNumber": 2}
             result = run.h.client.request("tools/call", {"name": "change_prepare", "arguments": run.args("hardware_plug", payload)})
             if not result.get("isError"):
@@ -359,14 +386,14 @@ def sp_modules(run, station_):
 
 
 def shared_device(run):
-    """The ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with HwPeerCpu."""
+    """The ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with HwPeerCpu; True when applied."""
     device, controller = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")
     payload = {"hardwarePath": device, "connectorIndex": 1, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": SHARED_IO, "sharedDevice": True}
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, SCRATCH, SP.prefix), constant(run, SCRATCH, "Local~" + SHARED_IO)))]
     run.apply("share %s with ScratchPLC" % SP.device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True}]},
               shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-              plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller], added=generated)
+              plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller], added=generated, boundary=True) is not None
 
 
 def unshare(run):
@@ -377,17 +404,21 @@ def unshare(run):
     run.apply("unshare %s from ScratchPLC" % SP.device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "disconnect": True, "sharedDevice": True}]},
               shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-              plc=scratch_plc(run), changed=["hw:" + device, "hw:" + run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")], removed=removed, restore=True)
+              plc=scratch_plc(run), changed=["hw:" + device, "hw:" + run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")], removed=removed, restore=True, boundary=True)
 
 
-def shared_access(run, name, access, restore=False):
-    """One ET 200SP module's SharedDeviceAccessType; the worker records HwPeerCpu and ScratchPLC as the station's address owners."""
-    module = run.path(SP.device, "items", name)
-    payload = {"hardwarePath": module, "accessType": access}
-    owners = sorted([run.path("HwPeer", "items", "HwPeerCpu"), run.path("ScratchStation", "items", "ScratchPLC")])
-    run.apply("set %s's shared-device access %s" % (name, access), "hardware_shared_device_access", payload,
-              {"effects": [{"hardwarePath": module, "accessAfter": access}]}, shown={**payload, "addressControllerOwnerPaths": owners},
-              changed=["hw:" + module], rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}}, restore=restore)
+def shared_access(run, name, access, shared, external=None, restore=False):
+    """One ET 200SP module's SharedDeviceAccessType; the worker records the PLCs of the station's IO systems (HwPeerCpu, and ScratchPLC
+    while the station is shared) as its address owners. external also sets NumberOfExternalIoControllers of the station's interface,
+    which TIA may require once a module is accessed outside the project. True when applied."""
+    module, interface = run.path(SP.device, "items", name), run.path(SP.device, "items", *SP.interface)
+    payload = {"hardwarePath": module, "accessType": access, **({"externalIoControllers": external} if external else {})}
+    owners = sorted([run.path("HwPeer", "items", "HwPeerCpu")] + ([run.path("ScratchStation", "items", "ScratchPLC")] if shared else []))
+    shown = {**payload, "addressControllerOwnerPaths": owners, **({"ioDeviceInterfacePath": interface} if external else {})}
+    return run.apply("set %s's shared-device access %s%s" % (name, access, " with %d external controller(s)" % external if external else ""), "hardware_shared_device_access", payload,
+                     {"effects": [{"hardwarePath": module, "accessAfter": access}]}, shown=shown,
+                     changed=["hw:" + module] + (["hw:" + interface] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
+                     restore=restore, boundary=True) is not None
 
 
 def scratch_plc(run):
@@ -406,10 +437,12 @@ def ring_ports(run):
 
 
 def mrp(run, interface, role, domain=None, create=False, restore=False):
+    """One interface's MRP role (and domain); True when applied."""
     payload = {"hardwarePath": interface, "role": role, **({"domainName": domain} if domain else {}), **({"createDomain": True} if create else {})}
     effect = {"hardwarePath": interface, "roleAfter": role, "createDomain": create, **({"domainAfter": domain} if domain else {})}
-    run.apply("MRP %s %s" % (interface.split("/devices/", 1)[1].split("/", 1)[0], role), "network_mrp_set", payload, {"effects": [effect]},
-              changed=["hw:" + interface], rows={"hw:" + interface: {"network": {"mrp": [{"role": role, **({"domain": domain} if domain else {})}]}}}, restore=restore)
+    label = "MRP %s %s%s%s" % (interface.split("/devices/", 1)[1].split("/", 1)[0], role, " in " + domain if domain else "", ", restored" if restore else "")
+    return run.apply(label, "network_mrp_set", payload, {"effects": [effect]}, changed=["hw:" + interface],
+                     rows={"hw:" + interface: {"network": {"mrp": [{"role": role, **({"domain": domain} if domain else {})}]}}}, restore=restore, boundary=True) is not None
 
 
 def ring(run):
@@ -418,15 +451,21 @@ def ring(run):
     and the ring closure each run once with checkpoint restore first (a partly built ring), then for real."""
     link(run, "hardware_port_disconnect", 1, pair=family_ports(run)["Hw1200"], label="Hw1200 Port_1, which cannot join the ring")
     manager, *clients = interfaces(run)
-    mrp(run, manager, "Manager", RING, create=True)
+    # A named domain needs the subnet's MrpDomainOwner; without it the roles go to the subnet's default domain.
+    domain = RING if mrp(run, manager, "Manager", RING, create=True) else None
+    if domain is None and not mrp(run, manager, "Manager"):
+        run.h.report.setdefault("boundaries", {})["ring"] = {"stage": "skipped", "error": "No MRP role could be set; the ring is not closed."}
+        return False
     run.b0 = run.current
-    mrp(run, clients[0], "Client", RING, restore=True)
-    for interface in clients:
-        mrp(run, interface, "Client", RING)
+    mrp(run, clients[0], "Client", domain, restore=True)
+    if not all([mrp(run, interface, "Client", domain) for interface in clients]):
+        run.h.report.setdefault("boundaries", {})["ring"] = {"stage": "skipped", "error": "A client role failed; the ring is not closed."}
+        return False
     run.b0 = run.current
     label = "the ring (HwMp Port_2 and ScratchPLC Port_1)"
     link(run, "hardware_port_connect", 2, pair=ring_ports(run), label=label + ", restored", restore=True)
     link(run, "hardware_port_connect", 2, pair=ring_ports(run), label=label)
+    return True
 
 
 def topology_refusals(run):
@@ -457,7 +496,7 @@ def address_change(run):
     run.apply("tag HwInput on HwDi's input", "tag_create", {"tagTableName": "Default tag table", "name": "HwInput", "dataTypeName": "Bool", "logicalAddress": "%%I%d.0" % start},
               plc=scratch_plc(run), added=["member:" + tag], changed=["tagTable:" + table])
     entries = run.h.stage("select DI 32x24VDC HF", lambda: run.h.tool("hardware_catalog_search", {"filter": WIDE_DI[0], "maxItems": 500}))["entries"]
-    wide = max((e["typeIdentifier"] for e in entries if (e.get("articleNumber") or "").startswith(WIDE_DI[1])), default=None)
+    wide = max((e["typeIdentifier"] for e in entries if (e.get("articleNumber") or "").startswith(WIDE_DI[1]) and e.get("typeName") == WIDE_DI[0]), default=None)
     require(wide, "No DI 32x24VDC HF in the installed catalog")
     run.h.report.setdefault("selected", {})["addressChange"] = wide
     payload = {"hardwarePath": module, "typeIdentifier": wide, "acceptAddressChange": True}
@@ -471,7 +510,7 @@ def address_change(run):
     run.apply("replace HwDi with %s moving its address" % wide, "hardware_replace", {**payload, "acknowledgedTags": [tag]},
               {"effects": [{"hardwarePath": module, "typeIdentifierAfter": wide, "acceptAddressChange": True}], "addressImpact": {"referencedTags": [{"path": tag}]}},
               changed=lambda applied, state: [key for key in under(module)(applied, state) if key in run.b0["view"]],
-              added=lambda applied, state: [key for key in under(module)(applied, state) if key not in run.b0["view"]], check=mapped, restore=True)
+              added=lambda applied, state: [key for key in under(module)(applied, state) if key not in run.b0["view"]], check=mapped, restore=True, boundary=True)
 
 
 def gsd_device(run):
@@ -500,7 +539,7 @@ def gsd_device(run):
     run.apply("assign %s to HwPeerCpu" % device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
               shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
-              changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated)
+              changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated, boundary=True)
     run.h.report["gsdDevice"] = {"typeIdentifier": identifier, "hardwarePath": path}
 
 
@@ -624,10 +663,11 @@ def phase_a(run):
     delete(run, "HwDi2")
     for station_, (_, second), _, _ in run.families:
         delete(run, second, station=station_)
-    shared_device(run)
-    shared_access(run, "SpDi3", "OutsideOfProject")
+    run.shared = shared_device(run)
+    # TIA may require an IO controller outside the project before a module is accessed there.
+    run.access = shared_access(run, "SpDi3", "OutsideOfProject", run.shared) or shared_access(run, "SpDi3", "OutsideOfProject", run.shared, external=1)
     topology_refusals(run)
-    ring(run)
+    run.ring = ring(run)
     gsd_device(run)
 
 
@@ -656,9 +696,12 @@ def phase_b(run):
         if station_.device in pairs:
             link(run, "hardware_port_disconnect", 1, restore=True, pair=pairs[station_.device], label=station_.device + " Port_1")
         delete(run, first, restore=True, station=station_, changed=timing(run, station_))
-    mrp(run, interfaces(run)[0], "ManagerAuto", restore=True)
-    shared_access(run, "SpDi3", "PLC", restore=True)
-    unshare(run)
+    if run.ring:
+        mrp(run, interfaces(run)[0], "ManagerAuto", restore=True)
+    if run.access:
+        shared_access(run, "SpDi3", "PLC", run.shared, restore=True)
+    if run.shared:
+        unshare(run)
     # Last: its tag stays in the project, so the pre-change state of the replacement includes it.
     address_change(run)
 
@@ -712,7 +755,7 @@ def body(h):
     phase_b(run)
     profiles(run)
     gaps = coverage_gaps(run.coverage, KINDS)
-    require(not gaps, "Kinds without applied, persisted, refused and restored evidence: %s" % gaps)
+    run.expect(not gaps, "coverage", "Kinds without applied, persisted, refused and restored evidence: %s" % gaps)
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ def items(raw, root):
                      "addresses": [{"ioType": address["ioType"], "lengthBits": address["length"]} for address in item.get("addresses") or []],
                      "channels": [{"type": channel["type"], "ioType": channel["ioType"], "number": channel["number"], "attributes": attributes(channel.get("attributes"))}
                                   for channel in item.get("channels") or []],
-                     "interface": None if not network else {"interfaceType": network.get("interfaceType"), "nodes": [node.get("name") for node in network.get("nodes", [])],
+                     "interface": None if not network else {"interfaceType": network.get("interfaceType"), "nodes": [node["name"] for node in network.get("nodes", []) if isinstance(node.get("name"), str)],
                                                             "ports": [port((row.get("port") or {}).get("ownerHardwarePath")) for row in network.get("ports", [])]}})
     if not rows or rows[0]["relativePath"] != "":
         raise ValueError("No raw hardware_inspect item for the profiled module " + root)

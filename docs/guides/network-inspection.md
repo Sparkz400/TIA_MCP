@@ -209,21 +209,24 @@ V21 Openness exposes a shared device in two ways, and the bridge reviews both. N
   `SharedDeviceAccessType` (`PLC` or `OutsideOfProject`; `Unknown` is the native unassigned state) on one module or
   submodule of an assigned IO device. Stations holding PLC software are refused. The bridge records the PLC items of the
   station's I/O systems as `addressControllerOwnerPaths`; the module and its subitems may take the requested access, every
-  address range stays and may keep at most one owner among those PLCs. The other project, `NumberOfExternalIoControllers`
-  and module copies (`SharedDeviceCopyOfModule`) are not configured.
+  address range stays and may keep at most one owner among those PLCs. Optional `externalIoControllers` (with `OutsideOfProject`)
+  also sets `NumberOfExternalIoControllers` of the station's one assigned interface in the same change, which TIA may require once
+  a module is accessed outside the project. The other project and module copies (`SharedDeviceCopyOfModule`) are not configured.
 
 V21 has no per-module controller selection in one project beyond these attributes; which PLC owns a module after a second
 assignment is what TIA decides, and the readback reports it.
 
 ## Media redundancy (MRP)
 
-`network_mrp_set` takes `hardwarePath` (a PROFINET interface with exactly one MRP instance, `MrpInstancesOwner`), `role`
-(`NotInRing`, `Manager`, `Client`, `ManagerAuto`), optional `domainName` and optional `createDomain: true`. It writes the
-instance's `MediaRedundancyRole` and, with `domainName`, adds the interface to that MRP domain of its subnet
+`network_mrp_set` takes `hardwarePath` (a PROFINET interface), `role` (`NotInRing`, `Manager`, `Client`, `ManagerAuto`),
+optional `domainName` and optional `createDomain: true`. It writes `MediaRedundancyRole` where V21 carries it: on the interface
+item itself (the CPU 1511-1 PN, IM 155-5 PN ST and IM 155-6 PN ST interfaces of the 31 October discovery pass expose it there and
+no `MrpInstancesOwner`), or on the interface's one MRP instance. With `domainName` it adds the interface to that MRP domain of its subnet
 (`MrpDomainOwner.MrpDomains`, `MrpDomain.DomainParticipants.Add`); `createDomain` creates it first and refuses an existing
 name, an absent one without it is `ObjectNotFound`. An unchanged role and domain is refused, and so is a role other than
-`NotInRing` on an instance without both `RingPort1` and `RingPort2` (`UnsupportedCapability`; a single-port device such as the
-CPU 1214C). V21 offers no participant removal, so an interface leaves a domain only by joining another one.
+`NotInRing` on an interface with fewer than two ports or an instance without both `RingPort1` and `RingPort2`; an interface with
+neither the attribute nor an instance (the single-port CPU 1214C) is `UnsupportedCapability`. The domain readback is the subnet
+domain whose `DomainParticipants` include the interface. V21 offers no participant removal, so an interface leaves a domain only by joining another one.
 
 `RingPort1`/`RingPort2` are read-only in V21 and stay the TIA defaults (Port_1 and Port_2). The ring itself is the port
 topology: set the roles first, then close the ring with `hardware_port_connect`; a ring without one manager fails the device

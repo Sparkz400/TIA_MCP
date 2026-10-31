@@ -694,7 +694,7 @@ namespace TiaMcp.Openness.V21
                     PrepareMrp(change, project, preview, out _);
                     break;
                 case "hardware_shared_device_access":
-                    PrepareSharedDeviceAccess(change, project, preview);
+                    PrepareSharedDeviceAccess(change, project, preview, out _);
                     break;
                 case "cax_import":
                     PrepareCaxImport(change, project, preview);

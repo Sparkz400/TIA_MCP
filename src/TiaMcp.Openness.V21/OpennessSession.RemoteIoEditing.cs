@@ -267,7 +267,7 @@ namespace TiaMcp.Openness.V21
         {
             bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind), mrp = HardwareEngineeringRules.CapturesMrp(kind);
             var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes
-                : kind == "hardware_shared_device_access" ? new HashSet<string>(HardwareWriteAttributes.Concat(SharedAccessAttributes), StringComparer.Ordinal) : HardwareWriteAttributes;
+                : kind == "hardware_shared_device_access" ? new HashSet<string>(HardwareWriteAttributes.Concat(SharedAccessAttributes).Concat(ExternalControllerAttributes), StringComparer.Ordinal) : HardwareWriteAttributes;
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
@@ -340,7 +340,7 @@ namespace TiaMcp.Openness.V21
                 ["limitations"] = "Unexposed vendor payloads, non-allowlisted parameters, physical wiring, shared-device/multi-controller behavior and runtime are not qualified." };
             if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
             if (HardwareEngineeringRules.CapturesMrp(change.Kind)) preview["preservation"]["covered"] += " Every interface's MRP instances (domain, MediaRedundancyRole, ring ports) and its subnet's MRP domain names are included.";
-            if (change.Kind == "hardware_shared_device_access") preview["preservation"]["covered"] += " SharedDeviceAccessType of every device item is included.";
+            if (change.Kind == "hardware_shared_device_access") preview["preservation"]["covered"] += " SharedDeviceAccessType and NumberOfExternalIoControllers of every device item are included.";
             if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress and Failsafe_FMonitoringtime of every device item are included.";
             if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));
         }

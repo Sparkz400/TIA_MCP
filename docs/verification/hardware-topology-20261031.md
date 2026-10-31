@@ -83,6 +83,15 @@ Two `--discover` passes ran on 31 October in one owned TIA Portal V21 instance e
 | `artifacts/hw1/hw_9fefba84` | `artifacts/hf1` (`743daa3f`) | snapshot after adding the ET 200SP station (55 steps) | The IM 155-6 PN ST V6.4 interface's ports sit on its BusAdapter `BA 2xRJ45` (`6ES7 193-6AR00-0AA0/V0.0`, slot 127), a sibling of the head; the profile builder refused them. Fixed in `b7af3ee4` (ports named `device:items/...`). The station's rack is `Rack_0` (`System:Rack.ET200SP`). |
 | `artifacts/hw2/hw_28ac766e` | `artifacts/hf2` (`b7af3ee4`) | apply of the first ET 200SP DI at slot 2 (114 steps) | V21 device compile: "The module 'SpDi' in slot 2 requires a new potential group (light-colored BaseUnit)", and "On IO device HwSpHead, the update time has changed from 128 ms to 2 ms". Before that, the ET 200SP assignment to the second CPU (with the declared generated server module, moved to slot 4) applied and compiled; its preview carries the companion as a second effect, and the BusAdapter's `Port_1`/`Port_2` take `SharedDeviceAccessType` `PLC` like the head's items. |
 
+Pass 2's snapshots also show what the later steps meet: `MediaRedundancyRole` is an attribute of the CPU 1511-1 PN,
+IM 155-5 PN ST and IM 155-6 PN ST interface items (value `NotInRing`), the CPU 1214C interface has none, and no interface
+exposes `MrpInstancesOwner`; every item of an assigned IO device (head, interface, ports, modules) carries
+`SharedDeviceAccessType` `PLC` and `SharedDeviceAccessConfigured`, and its interface `NumberOfExternalIoControllers` `0`. The
+worker now writes the role on the interface item when no MRP instance exists, and `hardware_shared_device_access` takes an
+optional `externalIoControllers`. The runner marks the shared-device, shared-access, MRP, address-change and GSD-assignment
+steps as boundaries: a `--discover` pass records a refusal, restores a failed change's checkpoint and goes on (a named MRP
+domain falls back to the subnet's default domain; shared access retries with one external controller).
+
 Everything before these points matched the runner's expectations (S7-1500, S7-1200, ET 200MP families up to the
 ET 200SP steps). The runner now plugs the first ET 200SP module at slot 1, where TIA gives it a light BaseUnit, and expects
 the update-time change there (`216f2984`). No shared-device, MRP, shared-access,

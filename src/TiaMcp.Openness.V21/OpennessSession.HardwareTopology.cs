@@ -138,23 +138,51 @@ namespace TiaMcp.Openness.V21
 
         private static readonly System.Collections.Generic.HashSet<string> MrpWriteAttributes = new System.Collections.Generic.HashSet<string>(new[] { "MediaRedundancyRole" }, StringComparer.Ordinal);
         private static readonly System.Collections.Generic.HashSet<string> SharedAccessAttributes = new System.Collections.Generic.HashSet<string>(new[] { "SharedDeviceAccessType" }, StringComparer.Ordinal);
+        private static readonly System.Collections.Generic.HashSet<string> ExternalControllerAttributes = new System.Collections.Generic.HashSet<string>(new[] { "NumberOfExternalIoControllers" }, StringComparer.Ordinal);
 
-        // The one MRP instance of a PROFINET interface item (V21 MrpInstancesOwner).
-        private static MrpInstance MrpInstanceOf(DeviceItem item)
+        private static bool Declares(IEngineeringObject target, string name) =>
+            target.GetAttributeInfos().Any(info => info.Name == name && (info.AccessMode & EngineeringAttributeAccessMode.Read) != 0);
+
+        // The object carrying MediaRedundancyRole: the interface's one MRP instance (MrpInstancesOwner) or, as V21 exposes it on S7-1500,
+        // IM 155-5 PN and IM 155-6 PN interfaces (observed 31 October, discovery hw2), the interface item itself. A ring role needs two ring ports.
+        private static IEngineeringObject MrpRoleTarget(DeviceItem item, NetworkInterface network, string role)
         {
-            var instances = item.GetService<MrpInstancesOwner>()?.MrpInstances.ToArray() ?? throw new BridgeException("UnsupportedCapability", "The selected item exposes no native MRP instances (MrpInstancesOwner); select a PROFINET interface.");
-            if (instances.Length != 1) throw new BridgeException("UnsupportedCapability", "Media redundancy covers an interface with exactly one MRP instance; this one has " + instances.Length + ".");
-            return instances[0];
+            var instances = item.GetService<MrpInstancesOwner>()?.MrpInstances.ToArray();
+            if (instances != null && instances.Length != 0)
+            {
+                if (instances.Length != 1) throw new BridgeException("UnsupportedCapability", "Media redundancy covers an interface with exactly one MRP instance; this one has " + instances.Length + ".");
+                if (role != "NotInRing" && (instances[0].RingPort1 == null || instances[0].RingPort2 == null))
+                    throw new BridgeException("UnsupportedCapability", "A ring role needs two ring ports; this interface's MRP instance lacks RingPort1 or RingPort2.");
+                return instances[0];
+            }
+            if (!Declares(item, "MediaRedundancyRole"))
+                throw new BridgeException("UnsupportedCapability", "The selected interface exposes neither an MRP instance nor a MediaRedundancyRole attribute (a single-port device such as the CPU 1214C has none).");
+            if (role != "NotInRing" && network.Ports.Count < 2)
+                throw new BridgeException("UnsupportedCapability", "A ring role needs two ring ports; this interface has " + network.Ports.Count + ".");
+            return item;
         }
 
-        // Name, domain, role and ring ports of each MRP instance of an interface item, null without MrpInstancesOwner.
+        // The MRP domain of the interface's subnet whose participants include it (V21 MrpDomain.DomainParticipants), or the instance's own.
+        private static MrpDomain MrpDomainOf(IEngineeringObject target, NetworkInterface network)
+        {
+            if (target is MrpInstance instance) return instance.ConnectedMrpDomain;
+            var subnets = network.Nodes.Select(node => node.ConnectedSubnet).Where(subnet => subnet != null).ToArray();
+            var owner = subnets.Length == 1 ? subnets[0].GetService<MrpDomainOwner>() : null;
+            return owner?.MrpDomains.FirstOrDefault(domain => domain.DomainParticipants.Contains(network));
+        }
+
+        // Name, domain, role and ring ports of each MRP instance of an interface item; for an interface carrying the role itself one row
+        // without name and ring ports; null when neither exists.
         private static JArray MrpRows(DeviceItem item, Func<NetworkPort, JToken> port)
         {
             var owner = item.GetService<MrpInstancesOwner>();
+            var network = item.GetService<NetworkInterface>();
+            if ((owner == null || owner.MrpInstances.Count == 0) && network != null && Declares(item, "MediaRedundancyRole"))
+                return new JArray(new JObject { ["name"] = JValue.CreateNull(), ["domain"] = HardwareEngineeringRules.MetadataString(MrpDomainOf(item, network)?.Name),
+                    ["role"] = HardwareEngineeringRules.MetadataString(item.GetAttribute("MediaRedundancyRole")?.ToString()), ["ringPorts"] = JValue.CreateNull() });
             return owner == null ? null : new JArray(owner.MrpInstances.Select(instance => new JObject { ["name"] = HardwareEngineeringRules.MetadataString(instance.Name),
                 ["domain"] = HardwareEngineeringRules.MetadataString(instance.ConnectedMrpDomain?.Name),
-                ["role"] = HardwareEngineeringRules.MetadataString(instance.GetAttributeInfos().Any(info => info.Name == "MediaRedundancyRole" && (info.AccessMode & EngineeringAttributeAccessMode.Read) != 0)
-                    ? instance.GetAttribute("MediaRedundancyRole")?.ToString() : null),
+                ["role"] = HardwareEngineeringRules.MetadataString(Declares(instance, "MediaRedundancyRole") ? instance.GetAttribute("MediaRedundancyRole")?.ToString() : null),
                 ["ringPorts"] = new JArray(new[] { instance.RingPort1, instance.RingPort2 }.Select(ring => ring == null ? JValue.CreateNull() : port(ring))) }));
         }
 
@@ -166,17 +194,15 @@ namespace TiaMcp.Openness.V21
             return owner == null ? null : new JObject { ["subnet"] = subnets[0].Name, ["domains"] = new JArray(owner.MrpDomains.Select(domain => domain.Name).OrderBy(name => name, StringComparer.Ordinal)) };
         }
 
-        // One interface's MRP instance takes a MediaRedundancyRole and optionally joins (or first creates) a named MRP domain of its subnet.
-        private MrpInstance PrepareMrp(EngineeringChange change, Project project, JObject preview, out MrpDomainComposition domains)
+        // One interface takes a MediaRedundancyRole and optionally joins (or first creates) a named MRP domain of its subnet.
+        private IEngineeringObject PrepareMrp(EngineeringChange change, Project project, JObject preview, out MrpDomainComposition domains)
         {
             string role = ChangeText(change.Payload, "role", 32);
             if (Array.IndexOf(HardwareEngineeringRules.MediaRedundancyRoles, role) < 0) throw new BridgeException("InvalidRequest", "role must be one of " + string.Join(", ", HardwareEngineeringRules.MediaRedundancyRoles) + ".");
             var item = ChangeHardware(project, change.Payload);
             var network = item.Item.GetService<NetworkInterface>() ?? throw new BridgeException("UnsupportedCapability", "Media redundancy needs a PROFINET interface; the selected item exposes no NetworkInterface.");
-            var instance = MrpInstanceOf(item.Item);
-            if (role != "NotInRing" && (instance.RingPort1 == null || instance.RingPort2 == null))
-                throw new BridgeException("UnsupportedCapability", "A ring role needs two ring ports; this interface's MRP instance lacks RingPort1 or RingPort2 (a single-port device such as the CPU 1214C).");
-            var changes = PrepareAttributes(instance, new JObject { ["MediaRedundancyRole"] = role }, MrpWriteAttributes);
+            var target = MrpRoleTarget(item.Item, network, role);
+            var changes = PrepareAttributes(target, new JObject { ["MediaRedundancyRole"] = role }, MrpWriteAttributes);
             string name = change.Payload["domainName"] == null ? null : ChangeText(change.Payload, "domainName", 128);
             bool create = change.Payload.Property("createDomain") != null && ExplicitChangeBool(change.Payload, "createDomain");
             if (create && name == null) throw new BridgeException("InvalidRequest", "createDomain needs domainName.");
@@ -192,42 +218,49 @@ namespace TiaMcp.Openness.V21
                 if (create && domain != null) throw new BridgeException("ObjectExists", "The subnet already has an MRP domain named " + name + ".");
                 if (!create && domain == null) throw new BridgeException("ObjectNotFound", "The interface's subnet has no MRP domain named " + name + "; set createDomain: true to create it.");
             }
-            string before = changes[0].Value<string>("before"), domainBefore = instance.ConnectedMrpDomain?.Name;
-            if (before == role && (name == null || Equals(instance.ConnectedMrpDomain, domain)))
+            var current = MrpDomainOf(target, network);
+            string before = changes[0].Value<string>("before"), domainBefore = current?.Name;
+            if (before == role && (name == null || Equals(current, domain)))
                 throw new BridgeException("InvalidRequest", "The requested MRP role and domain are unchanged.");
             if (preview != null)
             {
-                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["mrpInstance"] = instance.Name, ["roleBefore"] = before, ["roleAfter"] = role,
+                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["mrpInstance"] = (target as MrpInstance)?.Name, ["roleBefore"] = before, ["roleAfter"] = role,
                     ["domainBefore"] = domainBefore, ["domainAfter"] = name ?? domainBefore, ["createDomain"] = create });
                 preview["attributeChanges"] = changes;
                 ((JArray)preview["warnings"]).Add("Ring ports stay as configured; close or open the ring with hardware_port_connect and hardware_port_disconnect. A closed ring needs exactly one manager in its domain or the device compile fails.");
             }
-            return instance;
+            return target;
         }
 
         private void ApplyMrp(EngineeringChange change, Project project)
         {
-            var instance = PrepareMrp(change, project, null, out var domains);
+            var target = PrepareMrp(change, project, null, out var domains);
             var item = ChangeHardware(project, change.Payload);
-            string name = change.Payload.Value<string>("domainName");
+            var network = item.Item.GetService<NetworkInterface>();
+            string name = change.Payload.Value<string>("domainName"), role = change.Payload.Value<string>("role");
             if (name != null)
             {
-                // Join the domain first: TIA may reset the role of an instance that changes domain.
+                // Join the domain first: TIA may reset the role of an interface that changes domain.
                 var domain = domains.Find(name) ?? domains.Create(name);
-                if (!Equals(instance.ConnectedMrpDomain, domain)) domain.DomainParticipants.Add(item.Item.GetService<NetworkInterface>());
-                if (!Equals(MrpInstanceOf(item.Item).ConnectedMrpDomain, domain)) throw new BridgeException("MutationVerificationFailed", "The interface's MRP instance is not connected to the requested domain.");
+                if (!Equals(MrpDomainOf(target, network), domain)) domain.DomainParticipants.Add(network);
+                target = MrpRoleTarget(item.Item, network, role);
+                if (!Equals(MrpDomainOf(target, network), domain)) throw new BridgeException("MutationVerificationFailed", "The interface is not a participant of the requested MRP domain.");
             }
-            var readback = MrpInstanceOf(item.Item);
-            ApplyAttributes(readback, new JObject { ["MediaRedundancyRole"] = change.Payload.Value<string>("role") }, MrpWriteAttributes);
-            change.Readbacks.Add(new JObject { ["role"] = "mrp", ["hardwarePath"] = item.Path, ["mrpInstance"] = readback.Name, ["domain"] = readback.ConnectedMrpDomain?.Name, ["mediaRedundancyRole"] = readback.GetAttribute("MediaRedundancyRole")?.ToString() });
+            ApplyAttributes(target, new JObject { ["MediaRedundancyRole"] = role }, MrpWriteAttributes);
+            change.Readbacks.Add(new JObject { ["role"] = "mrp", ["hardwarePath"] = item.Path, ["mrpInstance"] = (target as MrpInstance)?.Name, ["domain"] = MrpDomainOf(target, network)?.Name,
+                ["mediaRedundancyRole"] = target.GetAttribute("MediaRedundancyRole")?.ToString() });
         }
 
         // One module or submodule of an IO device takes a V21 SharedDeviceAccessType. The payload records the PLC items whose
-        // I/O systems the station's connectors join, the only permitted address owners afterwards.
-        private DeviceItem PrepareSharedDeviceAccess(EngineeringChange change, Project project, JObject preview)
+        // I/O systems the station's connectors join, the only permitted address owners afterwards. With OutsideOfProject, optional
+        // externalIoControllers also sets NumberOfExternalIoControllers of the station's one assigned interface (recorded as ioDeviceInterfacePath).
+        private DeviceItem PrepareSharedDeviceAccess(EngineeringChange change, Project project, JObject preview, out DeviceItem ioDevice)
         {
             string access = ChangeText(change.Payload, "accessType", 32);
             if (Array.IndexOf(HardwareEngineeringRules.SharedDeviceAccessTypes, access) < 0) throw new BridgeException("InvalidRequest", "accessType must be one of " + string.Join(", ", HardwareEngineeringRules.SharedDeviceAccessTypes) + ".");
+            var external = change.Payload["externalIoControllers"];
+            if (external != null && access != "OutsideOfProject") throw new BridgeException("InvalidRequest", "externalIoControllers applies only with accessType OutsideOfProject.");
+            if (external == null && change.Payload["ioDeviceInterfacePath"] != null) throw new BridgeException("InvalidRequest", "ioDeviceInterfacePath is recorded by the bridge for externalIoControllers only.");
             var item = ChangeHardware(project, change.Payload);
             string station = item.Path.Substring(0, item.Path.IndexOf("/items/", StringComparison.Ordinal));
             var budget = new ScanBudget(50000);
@@ -236,24 +269,39 @@ namespace TiaMcp.Openness.V21
             var members = hardware.Where(entry => entry.Path.StartsWith(station + "/items/", StringComparison.Ordinal)).ToArray();
             var plcs = PlcItems(hardware);
             if (members.Any(entry => plcs.Contains(entry))) throw new BridgeException("UnsupportedCapability", "Shared-device access covers modules of an IO device; the selected station holds PLC software.");
-            var systems = members.Select(entry => entry.Item.GetService<NetworkInterface>()).Where(network => network != null).SelectMany(network => network.IoConnectors).Select(connector => connector.ConnectedToIoSystem).Where(system => system != null).ToArray();
+            var assigned = members.Where(entry => entry.Item.GetService<NetworkInterface>()?.IoConnectors.Any(connector => connector.ConnectedToIoSystem != null) == true).ToArray();
+            var systems = assigned.SelectMany(entry => entry.Item.GetService<NetworkInterface>().IoConnectors).Select(connector => connector.ConnectedToIoSystem).Where(system => system != null).ToArray();
             if (systems.Length == 0) throw new BridgeException("UnsupportedCapability", "Shared-device access applies to a module of an IO device assigned to an I/O system; assign the station first (network_io_assign).");
             var owners = systems.Select(system => OwningPlcItem(system.Parent, plcs) ?? throw new BridgeException("UnresolvedIoOwnership", "An I/O system of the station resolves to no PLC of the project.")).Select(entry => entry.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal);
             HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, new[] { "SharedDeviceAccessType" });
             var changes = PrepareAttributes(item.Item, new JObject { ["SharedDeviceAccessType"] = access }, SharedAccessAttributes);
             if (changes[0].Value<string>("before") == access) throw new BridgeException("InvalidRequest", "The item already has the requested SharedDeviceAccessType.");
+            ioDevice = null;
+            if (external != null)
+            {
+                if (HardwareIndex(change.Payload, "externalIoControllers") < 1) throw new BridgeException("InvalidRequest", "externalIoControllers must be at least 1.");
+                if (assigned.Length != 1) throw new BridgeException("UnsupportedCapability", "externalIoControllers needs exactly one assigned IO-device interface on the station; it has " + assigned.Length + ".");
+                ioDevice = assigned[0].Item;
+                change.Payload["ioDeviceInterfacePath"] = assigned[0].Path;
+                foreach (var row in PrepareAttributes(ioDevice, new JObject { ["NumberOfExternalIoControllers"] = external.DeepClone() }, ExternalControllerAttributes)) changes.Add(row);
+            }
             change.Payload["addressControllerOwnerPaths"] = new JArray(owners);
             if (preview != null)
             {
-                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["accessBefore"] = changes[0]["before"].DeepClone(), ["accessAfter"] = access });
+                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["accessBefore"] = changes[0]["before"].DeepClone(), ["accessAfter"] = access,
+                    ["externalIoControllers"] = external?.DeepClone() });
                 preview["attributeChanges"] = changes;
                 ((JArray)preview["warnings"]).Add("TIA moves the module's address ownership with its access (OutsideOfProject: an IO controller outside this project); its subitems may follow. Tags and absolute program accesses on the released addresses are not checked, and the device compile does not flag them.");
             }
             return item.Item;
         }
 
-        private void ApplySharedDeviceAccess(EngineeringChange change, Project project) =>
-            ApplyAttributes(PrepareSharedDeviceAccess(change, project, null), new JObject { ["SharedDeviceAccessType"] = change.Payload.Value<string>("accessType") }, SharedAccessAttributes);
+        private void ApplySharedDeviceAccess(EngineeringChange change, Project project)
+        {
+            var item = PrepareSharedDeviceAccess(change, project, null, out var ioDevice);
+            ApplyAttributes(item, new JObject { ["SharedDeviceAccessType"] = change.Payload.Value<string>("accessType") }, SharedAccessAttributes);
+            if (ioDevice != null) ApplyAttributes(ioDevice, new JObject { ["NumberOfExternalIoControllers"] = change.Payload["externalIoControllers"].DeepClone() }, ExternalControllerAttributes);
+        }
 
         private void ApplyHardwareReplace(EngineeringChange change, Project project)
         {

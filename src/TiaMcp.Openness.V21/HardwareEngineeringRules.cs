@@ -403,6 +403,8 @@ namespace TiaMcp.Openness.V21
                 string access = payload.Value<string>("accessType");
                 var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
                 if (Target(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
+                // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
+                if (payload["externalIoControllers"] != null) Target(expected, payload.Value<string>("ioDeviceInterfacePath"))["attributes"]["NumberOfExternalIoControllers"] = payload["externalIoControllers"].DeepClone();
                 foreach (var row in expected.OfType<JObject>().Where(row => InTree(row, path)))
                 {
                     var now = Target(after, row.Value<string>("path"));

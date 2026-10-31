@@ -401,6 +401,12 @@ Check("shared access without readback rejected", "hardware_shared_device_access"
 Check("shared access moving an address rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"][0]["startAddress"] = 8; }, false, AccessBase);
 Check("shared access foreign owner rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu9"); }, false, AccessBase);
 Check("shared access collateral rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[0]["attributes"]["Comment"] = "lost"; }, false, AccessBase);
+// externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change, and only then may it change.
+void AccessExternalBase(JArray rows) { AccessBase(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 0; }
+var accessExternal = (JObject)access.DeepClone(); accessExternal["externalIoControllers"] = 1; accessExternal["ioDeviceInterfacePath"] = remote;
+Check("shared access with external controllers", "hardware_shared_device_access", accessExternal, rows => { Outside(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 1; }, true, AccessExternalBase);
+Check("shared access external count differing rejected", "hardware_shared_device_access", accessExternal, rows => { Outside(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 2; }, false, AccessExternalBase);
+Check("external count changing unasked rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 1; }, false, AccessExternalBase);
 // Capability profiles: when the nearest profiled item has a profile, a write must be declared writable on the written item's row.
 JArray Declared(params (string name, string access)[] rows) => new JArray(rows.Select(row => new JObject { ["name"] = row.name, ["accessMode"] = row.access, ["type"] = "System.String" }));
 var profile = new JObject { ["typeIdentifier"] = "Catalog:DI", ["items"] = new JArray(

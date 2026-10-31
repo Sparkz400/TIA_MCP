@@ -63,19 +63,60 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual(1, len(managers))
         self.assertEqual({d for link in devices for d in link}, {path[len(run.base):].split("/")[0] for path in q.interfaces(run)})
 
-    def test_ring_restores_the_first_join_and_the_closure_once(self):
+    def ring(self, refused=()):
+        """ring() with mrp/link stubbed; refused names the (device, domain) role changes V21 refuses."""
         run = q.Run.__new__(q.Run)
         run.base, run.current, calls = "/projects/P/devices/", {"view": {}}, []
+        run.h = type("H", (), {"report": {}})()
+        def mrp(run_, interface, role, domain=None, create=False, restore=False):
+            calls.append(("mrp", interface.split("/")[4], role, domain, create, restore))
+            return (interface.split("/")[4], domain) not in refused
         saved = q.mrp, q.link
-        q.mrp = lambda run_, interface, role, domain=None, create=False, restore=False: calls.append(("mrp", interface.split("/")[4], role, create, restore))
-        q.link = lambda run_, kind, number, restore=False, pair=None, label=None: calls.append((kind, number, restore))
+        q.mrp, q.link = mrp, lambda run_, kind, number, restore=False, pair=None, label=None: calls.append((kind, number, restore))
         try:
-            q.ring(run)
+            closed = q.ring(run)
         finally:
             q.mrp, q.link = saved
-        self.assertEqual([("hardware_port_disconnect", 1, False), ("mrp", "ScratchStation", "Manager", True, False), ("mrp", "HwPeer", "Client", False, True),
-                          ("mrp", "HwPeer", "Client", False, False), ("mrp", "HwMp", "Client", False, False),
+        return closed, calls, run.h.report
+
+    def test_boundary_steps_are_recorded_and_recovered_only_in_discovery(self):
+        for discover in (True, False):
+            run = q.Run.__new__(q.Run)
+            run.h = type("H", (), {"report": {}, "args": type("A", (), {"discover": discover})()})()
+            run.current, recovered = {"view": {"k": 1}}, []
+            def refused(*args, **kwargs):
+                raise RuntimeError("change_prepare: UnsupportedCapability")
+            def failed(*args, **kwargs):
+                raise RuntimeError("change_apply: CompileFailed")
+            run.recover = lambda label, prepared, before: recovered.append((label, before))
+            run.prepare = refused
+            if discover:
+                self.assertIsNone(run.apply("step", "network_mrp_set", {}, boundary=True))
+                self.assertEqual("prepare", run.h.report["boundaries"]["step"]["stage"])
+                run.prepare, run.finish = (lambda *a, **k: {"changeId": "c", "previewHash": "h"}), failed
+                self.assertIsNone(run.apply("apply step", "network_mrp_set", {}, boundary=True))
+                self.assertEqual(("apply", [("apply step", {"view": {"k": 1}})]), (run.h.report["boundaries"]["apply step"]["stage"], recovered))
+                with self.assertRaises(RuntimeError):  # A step not marked as a boundary fails even a discovery pass.
+                    run.apply("plain", "hardware_plug", {})
+            else:
+                with self.assertRaises(RuntimeError):
+                    run.apply("step", "network_mrp_set", {}, boundary=True)
+
+    def test_ring_restores_the_first_join_and_the_closure_once(self):
+        closed, calls, _ = self.ring()
+        self.assertTrue(closed)
+        self.assertEqual([("hardware_port_disconnect", 1, False), ("mrp", "ScratchStation", "Manager", q.RING, True, False), ("mrp", "HwPeer", "Client", q.RING, False, True),
+                          ("mrp", "HwPeer", "Client", q.RING, False, False), ("mrp", "HwMp", "Client", q.RING, False, False),
                           ("hardware_port_connect", 2, True), ("hardware_port_connect", 2, False)], calls)
+
+    def test_ring_falls_back_to_the_default_domain_and_skips_an_unusable_ring(self):
+        closed, calls, _ = self.ring(refused={("ScratchStation", q.RING)})
+        self.assertTrue(closed)
+        self.assertEqual([("mrp", "ScratchStation", "Manager", None, False, False), ("mrp", "HwPeer", "Client", None, False, True)], [c for c in calls if c[0] == "mrp"][1:3])
+        closed, calls, report = self.ring(refused={("ScratchStation", q.RING), ("ScratchStation", None)})
+        self.assertFalse(closed)
+        self.assertNotIn(("hardware_port_connect", 2, False), calls)
+        self.assertEqual("skipped", report["boundaries"]["ring"]["stage"])
 
     def test_gsd_device_not_installed_is_recorded_not_failed(self):
         class Fake:
