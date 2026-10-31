@@ -2,8 +2,9 @@
 
 Usage: python -B scripts/technology_version_profiles.py <qualification.json> <evidenceId> [--contract PATH]
 
-Only native observations become cells: accepted stays accepted; refused and substituted become refused with the native
-code and message. Prepare-time refusals (including ones the profile already recorded) change nothing. A cell of the
+Only native observations become cells: accepted stays accepted; refused (TIA's create threw) and substituted become refused
+with the native code and message. failedAtApply and prepare-time refusals (including ones the profile already recorded)
+change nothing. A cell of the
 same CPU, type and version is replaced, so a later run supersedes an earlier one.
 """
 from __future__ import annotations
@@ -30,7 +31,7 @@ def observed_cells(report, evidence_id):
         if row["outcome"] == "accepted":
             cell["outcome"] = "accepted"
         elif row["outcome"] == "refused":
-            cell.update(outcome="refused", nativeRefusal={"code": row["error"]["code"], "message": row["error"]["message"]})
+            cell.update(outcome="refused", nativeRefusal=row["nativeRefusal"])
         elif row["outcome"] == "substituted":
             cell.update(outcome="refused", nativeRefusal={"code": "VersionSubstituted", "message": "V21 created %s %s instead." % (row["observed"]["typeIdentifier"], row["observed"]["version"])})
         else:

@@ -2,9 +2,10 @@
 
 Usage: python -B scripts/safety_fparameter_allowlist.py <qualification.json> <evidenceId> [--contract PATH]
 
-A row is added for every F-parameter whose round trip passed on an F-I/O with a known module catalog type; a later run's row
-replaces an earlier one of the same module type and name. Refused, skipped and unattempted parameters add nothing, so the
-allowlist only ever names what a native write, readback and checkpoint restore showed.
+A qualified row is added for every F-parameter whose round trip passed; the worker-resolved module type must be one of the
+catalog entries the run plugged, otherwise the merge stops. A later run's row replaces an earlier one (qualified or pending)
+of the same module type and name. Refused, skipped and unattempted parameters add nothing, so the allowlist only ever
+qualifies what a native write, readback and checkpoint restore showed.
 """
 from __future__ import annotations
 
@@ -17,18 +18,19 @@ CONTRACT = ROOT / "contracts" / "safety-fparameter-allowlist.v1.json"
 
 
 def passed_rows(report, evidence_id):
-    """(moduleTypeIdentifier, moduleTypeName, row) per passed round trip of a completed run."""
+    """(moduleTypeIdentifier, moduleTypeName, row) per passed round trip of a completed run. The worker-resolved module key
+    must be one of the catalog entries the run plugged, so a rack or any other identity never becomes a row."""
     if report.get("completed") is not True:
         raise ValueError("Only a completed discovery run is merged.")
-    names = {entry["typeIdentifier"]: entry["typeName"] for entry in (report.get("fModules") or {}).values() if "typeIdentifier" in entry}
-    if report.get("fModule"):
-        names[report["fModule"]["typeIdentifier"]] = report["fModule"]["typeName"]
+    plugged = [entry for entry in [report.get("fModule"), *(report.get("fModules") or {}).values()] if entry and "typeIdentifier" in entry]
+    names = {entry["typeIdentifier"]: entry["typeName"] for entry in plugged}
     rows = []
     for module in report["modules"]:
         identity = module.get("moduleTypeIdentifier")
-        for name, trip in sorted(module["roundTrips"].items()):
-            if identity and trip["outcome"] == "passed":
-                rows.append((identity, names.get(identity, identity), {"name": name, "evidenceId": evidence_id}))
+        passed = sorted(name for name, trip in module["roundTrips"].items() if trip["outcome"] == "passed")
+        if passed and identity not in names:
+            raise ValueError("Round trips on %s resolved module type %r, which is no plugged catalog entry." % (module["path"], identity))
+        rows.extend((identity, names[identity], {"name": name, "status": "qualified", "evidenceId": evidence_id}) for name in passed)
     return rows
 
 

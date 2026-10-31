@@ -1,13 +1,13 @@
 {
   "schemaVersion": "safety-fparameter-allowlist.v1",
   "tiaVersion": 21,
-  "rule": "change.safety_fparameter_set writes an F-parameter only when it is listed here for the F-I/O module's catalog type identifier (the nearest device item with one) and the module declares it readable and writable; F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. A row means one native write, readback and checkpoint restore passed with configured-hardware preservation; it does not validate, accept or approve a safety program. Rows come from native runs only: scripts/probe_safety_fparameters.py discovers and round-trips, scripts/safety_fparameter_allowlist.py merges a curated run.",
+  "rule": "change.safety_fparameter_set writes an F-parameter only when it is listed here as qualified for the F-I/O's module catalog type (the F-I/O's own type identifier, else its direct parent's; an order number with firmware or a GSD identity) and the module declares it readable and writable; F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment are never written. A qualified row means one native write, readback and checkpoint restore passed with configured-hardware preservation; it does not validate, accept or approve a safety program. A pending row refuses until a native run re-curates it. Rows come from native runs only: scripts/probe_safety_fparameters.py discovers and round-trips, scripts/safety_fparameter_allowlist.py merges a curated run.",
   "modules": [
     {
       "moduleTypeIdentifier": "OrderNumber:6ES7 136-6BA01-0CA0/V2.0",
       "moduleTypeName": "F-DI 8x24VDC HF",
       "parameters": [
-        { "name": "Failsafe_FDestinationAddress", "evidenceId": "local.safety_changes.20261028" }
+        { "name": "Failsafe_FDestinationAddress", "status": "pending", "reason": "Written natively in local.safety_changes.20261028, whose report records no worker-resolved moduleTypeIdentifier for the write; refused until a probe_safety_fparameters.py round trip on this module type is merged." }
       ]
     }
   ]

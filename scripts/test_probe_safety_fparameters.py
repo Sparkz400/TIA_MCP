@@ -64,14 +64,27 @@ class UnexpectedTests(unittest.TestCase):
 
 class AllowlistTests(unittest.TestCase):
     report = {"completed": True, "fModule": {"typeIdentifier": "T:DI", "typeName": "F-DI"}, "fModules": {"TiaMcpFdq": {"typeIdentifier": "T:DQ", "typeName": "F-DQ"}, "TiaMcpFai": {"skipped": "notInCatalog"}},
-              "modules": [{"moduleTypeIdentifier": "T:DI", "roundTrips": {DEST: {"outcome": "passed"}, "Failsafe_B": {"outcome": "refused"}}},
-                          {"moduleTypeIdentifier": "T:DQ", "roundTrips": {"Failsafe_A": {"outcome": "passed"}}},
-                          {"roundTrips": {}}]}
+              "modules": [{"path": "/di", "moduleTypeIdentifier": "T:DI", "roundTrips": {DEST: {"outcome": "passed"}, "Failsafe_B": {"outcome": "refused"}}},
+                          {"path": "/dq", "moduleTypeIdentifier": "T:DQ", "roundTrips": {"Failsafe_A": {"outcome": "passed"}}},
+                          {"path": "/x", "roundTrips": {}}]}
 
     def test_only_passed_round_trips_become_rows(self):
         merged = a.merge({"modules": []}, a.passed_rows(self.report, "local.x"))
         self.assertEqual([("T:DI", "F-DI", [DEST]), ("T:DQ", "F-DQ", ["Failsafe_A"])],
                          [(m["moduleTypeIdentifier"], m["moduleTypeName"], [r["name"] for r in m["parameters"]]) for m in merged["modules"]])
+
+    def test_rows_are_qualified_and_replace_pending_ones(self):
+        pending = {"modules": [{"moduleTypeIdentifier": "T:DI", "moduleTypeName": "F-DI", "parameters": [{"name": DEST, "status": "pending", "reason": "r"}]}]}
+        merged = a.merge(pending, a.passed_rows(self.report, "local.x"))
+        self.assertEqual([{"name": DEST, "status": "qualified", "evidenceId": "local.x"}], merged["modules"][0]["parameters"])
+
+    def test_an_unplugged_module_identity_stops_the_merge(self):
+        rail = json.loads(json.dumps(self.report))
+        rail["modules"][1]["moduleTypeIdentifier"] = "OrderNumber:6ES7 193-6AF00-0AA0"
+        with self.assertRaises(ValueError):
+            a.passed_rows(rail, "local.x")
+        rail["modules"][1]["roundTrips"] = {"Failsafe_A": {"outcome": "refused"}}
+        self.assertEqual([DEST], [row["name"] for _, _, row in a.passed_rows(rail, "local.x")])
 
     def test_a_later_run_replaces_the_row(self):
         first = a.merge({"modules": []}, a.passed_rows(self.report, "local.a"))

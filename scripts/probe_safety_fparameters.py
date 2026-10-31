@@ -1,7 +1,9 @@
 """Discover and round-trip every F-parameter V21 declares writable on F-I/O modules of an owned scratch F-CPU (safety.hardware).
 
-The Host runs with --safety-fparameter-discovery, so safety_fparameter_set admits declared-writable F-parameters outside the
-qualified allowlist; F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment stay refused by the worker.
+Needs a Host and worker built with -p:SafetyFParameterDiscovery=true (packaged and normal builds refuse the option); the Host
+runs with --safety-fparameter-discovery, so safety_fparameter_set admits declared-writable F-parameters outside the
+qualified allowlist (and its pending rows); F-source addresses, signatures, SIL/CRC/version and F-I/O DB assignment stay
+refused by the worker.
 The fixture is probe_safety_kinds' F-CPU 1511F-1 PN (failsafeRuntimeAccess) with an ET 200SP station carrying two F-DI 8x24VDC
 HF, an F-DQ, an F-AI and an F-PM-E (server module moved to slot 8), plus ET 200MP F-DI, F-DQ and F-AI modules in the F-CPU's
 central rack; a module type the catalog lacks or the rack refuses is recorded and skipped.

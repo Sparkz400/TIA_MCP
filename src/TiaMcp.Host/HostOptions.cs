@@ -74,7 +74,10 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             if (option == "--component-qualification") { componentQualification = true; continue; }
             if (option == "--testsuite-scope-probe") { testSuiteScopeProbe = true; continue; }
             if (option == "--translation-qualification") { translationQualification = true; continue; }
+#if SAFETY_FPARAMETER_DISCOVERY
+            // Only builds with -p:SafetyFParameterDiscovery=true, never the packaged ones, accept this option.
             if (option == "--safety-fparameter-discovery") { safetyFParameterDiscovery = true; continue; }
+#endif
 #if TESTSUITE_QUALIFICATION
             if (option == "--testsuite-qualification") { testSuiteQualification = true; continue; }
 #endif

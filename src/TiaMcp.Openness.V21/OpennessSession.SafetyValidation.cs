@@ -110,13 +110,10 @@ namespace TiaMcp.Openness.V21
             : (change.Payload["parameters"] as JArray ?? new JArray()).OfType<JObject>().Select(row => row["name"]?.Type == JTokenType.String ? row.Value<string>("name") : null)
                 .Where(name => !FParameterAllowlistRules.Denied(name)).ToArray();
 
-        // The catalog type of an F-I/O: the F-I/O device item itself often has none, its module does.
-        private static string FIoModuleTypeIdentifier(DeviceItem item)
-        {
-            for (IEngineeringInstance owner = item; owner is DeviceItem device; owner = device.Parent)
-                if (!string.IsNullOrEmpty(device.TypeIdentifier)) return device.TypeIdentifier;
-            throw new BridgeException("UnresolvedHardware", "The F-I/O's module catalog type identifier cannot be resolved.");
-        }
+        // The catalog type of an F-I/O: its own, else its direct parent module's (an ET 200SP F-I/O item has none). Never a rack's.
+        private static string FIoModuleTypeIdentifier(DeviceItem item) =>
+            FParameterAllowlistRules.ModuleKey(item.TypeIdentifier, (item.Parent as DeviceItem)?.TypeIdentifier)
+                ?? throw new BridgeException("UnresolvedHardware", "Neither the F-I/O nor its direct parent has a module type identifier (order number with firmware, or GSD); no allowlist row applies.");
 
         // Prepare (write=false) returns the preview rows; apply (write=true) rechecks ownership, expected values and collisions, writes, then reads back.
         private JArray FParameterSet(EngineeringChange change, Project project, bool write)
@@ -159,10 +156,11 @@ namespace TiaMcp.Openness.V21
                 if (infos.Length != 1 || (infos[0].AccessMode & EngineeringAttributeAccessMode.Read) == 0 || (infos[0].AccessMode & EngineeringAttributeAccessMode.Write) == 0)
                     throw new BridgeException("AttributeNotWritable", "The F-I/O must declare " + name + " once as readable and writable: " + path);
                 string module = FIoModuleTypeIdentifier(entry.Item);
-                var qualification = FParameterAllowlistRules.Qualification(FParameterAllowlist.Value, module, name);
-                if (qualification == null && !discovery)
-                    throw new BridgeException("UnsupportedAttribute", "F-parameter " + name + " is not in the qualified allowlist (safety-fparameter-allowlist.v1) for module type " + module + ": " + path,
-                        new JObject { ["hardwarePath"] = path, ["name"] = name, ["moduleTypeIdentifier"] = module });
+                var qualification = FParameterAllowlistRules.Row(FParameterAllowlist.Value, module, name);
+                if (!FParameterAllowlistRules.Qualified(qualification) && !discovery)
+                    throw new BridgeException("UnsupportedAttribute", "F-parameter " + name + (qualification == null ? " is not in" : " is pending re-curation in") +
+                        " the qualified allowlist (safety-fparameter-allowlist.v1) for module type " + module + ": " + path,
+                        new JObject { ["hardwarePath"] = path, ["name"] = name, ["moduleTypeIdentifier"] = module, ["allowlistRow"] = qualification });
                 object before = entry.Item.GetAttribute(name) ?? throw new BridgeException("AttributeTypeUnknown", "F-parameter has no native value: " + name);
                 if (!JToken.DeepEquals(ChangeScalar(before), row["expected"]))
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.",
@@ -173,7 +171,7 @@ namespace TiaMcp.Openness.V21
                 row["value"] = ChangeScalar(value);
                 targets.Add((entry, name, value));
                 result.Add(new JObject { ["hardwarePath"] = path, ["name"] = name, ["type"] = before.GetType().FullName, ["before"] = ChangeScalar(before), ["after"] = row["value"].DeepClone(),
-                    ["moduleTypeIdentifier"] = module, ["qualification"] = qualification ?? new JObject { ["discovery"] = true },
+                    ["moduleTypeIdentifier"] = module, ["qualification"] = FParameterAllowlistRules.Qualified(qualification) ? qualification : new JObject { ["discovery"] = true, ["allowlistRow"] = qualification },
                     ["fParameterSignatures"] = FParameterSignatures(entry.Item) });
             }
             foreach (var target in targets.Where(target => target.Name == "Failsafe_FDestinationAddress"))

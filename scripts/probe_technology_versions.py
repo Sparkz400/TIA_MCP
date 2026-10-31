@@ -3,30 +3,38 @@
 V21 has no CPU-specific technology type/version catalog, so each matrix cell is a create-and-refuse capture: one to_create
 of TvProbe with unprofiledAcknowledged, applied with checkpoint but without compile or save (an unconnected axis or
 encoder never compiles), read back through technology_read and restored from its own checkpoint. After every restore the
-blocks, types, tag tables and technology objects of every PLC must equal the baseline.
+blocks, types, tag tables and technology objects of every PLC must equal the baseline; the superseded recovered copy is
+then deleted (its checkpoint archives stay, and its size and project-file SHA-256 are recorded), and the matrix stops with
+a recorded diskSpace boundary when free space falls below MIN_FREE_BYTES.
 
-CPUs are installed-catalog identities recorded on this PC: the scratch CPU 1511-1 PN V4.1, a CPU 1511C-1 PN V2.6 (an S7-1500
-of the V2 firmware line with onboard high-speed counters, local.catalog.20261024) and a CPU 1214C DC/DC/DC V4.7 (S7-1200,
-local.cpu_memory_bytes.rerun.20261028), both added with configureScratchSecurity. Families and candidate versions follow
-Siemens' V21 overview of technology objects and versions; per CPU and family the versions are tried newest first until one
-is accepted. All motion objects of a CPU share one technology version, so after TO_PositioningAxis the other motion families
-are tried only at its accepted version (the newest candidate when none was accepted).
+CPUs: the scratch CPU 1511-1 PN V4.1 plus two catalog entries recorded on this PC, a CPU 1511C-1 PN V2.6 (an S7-1500 of the
+V2 firmware line with onboard high-speed counters; hardware_catalog_search in local.hardware.20261024) and a CPU 1214C
+DC/DC/DC V4.7 (S7-1200, added in local.cpu_memory_bytes.rerun.20261028), both added with configureScratchSecurity; a CPU
+the installed catalog lacks is recorded as notInCatalog. Families and candidate versions follow Siemens' V21 overview of
+technology objects and versions; per CPU and family the versions are tried newest first until one is accepted. All motion
+objects of a CPU share one technology version, so after TO_PositioningAxis the other motion families are tried only at its
+accepted version (the newest candidate when none was accepted).
 
 Outcomes per cell: accepted (technology_read shows exactly the requested type and version), substituted (another one),
-refused (the native create failed; code, message and native exception chain recorded), refusedByProfile (the embedded
-profile already records the refusal), refusedAtPrepare (another typed refusal). scripts/technology_version_profiles.py
-merges a curated report into contracts/technology-version-profiles.v1.json.
+refused (TIA's create threw: a Siemens.Engineering exception after the checkpoint and before the mutation completed; its
+native text recorded), failedAtApply (any other apply failure; not a profile fact), refusedByProfile (the embedded profile
+already records the refusal), refusedAtPrepare (another typed refusal). scripts/technology_version_profiles.py merges a
+curated report into contracts/technology-version-profiles.v1.json.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 from pathlib import Path
 import re
+import shutil
 
 from library_native_harness import Harness, require
 from qualify_drives import outcome
 
 NAME = "TvProbe"
+# Each cell leaves a checkpoint and a pre-recovery archive; the matrix stops with a recorded boundary below this free space.
+MIN_FREE_BYTES = 10 * 1024 ** 3
 # (typeIdentifier, typeName, CPU line); the first is the scratch CPU tia_create_scratch selects.
 CPUS = (("OrderNumber:6ES7 511-1AL03-0AB0/V4.1", "CPU 1511-1 PN", "S7-1500"),
         ("OrderNumber:6ES7 511-1CK01-0AB0/V2.6", "CPU 1511C-1 PN", "S7-1500"),
@@ -38,7 +46,7 @@ ANCHOR = "TO_PositioningAxis"
 MOTION = {"S7-1500": (ANCHOR, "TO_SpeedAxis", "TO_SynchronousAxis", "TO_ExternalEncoder", "TO_MeasuringInput", "TO_OutputCam", "TO_Cam"),
           "S7-1200": (ANCHOR, "TO_CommandTable", "TO_SpeedAxis")}
 LIMITATIONS = [
-    "Three CPUs of the installed V21 catalog: CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7. Other CPUs, "
+    "At most three CPUs of the installed V21 catalog: CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7. Other CPUs, "
     "firmware, F- and T-CPUs and the S7-1200 G2 are not probed; an unprofiled pair still needs unprofiledAcknowledged.",
     "A cell records whether V21 creates exactly that type and version at the PLC root; it does not compile, connect, parameterize "
     "or run the object. Children (output cams, measuring inputs under an axis) use to_child_create and are not probed here.",
@@ -74,6 +82,35 @@ def next_cell(line, outcomes):
     return None
 
 
+def apply_failure(error, status):
+    """A failed apply is a refused cell only when TIA refused the create itself: the checkpoint exists, the mutation never
+    completed and the journaled exception chain starts with a Siemens.Engineering exception. Anything else (a typed worker
+    refusal, a checkpoint or session failure) is failedAtApply, which the profile merge skips."""
+    stages = status.get("stages") or []
+    chains = [r.get("chain") or [] for r in status.get("readbacks") or [] if r.get("role") == "native-exception"]
+    native = [chain[0] for chain in chains if chain and str(chain[0].get("type") or "").startswith("Siemens.Engineering.")]
+    result = {"error": {k: error.get(k) for k in ("code", "message")}, "stages": stages, "native": chains}
+    if "recovery_archive_created" not in stages or "mutation_applied" in stages or not native:
+        return {"outcome": "failedAtApply", **result}
+    text = " ".join(t for t in (native[0].get("text"), native[0].get("detail")) if t) or native[0].get("message")
+    return {"outcome": "refused", "nativeRefusal": {"code": error.get("code"), "message": text}, **result}
+
+
+def recovery_copy(root, project):
+    """The recovery directory directly under root that holds project, or None for anything outside root."""
+    root, project = Path(root).resolve(), Path(project).resolve()
+    if root not in project.parents or project.parent == root:
+        return None
+    return root / project.relative_to(root).parts[0]
+
+
+def copy_receipt(directory, project):
+    """What a deleted recovered copy was: file count, bytes and the project file's SHA-256 (the checkpoint archives stay)."""
+    files = [p for p in Path(directory).rglob("*") if p.is_file()]
+    return {"path": str(directory), "files": len(files), "bytes": sum(p.stat().st_size for p in files),
+            "projectSha256": hashlib.sha256(Path(project).read_bytes()).hexdigest()}
+
+
 def same_version(first, second):
     """Version equality as System.Version compares two dotted parts or more."""
     parts = [tuple(int(x) for x in re.findall(r"\d+", str(v or ""))) for v in (first, second)]
@@ -82,7 +119,7 @@ def same_version(first, second):
 
 class Run:
     def __init__(self, h):
-        self.h, self.cpus, self.cells, self.baseline = h, [], [], None
+        self.h, self.cpus, self.cells, self.baseline, self.copy = h, [], [], None, None
         h.report.update(cpus=self.cpus, cells=self.cells)
 
     def plcs(self):
@@ -98,9 +135,31 @@ class Run:
         h = self.h
         restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
         require(restored["state"] == "restored" and "checkpoint_retrieved_to_new_directory" in restored["stages"], "Checkpoint recovery of %s failed: %s" % (label, restored))
-        state = self.state()
-        require(state == self.baseline, "The restored project differs from the baseline after %s" % label)
+        if self.baseline is not None:
+            require(self.state() == self.baseline, "The restored project differs from the baseline after %s" % label)
+        self.supersede(restored["recoveredProject"]["path"])
         return restored["state"]
+
+    def supersede(self, project):
+        """The copy just restored replaces the previous recovered copy, which is closed and deleted; only copies this run
+        retrieved under its own recovery directory are ever deleted, and each deletion is recorded."""
+        current, previous = recovery_copy(self.h.directory / "recovery", project), getattr(self, "copy", None)
+        self.copy = (current, project) if current else None
+        if previous and previous[0] != current:
+            receipt = copy_receipt(*previous)
+            try:
+                shutil.rmtree(previous[0])
+            except OSError as error:
+                receipt["deleteFailed"] = str(error)
+            self.h.report.setdefault("deletedCopies", []).append(receipt)
+
+    def disk_boundary(self):
+        """A recorded boundary when free space under the artifacts falls below MIN_FREE_BYTES, else None."""
+        free = shutil.disk_usage(self.h.directory).free
+        if free >= MIN_FREE_BYTES:
+            return None
+        self.h.report["boundary"] = {"stage": "diskSpace", "freeBytes": free, "minimumBytes": MIN_FREE_BYTES}
+        return self.h.report["boundary"]
 
     def add_cpu(self, identity, name, line):
         """An extra CPU from the exact installed catalog entry, added with checkpoint, compile and save; absent or refused CPUs are recorded."""
@@ -120,8 +179,7 @@ class Run:
             if error:
                 if h.unresolved_admissions():
                     h.reconcile_admission("release the failed add of " + name)
-                restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
-                return {"status": "failedAtApply", "error": {k: error.get(k) for k in ("code", "message")}, "restored": restored["state"]}
+                return {"status": "failedAtApply", "error": {k: error.get(k) for k in ("code", "message")}, "restored": self.restore("the add of " + name, prepared)}
             return {"status": "added", "stages": applied["stages"]}
         row.update(h.stage("add " + name, add))
         if row["status"] == "added":
@@ -141,9 +199,7 @@ class Run:
             if error:
                 if h.unresolved_admissions():
                     h.reconcile_admission("release the refused " + label)
-                status = h.tool("change_status", {"changeId": prepared["changeId"]})
-                result = {"outcome": "refused", "error": {k: error.get(k) for k in ("code", "message")},
-                          "native": [r for r in status.get("readbacks") or [] if r.get("role") in ("native-exception", "failure-details")]}
+                result = apply_failure(error, h.tool("change_status", {"changeId": prepared["changeId"]}))
             else:
                 created = [o for o in h.tool("technology_read", {"plcPath": cpu["plcPath"], "maxItems": 500})["technologyObjects"] if o["name"] == NAME]
                 require(len(created) == 1, "Expected one created %s: %s" % (NAME, created))
@@ -166,9 +222,11 @@ def body(h):
     run.baseline = h.stage("baseline program and technology state", run.state)
     for cpu in (c for c in run.cpus if c.get("plcPath")):
         outcomes = {}
-        while (cell := next_cell(cpu["line"], outcomes)) is not None:
+        while (cell := next_cell(cpu["line"], outcomes)) is not None and not run.disk_boundary():
             outcomes[cell] = run.cell(cpu, *cell)
         cpu["outcomes"] = {"%s %s" % key: value for key, value in outcomes.items()}
+        if "boundary" in h.report:
+            break
     h.report["summary"] = {c["typeName"]: c.get("outcomes", c.get("status")) for c in run.cpus}
 
 

@@ -7,8 +7,11 @@ ET 200SP station with two F-DI modules on the F-CPU's IO system. Then:
 - safety_inspect and safety_validation_inspect: exact F-PLC identity, runtime group, signatures and both F-DI F-parameters;
   maxItems 1 reports truncation; a standard PLC is refused with UnsupportedCapability.
 - safety_printout: a PDF whose bytes match the reported size and SHA-256; an absent printer and a bad layout are refused.
-- safety_fparameter_set: Failsafe_FDestinationAddress of one F-DI moved to a free address; typed refusals for a
-  non-allowlisted attribute, a wrong expected value, a missing acknowledgement and a duplicate address.
+- safety_fparameter_set: Failsafe_FDestinationAddress of one F-DI moved to a free address, whose worker-resolved
+  moduleTypeIdentifier must be the plugged F-DI's catalog entry; typed refusals for a never-written attribute, a wrong
+  expected value, a missing acknowledgement, a duplicate address, the read-only F-monitoring time and a declared-writable
+  F-DI parameter outside the allowlist (UnsupportedAttribute naming the module type). Needs a worker whose
+  safety-fparameter-allowlist.v1 qualifies that F-destination address, that is, a merged probe_safety_fparameters.py run.
 - safety_import_xml: Main_Safety_RTG1 re-imported with a block comment (the import needs an activated STEP 7 Safety license);
   refusals for a missing acknowledgement, a standard block, a scope mismatch and a wrong previewHash.
 
@@ -30,6 +33,7 @@ from qualify_plc_object_mutations import coverage_gaps, diff
 
 KINDS = ("safety_fparameter_set", "safety_import_xml")
 MAIN = "Main_Safety_RTG1"
+UNLISTED = "Failsafe_ShortCircuitTest_0"
 CRITERIA = {
     "AC-identity": "Reads name the exact F-PLC and refuse a standard PLC; changes refuse a non-allowlisted attribute, a wrong expected value, a duplicate F-destination, missing acknowledgements, a standard block and a scope mismatch, each leaving the project unchanged.",
     "AC-completeness": "safety_inspect and safety_validation_inspect report explicit gaps, list every F-DI and report truncation at maxItems 1.",
@@ -135,6 +139,10 @@ def fparameter(run, di, modules, label, restore=False, stale=False):
     before, value = values[di][DEST], free_destination(values[di][DEST], values)
     run.current_before = run.current["view"]
     prepared = run.prepare(label, "safety_fparameter_set", write(di, DEST, before, value))
+    # The worker's allowlist key must be the plugged F-DI's catalog entry, never its rack or station.
+    keys = [row["moduleTypeIdentifier"] for row in prepared["preview"]["parameterChanges"]]
+    run.h.report.setdefault("moduleTypeIdentifiers", {})[label] = keys
+    require(keys == [run.h.report["fModule"]["typeIdentifier"]], "The F-parameter write resolved another module type: %s" % keys)
     if stale:
         run.refuse_apply("safety_fparameter_set", "a wrong previewHash", {**prepared, "previewHash": "0" * 64}, "PreviewMismatch")
     applied = run.finish(label, "safety_fparameter_set", prepared, changed=["hw:" + di], tolerated=side_effects(run),
@@ -172,6 +180,11 @@ def refusals(run, di, di2, modules):
     run.refuse("safety_fparameter_set", "a missing safetyAcknowledged", {"parameters": write(di, DEST, current[DEST], current[DEST] + 2)["parameters"]}, "InvalidRequest")
     run.refuse("safety_fparameter_set", "the other F-DI's F-destination address", write(di, DEST, current[DEST], modules[di2][DEST]), "AddressConflict")
     run.refuse("safety_fparameter_set", "Failsafe_FMonitoringtime of this F-DI", write(di, MONITORING, current[MONITORING], current[MONITORING] + 10), "AttributeNotWritable")
+    # Declared ReadWrite on this F-DI (local.safety_changes.20261028 discovery data) but not allowlisted for its module type.
+    require(type(current.get(UNLISTED)) is bool, "This F-DI does not expose %s as a Boolean: %r" % (UNLISTED, current.get(UNLISTED)))
+    error = run.refuse("safety_fparameter_set", UNLISTED + " outside the allowlist", write(di, UNLISTED, current[UNLISTED], not current[UNLISTED]), "UnsupportedAttribute")
+    require((error.get("details") or {}).get("moduleTypeIdentifier") == run.h.report["fModule"]["typeIdentifier"],
+            "The allowlist refusal names another module type: %s" % error.get("details"))
     xml = run.h.tool("block_read", {"plcPath": run.plc, "blockName": MAIN})["xml"]
     run.refuse("safety_import_xml", "a missing safetyAcknowledged", {"xml": xml, "expectedBlockNames": [MAIN]}, "InvalidRequest")
     run.refuse("safety_import_xml", "another expected block name", {"xml": xml, "expectedBlockNames": ["TiaMcpOther"], "safetyAcknowledged": True}, "XmlScopeMismatch")

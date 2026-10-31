@@ -61,7 +61,9 @@ namespace TiaMcp.Openness.V21
                 State = "preparing", Journal = Path.Combine(directory, "journal.json"),
                 PreparedProcessId = _processId, CapturedStorageQualification = capturedStorage
             };
+#if SAFETY_FPARAMETER_DISCOVERY
             if (kind == "safety_fparameter_set" && args.Value<bool?>("fParameterDiscovery") == true) change.Selector["fParameterDiscovery"] = true;
+#endif
             if (string.IsNullOrWhiteSpace(change.Selector.Value<string>("plcPath")))
                 change.Selector["plcPath"] = ObjectIdentity.PlcPath(payload.Value<string>("scopePath") ?? args.Value<string>("scopePath"))
                     ?? ObjectIdentity.PlcPath(payload.Value<string>("blockPath") ?? payload.Value<string>("typePath") ?? payload.Value<string>("tagTablePath") ?? payload.Value<string>("technologyPath")

@@ -1,5 +1,7 @@
 """Offline checks of the technology version probe planner and the profile merge; nothing here starts TIA."""
 import json
+from pathlib import Path
+import tempfile
 import unittest
 
 import probe_technology_versions as p
@@ -41,13 +43,51 @@ class PlannerTests(unittest.TestCase):
         self.assertFalse(p.same_version(None, ""))
 
 
+class ApplyFailureTests(unittest.TestCase):
+    error = {"code": "EngineeringError", "message": "Error when calling method 'Create'."}
+    native = {"role": "native-exception", "chain": [{"type": "Siemens.Engineering.EngineeringTargetInvocationException", "message": "Error when calling method 'Create'.",
+                                                     "text": "The version 9.0 is not supported.", "detail": "Use 10.0."}]}
+
+    def status(self, stages, *readbacks):
+        return {"stages": stages, "readbacks": list(readbacks)}
+
+    def test_only_tia_refusing_the_create_is_a_refused_cell(self):
+        refused = p.apply_failure(self.error, self.status(["prechange_project_saved", "recovery_archive_created"], self.native))
+        self.assertEqual("refused", refused["outcome"])
+        self.assertEqual({"code": "EngineeringError", "message": "The version 9.0 is not supported. Use 10.0."}, refused["nativeRefusal"])
+
+    def test_other_apply_failures_are_failed_at_apply(self):
+        worker = {"role": "native-exception", "chain": [{"type": "TiaMcp.Openness.V21.BridgeException", "message": "Technology object already exists."}]}
+        for status in (self.status(["prechange_project_saved"], self.native),
+                       self.status(["prechange_project_saved", "recovery_archive_created", "mutation_applied"], self.native),
+                       self.status(["prechange_project_saved", "recovery_archive_created"], worker),
+                       self.status(["prechange_project_saved", "recovery_archive_created"], {"role": "failure-details", "details": {}}),
+                       self.status(["prechange_project_saved", "recovery_archive_created"])):
+            self.assertEqual("failedAtApply", p.apply_failure(self.error, status)["outcome"], status)
+
+
+class RecoveryCopyTests(unittest.TestCase):
+    def test_only_copies_under_the_run_recovery_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "recovery"
+            project = root / "Recovery_1" / "TiaMcpScratch" / "TiaMcpScratch.ap21"
+            self.assertEqual((root / "Recovery_1").resolve(), p.recovery_copy(root, project))
+            self.assertIsNone(p.recovery_copy(root, Path(directory) / "scratch" / "TiaMcpScratch" / "TiaMcpScratch.ap21"))
+            self.assertIsNone(p.recovery_copy(root, root / "loose.ap21"))
+            project.parent.mkdir(parents=True)
+            project.write_bytes(b"ap21")
+            receipt = p.copy_receipt(root / "Recovery_1", project)
+            self.assertEqual((1, 4), (receipt["files"], receipt["bytes"]))
+
+
 class MergeTests(unittest.TestCase):
     def report(self, *rows):
         return {"completed": True, "cells": [dict(cpuTypeIdentifier="cpu", cpuTypeName="CPU", **row) for row in rows]}
 
     def test_native_observations_become_cells(self):
         report = self.report({"typeIdentifier": "PID_Compact", "version": "3.0", "outcome": "accepted"},
-                             {"typeIdentifier": "TO_Cam", "version": "10.0", "outcome": "refused", "error": {"code": "EngineeringError", "message": "No."}},
+                             {"typeIdentifier": "TO_Cam", "version": "10.0", "outcome": "refused", "nativeRefusal": {"code": "EngineeringError", "message": "No."}},
+                             {"typeIdentifier": "TO_Cam", "version": "8.0", "outcome": "failedAtApply", "error": {"code": "CheckpointFailed", "message": "x"}},
                              {"typeIdentifier": "TO_Cam", "version": "9.0", "outcome": "substituted", "observed": {"typeIdentifier": "TO_Cam", "version": "10.0"}},
                              {"typeIdentifier": "PID_Temp", "version": "1.2", "outcome": "refusedAtPrepare", "error": {"code": "InvalidRequest"}})
         merged = t.merge({"cpus": []}, t.observed_cells(report, "local.x"))
@@ -60,7 +100,7 @@ class MergeTests(unittest.TestCase):
     def test_a_later_run_replaces_the_same_cell(self):
         first = t.merge({"cpus": []}, t.observed_cells(self.report({"typeIdentifier": "PID_Compact", "version": "3.0", "outcome": "accepted"}), "local.a"))
         second = t.merge(first, t.observed_cells(self.report({"typeIdentifier": "PID_Compact", "version": "3.00", "outcome": "refused",
-                                                               "error": {"code": "E", "message": "m"}}), "local.b"))
+                                                               "nativeRefusal": {"code": "E", "message": "m"}}), "local.b"))
         self.assertEqual([("3.00", "local.b")], [(c["version"], c["evidenceId"]) for c in second["cpus"][0]["cells"]])
 
     def test_an_incomplete_run_is_not_merged(self):
