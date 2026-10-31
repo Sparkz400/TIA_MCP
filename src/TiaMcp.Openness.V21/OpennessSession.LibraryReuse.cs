@@ -39,8 +39,16 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["typeName"] = name, ["typeGuid"] = source.TypeObject.Guid.ToString("D"), ["versionGuid"] = source.Guid.ToString("D"), ["version"] = source.VersionNumber.ToString(),
                 ["object"] = LibraryObjectDescription(uses[0].LibraryTypeInstance), ["comparedProperties"] = properties.Count, ["properties"] = new JArray(properties.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString() })),
                 ["ignoredDifferences"] = new JArray(ignored.Select(x => new JObject { ["description"] = x.Description, ["status"] = x.DetailCompareStatus.ToString(),
-                    ["reason"] = "Version comment only; type/version GUIDs match, and the component readback proves the installed content against the pinned source export before any mutation." })),
+                    ["reason"] = "Version comment only; type/version GUIDs match, and the component readback proves the installed content against the pinned source export before any mutation.",
+                    ["sourceValue"] = LibraryVersionComment(source), ["installedValue"] = LibraryVersionComment(installed) })),
                 ["proof"] = "Exact installed type/version GUID, one native link and identical native version metadata (default flag and uncompared original library excluded). Content is not compared; committed versions are immutable natively." };
+        }
+
+        private static JObject LibraryVersionComment(LibraryTypeVersion version)
+        {
+            var comment = new JObject();
+            foreach (var item in version.Comment?.Items ?? Enumerable.Empty<Siemens.Engineering.MultilingualTextItem>()) comment[item.Language?.Culture?.Name ?? "#" + comment.Count] = item.Text;
+            return comment;
         }
 
         // TIA allows one instance of a library type per device: an instance in another scope (root or software unit)

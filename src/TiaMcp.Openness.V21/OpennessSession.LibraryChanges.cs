@@ -905,7 +905,9 @@ namespace TiaMcp.Openness.V21
             bool component = change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload);
             if (component && !_libraryIntegrateApplyEnabled)
                 throw new BridgeException(PlcLibraryIntegrationPlanner.ApplyError, "This PLC integration is a plan only. No idempotency claim, checkpoint, save, compile or native mutation was dispatched. Review the explicit separate steps and native qualification gates.", LibraryChangeView(change));
-            if (component && PlcCombinedApplyRefusal(change) is JObject refusal)
+            // Only before the claim: afterwards the installed FB occupies its own number, and a retry must reach the
+            // idempotent replay (applied) or OutcomeUnknown below, never a fresh target refusal.
+            if (component && change.IdempotencyKey == null && PlcCombinedApplyRefusal(change) is JObject refusal)
                 throw new BridgeException(refusal.Value<string>("code"), "Combined apply refused: " + refusal.Value<string>("message") + " No idempotency claim, checkpoint or native mutation was dispatched.", LibraryChangeView(change));
             string key = ChangeText(args, "idempotencyKey", 128);
             if (ChangeText(args, "previewHash", 64) != change.PreviewHash) throw new BridgeException("PreviewMismatch", "previewHash does not match.");

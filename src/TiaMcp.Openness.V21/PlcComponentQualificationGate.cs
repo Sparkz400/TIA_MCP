@@ -106,11 +106,18 @@ namespace TiaMcp.Openness.V21
             System.IO.Path.Combine(System.IO.Path.GetDirectoryName(planDirectory), "c", planId.Substring(planId.Length - 32, 8));
         // The import step's directory change-lib-<32 hex> is the longest; the typed step's change-<32 hex> is shorter.
         internal static int CombinedApplyArchivePathLength(string workspace) => System.IO.Path.Combine(workspace, "change-lib-" + new string('0', 32), "before").Length;
-        internal static JObject CombinedApplyPathRefusal(string workspace)
+        // change_restore retrieves the checkpoint into <changes>/lr_<10 hex>/<project> (SharedMutationLibraryRecoveryDirectory);
+        // TIA limits that project directory to 143 characters as well.
+        internal static int CombinedApplyRecoveryPathLength(string planDirectory, string projectName) =>
+            System.IO.Path.Combine(System.IO.Path.GetDirectoryName(planDirectory), "lr_" + new string('0', 10), projectName).Length;
+        internal static JObject CombinedApplyPathRefusal(string planDirectory, string planId, string projectName)
         {
-            int length = CombinedApplyArchivePathLength(workspace);
+            int archive = CombinedApplyArchivePathLength(CombinedApplyWorkspace(planDirectory, planId)), recovery = CombinedApplyRecoveryPathLength(planDirectory, projectName);
+            int length = Math.Max(archive, recovery);
             return length <= TiaArchivePathLimit ? null : new JObject { ["code"] = "ComponentPathTooLong", ["length"] = length, ["limit"] = TiaArchivePathLimit,
-                ["message"] = "The step checkpoint archive path would be " + length + " characters, over TIA's " + TiaArchivePathLimit + "; start the Host with an artifact root at least " + (length - TiaArchivePathLimit) + " characters shorter." };
+                ["archivePathLength"] = archive, ["recoveryPathLength"] = recovery,
+                ["message"] = (archive >= recovery ? "The step checkpoint archive path" : "The recovered project directory of change_restore") + " would be " + length +
+                    " characters, over TIA's " + TiaArchivePathLimit + "; start the Host with an artifact root at least " + (length - TiaArchivePathLimit) + " characters shorter." };
         }
 
         // CreateFrom keeps a library block's number only while it is free; an occupied number renumbers the imported block, and a
@@ -125,13 +132,13 @@ namespace TiaMcp.Openness.V21
                 string kind = block.Name.LocalName.Substring("SW.Blocks.".Length), name = (string)block.Element("AttributeList")?.Element("Name");
                 if (!int.TryParse((string)block.Element("AttributeList")?.Element("Number"), System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number))
                     return Refusal("ComponentBlockNumberUnknown", kind + " " + name + " exports no block number, so the number its import takes cannot be checked before the claim.");
-                if (kind == "FB" && name == capturedFbName && number != capturedFbNumber)
+                if (kind == "FB" && name == capturedFbName && capturedFbNumber != null && number != capturedFbNumber)
                     return Refusal("CapturedStorageProfileUnavailable", "The captured instance profile binds " + name + " as FB" + capturedFbNumber + ", but the library version exports FB" + number + ".");
                 var used = target.FirstOrDefault(t => t.Value<string>("kind") == kind && t.Value<int?>("number") == number);
                 if (used != null)
                 {
                     var refusal = Refusal("ComponentBlockNumberOccupied", kind + number + " is already used by " + used.Value<string>("path") + ". Importing " + name +
-                        " would renumber it" + (name == capturedFbName ? ", which the captured instance profile does not cover" : "") + "; free or renumber that block first.");
+                        " would renumber it" + (name == capturedFbName && capturedFbNumber != null ? ", which the captured instance profile does not cover" : "") + "; free or renumber that block first.");
                     refusal["conflictingBlock"] = used.Value<string>("path"); refusal["number"] = number; refusal["kind"] = kind; refusal["importedBlock"] = name;
                     return refusal;
                 }

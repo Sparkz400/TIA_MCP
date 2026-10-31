@@ -171,7 +171,14 @@ internal static class BroadenedPlanTests
             Equal("CapturedStorageProfileUnavailable", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "5")], [], "Gate", 2).Value<string>("code"));
             Equal(null, PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Other", "5")], [], "Gate", 2));
             Equal("ComponentBlockNumberUnknown", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", null)], [], "Gate", 2).Value<string>("code"));
+            // Without a captured context the profile's FB name binds no number, and an occupied number names no profile.
+            Equal(null, PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "5")], [], "Gate", null));
+            var occupied = PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "5")], [Block("FB", 5, "/plc/blocks/Host")], "Gate", null);
+            Equal("ComponentBlockNumberOccupied", occupied.Value<string>("code")); Equal(false, occupied.Value<string>("message").Contains("captured instance profile"));
         });
+        // Why the refusal runs only before the claim: after a combined apply the installed FB occupies its own number.
+        test("an installed component's own FB number would be refused, so only unclaimed changes are checked", () =>
+            Equal("/plc/blocks/Gate", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "2")], [Block("FB", 2, "/plc/blocks/Gate")], "Gate", 2).Value<string>("conflictingBlock")));
         // 31 October native finding: the nested layout put the import archive at 164 characters under a 51-character root; now 121.
         test("combined apply steps live in a short workspace whose archive path fits TIA's limit for a normal Host root", () => {
             string id = "lib-05d85a3573b8471db3ded20b4118bb2b", root51 = @"D:\Entwicklung\TIA_MCP-public\artifacts\ic1\ie6fdb2";
@@ -179,10 +186,23 @@ internal static class BroadenedPlanTests
             Equal(Path.Combine(root51, "changes", "c", "05d85a35"), workspace); Equal(121, PlcComponentQualificationGate.CombinedApplyArchivePathLength(workspace));
             string root60 = @"C:\Users\someone\AppData\Local\TiaMcp\artifacts\run-00000001"; Equal(60, root60.Length);
             var fits = PlcComponentQualificationGate.CombinedApplyWorkspace(Path.Combine(root60, "changes", "change-" + id), id);
-            Equal(130, PlcComponentQualificationGate.CombinedApplyArchivePathLength(fits)); Equal(null, PlcComponentQualificationGate.CombinedApplyPathRefusal(fits));
+            const string scratch = "TiaMcpScratch_20261031_150445_6d8af7f2";
+            Equal(130, PlcComponentQualificationGate.CombinedApplyArchivePathLength(fits)); Equal(null, PlcComponentQualificationGate.CombinedApplyPathRefusal(Path.Combine(root60, "changes", "change-" + id), id, scratch));
             string root80 = root60 + new string('x', 20);
-            var refusal = PlcComponentQualificationGate.CombinedApplyPathRefusal(PlcComponentQualificationGate.CombinedApplyWorkspace(Path.Combine(root80, "changes", "change-" + id), id));
-            Equal("ComponentPathTooLong", refusal.Value<string>("code")); Equal(150, refusal.Value<int>("length")); Equal(true, refusal.Value<string>("message").Contains("150 characters"));
+            var refusal = PlcComponentQualificationGate.CombinedApplyPathRefusal(Path.Combine(root80, "changes", "change-" + id), id, scratch);
+            Equal("ComponentPathTooLong", refusal.Value<string>("code")); Equal(150, refusal.Value<int>("length")); Equal(150, refusal.Value<int>("archivePathLength"));
+            Equal(true, refusal.Value<string>("message").StartsWith("The step checkpoint archive path would be 150 characters", StringComparison.Ordinal));
+        });
+        // change_restore retrieves into <changes>/lr_<10 hex>/<project>; a long project name binds before the step archive does.
+        test("combined apply refuses a recovery directory over TIA's limit before the claim", () => {
+            string id = "lib-05d85a3573b8471db3ded20b4118bb2b", root73 = @"C:\Users\someone\AppData\Local\TiaMcp\artifacts\run-00000001" + new string('y', 13);
+            string plan = Path.Combine(root73, "changes", "change-" + id);
+            Equal(143, PlcComponentQualificationGate.CombinedApplyArchivePathLength(PlcComponentQualificationGate.CombinedApplyWorkspace(plan, id)));
+            Equal(134, PlcComponentQualificationGate.CombinedApplyRecoveryPathLength(plan, "TiaMcpScratch_20261031_150445_6d8af7f2"));
+            Equal(null, PlcComponentQualificationGate.CombinedApplyPathRefusal(plan, id, "TiaMcpScratch_20261031_150445_6d8af7f2"));
+            var refusal = PlcComponentQualificationGate.CombinedApplyPathRefusal(plan, id, new string('P', 48));
+            Equal("ComponentPathTooLong", refusal.Value<string>("code")); Equal(144, refusal.Value<int>("recoveryPathLength")); Equal(144, refusal.Value<int>("length"));
+            Equal(true, refusal.Value<string>("message").StartsWith("The recovered project directory of change_restore would be 144 characters", StringComparison.Ordinal));
         });
         test("reuse records an ignored version-comment difference in the plan", () => {
             var f = ReusedRoot(); f.Inventory["reusedVersions"][0]["ignoredDifferences"] = new JArray(new JObject { ["description"] = "Version comment", ["status"] = "ObjectsDifferent" });

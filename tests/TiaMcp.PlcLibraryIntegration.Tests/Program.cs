@@ -138,6 +138,14 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
     int combined = source.IndexOf("PlcComponentApplyCoordinator(change)", apply, StringComparison.Ordinal);
     int claim = source.IndexOf("LibraryJournalStore.Claim", apply, StringComparison.Ordinal);
     if (apply < 0 || flag < apply || gate <= flag || refusal <= gate || combined <= refusal || claim <= combined) throw new Exception("Guards must precede durable claim.");
+    // A same-key retry after a successful or uncertain combined apply must reach the idempotent replay or OutcomeUnknown,
+    // not a fresh target refusal (the installed FB occupies its own number): the refusal runs only for an unclaimed change.
+    const string unclaimed = "if (component && change.IdempotencyKey == null && ";
+    if (source.IndexOf(unclaimed + "PlcCombinedApplyRefusal(change) is JObject refusal)", apply, StringComparison.Ordinal) != refusal - unclaimed.Length)
+        throw new Exception("The combined-apply refusal must be limited to unclaimed changes.");
+    int replay = source.IndexOf("if (change.State == \"applied\") return LibraryChangeView(change);", refusal, StringComparison.Ordinal);
+    int unknown = source.IndexOf("throw new BridgeException(\"OutcomeUnknown\", \"This operation was already dispatched and cannot be replayed.\"", refusal, StringComparison.Ordinal);
+    if (replay < 0 || unknown < replay || unknown > claim) throw new Exception("The applied replay and OutcomeUnknown retry paths must stay unchanged before the claim.");
     // The target checks (languages, instance profile) are part of that pre-claim refusal, so a refused plan imports and saves nothing.
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     int shape = integration.IndexOf("private JObject PlcCombinedApplyRefusal(LibraryChange change)", StringComparison.Ordinal);

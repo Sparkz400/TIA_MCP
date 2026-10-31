@@ -160,7 +160,7 @@ namespace TiaMcp.Openness.V21
             string refusal = PlcComponentQualificationGate.CombinedApplyLanguageRefusal(languages.ActiveLanguages.Select(l => l.Culture.Name).ToArray(),
                 languages.ReferenceLanguage?.Culture.Name, languages.EditingLanguage?.Culture.Name);
             if (refusal != null) return NotQualified(refusal);
-            var path = PlcComponentQualificationGate.CombinedApplyPathRefusal(PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id));
+            var path = PlcComponentQualificationGate.CombinedApplyPathRefusal(change.Directory, change.Id, change.Project.Name);
             if (path != null) return path;
             try
             {
