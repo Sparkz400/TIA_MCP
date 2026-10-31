@@ -30,13 +30,13 @@ class Previews(unittest.TestCase):
         preview = {"applySupported": False, "combinedApply": {"enabled": True, "eligible": False, "refusal": "OB insertion is refused; add it."}}
         subject.require_combined_preview(preview, refusal="OB insertion is refused")
         with self.assertRaisesRegex(RuntimeError, "Unexpected combined-apply refusal"):
-            subject.require_combined_preview(preview, refusal=subject.LAD_REFUSAL)
+            subject.require_combined_preview(preview, refusal=subject.FB_REFUSAL)
         with self.assertRaisesRegex(RuntimeError, "eligibility differs"):
             subject.require_combined_preview(preview, eligible=True)
 
     def test_default_host_must_report_combined_apply(self):
         # Combined apply is the default: the old plan-only preview and capabilities are now failures.
-        for expectation in ({"eligible": True}, {"refusal": subject.LAD_REFUSAL}):
+        for expectation in ({"eligible": True}, {"refusal": subject.FB_REFUSAL}):
             with self.subTest(expectation=expectation), self.assertRaisesRegex(RuntimeError, "eligibility differs"):
                 subject.require_combined_preview({"applySupported": False}, **expectation)
         subject.require_capabilities({"plcIntegration": {"applySupported": True, "combinedApply": "Enabled"}})
@@ -195,7 +195,7 @@ class Candidates(unittest.TestCase):
         gate = {"ladCaller", "fbCaller", "multiInstance", "reusedComponent", "earlierPlacement"}
         for name, (overrides, features) in subject.CANDIDATES.items():
             with self.subTest(name=name):
-                self.assertTrue(set(features) <= gate and features)
+                self.assertTrue(set(features) <= gate)
                 self.assertIn(overrides["callerMode"], subject.MODES)
         for path in ("callers/TiaMcpComponentCaller.lad.s7dcl", "callers/TiaMcpComponentHost.s7dcl"):
             self.assertTrue((subject.FIXTURES / path).is_file(), path)

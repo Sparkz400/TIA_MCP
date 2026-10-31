@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3f9d9a8185e311e253632511266754d45ef56cb2b2d37408ddec666b7b404a09",
-      "bytes": 1430112
+      "sha256": "25449fea4e418195775ab2121a38bb0d3d02f0ff9e6a98cd1edfa001abb0c03b",
+      "bytes": 1431934
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2632,8 +2632,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
-      "sha256": "9bc9a6340a1a158b04ac1bf5ece8cf6964147786e9aac22f45c4d2f4e10d50dd",
-      "bytes": 126964
+      "sha256": "f02d06ca0445a3039423b40bfb76dbe82ae173c0f21e12ce582999c785fbfc8a",
+      "bytes": 127179
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs",
@@ -2717,8 +2717,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
-      "sha256": "ab542d08328292147f77178749ee88d141b0edf48720b27b833ddbdbb1bfe19c",
-      "bytes": 25056
+      "sha256": "fbc914e15fee8351d9f6b8e56ad0de5486e2ae09987f589114b7daf901d5da15",
+      "bytes": 25146
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.TypedPreview.cs",
@@ -2987,8 +2987,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "bd877836269fa0e5c9aea6a2abd4eac572cbfe2c2cb6819b0d353e9354ce4651",
-      "bytes": 9604
+      "sha256": "1927cde1a8fece2e2c563d662c406fed93dbb99ba76c0c1caf41c27f6ea61370",
+      "bytes": 9861
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -88142,7 +88142,7 @@
               "name": "PreparePlcCombinedApply",
               "line": 187,
               "endLine": 208,
-              "sha256": "a6207c88d5f47c9f017e35653e1fa1d25de25a7babdd8f820c0c740748fbe109"
+              "sha256": "e2c5fa3ccd1fee9d87602f4d708141fe566c6e572dbfa01553d375521adbf61b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -88319,7 +88319,7 @@
               "name": "PreparePlcCombinedApply",
               "line": 187,
               "endLine": 208,
-              "sha256": "a6207c88d5f47c9f017e35653e1fa1d25de25a7babdd8f820c0c740748fbe109"
+              "sha256": "e2c5fa3ccd1fee9d87602f4d708141fe566c6e572dbfa01553d375521adbf61b"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",

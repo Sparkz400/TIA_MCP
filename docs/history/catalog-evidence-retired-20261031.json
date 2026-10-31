@@ -1,0 +1,15 @@
+{
+  "description": "Curated summaries of 31 October 2026 that the catalog does not cite: both runs have a failed outcome, and a verified feature may cite only passed records. Their per-case results are referenced in the catalog limitations of library.integrate_combined_apply and change.library_instantiate and in docs/verification/component-candidate-shapes-20261031.md.",
+  "retiredFromCatalog": [],
+  "records": [],
+  "summariesNeverCataloged": [
+    {
+      "id": "local.library_integrate.candidate_shapes.20261031",
+      "reason": "Failed outcome: run 1 stopped every case at TIA's 143-character archive path and three run-2 cases failed; ladStandalone, ladExisting and earlierPlacement passed per case and are the verified shapes ladCaller and earlierPlacement."
+    },
+    {
+      "id": "local.library_units.namespace.20261031",
+      "reason": "Failed outcome: both runs stopped at the OB-rooted NAMESPACE caller source; the namespaced dependency and master-copy stages passed per step."
+    }
+  ]
+}

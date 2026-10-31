@@ -46,7 +46,9 @@ namespace TiaMcp.Openness.V21
         // that combination has its own native evidence and is listed in VerifiedShapes; a verified feature does not open its
         // untested combinations. Until then only a qualification Host (--component-qualification) runs it, on its own owned
         // scratch (candidates=true).
-        internal static readonly string[] VerifiedShapes = { };
+        // ladCaller (new LAD FC, existing LAD FC after its last network) and earlierPlacement (existing FBD FC) passed natively
+        // on 31 October (local.library_integrate.candidate_shapes.20261031, per-case results).
+        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "ladCaller" };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;

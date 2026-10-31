@@ -34,7 +34,9 @@ from typed_graphical_transport import artifact_bytes
 FLAG = "--enable-library-integrate-apply"
 CANDIDATE_FLAG = "--component-qualification"
 REFUSED = "PlcIntegrationNotQualified"
-LAD_REFUSAL = "Only a new or existing FBD FC caller is verified"
+# LAD FC callers and earlier placements are verified since 31 October; an FB caller is still refused in production.
+FB_REFUSAL = "Only a new or existing FBD FC caller is verified; FBD FB callers"
+HOST_FB = "TiaMcpComponentHost"
 MODES = ("createStandaloneFc", "existing")
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "library_capabilities")
 OB_NAME, OB_NUMBER = "TiaMcpComponentOb", 123
@@ -52,12 +54,13 @@ def candidate_client(host, timeout, arguments):
     return Client(host, timeout, [*arguments, CANDIDATE_FLAG])
 
 
-# Candidate install cases: manifest overrides and the exact unverified features the preview must name.
+# Candidate install cases: manifest overrides and the exact unverified features the preview must name. ladCaller and
+# earlierPlacement passed natively on 31 October and are verified shapes, so their previews name no feature any more.
 CANDIDATES = {
-    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, ["ladCaller"]),
-    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, ["ladCaller"]),
+    "ladStandalone": ({"callerMode": "createStandaloneFc", "language": "LAD"}, []),
+    "ladExisting": ({"callerMode": "existing", "language": "LAD", "callerSource": "callers/TiaMcpComponentCaller.lad.s7dcl"}, []),
     "fbCaller": ({"callerMode": "existing", "caller": "TiaMcpComponentHost", "callerSource": "callers/TiaMcpComponentHost.s7dcl"}, ["fbCaller"]),
-    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, ["earlierPlacement"]),
+    "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
 # The typed route's multi-instance profiles do not cover an FB with a structured (UDT) static; a refusal before any
@@ -424,8 +427,18 @@ class IntegrateApplyRun(ComponentRun):
         case["restoreVerified"] = True; self.persist()
         self.session.close()
 
+    def host_fb(self, plc):
+        """The FBD FB caller fixture, imported before the baseline; returns its path and an insertion recipe after its network."""
+        source = (self.native / "documents" / "callers" / (HOST_FB + ".s7dcl")).read_text(encoding="utf-8-sig")
+        self.apply("source_upsert", {"language": "SIMATIC_SD", "source": source, "expectedBlockNames": [HOST_FB]})
+        return plc + "/blocks/" + HOST_FB
+
+    def host_fb_recipe(self, baseline, path):
+        network, _ = terminal_network(Path(baseline["objects"]["block:" + path]["file"]).read_text(encoding="utf-8-sig"), "FBD")
+        return {"mode": "existing", "blockPath": path, "insertAfterNetworkId": network}
+
     def refusals(self, archive, released):
-        """Flag on: an FBD OB caller and a new LAD FC caller are refused at apply with no project change."""
+        """Flag on: an FBD OB caller and an existing FBD FB caller are refused at apply with no project change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         case, out = self.case("refusals", True), self.output / "refusals"
         scratch, opened, plc = self.stage_consumer(archive, released)
@@ -433,13 +446,13 @@ class IntegrateApplyRun(ComponentRun):
                    for name in ("Main", self.manifest["unrelatedCaller"])]
         first, second = self.manifest["signals"]
         self.apply("block_import_xml", {"xml": fbd_ob(*exports, first["name"], second["name"]), "expectedBlockNames": [OB_NAME]})
+        host = self.host_fb(plc)
         baseline = snapshot(self.call, out / "before")
         ob = plc + "/blocks/" + OB_NAME
         network, _ = terminal_network(Path(baseline["objects"]["block:" + ob]["file"]).read_text(encoding="utf-8-sig"), "FBD")
         for name, caller, caller_recipe, reason in (
                 ("obCaller", ob, {"mode": "existing", "blockPath": ob, "insertAfterNetworkId": network}, "OB insertion is refused"),
-                ("ladCaller", plc + "/blocks/" + self.manifest["caller"], {"mode": "createStandaloneFc", "name": self.manifest["caller"],
-                    "language": "LAD", "numberPolicy": "firstAvailable"}, LAD_REFUSAL)):
+                ("fbCaller", host, self.host_fb_recipe(baseline, host), FB_REFUSAL)):
             prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
             case[name] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=reason)}
             case[name]["refusal"] = self.refused_apply(prepared); self.persist()
@@ -449,19 +462,20 @@ class IntegrateApplyRun(ComponentRun):
 
     def default_host(self, archive, released):
         """Host without the former flag: combined apply is the default, so the standalone FBD plan previews eligible (the
-        install steps already applied it; it is not applied again) and an unverified LAD FC plan is refused with no change."""
+        install steps already applied it; it is not applied again) and an unverified FB caller plan is refused with no change."""
         self.manifest["callerMode"] = "createStandaloneFc"
         self.session.client_factory = host_client(False)
         case, out = self.case("defaultHost", False), self.output / "defaultHost"
         scratch, opened, plc = self.stage_consumer(archive, released)
         case["capabilities"] = require_capabilities(self.call("library_capabilities"))
+        host = self.host_fb(plc)
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, _ = self.select_caller(baseline, plc)
         prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
         case["combinedApply"] = require_combined_preview(prepared["preview"], eligible=True)
-        prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, dict(caller_recipe, language="LAD"))
-        case["ladCaller"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=LAD_REFUSAL),
-                             "refusal": self.refused_apply(prepared)}
+        prepared, _ = self.prepare(scratch, opened["libraryId"], released, plc, baseline, host, self.host_fb_recipe(baseline, host))
+        case["fbCaller"] = {"changeId": prepared["changeId"], "combinedApply": require_combined_preview(prepared["preview"], refusal=FB_REFUSAL),
+                            "refusal": self.refused_apply(prepared)}
         assert_snapshot(baseline, snapshot(self.call, out / "after"))
         case["projectUnchanged"] = True; self.persist()
         self.session.close()

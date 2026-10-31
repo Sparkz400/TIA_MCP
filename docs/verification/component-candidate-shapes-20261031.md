@@ -1,7 +1,8 @@
 # PLC component candidate shapes and library instance namespaces — 31 October 2026
 
-Status: builders and offline tests done; **no native run yet**. Combined `library_integrate` apply stays limited to the
-verified shapes on production Hosts ([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
+Status: builders and offline tests done; native runs on 31 October (below). `ladCaller` and `earlierPlacement` passed and
+are verified shapes; the other candidates stay closed on production Hosts
+([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
 
 ## Component shapes
 
@@ -61,3 +62,44 @@ and whether a namespaced DB resolves the un-namespaced UDT. The runner stops at 
 inside NAMESPACE TiaMcp_LibUnit" with V21's own message if either is refused.
 
 A dependency created alongside a namespaced root keeps its type namespace; that stays unexercised.
+
+## Native runs — 31 October 2026
+
+One owned TIA Portal V21 at a time, owned de-DE-only scratch projects, no PLCSIM. Frozen Debug builds under the project's
+`artifacts/` tree; raw reports in `artifacts/evidence`.
+
+[`local.library_integrate.candidate_shapes.20261031`](../../evidence/local.library_integrate.candidate_shapes.20261031.json)
+(outcome failed; the per-case results are the evidence):
+
+- Run 1 (build `a8819fa8`, `--artifacts artifacts/ic1`): every case stopped at the import step's checkpoint archive before
+  any mutation. TIA refused the archive path: `...\ic1\ie6fdb2\changes\change-lib-…\c\changes\change-lib-…\before`
+  is 164 characters, over its 143. The nested combined-apply directories leave about 20 characters for the Host artifact
+  root. `OwnedScratch` now passes the root as given, so run 2 used `Q:/ic2` with `Q:` a `subst` drive over `artifacts/q`
+  (build `3e92b2be`).
+- **Passed** (each with the exact `candidateFeatures`, installation_verified, the independent export/inventory diff, native
+  caller-insertion proof, call oracle, exact project library versions, fresh reopen, 0-error compile and initial-checkpoint
+  restore into a new location after retrieval and reopen):
+  - `ladStandalone`: a new LAD FC;
+  - `ladExisting`: an existing LAD FC after its last network (following IDs 8→D, 9→E);
+  - `earlierPlacement`: an existing two-network FBD FC after its first network (seven following IDs, the second network
+    included, shifted by 5).
+- **Failed, fixture/profile limit:** `fbCaller`, and the verified standalone FBD FC first install of `multiInstance`. The
+  FB caller fixture `TiaMcpComponentHost` took FB2, so the component FB was imported as FB3. The captured instance profile
+  compares the complete reference FB export, Number 2 included, and refused typed preparation after the import was saved
+  (`CapturedStorageProfileUnavailable`, recovery_required in the owned scratch). This also affects the verified standalone
+  shape: a target with FB2 taken fails after the import. A pre-claim check of the FB's import number would refuse it first.
+- **Failed, reuse proof:** `reuse` was refused at `change_prepare` (`DependencyConflict`): in the de-DE-only project the
+  installed FB version's "Version comment" differs from the source version (`ObjectsDifferent`). Nothing was claimed.
+- `multiInstance` never reached its typed multi-instance preparation; its expected storage-profile boundary is unexercised.
+
+[`local.library_units.namespace.20261031`](../../evidence/local.library_units.namespace.20261031.json) (outcome failed,
+77/79 steps in each run; build `3e92b2be`, then `e52b67f4`):
+
+- **Passed:** every stage of the 29 October run; a namespaced UDT root reused by a namespaced dependent FB (both under
+  `/namespaces/TiaMcp_LibUnit/`, one use each, compiled); a namespaced master-copy FC (`instanceNamespace.masterCopies`).
+- **V21 behavior:** V21 imports a `NAMESPACE TiaMcp_LibUnit` SCL source into the unit, but resolves unqualified names in
+  it against the root namespace. Run 1: the namespaced library FB instances were not found as instance-DB types by simple
+  name ("Could not find type \"TiaMcpLibraryGate\""), while the un-namespaced UDT resolved. Run 2, with qualified type
+  names: every block generated, but the OB's unqualified references to DBs of the same source failed compilation
+  ("Tag _.TiaMcpUnitNamespaced_Gate not defined"). The namespaced FB's later update is therefore unexercised; the next
+  attempt qualifies every reference in the caller source.

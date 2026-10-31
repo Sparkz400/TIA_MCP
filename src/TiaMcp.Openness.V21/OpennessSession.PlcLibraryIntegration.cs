@@ -197,7 +197,7 @@ namespace TiaMcp.Openness.V21
                 ["checkpoint"] = "The first step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
                 ["candidateFeatures"] = unverified,
                 ["qualification"] = unverified.Count != 0 ? "Candidate shape without native evidence, admitted only on this qualification Host's owned scratch."
-                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028)." };
+                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028; LAD FC callers and earlier placements: local.library_integrate.candidate_shapes.20261031)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
             coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";
