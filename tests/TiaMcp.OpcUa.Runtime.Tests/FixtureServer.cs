@@ -264,7 +264,7 @@ internal sealed partial class FixtureServer : StandardServer
     }
     internal async Task RestartFixture() {await StopAsync();await StartAsync(fixtureConfiguration!);}
     private sealed partial class FixtureNodes(IServerInternal server, ApplicationConfiguration configuration)
-        : CustomNodeManager2(server, configuration, Namespace)
+        : CustomNodeManager2(server, configuration, Namespace, PlcNamespace)
     {
         public override void CreateAddressSpace(IDictionary<NodeId, IList<IReference>> external)
         {
@@ -289,6 +289,7 @@ internal sealed partial class FixtureServer : StandardServer
             }
             AddPredefinedNode(SystemContext, folder);
             AddRootNotifier(folder);
+            CreateMethodsAndAlarm(refs);
         }
     }
 }

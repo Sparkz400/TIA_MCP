@@ -34,8 +34,8 @@ internal sealed partial class FixtureServer
             var filter=(EventFilter)item.RequestedParameters.Filter.Body;
             Audit.Enqueue(new {operation="FixtureEventFilter",node=item.ItemToMonitor.NodeId.ToString(),
                 fields=filter.SelectClauses.Select(s=>new{type=s.TypeDefinitionId.ToString(),path=s.BrowsePath.Select(p=>p.ToString()).ToArray(),attribute=s.AttributeId}).ToArray(),
-                operators=filter.WhereClause.Elements.Select(e=>e.FilterOperator.ToString()).ToArray(),
-                minimumSeverity=((LiteralOperand)filter.WhereClause.Elements[0].FilterOperands[1].Body).Value.Value});
+                operators=(filter.WhereClause?.Elements??[]).Select(e=>e.FilterOperator.ToString()).ToArray(),
+                minimumSeverity=(filter.WhereClause?.Elements?.Count??0)==0?null:((LiteralOperand)filter.WhereClause.Elements[0].FilterOperands[1].Body).Value.Value});
         }
         Audit.Enqueue(new {operation="ItemsCreated",subscription,items=response.Results.Select((r,i)=>new {clientHandle=items[i].RequestedParameters.ClientHandle,
             node=Convert.ToString(items[i].ItemToMonitor.NodeId.Identifier),status=$"0x{r.StatusCode.Code:x8}",id=r.MonitoredItemId,

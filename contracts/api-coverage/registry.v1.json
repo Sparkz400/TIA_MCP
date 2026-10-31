@@ -3444,6 +3444,31 @@
       ]
     },
     {
+      "featureId": "runtime_ua_call",
+      "obligations": [
+        "D16",
+        "C03",
+        "L03",
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_conditions",
+      "obligations": [
+        "D16",
+        "C03",
+        "X13"
+      ]
+    },
+    {
+      "featureId": "runtime_ua_history_probe",
+      "obligations": [
+        "D16",
+        "C03",
+        "X13"
+      ]
+    },
+    {
       "featureId": "runtime_ua_status",
       "obligations": [
         "D16",

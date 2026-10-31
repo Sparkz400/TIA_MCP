@@ -110,6 +110,29 @@ def server_restart():
     return report
 
 
+def services():
+    report = normal()
+    report["mode"] = "ua-services"
+    report["attempts"]["web"] = []
+    report["steps"] = [s for s in report["steps"] if "web" not in s["name"] and s["name"] not in (oracle.UA_WRITE, oracle.TO_STOP, oracle.PLCSIM_STOP, oracle.TO_RUN, oracle.PLCSIM_RUN)]
+    report["steps"] = [s for s in report["steps"] if s["name"] != "connect web"]
+
+    def conditions(*alarms):
+        return {"refresh": {"startObserved": True, "endObserved": True},
+                "events": [{"kind": "refreshStart"}] + [{"kind": "condition", "conditionId": a, "activeState": True, "retain": True} for a in alarms] + [{"kind": "refreshEnd"}]}
+    alarm = {"identifier": "alarm"}
+    report["steps"] += [step(oracle.UA_CALL, {"state": "called", "dispatched": True, "outputs": [{"encoding": "decimalInteger", "value": "42"}, {"encoding": "boolean", "value": False}]}),
+                        step(oracle.CALL_UNACKNOWLEDGED, {"code": "RuntimeAcknowledgementRequired"}),
+                        step(oracle.CALL_FAILED, {"state": "methodFailed", "dispatched": True, "statusCode": oracle.METHOD_BAD}),
+                        step(oracle.HISTORY, {"product": {"code": "UaHistoryReadUnsupported"}, "historyReadRaw": {"statusCode": "0x80720000", "valueCount": None}}),
+                        step(oracle.CONDITIONS[0], conditions()), step(oracle.CONDITIONS[1], conditions(alarm)), step(oracle.CONDITIONS[2], conditions())]
+    report["steps"] += [step(label, {"state": "refused", "dispatched": False, "refusal": code}) for label, code in oracle.CALL_REFUSALS.items()]
+    report["comparisons"] = [{"label": label, "channel": "ua", "channelRead": ua_read(n), "plcsimRead": plcsim(n)} for label, n in zip(oracle.CALLS, (0, 1, 1))]
+    report["alarmCondition"] = {"raised": True, "conditionIds": [json.dumps(alarm, sort_keys=True)]}
+    report["toolCalls"] = [{"name": name, "isError": False} for name in oracle.SERVICE_TOOLS]
+    return report
+
+
 class Oracle(unittest.TestCase):
     def issues(self, report, marker=None, stored=None):
         with tempfile.TemporaryDirectory() as root:
@@ -211,6 +234,21 @@ class Oracle(unittest.TestCase):
         # Run rs_abde1bb3: the UA subscription had already ended (sessionUnavailable) before the Host was terminated.
         report = host_loss(); named(report, oracle.BEFORE_LOSS)["result"] = {"ua": "ended", "web": "running"}
         self.assertTrue(any("still run" in issue for issue in self.issues(report)))
+
+    def test_services_need_one_counted_call_refusals_the_history_boundary_and_a_falling_condition(self):
+        self.assertEqual(self.issues(services()), [])
+        report = services(); report["alarmCondition"] = {"raised": False}  # PLCSIM raised nothing: recorded, not a product failure.
+        self.assertEqual(self.issues(report), [])
+        report = services(); named(report, oracle.CALL_STANDARD)["result"]["dispatched"] = True
+        self.assertTrue(any("standard server method" in issue for issue in self.issues(report)))
+        report = services(); report["comparisons"][1]["plcsimRead"]["value"] = report["comparisons"][1]["channelRead"]["value"] = 2
+        self.assertTrue(any("exactly one successful call" in issue for issue in self.issues(report)))
+        report = services(); named(report, oracle.HISTORY)["result"]["historyReadRaw"] = {"statusCode": "0x00000000", "valueCount": 1}
+        self.assertTrue(any("HistoryRead" in issue for issue in self.issues(report)))
+        report = services(); named(report, oracle.CONDITIONS[2])["result"] = named(report, oracle.CONDITIONS[1])["result"]
+        self.assertTrue(any("still active" in issue for issue in self.issues(report)))
+        report = services(); named(report, oracle.CONDITIONS[0])["result"]["refresh"]["endObserved"] = False
+        self.assertTrue(any("ConditionRefresh boundaries" in issue for issue in self.issues(report)))
 
     def test_a_failed_run_is_never_complete(self):
         report = normal(); report["completed"] = False

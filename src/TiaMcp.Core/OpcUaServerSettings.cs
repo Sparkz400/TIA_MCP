@@ -16,7 +16,7 @@ namespace TiaMcp.Core
         }
 
         // OnCpu: the CPU device item; otherwise its "OPC UA" sub-item, the one that exposes OpcUaServer. That item exposes
-        // OpcUaPort and OpcUaAutoAcceptAllClientCertificates only while the server is on. V21 models guest access as the
+        // OpcUaPort, OpcUaAutoAcceptAllClientCertificates and OpcUaAlarmsAndConditionsEnable only while the server is on. V21 models guest access as the
         // UMAC anonymous user holding the OPCUAServerAccess device right, not as an attribute.
         public static readonly Setting[] Settings =
         {
@@ -25,6 +25,7 @@ namespace TiaMcp.Core
             new Setting("guestAccess", false, null),
             new Setting("autoAcceptClientCertificates", false, "OpcUaAutoAcceptAllClientCertificates"),
             new Setting("runtimeLicense", true, "OpcUaPurchasedLicense"),
+            new Setting("alarmsAndConditions", false, "OpcUaAlarmsAndConditionsEnable"),
         };
 
         // UInt64 values 0..3 of OpcUaPurchasedLicense, as the V21 hardware parameter description names them.

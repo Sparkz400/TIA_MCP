@@ -9,6 +9,8 @@ public sealed record OpcUaRuntimeSelection(string Endpoint, string ApplicationUr
 public sealed record OpcUaRuntimeNode(string NamespaceUri, string IdentifierType, string Identifier);
 /// <summary>One gated owned-PLCSIM scalar write. Encoding, Expected and Value use runtime_ua_read's exact encoding and value forms.</summary>
 public sealed record OpcUaRuntimeWriteItem(OpcUaRuntimeNode Node, string Encoding, JsonElement Expected, JsonElement Value);
+/// <summary>One scalar input of a gated owned-PLCSIM method call, in runtime_ua_read's exact encoding and value forms.</summary>
+public sealed record OpcUaRuntimeCallArgument(string Encoding, JsonElement Value);
 public sealed record OpcUaRuntimeStatus(string SchemaVersion, string AttemptId, string HostId, OpcUaRuntimeSelection Selection,
     string State, string? ErrorCode, bool PeerVerified, DateTimeOffset UpdatedAt)
 {

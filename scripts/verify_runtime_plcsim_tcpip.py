@@ -4,7 +4,8 @@ Every UA or web value is compared with the PLCSIM API read of the same tag, ever
 certificate pin taken after the last compile, every Host and worker with its exit proof, and the retained session
 stores with the attempts the runner opened (nothing reconnects or logs in on its own). Recovery modes add their
 boundaries: an interrupted acquisition is never resumed, a lost write is never replayed and only an explicit read
-decides it.
+decides it. ua-services adds the server-method call counted by the PLCSIM API, its refusals, the HistoryRead boundary
+and the ConditionRefresh snapshots around a PLCSIM-raised alarm.
 """
 import argparse
 import datetime
@@ -13,9 +14,9 @@ import json
 from pathlib import Path
 
 SIEMENS_NS = "http://www.siemens.com/simatic-s7-opcua"
-MODES = ("normal", "host-loss-capture", "server-restart", "ua-write-loss", "web-write-loss")
+MODES = ("normal", "host-loss-capture", "server-restart", "ua-write-loss", "web-write-loss", "ua-services")
 POINTS = {"ua-write-loss": "ua.write.afterSend", "web-write-loss": "web.write.afterSend"}
-HOSTS = {"normal": 1, "server-restart": 1, "host-loss-capture": 3, "ua-write-loss": 3, "web-write-loss": 3}
+HOSTS = {"normal": 1, "server-restart": 1, "host-loss-capture": 3, "ua-write-loss": 3, "web-write-loss": 3, "ua-services": 1}
 MARKER = "runtime-interruption-marker.json"
 COMPILES = ("apply ", "simulation_download", "save the generated state")
 PIN_STEP = "certificate_inspect after the last compile"
@@ -31,6 +32,16 @@ CYCLE = "sim_state %s during the captures"
 START_BEFORE, START_AFTER = "server start time before the restart", "server start time after the restart"
 ACROSS, OLD_READ = "rows across the restart", "read on the old session after the restart"
 FINISHED = "acquisition status after the restart"
+EVENT_MODEL, METHOD_BROWSE = "runtime_ua_browse Server (event model)", "runtime_ua_browse ServerMethod_DB (server method)"
+UA_CALL, CALL_FAILED, METHOD_BAD = "runtime_ua_call", "runtime_ua_call whose method returns Bad", "0x80ab0000"
+CALL_UNACKNOWLEDGED = "runtime_ua_call without acknowledgement"
+CALL_STANDARD, CALL_ARGUMENTS = "runtime_ua_call of a standard server method", "runtime_ua_call with a wrong argument count"
+CALL_REFUSALS = {CALL_STANDARD: "UaMethodNotServerMethod", CALL_ARGUMENTS: "UaMethodArgumentInvalid"}
+CALLS = ("MethodCalls before the call", "MethodCalls after the call", "MethodCalls after the failed call")
+HISTORY = "runtime_ua_history_probe"
+CONDITIONS = ("runtime_ua_conditions before the alarm", "runtime_ua_conditions with the alarm raised", "runtime_ua_conditions after the alarm falls")
+SERVICE_TOOLS = ("runtime_plcsim_bind", "runtime_ua_connect", "runtime_ua_browse", "runtime_ua_read", "runtime_ua_call", "runtime_ua_history_probe",
+                 "runtime_ua_conditions", "runtime_ua_disconnect")
 REFUSALS = {"ua": ("UaSessionUnavailable", "UaEndpointSessionUnresolved"), "web": ("RuntimeSessionUnavailable", "RuntimeEndpointSessionUnresolved")}
 TOOLS = ("runtime_plcsim_bind",
          "runtime_ua_client_identity", "runtime_ua_credential_binding", "runtime_ua_connect", "runtime_ua_browse", "runtime_ua_read",
@@ -104,7 +115,7 @@ def verify(root):
             need(plcsim.get("quality") == "good" and same(value, plcsim.get("value")),
                  "%s: the %s read %r differs from the PLCSIM API read %r" % (row["label"], row["channel"], value, plcsim.get("value")))
             compared.add(row["channel"])
-        for channel in {"ua-write-loss": ("ua",), "web-write-loss": ("web",)}.get(mode, ("ua", "web")):
+        for channel in {"ua-write-loss": ("ua",), "web-write-loss": ("web",), "ua-services": ("ua",)}.get(mode, ("ua", "web")):
             need(channel in compared, "No %s value is compared with the PLCSIM API" % channel)
 
         # Pins come from certificate_inspect after the last compile and every connected session uses them.
@@ -193,6 +204,38 @@ def verify(root):
                 need(down or ended, "The %s capture records no downtime" % channel)
                 need(result(name(OLD_READ, channel)).get("code"), "The old %s session still answers after the restart" % channel)
                 need(any(r["label"] == name(FRESH, channel) for r in report.get("comparisons", [])), "No fresh %s session after the restart" % channel)
+        elif mode == "ua-services":
+            passed = {c["name"] for c in report.get("toolCalls", []) if not c["isError"]}
+            for tool in SERVICE_TOOLS:
+                need(tool in passed, "No successful call of " + tool)
+            called = result(UA_CALL)
+            need(called.get("state") == "called" and called.get("dispatched") is True and [(o.get("encoding"), o.get("value")) for o in called.get("outputs", [])]
+                 == [("decimalInteger", "42"), ("boolean", False)], "The server method call did not answer 42 and false")
+            need(result(CALL_UNACKNOWLEDGED).get("code") == "RuntimeAcknowledgementRequired", "A call without acknowledgement was not refused")
+            for label, code in CALL_REFUSALS.items():
+                refusal = result(label)
+                need(refusal.get("state") == "refused" and refusal.get("dispatched") is False and refusal.get("refusal") == code, "%s was not refused with %s" % (label, code))
+            failed = result(CALL_FAILED)
+            need(failed.get("state") == "methodFailed" and failed.get("statusCode") == METHOD_BAD, "The method's own Bad result was not returned")
+            counts = {r["label"]: r["plcsimRead"].get("value") for r in report.get("comparisons", []) if r["label"] in CALLS}
+            need(len(counts) == 3 and isinstance(counts[CALLS[0]], int) and counts[CALLS[1]] == counts[CALLS[0]] + 1 and counts[CALLS[2]] == counts[CALLS[1]],
+                 "The PLCSIM call counter does not show exactly one successful call: %s" % counts)
+            probe = result(HISTORY)
+            raw = probe.get("historyReadRaw") or {}
+            status = raw.get("statusCode")
+            need((probe.get("product") or {}).get("code") == "UaHistoryReadUnsupported" and raw.get("valueCount") is None
+                 and (raw.get("serviceStatusCode") or (isinstance(status, str) and int(status, 16) & 0x80000000)), "The HistoryRead probe did not record a server refusal")
+            snapshots = [result(label) for label in CONDITIONS]
+            need(all((s.get("refresh") or {}).get("startObserved") and (s.get("refresh") or {}).get("endObserved") for s in snapshots),
+                 "A condition snapshot lacks the ConditionRefresh boundaries")
+            alarm = report.get("alarmCondition") or {}
+            if need(isinstance(alarm.get("raised"), bool), "The run does not record whether PLCSIM raised the condition") and alarm["raised"]:
+                def active(snapshot):
+                    return {json.dumps(e.get("conditionId"), sort_keys=True) for e in snapshot.get("events", []) if e.get("kind") == "condition" and e.get("activeState") is True
+                            and e.get("retain") is True}
+                raised = active(snapshots[1]) - active(snapshots[0])
+                need(raised == set(alarm.get("conditionIds", [])) and len(raised) == 1, "The raised condition is not one new active retained condition")
+                need(not raised & active(snapshots[2]), "The condition is still active after the trigger fell")
     except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError) as error:
         issues.append("%s: %s" % (type(error).__name__, error))
     return {"completed": not issues, "kind": "runtime-plcsim-tcpip", "nativeInvoked": False, "issues": issues}

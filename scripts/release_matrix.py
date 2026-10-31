@@ -37,6 +37,7 @@ PREFIX_OWNERS = {
     "qualification_translation": ["D03"], "qualification_watch": ["D02"],
     "runtime.physical_plc": ["D16"], "runtime_capture": ["D16"], "runtime_handoff": ["C03"],
     "runtime_plcsim_bind": ["D16", "C03", "L03"], "runtime_web_write": ["D16", "L03"], "runtime_web_operating_mode": ["D16", "L03"], "runtime_ua_write": ["D16", "C03", "L03"],
+    "runtime_ua_call": ["D16", "C03", "L03", "X13"], "runtime_ua_conditions": ["D16", "C03", "X13"], "runtime_ua_history_probe": ["D16", "C03", "X13"],
     "library_update_check": ["X02", "L02"], "change.library_cleanup": ["X02", "L02"], "change.library_harmonize": ["X02", "L02"], "runtime_ua": ["C03"], "runtime_web": ["D12"], "safety_evidence": ["D14"], "safety_validation_inspect": ["D14"], "safety_printout": ["D14"], "change.safety_fparameter_set": ["D14"], "library.integrate_combined_apply": ["X02", "L02"],
     "simulation_": ["L03"], "software_unit": ["D07"], "teamcenter_": ["X09"],
     "sim_time": ["L03"], "sim_event": ["L03"], "sim_storage": ["L03"], "sim_read_signals": ["L03"], "sim_write_signals": ["L03"], "sim_area_": ["L03"], "sim_observe": ["L03"], "change.simulation_download_online": ["L03", "D09"],

@@ -174,6 +174,27 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
         foreach (var write in writes) ValidateNode(write.Node);
         return Use(attemptId, (client, token) => client.Write(attemptId, writes, token, afterSend), ct);
     }
+    /// <summary>Gated owned-PLCSIM server-method call; the Host verifies the target binding first. Busy acquisitions refuse.</summary>
+    public Task<object> Call(string attemptId, OpcUaRuntimeNode objectNode, OpcUaRuntimeNode methodNode, IReadOnlyList<OpcUaRuntimeCallArgument> inputs,
+        CancellationToken ct = default)
+    {
+        ValidateNode(objectNode); ValidateNode(methodNode);
+        if (inputs is null || inputs.Count > 16 || inputs.Any(i => i is null || i.Encoding is not ("boolean" or "decimalInteger" or "roundTripFloat" or "roundTripDouble" or "string") ||
+            i.Value.ValueKind == JsonValueKind.String && i.Value.GetString()!.Length > 16_384)) throw Error("UaRequestLimit");
+        return Use(attemptId, (client, token) => client.Call(attemptId, objectNode, methodNode, inputs, token), ct);
+    }
+    /// <summary>Read-only Alarms and Conditions snapshot with ConditionRefresh on a temporary subscription. Busy acquisitions refuse.</summary>
+    public Task<object> Conditions(string attemptId, int windowMilliseconds = 3000, int maximumEvents = 64, CancellationToken ct = default)
+    {
+        if (windowMilliseconds is < 500 or > 5000 || maximumEvents is < 1 or > 256) throw Error("UaRequestLimit");
+        return Use(attemptId, (client, token) => client.Conditions(attemptId, windowMilliseconds, maximumEvents, token), ct);
+    }
+    /// <summary>HistoryRead boundary probe on one node; no history values are returned.</summary>
+    public Task<object> HistoryProbe(string attemptId, OpcUaRuntimeNode node, CancellationToken ct = default)
+    {
+        ValidateNode(node);
+        return Use(attemptId, (client, token) => client.HistoryProbe(attemptId, node, token), ct);
+    }
     public Task<OpcUaRuntimeBrowseResult> Browse(string attemptId, OpcUaRuntimeNode node, int maximum = 256, CancellationToken ct = default)
     {
         ValidateNode(node);

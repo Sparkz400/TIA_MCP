@@ -127,6 +127,13 @@ internal static class SimulationNetworkAdmissionTests
         string Source(params string[] path) => File.ReadAllText(Path.Combine([root?.FullName ?? throw new InvalidOperationException("Source missing."), "src", .. path]));
         Check.Equal(true, Source("TiaMcp.Host", "PlcsimTargets.cs").Contains("RequireEndpoint(recorded, endpoint, SimulationNetworkRoute.Adapter(endpoint))", StringComparison.Ordinal));
         Check.Equal(true, Source("TiaMcp.Core", "PhysicalRuntime", "PlcsimTargetBinding.cs").Contains("SimulationNetworkAdmission.RouteRefusal(routeAdapter)", StringComparison.Ordinal));
+        // Every mutating UA tool checks the owned-PLCSIM binding before its session call.
+        string ua = Source("TiaMcp.Host", "OpcUaRuntimeTools.cs");
+        foreach (var (tool, send) in new[] { ("runtime_ua_write", "sessions.Store.Write("), ("runtime_ua_call", "sessions.Store.Call(") })
+        {
+            int start = ua.IndexOf("Name = \"" + tool + "\"", StringComparison.Ordinal), gate = ua.IndexOf("await targets.Require(bindingSha256", Math.Max(start, 0), StringComparison.Ordinal);
+            Check.Equal(true, start >= 0 && gate > start && gate < ua.IndexOf(send, start, StringComparison.Ordinal));
+        }
         string system = Source("TiaMcp.Openness.V21", "OpennessSession.TestSuiteSystem.cs");
         int guard = system.IndexOf("SimulationNetworkAdmission.RouteRefusal(SimulationNetworkRoute.Adapter(serverAddress))", StringComparison.Ordinal);
         Check.Equal(true, guard > system.IndexOf("private JObject TestSuiteOwnedEndpoint(", StringComparison.Ordinal) && guard < system.IndexOf("return simulator;", StringComparison.Ordinal));
