@@ -288,7 +288,8 @@ def verify_standalone_caller(xml, manifest):
     require(len(list(blocks[0].iter("SW.Blocks.CompileUnit"))) == 1, "Standalone caller must contain exactly one network.")
 
 
-def verify_preserved_installation(before, after, caller, added, added_member=None):
+def verify_preserved_installation(before, after, caller, added, added_member=None, after_network=None):
+    """after_network: index of the original network the new one must directly follow (negative from the end); None accepts any."""
     require(set(after["objects"]) - set(before["objects"]) == set(added)
             and not set(before["objects"]) - set(after["objects"]), "Installed object inventory differs from exact fixture additions.")
     reduced = {"objects": {k: v for k, v in after["objects"].items() if k in before["objects"]}}
@@ -377,7 +378,8 @@ def verify_preserved_installation(before, after, caller, added, added_member=Non
         return native_payload(candidate.toxml()) == expected
 
     # Two candidates can restore only when they are equal up to that shift.
-    require(any(restores(index) for index in range(new_count)),
+    candidates = range(new_count) if after_network is None else [after_network % old_count + 1]
+    require(any(restores(index) for index in candidates),
             "Caller content outside the inserted network changed beyond the accepted following-ID shift.")
 
 

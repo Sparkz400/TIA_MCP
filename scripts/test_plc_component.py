@@ -461,6 +461,9 @@ class ComponentFixtureTests(unittest.TestCase):
             for label, data in (('wrong shift', insert(shift=1)), ('unshifted ID', insert(keep_first=True))):
                 with self.subTest(label=label), self.assertRaises(RuntimeError):
                     verify_preserved_installation(before, snapshot(label.replace(' ', '-'), data), '/caller', [])
+            # Pinned to the selected network: the new one must follow exactly that network.
+            verify_preserved_installation(before, snapshot('pinned', accepted), '/caller', [], after_network=0)
+            verify_preserved_installation(before, snapshot('pinned-last', accepted), '/caller', [], after_network=-1)
 
     def call_from(self, name, spec):
         """A retained native typed call export, renamed to the fixture's semantics."""
@@ -511,6 +514,24 @@ class ComponentFixtureTests(unittest.TestCase):
             for label, member in (("unannounced", None), ("other name", "Other")):
                 with self.subTest(label=label), self.assertRaises(RuntimeError):
                     verify_preserved_installation(old, new, "/caller", [], member)
+
+    def test_pinned_placement_rejects_an_insertion_after_another_network(self):
+        import hashlib
+        unit = '<SW.Blocks.CompileUnit ID="%s" />'
+        before = '<Document><SW.Blocks.FC ID="0"><AttributeList><Name>C</Name></AttributeList><ObjectList>' + unit % 1 + unit % 2 + '</ObjectList></SW.Blocks.FC></Document>'
+        # A third, identical network after the second: it equals an insertion after the first only up to which one is new.
+        after = before.replace(unit % 2, unit % 2 + unit % 3)
+        with tempfile.TemporaryDirectory() as temporary:
+            def snap(name, text):
+                path = Path(temporary) / (name + ".xml"); data = text.encode("utf-8"); path.write_bytes(data)
+                return {"objects": {"block:/caller": {"path": "/caller", "file": str(path), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(), "payloadSha256": name}}}
+            old, new = snap("before", before), snap("after", after)
+            verify_preserved_installation(old, new, "/caller", [], after_network=1)
+            verify_preserved_installation(old, new, "/caller", [])
+            different = before.replace(unit % 2, unit % 2 + '<SW.Blocks.CompileUnit ID="3" Kind="new" />')
+            verify_preserved_installation(old, snap("different", different), "/caller", [], after_network=-1)
+            with self.assertRaisesRegex(RuntimeError, "accepted following-ID shift"):
+                verify_preserved_installation(old, snap("different-first", different), "/caller", [], after_network=0)
 
     def test_full_caller_preservation_rejects_unrelated_changes(self):
         with tempfile.TemporaryDirectory() as temporary:

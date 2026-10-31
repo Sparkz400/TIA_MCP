@@ -251,6 +251,13 @@ namespace TiaMcp.Openness.V21
                     Fail("ComponentReadbackMismatch", "Strict dependency raw content differs; no content policy applies.");
             }
             if (!JToken.DeepEquals(evidence["mappings"], contract["plan"]["mappings"])) Fail("ComponentReadbackMismatch", "Mapped native tag paths, names, types or addresses changed.");
+            // The root FB has exactly one use, the planned block, and keeps the block number of its first readback.
+            var fb = (JObject)contract["plan"]["fb"]; var root = actual.Single(v => v.Value<string>("typeGuid") == expected.Single(p => p.Value<string>("typeName") == fb.Value<string>("name")).Value<string>("typeGuid"));
+            if (!(root["objectPaths"] is JArray rootPaths) || rootPaths.Count != 1 || (string)rootPaths[0] != fb.Value<string>("path") ||
+                evidence["fb"]?.Value<string>("path") != fb.Value<string>("path") || evidence["fb"]?["number"]?.Type != JTokenType.Integer)
+                Fail("ComponentReadbackMismatch", "The root FB must have exactly one native use, the planned block " + fb.Value<string>("path") + ".");
+            if (record["fbNumber"] != null && record.Value<int>("fbNumber") != evidence["fb"].Value<int>("number")) Fail("ComponentReadbackMismatch", "The root FB's block number changed between readbacks.");
+            record["fbNumber"] = evidence["fb"].Value<int>("number");
         }
 
         private static void ValidateOriginalCaller(JObject record, JObject evidence)

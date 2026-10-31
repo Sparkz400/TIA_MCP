@@ -296,6 +296,30 @@ internal static class CoordinatorTests
             var status = s.Coordinator.Reconcile(); Equal("graphical_applied", status.Value<string>("state")); Equal(s.Ops.TypedCheckpoint, status["initialCheckpoint"].Value<string>("archivePath"));
             Equal("installation_verified", s.Next().Value<string>("state")); Equal(1, s.Ops.Applies);
         });
+        test("reused FB receipt that ends in recovery_required still anchors recovery on its typed checkpoint", () => {
+            var s = new Scenario(reused: true); s.Next(); s.Ops.LoseResponse = true; Throws<IOException>(() => s.Apply("graphical"));
+            s.Ops.StatusMutation = r => { r["state"] = "recovery_required"; r["stages"] = new JArray("prechange_project_saved", "recovery_archive_created", "mutation_applied"); };
+            var status = s.Coordinator.Reconcile(); Equal("recovery_required", status.Value<string>("state"));
+            Equal(s.Ops.TypedCheckpoint, status["initialCheckpoint"].Value<string>("archivePath")); Equal("typed-step", status["initialCheckpoint"].Value<string>("changeId"));
+            Equal(s.Ops.TypedCheckpoint, s.Coordinator.Status()["recovery"].Value<string>("archivePath")); Reject("ComponentRecoveryRequired", () => s.Next()); Equal(1, s.Ops.Applies);
+        });
+        test("reused FB receipt without a pre-mutation archive records no initial checkpoint", () => {
+            var s = new Scenario(reused: true); s.Next(); s.Ops.LoseResponse = true; Throws<IOException>(() => s.Apply("graphical"));
+            s.Ops.StatusMutation = r => { r["state"] = "recovery_required"; r.Remove("recoveryArchive"); r.Remove("recoveryArchiveSha256"); r["stages"] = new JArray("prechange_project_saved"); };
+            Equal(true, s.Coordinator.Reconcile()["initialCheckpoint"] == null);
+        });
+        test("root FB with another or a second native use is refused at readback", () => {
+            var s = new Scenario(); s.ToLibraryApplied(); s.Ops.ImportMutation = r => r["versions"][0]["objectPaths"] = new JArray("/plc/blocks/groups/G/Motor");
+            Reject("ComponentReadbackMismatch", () => s.Next());
+            s = new Scenario(); s.ToLibraryApplied(); s.Ops.ImportMutation = r => ((JArray)r["versions"][0]["objectPaths"]).Add("/plc/blocks/Motor2");
+            Reject("ComponentReadbackMismatch", () => s.Next());
+            s = new Scenario(); s.ToLibraryApplied(); s.Ops.ImportMutation = r => r.Remove("fb");
+            Reject("ComponentReadbackMismatch", () => s.Next());
+        });
+        test("root FB block number is pinned from its first readback", () => {
+            var s = new Scenario(); s.ToLibraryApplied(); Equal(4, s.Next().Value<int>("fbNumber"));
+            s.Ops.ImportMutation = r => r["fb"]["number"] = 5; Reject("ComponentReadbackMismatch", () => s.Next()); Equal(0, s.Ops.TypedPreparations);
+        });
         test("reused FB typed preparation failure needs no recovery", () => {
             var s = new Scenario(reused: true); s.Ops.FailTypedPrepare = true; Throws<IOException>(() => s.Next());
             Equal("preparation_failed", s.Coordinator.Status().Value<string>("state")); Equal(0, s.Ops.Applies);
@@ -459,7 +483,8 @@ internal static class CoordinatorTests
         private static JObject Evidence(JObject contract) {
             var result = new JObject { ["projectPath"] = contract["projectPath"].DeepClone(), ["plcPath"] = "/plc", ["scopeComplete"] = true,
             ["versions"] = new JArray(((JArray)contract["plan"]["versions"]).Select(v => new JObject { ["typeGuid"] = v["typeGuid"].DeepClone(), ["versionGuid"] = v["versionGuid"].DeepClone(), ["contentSha256"] = v["contentSha256"].DeepClone(), ["sourceContentSha256"] = v["contentSha256"].DeepClone(), ["objectPaths"] = new JArray("/plc/blocks/Motor") })),
-            ["mappings"] = contract["plan"]["mappings"].DeepClone(), ["callerSha256"] = contract["plan"]["callerArtifact"]?["sha256"]?.DeepClone() };
+            ["mappings"] = contract["plan"]["mappings"].DeepClone(), ["callerSha256"] = contract["plan"]["callerArtifact"]?["sha256"]?.DeepClone(),
+            ["fb"] = new JObject { ["path"] = contract["plan"]["fb"]["path"].DeepClone(), ["number"] = 4 } };
             if (PlcLibraryIntegrationPlanner.CreatesStandaloneCaller((JObject)contract["payload"])) {
                 result.Remove("callerSha256"); result["callerExists"] = false; result["callerPath"] = "/plc/blocks/MotorCaller";
             }

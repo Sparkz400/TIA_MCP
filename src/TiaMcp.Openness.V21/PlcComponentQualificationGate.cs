@@ -42,9 +42,11 @@ namespace TiaMcp.Openness.V21
 
         // Production combined apply (on by default since 29 October 2026) runs the shapes the component route verified
         // natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
-        // Each further feature below has a builder; it joins VerifiedFeatures only with its own native evidence. Until then only a
-        // qualification Host (--component-qualification) runs it, on its own owned scratch (candidates=true).
-        internal static readonly string[] VerifiedFeatures = { };
+        // Each further feature below has a builder. A plan's exact feature combination (ShapeKey) runs in production only once
+        // that combination has its own native evidence and is listed in VerifiedShapes; a verified feature does not open its
+        // untested combinations. Until then only a qualification Host (--component-qualification) runs it, on its own owned
+        // scratch (candidates=true).
+        internal static readonly string[] VerifiedShapes = { };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
@@ -60,8 +62,15 @@ namespace TiaMcp.Openness.V21
             return candidates ? null : (string)UnverifiedFeatures(plan, payload, callerExport).Properties().FirstOrDefault()?.Value;
         }
 
-        // The features of a plan beyond the first verified shape that have no native evidence yet, each with its refusal, in order.
-        internal static JObject UnverifiedFeatures(JObject plan, JObject payload, XDocument callerExport)
+        // The plan's features beyond the first verified shape, each with its refusal, when their exact combination is not verified.
+        internal static JObject UnverifiedFeatures(JObject plan, JObject payload, XDocument callerExport, System.Collections.Generic.IEnumerable<string> verifiedShapes = null)
+        {
+            var features = Features(plan, payload, callerExport);
+            return (verifiedShapes ?? VerifiedShapes).Contains(ShapeKey(features), StringComparer.Ordinal) ? new JObject() : features;
+        }
+        internal static string ShapeKey(JObject features) => string.Join("+", features.Properties().Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal));
+
+        private static JObject Features(JObject plan, JObject payload, XDocument callerExport)
         {
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
@@ -72,7 +81,6 @@ namespace TiaMcp.Openness.V21
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
                 features["earlierPlacement"] = "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
-            foreach (string verified in VerifiedFeatures) features.Remove(verified);
             return features;
         }
         // Step 1 imports and saves before step 2 creates the instance DB, so what step 2 needs from the target is decided

@@ -8,8 +8,9 @@ verified shapes on production Hosts ([combined apply](../guides/plc-library-inte
 `PlcComponentQualificationGate.UnverifiedFeatures` names every feature of a plan beyond the verified shape (fresh import,
 new global instance DB, FBD FC new or existing after its last network). The preview lists them in
 `combinedApply.candidateFeatures`. A production Host refuses each one with its earlier `PlcIntegrationNotQualified`
-wording. A `--component-qualification` Host admits them only in its own single owned scratch. `VerifiedFeatures` is
-empty; a feature is added there only with its native evidence.
+wording. A `--component-qualification` Host admits them only in its own single owned scratch. A plan opens in
+production only when its exact sorted feature combination (`ShapeKey`, for example `fbCaller+multiInstance`) is listed in
+`VerifiedShapes`, which is empty; each combination needs its own native evidence.
 
 | Feature | Builder | Native case (`qualify_library_integrate_apply.py --candidates`) |
 |---|---|---|
@@ -49,8 +50,14 @@ to the 29 October run (`local.library_units.namespace.20261029`):
 - a UDT instantiated as its own root in the unit namespace, then an FB that depends on it, with the same namespace,
   reusing it (both under `/namespaces/TiaMcp_LibUnit/`, one use each);
 - a master-copy FC instantiated with the namespace;
-- an OB in the namespace calling the namespaced FB, so a PLC-wide `library_update_project` to 1.1.0 proves the use
-  reachable; the updated FB must keep its path, namespace included. The update readback already fails closed when a
-  baseline object path disappears.
+- an OB in the namespace that reaches every library use of the PLC (the namespaced FB, the dependent FB and its UDT,
+  the first instantiation's un-namespaced UDT through a DB member) and calls the master-copy FC, so a PLC-wide
+  `library_update_project` to 1.1.0 proves each use reachable. The updated FB must keep its path, namespace included,
+  and the dependent FB, its UDT and the master copy must keep theirs after the update and after a fresh reopen. The
+  update readback already fails closed when a baseline object path disappears.
+
+Unproven inputs of that case: whether V21 imports a `NAMESPACE`-wrapped SCL source into a unit through `source_upsert`,
+and whether a namespaced DB resolves the un-namespaced UDT. The runner stops at the stage "import the OB-rooted callers
+inside NAMESPACE TiaMcp_LibUnit" with V21's own message if either is refused.
 
 A dependency created alongside a namespaced root keeps its type namespace; that stays unexercised.

@@ -147,6 +147,22 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
     foreach (string check in new[] { "CombinedApplyLanguageRefusal(", "CombinedApplyInstanceRefusal(", "CapturedStorageContext(change, true)" })
         if (integration.IndexOf(check, end, StringComparison.Ordinal) < 0) throw new Exception("Target check missing: " + check);
 });
+// Candidate shapes stay out of production: no shape is verified yet, and candidates are admitted only on a
+// --component-qualification worker in its own single owned scratch. Change these pins only together with native evidence.
+Test("candidate shapes run only on a qualification Host's owned scratch, and no shape is verified yet", () => {
+    Equal(0, PlcComponentQualificationGate.VerifiedShapes.Length);
+    string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
+    foreach (string pinned in new[] {
+        "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change))",
+        "private bool PlcComponentCandidatesAdmitted(LibraryChange change) =>\n            _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;" })
+        if (integration.Replace("\r\n", "\n").IndexOf(pinned, StringComparison.Ordinal) < 0) throw new Exception("Candidate admission changed: " + pinned);
+    if (integration.Split(new[] { "PlcComponentCandidatesAdmitted(" }, StringSplitOptions.None).Length != 3) throw new Exception("Candidate admission must have exactly one use.");
+    string gate = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs"));
+    if (gate.IndexOf("internal static readonly string[] VerifiedShapes = { };", StringComparison.Ordinal) < 0) throw new Exception("VerifiedShapes must stay empty until native evidence exists.");
+    // A failed combined apply carries the coordinator's initial checkpoint, the typed one of a reused FB included, into the change journal.
+    if (integration.IndexOf("if (record?[\"initialCheckpoint\"] is JObject checkpoint && ((JArray)change.Journal[\"checkpoints\"]).Count == 0) ((JArray)change.Journal[\"checkpoints\"]).Add(checkpoint.DeepClone());", StringComparison.Ordinal) < 0)
+        throw new Exception("The failure path no longer records the initial checkpoint in the change journal.");
+});
 TextBoundaryTests.Run(Test);
 CoordinatorTests.Run(Test);
 StandaloneTests.Run(Test);

@@ -113,7 +113,7 @@ Everything else is refused with `PlcIntegrationNotQualified` before any claim: O
 
 ### Candidate shapes (31 October)
 
-Five more features have a builder but no native evidence yet. Each preview names them in `combinedApply.candidateFeatures`; a production Host refuses them as above. Only a Host started with `--component-qualification` runs them, and only in its own single owned scratch. A feature moves to the verified shapes (`PlcComponentQualificationGate.VerifiedFeatures`) once its native run passes.
+Five more features have a builder but no native evidence yet. Each preview names them in `combinedApply.candidateFeatures`; a production Host refuses them as above. Only a Host started with `--component-qualification` runs them, and only in its own single owned scratch. A plan opens in production only when its exact feature combination (for example `earlierPlacement+ladCaller`) is listed in `PlcComponentQualificationGate.VerifiedShapes`, which needs that combination's own native evidence; verifying single features does not open their combinations.
 
 - `ladCaller`: a new or existing LAD FC caller; the call is enabled by the power rail. The captured instance storage profile serves LAD callers as well, because the instance DB depends on the FB alone.
 - `fbCaller`: an existing LAD/FBD FB caller with a new global instance DB.

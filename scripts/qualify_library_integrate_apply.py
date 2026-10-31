@@ -64,6 +64,19 @@ REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComp
 MULTI_BOUNDARY = ("InstanceCreationProfileUnavailable", "GraphicalInstanceTemplateUnavailable")
 
 
+def multi_boundary_journal(journal):
+    """The recorded multi-instance boundary only: a listed storage-profile refusal at typed preparation with nothing dispatched."""
+    failure, summary = journal.get("failure") or {}, journal.get("combinedApply") or {}
+    return (failure.get("code") in MULTI_BOUNDARY and failure.get("failedStep") == "prepare_graphical_typed_edit"
+            and summary.get("libraryStepDispatched") is False and summary.get("typedStepDispatched") is False)
+
+
+def failed_candidates(outcomes):
+    """Every candidate case that did not install; only multiInstance may instead end at its recorded boundary."""
+    return {name: outcome for name, outcome in outcomes.items()
+            if not (outcome == "installed" or name == "multiInstance" and outcome == "boundary")}
+
+
 def two_network_fc(peer_xml, name, number):
     """An FBD FC with two networks from the peer FC's native export: its one network twice, every object ID renumbered
     consecutively in document order (V21's own numbering), renamed and renumbered."""
@@ -306,7 +319,8 @@ class IntegrateApplyRun(ComponentRun):
         added = installed_objects(after, self.manifest, plc, existing) if not reused else \
             (["block:" + plan["instanceDb"]["path"]] if "instanceDb" in plan else []) + ([] if existing else ["block:" + plan["caller"]["blockPath"]])
         require(planned_objects(plan, existing) == {key for key in added if key.startswith("block:")}, "Installed blocks differ from the reviewed plan.")
-        verify_preserved_installation(baseline, after, caller, added, multi)
+        # The new network directly follows the selected one (the last by default).
+        verify_preserved_installation(baseline, after, caller, added, multi, self.manifest.get("insertNetworkIndex", -1) if existing else None)
         caller_xml = Path(after["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig")
         verify_component_call(caller_xml, self.manifest)
         if existing:
@@ -365,17 +379,17 @@ class IntegrateApplyRun(ComponentRun):
         after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
         self.call("library_close", {"libraryId": opened["libraryId"]})
         # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.
-        require(case["initialCheckpoint"]["archivePath"] != case["first"]["initialCheckpoint"]["archivePath"], "Reuse adopted the first install's checkpoint.")
+        require(case["initialCheckpoint"]["archivePath"] != case["first"]["initialCheckpoint"]["archivePath"]
+                and case["initialCheckpoint"].get("changeId") == applied["journal"]["combinedApply"]["typedChangeId"],
+                "The reuse checkpoint is not the typed step's own archive.")
         self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after, sorted(version_key(n, pin) for n, pin in released.items()))
 
     def multi_boundary(self, case, out, baseline, error):
         """True when the typed route's storage profiles refused the multi-instance before any dispatch: the recorded boundary,
         with the project unchanged. Any other failure stays a failure."""
         journal = (case.get("failureStatus") or {}).get("journal") or {}
-        failure, summary = journal.get("failure") or {}, journal.get("combinedApply") or {}
-        case["boundary"] = {"error": str(error), "failure": failure, "combinedApply": summary}; self.persist()
-        if not (failure.get("code") in MULTI_BOUNDARY and failure.get("failedStep") == "prepare_graphical_typed_edit"
-                and summary.get("libraryStepDispatched") is False and summary.get("typedStepDispatched") is False):
+        case["boundary"] = {"error": str(error), "failure": journal.get("failure"), "combinedApply": journal.get("combinedApply")}; self.persist()
+        if not multi_boundary_journal(journal):
             return False
         assert_snapshot(baseline, snapshot(self.call, out / "after-refusal"))
         case.update(outcome="boundary", projectUnchanged=True); self.persist()
@@ -464,7 +478,7 @@ class IntegrateApplyRun(ComponentRun):
                 try: self.session.close()
                 except Exception as cleanup: self.report["candidateCases"][name] += "; cleanup: " + str(cleanup)
             self.persist()
-        failed = {k: v for k, v in self.report["candidateCases"].items() if v not in ("installed", "boundary")}
+        failed = failed_candidates(self.report["candidateCases"])
         if failed: raise RuntimeError("Candidate cases failed: " + json.dumps(failed))
         self.report["status"] = "passed"
 

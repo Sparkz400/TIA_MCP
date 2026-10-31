@@ -20,13 +20,33 @@ VERSION : 0.1
 BEGIN
 END_FUNCTION
 """
-# An OB in the unit's namespace that calls the namespaced FB, so a PLC-wide update can prove the use reachable.
+# An OB in the unit's namespace that reaches every library use of the PLC, so a PLC-wide update can prove each one
+# reachable: the namespaced FB, the dependent FB (and through it its UDT), the un-namespaced UDT of the first
+# instantiation through a DB member, and the master-copy FC.
 CALLER_SOURCE = "NAMESPACE " + UNIT + """
 DATA_BLOCK "TiaMcpUnitNamespaced_Gate"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
 NON_RETAIN
-\"""" + FB + """\"
+"%s"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TiaMcpUnitNamespaced_Component"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+"%s"
+BEGIN
+END_DATA_BLOCK
+
+DATA_BLOCK "TiaMcpUnitNamespaced_State"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+NON_RETAIN
+VAR
+    State : "%s";
+END_VAR
 BEGIN
 END_DATA_BLOCK
 
@@ -35,13 +55,17 @@ ORGANIZATION_BLOCK "TiaMcpUnitNamespaced_Cycle"
 VERSION : 0.1
 VAR_TEMP
     Active : Bool;
+    ComponentActive : Bool;
 END_VAR
 BEGIN
     "TiaMcpUnitNamespaced_Gate"(Enable := TRUE, Active => #Active);
+    "TiaMcpUnitNamespaced_Component"(Enable := #Active, Active => #ComponentActive);
+    "TiaMcpUnitNamespaced_State".State.Active := #ComponentActive;
+    "%s"();
 END_ORGANIZATION_BLOCK
 END_NAMESPACE
-"""
-CALLERS = ["TiaMcpUnitNamespaced_Gate", "TiaMcpUnitNamespaced_Cycle"]
+""" % (FB, DEPENDENT_FB, UDT, MASTER_FC)
+CALLERS = ["TiaMcpUnitNamespaced_Gate", "TiaMcpUnitNamespaced_Component", "TiaMcpUnitNamespaced_State", "TiaMcpUnitNamespaced_Cycle"]
 
 
 def namespaced(software, unit, names):
@@ -162,6 +186,11 @@ def body(h):
     h.apply_prepared("library_instantiate", master)
     h.report["masterPlacement"] = h.stage("the master-copy FC is in namespace %s" % UNIT,
         lambda: namespaced(h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}), unit, [MASTER_FC]))
+
+    def others_unmoved():
+        observed = namespaced(h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}), unit, [DEPENDENT_FB, DEPENDENCY, MASTER_FC])
+        require(observed == {**h.report["dependencyPlacement"], **h.report["masterPlacement"]}, "The dependent FB, its UDT or the master copy moved: %s" % observed)
+        return observed
     h.tool("library_close", {"libraryId": source})
 
     # Unit uses have no OB-rooted reference here, so a PLC-wide native update is refused before any write.
@@ -174,7 +203,13 @@ def body(h):
     h.stage("the unit stays at 1.0.0 and no newer version was copied", unchanged)
 
     # An OB in the namespace calls the namespaced FB, so the PLC-wide update proves the use reachable and keeps the namespace.
-    h.apply("source_upsert", {"scopePath": unit, "language": "SCL", "source": CALLER_SOURCE, "expectedBlockNames": CALLERS})
+    def namespaced_callers():
+        # V21 acceptance of a NAMESPACE-wrapped SCL source in a unit (and its references to the un-namespaced UDT) is unproven.
+        try:
+            return h.apply("source_upsert", {"scopePath": unit, "language": "SCL", "source": CALLER_SOURCE, "expectedBlockNames": CALLERS})["state"]
+        except Exception as error:
+            raise RuntimeError("V21 refused the NAMESPACE %s SCL caller source in the unit: %s" % (UNIT, error)) from error
+    h.stage("import the OB-rooted callers inside NAMESPACE " + UNIT, namespaced_callers)
     update = h.prepare("library_update_project", h.selected(source, [second], updateScope="entireSelectedPlc", target={"plcPath": plc}))
     guard = update["preview"]["updateCleanupGuard"]
     h.report["cleanupGuard"] = guard
@@ -184,6 +219,7 @@ def body(h):
     h.apply_prepared("library_update_project", update)
     h.stage("FB at exactly 1.1.0", lambda: h.verify_use(consumer, second, 1))
     h.stage("the updated FB keeps namespace %s" % UNIT, lambda: require(placement() == h.report["placement"], "The update moved the FB or UDT") or True)
+    h.stage("the dependent FB, its UDT and the master-copy FC keep namespace %s" % UNIT, others_unmoved)
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
@@ -208,6 +244,7 @@ def body(h):
     h.owned_portal("reopen")
     h.stage("reopen consumer", lambda: h.reopen_project(project_path))
     h.stage("reopened: namespaced FB at 1.1.0 and UDT intact", lambda: h.verify_use(h.project_library(), second, 1) and placement())
+    h.stage("reopened: the dependent FB, its UDT and the master-copy FC in namespace %s" % UNIT, others_unmoved)
 
 
 if __name__ == "__main__":

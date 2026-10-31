@@ -157,6 +157,8 @@ namespace TiaMcp.Openness.V21
                                 ["CreationDate"] = CaptureSetting(() => fb.CreationDate) };
                         }
                     }
+                    var rootFb = blocks.Where(b => b.Path == contract["plan"]["fb"].Value<string>("path")).ToArray();
+                    if (rootFb.Length == 1) result["fb"] = new JObject { ["path"] = rootFb[0].Path, ["number"] = rootFb[0].Item.Number };
                     var mappings = new JArray(); result["mappings"] = mappings;
                     foreach (JObject mapping in (JArray)contract["plan"]["mappings"])
                     {

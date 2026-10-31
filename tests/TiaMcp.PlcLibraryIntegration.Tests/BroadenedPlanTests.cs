@@ -125,6 +125,14 @@ internal static class BroadenedPlanTests
             ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }),
             ("OB caller", Ob) })
             test("combined apply refuses " + name + " even on a qualification Host", () => { if (Refusal(shape(), true) == null) throw new Exception("Shape without a builder admitted."); });
+        // A shape opens as its exact feature combination; verified single features never open their combinations.
+        test("verified shapes open exact feature combinations only", () => {
+            JObject Unverified(Fixture f, params string[] shapes) => PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, shapes);
+            Equal(0, Unverified(ladExisting(), "ladCaller").Count); Equal(1, Unverified(ladExisting(), "fbCaller").Count);
+            Equal("fbCaller+multiInstance", PlcComponentQualificationGate.ShapeKey(Unverified(Multi())));
+            Equal(2, Unverified(Multi(), "fbCaller", "multiInstance").Count); Equal(0, Unverified(Multi(), "fbCaller+multiInstance").Count);
+            Equal(2, Unverified(Multi(), "multiInstance+fbCaller").Count);
+        });
         test("verified shapes have no candidate features", () => { Equal("", Features(new Fixture())); var f = new Fixture(); f.Standalone("FBD"); Equal("", Features(f)); Equal("", Features(Titled(Unit1, 2))); });
         test("candidate refusals keep their earlier wording", () => {
             Equal(true, Refusal(ladExisting()).StartsWith("Only a new or existing FBD FC caller is verified; LAD FC callers", StringComparison.Ordinal));
