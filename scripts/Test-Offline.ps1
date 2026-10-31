@@ -253,7 +253,7 @@ try {
             $result.managedSuiteSeconds[$managedSuite] = [math]::Round($suiteClock.Elapsed.TotalSeconds, 1)
         }
         Invoke-CheckGroup 0 {
-            if ($Suite -eq 'All') {
+            if ($Suite -in @('All','Managed')) {
                 $previousRelationshipEvidence = $env:TIA_RELATIONSHIP_EVIDENCE
                 $previousExplorerModel = $env:TIA_EXPLORER_MODEL
                 try {

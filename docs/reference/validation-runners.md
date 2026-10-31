@@ -11,7 +11,8 @@ managed suites, real Git and separate-process persistence, and actual stdio Host
 workflows with deliberately absent native workers. It explicitly invokes the
 Test Suite JSON Schema harness on fresh managed fixture output; unittest discovery
 alone does not run that harness. `-Suite Python` and `-Suite Managed` are the CI
-partitions. The managed partition also runs schema and actual MCP checks.
+partitions. The managed partition also runs schema and actual MCP checks, and, in the shard that holds
+`TiaMcp.ProjectModel.Tests`, the Explorer relationship scope and scale checks (Node).
 It verifies the normal translation admission refusals, same-binary qualification
 visibility and mutually exclusive local mode options with absent native workers.
 
