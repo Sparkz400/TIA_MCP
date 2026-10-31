@@ -401,6 +401,15 @@ Check("shared access without readback rejected", "hardware_shared_device_access"
 Check("shared access moving an address rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"][0]["startAddress"] = 8; }, false, AccessBase);
 Check("shared access foreign owner rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu9"); }, false, AccessBase);
 Check("shared access collateral rejected", "hardware_shared_device_access", access, rows => { Outside(rows); rows[0]["attributes"]["Comment"] = "lost"; }, false, AccessBase);
+// PLC assigns the module to one PLC of the station through SharedDeviceAssignmentTarget (with SharedDeviceAccessConfigured); V21 derives the access.
+var accessPlc = new JObject { ["hardwarePath"] = module, ["accessType"] = "PLC", ["assignmentTargetPath"] = "/cpu2", ["addressControllerOwnerPaths"] = new JArray("/cpu1", "/cpu2") };
+void Inputs(JArray rows, string access, bool configured, string target) { rows[1]["attributes"]["SharedDeviceAccessType"] = access; rows[1]["attributes"]["SharedDeviceAccessConfigured"] = configured; rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = target; }
+Check("shared access assigns the module to another PLC", "hardware_shared_device_access", accessPlc, rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, true,
+    rows => { AccessBase(rows); Inputs(rows, "PLC", true, "/cpu1"); });
+Check("shared access to another target than requested rejected", "hardware_shared_device_access", accessPlc, rows => Inputs(rows, "PLC", true, "/cpu1"), false,
+    rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); });
+Check("shared access target change outside the subtree rejected", "hardware_shared_device_access", accessPlc, rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[0]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, false,
+    rows => { AccessBase(rows); Inputs(rows, "PLC", true, "/cpu1"); rows[0]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1"; });
 // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change, and only then may it change.
 void AccessExternalBase(JArray rows) { AccessBase(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 0; }
 var accessExternal = (JObject)access.DeepClone(); accessExternal["externalIoControllers"] = 1; accessExternal["ioDeviceInterfacePath"] = remote;

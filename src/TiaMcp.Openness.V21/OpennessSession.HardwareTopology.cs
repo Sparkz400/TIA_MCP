@@ -137,7 +137,7 @@ namespace TiaMcp.Openness.V21
         }
 
         private static readonly System.Collections.Generic.HashSet<string> MrpWriteAttributes = new System.Collections.Generic.HashSet<string>(new[] { "MediaRedundancyRole" }, StringComparer.Ordinal);
-        private static readonly System.Collections.Generic.HashSet<string> SharedAccessAttributes = new System.Collections.Generic.HashSet<string>(new[] { "SharedDeviceAccessType" }, StringComparer.Ordinal);
+        private static readonly System.Collections.Generic.HashSet<string> SharedAccessAttributes = new System.Collections.Generic.HashSet<string>(new[] { "SharedDeviceAccessType", "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" }, StringComparer.Ordinal);
         private static readonly System.Collections.Generic.HashSet<string> ExternalControllerAttributes = new System.Collections.Generic.HashSet<string>(new[] { "NumberOfExternalIoControllers" }, StringComparer.Ordinal);
 
         private static bool Declares(IEngineeringObject target, string name) =>
@@ -251,13 +251,26 @@ namespace TiaMcp.Openness.V21
                 ["mediaRedundancyRole"] = target.GetAttribute("MediaRedundancyRole")?.ToString() });
         }
 
-        // One module or submodule of an IO device takes a V21 SharedDeviceAccessType. The payload records the PLC items whose
-        // I/O systems the station's connectors join, the only permitted address owners afterwards. With OutsideOfProject, optional
+        // V21 derives the read-only SharedDeviceAccessType of an IO-device item from SharedDeviceAccessConfigured and the DeviceItem in
+        // SharedDeviceAssignmentTarget, both declared ReadWrite (capability profiles of discovery hw3).
+        internal const string SharedConfigured = "SharedDeviceAccessConfigured", SharedTarget = "SharedDeviceAssignmentTarget";
+
+        private static bool Writable(IEngineeringObject target, string name)
+        {
+            var declared = target.GetAttributeInfos().Where(info => info.Name == name).Take(2).ToArray();
+            return declared.Length == 1 && (declared[0].AccessMode & EngineeringAttributeAccessMode.Read) != 0 && (declared[0].AccessMode & EngineeringAttributeAccessMode.Write) != 0;
+        }
+
+        // One module or submodule of an IO device: PLC assigns it to the PLC item assignmentTargetPath (one of the station's I/O-system
+        // PLCs); OutsideOfProject clears SharedDeviceAccessConfigured, leaving it to an IO controller outside this project. The payload
+        // records the station's I/O-system PLC items, the only permitted address owners afterwards. With OutsideOfProject, optional
         // externalIoControllers also sets NumberOfExternalIoControllers of the station's one assigned interface (recorded as ioDeviceInterfacePath).
-        private DeviceItem PrepareSharedDeviceAccess(EngineeringChange change, Project project, JObject preview, out DeviceItem ioDevice)
+        private DeviceItem PrepareSharedDeviceAccess(EngineeringChange change, Project project, JObject preview, out DeviceItem ioDevice, out DeviceItem target)
         {
             string access = ChangeText(change.Payload, "accessType", 32);
             if (Array.IndexOf(HardwareEngineeringRules.SharedDeviceAccessTypes, access) < 0) throw new BridgeException("InvalidRequest", "accessType must be one of " + string.Join(", ", HardwareEngineeringRules.SharedDeviceAccessTypes) + ".");
+            string targetPath = change.Payload["assignmentTargetPath"] == null ? null : ChangeText(change.Payload, "assignmentTargetPath", 4096);
+            if ((access == "PLC") != (targetPath != null)) throw new BridgeException("InvalidRequest", "accessType PLC needs assignmentTargetPath, the PLC item of one of the station's I/O systems; OutsideOfProject takes none.");
             var external = change.Payload["externalIoControllers"];
             if (external != null && access != "OutsideOfProject") throw new BridgeException("InvalidRequest", "externalIoControllers applies only with accessType OutsideOfProject.");
             if (external == null && change.Payload["ioDeviceInterfacePath"] != null) throw new BridgeException("InvalidRequest", "ioDeviceInterfacePath is recorded by the bridge for externalIoControllers only.");
@@ -272,12 +285,22 @@ namespace TiaMcp.Openness.V21
             var assigned = members.Where(entry => entry.Item.GetService<NetworkInterface>()?.IoConnectors.Any(connector => connector.ConnectedToIoSystem != null) == true).ToArray();
             var systems = assigned.SelectMany(entry => entry.Item.GetService<NetworkInterface>().IoConnectors).Select(connector => connector.ConnectedToIoSystem).Where(system => system != null).ToArray();
             if (systems.Length == 0) throw new BridgeException("UnsupportedCapability", "Shared-device access applies to a module of an IO device assigned to an I/O system; assign the station first (network_io_assign).");
-            var owners = systems.Select(system => OwningPlcItem(system.Parent, plcs) ?? throw new BridgeException("UnresolvedIoOwnership", "An I/O system of the station resolves to no PLC of the project.")).Select(entry => entry.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal);
-            HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, new[] { "SharedDeviceAccessType" });
-            var changes = PrepareAttributes(item.Item, new JObject { ["SharedDeviceAccessType"] = access }, SharedAccessAttributes);
+            var owners = systems.Select(system => OwningPlcItem(system.Parent, plcs) ?? throw new BridgeException("UnresolvedIoOwnership", "An I/O system of the station resolves to no PLC of the project.")).Distinct().OrderBy(entry => entry.Path, StringComparer.Ordinal).ToArray();
+            target = targetPath == null ? null : owners.FirstOrDefault(entry => entry.Path == targetPath)?.Item
+                ?? throw new BridgeException("InvalidRequest", "assignmentTargetPath must be the PLC item of one of the station's I/O systems: " + string.Join(", ", owners.Select(entry => entry.Path)) + ".");
+            var names = access == "PLC" ? new[] { SharedConfigured, SharedTarget } : new[] { SharedConfigured };
+            foreach (string name in names)
+                if (!Writable(item.Item, name)) throw new BridgeException("AttributeNotWritable", "The item declares no readable and writable " + name + "; V21 keeps SharedDeviceAccessType itself read-only.");
+            HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, names);
+            string before = item.Item.GetAttribute("SharedDeviceAccessType")?.ToString();
+            var current = item.Item.GetAttribute(SharedTarget) as DeviceItem;
+            string currentTarget = current == null ? null : hardware.FirstOrDefault(entry => Equals(entry.Item, current))?.Path;
             // With externalIoControllers a module already outside the project may change only its station's external controller count.
-            bool accessUnchanged = changes[0].Value<string>("before") == access;
-            if (accessUnchanged && external == null) throw new BridgeException("InvalidRequest", "The item already has the requested SharedDeviceAccessType.");
+            bool accessUnchanged = before == access && (access != "PLC" || currentTarget == targetPath);
+            if (accessUnchanged && external == null) throw new BridgeException("InvalidRequest", "The item already has the requested shared-device access.");
+            var changes = new JArray(new JObject { ["name"] = "SharedDeviceAccessType", ["type"] = "Siemens.Engineering.HW.SharedDeviceAccessType", ["before"] = before, ["after"] = access, ["derived"] = true });
+            if (access == "PLC") changes.Add(new JObject { ["name"] = SharedTarget, ["type"] = typeof(DeviceItem).FullName, ["before"] = currentTarget, ["after"] = targetPath });
+            else changes.Add(new JObject { ["name"] = SharedConfigured, ["type"] = typeof(bool).FullName, ["before"] = ChangeScalar(item.Item.GetAttribute(SharedConfigured)), ["after"] = false });
             ioDevice = null;
             if (external != null)
             {
@@ -289,10 +312,10 @@ namespace TiaMcp.Openness.V21
                 if (accessUnchanged && countChange[0]["before"]?.ToString() == count.ToString()) throw new BridgeException("InvalidRequest", "The requested access and external controller count are unchanged.");
                 foreach (var row in countChange) changes.Add(row);
             }
-            change.Payload["addressControllerOwnerPaths"] = new JArray(owners);
+            change.Payload["addressControllerOwnerPaths"] = new JArray(owners.Select(entry => entry.Path));
             if (preview != null)
             {
-                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["accessBefore"] = changes[0]["before"].DeepClone(), ["accessAfter"] = access,
+                ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["accessBefore"] = before, ["accessAfter"] = access, ["assignmentTargetPath"] = targetPath,
                     ["externalIoControllers"] = external?.DeepClone() });
                 preview["attributeChanges"] = changes;
                 ((JArray)preview["warnings"]).Add("TIA moves the module's address ownership with its access (OutsideOfProject: an IO controller outside this project); its subitems may follow. Tags and absolute program accesses on the released addresses are not checked, and the device compile does not flag them.");
@@ -302,8 +325,16 @@ namespace TiaMcp.Openness.V21
 
         private void ApplySharedDeviceAccess(EngineeringChange change, Project project)
         {
-            var item = PrepareSharedDeviceAccess(change, project, null, out var ioDevice);
-            ApplyAttributes(item, new JObject { ["SharedDeviceAccessType"] = change.Payload.Value<string>("accessType") }, SharedAccessAttributes);
+            var item = PrepareSharedDeviceAccess(change, project, null, out var ioDevice, out var target);
+            string access = change.Payload.Value<string>("accessType");
+            if (target == null) item.SetAttribute(SharedConfigured, false);
+            else
+            {
+                if (!(item.GetAttribute(SharedConfigured) is bool configured && configured)) item.SetAttribute(SharedConfigured, true);
+                item.SetAttribute(SharedTarget, target);
+            }
+            if (item.GetAttribute("SharedDeviceAccessType")?.ToString() != access || (target != null && !Equals(item.GetAttribute(SharedTarget), target)))
+                throw new BridgeException("MutationVerificationFailed", "The item does not read back the requested shared-device access" + (target == null ? "." : " and assignment target."));
             if (ioDevice != null) ApplyAttributes(ioDevice, new JObject { ["NumberOfExternalIoControllers"] = change.Payload["externalIoControllers"].DeepClone() }, ExternalControllerAttributes);
         }
 

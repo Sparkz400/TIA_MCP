@@ -102,20 +102,24 @@ class HardwareChangeTests(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     run.apply("step", "network_mrp_set", {}, boundary=True)
 
-    def test_ring_restores_the_first_join_and_the_closure_once(self):
+    def test_ring_opens_the_line_sets_roles_then_relinks_and_closes(self):
         closed, calls, _ = self.ring()
         self.assertTrue(closed)
-        self.assertEqual([("hardware_port_disconnect", 1, False), ("mrp", "ScratchStation", "Manager", q.RING, True, False), ("mrp", "HwPeer", "Client", q.RING, False, True),
+        self.assertEqual([("hardware_port_disconnect", 1, False), ("hardware_port_disconnect", 2, False), ("hardware_port_disconnect", 2, False),
+                          ("mrp", "ScratchStation", "Manager", q.RING, True, False), ("mrp", "HwPeer", "Client", q.RING, False, True),
                           ("mrp", "HwPeer", "Client", q.RING, False, False), ("mrp", "HwMp", "Client", q.RING, False, False),
+                          ("hardware_port_connect", 2, False), ("hardware_port_connect", 2, False),
                           ("hardware_port_connect", 2, True), ("hardware_port_connect", 2, False)], calls)
 
-    def test_ring_falls_back_to_the_default_domain_and_skips_an_unusable_ring(self):
+    def test_ring_falls_back_to_the_default_domain_and_relinks_without_roles(self):
         closed, calls, _ = self.ring(refused={("ScratchStation", q.RING)})
         self.assertTrue(closed)
         self.assertEqual([("mrp", "ScratchStation", "Manager", None, False, False), ("mrp", "HwPeer", "Client", None, False, True)], [c for c in calls if c[0] == "mrp"][1:3])
-        closed, calls, report = self.ring(refused={("ScratchStation", q.RING), ("ScratchStation", None)})
-        self.assertFalse(closed)
-        self.assertNotIn(("hardware_port_connect", 2, False), calls)
+        closed, calls, report = self.ring(refused={("HwMp", q.RING)})
+        self.assertFalse(closed)  # The IM refused its role: the applied roles go back to NotInRing, the line is relinked, no ring.
+        self.assertEqual([("mrp", "ScratchStation", "NotInRing", None, False, False), ("mrp", "HwPeer", "NotInRing", None, False, False)],
+                         [c for c in calls if c[0] == "mrp" and c[2] == "NotInRing"])
+        self.assertEqual([("hardware_port_connect", 2, False)] * 2, [c for c in calls if c[0] == "hardware_port_connect"])
         self.assertEqual("skipped", report["boundaries"]["ring"]["stage"])
 
     def test_gsd_device_not_installed_is_recorded_not_failed(self):

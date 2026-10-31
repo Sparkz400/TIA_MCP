@@ -386,9 +386,12 @@ def sp_modules(run, station_):
 
 
 def shared_device(run):
-    """The ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with HwPeerCpu; True when applied."""
+    """The ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with HwPeerCpu, and SpDi3
+    is assigned to the scratch CPU in the same change: V21 compiles a further controller only with a submodule of its own (hw3).
+    True when applied."""
     device, controller = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")
-    payload = {"hardwarePath": device, "connectorIndex": 1, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": SHARED_IO, "sharedDevice": True}
+    payload = {"hardwarePath": device, "connectorIndex": 1, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": SHARED_IO, "sharedDevice": True,
+               "sharedSubmodules": [run.path(SP.device, "items", "SpDi3")]}
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, SCRATCH, SP.prefix), constant(run, SCRATCH, "Local~" + SHARED_IO)))]
     run.apply("share %s with ScratchPLC" % SP.device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True}]},
@@ -407,12 +410,13 @@ def unshare(run):
               plc=scratch_plc(run), changed=["hw:" + device, "hw:" + run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")], removed=removed, restore=True, boundary=True)
 
 
-def shared_access(run, name, access, shared, external=None, restore=False):
-    """One ET 200SP module's SharedDeviceAccessType; the worker records the PLCs of the station's IO systems (HwPeerCpu, and ScratchPLC
-    while the station is shared) as its address owners. external also sets NumberOfExternalIoControllers of the station's interface,
-    which TIA may require once a module is accessed outside the project. True when applied."""
+def shared_access(run, name, access, shared, external=None, target=None, restore=False):
+    """One ET 200SP module's shared-device access: OutsideOfProject, or PLC with the PLC item target. The worker records the PLCs of the
+    station's IO systems (HwPeerCpu, and ScratchPLC while the station is shared) as its address owners. external also sets
+    NumberOfExternalIoControllers of the station's interface, which TIA may require once a module is accessed outside the project.
+    True when applied."""
     module, interface = run.path(SP.device, "items", name), run.path(SP.device, "items", *SP.interface)
-    payload = {"hardwarePath": module, "accessType": access, **({"externalIoControllers": external} if external else {})}
+    payload = {"hardwarePath": module, "accessType": access, **({"assignmentTargetPath": target} if target else {}), **({"externalIoControllers": external} if external else {})}
     owners = sorted([run.path("HwPeer", "items", "HwPeerCpu")] + ([run.path("ScratchStation", "items", "ScratchPLC")] if shared else []))
     shown = {**payload, "addressControllerOwnerPaths": owners, **({"ioDeviceInterfacePath": interface} if external else {})}
     return run.apply("set %s's shared-device access %s%s" % (name, access, " with %d external controller(s)" % external if external else ""), "hardware_shared_device_access", payload,
@@ -446,22 +450,34 @@ def mrp(run, interface, role, domain=None, create=False, restore=False):
 
 
 def ring(run):
-    """The CPU 1214C has one port, so it leaves the line; an MRP domain on HwNet takes the scratch CPU as manager and HwPeerCpu and
-    the IM 155-5 PN ST as clients, then the scratch CPU's Port_1 and the IM's Port_2 close the ring. The first client's domain join
-    and the ring closure each run once with checkpoint restore first (a partly built ring), then for real."""
+    """V21 compiles an MRP role only while every link of the interface's ports goes to another ring port ("Ring port ... is connected
+    to port ..., which is not a ring port", discovery hw3), so the line opens first: the CPU 1214C (one port) leaves it and the two links
+    between the members go. The scratch CPU becomes manager in a new MRP domain HwRing (the subnet's default domain if V21 refuses it),
+    HwPeerCpu and the IM 155-5 PN ST clients (the first client's join restored once), the two segments are linked again, and the scratch
+    CPU's Port_1 and the IM's Port_2 close the ring (restored once, then for real). Without all roles the segments are relinked as a
+    plain line."""
+    segments = (("scratch-peer", tuple(ports(run, 2))), ("peer-HwMp", family_ports(run)["HwMp"]))
     link(run, "hardware_port_disconnect", 1, pair=family_ports(run)["Hw1200"], label="Hw1200 Port_1, which cannot join the ring")
+    for name, pair in segments:
+        link(run, "hardware_port_disconnect", 2, pair=pair, label=name + " link, opened for the ring roles")
     manager, *clients = interfaces(run)
     # The worker refuses a ring role on an interface with fewer than two ports (a head whose ports sit on a BusAdapter would show it).
     run.h.report["ringMemberPorts"] = {path: len(((run.current["view"].get("hw:" + path) or {}).get("network") or {}).get("ports") or []) for path in (manager, *clients)}
-    # A named domain needs the subnet's MrpDomainOwner; without it the roles go to the subnet's default domain.
     domain = RING if mrp(run, manager, "Manager", RING, create=True) else None
-    if domain is None and not mrp(run, manager, "Manager"):
-        run.h.report.setdefault("boundaries", {})["ring"] = {"stage": "skipped", "error": "No MRP role could be set; the ring is not closed."}
-        return False
-    run.b0 = run.current
-    mrp(run, clients[0], "Client", domain, restore=True)
-    if not all([mrp(run, interface, "Client", domain) for interface in clients]):
-        run.h.report.setdefault("boundaries", {})["ring"] = {"stage": "skipped", "error": "A client role failed; the ring is not closed."}
+    applied = [manager] if domain is not None or mrp(run, manager, "Manager") else []
+    if applied:
+        run.b0 = run.current
+        mrp(run, clients[0], "Client", domain, restore=True)
+        applied += [interface for interface in clients if mrp(run, interface, "Client", domain)]
+    roles = len(applied) == 1 + len(clients)
+    if not roles:
+        # A member with a ring role cannot link to one without; the line returns without media redundancy.
+        for interface in applied:
+            mrp(run, interface, "NotInRing")
+        run.h.report.setdefault("boundaries", {})["ring"] = {"stage": "skipped", "error": "Not every member took its MRP role; the ring is not closed."}
+    for name, pair in segments:
+        link(run, "hardware_port_connect", 2, pair=pair, label=name + " link" + (" between ring members" if roles else ", relinked"))
+    if not roles:
         return False
     run.b0 = run.current
     label = "the ring (HwMp Port_2 and ScratchPLC Port_1)"
@@ -511,7 +527,8 @@ def address_change(run):
     run.b0 = run.current
     run.apply("replace HwDi with %s moving its address" % wide, "hardware_replace", {**payload, "acknowledgedTags": [tag]},
               {"effects": [{"hardwarePath": module, "typeIdentifierAfter": wide, "acceptAddressChange": True}], "addressImpact": {"referencedTags": [{"path": tag}]}},
-              changed=lambda applied, state: [key for key in under(module)(applied, state) if key in run.b0["view"]],
+              # The submodule's device_inventory row stays (hw3); the module's row and every hardware row change.
+              changed=lambda applied, state: [key for key in under(module)(applied, state) if key in run.b0["view"] and (key.startswith("hw:") or key == "inv:" + module)],
               added=lambda applied, state: [key for key in under(module)(applied, state) if key not in run.b0["view"]], check=mapped, restore=True, boundary=True)
 
 
@@ -665,9 +682,11 @@ def phase_a(run):
     delete(run, "HwDi2")
     for station_, (_, second), _, _ in run.families:
         delete(run, second, station=station_)
+    # SpDi3 becomes the scratch CPU's submodule of the shared device; SpDi4 (slot 3, continuing the potential group) goes outside the project.
+    plug(run, "SpDi4", 3, sp, older)
     run.shared = shared_device(run)
     # TIA may require an IO controller outside the project before a module is accessed there.
-    run.access = shared_access(run, "SpDi3", "OutsideOfProject", run.shared) or shared_access(run, "SpDi3", "OutsideOfProject", run.shared, external=1)
+    run.access = shared_access(run, "SpDi4", "OutsideOfProject", run.shared) or shared_access(run, "SpDi4", "OutsideOfProject", run.shared, external=1)
     topology_refusals(run)
     run.ring = ring(run)
     gsd_device(run)
@@ -701,7 +720,7 @@ def phase_b(run):
     if run.ring:
         mrp(run, interfaces(run)[0], "ManagerAuto", restore=True)
     if run.access:
-        shared_access(run, "SpDi3", "PLC", run.shared, restore=True)
+        shared_access(run, "SpDi4", "PLC", run.shared, target=run.path("HwPeer", "items", "HwPeerCpu"), restore=True)
     if run.shared:
         unshare(run)
     # Last: its tag stays in the project, so the pre-change state of the replacement includes it.

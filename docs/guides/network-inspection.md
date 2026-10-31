@@ -203,11 +203,15 @@ V21 Openness exposes a shared device in two ways, and the bridge reviews both. N
   the other connectors stay assigned; one connector per PLC. The bridge records the PLC items of the other assigned
   connectors as `sharedAddressControllerOwnerPaths` (refused when supplied without `sharedDevice`, overwritten with it). Preservation lets each station
   address have at most one owner among those PLCs and the selected one; the other connectors must stay exact.
-  `disconnect: true` with `sharedDevice` removes one PLC again. Without `sharedDevice`, a further assigned connector is
+  A connection also names `sharedSubmodules` (1 to 64 exact items of the station) whose `SharedDeviceAssignmentTarget` becomes
+  the selected PLC item in the same change: V21 compiles a further IO controller only with a submodule of its own ("Connected PLCs
+  must have at least one assigned submodule as a shared device"). `disconnect: true` with `sharedDevice` removes one PLC again. Without `sharedDevice`, a further assigned connector is
   `UnsupportedCapability`; the generated server contract (`expectedServerModule`) belongs to the first assignment only.
-- **A controller outside the project.** `hardware_shared_device_access` writes the device item attribute
-  `SharedDeviceAccessType` (`PLC` or `OutsideOfProject`; `Unknown` is the native unassigned state) on one module or
-  submodule of an assigned IO device. Stations holding PLC software are refused. The bridge records the PLC items of the
+- **Per-module access.** V21 keeps `SharedDeviceAccessType` (`Unknown`, `OutsideOfProject`, `PLC`) read-only and derives it
+  from `SharedDeviceAccessConfigured` and the device item in `SharedDeviceAssignmentTarget`, both writable on every item of an
+  IO device. `hardware_shared_device_access` takes `accessType` `PLC` with `assignmentTargetPath` (the PLC item of one of the
+  station's I/O systems) or `OutsideOfProject` (clears `SharedDeviceAccessConfigured`), on one module or submodule of an
+  assigned IO device. Stations holding PLC software are refused. The bridge records the PLC items of the
   station's I/O systems as `addressControllerOwnerPaths`; the module and its subitems may take the requested access, every
   address range stays and may keep at most one owner among those PLCs. Optional `externalIoControllers` (1 to 32, with
   `OutsideOfProject`) also sets `NumberOfExternalIoControllers` of the station's one assigned interface in the same change, which
@@ -231,7 +235,8 @@ domain whose `DomainParticipants` include the interface. V21 offers no participa
 
 `RingPort1`/`RingPort2` are read-only in V21 and stay the TIA defaults (Port_1 and Port_2). The ring itself is the port
 topology: set the roles first, then close the ring with `hardware_port_connect`; a ring without one manager fails the device
-compile. Preservation adds every interface's MRP instances (name, domain, role, ring ports) and its subnet's MRP domain names to
+compile. V21 compiles a ring role only while each of the interface's ports links to another ring port ("Ring port ... is
+connected to port ..., which is not a ring port"), so set the roles while the members' ports are unlinked or linked to each other. Preservation adds every interface's MRP instances (name, domain, role, ring ports) and its subnet's MRP domain names to
 the manifest; only the selected instance's role and domain may change, and only `createDomain` adds its domain name. MRP domain attributes (`IsDefault`, `ManagerOutsideOfProjectActive`), domain
 deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed.
 

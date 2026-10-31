@@ -414,6 +414,7 @@ namespace TiaMcp.Openness.V21
                 string access = payload.Value<string>("accessType");
                 var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
                 if (Target(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
+                if (access == "PLC" && Target(after, path)["attributes"]?.Value<string>("SharedDeviceAssignmentTarget") != payload.Value<string>("assignmentTargetPath")) Fail("The selected item does not read back the requested assignment target.");
                 // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
                 if (payload["externalIoControllers"] != null)
                 {
@@ -426,6 +427,9 @@ namespace TiaMcp.Openness.V21
                     string was = row["attributes"]?.Value<string>("SharedDeviceAccessType"), becomes = now["attributes"]?.Value<string>("SharedDeviceAccessType");
                     if (becomes != was && becomes != access) Fail("A subitem took a SharedDeviceAccessType other than the requested one.");
                     if (becomes != null) row["attributes"]["SharedDeviceAccessType"] = becomes;
+                    // The writable inputs V21 derives the access from may follow in the subtree.
+                    foreach (string name in new[] { "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" })
+                        if (now["attributes"]?[name] != null) row["attributes"][name] = now["attributes"][name].DeepClone(); else (row["attributes"] as JObject)?.Remove(name);
                     var addresses = (JArray)row["addresses"]; var observed = now["addresses"] as JArray ?? new JArray();
                     if (observed.Count != addresses.Count) Fail("The selected subtree's address ranges changed.");
                     for (int i = 0; i < addresses.Count; i++)
