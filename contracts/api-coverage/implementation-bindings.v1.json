@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "3f9d9a8185e311e253632511266754d45ef56cb2b2d37408ddec666b7b404a09",
-      "bytes": 1430112
+      "sha256": "2d040fd1d7bfa4cde3d099abdd0e028f178fdf4d65ecba3c80ebf5f876d60f35",
+      "bytes": 1441048
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -110363,6 +110363,13 @@
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -110428,6 +110435,13 @@
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -110460,6 +110474,13 @@
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -110491,6 +110512,13 @@
           "profileSha256": "a983958875e0d7e19ba4cefc5eef8a71d10dd00a0905542b066a25a992f70afe",
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
           ]
         }
       ],
@@ -110695,6 +110723,13 @@
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -110732,6 +110767,13 @@
           "profileSha256": "a983958875e0d7e19ba4cefc5eef8a71d10dd00a0905542b066a25a992f70afe",
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
           ]
         }
       ],
@@ -110797,6 +110839,13 @@
           "profileSha256": "a983958875e0d7e19ba4cefc5eef8a71d10dd00a0905542b066a25a992f70afe",
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
           ]
         }
       ],
@@ -110874,6 +110923,13 @@
           "profileSha256": "a983958875e0d7e19ba4cefc5eef8a71d10dd00a0905542b066a25a992f70afe",
           "artifacts": [
             "evidence/local.translation.qualification.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.restricted.qualification.20261031",
+          "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b",
+          "artifacts": [
+            "evidence/local.translation.restricted.qualification.20261031.json"
           ]
         }
       ],
@@ -118786,6 +118842,13 @@
           "artifacts": [
             "evidence/local.translation.native.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.native.20261031",
+          "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a",
+          "artifacts": [
+            "evidence/local.translation.restricted.native.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -118851,6 +118914,13 @@
           "profileSha256": "83d3adf9e3efc3324863d1bfff9ed6cca5990b154e121bbdb74cc124216845c8",
           "artifacts": [
             "evidence/local.translation.native.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.restricted.native.20261031",
+          "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a",
+          "artifacts": [
+            "evidence/local.translation.restricted.native.20261031.json"
           ]
         }
       ],
@@ -118964,6 +119034,13 @@
           "artifacts": [
             "evidence/local.translation.native.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.native.20261031",
+          "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a",
+          "artifacts": [
+            "evidence/local.translation.restricted.native.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119030,6 +119107,13 @@
           "artifacts": [
             "evidence/local.translation.native.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.native.20261031",
+          "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a",
+          "artifacts": [
+            "evidence/local.translation.restricted.native.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119093,6 +119177,13 @@
           "artifacts": [
             "evidence/local.translation.native.20261028.json"
           ]
+        },
+        {
+          "id": "local.translation.restricted.native.20261031",
+          "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a",
+          "artifacts": [
+            "evidence/local.translation.restricted.native.20261031.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -119142,6 +119233,13 @@
           "profileSha256": "83d3adf9e3efc3324863d1bfff9ed6cca5990b154e121bbdb74cc124216845c8",
           "artifacts": [
             "evidence/local.translation.native.20261028.json"
+          ]
+        },
+        {
+          "id": "local.translation.restricted.native.20261031",
+          "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a",
+          "artifacts": [
+            "evidence/local.translation.restricted.native.20261031.json"
           ]
         }
       ],
@@ -121679,6 +121777,16 @@
       "sha256": "0fc833986f1aaafc30c72aceceadb7acfae011de808758ea1e2095500caec0b8"
     },
     {
+      "path": "evidence/local.translation.restricted.native.20261031.json",
+      "state": "observed",
+      "sha256": "f8283e8c25cf11caefc414b229911dcfa70d31cf84eab0f36690c22421c2078a"
+    },
+    {
+      "path": "evidence/local.translation.restricted.qualification.20261031.json",
+      "state": "observed",
+      "sha256": "01ce8b8b8ee98089b5597301914a1798d5b8360eb4d686cf10f714efc960901d"
+    },
+    {
       "path": "evidence/local.typed.crossscope.engineering.rerun.20261029.json",
       "state": "observed",
       "sha256": "d7d0dff6021a3186d3cf45a202e8d250ec6b5517fd4acd925cd61afe35ab1181"
@@ -122404,6 +122512,14 @@
     {
       "id": "local.translation.qualification.20261028",
       "profileSha256": "a983958875e0d7e19ba4cefc5eef8a71d10dd00a0905542b066a25a992f70afe"
+    },
+    {
+      "id": "local.translation.restricted.native.20261031",
+      "profileSha256": "7c442ecd8ca2c399c77f0d579e495e6048100fc45e782f6482dd22c9e063594a"
+    },
+    {
+      "id": "local.translation.restricted.qualification.20261031",
+      "profileSha256": "8f1b5afa29eaaf6f34fc2dcf01fd3f8b6848d13a4005f64c3b22d279ad84d63b"
     },
     {
       "id": "local.typed.crossscope.engineering.rerun.20261029",
