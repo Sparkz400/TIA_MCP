@@ -48,7 +48,7 @@ namespace TiaMcp.Openness.V21
                 (_translationQualification ? !WatchOwnsScratch(project) : TranslationInstalledEntry(args.Value<string>("projectPath")) == null) ||
                 project.Path.FullName != args.Value<string>("projectPath") || (saved && project.IsModified))
                 throw new BridgeException("ProjectIsolationRequired", "Exact saved worker-owned translation fixture required.");
-            EnsureProjectOffline(project); if (!_translationQualification) TranslationProductionScope(args, null);
+            EnsureProjectOffline(project); if (!_translationQualification) TranslationProductionScope(args, null, TranslationInstalledEntry(args.Value<string>("projectPath")));
             var budget = new ScanBudget(10000);
             var owners = DeviceItems(project, budget).Select(x => new { x.Path, Software = x.Item.GetService<SoftwareContainer>()?.Software }).Where(x => x.Software != null)
                 .Select(x => x.Software is PlcSoftware ? x.Path + "/plc/" + Segment(x.Software.Name) : null).OrderBy(x => x, StringComparer.Ordinal).ToArray();
@@ -67,12 +67,15 @@ namespace TiaMcp.Openness.V21
         }
         private static string[] TranslationCultures(JObject args) =>
             new[] { args.Value<string>("sourceCulture") ?? "de-DE", args.Value<string>("targetCulture") ?? "en-GB" };
-        // The installed admission contract is whole-project de-DE/en-GB, one PLC, target-only; generalized selectors stay qualification-only.
-        private static void TranslationProductionScope(JObject selector, JObject context)
+        // Installed admission contracts are de-DE/en-GB, one PLC, target-only, and either the whole-project export or exactly the
+        // installed entry's restricted categories; other generalized selectors stay qualification-only.
+        private static void TranslationProductionScope(JObject selector, JObject context, JObject entry)
         {
+            var key = (JObject)entry["profile"]["key"];
+            var admitted = key.Value<string>("contract") == TranslationAdmissionLedger.RestrictedContract ? ((JArray)key["scope"]["categoryIds"]).Values<string>().ToArray() : new string[0];
             if (TranslationOwners(selector).Length != 1 || !TranslationCultures(selector).SequenceEqual(new[] { "de-DE", "en-GB" }) ||
-                context?.Value<bool?>("updateSourceLanguage") == true)
-                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, de-DE/en-GB and target-only import.");
+                context?.Value<bool?>("updateSourceLanguage") == true || !ProjectTextList(selector, "categoryIds", 256).SequenceEqual(admitted))
+                throw new BridgeException("TranslationAdmissionMismatch", "Production admission covers only one PLC, de-DE/en-GB, target-only import and exactly the installed export scope.");
         }
         private JObject TranslationFixture(JObject args)
         {
@@ -146,9 +149,18 @@ namespace TiaMcp.Openness.V21
             if (pair[0] == pair[1] || !cultures.SequenceEqual(pair.OrderBy(x => x, StringComparer.Ordinal)) || settings.ReferenceLanguage.Culture.Name != pair[0])
                 throw new BridgeException("TranslationScopeUnqualified", "Exactly the source/target pair must be active, with the source as reference language.");
             string workbook = Path.Combine(directory, "all.xlsx");
-            // This profile is explicitly whole-project. Restricted overloads are never substituted.
-            project.ExportProjectTexts(new FileInfo(workbook), CultureInfo.GetCultureInfo(pair[0]), CultureInfo.GetCultureInfo(pair[1]));
             var owners = TranslationOwners(args);
+            string[] categoryIds = ProjectTextList(args, "categoryIds", 256);
+            // Whole-project unless the qualification selector names categories; one never substitutes for the other.
+            if (categoryIds.Length == 0)
+                project.ExportProjectTexts(new FileInfo(workbook), CultureInfo.GetCultureInfo(pair[0]), CultureInfo.GetCultureInfo(pair[1]));
+            else
+            {
+                // V21 returns every row of the named PLCs here; the Host keeps exactly the requested categories by row identity.
+                var categories = categoryIds.Select(id => project.TextCategories.Find(id) ?? throw new BridgeException("CategoryUnavailable", "Unknown text category: " + id)).ToArray();
+                var plcs = owners.Select(path => { var owner = (JObject)args.DeepClone(); owner["plcPath"] = path; return (IEngineeringObject)SelectPlc(owner).Software; }).ToArray();
+                project.ExportProjectTexts(new FileInfo(workbook), ProjectTextLanguage(settings, pair[0]), new[] { ProjectTextLanguage(settings, pair[1]) }, categories, plcs);
+            }
             var peers = new JArray(); var receipts = new JArray(); JToken hardware = null;
             for (int index = 0; index < owners.Length; index++)
             {
@@ -170,6 +182,7 @@ namespace TiaMcp.Openness.V21
                 ["sessionEpoch"] = _translationEpoch, ["workerSha256"] = ChangeFileHash(typeof(OpennessSession).Assembly.Location),
                 ["hardwareIdentity"] = hardware, ["offline"] = true,
                 ["activeCultures"] = new JArray(cultures), ["categoryIds"] = new JArray(project.TextCategories.Select(x => x.Identifier).OrderBy(x => x, StringComparer.Ordinal)),
+                ["requestedCategoryIds"] = new JArray(categoryIds),
                 ["processId"] = _processId, ["modified"] = project.IsModified, ["nativeSnapshot"] = receipts.Count == 1 ? receipts[0] : receipts };
             TranslationWrite(Path.Combine(directory, "observation.json"), result); return result;
         }
@@ -186,7 +199,7 @@ namespace TiaMcp.Openness.V21
                 if (entry.Value<string>("plcPath") != selector.Value<string>("plcPath") ||
                     op["plan"]["target"].Value<string>("adapterSha256") != ChangeFileHash(typeof(OpennessSession).Assembly.Location))
                     throw new BridgeException("TranslationAdmissionMismatch", "Installed native selector or owning worker changed.");
-                TranslationProductionScope(selector, context);
+                TranslationProductionScope(selector, context, entry);
             }
             if (op.Value<string>("state") == "acquired")
             {

@@ -30,12 +30,21 @@ internal sealed record TranslationAdmissionProfile(string Id, TranslationAdmissi
 internal static class TranslationProductionAdmission
 {
     internal const string Contract = "translation.whole-project-de-DE-en-GB-main-ob1.exact.v1";
+    // The Host-filtered BlockCommentCategoryData capture of exactly one PLC. Its ledger adds the restricted
+    // category controls; a proof needs the restricted native packet, so no registry can admit it before that run.
+    internal const string RestrictedContract = "translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1";
     internal static readonly string[] NativeCases = [
         "complete-inventory", "native-import-readback", "preservation", "compile-save-fresh-reopen",
         "distinct-recovery-fresh-reopen", "lost-restore-response-reconciliation", "lost-import-response-reconciliation",
         "lost-compile-response-reconciliation", "lost-save-response-reconciliation", "lost-reopen-response-reconciliation",
         "interruption-before-dispatch", "stale-source-refusal", "existing-recovery-destination-refusal", "exact-process-cleanup"
     ];
+    internal static readonly string[] RestrictedNativeCases = [.. NativeCases, "restricted-category-filter"];
+    // The default-mode packet on the installed provisional entry: clean lifecycle plus worker loss at checkpoint
+    // intent and during the import, and Host loss during the import. Without it a restricted entry is provisional.
+    internal static readonly string[] DefaultModeCases = ["default-mode-lifecycle", "worker-loss-at-checkpoint-intent", "worker-loss-during-import", "host-loss-during-import"];
+    internal static string[] NativeCasesFor(string contract, bool provisional = false) =>
+        contract != RestrictedContract ? NativeCases : provisional ? RestrictedNativeCases : [.. RestrictedNativeCases, .. DefaultModeCases];
     internal static readonly string[] PortableCases = [
         "exact-key-and-binary-refusal", "stale-plan-revision-replay-refusal", "source-clear-empty-richtext-refusal",
         "key-source-target-culture-peer-drift-refusal", "artifact-tampering-refusal", "lost-cleanup-response-reservation"
@@ -60,10 +69,11 @@ internal static class TranslationProductionAdmission
         var candidate = new TranslationWorkflowStore(context.ArtifactRoot).NativeCandidate(binding.CandidateRef, binding.CandidateReceiptSha256);
         var scope = binding.Baseline.Scope;
         Require(!candidate.UpdateSourceLanguage, "TranslationAdmissionScopeUnqualified", "Source-text mode has no production admission.");
+        bool restricted = scope.ObjectSelections is not ["whole-project:legacy-bilingual"];
         Require(scope.SourceCulture == "de-DE" && scope.TargetCulture == "en-GB" &&
             scope.ActiveCultures.SequenceEqual(new[] { "de-DE", "en-GB" }) &&
-            scope.ObjectSelections.SequenceEqual(new[] { "whole-project:legacy-bilingual" }),
-            "TranslationAdmissionScopeUnqualified", "Only the exact whole-project de-DE/en-GB inventory is eligible; restricted selections and additional languages need independent evidence.");
+            (!restricted || scope.ObjectSelections is [var plc] && plc.StartsWith("plc:", StringComparison.Ordinal) && scope.CategoryIds is ["BlockCommentCategoryData"]),
+            "TranslationAdmissionScopeUnqualified", "Only the exact whole-project or one-PLC BlockCommentCategoryData de-DE/en-GB inventory is eligible; other selections and additional languages need independent evidence.");
         var rows = candidate.Baseline.Profile.Rows.Select(row => {
             Require(row.Targets.Length == 1 && row.Targets[0].Culture == "en-GB", "TranslationAdmissionScopeUnqualified", "Exactly one English target per native row required.");
             var cell = row.Targets[0].Location;
@@ -78,7 +88,7 @@ internal static class TranslationProductionAdmission
             Require(changed[0].Category == "<BlockCommentCategoryData>" && TranslationNativeComparison.MainCommentView(changed[0].ViewPath, target.ProjectFilePath),
                 "TranslationAdmissionScopeUnqualified", "Only the exact captured Main OB1 block-comment field is eligible.");
         }
-        return new(Contract, Clone(binaries), operation.Plan.Resources.Single().ResourceKey,
+        return new(restricted ? RestrictedContract : Contract, Clone(binaries), operation.Plan.Resources.Single().ResourceKey,
             target.Reference.Snapshot.TiaVersion, target.HardwareIdentity, target.NativeIdentity, target.ProfileSha256,
             Clone(scope), binding.BaselineContentSha256, binding.CandidateContentSha256, rows,
             binding.Baseline.Peers.OrderBy(peer => peer.Identity, StringComparer.Ordinal)
@@ -90,22 +100,27 @@ internal static class TranslationProductionAdmission
                     Sha256(TranslationNativeComparison.Peer(retained.ReadBytes(peer.Evidence), peer.ComparisonProfile, candidate)))).ToArray());
     }
 
-    internal static void RequireComplete(TranslationAdmissionProfile profile, TranslationAdmissionKey actual)
+    internal static void RequireComplete(TranslationAdmissionProfile profile, TranslationAdmissionKey actual, bool provisional = false)
     {
-        Require(!string.IsNullOrWhiteSpace(profile.Id) && profile.Key.Contract == Contract &&
+        Require(!string.IsNullOrWhiteSpace(profile.Id) && profile.Key.Contract is Contract or RestrictedContract &&
             HashJson(profile.Key) == HashJson(actual), "TranslationAdmissionMismatch", "No wildcard, altered text, location, peer, culture, source package or binary may inherit an exact profile.");
         EngineeringIdentityGuard.Sha256(profile.SourcePackageSha256, "sourcePackageSha256");
         string key = HashJson(actual);
-        Require(profile.Proofs is not null && profile.Proofs.Length == NativeCases.Length + PortableCases.Length &&
+        var native = NativeCasesFor(actual.Contract, provisional);
+        Require(profile.Proofs is not null && profile.Proofs.Length == native.Length + PortableCases.Length &&
             profile.Proofs.Select(proof => proof.Case).Distinct(StringComparer.Ordinal).Count() == profile.Proofs.Length,
             "TranslationAdmissionIncomplete", "Exactly one independent receipt for every required case is necessary.");
-        foreach (string name in NativeCases.Concat(PortableCases))
+        foreach (string name in native.Concat(PortableCases))
         {
             var proof = profile.Proofs!.SingleOrDefault(proof => proof.Case == name);
             Require(proof is not null && proof.KeySha256 == key && proof.SourcePackageSha256 == profile.SourcePackageSha256 &&
-                proof.Mode == (NativeCases.Contains(name) ? "native" : "portable"),
+                proof.Mode == (native.Contains(name) ? "native" : "portable"),
                 "TranslationAdmissionIncomplete", "Missing, synthetic, foreign-key or foreign-package evidence for " + name + ".");
             EngineeringIdentityGuard.Sha256(proof!.EvidenceSha256, "admissionEvidenceSha256");
         }
+        // The second packet cannot be satisfied by citing the first packet's receipt again.
+        var defaultMode = profile.Proofs.Where(proof => DefaultModeCases.Contains(proof.Case)).Select(proof => proof.EvidenceSha256).Distinct(StringComparer.Ordinal).ToArray();
+        Require(defaultMode.Length == 0 || defaultMode.Length == 1 && profile.Proofs.All(proof => DefaultModeCases.Contains(proof.Case) || proof.EvidenceSha256 != defaultMode[0]),
+            "TranslationAdmissionIncomplete", "The default-mode interruption packet needs its own retained evidence.");
     }
 }

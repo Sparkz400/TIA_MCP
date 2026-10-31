@@ -43,5 +43,56 @@ class PacketChecks(unittest.TestCase):
     def test_category_mutation_is_refused_before_interpretation(self):
         with self.assertRaisesRegex(ValueError, 'modified'): coordinator.category_verdict({'projectModified': True})
 
+    def restricted(self):
+        """The 31 October PLC: five block comments and one hardware comment; each native category export returned all six.
+        The baseline is the category probe's independently decoded all-category PLC export."""
+        labels = ['<BlockCommentCategoryData>'] * 5 + ['<HwcnCommentTextCategoryData>']
+        baseline = {f'K-{i}': {'nativeKey': f'K-{i}', 'category': c, 'source': f'S{i}', 'target': '' if i == 5 else f'T{i}'} for i, c in enumerate(labels)}
+        def row(r): return {'nativeKey': r['nativeKey'], 'category': r['category'], 'source': {'state': 'text', 'text': r['source']},
+                            'target': {'state': 'empty', 'text': ''} if not r['target'] else {'state': 'text', 'text': r['target']}}
+        captures = {}
+        for category in coordinator.RESTRICTED:
+            kept = [row(r) for r in baseline.values() if r['category'] == '<' + category + '>']
+            captures[category] = {'rows': kept, 'scope': {'categoryIds': [category], 'objectSelections': ['plc:/PLC_1/plc/PLC_1']},
+                                  'excludedRows': {k: {'category': r['category']} for k, r in baseline.items() if r['category'] != '<' + category + '>'}}
+        return baseline, captures
+
+    def test_over_returned_rows_are_filtered_to_five_one_and_zero(self):
+        result = coordinator.restricted_verdict(*self.restricted())
+        self.assertEqual([(c['keptRows'], c['excludedRows'], c['nativeRows']) for c in result['captures']], [(5, 1, 6), (1, 5, 6), (0, 6, 6)])
+        self.assertEqual(result['plcRows'], 6)
+
+    def test_leaked_row_in_a_filtered_capture_is_refused(self):
+        baseline, captures = self.restricted()
+        captures['HwcnCommentTextCategoryData']['rows'].append(captures['BlockCommentCategoryData']['rows'][0])
+        with self.assertRaisesRegex(ValueError, 'kept 2 rows'): coordinator.restricted_verdict(baseline, captures)
+
+    def test_changed_text_in_a_filtered_capture_is_refused(self):
+        baseline, captures = self.restricted()
+        captures['BlockCommentCategoryData']['rows'][0] = dict(captures['BlockCommentCategoryData']['rows'][0], target={'state': 'text', 'text': 'drift'})
+        with self.assertRaisesRegex(ValueError, 'BlockCommentCategoryData: kept'): coordinator.restricted_verdict(baseline, captures)
+
+    def test_requested_category_in_the_excluded_rows_is_refused(self):
+        baseline, captures = self.restricted()
+        captures['AlarmClassDisplayNameCategory']['excludedRows']['K-9'] = {'category': '<AlarmClassDisplayNameCategory>'}
+        with self.assertRaisesRegex(ValueError, 'excluded rows'): coordinator.restricted_verdict(baseline, captures)
+
+    def test_dropped_plc_row_is_refused(self):
+        baseline, captures = self.restricted()
+        del captures['HwcnCommentTextCategoryData']['excludedRows']['K-0']
+        with self.assertRaisesRegex(ValueError, 'excluded rows'): coordinator.restricted_verdict(baseline, captures)
+
+    def test_whole_project_scope_cannot_pass_as_restricted(self):
+        baseline, captures = self.restricted()
+        captures['BlockCommentCategoryData']['scope']['objectSelections'] = ['whole-project:legacy-bilingual']
+        with self.assertRaisesRegex(ValueError, 'restricted scope'): coordinator.restricted_verdict(baseline, captures)
+
+    def test_fixture_drift_from_the_expected_counts_is_refused(self):
+        baseline, captures = self.restricted()
+        baseline['K-6'] = {'nativeKey': 'K-6', 'category': '<AlarmClassDisplayNameCategory>', 'source': 'Alarm', 'target': ''}
+        for category in ('BlockCommentCategoryData', 'HwcnCommentTextCategoryData'):
+            captures[category]['excludedRows']['K-6'] = {'category': '<AlarmClassDisplayNameCategory>'}
+        with self.assertRaisesRegex(ValueError, 'AlarmClassDisplayNameCategory: kept 0 rows; the PLC export has 1'): coordinator.restricted_verdict(baseline, captures)
+
 
 if __name__ == '__main__': unittest.main()

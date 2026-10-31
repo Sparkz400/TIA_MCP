@@ -71,6 +71,60 @@ public static class TranslationCategoryScope
         return report;
     }
 
+    // Retained V21 exports use nine of these parts, <sheets> only and <sheetData> only. The other entries name no cell.
+    // Keep in sync with scripts/inventory_translation_exports.py, which checks the retained exports against them.
+    private static readonly string[] FilterableParts = ["[Content_Types].xml", "_rels/.rels", "docProps/app.xml", "docProps/core.xml", "docProps/custom.xml",
+        "xl/_rels/workbook.xml.rels", "xl/sharedStrings.xml", "xl/styles.xml", "xl/theme/theme1.xml", "xl/workbook.xml", "xl/worksheets/sheet1.xml", "xl/worksheets/sheet2.xml"];
+    private static readonly string[] FilterableWorkbookElements = ["fileVersion", "workbookPr", "bookViews", "sheets", "calcPr"];
+    private static readonly string[] FilterableSheetElements = ["sheetPr", "dimension", "sheetViews", "sheetFormatPr", "cols", "sheetData", "pageMargins", "pageSetup", "headerFooter"];
+
+    /// <summary>
+    /// V21 category exports return every row of the selected owners. Keeps exactly the rows whose observed
+    /// category label is requested, renumbered as a contiguous native layout. Every native row must first
+    /// carry a unique key and a label from the project inventory; otherwise the capture is refused. The
+    /// excluded rows' complete records are returned for preservation; the caller retains the native bytes.
+    /// </summary>
+    internal static (byte[] Workbook, byte[] ExcludedRows) Restrict(TranslationWorkbook native, string[] inventoryIds, string[] requestedIds)
+    {
+        Require(requestedIds is { Length: > 0 and <= 256 } && requestedIds.Distinct(StringComparer.Ordinal).Count() == requestedIds.Length &&
+            requestedIds.All(id => inventoryIds.Contains(id, StringComparer.Ordinal)),
+            "InvalidTranslationCategoryScope", "Requested categories must be distinct members of the project category inventory.");
+        var allowed = requestedIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal);
+        var rows = ReadCompleteObservedLayout(native, inventoryIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal)).Rows;
+        // Removing rows must leave no reference behind (layout recorded by scripts/inventory_translation_exports.py).
+        // Only parts and elements that name no cell are kept; a dimension must match its native rows and is rewritten.
+        // Merged cells, hyperlinks, formatting ranges, validations, defined names, comments, tables and anything unlisted are refused.
+        bool Listed(System.Xml.Linq.XElement root, string[] names) => root.Elements().All(e => e.Name.Namespace == BoundedOpcPackage.Sheet && names.Contains(e.Name.LocalName));
+        Require(native.Package.Parts.Keys.All(FilterableParts.Contains) && Listed(native.Package.Xml["xl/workbook.xml"].Root!, FilterableWorkbookElements) &&
+            FilterableParts[^2..].All(part => Listed(native.Package.Xml[part].Root!, FilterableSheetElements) &&
+                native.Package.Xml[part].Root!.Elements(BoundedOpcPackage.Sheet + "dimension").Count() <= 1),
+            "UnsupportedTranslationScopeLayout", "Row filtering requires the observed export layout; parts or elements that can reference rows are refused.");
+        var kept = native.Mapping.Rows.Where(r => allowed.Contains(r.Category)).Select(r => r.KeyCell).ToHashSet();
+        var parts = new Dictionary<string, byte[]>(StringComparer.Ordinal);
+        foreach (string part in FilterableParts[^2..])
+        {
+            var document = new System.Xml.Linq.XDocument(native.Package.Xml[part]);
+            var data = document.Root!.Element(BoundedOpcPackage.Sheet + "sheetData")!;
+            var dimension = document.Root.Element(BoundedOpcPackage.Sheet + "dimension");
+            string Extent() => "A1:" + TranslationWorkbook.ColumnName(data.Elements().First().Elements().Count()) + data.Elements().Count();
+            Require(dimension is null || dimension.Attributes().Count() == 1 && (string?)dimension.Attribute("ref") == Extent(),
+                "UnsupportedTranslationScopeLayout", "A worksheet dimension must match its native rows.");
+            int number = 1;
+            foreach (var row in data.Elements(BoundedOpcPackage.Sheet + "row").Skip(1).ToArray())
+            {
+                if (!kept.Contains(new CellLocation(part, "C" + (string)row.Attribute("r")!))) { row.Remove(); continue; }
+                string r = (++number).ToString(System.Globalization.CultureInfo.InvariantCulture);
+                row.SetAttributeValue("r", r);
+                foreach (var cell in row.Elements(BoundedOpcPackage.Sheet + "c"))
+                    cell.SetAttributeValue("r", System.Text.RegularExpressions.Regex.Replace((string)cell.Attribute("r")!, "[0-9]+$", r));
+            }
+            dimension?.SetAttributeValue("ref", Extent());
+            parts.Add(part, BoundedOpcPackage.XmlBytes(document));
+        }
+        var excluded = rows.Where(p => !allowed.Contains(p.Value.Category)).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+        return (native.Package.Repack(parts), System.Text.Encoding.UTF8.GetBytes(CanonicalJson.Serialize(Node(excluded))));
+    }
+
     private sealed record ObservedRow(string Worksheet, string Category, string ViewPath, string Substitutions,
         string SourceCulture, string SourceSha256, string TargetCulture, string TargetSha256);
     private sealed record ObservedLayout(string TargetCulture, Dictionary<string, ObservedRow> Rows);

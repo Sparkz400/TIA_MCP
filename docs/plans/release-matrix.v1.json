@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "391947d03eb88de396e3ff7af56a6ecfeb5d9779f323a51425632717e4428762",
+    "catalogSha256": "43b51a3a4ae478b7c3966110ea0be6cc8f9d0a5e8980e8b4b06a5b281e2fdd05",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -14631,35 +14631,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14676,35 +14681,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14721,35 +14731,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14766,35 +14781,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14811,35 +14831,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14856,35 +14881,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14901,35 +14931,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -14946,35 +14981,40 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.qualification.20261028"
+        "local.translation.qualification.20261028",
+        "local.translation.restricted.qualification.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.qualification.20261028"
+            "local.translation.qualification.20261028",
+            "local.translation.restricted.qualification.20261031"
           ]
         }
       ]
@@ -15628,56 +15668,64 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.native.20261028"
+        "local.translation.native.20261028",
+        "local.translation.restricted.native.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         }
       ]
@@ -15694,56 +15742,64 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.native.20261028"
+        "local.translation.native.20261028",
+        "local.translation.restricted.native.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         }
       ]
@@ -15760,56 +15816,64 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.native.20261028"
+        "local.translation.native.20261028",
+        "local.translation.restricted.native.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         }
       ]
@@ -15826,56 +15890,64 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.native.20261028"
+        "local.translation.native.20261028",
+        "local.translation.restricted.native.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         }
       ]
@@ -15892,56 +15964,64 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.native.20261028"
+        "local.translation.native.20261028",
+        "local.translation.restricted.native.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         }
       ]
@@ -15958,56 +16038,64 @@
         "D03"
       ],
       "evidenceIds": [
-        "local.translation.native.20261028"
+        "local.translation.native.20261028",
+        "local.translation.restricted.native.20261031"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.translation.native.20261028"
+            "local.translation.native.20261028",
+            "local.translation.restricted.native.20261031"
           ]
         }
       ]
@@ -26918,6 +27006,48 @@
         {
           "path": "evidence/local.translation.qualification.20261028.json",
           "sha256": "0fc833986f1aaafc30c72aceceadb7acfae011de808758ea1e2095500caec0b8"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.translation.restricted.native.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "languages": [
+          "de-DE",
+          "en-GB"
+        ]
+      },
+      "sourceCommit": "2b11b47b4575d7add517eb730f463dc6a299ded6",
+      "retained": [
+        {
+          "path": "evidence/local.translation.restricted.native.20261031.json",
+          "sha256": "f8283e8c25cf11caefc414b229911dcfa70d31cf84eab0f36690c22421c2078a"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.translation.restricted.qualification.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "languages": [
+          "de-DE",
+          "en-GB"
+        ]
+      },
+      "sourceCommit": "2b11b47b4575d7add517eb730f463dc6a299ded6",
+      "retained": [
+        {
+          "path": "evidence/local.translation.restricted.qualification.20261031.json",
+          "sha256": "01ce8b8b8ee98089b5597301914a1798d5b8360eb4d686cf10f714efc960901d"
         }
       ],
       "notRetained": []

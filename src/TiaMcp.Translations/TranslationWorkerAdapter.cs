@@ -10,10 +10,12 @@ namespace TiaMcp.Translations;
 
 /// <summary>Internal owning-worker binding; no request can supply its admission delegate.</summary>
 internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root, string projectPath, string plcPath,
-    Action<TranslationImportContext, string> admission, string sourceCulture = "de-DE", string targetCulture = "en-GB", string[]? plcPaths = null) : ITranslationImportAdapter
+    Action<TranslationImportContext, string> admission, string sourceCulture = "de-DE", string targetCulture = "en-GB", string[]? plcPaths = null,
+    string[]? categoryIds = null) : ITranslationImportAdapter
 {
+    internal const string ExcludedRowsPeer = "translation:excluded-native-rows";
     private readonly TranslationImportArtifacts artifacts = new(root);
-    private object Selector => new { projectPath, plcPath, plcPaths = plcPaths ?? [plcPath], sourceCulture, targetCulture, artifactDirectory = root };
+    private object Selector => new { projectPath, plcPath, plcPaths = plcPaths ?? [plcPath], sourceCulture, targetCulture, categoryIds, artifactDirectory = root };
     internal Action<string>? AfterNativeReturn { get; set; }
     internal bool DriftSourceAfterCheckpoint { get; set; }
     public void RequireQualification(TranslationImportContext context, string action) => admission(context, action);
@@ -48,6 +50,16 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
         var profile = NativeProfile(bytes);
         string path = value["projectPath"]!.GetValue<string>(), name = value["projectName"]!.GetValue<string>();
         var provisional = new EngineeringObjectReference(new(path, null, null, "/project/" + name, "project"), new(Guid.NewGuid().ToString("N"), new('0', 64)), new('0', 64));
+        string[] inventory = value["categoryIds"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray();
+        Require((value["requestedCategoryIds"]?.AsArray().Select(x => x!.GetValue<string>()) ?? []).SequenceEqual(categoryIds ?? []),
+            "TranslationScopeMismatch", "The worker export differs from the requested category selection.");
+        byte[]? excluded = null;
+        // Restricted capture: the native bytes stay retained evidence (ReadNative); review and import see only the requested categories.
+        if (categoryIds is { Length: > 0 })
+        {
+            (bytes, excluded) = TranslationCategoryScope.Restrict(TranslationWorkbook.Open(bytes, profile, provisional, Sha256(bytes)), inventory, categoryIds);
+            profile = NativeProfile(bytes);
+        }
         var workbook = TranslationWorkbook.Open(bytes, profile, provisional, Sha256(bytes));
         string content = TranslationCategoryScope.NativeContentSha256(workbook);
         var reference = provisional with { Snapshot = provisional.Snapshot with { SourceSha256 = content }, ContentSha256 = content };
@@ -55,10 +67,12 @@ internal sealed class TranslationWorkerAdapter(IBridgeClient bridge, string root
             var evidence = artifacts.RetainBytes(ReadNative(p!["artifact"]!));
             return new TranslationImportPeer(p["identity"]!.GetValue<string>(), evidence.Sha256, evidence, p["profile"]!.GetValue<string>());
         }).ToArray();
+        // Rows outside the restricted categories are never imported; their complete records must stay unchanged.
+        if (excluded is not null) { var evidence = artifacts.RetainBytes(excluded); peers = [.. peers, new(ExcludedRowsPeer, evidence.Sha256, evidence)]; }
         Require(profile.SourceCulture == sourceCulture && TranslationCategoryScope.NativeTargetCulture(workbook) == targetCulture,
             "TranslationScopeMismatch", "Exported workbook cultures differ from the requested source/target pair.");
         var scope = new TranslationImportScope(sourceCulture, targetCulture, value["activeCultures"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray(),
-            ["whole-project:legacy-bilingual"], value["categoryIds"]!.AsArray().Select(x => x!.GetValue<string>()).ToArray());
+            excluded is null ? ["whole-project:legacy-bilingual"] : (plcPaths ?? [plcPath]).Select(p => "plc:" + p).ToArray(), excluded is null ? inventory : categoryIds!);
         var target = new NativeTargetObservation(reference, path, value["sessionEpoch"]!.GetValue<string>(), value["workerSha256"]!.GetValue<string>(),
             HashJson(profile), value["hardwareIdentity"]!.GetValue<string>(), name, value["offline"]!.GetValue<bool>(),
             [new("translation.languages", "observed", HashJson(scope.ActiveCultures)), new("translation.scope", "observed", HashJson(scope)),

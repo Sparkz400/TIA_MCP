@@ -3305,6 +3305,52 @@
         "safety_fparameter_set writes Failsafe_FDestinationAddress here; the other 76 allowlisted F-parameters rest on local.safety.fparameter_discovery.20261031 (discovery Host).",
         "No F-logic behavior, acceptance, login, password or download; a printout or signature read does not validate or approve a safety program."
       ]
+    },
+    {
+      "id": "local.translation.restricted.qualification.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "languages": [
+          "de-DE",
+          "en-GB"
+        ],
+        "sourceCommit": "fa013be2ec21f40ffb090d68b6d1491f11cc628b",
+        "passedScope": "The qualification_translation_* tools in an explicit --translation-qualification session on a frozen Debug build of fa013be2 (artifacts/tr09/fa013be2) under TIA Portal V21 Update 3, English UI: qualify_translation_import.py --same-instance --restricted-lifecycle. Category probes with a conclusive populated-Main control (seeded Main block comment, English view paths); Host-filtered PLC captures keeping exactly 5, 1 and 0 rows of 6 native rows each for BlockCommentCategoryData, HwcnCommentTextCategoryData and AlarmClassDisplayNameCategory; then on the filtered BlockCommentCategoryData scope the seven forward cases (interruption before dispatch, source drift, lost import, compile, save, reopen and restore replies), three reviewed reverse edits, 8 imports and 10 distinct restorations, every operation reconciled, and a final unattempted plan with the same restricted-contract key. The independent verify_translation_admission.py (2b11b47b) passed."
+      },
+      "artifacts": [
+        "evidence/local.translation.restricted.qualification.20261031.json"
+      ],
+      "limitations": [
+        "One owned CPU 1511-1 PN V4.1 scratch, English TIA UI, de-DE reference and en-GB target, one PLC, target-only plain text; only the BlockCommentCategoryData restriction was imported.",
+        "Native category filtering still leaks under Update 3: every category request on the PLC returned all six PLC rows, and the Main block requests all three Main rows; only the Host filter makes the capture exact. An empty restricted import was not exercised."
+      ]
+    },
+    {
+      "id": "local.translation.restricted.native.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "languages": [
+          "de-DE",
+          "en-GB"
+        ],
+        "sourceCommit": "fa013be2ec21f40ffb090d68b6d1491f11cc628b",
+        "passedScope": "The six translation_native_* tools in default mode (no qualification flag) on the fa013be2 Debug build with the provisional restricted registry (translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1, 21 proofs) built by build_translation_admission.py from the verified restricted same-instance packet and bound to that deployment: qualify_translation_native.py with worker and Portal loss at checkpointIntent and inside the native import and Host loss during the import, each reconciled unchanged from a fresh Host without replay; then refusals of an uninstalled or malformed profile and an unknown operation, Host-filtered capture, offline review, approval and candidate, admitted prepare, forged-plan and stale-revision refusals, one import with readback, preservation, compile, save and fresh reopen, replay and existing-destination refusals, checkpoint recovery, read-only reconciliation (verifiedApplied/verifiedRestored) and a changed-baseline refusal. build_translation_admission.py --finalize then produced the 25-proof final entry, accepted by the Host loader in a separate deployment, while the provisional entry is refused outside its deployment."
+      },
+      "artifacts": [
+        "evidence/local.translation.restricted.native.20261031.json"
+      ],
+      "limitations": [
+        "The installed admission is instance-bound: it admits one scratch project and one Main OB1 comment edit on the Host-filtered BlockCommentCategoryData scope of one PLC; it was installed only into test deployments and no shipped package contains a registry.",
+        "A Host lost at dispatchIntent can only be reconciled read-only; the Update 3 read-only-row warning is matched in its English wording only. The worker side of the finalized entry was not run natively."
+      ]
     }
   ],
   "features": [
@@ -16287,13 +16333,15 @@
         "limitations": [
           "Qualification-session only: seed and reopen the exact newly owned bilingual scratch.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Seeds de-DE reference/en-GB and the three block comments once per scratch (durable seed marker), whatever the TIA UI language."
+          "Natively qualified by local.translation.qualification.20261028: Seeds de-DE reference/en-GB and the three block comments once per scratch (durable seed marker), whatever the TIA UI language.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: seeded the restricted packet's fixture on an English-UI scratch."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16332,13 +16380,15 @@
         "limitations": [
           "Qualification-session only: retained populated category controls and filtering matrix.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Category leakage still holds under Update 3: block-comment, hardware and alarm-class requests on the PLC each returned all six PLC rows; the populated-Main control is inconclusive on an English-UI scratch. Restricted profiles stay disabled."
+          "Natively qualified by local.translation.qualification.20261028: Category leakage still holds under Update 3: block-comment, hardware and alarm-class requests on the PLC each returned all six PLC rows; the populated-Main control is inconclusive on an English-UI scratch. Restricted profiles stay disabled.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: the populated-Main control is conclusive (seeded Main block comment, English view paths) and shows leakage on Main as well: hardware and alarm-class requests returned all three Main rows."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16377,13 +16427,15 @@
         "limitations": [
           "Qualification-session only: complete live bilingual text and peer capture.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Whole-project de-DE/en-GB capture of one PLC owner; generalized culture pairs, several PLC owners and source-text mode were not run natively."
+          "Natively qualified by local.translation.qualification.20261028: Whole-project de-DE/en-GB capture of one PLC owner; generalized culture pairs, several PLC owners and source-text mode were not run natively.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: categoryIds captures of one PLC, Host-filtered to exactly 5, 1 and 0 of 6 native rows for BlockCommentCategoryData, HwcnCommentTextCategoryData and AlarmClassDisplayNameCategory, with every excluded row retained as evidence."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16422,13 +16474,15 @@
         "limitations": [
           "Qualification-session only: bind fresh capture for one active culture pair and named PLC owners to an explicit no-op or single edit (target, or source under the separately approved source-text mode) and exact durable review.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Target-only no-op or one Main OB1 comment edit; source-text mode and the generalized selectors were not run natively."
+          "Natively qualified by local.translation.qualification.20261028: Target-only no-op or one Main OB1 comment edit; source-text mode and the generalized selectors were not run natively.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: the seven forward cases and three reviewed reverse edits also ran on the Host-filtered BlockCommentCategoryData scope (restricted contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16467,13 +16521,15 @@
         "limitations": [
           "Qualification-session only: one durable import, readback, preservation, compile, save and fresh reopen.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Seven bounded failure cases (before dispatch, source drift, lost import/compile/save/reopen/restore replies), reviewed reverse edits and no-op/edit lifecycles; Update 3 import returns Warning for two unchanged read-only rows, accepted only in that exact shape."
+          "Natively qualified by local.translation.qualification.20261028: Seven bounded failure cases (before dispatch, source drift, lost import/compile/save/reopen/restore replies), reviewed reverse edits and no-op/edit lifecycles; Update 3 import returns Warning for two unchanged read-only rows, accepted only in that exact shape.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: the seven forward cases and three reviewed reverse edits also ran on the Host-filtered BlockCommentCategoryData scope (restricted contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16512,13 +16568,15 @@
         "limitations": [
           "Qualification-session only: one original-checkpoint restoration to an absent reserved destination; optional retained reply-loss test.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: One restoration per operation into a new directory; an existing destination is refused without change."
+          "Natively qualified by local.translation.qualification.20261028: One restoration per operation into a new directory; an existing destination is refused without change.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: the seven forward cases and three reviewed reverse edits also ran on the Host-filtered BlockCommentCategoryData scope (restricted contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16557,13 +16615,15 @@
         "limitations": [
           "Qualification-session only: fresh original and restored observations, without import or restore replay.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Read-only fresh reopen of original and recovered copies, including a lost restore reply; no import or restore replay."
+          "Natively qualified by local.translation.qualification.20261028: Read-only fresh reopen of original and recovered copies, including a lost restore reply; no import or restore replay.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: the seven forward cases and three reviewed reverse edits also ran on the Host-filtered BlockCommentCategoryData scope (restricted contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -16602,13 +16662,15 @@
         "limitations": [
           "Qualification-session only: retained operation state; never resumes native work.",
           "Requires explicit --translation-qualification session. No production profile is enabled by this declaration.",
-          "Natively qualified by local.translation.qualification.20261028: Journal-only reads; never starts a worker."
+          "Natively qualified by local.translation.qualification.20261028: Journal-only reads; never starts a worker.",
+          "Natively qualified by local.translation.restricted.qualification.20261031: the seven forward cases and three reviewed reverse edits also ran on the Host-filtered BlockCommentCategoryData scope (restricted contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.qualification.20261028"
+          "local.translation.qualification.20261028",
+          "local.translation.restricted.qualification.20261031"
         ]
       },
       "availability": {
@@ -17268,8 +17330,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
@@ -17277,7 +17339,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.native.20261028"
+          "local.translation.native.20261028",
+          "local.translation.restricted.native.20261031"
         ]
       },
       "availability": {
@@ -17319,8 +17382,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
@@ -17328,7 +17391,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.native.20261028"
+          "local.translation.native.20261028",
+          "local.translation.restricted.native.20261031"
         ]
       },
       "availability": {
@@ -17370,8 +17434,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
@@ -17379,7 +17443,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.native.20261028"
+          "local.translation.native.20261028",
+          "local.translation.restricted.native.20261031"
         ]
       },
       "availability": {
@@ -17421,8 +17486,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
@@ -17430,7 +17495,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.native.20261028"
+          "local.translation.native.20261028",
+          "local.translation.restricted.native.20261031"
         ]
       },
       "availability": {
@@ -17472,8 +17538,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
@@ -17481,7 +17547,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.native.20261028"
+          "local.translation.native.20261028",
+          "local.translation.restricted.native.20261031"
         ]
       },
       "availability": {
@@ -17523,8 +17590,8 @@
         "status": "partial",
         "limitations": [
           "Only exact reviewed package, project, language, row, candidate and peer identities can be admitted; missing or stale registry refuses before native dispatch.",
-          "Restricted category/object profiles remain blocked by native category leakage, which still holds under V21 Update 3. Broad translation support is not qualified.",
-          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; the installed admission contract stays whole-project de-DE/en-GB, one PLC and target-only.",
+          "Native category filtering still leaks under V21 Update 3. One restricted profile is qualified instead: the Host-filtered BlockCommentCategoryData capture of one PLC (contract translation.plc-block-comments-de-DE-en-GB-main-ob1.exact.v1), natively qualified by local.translation.restricted.qualification.20261031 and local.translation.restricted.native.20261031 including the default-mode interruptions. A restricted registry built from the qualification packet alone is provisional and refused outside its qualification deployment until build_translation_admission.py --finalize adds the default-mode packet. Other categories, several PLCs and block selections stay unqualified. Broad translation support is not qualified.",
+          "Generalized culture pairs, several named PLC owners and the separately approved source-text mode run only in qualification mode; installed admission contracts stay de-DE/en-GB, one PLC and target-only, with the whole-project export or the one-PLC block-comment restriction.",
           "Natively qualified by local.translation.native.20261028 with a registry that scripts/build_translation_admission.py built from the verified same-instance packet and installed only into a byte-identical copy of the frozen test binaries. That registry admits exactly one scratch project and one Main OB1 comment edit; no shipped package contains a registry, so production import stays unavailable until an operator installs a reviewed one.",
           "Default-mode interruption: worker loss at checkpoint intent and during the import, and Host loss during the import, each reconciled from a fresh Host without replay."
         ]
@@ -17532,7 +17599,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.translation.native.20261028"
+          "local.translation.native.20261028",
+          "local.translation.restricted.native.20261031"
         ]
       },
       "availability": {

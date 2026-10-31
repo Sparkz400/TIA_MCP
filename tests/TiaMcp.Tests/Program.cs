@@ -269,6 +269,7 @@ internal static partial class Program
             ("Unsupported array paths and bounds remain explicit", OfflineEvidenceTests.InterfaceArrayPathsStayExplicitWhenUnresolved),
             ("Interface normalization obeys traversal bounds without expanding arrays", OfflineEvidenceTests.InterfaceNormalizationIsBounded),
             ("Native symbolic matching preserves nested and instance boundaries", OfflineEvidenceTests.NativeSymbolsKeepNestedAndInstanceBoundaries),
+            ("Worker translation admission ledgers stay provisional until the default-mode packet", TranslationAdmissionLedgerTests.ProvisionalAndFinalRestrictedLedgers),
             ("Deletion policies and empty group checks fail closed", DependencyRulesTests.DeletionPolicyAndEmptyGroupsFailClosed),
             ("Dependency token scans preserve unresolved evidence", DependencyRulesTests.NativeDependencyTokensAreConservative),
             ("Dependency exclusion preserves same-name declarations in other owners", DependencyRulesTests.SelectedDeclarationExclusionPreservesOtherOwners),

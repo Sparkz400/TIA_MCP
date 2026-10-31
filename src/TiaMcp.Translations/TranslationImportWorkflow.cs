@@ -366,6 +366,10 @@ public sealed class TranslationImportWorkflow
             TranslationCategoryScope.NativeTargetCulture(workbook) == scope.TargetCulture &&
             workbook.Profile.Rows.SelectMany(r => r.Targets).All(t => t.Culture == scope.TargetCulture),
             "TranslationScopeMismatch", "Exact bounded bilingual scope and complete active language inventory are required.");
+        // A restricted scope admits only its own categories; the candidate shares this profile, so no row outside them is imported.
+        var admitted = scope.CategoryIds.Select(id => "<" + id + ">").ToHashSet(StringComparer.Ordinal);
+        Require(scope.ObjectSelections is ["whole-project:legacy-bilingual"] || workbook.Profile.Rows.All(r => admitted.Contains(r.Category)),
+            "TranslationScopeMismatch", "Every reviewed and candidate row must belong to the admitted restricted categories.");
         Require(value.Target.ProfileSha256 == workbook.ProfileSha256, "TranslationScopeMismatch", "Native profile differs from the reviewed complete workbook map.");
         Require(EngineeringResourceKey.ForPath("project", value.Target.ProjectFilePath) == EngineeringResourceKey.ForPath("project", value.Target.Reference.Object.ProjectPath),
             "IdentityMismatch", "Native project path and captured exact project selector differ.");

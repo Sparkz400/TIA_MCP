@@ -41,7 +41,8 @@ class ExactClient(Client):
         while True:
             try:time.sleep(.2)
             except BaseException:pass
-    def request(self,method,params):
+    # params defaults like smoke_mcp.Client.request, which prefetches tools/list before the first tools/call.
+    def request(self,method,params=None):
         with self._close_mutex:
             if self._closing or self._request_failure is not None:
                 raise RuntimeError('Exact client is closed or failed; automatic replay is prohibited')

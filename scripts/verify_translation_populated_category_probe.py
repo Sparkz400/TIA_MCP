@@ -188,11 +188,23 @@ def decode(path):
     return rows, profiles, sheet_summaries
 
 
+# Program-blocks folder and block-comment leaf of the Main OB1 view path under a German and an English TIA UI.
+MAIN_BLOCK_LABELS = (("Programmbausteine", "Bausteinkommentar"), ("Program blocks", "Block comment"))
+
+
+def main_prefix(project_name, plc_name, blocks): return project_name + "\\" + plc_name + "\\" + blocks + "\\Main\\"
+
+
 def populated_control(plc, main, project_name, plc_name):
-    prefix = project_name + "\\" + plc_name + "\\Programmbausteine\\Main\\"
-    sentinels = {"Remanence": "=True, if remanent data are available", "Initial_Call": "Initial call of this OB"}
-    return bool(main) and all(k in plc and r == plc[k] and r["viewPath"].startswith(prefix) for k, r in main.items()) and all(
-        any(r["viewPath"] == prefix + tail and r["category"] == LABELS[COMMENTS] and r["source"] == source for r in main.values()) for tail, source in sentinels.items())
+    """View paths follow the TIA UI language. An English-UI scratch keeps the default OB interface comments under en-US,
+    not the de-DE source, so there the seeded fixture block comment is the sentinel; the German-UI defaults still count."""
+    for blocks, comment in MAIN_BLOCK_LABELS:
+        prefix = main_prefix(project_name, plc_name, blocks)
+        def has(tail, source): return any(r["viewPath"] == prefix + tail and r["category"] == LABELS[COMMENTS] and r["source"] == source for r in main.values())
+        if main and all(k in plc and r == plc[k] and r["viewPath"].startswith(prefix) for k, r in main.items()) and (
+                has("Remanence", "=True, if remanent data are available") and has("Initial_Call", "Initial call of this OB") or has(comment, "Prueftext Main {0}")):
+            return True
+    return False
 
 
 def compare(baseline, selected, identifier):

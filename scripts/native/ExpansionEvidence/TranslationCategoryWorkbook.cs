@@ -104,13 +104,19 @@ internal static class TranslationCategoryWorkbook
     internal static bool Equal(Dictionary<string, Row> left, Dictionary<string, Row> right) => left.Count == right.Count &&
         left.All(item => right.ContainsKey(item.Key) && item.Value.Same(right[item.Key]));
 
+    // View paths follow the TIA UI language. An English-UI scratch keeps the default OB interface comments under en-US,
+    // not the de-DE source, so there the seeded fixture block comment is the sentinel; the German-UI defaults still count.
     internal static bool PopulatedMainControl(Dictionary<string, Row> plc, Dictionary<string, Row> main, string projectName, string plcName)
     {
-        string prefix = projectName + "\\" + plcName + "\\Programmbausteine\\Main\\";
-        return main.Count > 0 && main.All(item => plc.ContainsKey(item.Key) && item.Value.Same(plc[item.Key]) &&
-            item.Value.ViewPath.StartsWith(prefix, StringComparison.Ordinal)) &&
-            main.Values.Any(row => row.ViewPath == prefix + "Remanence" && row.Category == "<BlockCommentCategoryData>" && row.Source == "=True, if remanent data are available") &&
-            main.Values.Any(row => row.ViewPath == prefix + "Initial_Call" && row.Category == "<BlockCommentCategoryData>" && row.Source == "Initial call of this OB");
+        foreach (var labels in new[] { new[] { "Programmbausteine", "Bausteinkommentar" }, new[] { "Program blocks", "Block comment" } })
+        {
+            string prefix = projectName + "\\" + plcName + "\\" + labels[0] + "\\Main\\";
+            Func<string, string, bool> has = (tail, source) => main.Values.Any(row => row.ViewPath == prefix + tail && row.Category == "<BlockCommentCategoryData>" && row.Source == source);
+            if (main.Count > 0 && main.All(item => plc.ContainsKey(item.Key) && item.Value.Same(plc[item.Key]) && item.Value.ViewPath.StartsWith(prefix, StringComparison.Ordinal)) &&
+                (has("Remanence", "=True, if remanent data are available") && has("Initial_Call", "Initial call of this OB") || has(labels[1], "Prueftext Main {0}")))
+                return true;
+        }
+        return false;
     }
 
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidDataException(message); }
