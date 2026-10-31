@@ -13,6 +13,15 @@ namespace TiaMcp.Simulation
             return requiredInterface == "Softbus" && networkMode == "Softbus" && instanceInterface == "Softbus" ? null : "SoftbusRequired";
         }
 
+        // TCP/IP instances answer only on PLCSIM's virtual Ethernet adapter: a TIA PG/PC interface name or a Windows adapter description.
+        public static bool PlcsimAdapter(string name) =>
+            (name ?? "").IndexOf("PLCSIM Virtual Ethernet Adapter", System.StringComparison.OrdinalIgnoreCase) >= 0;
+
+        // A write to a TCP/IP instance's address must leave through that adapter: a physical PLC with the same address can sit
+        // behind any other network card. routeAdapter comes from SimulationNetworkRoute.Adapter; null means undetermined.
+        public static string RouteRefusal(string routeAdapter) =>
+            routeAdapter == null ? "RuntimeTargetRouteUnverified" : PlcsimAdapter(routeAdapter) ? null : "RuntimeTargetNotOwnedPlcsim";
+
         // The one new device an owned empty startup produced qualifies for the documented bootstrap address. Softbus: only at
         // that address. TCP/IP: also without an IP, which TIA shows as no address, 0.0.0.0 or the device's MAC
         // (observed 29 October 2026: address = MAC 02-C0-A8-00-0A-00, series "S7-1500 (PLCSIM)").

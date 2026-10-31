@@ -476,6 +476,10 @@ def foreign_instance(h, lab, foreign):
     require(selected["owned"] is False, "A foreign instance was selected as owned")
     refuse(h, "a foreign instance", "sim_write_signals", {"instanceId": foreign["id"], "writes": [{"symbol": '"SigDb".VBool', "type": "bool", "value": True}]}, ["OwnedInstanceRequired"])
     refuse(h, "a foreign instance", "sim_area_write", {"instanceId": foreign["id"], "area": "marker", "offset": 0, "bytes": [1]}, ["OwnedInstanceRequired"])
+    refuse(h, "a foreign instance", "sim_write", {"instanceId": foreign["id"], "writes": [{"symbol": '"SigDb".VBool', "type": "bool", "value": True}]}, ["OwnedInstanceRequired"])
+    refuse(h, "a foreign instance", "sim_state", {"instanceId": foreign["id"], "action": "powerOff", "timeoutMs": 30000}, ["OwnedInstanceRequired"])
+    refuse(h, "a foreign instance", "sim_test", {"instanceId": foreign["id"], "signals": [{"symbol": '"SigDb".VBool', "type": "bool"}],
+                                                "steps": [{"writes": [{"symbol": '"SigDb".VBool', "type": "bool", "value": True}]}]}, ["OwnedInstanceRequired"])
     def readable():
         observed = h.tool("sim_observe", {"instanceId": foreign["id"], "windowMs": 200})
         require(observed["after"]["operatingState"] == "Off", "The foreign instance is not Off: %s" % observed["after"])

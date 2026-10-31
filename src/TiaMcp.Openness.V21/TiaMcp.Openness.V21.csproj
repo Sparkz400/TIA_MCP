@@ -30,6 +30,7 @@
     <Compile Include="../TiaMcp.Core/SimulationCardLockHolders.cs" Link="SimulationCardLockHolders.cs" />
     <Compile Include="../TiaMcp.Core/SimulationDiscoveryWait.cs" Link="SimulationDiscoveryWait.cs" />
     <Compile Include="../TiaMcp.Core/SimulationNetworkAdmission.cs" Link="SimulationNetworkAdmission.cs" />
+    <Compile Include="../TiaMcp.Core/SimulationNetworkRoute.cs" Link="SimulationNetworkRoute.cs" />
     <Compile Include="../TiaMcp.Core/OpcUaServerSettings.cs" Link="OpcUaServerSettings.cs" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Security" />

@@ -71,11 +71,25 @@ internal static class PackageStorage
         }
     }
 
-    internal static FileStream Lock(string path)
+    // A short holder (a status poll, another Host) is waited out, so a returned native call is still recorded; a longer hold refuses.
+    internal static TimeSpan LockWait = TimeSpan.FromSeconds(5);
+
+    /// <summary>Ownership locks held for a whole job pass <see cref="TimeSpan.Zero"/>: waiting would only delay their refusal.</summary>
+    internal static FileStream Lock(string path, TimeSpan? wait = null)
     {
         EnsureNoLinks(path);
-        try { return new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+        try { return WaitForLock(() => new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None), System.Diagnostics.Stopwatch.StartNew(), wait ?? LockWait); }
         catch (IOException error) { throw new BridgeException("IntakeBusy", "Another intake operation holds this resource. Retry the same read or upload request later.", error); }
+    }
+
+    /// <summary>The one bounded lock-file wait (also the credential vault's): only a sharing or lock violation is retried.</summary>
+    internal static FileStream WaitForLock(Func<FileStream> open, System.Diagnostics.Stopwatch elapsed, TimeSpan bound)
+    {
+        while (true)
+        {
+            try { return open(); }
+            catch (IOException error) when (error.HResult is unchecked((int)0x80070020) or unchecked((int)0x80070021) && elapsed.Elapsed < bound) { Thread.Sleep(25); }
+        }
     }
 
     internal static void PublishDirectory(string staging, string destination) =>

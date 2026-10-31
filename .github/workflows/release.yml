@@ -19,34 +19,83 @@ jobs:
     name: Explorer validation
     uses: ./.github/workflows/playwright.yml
 
-  draft:
-    name: Package and draft release
+  build:
+    name: Package and verify
     needs: [offline, explorer]
     runs-on: windows-latest
     timeout-minutes: 40
     permissions:
-      contents: write # gh release create --draft only
+      contents: read # NuGet restore and dotnet build run here, so no write token
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.402' # Published SDK; avoid unavailable latestFeature redirects.
-      - name: Package, verify and draft the release
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Package, verify and stage the release files
         shell: pwsh
         env:
-          GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
           $bundle = ./scripts/Package.ps1 -Offline
           $verified = ./scripts/Verify-TiaMcpBundle.ps1 -BundlePath $bundle -Strict
           $version = $verified.productVersion
           if ($env:TAG -cne "v$version") { throw "Tag $env:TAG does not name the bundle's product version $version." }
+          # From 1.0 on the ledger must be release-ready with no open or deferred cell.
+          python -B scripts/release_matrix.py --release-gate $version
+          if ($LASTEXITCODE -ne 0) { throw "Release gate refused $version." }
           $section = [regex]::Match((Get-Content -LiteralPath CHANGELOG.md -Raw), '(?ms)^## \[' + [regex]::Escape($version) + '\][^\n]*\n(.*?)(?=^## \[|\z)')
           if (-not $section.Success) { throw "CHANGELOG.md has no [$version] section." }
-          $notes = Join-Path $env:RUNNER_TEMP 'release-notes.md'
-          $section.Groups[1].Value.Trim() | Set-Content -LiteralPath $notes -Encoding UTF8
-          Copy-Item -LiteralPath (Join-Path $bundle 'manifest.json') -Destination "$bundle.manifest.json"
-          $flags = @('--draft', '--verify-tag', '--title', "TIA MCP $version", '--notes-file', $notes)
+          $stage = Join-Path $env:RUNNER_TEMP 'release-files'
+          New-Item -ItemType Directory -Path $stage | Out-Null
+          $section.Groups[1].Value.Trim() | Set-Content -LiteralPath (Join-Path $stage 'release-notes.md') -Encoding UTF8
+          Copy-Item -LiteralPath (Join-Path $bundle 'manifest.json') -Destination (Join-Path $stage ((Split-Path $bundle -Leaf) + '.manifest.json'))
+          Copy-Item -LiteralPath "$bundle.zip", "$bundle.zip.sha256" -Destination $stage
+          "RELEASE_FILES=$stage" | Add-Content -LiteralPath $env:GITHUB_ENV
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-files
+          path: ${{ env.RELEASE_FILES }}
+          if-no-files-found: error
+          retention-days: 7
+
+  draft:
+    name: Draft release
+    needs: build
+    runs-on: windows-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # gh release create --draft only; nothing is built here
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v7
+        with:
+          name: release-files
+          path: release-files
+      - name: Verify the uploaded ZIP and draft the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $zip = @(Get-ChildItem -LiteralPath release-files -Filter '*.zip')
+          if ($zip.Count -ne 1) { throw 'Expected exactly one ZIP in the build artifact.' }
+          $expected = ((Get-Content -LiteralPath "$($zip[0].FullName).sha256" -Raw).Trim() -split '\s+')[0]
+          if ((Get-FileHash -LiteralPath $zip[0].FullName -Algorithm SHA256).Hash -ine $expected) { throw 'ZIP does not match its .sha256 file.' }
+          # Verify what will be uploaded, not the folder it was built from.
+          $expanded = Join-Path $env:RUNNER_TEMP 'expanded'
+          Expand-Archive -LiteralPath $zip[0].FullName -DestinationPath $expanded
+          $verified = ./scripts/Verify-TiaMcpBundle.ps1 -BundlePath $expanded -Strict
+          $version = $verified.productVersion
+          if ($env:TAG -cne "v$version") { throw "Tag $env:TAG does not name the bundle's product version $version." }
+          $files = @(Get-ChildItem -LiteralPath release-files -File | ForEach-Object { $_.FullName } | Where-Object { $_ -notlike '*release-notes.md' })
+          $flags = @('--draft', '--verify-tag', '--title', "TIA MCP $version", '--notes-file', 'release-files/release-notes.md')
           if ($version -match '^0\.|-') { $flags += '--prerelease' }
-          gh release create $env:TAG "$bundle.zip" "$bundle.zip.sha256" "$bundle.manifest.json" @flags
+          gh release create $env:TAG @files @flags
           if ($LASTEXITCODE -ne 0) { throw 'Creating the draft release failed.' }

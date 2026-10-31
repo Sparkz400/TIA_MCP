@@ -147,6 +147,43 @@ internal static class EngineeringOperationChecks
             Reject(() => EngineeringResourceKey.ForPath("project", originalFile), "InvalidResourceKey");
             Reject(() => EngineeringResourceKey.ForPath("project", aliasFile), "InvalidResourceKey");
         }
+        // A scan reads a finished record for its chain only: a succeeded operation's deleted checkpoint archive no longer
+        // blocks every later admission, while reading that operation by id still refuses.
+        string finishedRoot = Path.Combine(root, "finished"); Directory.CreateDirectory(finishedRoot);
+        foreach (string name in new[] { input.RelativePath, checkpoint.RelativePath, proof.RelativePath }) File.Copy(Path.Combine(root, name), Path.Combine(finishedRoot, name));
+        var finishedStore = new EngineeringOperationStore(finishedRoot);
+        EngineeringOperationPlan Owned(string name)
+        {
+            string path = Path.Combine(finishedRoot, name + ".ap21");
+            return plan with { Target = target with { ProjectFilePath = path }, Resources = [new(EngineeringResourceKey.ForPath("project", path), "project", "write", "projectArchiveToNewLocation")] };
+        }
+        EngineeringOperationRecord Succeed(string name)
+        {
+            var p = Owned(name); var r = finishedStore.Prepare(p, name); r = finishedStore.Acquire(r.Id, r.Revision);
+            r = finishedStore.BeginCheckpoint(r.Id, r.Revision, () => p.Target); r = finishedStore.Checkpoint(r.Id, r.Revision, [checkpoint]);
+            r = finishedStore.Dispatch(r.Id, r.Revision, () => p.Target);
+            return finishedStore.RecordOutcome(r.Id, r.Revision, true, p.RequiredGates.Select(g => new EngineeringGateEvidence(g, proof)).ToArray());
+        }
+        var finished = Succeed("finished");
+        File.Delete(Path.Combine(finishedRoot, checkpoint.RelativePath));
+        var later = finishedStore.Prepare(Owned("later"), "later");
+        Check(finishedStore.Acquire(later.Id, later.Revision).State == "acquired", "A succeeded operation whose checkpoint archive is gone does not block unrelated admission");
+        Reject(() => finishedStore.Read(finished.Id), "ArtifactChanged");
+        File.Copy(Path.Combine(root, checkpoint.RelativePath), Path.Combine(finishedRoot, checkpoint.RelativePath));
+        int bound = EngineeringOperationStore.ArchiveAbove; EngineeringOperationStore.ArchiveAbove = 0;
+        try
+        {
+            var archived = Succeed("archived");
+            Check(!Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", archived.Id)) && Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", ".archive", archived.Id)) &&
+                finishedStore.Read(archived.Id).State == "succeeded", "A finished operation moves into .archive, out of the growth bound, and still reads by id");
+            Check(finishedStore.Prepare(Owned("archived"), "archived").Id == archived.Id, "An archived operation keeps its idempotency key");
+            Reject(() => PackageStorage.Id(".archive"), "InvalidRequest"); // So an older Host's scan refuses the store instead of missing archived keys.
+            var recovering = finishedStore.ReserveRecovery(archived.Id, archived.Revision, [new(archived.Plan.Resources[0].ResourceKey, Path.Combine(finishedRoot, "recovered.ap21"))]);
+            var rival = finishedStore.Prepare(Owned("archived"), "archived-contender");
+            Reject(() => finishedStore.Acquire(rival.Id, rival.Revision), "ResourceBusy");
+            Check(recovering.State == "recoveryIntent" && Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", archived.Id)), "Recovery of an archived success owns its resources in the scanned store again");
+        }
+        finally { EngineeringOperationStore.ArchiveAbove = bound; }
         Console.WriteLine($"PASS Native target guards and durable engineering operations: {passed} checks; synthetic callbacks only, no native execution. Receipts retained at {root}");
     }
 
@@ -186,5 +223,5 @@ internal static class EngineeringOperationChecks
 
     [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, EntryPoint = "CreateHardLinkW", SetLastError = true)]
     [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-    private static extern bool CreateHardLink(string name, string existing, IntPtr security);
+    internal static extern bool CreateHardLink(string name, string existing, IntPtr security);
 }

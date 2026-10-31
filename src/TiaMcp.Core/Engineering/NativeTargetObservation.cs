@@ -11,11 +11,12 @@ public static class NativeTargetGuard
 {
     private static readonly string[] States = ["observed", "empty", "absent", "blocked", "failed", "unknown"];
 
-    public static void Validate(NativeTargetObservation value)
+    /// <summary>Without <paramref name="live"/>, a stored observation is checked without re-deriving its project key from the filesystem.</summary>
+    public static void Validate(NativeTargetObservation value, bool live = true)
     {
         if (value is null) throw new BridgeException("InvalidIdentity", "A native observation is required.");
         EngineeringIdentityGuard.Validate(value.Reference);
-        _ = EngineeringJobs.EngineeringResourceKey.ForPath("project", value.ProjectFilePath);
+        if (live) _ = EngineeringJobs.EngineeringResourceKey.ForPath("project", value.ProjectFilePath);
         Text(value.SessionEpoch); Text(value.HardwareIdentity);
         if (value.NativeIdentity is not null) Text(value.NativeIdentity);
         EngineeringIdentityGuard.Sha256(value.AdapterSha256, "adapterSha256");

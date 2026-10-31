@@ -1,7 +1,7 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). On `main`, 29 October 2026:
+simulators you own (see the [README](../README.md)). On `main`, 31 October 2026:
 
 | | |
 | --- | --- |
@@ -33,7 +33,7 @@ names every row with an open cell.
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision
   of 29 October; each row's disposition is in the ledger). The three block-protection kinds
-  lacked only a repository route; building it is 1.0 work (decision of 29 October).
+  left the blocked set: their credential route was built and verified on 30 October.
 - **Deferred rows:** eight `not_implemented` rows (24 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
 - **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
@@ -58,6 +58,14 @@ record is cited by a feature; records no feature cites any more are in the retir
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). On
+[31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed
+offline, among them simulator ownership on every write, a PLCSIM route check for runtime writes and
+stores that no longer block on a missing old path; the changed native paths await a native recheck. On
+[30 October](history/status-log.md#30-october-2026): software-unit rename and create-from, motion
+connections, five PLCSIM signal and observation tools, Test Suite application runs (TS-Q02), MCP
+resource templates, completions and logging, the block-protection credential route, the CPU
+protection-level route and default-on combined library apply were added and natively qualified
+(catalog 0.4.86). On
 [29 October](history/status-log.md#29-october-2026): online downloads to an owned PLCSIM instance, PLCSIM virtual time, interrupt injection, memory reset and storage, typed CPU parameters, device/project compile and the tag-table lifecycle were added and natively qualified except HMI compilation ([record](verification/plcsim-openness-gaps-20261029.md)); the runtime UA, web and capture tools passed
 against the real servers of an owned TCP/IP PLCSIM instance ([record](verification/runtime-real-server-20261029.md)); the [MCP surface](reference/mcp-surface.md)
 gained `--toolsets`, tool titles, workflow prompts, progress heartbeats and output schemas; the remaining re-runnable lost records

@@ -199,6 +199,8 @@ internal sealed partial class CredentialVault
         public void Dispose() { try { file.Dispose(); } finally { turn.Release(); } }
     }
 
+    // Lock order: this vault lock, then engineering-operations/store.lock (operation methods, VerifyReleased); the store's credential
+    // callbacks run inside that vault lock and never take it, so the two locks cannot wait on each other.
     private IDisposable Lock()
     {
         CheckDirectory(); string path = Path.Combine(root, ".lock");
@@ -214,11 +216,8 @@ internal sealed partial class CredentialVault
                 catch (IOException) when (File.Exists(path)) { }
             }
             CheckFile(path);
-            while (true)  // Another process (the credential CLI, another Host) can hold the file lock.
-            {
-                try { return new Held(new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None), turn); }
-                catch (IOException) when (deadline.Elapsed < LockWait) { Thread.Sleep(25); }
-            }
+            // Another process (the credential CLI, another Host) can hold the file lock.
+            return new Held(PackageStorage.WaitForLock(() => new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None), deadline, LockWait), turn);
         }
         catch (IOException) { turn.Release(); throw Error("CredentialStoreBusy"); }
         catch { turn.Release(); throw; }

@@ -85,6 +85,21 @@ public sealed class ArtifactUploadStore
         return status;
     }
 
+    /// <summary>Server-side upload of in-memory bytes in chunk-limit slices; a failed upload is aborted so it holds no quota.</summary>
+    public string Upload(byte[] bytes, string name) => Upload(bytes, name, Convert.ToHexStringLower(SHA256.HashData(bytes)));
+
+    internal string Upload(byte[] bytes, string name, string sha256)
+    {
+        var begun = Begin(name, bytes.Length, sha256);
+        try
+        {
+            for (int offset = 0; offset < bytes.Length; offset += begun.MaxChunkBytes)
+                Write(begun.UploadId, offset, Convert.ToBase64String(bytes, offset, Math.Min(begun.MaxChunkBytes, bytes.Length - offset)));
+            return Commit(begun.UploadId).ArtifactRef!;
+        }
+        catch { Abort(begun.UploadId); throw; }
+    }
+
     public ArtifactUploadStatus Status(string uploadId)
     {
         using var gate = PackageStorage.Lock(Path.Combine(_root, "intake.lock"));

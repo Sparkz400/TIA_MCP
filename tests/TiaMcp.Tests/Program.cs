@@ -11,6 +11,7 @@ internal static partial class Program
 {
     private static async Task<int> Main(string[] args)
     {
+        PackageStorage.LockWait = TimeSpan.FromMilliseconds(250); // Contention checks hold a store lock past this short bound.
         if (args.Contains("--fake-worker")) return await FakeWorker.RunAsync(args);
         if (args.Length == 2 && args[0] is "--handoff-server" or "--handoff-client") return await AddInReceiverTests.Child(args[0], args[1]);
         if (args.Length == 1 && args[0] == "--identity-child") { Console.WriteLine("ready"); Console.ReadLine(); return 0; }
@@ -154,13 +155,14 @@ internal static partial class Program
             ("TCP/IP provisioning decides its target by address, or by MAC once the budget is spent", SimulationNetworkAdmissionTests.RuntimeTargetFromDiscoverySamples),
             ("Only TCP/IP retries GoOnline, once, before any callback or credential use", SimulationNetworkAdmissionTests.GoOnlineRetryOnlyBeforeAnyCallbackInTcpIp),
             ("Simulator worker never assigns network mode, adapters or IPs", SimulationNetworkAdmissionTests.WorkerNeverAssignsNetworkMode),
+            ("Runtime and Test Suite writes to a TCP/IP instance must route through the PLCSIM adapter", SimulationNetworkAdmissionTests.WritesRouteThroughThePlcsimAdapter),
             ("Simulator time requests are bounded, finite and explicit UTC", SimulationRuntimeControlTests.TimeBoundsAndUtc),
             ("Simulator events map to the exact V8 enum codes", SimulationRuntimeControlTests.EventsMapToV8Codes),
             ("Simulator events refuse malformed requests before any runtime call", SimulationRuntimeControlTests.EventsRefuseBeforeTheRuntimeCall),
             ("Simulator storage retrieve accepts only an unchanged own archive", SimulationRuntimeControlTests.ArchiveRetrieveNeedsOwnUnchangedArchive),
             ("Simulator I/Q/M area access is bounded before any runtime call", SimulationRuntimeControlTests.AreaAccessIsBoundedBeforeTheRuntimeCall),
             ("Simulator signal batches carry primitive values with distinct written symbols", SimulationRuntimeControlTests.SignalBatchesCarryPrimitiveValues),
-            ("Simulator time, event, storage, memory-reset, batch and area writes require an owned instance", SimulationRuntimeControlTests.WritesRequireAnOwnedInstance),
+            ("Simulator state changes, writes, scenario writes, time, event, storage, batch and area writes require an owned instance", SimulationRuntimeControlTests.WritesRequireAnOwnedInstance),
             ("OPC UA server settings map pinned native attributes and payload forms", OpcUaServerSettingsTests.PinnedFieldsAndPayloadForms),
             ("OPC UA server settings refuse bad values and stale expectations", OpcUaServerSettingsTests.RefusesBadValuesAndStaleExpectations),
             ("Project reviews survive restart and reject tampering", ProjectReviewStoreTests.PersistenceAndTamper),

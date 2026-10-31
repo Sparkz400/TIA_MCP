@@ -131,6 +131,23 @@ def build(root=ROOT):
     }
 
 
+def disposition_errors(rows, dispositions):
+    """A blocked row needs a maintainer disposition, and a disposition needs its blocked row."""
+    blocked = {row["featureId"] for row in rows if row["support"] == "unavailable_target"}
+    decided = {row["featureId"] for row in dispositions}
+    return ([f"{f}: blocked without a ledger disposition" for f in sorted(blocked - decided)]
+            + [f"{f}: ledger disposition without a blocked row" for f in sorted(decided - blocked)])
+
+
+def release_gate_errors(version, ledger, matrix):
+    """From 1.0 on, a release needs a ready ledger and no open or deferred cell."""
+    if int(version.split(".")[0]) < 1:
+        return []
+    cells = matrix["summary"]["cells"]
+    return ([] if ledger["releaseReady"] else ["ledger releaseReady is false"]) + [
+        f"{cells.get(state, 0)} {state} cells" for state in ("open", "deferred") if cells.get(state, 0)]
+
+
 def render(matrix):
     return json.dumps(matrix, indent=2, ensure_ascii=False) + "\n"
 
@@ -138,8 +155,19 @@ def render(matrix):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="fail if the committed matrix is stale")
+    parser.add_argument("--release-gate", metavar="VERSION", help="fail unless VERSION may ship (1.0 and later need releaseReady and no open cells)")
     args = parser.parse_args()
-    text = render(build())
+    matrix = build()
+    ledger = json.loads((ROOT / LEDGER).read_text(encoding="utf-8"))
+    errors = disposition_errors(matrix["rows"], ledger["dispositions"])
+    if args.release_gate:
+        errors += release_gate_errors(args.release_gate, ledger, matrix)
+    if errors:
+        raise SystemExit("\n".join(["Release matrix check failed:", *errors]))
+    if args.release_gate:
+        print(f"PASS {args.release_gate} may ship.")
+        return
+    text = render(matrix)
     target = ROOT / MATRIX
     if args.check:
         if not target.is_file() or target.read_text(encoding="utf-8") != text:

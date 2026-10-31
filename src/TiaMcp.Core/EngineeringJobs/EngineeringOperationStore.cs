@@ -14,13 +14,26 @@ public sealed class EngineeringOperationStore
 {
     private readonly string artifacts;
     private readonly string directory;
+    private readonly string archive;
     private static readonly string[] Terminal = ["succeeded", "reconciled", "stopped"];
+    // Every scan reads each record left in place, so once a store holds this many, records that finish move into its .archive folder.
+    // An older Host's scan refuses that folder (InvalidRequest) instead of silently missing archived keys.
+    internal static int ArchiveAbove = 1000;
     public EngineeringOperationStore(string artifactRoot)
     {
         artifacts = Path.GetFullPath(artifactRoot);
         PackageStorage.EnsureNoLinks(artifacts);
         directory = PackageStorage.Under(artifacts, "engineering-operations");
+        archive = PackageStorage.Under(directory, ".archive");
         Directory.CreateDirectory(directory);
+    }
+
+    // Best effort once the finished revision is durable: a record left in place stays valid and only counts toward the store bound.
+    // A failed index write (beforeMove) skips the move, so an archived operation is always findable by its key.
+    internal static void Archive(string record, string destination, Action? beforeMove = null)
+    {
+        try { Directory.CreateDirectory(Path.GetDirectoryName(destination)!); beforeMove?.Invoke(); Directory.Move(record, destination); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or BridgeException) { }
     }
 
     public EngineeringOperationRecord Prepare(EngineeringOperationPlan plan, string idempotencyKey)
@@ -33,9 +46,11 @@ public sealed class EngineeringOperationStore
         VerifyArtifacts(plan.Inputs);
         string hash = Hash(plan);
         var prior = Records().SingleOrDefault(r => r.IdempotencyKey == idempotencyKey);
+        prior = prior is null ? null : ReadLocked(prior.Id); // The scan may have read it without filesystem checks.
+        if (prior is null && File.Exists(Marker(idempotencyKey))) prior = ReadLocked(PackageStorage.Load<string>(Marker(idempotencyKey)));
         if (prior is not null)
         {
-            if (prior.PlanSha256 != hash) Fail("IdempotencyConflict", "The key belongs to a different immutable plan.");
+            if (prior.PlanSha256 != hash || prior.IdempotencyKey != idempotencyKey) Fail("IdempotencyConflict", "The key belongs to a different immutable plan.");
             return prior;
         }
         string id = Guid.NewGuid().ToString("N");
@@ -190,15 +205,16 @@ public sealed class EngineeringOperationStore
         return r with { State = "recoveryIntent", RecoveryDestinations = destinations, RecoveryTarget = recoveryTarget };
     });
 
-    private static void ValidateRecoveryTarget(EngineeringOperationPlan plan, NativeTargetObservation target)
+    private static void ValidateRecoveryTarget(EngineeringOperationPlan plan, NativeTargetObservation target, bool live = true)
     {
         if (plan.Credentials?.Any(c => c.UsePhase == "recovery") != true)
             Fail("JournalInvalid", "Recovery context requires explicit recovery credentials.");
+        if (!live) return;
         NativeTargetGuard.EnsureRecoveryTarget(plan.Target, target);
         NativeTargetGuard.EnsureFresh(target, target, plan.RequiredProbes);
     }
 
-    private static void ValidateDestinations(EngineeringOperationPlan plan, IReadOnlyList<EngineeringRecoveryDestination> destinations, bool externalRecovery = false)
+    private static void ValidateDestinations(EngineeringOperationPlan plan, IReadOnlyList<EngineeringRecoveryDestination> destinations, bool externalRecovery = false, bool live = true)
     {
         if (destinations is null || destinations.Count > 64 || destinations.Count == 0 && (!externalRecovery || !plan.Resources.Any(r => r.Kind == "external")) || destinations.Any(d => d is null) ||
             destinations.Select(d => d.ResourceKey).Distinct(StringComparer.Ordinal).Count() != destinations.Count)
@@ -209,6 +225,7 @@ public sealed class EngineeringOperationStore
             Text(destination.ResourceKey); Text(destination.RecoveryLocation);
             var resource = plan.Resources.SingleOrDefault(r => r.ResourceKey == destination.ResourceKey);
             if (resource is null || resource.Kind == "external" || resource.RecoveryStrategy == "reconcileExternalCommit") Fail("InvalidRecovery", "Only a planned local resource can be restored to a new location.");
+            if (!live) continue;
             string key = EngineeringResourceKey.ForPath(resource!.Kind, destination.RecoveryLocation);
             if (plan.Resources.Any(r => EngineeringResourceKey.Overlaps(r.ResourceKey, key)) || keys.Any(k => EngineeringResourceKey.Overlaps(k, key)))
                 Fail("InvalidRecovery", "Recovery destinations cannot overlap original resources or each other.");
@@ -217,7 +234,7 @@ public sealed class EngineeringOperationStore
     }
 
     private void ValidateReconciliation(EngineeringOperationRecord record, int revision, IReadOnlyList<ResourceReconciliation> evidence,
-        IReadOnlyList<EngineeringRecoveryDestination> admittedDestinations, IReadOnlyList<EngineeringRecoveryResolution> recoveryEvidence)
+        IReadOnlyList<EngineeringRecoveryDestination> admittedDestinations, IReadOnlyList<EngineeringRecoveryResolution> recoveryEvidence, bool live = true)
     {
         var plan = record.Plan;
         if (recoveryEvidence is null || recoveryEvidence.Count != admittedDestinations.Count || recoveryEvidence.Any(e => e is null) ||
@@ -229,9 +246,9 @@ public sealed class EngineeringOperationStore
             if (resolution is not null) Text(resolution.RecoveryLocation);
             string kind = plan.Resources.Single(r => r.ResourceKey == admitted.ResourceKey).Kind;
             if (resolution is null || resolution.Disposition is not ("verifiedRestored" or "verifiedAbsent" or "retainedPartial") ||
-                EngineeringResourceKey.ForPath(kind, resolution.RecoveryLocation) != EngineeringResourceKey.ForPath(kind, admitted.RecoveryLocation))
+                live && EngineeringResourceKey.ForPath(kind, resolution.RecoveryLocation) != EngineeringResourceKey.ForPath(kind, admitted.RecoveryLocation))
                 Fail("ReconciliationIncomplete", "Recovery destination identity or disposition is unresolved.");
-            VerifyArtifacts([resolution!.Evidence]);
+            VerifyArtifacts([resolution!.Evidence], live);
         }
         if (evidence is null || evidence.Count != plan.Resources.Count || evidence.Any(e => e is null) ||
             evidence.Select(e => e.ResourceKey).Distinct(StringComparer.Ordinal).Count() != evidence.Count)
@@ -246,8 +263,8 @@ public sealed class EngineeringOperationStore
             {
                 if (item!.Disposition is not ("externalBaselineObserved" or "externalDesiredStateObserved") || item.RecoveryLocation is not null)
                     Fail("InvalidRecovery", "External resources require their own state readback, never a project-copy or external-commit substitute.");
-                VerifyArtifacts([item.Evidence]);
-                EngineeringExternalEvidence.Verify(artifacts, record, revision, resource, "reconciliation",
+                VerifyArtifacts([item.Evidence], live);
+                if (live) EngineeringExternalEvidence.Verify(artifacts, record, revision, resource, "reconciliation",
                     item.Disposition == "externalDesiredStateObserved" ? resource.External!.After : resource.External!.Before, item.Evidence);
                 continue;
             }
@@ -255,20 +272,23 @@ public sealed class EngineeringOperationStore
             if (item!.Disposition == "restoredToNewLocation")
             {
                 Text(item.RecoveryLocation!);
-                string destination = EngineeringResourceKey.ForPath(resource.Kind, item.RecoveryLocation!);
-                if (plan.Resources.Any(r => EngineeringResourceKey.Overlaps(destination, r.ResourceKey)) ||
-                    destinations.Any(d => EngineeringResourceKey.Overlaps(destination, d)) || resource.RecoveryStrategy == "reconcileExternalCommit")
-                    Fail("InvalidRecovery", "Restore must use a distinct location and cannot undo an external commit.");
-                destinations.Add(destination);
-                if (!admittedDestinations.Any(d => d.ResourceKey == resource.ResourceKey && EngineeringResourceKey.ForPath(resource.Kind, d.RecoveryLocation) == destination))
-                    Fail("RecoveryAdmissionRequired", "A restore result must bind its previously reserved destination.");
+                if (resource.RecoveryStrategy == "reconcileExternalCommit") Fail("InvalidRecovery", "Restore must use a distinct location and cannot undo an external commit.");
+                if (live)
+                {
+                    string destination = EngineeringResourceKey.ForPath(resource.Kind, item.RecoveryLocation!);
+                    if (plan.Resources.Any(r => EngineeringResourceKey.Overlaps(destination, r.ResourceKey)) || destinations.Any(d => EngineeringResourceKey.Overlaps(destination, d)))
+                        Fail("InvalidRecovery", "Restore must use a distinct location and cannot undo an external commit.");
+                    destinations.Add(destination);
+                    if (!admittedDestinations.Any(d => d.ResourceKey == resource.ResourceKey && EngineeringResourceKey.ForPath(resource.Kind, d.RecoveryLocation) == destination))
+                        Fail("RecoveryAdmissionRequired", "A restore result must bind its previously reserved destination.");
+                }
                 if (!recoveryEvidence.Any(e => e.ResourceKey == resource.ResourceKey && e.Disposition == "verifiedRestored"))
                     Fail("ReconciliationIncomplete", "A restored resource requires verified recovered-copy evidence.");
             }
             else if (item.RecoveryLocation is not null) Fail("InvalidRecovery", "Only a restored resource has a recovery location.");
             if (item.Disposition == "externalCommitRetained" && resource.RecoveryStrategy != "reconcileExternalCommit")
                 Fail("InvalidRecovery", "External-commit evidence cannot discharge a local restore obligation.");
-            VerifyArtifacts([item.Evidence]);
+            VerifyArtifacts([item.Evidence], live);
         }
     }
 
@@ -279,7 +299,18 @@ public sealed class EngineeringOperationStore
         if (previous.Revision != revision) Fail("RevisionConflict", "The durable operation changed; reread before proceeding.");
         var next = change(previous) with { Revision = revision + 1, PreviousSha256 = Hash(previous), RecordedAt = DateTimeOffset.UtcNow };
         ValidateTransition(previous, next);
-        Write(next); return next;
+        string folder = Folder(id), active = PackageStorage.Under(directory, id);
+        // An archived success that reserves recovery must be visible to scans before that revision is durable.
+        if (folder != active && !Terminal.Contains(next.State))
+        {
+            try { Directory.Move(folder, active); folder = active; }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            { throw new BridgeException("OperationStoreBusy", "The archived operation could not return to the active store; nothing was recorded. Retry the same request.", error); }
+        }
+        Write(next, folder);
+        if (folder == active && Terminal.Contains(next.State) && Directory.GetDirectories(directory).Length > ArchiveAbove)
+            Archive(active, PackageStorage.Under(archive, id), () => PackageStorage.Save(Marker(next.IdempotencyKey), id)); // Prepare still finds the key.
+        return next;
     }
 
     private void Fresh(EngineeringOperationRecord r, Func<NativeTargetObservation> reacquire)
@@ -288,11 +319,12 @@ public sealed class EngineeringOperationStore
         NativeTargetGuard.EnsureFresh(r.Plan.Target, reacquire(), r.Plan.RequiredProbes);
     }
 
-    private void VerifyArtifacts(IEnumerable<EngineeringArtifactReference> values)
+    private void VerifyArtifacts(IEnumerable<EngineeringArtifactReference> values, bool live = true)
     {
         foreach (var value in values)
         {
             ValidateArtifact(value);
+            if (!live) continue;
             string path = PackageStorage.Under(artifacts, PackageStorage.Relative(value.RelativePath));
             if (!File.Exists(path) || PackageStorage.FileHash(path) != value.Sha256)
                 Fail("ArtifactChanged", "A retained input/checkpoint/evidence artifact is missing or changed.");
@@ -305,18 +337,18 @@ public sealed class EngineeringOperationStore
         Text(value!.RelativePath); EngineeringIdentityGuard.Sha256(value.Sha256, "artifactSha256");
     }
 
-    private void ValidateEvidence(IReadOnlyList<EngineeringGateEvidence> evidence)
+    private void ValidateEvidence(IReadOnlyList<EngineeringGateEvidence> evidence, bool live = true)
     {
         if (evidence is null || evidence.Count > 256 || evidence.Any(e => e is null) || evidence.Select(e => e.Gate).Distinct(StringComparer.Ordinal).Count() != evidence.Count)
             Fail("VerificationIncomplete", "Evidence gates must be bounded and unique.");
         foreach (var entry in evidence!) Text(entry.Gate);
-        VerifyArtifacts(evidence!.Select(e => e.Artifact));
+        VerifyArtifacts(evidence!.Select(e => e.Artifact), live);
     }
 
-    private static void ValidatePlan(EngineeringOperationPlan plan)
+    private static void ValidatePlan(EngineeringOperationPlan plan, bool live = true)
     {
         if (plan is null) Fail("InvalidOperationPlan", "An immutable plan is required.");
-        Text(plan!.Operation); NativeTargetGuard.Validate(plan.Target);
+        Text(plan!.Operation); NativeTargetGuard.Validate(plan.Target, live);
         if (plan.Resources is null || plan.Resources.Count is < 1 or > 64 || plan.Resources.Any(r => r is null) ||
             plan.Resources.Select(r => r.ResourceKey).Distinct(StringComparer.Ordinal).Count() != plan.Resources.Count ||
             plan.Inputs is null || plan.Inputs.Count is < 1 or > 256 || plan.RequiredProbes is null || plan.RequiredProbes.Count > 256 ||
@@ -326,7 +358,7 @@ public sealed class EngineeringOperationStore
         foreach (var r in plan.Resources!)
         {
             Text(r.ResourceKey); Text(r.Kind); Text(r.Effect);
-            EngineeringResourceKey.Validate(r);
+            EngineeringResourceKey.Validate(r, live);
             if (r.RecoveryStrategy is not ("projectArchiveToNewLocation" or "libraryCopyToNewLocation" or "immutableWorkspaceVersion" or "reconcileExternalCommit" or "externalStateReadback"))
                 Fail("InvalidOperationPlan", "Unknown resource recovery strategy.");
             if (r.Kind == "project" && r.RecoveryStrategy != "projectArchiveToNewLocation" ||
@@ -337,7 +369,7 @@ public sealed class EngineeringOperationStore
             if (r.Kind == "external" && !plan.RequiredGates.Contains(EngineeringExternalEvidence.OutcomeGate(r.ResourceKey), StringComparer.Ordinal))
                 Fail("InvalidOperationPlan", "Every external resource needs its own required readback gate.");
         }
-        if (!plan.Resources!.Any(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", plan.Target.ProjectFilePath)))
+        if (live && !plan.Resources!.Any(r => r.ResourceKey == EngineeringResourceKey.ForPath("project", plan.Target.ProjectFilePath)))
             Fail("InvalidOperationPlan", "The exact target project must be reserved in the effect set.");
         foreach (var name in plan.RequiredProbes!.Concat(plan.RequiredGates!)) Text(name);
         foreach (var input in plan.Inputs!) ValidateArtifact(input);
@@ -360,35 +392,48 @@ public sealed class EngineeringOperationStore
         {
             string name = Path.GetFileName(path);
             // A staged prepare never authorizes checkpoint/dispatch and is not a committed operation.
-            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit)) continue;
-            yield return ReadLocked(name);
+            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
+            yield return ReadLocked(name, scan: true);
         }
     }
 
-    private EngineeringOperationRecord ReadLocked(string id)
+    // A finished record may have moved into .archive; ids are unique across both.
+    private string Folder(string id)
+    {
+        string active = PackageStorage.Under(directory, id);
+        return Directory.Exists(active) ? active : PackageStorage.Under(archive, id);
+    }
+    private string Marker(string idempotencyKey) =>
+        PackageStorage.Under(archive, Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(idempotencyKey))) + ".json");
+
+    private EngineeringOperationRecord ReadLocked(string id, bool scan = false)
     {
         PackageStorage.Id(id);
-        string root = PackageStorage.Under(directory, id);
+        string root = Folder(id);
         if (!Directory.Exists(root)) Fail("OperationNotFound", "No durable operation has this ID.");
         var files = Directory.GetFiles(root, "*.json").OrderBy(x => x, StringComparer.Ordinal).ToArray();
         if (files.Length is 0 or > 10000) Fail("JournalInvalid", "Missing or excessive operation revisions.");
+        // A scan needs a record that owns nothing only for its chain: its paths or artifacts may be gone (a removed drive, a deleted folder).
+        if (new FileInfo(files[^1]).Length > 8 * 1024 * 1024) Fail("JournalInvalid", "A persisted revision exceeds 8 MiB.");
+        var last = PackageStorage.Load<EngineeringOperationRecord>(files[^1]);
+        bool live = !scan || HoldsResources(last);
         EngineeringOperationRecord? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
             if (new FileInfo(files[i]).Length > 8 * 1024 * 1024) Fail("JournalInvalid", "A persisted revision exceeds 8 MiB.");
-            var record = PackageStorage.Load<EngineeringOperationRecord>(files[i]);
-            ValidatePlan(record.Plan);
+            var record = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringOperationRecord>(files[i]);
+            ValidatePlan(record.Plan, live);
             if (Path.GetFileName(files[i]) != i.ToString("D6") + ".json" || record.Id != id || record.Revision != i ||
                 record.PlanSha256 != Hash(record.Plan) || record.PreviousSha256 != (previous is null ? null : Hash(previous)) ||
                 previous is not null && (record.PlanSha256 != previous.PlanSha256 || record.IdempotencyKey != previous.IdempotencyKey))
                 Fail("JournalInvalid", "The operation revision chain or immutable plan is invalid.");
-            ValidateTransition(previous, record);
+            ValidateTransition(previous, record, live);
             previous = record;
         }
         return previous!;
     }
 
-    private void ValidateTransition(EngineeringOperationRecord? previous, EngineeringOperationRecord current)
+    private void ValidateTransition(EngineeringOperationRecord? previous, EngineeringOperationRecord current, bool live = true)
     {
         if (current.Checkpoints is null || current.Evidence is null || current.Reconciliation is null || current.RecoveryDestinations is null || current.RecoveryResolutions is null ||
             current.Checkpoints.Any(x => x is null) || current.Evidence.Any(x => x is null) || current.Reconciliation.Any(x => x is null))
@@ -411,7 +456,7 @@ public sealed class EngineeringOperationStore
             (previous?.RecoveryTarget is null ? null : Hash(previous.RecoveryTarget));
         if (targetChanged && (current.State != "recoveryIntent" || previous is null || previous.State == "recoveryIntent" || previous.RecoveryTarget is not null))
             Fail("JournalInvalid", "A recovery target is immutable after first-use admission.");
-        if (current.RecoveryTarget is not null) ValidateRecoveryTarget(current.Plan, current.RecoveryTarget);
+        if (current.RecoveryTarget is not null) ValidateRecoveryTarget(current.Plan, current.RecoveryTarget, live);
         if (current.State == "recoveryIntent" && current.Plan.Credentials is not null &&
             (current.RecoveryTarget is null && current.RecoveryDestinations.Count == 0 || previous?.State != "recoveryIntent" && previous?.RecoveryTarget is not null))
             Fail("JournalInvalid", "Credential recovery requires first-use context and cannot replay after unknown completion.");
@@ -419,7 +464,7 @@ public sealed class EngineeringOperationStore
             Fail("JournalInvalid", "Recovery destination outcomes require explicit reconciliation.");
         if (destinationChanged && (current.State != "recoveryIntent" || previous!.State == "recoveryIntent" || previous.RecoveryDestinations.Count != 0 || previous.RecoveryTarget is not null))
             Fail("JournalInvalid", "Recovery destinations require first-use durable admission.");
-        if (current.State == "recoveryIntent") ValidateDestinations(current.Plan, current.RecoveryDestinations!, current.RecoveryTarget is not null);
+        if (current.State == "recoveryIntent") ValidateDestinations(current.Plan, current.RecoveryDestinations!, current.RecoveryTarget is not null, live);
         if (previous?.State != "dispatchIntent" && current.State == "dispatchIntent" && evidenceChanged)
             Fail("JournalInvalid", "Initial dispatch intent cannot invent returned result evidence.");
         if (previous?.State == "dispatchIntent" && current.State == "dispatchIntent")
@@ -428,7 +473,7 @@ public sealed class EngineeringOperationStore
                 Hash(current.Evidence.Take(previous.Evidence.Count).ToArray()) != Hash(previous.Evidence) ||
                 current.Evidence.Last().Gate?.StartsWith("dispatch.", StringComparison.Ordinal) != true)
                 Fail("JournalInvalid", "A pending dispatch revision may only append one immutable returned result, never redispatch.");
-            ValidateEvidence(current.Evidence);
+            ValidateEvidence(current.Evidence, live);
         }
         if (previous?.State == "dispatchIntent" && current.State is "succeeded" or "recoveryRequired" &&
             Hash(current.Evidence.Take(previous.Evidence.Count).ToArray()) != Hash(previous.Evidence))
@@ -439,13 +484,13 @@ public sealed class EngineeringOperationStore
                 current.Evidence.LastOrDefault()?.Gate == "interruption." + previous.Revision;
             if ((!interruption && (previous!.State != current.State || current.RecoveryDestinations.Count == 0 && !current.Plan.Resources.Any(x => x.Kind == "external"))) || current.Evidence.Count != previous!.Evidence.Count + 1 ||
                 Hash(current.Evidence.Take(previous.Evidence.Count).ToArray()) != Hash(previous.Evidence)) Fail("JournalInvalid", "Recovery evidence must append exactly one immutable observation.");
-            ValidateEvidence(current.Evidence);
+            ValidateEvidence(current.Evidence, live);
         }
         if (checkpointChanged && current.State != "ready" || evidenceChanged && current.State is not ("dispatchIntent" or "succeeded" or "recoveryRequired" or "recoveryIntent" or "outcomeUnknown") ||
             recoveryChanged && current.State != "reconciled") Fail("JournalInvalid", "Evidence was changed outside its allowed transition.");
         if (current.State is "ready" or "dispatchIntent" or "succeeded" or "recoveryRequired")
             if (current.Checkpoints.Count != current.Plan.Resources.Count) Fail("JournalInvalid", "The persisted operation lacks all resource checkpoints.");
-        if (current.State == "ready")
+        if (current.State == "ready" && live)
             for (int i = 0; i < current.Plan.Resources.Count; i++)
                 if (current.Plan.Resources[i].Kind == "external")
                 {
@@ -456,23 +501,22 @@ public sealed class EngineeringOperationStore
         {
             if (current.Plan.RequiredGates.Any(g => !current.Evidence.Any(e => e.Gate == g)))
                 Fail("JournalInvalid", "A successful persisted operation lacks its required gates.");
-            ValidateEvidence(current.Evidence); VerifyArtifacts(current.Checkpoints);
-            foreach (var resource in current.Plan.Resources.Where(r => r.Kind == "external"))
+            ValidateEvidence(current.Evidence, live); VerifyArtifacts(current.Checkpoints, live);
+            foreach (var resource in current.Plan.Resources.Where(r => live && r.Kind == "external"))
                 EngineeringExternalEvidence.Verify(artifacts, current, previous!.Revision, resource, "outcome", resource.External!.After,
                     current.Evidence.Single(e => e.Gate == EngineeringExternalEvidence.OutcomeGate(resource.ResourceKey)).Artifact);
         }
         if (current.State == "recoveryRequired")
         {
             if (!current.Evidence!.Any(e => e.Gate == "failure")) Fail("JournalInvalid", "The original failure evidence is missing.");
-            ValidateEvidence(current.Evidence);
+            ValidateEvidence(current.Evidence, live);
         }
-        if (current.State == "reconciled") ValidateReconciliation(current, previous!.Revision, current.Reconciliation!, current.RecoveryDestinations!, current.RecoveryResolutions!);
+        if (current.State == "reconciled") ValidateReconciliation(current, previous!.Revision, current.Reconciliation!, current.RecoveryDestinations!, current.RecoveryResolutions!, live);
     }
 
-    private void Write(EngineeringOperationRecord record, string? preparedDirectory = null)
+    private void Write(EngineeringOperationRecord record, string folder)
     {
-        string path = preparedDirectory is null ? PackageStorage.Under(directory, record.Id + "/" + record.Revision.ToString("D6") + ".json") :
-            PackageStorage.Under(preparedDirectory, "000000.json");
+        string path = PackageStorage.Under(folder, record.Revision.ToString("D6") + ".json");
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(record, BridgeProtocol.Json);
         if (bytes.Length > 8 * 1024 * 1024) Fail("OperationStoreLimit", "The operation record exceeds 8 MiB.");
         // A crash leaves a .tmp; only a fully flushed rename becomes a committed revision.

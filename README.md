@@ -157,7 +157,7 @@ Configure your MCP client's stdio server using your actual checkout path:
 }
 ```
 
-The Host advertises about 290 tools. If your client limits tools per server, add
+The Host advertises about 300 tools. If your client limits tools per server, add
 `"--toolsets", "core,simulation"` (or other groups) to `args`; see
 [MCP surface](docs/reference/mcp-surface.md#tool-groups---toolsets) for the groups.
 

@@ -17,6 +17,8 @@ concurrency:
 jobs:
   sync:
     name: Publish docs/wiki
+    # A manual run from a feature branch must not publish that branch's pages.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

@@ -47,6 +47,7 @@ namespace TiaMcp.Openness.V21
         {
             var project = SelectProject(args);
             EnsureProjectOffline(project);
+            RequireNoUnresolvedChange(project, null);
             var kind = ChangeText(args, "kind", 64);
             var payload = args["payload"] as JObject ?? throw new BridgeException("InvalidRequest", "payload must be an object.");
             var id = Guid.NewGuid().ToString("N");
@@ -74,6 +75,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["changeId"] = id;
                 change.Preview["kind"] = kind;
                 change.Preview["project"] = ProjectInfo(project);
+                change.Preview["isModified"] = project.IsModified;
                 change.Preview["payload"] = change.Payload.DeepClone();
                 change.Preview["baseFingerprint"] = change.BaseFingerprint;
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
@@ -142,7 +144,7 @@ namespace TiaMcp.Openness.V21
             if (!compile && change.Kind == "vci_synchronize" && change.Payload.Value<string>("direction") == "WorkspaceToProject")
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             // network_configure kept its optional compile when it joined the hardware rules; remote-I/O fixtures defer it.
-            if (!compile && ((HardwareEngineeringRules.Applies(change.Kind) && change.Kind != "network_configure") || IsPlcAlarmKind(change.Kind) || new[] { "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "tag_table_create", "tag_table_rename", "tag_table_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
+            if (!compile && ((HardwareEngineeringRules.Applies(change.Kind) && change.Kind != "network_configure") || IsPlcAlarmKind(change.Kind) || new[] { "block_rename", "block_delete", "to_delete", "hardware_delete", "type_rename", "type_delete", "tag_set", "tag_delete", "constant_set", "constant_delete", "tag_create", "constant_create", "block_number_set", "block_attributes_set", "instance_db_create", "group_create", "group_rename", "group_delete", "tag_table_create", "tag_table_rename", "tag_table_delete", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "hardware_address_set", "drive_telegram_set", "connection_create", "connection_delete", "connection_set", "graph_import", "to_connect", "to_disconnect",
                 "software_unit_create", "software_unit_relation_set", "software_unit_publication_set", "software_unit_delete", "software_unit_rename", "software_unit_create_from", "webserver_page_set", "webserver_user_pages_generate", "umac_role_set" }.Concat(BlockProtectionKinds).Contains(change.Kind) || change.Kind.StartsWith("opcua_", StringComparison.Ordinal)))
                 throw new BridgeException("InvalidRequest", "This engineering operation requires compile=true.");
             if (change.Kind == "cax_import") RequireCaxImportRoute();
@@ -162,6 +164,8 @@ namespace TiaMcp.Openness.V21
                 // An unopenable credential must refuse before the checkpoint save, not after it.
                 if (change.Preview["credentials"] != null) RequireRoutedCredentials(change);
                 EngineeringPaths.ValidateProjectArchivePath(change.Directory, "before.zap21");
+                // Another change may have failed after this one was prepared.
+                RequireNoUnresolvedChange(project, change.Id);
                 change.IdempotencyKey = key;
                 _changeKeys[key] = change.Id;
                 change.State = "checkpointing";
@@ -1527,6 +1531,18 @@ namespace TiaMcp.Openness.V21
             string id = ChangeText(args, "changeId", 64);
             if (!_changes.TryGetValue(id, out var change)) throw new BridgeException("ChangeNotFound", "Unknown changeId in this worker session. Saved journal files remain available after disconnect.");
             return change;
+        }
+
+        // A checkpoint save would persist an unresolved change's unsaved edits and make it unrestorable. Only the TIA process
+        // that prepared it can still hold them; a new process starts from the saved files.
+        private void RequireNoUnresolvedChange(Project project, string exceptId)
+        {
+            var unresolved = _changes.Values.FirstOrDefault(x => x.Id != exceptId && x.PreparedProcessId == _processId &&
+                string.Equals(x.ProjectPath, project.Path.FullName, StringComparison.OrdinalIgnoreCase) &&
+                (x.State == "recovery_required" || x.State == "checkpointing" || x.State == "applying" || x.State == "restoring"));
+            if (unresolved != null)
+                throw new BridgeException("RecoveryRequired", "Change " + unresolved.Id + " on this project is " + unresolved.State + ". Run change_restore " + unresolved.Id +
+                    " (owned instance, recovery_required); otherwise tia_detach and start a new instance, or restart the worker.", ChangeView(unresolved));
         }
 
         private Project ProjectForChange(EngineeringChange change)

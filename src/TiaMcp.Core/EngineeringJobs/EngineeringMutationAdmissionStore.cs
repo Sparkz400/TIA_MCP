@@ -17,6 +17,7 @@ public sealed class EngineeringMutationAdmissionStore
     private readonly string artifacts;
     private readonly string directory;
     private readonly string lockPath;
+    private readonly string archive;
     public EngineeringMutationAdmissionStore(string artifactRoot)
     {
         artifacts = Path.GetFullPath(artifactRoot); PackageStorage.EnsureNoLinks(artifacts);
@@ -24,6 +25,7 @@ public sealed class EngineeringMutationAdmissionStore
         string operations = PackageStorage.Under(artifacts, "engineering-operations");
         Directory.CreateDirectory(directory); Directory.CreateDirectory(operations);
         lockPath = Path.Combine(operations, "store.lock");
+        archive = PackageStorage.Under(directory, ".archive");
     }
 
     public EngineeringMutationAdmission Acquire(EngineeringMutationScope scope, string requestSha256)
@@ -50,7 +52,7 @@ public sealed class EngineeringMutationAdmissionStore
     public DateTimeOffset AdmittedAt(string id)
     {
         using var held = PackageStorage.Lock(lockPath); _ = ReadUnderLock(artifacts, id);
-        return PackageStorage.Load<EngineeringMutationAdmission>(PackageStorage.Under(directory, id + "/00000000.json")).RecordedAt;
+        return PackageStorage.Load<EngineeringMutationAdmission>(PackageStorage.Under(Folder(artifacts, id), "00000000.json")).RecordedAt;
     }
 
     public EngineeringMutationAdmission Returned(string id, int revision, EngineeringArtifactReference response) =>
@@ -83,8 +85,12 @@ public sealed class EngineeringMutationAdmissionStore
     {
         using var held = PackageStorage.Lock(lockPath); var prior = ReadUnderLock(artifacts, id);
         if (prior.Revision != revision) throw new BridgeException("RevisionConflict", "Mutation admission changed; reread it before reconciliation.");
-        var next = update(prior) with { Revision = revision + 1, PreviousSha256 = Hash(prior), RecordedAt = DateTimeOffset.UtcNow };
-        ValidateRecord(artifacts, prior, next); Write(next, PackageStorage.Under(directory, id)); return next;
+        // A clock stepped back (w32time, VM restore) must not turn a recorded outcome into an invalid journal.
+        var next = update(prior) with { Revision = revision + 1, PreviousSha256 = Hash(prior), RecordedAt = prior.RecordedAt > DateTimeOffset.UtcNow ? prior.RecordedAt : DateTimeOffset.UtcNow };
+        ValidateRecord(artifacts, prior, next); Write(next, PackageStorage.Under(directory, id));
+        if (next.State is "returned" or "reconciled" && Directory.GetDirectories(directory).Length > EngineeringOperationStore.ArchiveAbove)
+            EngineeringOperationStore.Archive(PackageStorage.Under(directory, id), PackageStorage.Under(archive, id));
+        return next;
     }
 
     private static IEnumerable<EngineeringMutationAdmission> RecordsUnderLock(string artifacts)
@@ -96,48 +102,59 @@ public sealed class EngineeringMutationAdmissionStore
         foreach (string folder in folders)
         {
             string name = Path.GetFileName(folder);
-            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit)) continue;
-            yield return ReadUnderLock(artifacts, name);
+            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
+            yield return ReadUnderLock(artifacts, name, scan: true);
         }
     }
 
-    private static EngineeringMutationAdmission ReadUnderLock(string artifacts, string id)
+    // A finished record may have moved into .archive (an older Host's scan refuses that folder); ids are unique across both.
+    private static string Folder(string artifacts, string id)
     {
-        PackageStorage.Id(id); string root = PackageStorage.Under(artifacts, "engineering-admissions/" + id);
+        string active = PackageStorage.Under(artifacts, "engineering-admissions/" + id);
+        return Directory.Exists(active) ? active : PackageStorage.Under(artifacts, "engineering-admissions/.archive/" + id);
+    }
+
+    private static EngineeringMutationAdmission ReadUnderLock(string artifacts, string id, bool scan = false)
+    {
+        PackageStorage.Id(id); string root = Folder(artifacts, id);
         if (!Directory.Exists(root)) throw new BridgeException("OperationNotFound", "Mutation admission was not found.");
         var files = Directory.GetFiles(root, "*.json").Order(StringComparer.Ordinal).ToArray();
         if (files.Length is < 1 or > 16) throw new BridgeException("JournalInvalid", "Mutation admission revisions are missing or excessive.");
+        // A scan needs a finished record only for its chain: its paths or responses may be gone (a removed drive, a deleted folder).
+        if (new FileInfo(files[^1]).Length > 1024 * 1024) throw new BridgeException("JournalInvalid", "Mutation admission revisions must be contiguous and bounded.");
+        var last = PackageStorage.Load<EngineeringMutationAdmission>(files[^1]);
+        bool live = !scan || last.State is not ("returned" or "reconciled");
         EngineeringMutationAdmission? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
             if (Path.GetFileName(files[i]) != i.ToString("D8") + ".json" || new FileInfo(files[i]).Length > 1024 * 1024)
                 throw new BridgeException("JournalInvalid", "Mutation admission revisions must be contiguous and bounded.");
-            var next = PackageStorage.Load<EngineeringMutationAdmission>(files[i]);
+            var next = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringMutationAdmission>(files[i]);
             if (next.Id != id || next.Revision != i) throw new BridgeException("JournalInvalid", "Mutation admission revision identity differs.");
-            ValidateRecord(artifacts, previous, next); previous = next;
+            ValidateRecord(artifacts, previous, next, live); previous = next;
         }
         return previous!;
     }
 
-    private static void ValidateRecord(string artifacts, EngineeringMutationAdmission? previous, EngineeringMutationAdmission current)
+    private static void ValidateRecord(string artifacts, EngineeringMutationAdmission? previous, EngineeringMutationAdmission current, bool live = true)
     {
-        ValidateScope(current.Scope); EngineeringIdentityGuard.Sha256(current.RequestSha256, "requestSha256");
-        if (current.ResourceKeys is null || !ScopeKeys(current.Scope).SequenceEqual(current.ResourceKeys) || current.Reconciliation is null)
+        ValidateScope(current.Scope, live); EngineeringIdentityGuard.Sha256(current.RequestSha256, "requestSha256");
+        if (current.ResourceKeys is null || current.ResourceKeys.Count != current.Scope.Resources.Count || live && !ScopeKeys(current.Scope).SequenceEqual(current.ResourceKeys) || current.Reconciliation is null)
             throw new BridgeException("JournalInvalid", "Mutation resource keys differ from their exact scope.");
         bool valid = previous is null ? current.State == "dispatchIntent" && current.PreviousSha256 is null && current.Response is null && current.Reconciliation.Count == 0
             : current.PreviousSha256 == Hash(previous) && current.RequestSha256 == previous.RequestSha256 && Hash(current.Scope) == Hash(previous.Scope) &&
               current.RecordedAt >= previous.RecordedAt && (previous.State == "dispatchIntent" && current.State is "returned" or "outcomeUnknown" or "reconciled" ||
               previous.State == "outcomeUnknown" && current.State == "reconciled");
         if (!valid) throw new BridgeException("JournalInvalid", "Mutation admission transition or immutable scope changed.");
-        if (current.Response is not null) VerifyArtifact(artifacts, current.Response);
+        if (current.Response is not null && live) VerifyArtifact(artifacts, current.Response);
         if (current.State == "returned" && current.Response is null) throw new BridgeException("JournalInvalid", "Returned dispatch needs its exact retained response.");
-        if (current.State == "reconciled") ValidateReconciliation(artifacts, current.ResourceKeys, current.Reconciliation);
+        if (current.State == "reconciled") ValidateReconciliation(artifacts, current.ResourceKeys, current.Reconciliation, live);
         else if (current.Reconciliation.Count != 0) throw new BridgeException("JournalInvalid", "Unreconciled admission contains reconciliation claims.");
         if (previous is not null && current.State == "reconciled" && Hash(current.Response) != Hash(previous.Response))
             throw new BridgeException("JournalInvalid", "Reconciliation cannot replace the retained dispatch outcome.");
     }
 
-    private static void ValidateScope(EngineeringMutationScope scope)
+    private static void ValidateScope(EngineeringMutationScope scope, bool live = true)
     {
         if (scope is null || !IsMutation(scope.Operation) || string.IsNullOrWhiteSpace(scope.SessionEpoch) || scope.SessionEpoch.Length > 128 || scope.ProcessId <= 0 ||
             scope.Resources is null || scope.Resources.Count is < 1 or > 64 || scope.Resources.Any(r => r is null))
@@ -147,10 +164,11 @@ public sealed class EngineeringMutationAdmissionStore
         EngineeringIdentityGuard.Sha256(scope.AdapterSha256, "adapterSha256");
         foreach (var resource in scope.Resources)
         {
-            _ = EngineeringResourceKey.ForPath(resource.Kind, resource.Path);
+            if (live) _ = EngineeringResourceKey.ForPath(resource.Kind, resource.Path);
             if (string.IsNullOrWhiteSpace(resource.Effect) || resource.Effect.Length > 256 || resource.Effect.Any(char.IsControl))
                 throw new BridgeException("InvalidMutationScope", "Every resource needs an exact bounded effect.");
         }
+        if (!live) return;
         var keys = ScopeKeys(scope);
         if (keys.Distinct(StringComparer.Ordinal).Count() != keys.Length)
             throw new BridgeException("InvalidMutationScope", "Duplicate resource keys are refused.");
@@ -161,7 +179,7 @@ public sealed class EngineeringMutationAdmissionStore
     private static string[] ScopeKeys(EngineeringMutationScope scope) => scope.Resources.Select(r => EngineeringResourceKey.ForPath(r.Kind, r.Path)).Order(StringComparer.Ordinal).ToArray();
     private static void State(EngineeringMutationAdmission record, string expected)
     { if (record.State != expected) throw new BridgeException("RecoveryRequired", "An attempted native dispatch is never replayed."); }
-    private static void ValidateReconciliation(string artifacts, IReadOnlyList<string> keys, IReadOnlyList<ResourceReconciliation> evidence)
+    private static void ValidateReconciliation(string artifacts, IReadOnlyList<string> keys, IReadOnlyList<ResourceReconciliation> evidence, bool live = true)
     {
         if (evidence is null || evidence.Count != keys.Count || evidence.Any(e => e is null) ||
             !evidence.Select(e => e.ResourceKey).Order(StringComparer.Ordinal).SequenceEqual(keys))
@@ -170,7 +188,7 @@ public sealed class EngineeringMutationAdmissionStore
         {
             if (item.Disposition is not ("unchanged" or "verifiedApplied") || item.RecoveryLocation is not null)
                 throw new BridgeException("ReconciliationIncomplete", "This dispatch-only adapter cannot assert restoration or partial cleanup.");
-            VerifyArtifact(artifacts, item.Evidence);
+            if (live) VerifyArtifact(artifacts, item.Evidence);
         }
     }
     private static void VerifyArtifact(string artifacts, EngineeringArtifactReference reference)

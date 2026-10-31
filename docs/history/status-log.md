@@ -5,6 +5,16 @@ Dated delivery notes, newest first. Until 28 October 2026 they were the body of
 banners of the [documentation index](../README.md). Each entry keeps the counts
 and catalog version of its day; [STATUS](../STATUS.md) has the current ones.
 
+## 31 October 2026
+
+**Code audit fixes — 31 October 2026:**
+- **Safety boundary:** `sim_write`, `sim_state` and `sim_test` with writes now refuse instances this adapter does not own (a parallel session could select and drive another session's instance). Runtime writes, RUN/STOP and Test Suite system tests also need Windows to route the endpoint through the PLCSIM virtual adapter; matching the IP text alone could reach a physical PLC with the same address. One shared rule identifies the adapter for provisioning, the Host gate and the worker.
+- **Robustness:** a cancelled `sim_*` call no longer faults the simulator bridge; a missing drive or a case-renamed folder of an old, finished change no longer blocks every new change; store locks wait up to 5 s instead of failing at once; finished admissions and operations move to `.archive` past 1,000 records; a backward clock step no longer turns a success into `JournalInvalid`.
+- **Correctness:** `library_package_stage` no longer copies arbitrary host files into the artifact store; `translation_native_capture` chunks workbooks over 64 KiB; `db_snapshot_create` compares snapshot content; translation reopen keeps scratch status honest; change prepare/apply refuse while another change on the project needs recovery; generated-source reads take exclusive access; the delete and rename kinds need `compile`.
+- **Release tooling:** blocked matrix rows must match the ledger's dispositions; verified features need a non-lost run covering their tools; the Explorer relationship checks run in the managed CI shard; the release workflow gates 1.x tags on `releaseReady`, builds without a write token and verifies the uploaded ZIP; the wiki sync runs from `main` only; two dead scripts removed; four CodeQL false positives dismissed.
+- **Docs:** 23 drift items across CHANGELOG, STATUS, TODO, README, guides, wiki and two catalog limitations corrected.
+- **Not native:** every change passes the offline suites; the changed native paths are built but wait for a native recheck ([TODO](../TODO.md#release-mechanics-and-policy)). Catalog 0.4.86 counts are unchanged: 437 of 469 verified; matrix 1,995 bound, 108 open, 31 blocked, 24 deferred.
+
 ## 30 October 2026
 
 **Software units, motion connections and library compile with a drive — 30 October 2026:**

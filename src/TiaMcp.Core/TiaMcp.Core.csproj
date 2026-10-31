@@ -11,5 +11,8 @@
     <EmbeddedResource Include="../../third-party/automationml/*.xsd" LogicalName="TiaMcp.AutomationMl.%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../contracts/feature-catalog.v1.json" LogicalName="TiaMcp.FeatureCatalog.v1.json" />
     <EmbeddedResource Include="../../fixtures/watch-tables/native-owned-v21/MilestoneWatch.before.xml" LogicalName="TiaMcp.WatchTable.OwnedV21.xml" />
+    <!-- Offline suites shorten the store lock wait and the archive bound for their contention and growth checks. -->
+    <InternalsVisibleTo Include="TiaMcp.Engineering.Tests" />
+    <InternalsVisibleTo Include="TiaMcp.ComponentWindow.Tests" />
   </ItemGroup>
 </Project>

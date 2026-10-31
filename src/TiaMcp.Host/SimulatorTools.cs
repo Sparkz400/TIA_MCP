@@ -31,14 +31,14 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_creation_status", new { creationId, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation") }, cancellationToken);
 
     [McpServerTool(Name = "sim_select", Destructive = false, OpenWorld = false)]
-    [Description("Select an existing local simulated instance by its ID AND expected name. Optional creationId explicitly requests ownership adoption after the original worker exits; requires a signed ready receipt and matching native ID, name, CPU, storage and marker. No CPU state change or new download ticket. Without creationId the selection stays unowned.")]
+    [Description("Select an existing local simulated instance by its ID AND expected name. Optional creationId explicitly requests ownership adoption after the original worker exits; requires a signed ready receipt and matching native ID, name, CPU, storage and marker. No CPU state change or new download ticket. Without creationId the selection stays unowned: it can be read and observed, never written, powered, run or stopped.")]
     public Task<CallToolResult> Select(int instanceId, string expectedName, CancellationToken cancellationToken, string? creationId = null)
         => Call("sim_select", new { instanceId, expectedName, creationId, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation") }, cancellationToken);
 
     [McpServerTool(Name = "sim_state", Destructive = true, OpenWorld = false)]
-    [Description("Change only a selected PLCSIM instance: powerOn, powerOff, run, stop, or memoryReset (owned instances only; restarts the virtual controller with its loaded program). Exact local simulator identity is rechecked. Never targets a physical PLC. SimulationConfigurationPasswordRequired requests the separate confidential configuration-protection password; user login requires username and password only if separately requested. This tool accepts no raw credentials; follow the returned guidance and server authentication instructions.")]
+    [Description("Change only a PLCSIM instance this session created or adopted (otherwise OwnedInstanceRequired): powerOn, powerOff, run, stop, or memoryReset (restarts the virtual controller with its loaded program). Refused with SimulationCaptureModeActive while a cycle-synchronous capture holds the instance. timeoutMs (1000-60000, default 30000; twice it for powerOn, whose failure is followed by a powerOff) must end 5 s before the Host's --timeout-seconds, otherwise InvalidRequest. Exact local simulator identity is rechecked. Never targets a physical PLC. SimulationConfigurationPasswordRequired requests the separate confidential configuration-protection password; user login requires username and password only if separately requested. This tool accepts no raw credentials; follow the returned guidance and server authentication instructions.")]
     public Task<CallToolResult> State(int instanceId, string action, CancellationToken cancellationToken, int timeoutMs = 30000)
-        => Call("sim_state", new { instanceId, action, timeoutMs }, cancellationToken);
+        => Call("sim_state", new { instanceId, action, timeoutMs }, cancellationToken, action == "powerOn" ? 2 * timeoutMs : timeoutMs);
 
     [McpServerTool(Name = "sim_tags", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect exposed simulation symbols after a program is loaded. Returns bounded native tag metadata; this is separate from offline tag tables.")]
@@ -51,7 +51,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_read", new { instanceId, signals = Array(signals) }, cancellationToken);
 
     [McpServerTool(Name = "sim_write", Destructive = true, OpenWorld = false)]
-    [Description("Write typed simulation stimuli to a selected local simulated instance. writes is an array of {symbol,type,value}. Writes affect the simulated program and may be overwritten by its scan.")]
+    [Description("Write typed simulation stimuli to a local simulated instance this session created or adopted (otherwise OwnedInstanceRequired). writes is an array of {symbol,type,value}. Writes affect the simulated program and may be overwritten by its scan.")]
     public Task<CallToolResult> Write(int instanceId, JsonElement writes, CancellationToken cancellationToken)
         => Call("sim_write", new { instanceId, writes = Array(writes) }, cancellationToken);
 
@@ -76,14 +76,14 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_area_write", new { instanceId, area, offset, bytes, bit, value }, cancellationToken);
 
     [McpServerTool(Name = "sim_observe", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Observe a selected PLCSIM instance: operating state and mode before and after, the display data summary (includeDisplayData adds the bytes as base64) and, for windowMs 1-60000 (default 0, a snapshot only), every operating-state and LED change the runtime reports, up to maxEvents (1-256, default 64; the window ends when reached). The subscription ends with the call. V8 has no LED getter, so LEDs appear only as changes. Calls run one at a time, so the window sees changes from the program, the PLCSIM UI or other API clients, not from other tool calls.")]
+    [Description("Observe a selected PLCSIM instance: operating state and mode before and after, the display data summary (includeDisplayData adds the bytes as base64) and, for windowMs 1-60000 (default 0, a snapshot only), every operating-state and LED change the runtime reports, up to maxEvents (1-256, default 64; the window ends when reached). The window must end 5 s before the Host's --timeout-seconds, otherwise InvalidRequest. The subscription ends with the call. V8 has no LED getter, so LEDs appear only as changes. Calls run one at a time, so the window sees changes from the program, the PLCSIM UI or other API clients, not from other tool calls.")]
     public Task<CallToolResult> Observe(int instanceId, CancellationToken cancellationToken, int windowMs = 0, int maxEvents = 64, bool includeDisplayData = false)
-        => Call("sim_observe", new { instanceId, windowMs, maxEvents, includeDisplayData }, cancellationToken);
+        => Call("sim_observe", new { instanceId, windowMs, maxEvents, includeDisplayData }, cancellationToken, windowMs);
 
     [McpServerTool(Name = "sim_test", Destructive = true, OpenWorld = false)]
-    [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Wall-clock polling is not scan-accurate. virtualTime:true (owned instances only) runs the scenario in TimespanSynchronized_C: every wait is a StartProcessing span of virtual time, samples are read while the CPU is frozen, elapsedMs is virtual time, and the previous operating mode is restored. Duration/sample bounds are enforced by the adapter.")]
+    [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Steps with writes and virtualTime:true need an instance this session created or adopted (otherwise OwnedInstanceRequired). Wall-clock polling is not scan-accurate. virtualTime:true runs the scenario in TimespanSynchronized_C: every wait is a StartProcessing span of virtual time, samples are read while the CPU is frozen, elapsedMs is virtual time, and the previous operating mode is restored. Duration/sample bounds are enforced by the adapter; its 90 s execution cap needs a Host --timeout-seconds of at least 105, otherwise InvalidRequest.")]
     public Task<CallToolResult> Test(int instanceId, JsonElement signals, JsonElement steps, CancellationToken cancellationToken, int intervalMs = 100, bool virtualTime = false)
-        => Call("sim_test", new { instanceId, signals = Array(signals), steps = Array(steps), intervalMs, virtualTime, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-tests") }, cancellationToken);
+        => Call("sim_test", new { instanceId, signals = Array(signals), steps = Array(steps), intervalMs, virtualTime, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-tests") }, cancellationToken, TestWaitMs);
 
     [McpServerTool(Name = "sim_time", Destructive = true, OpenWorld = false)]
     [Description("Read or set the virtual clock of a selected PLCSIM instance. Without arguments it reads scaleFactor, virtual system time and operating mode. scaleFactor (greater than 0, at most 1000) speeds up or slows down the virtual clock in the default operating mode; systemTimeUtc (ISO 8601 ending in Z, 1970-2200) sets the virtual system time. Writes need an instance this session created or adopted and are read back. Never a physical PLC.")]
@@ -101,16 +101,25 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_storage", new { instanceId, action, archivePath, expectedSha256, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-archives") }, cancellationToken);
 
     [McpServerTool(Name = "sim_release", Destructive = true, OpenWorld = false)]
-    [Description("Release the adapter's simulation attachment. deleteOwned additionally removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]
+    [Description("Release the adapter's simulation attachment; without deleteOwned it is refused with SimulationCaptureModeActive while a cycle-synchronous capture holds the instance. deleteOwned additionally powers off and removes only an instance created by this adapter; existing selected instances cannot be deleted through this tool.")]
     public Task<CallToolResult> Release(int instanceId, CancellationToken cancellationToken, bool deleteOwned = false)
-        => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken);
+        => Call("sim_release", new { instanceId, deleteOwned }, cancellationToken, deleteOwned ? 30000 : 0);
 
     private static JsonElement Array(JsonElement value) => value.ValueKind == JsonValueKind.Array ? value : throw new McpException("An array is required.");
-    private async Task<CallToolResult> Call(string operation, object args, CancellationToken cancellationToken)
+    // sim_test: the adapter's 90 s execution cap plus one interval and one sync-point wait it can still run after its last cap check.
+    private const int TestWaitMs = 100000, BridgeMarginMs = 5000;
+    // The request's token is never passed on: a cancelled bridge call faults the simulator worker for every later tool. A wait
+    // (waitMs) that outlasts the bridge timeout faults it the same way, so it must end before that timeout.
+    private async Task<CallToolResult> Call(string operation, object args, CancellationToken cancellationToken, int waitMs = 0)
     {
         string json;
         bool error;
-        try { json = (await simulator.Bridge.CallAsync(operation, args, cancellationToken)).GetRawText(); error = false; }
+        try
+        {
+            if (waitMs > options.TimeoutSeconds * 1000 - BridgeMarginMs)
+                throw new BridgeException("InvalidRequest", $"{operation} can wait {waitMs} ms, which does not end {BridgeMarginMs} ms before this Host's {options.TimeoutSeconds} s bridge timeout (--timeout-seconds). Shorten the wait or start the Host with a longer timeout; nothing was sent.");
+            json = (await simulator.Bridge.CallAsync(operation, args, CancellationToken.None)).GetRawText(); error = false;
+        }
         catch (BridgeException ex)
         { json = JsonSerializer.Serialize(new { error = new { code = ex.Code, message = ex.Message, details = (ex as BridgeOperationException)?.Details } }, BridgeProtocol.Json); error = true; }
         return new CallToolResult { IsError = error, Content = [new TextContentBlock { Text = json }], StructuredContent = JsonSerializer.Deserialize<JsonElement>(json) };

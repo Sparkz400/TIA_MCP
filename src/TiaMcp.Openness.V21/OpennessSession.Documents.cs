@@ -42,16 +42,24 @@ namespace TiaMcp.Openness.V21
                 if (extension == null) throw new BridgeException("UnsupportedFormat", "Source generation covers SCL/STL blocks, DBs and PLC data types; " + language + " has no external source form.");
                 var sources = (target.Scope?.Unit?.ExternalSourceGroup ?? target.Plc.Software.ExternalSourceGroup) as PlcExternalSourceSystemGroup
                     ?? throw new BridgeException("UnsupportedCapability", "The selected scope exposes no external-source system group.");
-                var before = new HashSet<string>(sources.ExternalSources.Select(source => source.Name), StringComparer.Ordinal);
-                sources.GenerateSource(new IGenerateSource[] { block != null ? block : type }, new FileInfo(Path.Combine(directory.FullName, name + extension)), GenerateOptions.None);
-                // The API documents a file result only; anything it leaves in the project is removed and the group re-verified.
-                var added = sources.ExternalSources.Where(source => !before.Contains(source.Name)).ToList();
-                var removed = new JArray(added.Select(source => source.Name));
-                if (added.Count != 0) ObserveIndexOperation("generated_source_cleanup");
-                foreach (var source in added) source.Delete();
-                if (sources.ExternalSources.Any(source => !before.Contains(source.Name)))
-                    throw new BridgeException("ProjectSideEffect", "Source generation left an external source in the project that could not be removed.", new JObject { ["externalSources"] = removed });
-                result["export"] = new JObject { ["artifacts"] = DirectoryArtifacts(directory, "text/plain"), ["removedExternalSources"] = removed };
+                var project = target.Plc.Project;
+                // Generation can add an external source that the cleanup deletes, so it is guarded like a write.
+                EnsureProjectOffline(project);
+                using (_portal.ExclusiveAccess("TIA MCP: generate one external source file"))
+                {
+                    bool modifiedBefore = project.IsModified;
+                    var before = new HashSet<string>(sources.ExternalSources.Select(source => source.Name), StringComparer.Ordinal);
+                    sources.GenerateSource(new IGenerateSource[] { block != null ? block : type }, new FileInfo(Path.Combine(directory.FullName, name + extension)), GenerateOptions.None);
+                    // The API documents a file result only; anything it leaves in the project is removed and the group re-verified.
+                    var added = sources.ExternalSources.Where(source => !before.Contains(source.Name)).ToList();
+                    var removed = new JArray(added.Select(source => source.Name));
+                    if (added.Count != 0) ObserveIndexOperation("generated_source_cleanup");
+                    foreach (var source in added) source.Delete();
+                    if (sources.ExternalSources.Any(source => !before.Contains(source.Name)))
+                        throw new BridgeException("ProjectSideEffect", "Source generation left an external source in the project that could not be removed.", new JObject { ["externalSources"] = removed });
+                    result["export"] = new JObject { ["artifacts"] = DirectoryArtifacts(directory, "text/plain"), ["removedExternalSources"] = removed,
+                        ["projectModifiedBefore"] = modifiedBefore, ["projectModifiedAfter"] = project.IsModified };
+                }
             }
             result["completeness"] = new JObject { ["complete"] = true, ["scope"] = format == "simaticSd" ? "Native SIMATIC SD document export of one " + kind : "Native generated external source of one " + kind + " without dependencies",
                 ["note"] = "Every file written into the fresh artifact directory is hashed. No normalized model is returned." };
