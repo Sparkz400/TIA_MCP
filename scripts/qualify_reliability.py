@@ -73,7 +73,7 @@ def verify_no_replay(events, token, mutations=1, starts=1):
 
 class ReliabilityClient(Client):
     """Keep asynchronous request IDs explicit so the harness can interrupt its own call."""
-    def __init__(self, host, worker, artifacts, timeout=5, config=None, record=None):
+    def __init__(self, host, worker, artifacts, timeout=5, config=None, record=None, extra=None):
         self.timeout, self.sequence = timeout, 0
         self.tool_calls = [] if record is None else record
         self.lines, self.errors = queue.Queue(), []
@@ -83,7 +83,7 @@ class ReliabilityClient(Client):
         else:
             environment.pop("TIA_MCP_RELIABILITY_CONFIG", None)
         self.process = subprocess.Popen(
-            [str(host), "--worker", str(worker), "--timeout-seconds", str(timeout), "--artifacts", str(artifacts)],
+            [str(host), "--worker", str(worker), "--timeout-seconds", str(timeout), "--artifacts", str(artifacts), *(extra or [])],
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, encoding="utf-8", bufsize=1, env=environment,
         )

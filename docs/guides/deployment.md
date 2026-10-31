@@ -85,6 +85,7 @@ Qualification-only options register gated test tools and interruption points for
 | `--testsuite-scope-probe` | Its own sequential Host |
 | `--testsuite-qualification` | Its own sequential Host; only in builds with the `TESTSUITE_QUALIFICATION` constant |
 | `--translation-qualification` | Its own sequential Host |
+| `--hmi-text-list-qualification <profile>` | Its own sequential Host; `unified-comfort` or `unified-pc`. The worker admits change kind `hmi_text_list_import` for that profile only in a project it created or retrieved itself; production admits only profiles whose native qualification passed |
 
 As the first argument, `--credential-store` and `--ua-identity-store` run the [protected credential](../reference/protected-credentials.md) and OPC UA identity commands instead of the server. `--session-relay-server` and `--session-relay-client` are internal to `Start-TiaMcp.ps1 -InteractiveSession`.
 

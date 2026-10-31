@@ -16,8 +16,10 @@ namespace TiaMcp.Model
     internal static class HmiTextListImportRules
     {
         internal const string Operation = "text_list_import";
-        // The profiles the gate opens for; the catalog states which of them a native run qualified.
-        internal static readonly string[] Profiles = { "unified-comfort", "unified-pc" };
+        // Profiles whose native qualification passed; the evidence-curation commit adds each one (empty until then).
+        internal static readonly string[] Profiles = { };
+        // Profiles a qualification-only Host (--hmi-text-list-qualification <profile>) may admit in a project its own worker retrieved.
+        internal static readonly string[] QualificationProfiles = { "unified-comfort", "unified-pc" };
         private static readonly Dictionary<string, JToken> EntryDefaults = new Dictionary<string, JToken>(StringComparer.Ordinal)
             { ["Type"] = "SingleValue", ["Value"] = 0L, ["FromValue"] = 0L, ["ToValue"] = 0L, ["IsDefaultEntry"] = false };
 
@@ -55,18 +57,46 @@ namespace TiaMcp.Model
                 throw new ArgumentException("The candidate names its lists and languages.");
         }
 
-        internal static JObject Gate(string family, string profile)
+        /// <summary>qualificationProfile is the profile a qualification-only Host admits, passed only for a project the worker retrieved itself.</summary>
+        internal static JObject Gate(string family, string profile, string qualificationProfile = null)
         {
-            bool available = family == "unified" && Profiles.Contains(profile, StringComparer.Ordinal);
+            bool production = family == "unified" && Profiles.Contains(profile, StringComparer.Ordinal);
+            bool qualification = !production && family == "unified" && profile != null && profile == qualificationProfile && QualificationProfiles.Contains(profile, StringComparer.Ordinal);
+            bool available = production || qualification;
             return new JObject { ["family"] = family, ["targetProfile"] = profile ?? "unknown", ["operation"] = Operation, ["available"] = available,
-                ["apiAvailability"] = "available", ["bridgeImplementation"] = "guarded_body", ["nativeQualification"] = "unverified",
+                ["admission"] = production ? "production" : qualification ? "qualification" : null,
+                ["apiAvailability"] = "available", ["bridgeImplementation"] = "guarded_body", ["nativeQualification"] = production ? "verified" : "unverified",
                 ["reasonCode"] = available ? null : "HmiPreservationUnavailable",
-                ["reason"] = available
-                    ? "Opened by the 31 October maintainer decision for this kind only: HmiTextListComposition.Import with exact export-compare readback, unchanged other text lists and whole-HMI capture, unchanged compiler errors/warnings, save and checkpoint restore. Screens and every other HMI write stay behind the closed preservation gate."
-                    : "Unified text-list import is open only for the unified-comfort and unified-pc profiles; this target's profile is " + (profile ?? "unknown") + ".",
+                ["reason"] = production
+                    ? "Opened by the 31 October maintainer decision for this kind only, on a natively qualified profile: HmiTextListComposition.Import with exact export-compare readback, unchanged other text lists and whole-HMI capture, unchanged compiler errors/warnings, save and checkpoint restore. Screens and every other HMI write stay behind the closed preservation gate."
+                    : qualification ? "Qualification-only admission of profile " + profile + " in a project this worker retrieved; no production profile is qualified yet."
+                    : "No profile has passed native qualification of Unified text-list import (this target's profile is " + (profile ?? "unknown") + "); only a qualification Host admits unified-comfort or unified-pc in its own retrieved project.",
                 ["requiredGates"] = new JArray("completePreservationScope", "candidateRefusals", "activeLanguagesEqual", "exactImportReadback", "otherTextListsUnchanged",
                     "unrelatedContentPreserved", "compilerProblemsUnchanged", "saveReopen", "archiveRecoveryEquality", "interruptedWriteRecovery"),
                 ["runtimeVerified"] = false };
+        }
+
+        /// <summary>The Unified capture always records its two standing notes (tag-table export stability; no Screen.Export), so it is
+        /// never "complete". This kind accepts exactly those notes and nothing else: no typed read error, no native capture failure,
+        /// no Classic gap, no other note. Its content hash is then the observed-artifacts hash.</summary>
+        internal static bool ScopeAccepted(JObject manifest)
+        {
+            if (manifest == null || manifest["nativeFailure"]?.Type is JTokenType type && type != JTokenType.Null || manifest.Value<string>("family") != "unified") return false;
+            var notes = manifest["missingCoverage"] as JArray; var targets = manifest["targets"] as JArray;
+            string observed = manifest.Value<string>("observedArtifactsHash");
+            return notes != null && targets != null && targets.Count > 0 && targets.All(t => t.Value<string>("family") == "unified")
+                && notes.All(n => n.Type == JTokenType.String && ((string)n == HmiPreservationRules.UnifiedTagTableExportNote || (string)n == HmiPreservationRules.UnifiedTypedReadbackNote))
+                && observed != null && observed.Length == 64 && observed.All(Uri.IsHexDigit);
+        }
+
+        /// <summary>The text-list export skips lists with formatted text (Siemens), so every typed text-list node of the target must
+        /// be a list the export holds; otherwise an unexported peer could change unseen.</summary>
+        internal static bool ExportCoversTypedLists(IEnumerable<string> artifactKeys, string hmiPath, IEnumerable<string> exportedNames)
+        {
+            string prefix = hmiPath + "/textLists/";
+            var typed = new HashSet<string>(artifactKeys.Where(k => k.StartsWith(prefix, StringComparison.Ordinal) && k.IndexOf('/', prefix.Length) < 0)
+                .Select(k => k.Substring(prefix.Length)), StringComparer.Ordinal);
+            return typed.SetEquals(exportedNames.Select(Uri.EscapeDataString));
         }
 
         /// <summary>Text lists by name, each as canonical JSON of its meaning.</summary>
@@ -147,15 +177,17 @@ namespace TiaMcp.Model
             return Generic(node);
         }
 
-        private static JToken Texts(List<KeyValuePair<string, object>> libraries, JToken reference)
+        // An entry without a reference keeps null; any other reference must resolve to exactly one library entry with one text per language.
+        private static JToken Texts(Dictionary<string, object> libraries, JToken reference)
         {
+            if (reference.Type == JTokenType.Null) return JValue.CreateNull();
             string text = reference.Type == JTokenType.String ? (string)reference : null;
             var owners = text == null ? new KeyValuePair<string, object>[0] : libraries.Where(l => text.StartsWith(l.Key + ".", StringComparison.Ordinal)).ToArray();
             if (owners.Length == 1)
             {
                 var owner = AsMapping(owners[0].Value, "library");
                 var languages = Field(owner, "Languages") as List<object>;
-                var entry = Field(AsMapping(Field(owner, "Entries"), "Entries"), text.Substring(owners[0].Key.Length + 1)) as List<KeyValuePair<string, object>>;
+                var entry = Field(AsMapping(Field(owner, "Entries"), "Entries"), text.Substring(owners[0].Key.Length + 1)) as Dictionary<string, object>;
                 var texts = entry == null ? null : Field(entry, "Text") as List<object>;
                 if (languages != null && texts != null && languages.Count == texts.Count && languages.All(l => l is Scalar) && texts.All(t => t is Scalar))
                 {
@@ -168,7 +200,7 @@ namespace TiaMcp.Model
                     return Canonical(map);
                 }
             }
-            return new JObject { ["unresolved"] = reference.DeepClone() };
+            throw new FormatException("Unresolved or ambiguous text reference: " + Shorten(reference.ToString(Formatting.None)));
         }
 
         private static JToken Generic(object node)
@@ -177,7 +209,7 @@ namespace TiaMcp.Model
             if (node is Scalar scalar) return scalar.Text;
             if (node is List<object> sequence) return new JArray(sequence.Select(n => (object)Generic(n)).ToArray());
             var map = new SortedDictionary<string, JToken>(StringComparer.Ordinal);
-            foreach (var pair in (List<KeyValuePair<string, object>>)node) map[pair.Key] = Generic(pair.Value);
+            foreach (var pair in (Dictionary<string, object>)node) map[pair.Key] = Generic(pair.Value);
             return Canonical(map);
         }
 
@@ -189,9 +221,9 @@ namespace TiaMcp.Model
             return result;
         }
 
-        private static object Field(List<KeyValuePair<string, object>> mapping, string key) => mapping.Where(p => p.Key == key).Select(p => p.Value).FirstOrDefault();
-        private static List<KeyValuePair<string, object>> AsMapping(object node, string role)
-            => node == null ? new List<KeyValuePair<string, object>>() : node as List<KeyValuePair<string, object>> ?? throw new FormatException(role + " is not a mapping.");
+        private static object Field(Dictionary<string, object> mapping, string key) => mapping.TryGetValue(key, out var value) ? value : null;
+        private static Dictionary<string, object> AsMapping(object node, string role)
+            => node == null ? new Dictionary<string, object>(StringComparer.Ordinal) : node as Dictionary<string, object> ?? throw new FormatException(role + " is not a mapping.");
 
         internal sealed class Scalar { internal string Text; internal bool Plain; }
 
@@ -210,7 +242,7 @@ namespace TiaMcp.Model
             Skip(lines, ref index);
             if (index == lines.Length) return null;
             if (Indent(lines[index]) != 0) throw new FormatException("The document must start at column 0.");
-            var result = Node(lines, ref index, 0);
+            var result = Node(lines, ref index, 0, 0);
             Skip(lines, ref index);
             if (index != lines.Length) throw new FormatException("Unexpected content at line " + (index + 1) + ".");
             return result;
@@ -231,8 +263,11 @@ namespace TiaMcp.Model
 
         private static bool IsItem(string content) => content == "-" || content.StartsWith("- ", StringComparison.Ordinal);
 
-        private static object Node(string[] lines, ref int index, int indent)
+        private const int MaxDepth = 32;
+
+        private static object Node(string[] lines, ref int index, int indent, int depth)
         {
+            if (depth > MaxDepth) throw new FormatException("Text-list YAML nests deeper than " + MaxDepth + " levels.");
             string content = lines[index].Substring(indent);
             if (IsItem(content))
             {
@@ -246,19 +281,19 @@ namespace TiaMcp.Model
                 }
                 return sequence;
             }
-            var mapping = new List<KeyValuePair<string, object>>();
+            var mapping = new Dictionary<string, object>(StringComparer.Ordinal);
             while (index < lines.Length && Indent(lines[index]) == indent && !IsItem(lines[index].Substring(indent)))
             {
                 string line = lines[index].Substring(indent);
                 int end; string key = Key(line, out end);
-                if (mapping.Any(p => p.Key == key)) throw new FormatException("Duplicate mapping key: " + key);
+                if (mapping.ContainsKey(key)) throw new FormatException("Duplicate mapping key: " + key);
                 string rest = line.Substring(end);
                 object value;
                 if (rest.Trim(' ').Length == 0 || rest.TrimStart(' ').StartsWith("#", StringComparison.Ordinal))
                 {
                     index++; Skip(lines, ref index);
-                    if (index < lines.Length && Indent(lines[index]) > indent) value = Node(lines, ref index, Indent(lines[index]));
-                    else if (index < lines.Length && Indent(lines[index]) == indent && IsItem(lines[index].Substring(indent))) value = Node(lines, ref index, indent);
+                    if (index < lines.Length && Indent(lines[index]) > indent) value = Node(lines, ref index, Indent(lines[index]), depth + 1);
+                    else if (index < lines.Length && Indent(lines[index]) == indent && IsItem(lines[index].Substring(indent))) value = Node(lines, ref index, indent, depth + 1);
                     else value = null;
                 }
                 else
@@ -267,7 +302,7 @@ namespace TiaMcp.Model
                     value = Value(lines, ref index, indent, rest.TrimStart(' '), false);
                     Skip(lines, ref index);
                 }
-                mapping.Add(new KeyValuePair<string, object>(key, value));
+                mapping.Add(key, value);
             }
             if (index < lines.Length && Indent(lines[index]) > indent) throw new FormatException("Unexpected indentation at line " + (index + 1) + ".");
             return mapping;
@@ -296,7 +331,7 @@ namespace TiaMcp.Model
             if (value.StartsWith("|", StringComparison.Ordinal) || value.StartsWith(">", StringComparison.Ordinal)) return Block(lines, ref index, indent, value);
             index++;
             if (value == "[]" ) return new List<object>();
-            if (value == "{}") return new List<KeyValuePair<string, object>>();
+            if (value == "{}") return new Dictionary<string, object>(StringComparer.Ordinal);
             if (value.StartsWith("\"", StringComparison.Ordinal) || value.StartsWith("'", StringComparison.Ordinal))
             {
                 string text = Quoted(value, out int close);

@@ -197,8 +197,10 @@ non-executing parser used by the oracle. No parser dependency is added to the Ho
 
 Change kind `hmi_text_list_import` imports one retained candidate pair through the shared
 `change_prepare`/`change_apply`/`change_restore` admission. It is the only Unified write
-the closed HMI preservation gate lets through (maintainer decision of 31 October 2026), and
-only for the `unified-comfort` and `unified-pc` profiles. It is not natively qualified yet.
+the closed HMI preservation gate lets through (maintainer decision of 31 October 2026). The
+gate admits a profile in production only after its native qualification passed; no profile
+has yet. Until then only a Host started with `--hmi-text-list-qualification unified-comfort`
+or `unified-pc` admits that profile, in a project its own worker retrieved or created.
 
 ```json
 { "kind": "hmi_text_list_import", "payload": { "schemaVersion": 1, "target": "<hmiDevice identity from hmi_inspect section=devices>",
@@ -208,16 +210,20 @@ only for the `unified-comfort` and `unified-pc` profiles. It is not natively qua
 - The Host reopens the record with full revalidation and applies the refusals above to it,
   also to records published before they existed. The worker only receives the exact
   candidate pair; a client-supplied candidate is refused.
-- Prepare captures the complete Unified scope of every HMI in the project. A first prepare
-  with any `expectedContentHash` returns `StaleRevision` with
-  `details.baseline.contentHash`; review it and prepare again with that hash. The
+- Prepare captures the Unified scope of every HMI in the project. Only the capture's two
+  standing notes (tag-table export stability, no `Screen.Export`) are accepted; a typed read
+  error, a capture failure or a Classic HMI refuses. A first prepare with any
+  `expectedContentHash` returns `StaleRevision` with `details.baseline.contentHash`; review it
+  and prepare again with that hash. Every typed text-list node must be a list the export
+  holds, because V21 skips lists with formatted text (`HmiTextListExportIncomplete`). The
   candidate's languages must equal the project's active languages
   (`HmiTextListLanguageMismatch`). The preview lists the `created` and `replaced` lists; a
   replaced list loses its old content. No other list is renamed or deleted.
 - Apply needs `compile=true` and `save=true`. It compiles the HMI device, imports the pair,
   and reads the whole export back: the candidate lists must equal the candidate and every
-  other list must be unchanged, compared by meaning as the native oracle compares them.
-  Everything else in the HMI capture must be unchanged, and the device's compiler errors and
+  other list must be unchanged, compared by meaning as the native oracle compares them. An
+  unresolved text reference refuses. Everything else in the HMI capture, apart from the
+  candidate lists' own typed nodes, must be unchanged, and the device's compiler errors and
   warnings must be unchanged by the import. Then the project is saved.
 - `change_restore` retrieves the checkpoint into a new directory and requires the complete
   HMI content of the pre-change capture.

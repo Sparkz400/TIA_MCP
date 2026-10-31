@@ -1562,6 +1562,10 @@ namespace TiaMcp.Openness.V21
         {
             if (change.InputPath != null && (!File.Exists(change.InputPath) || ChangeFileHash(change.InputPath) != change.InputHash))
                 throw new BridgeException("ArtifactChanged", "Prepared import/source artifact changed after preview.");
+            // A text-list import reads its TextLibrary file next to the configuration file.
+            foreach (var file in change.Backups.OfType<JObject>().Where(b => b.Value<string>("role") == "hmi-text-list-candidate-library").Select(b => (JObject)b["artifact"]))
+                if (!File.Exists(file.Value<string>("path")) || ChangeFileHash(file.Value<string>("path")) != file.Value<string>("sha256"))
+                    throw new BridgeException("ArtifactChanged", "Prepared TextLibrary candidate changed after preview.");
         }
 
         private JObject ChangeView(EngineeringChange change)

@@ -12,6 +12,12 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
+        // --hmi-text-list-qualification <profile>: admits that profile only in a project this worker created or retrieved.
+        internal string HmiTextListQualificationProfile { get; set; }
+        private readonly HashSet<string> _retrievedProjectPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private string TextListQualificationProfile(Project project) => HmiTextListQualificationProfile != null && _ownsPortal &&
+            (WatchOwnsScratch(project) || _retrievedProjectPaths.Contains(project.Path.FullName)) ? HmiTextListQualificationProfile : null;
+
         // Change kind hmi_text_list_import: a Host-resolved hmi_text_list_author/generate_set candidate pair imported through
         // HmiTextListComposition.Import, the route the independent seeder qualified (local.hmi.text-list-import.20261029).
         // The gate is open for this kind only; screens and every other HMI write stay behind the closed preservation gate.
@@ -23,7 +29,7 @@ namespace TiaMcp.Openness.V21
             var identity = (JObject)payload["target"];
             var discovered = HmiResolveNativeTarget(project, identity);
             if (discovered.Family != "unified") throw new BridgeException("HmiTargetMismatch", "hmi_text_list_import requires a Unified HMI.");
-            var gate = HmiTextListImportRules.Gate(discovered.Family, discovered.Profile);
+            var gate = HmiTextListImportRules.Gate(discovered.Family, discovered.Profile, TextListQualificationProfile(project));
             gate["catalogIdentifier"] = discovered.CatalogIdentifier;
             gate["runtimeVersion"] = discovered.RuntimeVersion;
             var candidate = (JObject)payload["candidate"];
@@ -34,7 +40,7 @@ namespace TiaMcp.Openness.V21
             change.HmiBeforeManifest = CaptureHmiEngineeringScope(change, project, "before");
             change.HmiEvidence["baseline"] = change.HmiBeforeManifest.DeepClone();
             RequireHmiEngineeringGate(gate, change.HmiEvidence);
-            RequireHmiCompleteScope(change.HmiBeforeManifest);
+            RequireHmiScope(change, change.HmiBeforeManifest);
             if (change.HmiBeforeManifest.Value<string>("contentHash") != payload.Value<string>("expectedContentHash"))
                 throw new BridgeException("StaleRevision", "HMI native content differs from expectedContentHash; prepare again with hmiEvidence.baseline.contentHash after reviewing it.", change.HmiEvidence);
             // V21 exports every text in every active project language; another language set cannot read back exactly.
@@ -63,6 +69,8 @@ namespace TiaMcp.Openness.V21
             if (!new HashSet<string>(expected.Keys, StringComparer.Ordinal).SetEquals(((JArray)candidate["lists"]).Values<string>()))
                 throw new BridgeException("HmiTextListCandidateUnsupported", "The candidate files do not declare exactly the record's lists.");
             var before = ExportTextLists(change, ResolveHmiTarget(project, identity), "before");
+            if (!HmiTextListImportRules.ExportCoversTypedLists(((JObject)change.HmiBeforeManifest["artifacts"]).Properties().Select(p => p.Name), discovered.Path, before.Keys))
+                throw new BridgeException("HmiTextListExportIncomplete", "The native text-list export does not hold every text list of the HMI (V21 skips lists with formatted text); an unexported list could change unseen.", change.HmiEvidence);
             var effect = new JObject { ["operation"] = HmiTextListImportRules.Operation, ["hmiPath"] = discovered.Path, ["configuration"] = Path.GetFileName(copied[0]),
                 ["created"] = new JArray(expected.Keys.Where(k => !before.ContainsKey(k)).ToArray()), ["replaced"] = new JArray(expected.Keys.Where(before.ContainsKey).ToArray()),
                 ["unchangedPeers"] = new JArray(before.Keys.Where(k => !expected.ContainsKey(k)).ToArray()), ["recordId"] = candidate["recordId"].DeepClone(), ["outputId"] = candidate["outputId"]?.DeepClone() };
@@ -77,23 +85,24 @@ namespace TiaMcp.Openness.V21
         {
             var identity = (JObject)change.Payload["target"];
             var discovered = HmiResolveNativeTarget(project, identity);
-            RequireHmiEngineeringGate(HmiTextListImportRules.Gate(discovered.Family, discovered.Profile), change.HmiEvidence);
-            RequireHmiCompleteScope(change.HmiBeforeManifest);
+            RequireHmiEngineeringGate(HmiTextListImportRules.Gate(discovered.Family, discovered.Profile, TextListQualificationProfile(project)), change.HmiEvidence);
+            RequireHmiScope(change, change.HmiBeforeManifest);
             var target = ResolveHmiTarget(project, identity);
+            // ValidatePreparedFiles re-hashed both candidate files before the checkpoint.
             string library = change.Backups.OfType<JObject>().Single(b => b.Value<string>("role") == "hmi-text-list-candidate-library")["artifact"].Value<string>("path");
-            if (ChangeFileHash(library) != change.Backups.OfType<JObject>().Single(b => b.Value<string>("role") == "hmi-text-list-candidate-library")["artifact"].Value<string>("sha256"))
-                throw new BridgeException("ArtifactChanged", "Prepared TextLibrary candidate changed after preview.");
             var expected = HmiTextListImportRules.Resolve(ReadTextListFile(change.InputPath), ReadTextListFile(library));
             // The compile before the import is the reference for "unchanged compiler problems".
             change.HmiEvidence["baselineCompile"] = CompileHmiTextListTarget(project, (JObject)change.Payload["target"]);
             // Preservation compares with the compiled state, so compiler effects are never attributed to the import.
             var compiled = CaptureHmiEngineeringScope(change, project, "pre-import");
-            RequireHmiCompleteScope(compiled);
+            RequireHmiScope(change, compiled);
             change.HmiEvidence["preImport"] = compiled;
             change.HmiEvidence["baselineCompileChangedCapture"] = compiled.Value<string>("contentHash") != change.HmiBeforeManifest.Value<string>("contentHash");
             change.Stages.Add("hmi_baseline_compiled");
             WriteChangeJournal(change);
             var before = ExportTextLists(change, target, "pre-import");
+            change.Stages.Add("hmi_text_list_import_started");
+            WriteChangeJournal(change);
             bool accepted = ImportTextLists(target, Path.GetDirectoryName(change.InputPath), Path.GetFileName(change.InputPath));
             change.HmiEvidence["importAccepted"] = accepted;
             change.Stages.Add("hmi_text_list_import_returned");

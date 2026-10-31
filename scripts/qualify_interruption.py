@@ -86,12 +86,13 @@ POINTS = {
     "save": (lambda j: j.get("state") == "applying" and "changed_project_saved" in stages(j), "worker"),
     "host": (lambda j: j.get("state") == "applying", "host"),
 }
-# hmi_text_list_import journals the native import and its readback separately: worker and Host loss at each durable
-# boundary (checkpoint, import, readback, compile/preservation, save).
-_IMPORTING = lambda j: j.get("state") == "applying" and "hmi_baseline_compiled" in stages(j) and "hmi_text_list_import_returned" not in stages(j)
+# hmi_text_list_import journals the baseline compile, the native import and its readback separately: worker and Host loss
+# at each durable boundary (checkpoint, baseline compile, import, readback, compile/preservation, save).
+_COMPILING = lambda j: j.get("state") == "applying" and "hmi_baseline_compiled" not in stages(j) and "mutation_applied" not in stages(j)
+_IMPORTING = lambda j: j.get("state") == "applying" and "hmi_text_list_import_started" in stages(j) and "hmi_text_list_import_returned" not in stages(j)
 _READING = lambda j: j.get("state") == "applying" and "hmi_text_list_import_returned" in stages(j) and "mutation_applied" not in stages(j)
-TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "imp": (_IMPORTING, "worker"), "read": (_READING, "worker"), "comp": POINTS["comp"], "save": POINTS["save"],
-                    "hckp": (POINTS["ckpt"][0], "host"), "himp": (_IMPORTING, "host"), "hred": (_READING, "host"), "hsav": (POINTS["save"][0], "host")}
+TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp": (_IMPORTING, "worker"), "read": (_READING, "worker"), "comp": POINTS["comp"],
+                    "save": POINTS["save"], "hckp": (POINTS["ckpt"][0], "host"), "himp": (_IMPORTING, "host"), "hred": (_READING, "host"), "hsav": (POINTS["save"][0], "host")}
 
 
 def expected_outcome(kind, point):
@@ -146,6 +147,7 @@ def technology_present(client):
 
 
 HMI_FIXTURE = None  # --hmi-fixture: an HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios.
+HMI_FIXTURE_PROFILE = "unified-comfort"  # --hmi-fixture-profile: the fixture's profile, admitted by the qualification Host.
 TEXT_LIST = "EntryTypes"  # Created by the boundary-values candidate.
 
 
@@ -157,6 +159,11 @@ def setup_text_list(scenario, client):
     require(HMI_FIXTURE is not None, "tl-* scenarios need --hmi-fixture (HmiSeeder textlist-fixture checkpoint.zap21)")
     scenario.step("project_retrieve HMI fixture", client.tool("project_retrieve", {
         "archivePath": str(HMI_FIXTURE), "expectedSha256": hashlib.sha256(HMI_FIXTURE.read_bytes()).hexdigest()}))
+
+
+def text_list_host_arguments():
+    """The qualification-only admission of the fixture's profile (the production gate ships with no profile)."""
+    return ["--hmi-text-list-qualification", HMI_FIXTURE_PROFILE]
 
 
 def prepare_text_list(scenario, client):
@@ -242,9 +249,10 @@ class Scenario:
         self.root = base / name
         self.root.mkdir(parents=True)
         self.report = {"scenario": name, "artifactRoot": str(self.root), "steps": [], "passed": False, "toolCalls": []}
+        self.host_arguments = []
 
     def client(self):
-        return ReliabilityClient(self.host, self.worker, self.root, timeout=900, record=self.report["toolCalls"])
+        return ReliabilityClient(self.host, self.worker, self.root, timeout=900, record=self.report["toolCalls"], extra=self.host_arguments)
 
     def step(self, name, value):
         self.report["steps"].append({"name": name, "result": value})
@@ -311,6 +319,8 @@ class Scenario:
         no replay and recovery from the checkpoint against independent fresh reads."""
         kind, prepare, present, setup, points = KINDS[prefix]
         trigger, mode = points[point]
+        if prefix == "tl":
+            self.host_arguments = text_list_host_arguments()
         expected = self.report["expected"] = expected_outcome(kind, point)
         self.report.update({"kind": kind, "point": point, "reconciliationClass": reconciliation_class(kind)})
         client = self.client()
@@ -665,9 +675,11 @@ def main():
     parser.add_argument("--existing", nargs=2, action="append", default=[], metavar=("ARTIFACTS", "ADMISSION_ID"))
     parser.add_argument("--report", type=pathlib.Path, required=True)
     parser.add_argument("--hmi-fixture", type=pathlib.Path, help="HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios")
+    parser.add_argument("--hmi-fixture-profile", choices=("unified-comfort", "unified-pc"), default="unified-comfort")
     args = parser.parse_args()
-    global HMI_FIXTURE
+    global HMI_FIXTURE, HMI_FIXTURE_PROFILE
     HMI_FIXTURE = args.hmi_fixture.resolve(strict=True) if args.hmi_fixture else None
+    HMI_FIXTURE_PROFILE = args.hmi_fixture_profile
     host, worker = args.host.resolve(strict=True), args.worker.resolve(strict=True)
     args.base.mkdir(parents=True, exist_ok=False)
     report = {"schemaVersion": 1, "completed": False, "base": str(args.base), "hostSha256": hashlib.sha256(host.read_bytes()).hexdigest(),

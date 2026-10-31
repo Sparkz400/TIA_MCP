@@ -98,6 +98,12 @@ namespace TiaMcp.Openness.V21
             var hashes = artifacts.Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             manifest["observedArtifactsHash"] = hashes.Count == 0 ? null : HmiPreservationRules.ScopeHash(target.Family, hashes, true);
             if (missing.Count == 0) manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
+            // hmi_text_list_import accepts exactly the two standing Unified notes; its content hash is then the observed-artifacts hash.
+            else if (change.Kind == "hmi_text_list_import" && HmiTextListImportRules.ScopeAccepted(manifest))
+            {
+                manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
+                manifest["scopeAcceptance"] = "hmi_text_list_import: only the standing Unified tag-table export and typed-readback notes";
+            }
             string path = Path.Combine(directory, "manifest.json");
             File.WriteAllText(path, manifest.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "hmi-" + stage + "-preservation-manifest", ["artifact"] = ChangeArtifact(path) });
@@ -173,7 +179,7 @@ namespace TiaMcp.Openness.V21
                 foreach (string path in Directory.GetFiles(exported, "*", SearchOption.AllDirectories))
                     AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + path.Substring(exported.Length + 1).Replace('\\', '/'), path, artifacts);
             }
-            missing.Add("Unified tag tables were exported using their documented native composition export. Export stability, full dependency closure and unrelated-resource preservation remain unqualified.");
+            missing.Add(HmiPreservationRules.UnifiedTagTableExportNote);
             // The complete paired text-list export; it re-exports byte-identically (local.hmi.text-list-import.20261029).
             string lists = Path.Combine(directory, "text-lists");
             Directory.CreateDirectory(lists);
@@ -193,7 +199,7 @@ namespace TiaMcp.Openness.V21
                 typed[path] = new JObject { ["sha256"] = HmiPreservationRules.Hash(node.Row.ToString(Formatting.None)), ["source"] = "typedReadback" };
             }
             if (walk.ErrorCount > 0) missing.Add(walk.ErrorCount + " Unified typed attribute read(s) failed; their readError markers are compared, their values are not. See typed-model.json.");
-            missing.Add("Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.");
+            missing.Add(HmiPreservationRules.UnifiedTypedReadbackNote);
         }
 
         private static void CaptureHmiArtifact(string directory, string identity, JObject artifacts, Action<FileInfo> exporter)
@@ -222,6 +228,14 @@ namespace TiaMcp.Openness.V21
                 }
             }
             artifacts.Add(identity, artifact);
+        }
+
+        // The capture requirement of the change's kind: complete for hmi_engineering, standing Unified notes only for hmi_text_list_import.
+        private static void RequireHmiScope(EngineeringChange change, JObject manifest)
+        {
+            if (change.Kind != "hmi_text_list_import") { RequireHmiCompleteScope(manifest); return; }
+            if (!HmiTextListImportRules.ScopeAccepted(manifest) || manifest.Value<string>("contentHash") != manifest.Value<string>("observedArtifactsHash"))
+                throw new BridgeException("HmiPreservationUnavailable", "The Unified capture has coverage gaps beyond its two standing notes (typed read errors, a capture failure or a Classic HMI); no text-list import is authorized.", manifest);
         }
 
         private static void RequireHmiCompleteScope(JObject manifest)
@@ -855,7 +869,7 @@ namespace TiaMcp.Openness.V21
         private string HmiEngineeringFingerprint(EngineeringChange change, Project project)
         {
             var manifest = CaptureHmiEngineeringScope(change, project, "fingerprint");
-            RequireHmiCompleteScope(manifest);
+            RequireHmiScope(change, manifest);
             return manifest.Value<string>("contentHash");
         }
 
@@ -864,7 +878,7 @@ namespace TiaMcp.Openness.V21
             var after = CaptureHmiEngineeringScope(change, project, "after");
             // A text-list import is compared with its compiled pre-import capture; recovery still compares with the checkpoint's.
             var reference = change.Kind == "hmi_text_list_import" ? (JObject)change.HmiEvidence["preImport"] : change.HmiBeforeManifest;
-            RequireHmiCompleteScope(after); RequireHmiCompleteScope(reference);
+            RequireHmiScope(change, after); RequireHmiScope(change, reference);
             var beforeHashes = ((JObject)reference["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             var afterHashes = ((JObject)after["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             // Until an operation-specific artifact delta has native qualification,
@@ -873,9 +887,10 @@ namespace TiaMcp.Openness.V21
             string operation = change.Payload.Value<string>("operation");
             try
             {
-                // A text-list import may change only the text lists, which the import readback compared by meaning.
+                // A text-list import may change only the candidate lists' typed nodes and the export, which the import readback compared by meaning.
                 if (change.Kind == "hmi_text_list_import")
-                    HmiPreservationRules.RequireUnrelatedPreservedOutsidePrefixes(beforeHashes, afterHashes, changed + "/textLists/", changed + "/textListExport/");
+                    HmiPreservationRules.RequireUnrelatedPreservedOutsideSubtrees(beforeHashes, afterHashes, ((JArray)change.Payload["candidate"]["lists"]).Values<string>()
+                        .Select(name => changed + "/textLists/" + Segment(name)).Concat(new[] { changed + "/textListExport" }).ToArray());
                 // Tag creation changes the table's export files and adds the created tag's typed nodes, both keyed below its objectPath.
                 else if (operation == "tag_create" || operation == "external_tag_create")
                     HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/", changed + "/tags/" + Segment(change.Payload.Value<string>("name")));
@@ -898,7 +913,7 @@ namespace TiaMcp.Openness.V21
         private void VerifyHmiEngineeringRecovery(EngineeringChange change, Project recovered)
         {
             var actual = CaptureHmiEngineeringScope(change, recovered, "recovery");
-            RequireHmiCompleteScope(actual); RequireHmiCompleteScope(change.HmiBeforeManifest);
+            RequireHmiScope(change, actual); RequireHmiScope(change, change.HmiBeforeManifest);
             if (actual.Value<string>("contentHash") != change.HmiBeforeManifest.Value<string>("contentHash"))
                 throw new BridgeException("PreservationMismatch", "Retrieved HMI content does not match the pre-change complete native content hash; the recovered copy is retained for inspection.", actual);
             change.HmiEvidence["recovery"] = actual;

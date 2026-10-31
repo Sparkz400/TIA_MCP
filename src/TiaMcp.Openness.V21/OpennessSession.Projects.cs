@@ -35,6 +35,7 @@ namespace TiaMcp.Openness.V21
             try
             {
                 var project = _portal.Projects.Retrieve(file, new DirectoryInfo(directory));
+                _retrievedProjectPaths.Add(project.Path.FullName);
                 result["project"] = ProjectInfo(project);
                 result["retrieved"] = true;
                 return result;

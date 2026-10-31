@@ -169,7 +169,9 @@ def run_profile(args, profile, base, report):
     store = base / ("h1" if profile == "unified-comfort" else "h2")
     retained = install_retained(store)
     calls = row["toolCalls"] = []
-    client = ReliabilityClient(args.host.resolve(strict=True), args.worker.resolve(strict=True), store, timeout=1800, record=calls)
+    # The production gate ships with no profile; the qualification Host admits exactly this profile in its own retrieved copy.
+    admission = ["--hmi-text-list-qualification", profile]
+    client = ReliabilityClient(args.host.resolve(strict=True), args.worker.resolve(strict=True), store, timeout=900, record=calls, extra=admission)
     applied, history, project = [], [], None
     try:
         client.initialize()
@@ -220,7 +222,8 @@ def run_profile(args, profile, base, report):
         for label, record_id, output_id in sequence:
             prepared = step("change_prepare " + label, prepare(client, device, record_id, output_id))
             evidence = prepared["preview"]["hmiEvidence"]
-            gate(evidence["gate"]["available"] is True and evidence["gate"]["targetProfile"] == profile, "Gate open for this kind and profile: " + label)
+            gate(evidence["gate"]["available"] is True and evidence["gate"]["targetProfile"] == profile and evidence["gate"]["admission"] == "qualification",
+                 "Gate admits this kind and profile by qualification only: " + label)
             candidate, before = candidate_lists(prepared), history[-1]
             effect = prepared["preview"]["effects"][0]
             gate(sorted(effect["created"]) == sorted(set(candidate) - set(before)) and sorted(effect["replaced"]) == sorted(set(candidate) & set(before)),
@@ -261,7 +264,7 @@ def run_profile(args, profile, base, report):
     if project is None or len(history) < 2:
         row["passed"] = False
         return
-    fresh = ReliabilityClient(args.host.resolve(strict=True), args.worker.resolve(strict=True), store, timeout=1800, record=calls)
+    fresh = ReliabilityClient(args.host.resolve(strict=True), args.worker.resolve(strict=True), store, timeout=900, record=calls, extra=admission)
     try:
         fresh.initialize()
         step("fresh tia_start", fresh.tool("tia_start"))

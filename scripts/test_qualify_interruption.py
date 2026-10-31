@@ -46,20 +46,25 @@ class InterruptionMatrixTests(unittest.TestCase):
     def test_text_list_points_split_import_and_readback(self):
         journals = {
             "ckpt": {"state": "checkpointing", "stages": []},
-            "imp": {"state": "applying", "stages": ["recovery_archive_created", "hmi_baseline_compiled"]},
-            "read": {"state": "applying", "stages": ["hmi_baseline_compiled", "hmi_text_list_import_returned"]},
-            "comp": {"state": "applying", "stages": ["hmi_text_list_import_returned", "hmi_text_lists_read_back_exactly", "hmi_precise_readback_verified", "mutation_applied"]},
+            "mut": {"state": "applying", "stages": ["prechange_project_saved", "recovery_archive_created"]},
+            "imp": {"state": "applying", "stages": ["recovery_archive_created", "hmi_baseline_compiled", "hmi_text_list_import_started"]},
+            "read": {"state": "applying", "stages": ["hmi_baseline_compiled", "hmi_text_list_import_started", "hmi_text_list_import_returned"]},
+            "comp": {"state": "applying", "stages": ["hmi_text_list_import_returned", "hmi_text_lists_read_back_exactly", "mutation_applied"]},
             "save": {"state": "applying", "stages": ["mutation_applied", "compile_finished", "hmi_unrelated_content_preserved", "changed_project_saved"]},
         }
+        host = {"ckpt": ["hckp"], "imp": ["himp"], "read": ["hred"], "save": ["hsav"], "mut": [], "comp": []}
         for name, journal in journals.items():
-            for mode, prefix in (("worker", ""), ("host", "h")):
+            for mode in ("worker", "host"):
                 hits = [point for point, (trigger, m) in q.TEXT_LIST_POINTS.items() if m == mode and trigger(journal)]
-                expected = [name] if mode == "worker" else [{"ckpt": "hckp", "imp": "himp", "read": "hred", "save": "hsav"}[name]] if name != "comp" else []
-                self.assertEqual(expected, hits, (name, mode))
-        # The baseline compile precedes the import; a kill there is neither the import nor its readback.
-        self.assertFalse(any(trigger({"state": "applying", "stages": ["recovery_archive_created"]}) for point, (trigger, _) in q.TEXT_LIST_POINTS.items() if point in ("imp", "read", "himp", "hred")))
+                self.assertEqual([name] if mode == "worker" else host[name], hits, (name, mode))
+        # The pre-import export between the baseline compile and the import start is no boundary of its own.
+        between = {"state": "applying", "stages": ["recovery_archive_created", "hmi_baseline_compiled"]}
+        self.assertEqual([], [point for point, (trigger, _) in q.TEXT_LIST_POINTS.items() if trigger(between)])
         for terminal in ({"state": "applied", "stages": ["changed_project_saved"]}, {"state": "prepared"}, {}):
             self.assertFalse(any(trigger(terminal) for trigger, _ in q.TEXT_LIST_POINTS.values()), terminal)
+
+    def test_text_list_scenarios_run_on_the_qualification_host(self):
+        self.assertEqual(["--hmi-text-list-qualification", "unified-comfort"], q.text_list_host_arguments())
 
     def test_expected_outcomes(self):
         for kind in ("source_upsert", "hardware_plug", "to_create", "tag_set"):
@@ -71,14 +76,14 @@ class InterruptionMatrixTests(unittest.TestCase):
         self.assertEqual({"released": True, "project": "verifiedApplied", "effectPersisted": True}, q.expected_outcome("hardware_plug", "host"))
         self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome("to_create", "host"))
         # The text-list import is a target kind: Host loss at any boundary leaves the worker to finish and save; held for review.
-        for point in ("imp", "read"):
+        for point in ("mut", "imp", "read"):
             self.assertEqual({"released": True, "project": "unchanged", "effectPersisted": False}, q.expected_outcome("hmi_text_list_import", point))
         for point in ("hckp", "himp", "hred", "hsav"):
             self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome("hmi_text_list_import", point))
 
     def test_scenario_names_stay_short(self):
         # The reconciliation retrieve root (base/scenario/ar_<12>) must stay within the worker's 70-character limit.
-        self.assertEqual(24, len(q.KIND_SCENARIOS))
+        self.assertEqual(25, len(q.KIND_SCENARIOS))
         self.assertTrue(all(len(name) <= 7 for name in q.KIND_SCENARIOS))
         self.assertFalse(set(q.KIND_SCENARIOS) & set(q.SCENARIOS))
 
