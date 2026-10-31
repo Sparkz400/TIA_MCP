@@ -74,24 +74,32 @@ def category_verdict(result):
             'admittedScope': 'whole-project:legacy-bilingual', 'categoryFilteringReliedOn': False}
 
 
-def restricted_verdict(whole, captures):
-    """Host-filtered PLC category captures against the whole-project capture of the same fixture: each keeps exactly
-    that category's rows, and every other row the native export returned is listed as excluded, never dropped."""
-    rows = {r['nativeKey']: r for r in whole['rows']}
+def plc_baseline(result):
+    """The category probe's all-category PLC export, decoded independently of the Host reader."""
+    artifact = next(r for r in result['matrix']['exports'] if r['mode'] == 'plc-all')['artifact']
+    require(ref(Path(artifact['path'])) == artifact, 'Category export bytes changed')
+    return decode(Path(artifact['path']))[0]
+
+
+def restricted_verdict(baseline, captures):
+    """Host-filtered PLC category captures against the independently decoded all-category export of the same PLC
+    (category probe `plc-all`): each keeps exactly that category's rows with unchanged texts, and every other row of
+    the PLC is listed as excluded, never dropped. The whole-project export also has project-level rows (alarm classes)
+    that no PLC-owner export returns, so it is not the comparison baseline."""
     results = []
     for category, expected in RESTRICTED.items():
         capture, label = captures[category], '<' + category + '>'
-        kept = {r['nativeKey']: r for r in capture['rows']}
-        wanted = {k: r for k, r in rows.items() if r['category'] == label}
-        require(kept == wanted and len(kept) == expected, f'{category}: kept {len(kept)} rows; the whole-project capture has {len(wanted)}, the fixture {expected}')
+        kept = {r['nativeKey']: (r['category'], r['source'].get('text') or '', r['target'].get('text') or '') for r in capture['rows']}
+        wanted = {k: (r['category'], r['source'], r['target']) for k, r in baseline.items() if r['category'] == label}
+        require(kept == wanted and len(kept) == expected, f'{category}: kept {len(kept)} rows; the PLC export has {len(wanted)}, the fixture {expected}')
         excluded = capture['excludedRows']
-        require(excluded is not None and set(excluded) <= set(rows) - set(wanted) and all(e['category'] != label for e in excluded.values()),
-                category + ': excluded rows must be other-category whole-project rows')
+        require(excluded is not None and set(excluded) == set(baseline) - set(wanted) and all(e['category'] != label for e in excluded.values()),
+                category + ': excluded rows must be exactly the other PLC rows')
         require(capture['scope']['categoryIds'] == [category] and capture['scope']['objectSelections'] != ['whole-project:legacy-bilingual'],
                 category + ': restricted scope not recorded')
         results.append({'category': category, 'expectedRows': expected, 'keptRows': len(kept), 'excludedRows': len(excluded),
                         'nativeRows': len(kept) + len(excluded)})
-    return {'wholeProjectRows': len(rows), 'captures': results, 'productionAdmitted': False}
+    return {'plcRows': len(baseline), 'captures': results, 'productionAdmitted': False}
 
 
 class Run:
@@ -294,7 +302,7 @@ class Run:
                     categories = self.call('qualification_translation_categories', selector)
                     verdict = category_verdict(categories)
                     if self.restricted:
-                        verdict['restricted'] = restricted_verdict(self.call('qualification_translation_capture', selector),
+                        verdict['restricted'] = restricted_verdict(plc_baseline(categories),
                             {c: self.call('qualification_translation_capture', {**selector, 'categoryIds': [c]}) for c in RESTRICTED})
                         # Every following capture, plan, apply, recovery and reconciliation uses the Host-filtered block-comment scope.
                         selector = {**selector, 'categoryIds': ['BlockCommentCategoryData']}
