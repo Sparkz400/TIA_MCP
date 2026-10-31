@@ -74,7 +74,7 @@ public sealed class WebApplicationWorkflowStore(string artifactsRoot)
     {
         string analysisRoot = Path.Combine(Path.GetFullPath(artifactsRoot), "web-application-analysis");
         PackageStorage.EnsureNoLinks(analysisRoot); Directory.CreateDirectory(analysisRoot);
-        using var gate = PackageStorage.Lock(Path.Combine(analysisRoot, ".inspect.lock"));
+        using var gate = PackageStorage.Lock(Path.Combine(analysisRoot, ".inspect.lock"), TimeSpan.Zero);
         string scratch = PackageStorage.Under(analysisRoot, Guid.NewGuid().ToString("N")); Directory.CreateDirectory(scratch);
         try
         {

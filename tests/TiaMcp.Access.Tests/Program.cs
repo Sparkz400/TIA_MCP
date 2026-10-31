@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using TiaMcp.Core;
 using TiaMcp.Core.Security;
 
+PackageStorage.LockWait = TimeSpan.FromMilliseconds(250); // Contention checks hold a store lock past this short bound.
 if (args is ["--handoff-publication-child", var childRoot, var childUpload, var childPhase, var signalPath])
 {
     var childStore = new RuntimeHandoffWorkflowStore(childRoot, null, (phase, path) => {

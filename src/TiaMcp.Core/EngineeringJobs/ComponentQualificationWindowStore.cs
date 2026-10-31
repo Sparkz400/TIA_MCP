@@ -166,7 +166,7 @@ public sealed class ComponentQualificationWindowStore
             if (!parent.Any(p => Contains(p, key))) Fail("ComponentResourceEscape", "A child resource is outside the complete admitted component manifest.");
     }
 
-    public static void ValidateManifest(string artifactRoot, ComponentWindowManifest m)
+    public static void ValidateManifest(string artifactRoot, ComponentWindowManifest m, bool live = true)
     {
         if (m is null || m.SchemaVersion != 1 || m.Resources is null || m.Resources.Count != 6 || m.InitialNativeProcessId <= 0 ||
             string.IsNullOrWhiteSpace(m.InitialNativeSessionEpoch) || string.IsNullOrWhiteSpace(m.PlcPath) || string.IsNullOrWhiteSpace(m.SourceLibraryId))
@@ -186,6 +186,7 @@ public sealed class ComponentQualificationWindowStore
             new("workspace", m.Workspace, "allPreparationJournalsClaimsCheckpointsReadbackAndRecovery") };
         if (Hash(expected.OrderBy(x => x.Effect).ToArray()) != Hash(m.Resources.OrderBy(x => x.Effect).ToArray()))
             Fail("MutationScopeIncomplete", "The manifest must include exactly target companions, plan artifacts, working source, original snapshot, and the complete future workspace.");
+        if (!live) return;
         _ = Keys(m.Resources); _ = EngineeringResourceKey.ForPath("project", m.ProjectPath);
         if (m.Resources.Where(r => r.Path != m.Workspace).Any(r => Contains(EngineeringResourceKey.ForPath(r.Kind, r.Path), EngineeringResourceKey.ForPath("workspace", m.Workspace)) ||
             Contains(EngineeringResourceKey.ForPath("workspace", m.Workspace), EngineeringResourceKey.ForPath(r.Kind, r.Path))))
@@ -203,7 +204,8 @@ public sealed class ComponentQualificationWindowStore
     {
         using var held = PackageStorage.Lock(lockPath); var prior = ReadUnderLock(root, id);
         if (prior.Revision != revision) Fail("RevisionConflict", "The component reservation changed; reread its exact revision.");
-        var next = update(prior) with { Revision = revision + 1, PreviousSha256 = Hash(prior), RecordedAt = DateTimeOffset.UtcNow, Transition = transition };
+        // A clock stepped back (w32time, VM restore) must not turn a recorded outcome into an invalid journal.
+        var next = update(prior) with { Revision = revision + 1, PreviousSha256 = Hash(prior), RecordedAt = prior.RecordedAt > DateTimeOffset.UtcNow ? prior.RecordedAt : DateTimeOffset.UtcNow, Transition = transition };
         ValidateRecord(root, prior, next); Write(next, PackageStorage.Under(directory, id)); return next;
     }
     private static IEnumerable<ComponentWindowReservation> Records(string root)
@@ -214,29 +216,33 @@ public sealed class ComponentQualificationWindowStore
         {
             string name = Path.GetFileName(folder);
             if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit)) continue;
-            yield return ReadUnderLock(root, name);
+            yield return ReadUnderLock(root, name, scan: true);
         }
     }
-    private static ComponentWindowReservation ReadUnderLock(string root, string id)
+    private static ComponentWindowReservation ReadUnderLock(string root, string id, bool scan = false)
     {
         PackageStorage.Id(id); string path = PackageStorage.Under(root, "engineering-component-windows/" + id);
         if (!Directory.Exists(path)) Fail("OperationNotFound", "Component window was not found.");
         var files = Directory.GetFiles(path, "*.json").Order(StringComparer.Ordinal).ToArray();
         if (files.Length is < 1 or > 96) Fail("JournalInvalid", "Component reservation revisions must be bounded.");
+        // A scan needs a finished window only for its chain: its plan, sources or evidence may be gone.
+        if (new FileInfo(files[^1]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
+        var last = PackageStorage.Load<ComponentWindowReservation>(files[^1]);
+        bool live = !scan || !Terminal(last);
         ComponentWindowReservation? previous = null;
         for (int i = 0; i < files.Length; i++)
         {
             if (Path.GetFileName(files[i]) != i.ToString("D8") + ".json" || new FileInfo(files[i]).Length > 2 * 1024 * 1024) Fail("JournalInvalid", "Component revisions must be contiguous and bounded.");
-            var record = PackageStorage.Load<ComponentWindowReservation>(files[i]);
+            var record = i == files.Length - 1 ? last : PackageStorage.Load<ComponentWindowReservation>(files[i]);
             if (record.Id != id || record.Revision != i) Fail("JournalInvalid", "Component reservation identity changed.");
-            ValidateRecord(root, previous, record); previous = record;
+            ValidateRecord(root, previous, record, live); previous = record;
         }
         return previous!;
     }
-    private static void ValidateRecord(string root, ComponentWindowReservation? prior, ComponentWindowReservation r)
+    private static void ValidateRecord(string root, ComponentWindowReservation? prior, ComponentWindowReservation r, bool live = true)
     {
-        ValidateManifest(root, r.Manifest);
-        if (r.Id != r.Manifest.Id || r.ManifestSha256 != ManifestHash(r.Manifest) || !Keys(r.Manifest.Resources).SequenceEqual(r.ResourceKeys) ||
+        ValidateManifest(root, r.Manifest, live);
+        if (r.Id != r.Manifest.Id || r.ManifestSha256 != ManifestHash(r.Manifest) || r.ResourceKeys is null || live && !Keys(r.Manifest.Resources).SequenceEqual(r.ResourceKeys) ||
             r.OwnerHostProcessId <= 0 || r.OwnerHostBirthUtc.Kind != DateTimeKind.Utc || r.Children is null || r.Children.Count > Sequence.Length ||
             r.State is not ("active" or "outcomeUnknown" or "released" or "recoveryReconciled")) Fail("JournalInvalid", "Component reservation scope or state is invalid.");
         EngineeringIdentityGuard.Sha256(r.OwnerCapabilitySha256, "ownerCapabilitySha256");
@@ -252,11 +258,11 @@ public sealed class ComponentQualificationWindowStore
             EngineeringIdentityGuard.Sha256(c.RequestSha256, "childRequestSha256");
             string? key = c.Step is "applyLibrary" or "applyGraphical" ? TokenHash(r.Manifest.ComponentId + ":" + (c.Step == "applyLibrary" ? "library" : "graphical")) : null;
             if (c.IdempotencyKeyHash != key || c.State is "returned" or "reconciled" && c.Response is null) Fail("JournalInvalid", "Exact inner idempotency or returned evidence is missing.");
-            if (c.Response is not null) VerifyArtifact(root, c.Response);
+            if (c.Response is not null && live) VerifyArtifact(root, c.Response);
         }
         if (r.State != "recoveryReconciled" && (r.State == "outcomeUnknown") != r.Children.Any(c => c.State == "outcomeUnknown") || Terminal(r) && r.Completion is null)
             Fail("JournalInvalid", "Component lifetime cannot discard an unresolved child or final evidence.");
-        if (r.Completion is not null) VerifyArtifact(root, r.Completion);
+        if (r.Completion is not null && live) VerifyArtifact(root, r.Completion);
         if (prior is null)
         {
             if (r.Revision != 0 || r.State != "active" || r.Children.Count != 0 || r.PreviousSha256 is not null || !r.InstallationAllowed || r.Completion is not null || r.Transition != "acquire")

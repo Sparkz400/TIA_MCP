@@ -46,7 +46,7 @@ internal sealed class AddInHandoff : IAsyncDisposable
         clock = timeProvider ?? TimeProvider.System;
         artifacts = Path.GetFullPath(artifactsRoot); root = Path.Combine(artifacts, "addin-handoffs");
         PackageStorage.EnsureNoLinks(root); Directory.CreateDirectory(root); PackageStorage.EnsureNoLinks(root);
-        owner = PackageStorage.Lock(Path.Combine(root, "owner.lock"));
+        owner = PackageStorage.Lock(Path.Combine(root, "owner.lock"), TimeSpan.Zero);
     }
 
     internal async Task<JsonObject> BeginAsync(string requestId, string reviewId, byte[] selection, AddInHandoffPeer peer, CancellationToken token = default)

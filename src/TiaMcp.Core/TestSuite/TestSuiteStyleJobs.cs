@@ -396,7 +396,7 @@ public sealed class TestSuiteStyleJobs
     private string JobPath(string id) => PackageStorage.Under(directory, PackageStorage.Id(id) + ".json");
     private string StopPath(string id) => PackageStorage.Under(directory, PackageStorage.Id(id) + ".stop.json");
     private FileStream Control(string id) => PackageStorage.Lock(PackageStorage.Under(directory, PackageStorage.Id(id) + ".control.lock"));
-    private FileStream Execution(string id) => PackageStorage.Lock(PackageStorage.Under(directory, PackageStorage.Id(id) + ".execution.lock"));
+    private FileStream Execution(string id) => PackageStorage.Lock(PackageStorage.Under(directory, PackageStorage.Id(id) + ".execution.lock"), TimeSpan.Zero);
     private void EnsureRunning(string id) { if (Stopped(id)) throw new BridgeException("TestSuiteStopRequested", "The durable stop request prevents another dispatch; it cannot cancel an active call."); }
     private static void Match(TestSuiteStyleJob job, string hash) { if (job.ReviewSha256 != hash) throw new BridgeException("ReviewMismatch", "Exact complete reviewed job SHA-256 required."); }
     private string ArtifactPath(EngineeringArtifactReference artifact) => PackageStorage.Under(root, PackageStorage.Relative(artifact.RelativePath));
