@@ -5518,7 +5518,7 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "memoryReset (owned instances only) restarts the virtual controller through IInstance.MemoryReset; natively it returned the instance with start values and the online-downloaded program (local.plcsim_gaps.20261029)."
+          "Every action needs an instance this worker created or adopted (OwnedInstanceRequired) and is refused while a cycle-synchronous capture holds it (SimulationCaptureModeActive). memoryReset restarts the virtual controller through IInstance.MemoryReset; natively it returned the instance with start values and the online-downloaded program (local.plcsim_gaps.20261029)."
         ]
       },
       "qualification": {
@@ -5692,7 +5692,7 @@
         "limitations": [
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "virtualTime=true (owned instances only) runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor."
+          "Steps with writes and virtualTime=true need an instance this worker created or adopted (OwnedInstanceRequired). virtualTime=true runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor."
         ]
       },
       "qualification": {
@@ -19272,7 +19272,7 @@
           "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
           "One native Run returns one TestResults tree. It is retained losslessly for every reviewed case, but only a single-definition run owns it; lists and groups stay inconclusive per case. Warning and Information states, including inconclusive runtime outcomes, never pass.",
-          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses before SetScope and Run. Physical or unowned endpoints are refused.",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified).",
           "StandardSIMATIC interface only, anonymous OPC UA only. UserDefined and SiOME interfaces need SetScope(String, ServerInterfaces, DirectoryInfo) with a hash-pinned interface folder and are not offered. No credential or security-policy argument exists in the V21 API.",
           "SetScope persists the address on every reviewed case after the checkpoint. Preservation and effective scope remain unverified.",
           "Native blocker (28 October 2026, V21 Update 3): application and system test execution (TestCaseExecutor.Run, SystemTestCaseExecutor.Run) has no qualification mode, and the production profile gate refuses it on Host and worker, so AC-native, AC-recovery, AC-runtime and AC-simulator-lifecycle have no native run. The definitions themselves are qualified (local.testsuite.definitions.20261028). Qualifying execution needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance on Softbus."
@@ -21672,7 +21672,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite, 1..16 host-owned selections and an exact expected simple-mode value for each; any mismatch writes nothing.",
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); Windows' best route to that address must also leave through the PLCSIM Virtual Ethernet Adapter. Physical PLCs, host names and a route through another network card (where a physical PLC can hold the same address) fail with RuntimeTargetNotOwnedPlcsim, an undetermined route with RuntimeTargetRouteUnverified, before anything is sent. Requires acknowledgeWrite, 1..16 host-owned selections and an exact expected simple-mode value for each; any mismatch writes nothing.",
           "Each write is sent once in order, stops the sequence on a provider error, unknown outcome or readback mismatch, and is read back once; the PLCSIM scan may overwrite assignments. No forcing, raw mode, batch atomicity, durable intent journal or automatic retry. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
           "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
         ]
@@ -21717,7 +21717,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeModeChange and an exact expected current mode (run/stop) different from the requested mode; otherwise nothing is sent.",
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); Windows' best route to that address must also leave through the PLCSIM Virtual Ethernet Adapter. Physical PLCs, host names and a route through another network card (where a physical PLC can hold the same address) fail with RuntimeTargetNotOwnedPlcsim, an undetermined route with RuntimeTargetRouteUnverified, before anything is sent. Requires acknowledgeModeChange and an exact expected current mode (run/stop) different from the requested mode; otherwise nothing is sent.",
           "Boolean success only acknowledges the request; Plc.ReadOperatingMode is observed for about 5 s and readbackMatches reports the outcome. Never retried; selector or CPU conditions may refuse. HOLD, STARTUP and R/H redundancy_id are not exposed. Web API alarm acknowledgment (Alarms.Acknowledge) is not implemented: its parameters and alarm acknowledgment state are not represented in the verified protocol. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
           "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
         ]
@@ -23689,7 +23689,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); physical PLCs and host names fail with RuntimeTargetNotOwnedPlcsim before anything is sent. Requires acknowledgeWrite, 1..16 distinct nodes, no running acquisition on the session and an exact expected value in runtime_ua_read encoding for each; any mismatch writes nothing.",
+          "Refuses unless the session endpoint is a literal controller IPv4 address of a runtime_plcsim_bind binding and the simulator worker still observes the same owned instance (ID, name, creationId, storage, marker digest, addresses); Windows' best route to that address must also leave through the PLCSIM Virtual Ethernet Adapter. Physical PLCs, host names and a route through another network card (where a physical PLC can hold the same address) fail with RuntimeTargetNotOwnedPlcsim, an undetermined route with RuntimeTargetRouteUnverified, before anything is sent. Requires acknowledgeWrite, 1..16 distinct nodes, no running acquisition on the session and an exact expected value in runtime_ua_read encoding for each; any mismatch writes nothing.",
           "Boolean, integer, Float/Double and String scalars only, converted to the observed built-in type with exact round-trip; one Write call, then an independent read reports per-item status codes and readbackMatches. Any failure inside the session call, including a value that does not convert, marks the session remoteSessionUnknown; nothing is retried. No arrays, structures, method calls, forcing or durable intent journal. PLCSIM Advanced exposes its web server and OPC UA server only with TCP/IP communication; this adapter never reconfigures an instance, so a reachable bound endpoint needs an owned instance already configured for it.",
           "Compiled against the Host, simulator worker and Core contracts only; not natively qualified against PLCSIM Advanced V8 or a CPU web/OPC UA server."
         ]

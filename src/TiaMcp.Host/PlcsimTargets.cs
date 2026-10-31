@@ -1,5 +1,6 @@
 using TiaMcp.Core;
 using TiaMcp.Core.PhysicalRuntime;
+using TiaMcp.Simulation;
 
 namespace TiaMcp.Host;
 
@@ -17,11 +18,11 @@ public sealed class PlcsimTargets(SimulatorClient simulator, IBridgeClient engin
             programFingerprint = binding.ProgramFingerprintSha256 is null ? "notObserved" : "boundOnlineFingerprint", physicalPlc = false, nativeQualified = false };
     }
 
-    /// <summary>Refuses unless the endpoint is a controller address of the bound instance and the worker still observes that exact owned instance.</summary>
+    /// <summary>Refuses unless the endpoint is a controller address of the bound instance, routed through the PLCSIM adapter, and the worker still observes that exact owned instance.</summary>
     public async Task Require(string bindingSha256, string endpoint)
     {
         var recorded = PlcsimTargetBindings.Read(options.ArtifactsDirectory, bindingSha256);
-        PlcsimTargetBindings.RequireEndpoint(recorded, endpoint);
+        PlcsimTargetBindings.RequireEndpoint(recorded, endpoint, SimulationNetworkRoute.Adapter(endpoint));
         PlcsimTargetBindings.RequireSameInstance(recorded, await Observe(recorded.InstanceId, recorded.InstanceName, recorded.CreationId));
     }
 

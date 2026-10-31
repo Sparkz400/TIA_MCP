@@ -14,6 +14,7 @@ public static class PlcsimTargetBindingChecks
         { try { action(); } catch (BridgeException e) when (e.Code == code) { checks++; return; } throw new Exception("Expected " + code); }
         JsonElement Json(string text) { using var doc = JsonDocument.Parse(text); return doc.RootElement.Clone(); }
         string creation = new('a', 32), marker = new('b', 64);
+        const string Plcsim = "Siemens PLCSIM Virtual Ethernet Adapter"; // the Windows adapter description
         string Identity(string name = "Sim1", bool owned = true, string addresses = "\"192.168.0.10\",\"0.0.0.0\",\"10.0.0.1\"", string communication = "TCPIP") =>
             $$$"""{"instanceId":3,"instanceName":"{{{name}}}","creationId":"{{{creation}}}","markerSha256":"{{{marker}}}","controllerAddresses":[{{{addresses}}}],"communicationInterface":"{{{communication}}}","instance":{"id":3,"name":"{{{name}}}","owned":{{{(owned ? "true" : "false")}}},"storagePath":"C:\\sim\\Sim1"}}""";
         var observed = DateTimeOffset.Parse("2026-10-27T12:00:00Z");
@@ -29,17 +30,21 @@ public static class PlcsimTargetBindingChecks
 
         // Softbus is local to this PC: it never backs a network endpoint, whatever its addresses.
         var softbus = PlcsimTargetBindings.Observed(Json(Identity(addresses: "\"192.168.0.1\"", communication: "Softbus")), 3, "Sim1", creation, observed);
-        Fails(() => PlcsimTargetBindings.RequireEndpoint(softbus, "opc.tcp://192.168.0.1:4840/"), "PlcsimEndpointUnreachable");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(softbus, "opc.tcp://192.168.0.1:4840/", Plcsim), "PlcsimEndpointUnreachable");
         Check(!PlcsimTargetBindings.Covers(softbus, "https://192.168.0.1"), "A Softbus binding covers no endpoint");
         var tcpip = PlcsimTargetBindings.Observed(Json(Identity(addresses: "\"192.168.0.1\"")), 3, "Sim1", creation, observed);
-        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "opc.tcp://192.168.0.2:4840/"), "RuntimeTargetNotOwnedPlcsim");
-        PlcsimTargetBindings.RequireEndpoint(tcpip, "opc.tcp://192.168.0.1:4840/");
-        PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "opc.tcp://192.168.0.2:4840/", Plcsim), "RuntimeTargetNotOwnedPlcsim");
+        PlcsimTargetBindings.RequireEndpoint(tcpip, "opc.tcp://192.168.0.1:4840/", Plcsim);
+        PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", "siemens plcsim virtual ethernet adapter #2");
+        // The same factory-default address on a plant network card is a physical PLC, whatever the binding says; an unknown route never qualifies.
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", "Intel(R) Ethernet Connection I219-LM"), "RuntimeTargetNotOwnedPlcsim");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", ""), "RuntimeTargetNotOwnedPlcsim");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", null), "RuntimeTargetRouteUnverified");
         Fails(() => PlcsimTargetBindings.RequireSameInstance(tcpip, tcpip with { CommunicationInterface = "Softbus" }), "PlcsimTargetBindingStale");
 
         Check(PlcsimTargetBindings.Covers(binding, "https://192.168.0.10") && PlcsimTargetBindings.Covers(binding, "opc.tcp://10.0.0.1:4840/"), "Owned controller addresses bind Web and UA endpoints");
         Check(!PlcsimTargetBindings.Covers(binding, "https://192.168.0.11") && !PlcsimTargetBindings.Covers(binding, "https://plc.example"), "Other addresses and host names stay unbound");
-        Fails(() => PlcsimTargetBindings.RequireEndpoint(binding, "https://192.168.0.11"), "RuntimeTargetNotOwnedPlcsim");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(binding, "https://192.168.0.11", Plcsim), "RuntimeTargetNotOwnedPlcsim");
         Fails(() => PlcsimTargetBindings.RequireSameInstance(binding, binding with { MarkerSha256 = new('c', 64) }), "PlcsimTargetBindingStale");
         PlcsimTargetBindings.RequireSameInstance(binding, binding with { ObservedUtc = observed.AddMinutes(1), ControllerAddresses = [.. binding.ControllerAddresses] });
 
@@ -58,7 +63,7 @@ public static class PlcsimTargetBindingChecks
             legacySha256 != sha256, "Legacy bytes omit the interface and hash differently");
         var legacy = PlcsimTargetBindings.Read(root, legacySha256);
         Check(legacy.CommunicationInterface is null, "Legacy binding reopens without an interface");
-        Fails(() => PlcsimTargetBindings.RequireEndpoint(legacy, "https://192.168.0.10"), "PlcsimEndpointUnreachable");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(legacy, "https://192.168.0.10", Plcsim), "PlcsimEndpointUnreachable");
 
         string fingerprint = new('d', 64);
         string Compare(string name, string address, bool available = true) =>
