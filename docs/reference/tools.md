@@ -54,7 +54,7 @@ option registers or admits the tool only on a qualification Host.
 | `change_apply` | Checkpoint, mutate, compile and journal a prepared change | shipped | core |  | 131 features |
 | `change_prepare` | Validate and preview an explicit offline mutation | shipped | core |  | 131 features |
 | `change_restore` | Restore a recorded checkpoint into a new project | shipped | core |  | 131 features |
-| `change_status` | Read in-memory or persisted change outcomes | shipped | core |  | 124 features |
+| `change_status` | Read in-memory or persisted change outcomes | shipped | core |  | 123 features |
 
 ## connections
 

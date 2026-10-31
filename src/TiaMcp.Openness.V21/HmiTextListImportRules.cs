@@ -16,8 +16,8 @@ namespace TiaMcp.Model
     internal static class HmiTextListImportRules
     {
         internal const string Operation = "text_list_import";
-        // Profiles whose native qualification passed; the evidence-curation commit adds each one (empty until then).
-        internal static readonly string[] Profiles = { };
+        // Profiles whose native qualification passed (local.hmi.text-list-import.route.20261031 and the interruption records).
+        internal static readonly string[] Profiles = { "unified-comfort", "unified-pc" };
         // Profiles a qualification-only Host (--hmi-text-list-qualification <profile>) may admit in a project its own worker retrieved.
         internal static readonly string[] QualificationProfiles = { "unified-comfort", "unified-pc" };
         private static readonly Dictionary<string, JToken> EntryDefaults = new Dictionary<string, JToken>(StringComparer.Ordinal)

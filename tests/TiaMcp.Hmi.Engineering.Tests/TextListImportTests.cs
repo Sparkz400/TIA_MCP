@@ -132,16 +132,14 @@ static class TextListImportTests
             var truncated = Compile(("Error", "password"), ("Warning", "w")); truncated["targets"][0]["messagesTruncated"] = true;
             Assert(!HmiTextListImportRules.CompileProblemsUnchanged(baseline, truncated) && !HmiTextListImportRules.CompileProblemsUnchanged(null, baseline), "incomplete diagnostics");
         });
-        check("No profile is open in production; a qualification Host admits exactly its profile", () => {
-            Assert(HmiTextListImportRules.Profiles.Length == 0, "ships with no qualified profile");
+        check("Production admits exactly the natively qualified Unified Comfort and Unified PC profiles", () => {
+            Assert(HmiTextListImportRules.Profiles.OrderBy(p => p, StringComparer.Ordinal).SequenceEqual(new[] { "unified-comfort", "unified-pc" }), "the qualified profiles of 31 October");
             foreach (string profile in new[] { "unified-comfort", "unified-pc" })
             {
-                var closed = HmiTextListImportRules.Gate("unified", profile);
-                Assert(!closed.Value<bool>("available") && closed.Value<string>("reasonCode") == "HmiPreservationUnavailable", "closed without qualification: " + profile);
-                var admitted = HmiTextListImportRules.Gate("unified", profile, profile);
-                Assert(admitted.Value<bool>("available") && admitted.Value<string>("admission") == "qualification" && admitted.Value<string>("nativeQualification") == "unverified", "qualification admits " + profile);
+                var production = HmiTextListImportRules.Gate("unified", profile);
+                Assert(production.Value<bool>("available") && production.Value<string>("admission") == "production" && production.Value<string>("nativeQualification") == "verified", "production admits " + profile);
+                Assert(HmiTextListImportRules.Gate("unified", profile, profile).Value<string>("admission") == "production", "a qualification Host does not change a qualified profile's admission: " + profile);
             }
-            Assert(!HmiTextListImportRules.Gate("unified", "unified-pc", "unified-comfort").Value<bool>("available"), "another profile's qualification does not admit");
             foreach (var (family, profile) in new[] { ("unified", "unknown"), ("classic", "classic-comfort"), ("unified", null) })
                 Assert(!HmiTextListImportRules.Gate(family, profile, profile).Value<bool>("available"), "never admitted: " + profile);
             foreach (string operation in new[] { "screen_create", "tag_create", "classic_xml_import" })

@@ -3235,6 +3235,51 @@
         "One Unified Comfort fixture with en-US/de-DE enabled for runtime; Unified PC, other devices and customer projects were not interrupted.",
         "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
       ]
+    },
+    {
+      "id": "local.hmi.text-list-import.route.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort and WinCC Unified PC RT, 21.0.1.0",
+        "languages": [
+          "en-US",
+          "de-DE"
+        ],
+        "sourceCommit": "a84d2a53f38b1114c3e762599493b9c7754376e4",
+        "passedScope": "Change kind hmi_text_list_import through change_prepare/change_apply/change_restore on a qualification Host (--hmi-text-list-qualification <profile>), frozen artifacts/fw3g = a84d2a53, run artifacts/tx3, for unified-comfort (MTP700 Unified Comfort 21.0.1.0) and unified-pc (WinCC Unified PC RT 21.0.1.0). Per profile: HmiSeeder textlist-fixture created and archived an owned seeded fixture (two screens with items, a tag, start screen, a discrete alarm, a Loaded script, the bilingual peer list, en-US/de-DE enabled for runtime); the production Host retrieved an owned copy. Refusals before any write: four actual prior records with content V21 changes (HmiTextListValueOutOfRange, HmiTextListNameUnsupported, HmiTextListTextUnsupported, HmiTextListDefaultEntryValue), an author record with outputId, an unknown record, a client-supplied candidate, an unknown set output, and a candidate missing a project language (HmiTextListLanguageMismatch). Nine imports in order (boundary values, texts and names, the v1 base replacing the peer list, the retained v2 author, the retained v3 author replacing it, both outputs of a retained v1 set, reordered languages): each prepared with the StaleRevision-bound content hash, applied with checkpoint, device compile and save, worker readback exact, the independent PyYAML oracle on hmi_inspect's export exact with every other list unchanged, same-key replay returning the recorded outcome and another key refused RecoveryRequired; a preview prepared before another saved import refused StaleRevision and left prepared; every typed HMI node outside the text lists unchanged; change_restore of the last import with HMI content equality and the previous lists; a fresh Host and owned TIA reopening the saved original with the last lists and unchanged typed nodes. 168 checks, no failures."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.route.20261031.json"
+      ],
+      "limitations": [
+        "Owned seeded fixtures only, one Unified HMI per project, en-US/de-DE both enabled for runtime; other devices, languages, customer projects, consumers of the imported lists, runtime and visual behavior were not run.",
+        "Compiler problems are compared by state, text and path; the fixtures keep their two encrypted-transfer password errors (no public setter), so no clean compile is shown.",
+        "A project language not enabled for runtime is refused (V21 throws from HmiLanguageAndFont.Order); formatted and system text lists, graphic lists and script modules are not imported."
+      ]
+    },
+    {
+      "id": "local.hmi.text-list-import.interruption-pc.20261031",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "WinCC Unified PC RT 21.0.1.0",
+        "languages": [
+          "en-US",
+          "de-DE"
+        ],
+        "sourceCommit": "a84d2a53f38b1114c3e762599493b9c7754376e4",
+        "passedScope": "Change kind hmi_text_list_import on a qualification Host (--hmi-text-list-qualification unified-pc, frozen artifacts/fw3g = a84d2a53, run artifacts/ti2): ten qualify_interruption.py tl-* scenarios on owned copies of the HmiSeeder textlist-fixture WinCC Unified PC RT archive of run tx3 (artifacts/tx3/f2). Worker loss at the checkpoint (held, not persisted), during the baseline compile, the native import, the export readback and the compile/preservation stage (released unchanged, not persisted), and after the save (held, persisted); Host loss at the checkpoint, import, readback and save (held, persisted; the journal ended applied with every stage of a complete import). Each reconciled once from a fresh Host and owned TIA without replay (journal bytes unchanged), one admission each, checkpoint recovery for released cases and an independent fresh read of the effect."
+      },
+      "artifacts": [
+        "evidence/local.hmi.text-list-import.interruption-pc.20261031.json"
+      ],
+      "limitations": [
+        "One Unified PC fixture with en-US/de-DE enabled for runtime; other devices and customer projects were not interrupted.",
+        "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
+      ]
     }
   ],
   "features": [
@@ -12490,7 +12535,6 @@
       "mcpTools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "hmi_text_list_import",
@@ -12506,23 +12550,25 @@
           "payload {schemaVersion: 1, target: the Unified hmiDevice identity from hmi_inspect section=devices, expectedContentHash, recordId, outputId (set records only)}. The Host reopens the hmi_text_list_author or hmi_text_list_generate_set record with full revalidation, refuses the content V21's import changes with the authoring codes (HmiTextListValueOutOfRange, HmiTextListBoolDefaultEntry, HmiTextListDefaultEntryValue, HmiTextListTextUnsupported, HmiTextListNameUnsupported), also for records published before those refusals, and hands the worker only the exact hash-checked candidate pair; a client-supplied candidate is refused.",
           "Prepare captures the Unified scope of every HMI in the project (tag-table and paired text-list exports, typed readback of every node). The capture is accepted only with the two standing Unified coverage notes (tag-table export stability, no Screen.Export); a typed read error, a capture failure or a Classic HMI refuses with HmiPreservationUnavailable, and the content hash is the observed-artifacts hash. expectedContentHash must equal it; a StaleRevision refusal returns it. Every typed text-list node must be a list the export holds (V21 skips lists with formatted text; HmiTextListExportIncomplete). The candidate's languages must be exactly the project's active languages (HmiTextListLanguageMismatch). The preview lists created and replaced lists; a replaced list loses its old content, no other list is renamed or deleted.",
           "Apply requires compile=true and save=true. Both candidate files are re-hashed before the checkpoint. After it the HMI device is compiled and the scope captured again, then the pair is imported with HmiTextListComposition.Import (which must return true) and the complete export is read back: every candidate list must equal the candidate and every other list stay unchanged, compared by meaning (entries with defaults applied, texts per language; the rule of the native qualification oracle) by a strict YAML-subset reader that refuses any other construct and every unresolved text reference. Outside the candidate lists' own typed nodes and the export the capture must be unchanged, and the device's compiler errors and warnings unchanged by the import (Unified fixtures keep their encrypted-transfer password errors), compared by state, text and path; the tree container a problem sits under, empty-text container rows and the closing summary row's counts are not compared; then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
-          "Gate: this kind only (31 October maintainer decision). The production profile list ships empty; the evidence-curation commit adds each profile whose native qualification passed (candidates unified-comfort and unified-pc). Until then only a Host started with --hmi-text-list-qualification <profile> admits that profile, in a project its own worker retrieved or created. Classic, other profiles, screens and every hmi_engineering operation stay behind the closed preservation gate. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Gate: this kind only (31 October maintainer decision), admitted in production on unified-comfort and unified-pc, the profiles whose native qualification passed; Classic, other profiles, screens and every hmi_engineering operation stay behind the closed preservation gate. --hmi-text-list-qualification <profile> admits a further candidate profile only in a project its own worker retrieved or created. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Consumers of an imported list are checked only by typed-readback equality of every other node; formatted and system text lists, graphic lists and script modules are not imported; runtime and visual behavior are not verified.",
-          "Native, 31 October (local.hmi.text-list-import.interruption.20261031): worker loss at the checkpoint, baseline compile, import, readback, compile/preservation and after the save, and Host loss at the checkpoint, import, readback and save, each reconciled once without replay on Unified Comfort; the Host-loss cases show the worker completing a whole apply with save. The route runner (apply sequence, refusals, restore, fresh reopen) has not passed yet: runs tx1/tx2 stopped before the first saved apply: the fixture was changed to enable every project language for runtime (c6191401) and the compiler-problem rule was fixed (1121bb82); no profile is admitted in production.",
+          "Native, 31 October: the route passed on MTP700 Unified Comfort and WinCC Unified PC RT (local.hmi.text-list-import.route.20261031, run tx3, 168 checks): refusals before any write, nine imports of every record kind with exact worker and independent PyYAML readback, recorded same-key replay and RecoveryRequired for another key, stale-preview refusal, unchanged typed nodes, change_restore and a fresh reopen. Interruption at the checkpoint, baseline compile, import, readback, compile/preservation and save, and Host loss at the checkpoint, import, readback and save, passed on both profiles (local.hmi.text-list-import.interruption.20261031, local.hmi.text-list-import.interruption-pc.20261031). Earlier runs tx1/tx2 led to the fixture runtime-language change (c6191401) and the compiler-problem rule fix (1121bb82).",
           "A project language that is not enabled for runtime is refused with HmiPreservationUnavailable: V21 throws EngineeringTargetInvocationException from its HmiLanguageAndFont.Order, which the capture records as a typed read error (run artifacts/tx1). Enable every project language under the HMI's runtime settings before importing.",
-          "Compiled against the V21 PublicAPI only; not natively qualified."
+          "Qualified on owned seeded fixtures (one Unified HMI, en-US/de-DE enabled for runtime, two encrypted-transfer password errors kept); other devices, languages, customer projects, consumers of imported lists, runtime and visual behavior are not covered."
         ]
       },
       "qualification": {
-        "status": "unverified",
+        "status": "verified",
         "evidenceIds": [
-          "local.hmi.text-list-import.interruption.20261031"
+          "local.hmi.text-list-import.route.20261031",
+          "local.hmi.text-list-import.interruption.20261031",
+          "local.hmi.text-list-import.interruption-pc.20261031"
         ]
       },
       "availability": {
         "status": "conditional",
         "reasons": [
-          "No profile has passed native qualification; production prepare refuses with HmiPreservationUnavailable. A qualification Host (--hmi-text-list-qualification) admits unified-comfort or unified-pc only in its own retrieved or created project."
+          "Requires an owned project with a Unified Comfort or Unified PC HMI whose capture shows only the two standing notes, every project language enabled for runtime, a retained candidate whose languages equal the project's active languages, and a worker-owned TIA instance for change_restore."
         ]
       },
       "prerequisites": [

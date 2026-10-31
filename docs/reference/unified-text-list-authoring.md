@@ -197,10 +197,10 @@ non-executing parser used by the oracle. No parser dependency is added to the Ho
 
 Change kind `hmi_text_list_import` imports one retained candidate pair through the shared
 `change_prepare`/`change_apply`/`change_restore` admission. It is the only Unified write
-the closed HMI preservation gate lets through (maintainer decision of 31 October 2026). The
-gate admits a profile in production only after its native qualification passed; no profile
-has yet. Until then only a Host started with `--hmi-text-list-qualification unified-comfort`
-or `unified-pc` admits that profile, in a project its own worker retrieved or created.
+the closed HMI preservation gate lets through (maintainer decision of 31 October 2026). It is
+admitted for the `unified-comfort` and `unified-pc` profiles, which passed native qualification
+on 31 October; any other profile needs a Host started with `--hmi-text-list-qualification
+<profile>`, which admits it only in a project its own worker retrieved or created.
 
 ```json
 { "kind": "hmi_text_list_import", "payload": { "schemaVersion": 1, "target": "<hmiDevice identity from hmi_inspect section=devices>",
@@ -238,8 +238,8 @@ or `unified-pc` admits that profile, in a project its own worker retrieved or cr
   object (tree container) a problem is listed under, because V21 nests the same problems
   differently from one compile to the next.
 
-Native status (31 October): interruption at every boundary passed on Unified Comfort; the route
-runner has not passed yet ([record](../verification/hmi-text-list-route-20261031.md)).
+Native status (31 October): the route and interruption at every boundary passed on Unified
+Comfort and Unified PC ([record](../verification/hmi-text-list-route-20261031.md)).
 Native runners: [`qualify_hmi_text_list_route.py`](../../scripts/qualify_hmi_text_list_route.py)
 (apply, refusals, restore, fresh reopen per profile) and the `tl-*` scenarios of
 [`qualify_interruption.py`](../../scripts/qualify_interruption.py) (worker and Host loss at

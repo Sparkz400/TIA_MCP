@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "10b5a721de1442e2d30022b7aee60c17308f3b20c51c0370c1cce453381c5243",
-      "bytes": 1438761
+      "sha256": "1d7234d19a50880748ef95c912d5dea9a8cccfd37ada1e84978373e122804aa6",
+      "bytes": 1443804
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2402,8 +2402,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiTextListImportRules.cs",
-      "sha256": "66c07f20374a99e73ab2ec6b3f7a6034e1760296ee9daa953c8c4cd30634913e",
-      "bytes": 34685
+      "sha256": "81acc0762aefd1fc48c0a816f6765a1d084830d5bd56ee8099666f8aca64ae29",
+      "bytes": 34727
     },
     {
       "path": "src/TiaMcp.Openness.V21/LibraryDependencyCapture.cs",
@@ -98445,7 +98445,6 @@
       "tools": [
         "change_prepare",
         "change_apply",
-        "change_status",
         "change_restore"
       ],
       "changeKind": "hmi_text_list_import",
@@ -98509,10 +98508,24 @@
       "schemaReview": "unresolved",
       "evidenceRefs": [
         {
+          "id": "local.hmi.text-list-import.route.20261031",
+          "profileSha256": "1703763e3884981210993ef96ce37d05068d1a158446be7aa9551dc3942094b1",
+          "artifacts": [
+            "evidence/local.hmi.text-list-import.route.20261031.json"
+          ]
+        },
+        {
           "id": "local.hmi.text-list-import.interruption.20261031",
           "profileSha256": "385fe7712309b044a901fc1e539e2bd61167802c913fa54126981a4ae819a3aa",
           "artifacts": [
             "evidence/local.hmi.text-list-import.interruption.20261031.json"
+          ]
+        },
+        {
+          "id": "local.hmi.text-list-import.interruption-pc.20261031",
+          "profileSha256": "37f5776f20fd07c3b2bb4a0ead965992c8e684d5d6511249f9a901d3d80c1b59",
+          "artifacts": [
+            "evidence/local.hmi.text-list-import.interruption-pc.20261031.json"
           ]
         }
       ],
@@ -122363,9 +122376,19 @@
       "sha256": "7c7042792dab344a28bf1ebc1f31d4393545d39c9d96d1043e4f3a9dac2e2e9e"
     },
     {
+      "path": "evidence/local.hmi.text-list-import.interruption-pc.20261031.json",
+      "state": "observed",
+      "sha256": "b5fa91be0b22c93edd7a2f17b3a322b2be72152d008df6eb0cb2cf0fca606713"
+    },
+    {
       "path": "evidence/local.hmi.text-list-import.interruption.20261031.json",
       "state": "observed",
       "sha256": "0a42b9caea26b4b5d4e862ef24ba32928b002a3f0ac15003c64a711ac49c2833"
+    },
+    {
+      "path": "evidence/local.hmi.text-list-import.route.20261031.json",
+      "state": "observed",
+      "sha256": "be5f1f1f6a9b378a97ca3eaf15fa9207cd2d40d552546ea32ff95c89385cfade"
     },
     {
       "path": "evidence/local.hostonly.access-review.rerun.20261028.json",
@@ -123188,8 +123211,16 @@
       "profileSha256": "87410f19140d4e7f4ee513f744db565fc82eb41b59ef48682e34cc8b6ccd998a"
     },
     {
+      "id": "local.hmi.text-list-import.interruption-pc.20261031",
+      "profileSha256": "37f5776f20fd07c3b2bb4a0ead965992c8e684d5d6511249f9a901d3d80c1b59"
+    },
+    {
       "id": "local.hmi.text-list-import.interruption.20261031",
       "profileSha256": "385fe7712309b044a901fc1e539e2bd61167802c913fa54126981a4ae819a3aa"
+    },
+    {
+      "id": "local.hmi.text-list-import.route.20261031",
+      "profileSha256": "1703763e3884981210993ef96ce37d05068d1a158446be7aa9551dc3942094b1"
     },
     {
       "id": "local.hostonly.access-review.rerun.20261028",
