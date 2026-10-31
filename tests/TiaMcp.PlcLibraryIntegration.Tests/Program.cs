@@ -173,6 +173,14 @@ Test("candidate shapes run only on a qualification Host's owned scratch, and no 
     if (integration.IndexOf("if (record?[\"initialCheckpoint\"] is JObject checkpoint && ((JArray)change.Journal[\"checkpoints\"]).Count == 0) ((JArray)change.Journal[\"checkpoints\"]).Add(checkpoint.DeepClone());", StringComparison.Ordinal) < 0)
         throw new Exception("The failure path no longer records the initial checkpoint in the change journal.");
 });
+// The admitted step workspace of a combined apply needs its own reconcile rule, or a crash leaves the admission unreleasable.
+Test("the combined apply's admitted step workspace has a reconcile rule", () => {
+    string admission = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs"));
+    string reconcile = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.AdmissionReconcileLibrary.cs"));
+    if (!admission.Contains("PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id), \"combinedApplyStepWorkspace\")") ||
+        !reconcile.Contains("check.Rows(\"combinedApplyStepWorkspace\")") || !reconcile.Contains("PlcComponentCoordinator.ReconcileWorkspace(row.Value<string>(\"path\")"))
+        throw new Exception("The admitted combinedApplyStepWorkspace row must be proven by PlcComponentCoordinator.ReconcileWorkspace.");
+});
 TextBoundaryTests.Run(Test);
 CoordinatorTests.Run(Test);
 StandaloneTests.Run(Test);

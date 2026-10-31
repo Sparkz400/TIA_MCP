@@ -160,7 +160,10 @@ namespace TiaMcp.Openness.V21
             string refusal = PlcComponentQualificationGate.CombinedApplyLanguageRefusal(languages.ActiveLanguages.Select(l => l.Culture.Name).ToArray(),
                 languages.ReferenceLanguage?.Culture.Name, languages.EditingLanguage?.Culture.Name);
             if (refusal != null) return NotQualified(refusal);
-            var path = PlcComponentQualificationGate.CombinedApplyPathRefusal(change.Directory, change.Id, change.Project.Name);
+            // Retrieval names the project directory after the project (lr_<10 hex>/<name>/<name>.ap21, seen natively on 31 October);
+            // the longer of the name and the current folder name keeps a renamed folder conservative.
+            string folder = change.Project.Path.Directory.Name;
+            var path = PlcComponentQualificationGate.CombinedApplyPathRefusal(change.Directory, change.Id, folder.Length > change.Project.Name.Length ? folder : change.Project.Name);
             if (path != null) return path;
             try
             {

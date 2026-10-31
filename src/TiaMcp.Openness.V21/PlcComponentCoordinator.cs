@@ -408,6 +408,47 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["planChangeId"] = prepared["changeId"].DeepClone(), ["planPreviewHash"] = prepared["previewHash"].DeepClone(), ["projectPath"] = preview["projectPath"].DeepClone(), ["payload"] = preview["payload"].DeepClone(), ["plan"] = plan.DeepClone() };
         }
 
+        /// <summary>Admission reconciliation of a production combined apply's step workspace, worker-owned scratch of its steps: every
+        /// coordinator journal must verify its own hash, and every checkpoint archive must be recorded with its hash by the step journal
+        /// beside it, so the steps' own records account for what was written. "unchanged", "verifiedApplied" or null (held, basis is why).</summary>
+        internal static string ReconcileWorkspace(string workspace, JObject evidence, out string basis)
+        {
+            if (File.Exists(workspace)) { basis = "The step workspace path is a file."; return null; }
+            if (!Directory.Exists(workspace) || !Directory.EnumerateFileSystemEntries(workspace).Any())
+            { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
+            var states = new JArray(); evidence["coordinatorStates"] = states;
+            foreach (string journal in Directory.GetFiles(workspace, "component-journal.json", SearchOption.AllDirectories))
+            {
+                try { states.Add(ReadChecked(journal).Value<string>("state")); }
+                catch (Exception error) when (error is PlcComponentException || error is IOException || error is JsonException)
+                { basis = "Coordinator journal " + journal + " is unreadable or its hash differs: " + error.Message; return null; }
+            }
+            var archives = new JArray(); evidence["checkpointArchives"] = archives;
+            foreach (string archive in Directory.GetFiles(workspace, "*.za?21", SearchOption.AllDirectories))
+            {
+                string directory = Path.GetDirectoryName(archive), name = Path.GetFileName(directory), path = Path.Combine(directory, "journal.json"), hash = FileHash(archive);
+                bool recorded = false;
+                try
+                {
+                    if (name.StartsWith("change-lib-", StringComparison.Ordinal))
+                        recorded = (LibraryJournalStore.Read(path, name.Substring("change-".Length))["checkpoints"] as JArray ?? new JArray()).OfType<JObject>()
+                            .Any(c => SamePath(c.Value<string>("archivePath"), archive) && c.Value<string>("sha256") == hash);
+                    else if (name.StartsWith("change-", StringComparison.Ordinal) && File.Exists(path) && new FileInfo(path).Length <= 8 * 1024 * 1024)
+                    {
+                        var step = JObject.Parse(File.ReadAllText(path));
+                        recorded = "change-" + step.Value<string>("changeId") == name && SamePath(step.Value<string>("recoveryArchive"), archive) && step.Value<string>("recoveryArchiveSha256") == hash;
+                    }
+                }
+                catch (Exception error) when (error is IOException || error is InvalidDataException || error is JsonException) { recorded = false; }
+                if (!recorded) { basis = "Checkpoint archive " + archive + " is missing from, or differs from, its step journal."; return null; }
+                archives.Add(new JObject { ["path"] = archive, ["sha256"] = hash });
+            }
+            basis = "Worker-owned step scratch of the combined apply: every coordinator journal verifies its hash and every checkpoint archive is recorded with its hash by its step journal.";
+            return "verifiedApplied";
+        }
+        private static bool SamePath(string left, string right) =>
+            !string.IsNullOrEmpty(left) && Path.IsPathRooted(left) && string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
+
         private IDisposable Lock()
         {
             try { return new FileStream(_resourceLock, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }

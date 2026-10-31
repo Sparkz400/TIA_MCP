@@ -356,6 +356,34 @@ internal static class CoordinatorTests
             s.Ops.PreparedMutation = p => ((JArray)p["preview"]["effects"]).Add(new JObject { ["action"] = "createMultiInstance", ["callerPath"] = "/plc/blocks/Main", ["member"] = "Motor1", ["dataType"] = "\"Motor\"" });
             Reject("ComponentPreparationMismatch", () => s.Next());
         });
+        // Admission reconcile of a crashed combined apply: its step workspace (changes/c/<8 hex>) resolves with the steps' own records.
+        test("admission reconcile resolves a crashed combined apply's step workspace from its step records", () => {
+            var s = new Scenario(create: false); string workspace = Path.Combine(s.Root, "changes", "c", "05d85a35");
+            string Hash(string path) => Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
+            string Reconcile(out string basis, JObject evidence = null) => PlcComponentCoordinator.ReconcileWorkspace(workspace, evidence ?? new JObject(), out basis);
+            Equal("unchanged", Reconcile(out _));
+            var coordinator = PlcComponentCoordinator.Create(workspace, s.PreparedPlan, s.Ops); coordinator.Advance(); coordinator.Advance(coordinator.Status()["library"]["prepared"].Value<string>("previewHash"));
+            // The crash came during the import step: its journal records the archive it wrote before the mutation.
+            string library = Path.Combine(workspace, "change-lib-" + new string('a', 32)); Directory.CreateDirectory(library);
+            string archive = Path.Combine(library, "before.zap21"); File.WriteAllText(archive, "pre-import project");
+            var preview = new JObject { ["kind"] = "library_instantiate" };
+            LibraryJournalStore.Write(Path.Combine(library, "journal.json"), new JObject { ["changeId"] = "lib-" + new string('a', 32), ["preview"] = preview,
+                ["previewHash"] = LibraryJournalStore.Hash(preview.ToString(Formatting.None)), ["state"] = "applying",
+                ["checkpoints"] = new JArray(new JObject { ["kind"] = "project", ["archivePath"] = archive, ["sha256"] = Hash(archive) }) });
+            string typed = Path.Combine(workspace, "change-" + new string('b', 32)); Directory.CreateDirectory(typed);
+            string typedArchive = Path.Combine(typed, "before.zap21"); File.WriteAllText(typedArchive, "pre-typed project");
+            File.WriteAllText(Path.Combine(typed, "journal.json"), new JObject { ["changeId"] = new string('b', 32), ["recoveryArchive"] = typedArchive, ["recoveryArchiveSha256"] = Hash(typedArchive) }.ToString());
+            var evidence = new JObject();
+            Equal("verifiedApplied", Reconcile(out _, evidence)); Equal("library_applied", evidence["coordinatorStates"][0].Value<string>()); Equal(2, ((JArray)evidence["checkpointArchives"]).Count);
+            // A partial archive its step never recorded holds; so does a changed recorded archive or a tampered coordinator journal.
+            string partial = Path.Combine(workspace, "change-" + new string('c', 32)); Directory.CreateDirectory(partial); File.WriteAllText(Path.Combine(partial, "before.zap21"), "partial");
+            Equal(null, Reconcile(out var held)); Equal(true, held.Contains("missing from, or differs from, its step journal"));
+            Directory.Delete(partial, true); Equal("verifiedApplied", Reconcile(out _));
+            File.WriteAllText(typedArchive, "changed later"); Equal(null, Reconcile(out _)); File.WriteAllText(typedArchive, "pre-typed project");
+            string journal = Directory.GetFiles(workspace, "component-journal.json", SearchOption.AllDirectories).Single();
+            var envelope = JObject.Parse(File.ReadAllText(journal)); envelope["record"]["state"] = "installation_verified"; File.WriteAllText(journal, envelope.ToString());
+            Equal(null, Reconcile(out var tampered)); Equal(true, tampered.StartsWith("Coordinator journal", StringComparison.Ordinal));
+        });
         test("planOnly steps cannot be dispatched by coordinator", () => {
             var s = new Scenario(create: false); s.PreparedPlan["preview"]["integrationPlan"]["steps"][1]["planOnly"] = true; s.RehashPlan();
             Reject("ComponentPlanBlocked", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops)); Equal(0, s.Ops.Applies);

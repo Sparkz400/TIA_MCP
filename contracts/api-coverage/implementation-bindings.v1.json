@@ -2447,8 +2447,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.AdmissionReconcileLibrary.cs",
-      "sha256": "e15d2201e3025ecf05d407681fdf4300be8e1692795612ed3606fd5dd8505f89",
-      "bytes": 8669
+      "sha256": "acde93d82566e15cc385f3f00187ac70bc0220eb1d74278a4469c74acee13665",
+      "bytes": 9278
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Analysis.cs",
@@ -2717,8 +2717,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
-      "sha256": "6dd078bef8057507b4be56661ff05066e3c8c50090bb028f6628e9db882aadb2",
-      "bytes": 27691
+      "sha256": "9690dbbe4858e468bb0e68add8af894e5202b65a76a498b98905ade0a0870699",
+      "bytes": 28046
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.TypedPreview.cs",
@@ -2982,8 +2982,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentCoordinator.cs",
-      "sha256": "ff07691f0ec61591c3ad2f8761327d87326c99350bf2e842d3ccb5f7f86249e6",
-      "bytes": 38463
+      "sha256": "ee0f5d2223caebd2642e8777801c09ccf7f1f0b2b07c9b4bfbeaf5689fca98e2",
+      "bytes": 42083
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
@@ -88140,8 +88140,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
               "name": "PreparePlcCombinedApply",
-              "line": 211,
-              "endLine": 232,
+              "line": 214,
+              "endLine": 235,
               "sha256": "3bbdce187bc28f81723af6337f341937ffa45bde9097cc5157ce4acba9109a39"
             },
             {
@@ -88317,8 +88317,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
               "name": "PreparePlcCombinedApply",
-              "line": 211,
-              "endLine": 232,
+              "line": 214,
+              "endLine": 235,
               "sha256": "3bbdce187bc28f81723af6337f341937ffa45bde9097cc5157ce4acba9109a39"
             },
             {
