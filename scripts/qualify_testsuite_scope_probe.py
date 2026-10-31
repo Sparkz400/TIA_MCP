@@ -21,7 +21,7 @@ import psutil
 from block_test_process import OwnedTiaProcessWatcher
 from qualify_worker_startup_exact import identity
 from smoke_mcp import Client
-from retained_native_lifecycle import wait_retained_terminal
+from retained_native_lifecycle import terminal_deadline_seconds, wait_retained_terminal
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -478,7 +478,7 @@ class Session:
         deadline = None; deadline_recorded = False
         while True:
             try:
-                if deadline is None: deadline = clock() + timeout_seconds
+                if deadline is None: deadline = clock() + max([timeout_seconds, *(terminal_deadline_seconds(i.get("name"), timeout_seconds) for i, _ in self.tracked.values())])
                 self.require_captured_startup()
                 watchers = [self.host_watcher, *(watcher for _, watcher in self.tracked.values())]
                 if all(w.api.wait(w._handle, 0) == 0 for w in watchers): return
@@ -652,7 +652,7 @@ class Session:
         cleanup["errors"].extend(self.tracking_errors)
         for info, watcher in list(self.tracked.values()):
             try:
-                proof = wait_retained_terminal(watcher, timeout_seconds=45)
+                proof = wait_retained_terminal(watcher, timeout_seconds=terminal_deadline_seconds(info.get("name"), 45))
             except BaseException as error:
                 proof = getattr(error, "evidence", {"error": str(error)})
                 cleanup["errors"].append("owned descendant exit: " + str(error))

@@ -55,6 +55,17 @@ def bind_original_handle(watcher, info):
     return exact_birth
 
 
+# Measured on this PC on 24 October 2026: the FileStorage server exits 300.0-301.7 s after
+# the terminal wait begins (a fixed idle shutdown). It gets that plus a 60 s margin; every
+# other owned process keeps the caller's deadline. Every runner's terminal wait selects it here.
+FILE_STORAGE_SERVER = "Siemens.Automation.ObjectFrame.FileStorage.Server.exe"
+FILE_STORAGE_TERMINAL_SECONDS = 360
+
+
+def terminal_deadline_seconds(process_name, default_seconds):
+    return max(default_seconds, FILE_STORAGE_TERMINAL_SECONDS) if process_name == FILE_STORAGE_SERVER else default_seconds
+
+
 def wait_retained_terminal(watcher, *, timeout_seconds=45, report=None, clock=time.monotonic,
                            mutex=None, publish=None):
     """Never close a live handle, including on timeout, cancellation, or wait error."""
@@ -360,7 +371,8 @@ class RetainedNativeTree:
                 packet.update(identity=row["identity"], role=row["role"], handleEvidence=copy.deepcopy(row["watcher"].evidence))
                 reports.append(copy.deepcopy(packet))
                 emit(self.directory / f"process-{row['identity']['pid']}-{row['watcher'].evidence['originalFileTimeTicks']}-blocked-{len(reports):03}.json", packet)
-            wait_retained_terminal(row["watcher"], timeout_seconds=timeout_seconds, report=report,
+            wait_retained_terminal(row["watcher"], report=report,
+                timeout_seconds=terminal_deadline_seconds(row["identity"].get("name"), timeout_seconds),
                 mutex=self.mutex, publish=lambda proof: row.update(proof=proof))
             try:
                 emit(self.directory / f"process-{row['identity']['pid']}-{row['watcher'].evidence['originalFileTimeTicks']}-exit.json",
@@ -375,6 +387,8 @@ class RetainedNativeTree:
         return copy.deepcopy(row["proof"])
 
     def close_all(self, *, timeout_seconds=75):
+        timeout_seconds = max([timeout_seconds, *(terminal_deadline_seconds(r["identity"].get("name"), timeout_seconds)
+                                                  for r in self.snapshot())])
         deadline = time.monotonic() + timeout_seconds; reasons = self.cleanup_reasons; report_number = 0
         while True:
             try:
