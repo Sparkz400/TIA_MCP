@@ -1,0 +1,63 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.translation.restricted.qualification.20261031",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-31T14:17:19+00:00",
+  "source": {
+    "commit": "2b11b47b4575d7add517eb730f463dc6a299ded6",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "The qualification_translation_* tools in an explicit --translation-qualification session on a frozen Debug build of fa013be2 (artifacts/tr09/fa013be2) under TIA Portal V21 Update 3, English UI: qualify_translation_import.py --same-instance --restricted-lifecycle. Category probes with a conclusive populated-Main control (seeded Main block comment, English view paths); Host-filtered PLC captures keeping exactly 5, 1 and 0 rows of 6 native rows each for BlockCommentCategoryData, HwcnCommentTextCategoryData and AlarmClassDisplayNameCategory; then on the filtered BlockCommentCategoryData scope the seven forward cases (interruption before dispatch, source drift, lost import, compile, save, reopen and restore replies), three reviewed reverse edits, 8 imports and 10 distinct restorations, every operation reconciled, and a final unattempted plan with the same restricted-contract key. The independent verify_translation_admission.py (2b11b47b) passed.",
+  "limitations": [
+    "One owned CPU 1511-1 PN V4.1 scratch, de-DE reference and en-GB target, one PLC, target-only plain text; only the BlockCommentCategoryData restriction was imported. Native category filtering itself still leaks: every category request returned all six PLC rows, and the Main block requests returned all three Main rows.",
+    "The build output directories also hold the provisional restricted registry installed after this run for the default-mode packet; an empty restricted import was not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 29,
+      "sha256": "49d3a67bbc3d8c329d4c1c32089a7f37d14e96ee3b2c995e5d2f4d7b23ca1f53"
+    },
+    {
+      "name": "net48",
+      "files": 9,
+      "sha256": "343e52bcf5f046aabdc3ac260ce3bca48a4c3bac81590ba87569dd894378e252"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification-restricted.json",
+      "sha256": "ed3ffe6d4624b7aeeca30a8e12333e6fa52f158500010043b67d4567e09f0886",
+      "bytes": 16836,
+      "completed": true,
+      "steps": [
+        "si3: completed",
+        "verifier si3-verification.json: completed"
+      ],
+      "toolsPassed": [
+        "project_open",
+        "qualification_translation_apply",
+        "qualification_translation_capture",
+        "qualification_translation_categories",
+        "qualification_translation_fixture",
+        "qualification_translation_prepare",
+        "qualification_translation_reconcile",
+        "qualification_translation_recover",
+        "qualification_translation_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_translation_apply",
+        "qualification_translation_recover"
+      ]
+    }
+  ]
+}
