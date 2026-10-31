@@ -40,7 +40,11 @@ internal static class TranslationProductionAdmission
         "interruption-before-dispatch", "stale-source-refusal", "existing-recovery-destination-refusal", "exact-process-cleanup"
     ];
     internal static readonly string[] RestrictedNativeCases = [.. NativeCases, "restricted-category-filter"];
-    internal static string[] NativeCasesFor(string contract) => contract == RestrictedContract ? RestrictedNativeCases : NativeCases;
+    // The default-mode packet on the installed provisional entry: clean lifecycle plus worker loss at checkpoint
+    // intent and during the import, and Host loss during the import. Without it a restricted entry is provisional.
+    internal static readonly string[] DefaultModeCases = ["default-mode-lifecycle", "worker-loss-at-checkpoint-intent", "worker-loss-during-import", "host-loss-during-import"];
+    internal static string[] NativeCasesFor(string contract, bool provisional = false) =>
+        contract != RestrictedContract ? NativeCases : provisional ? RestrictedNativeCases : [.. RestrictedNativeCases, .. DefaultModeCases];
     internal static readonly string[] PortableCases = [
         "exact-key-and-binary-refusal", "stale-plan-revision-replay-refusal", "source-clear-empty-richtext-refusal",
         "key-source-target-culture-peer-drift-refusal", "artifact-tampering-refusal", "lost-cleanup-response-reservation"
@@ -96,13 +100,13 @@ internal static class TranslationProductionAdmission
                     Sha256(TranslationNativeComparison.Peer(retained.ReadBytes(peer.Evidence), peer.ComparisonProfile, candidate)))).ToArray());
     }
 
-    internal static void RequireComplete(TranslationAdmissionProfile profile, TranslationAdmissionKey actual)
+    internal static void RequireComplete(TranslationAdmissionProfile profile, TranslationAdmissionKey actual, bool provisional = false)
     {
         Require(!string.IsNullOrWhiteSpace(profile.Id) && profile.Key.Contract is Contract or RestrictedContract &&
             HashJson(profile.Key) == HashJson(actual), "TranslationAdmissionMismatch", "No wildcard, altered text, location, peer, culture, source package or binary may inherit an exact profile.");
         EngineeringIdentityGuard.Sha256(profile.SourcePackageSha256, "sourcePackageSha256");
         string key = HashJson(actual);
-        var native = NativeCasesFor(actual.Contract);
+        var native = NativeCasesFor(actual.Contract, provisional);
         Require(profile.Proofs is not null && profile.Proofs.Length == native.Length + PortableCases.Length &&
             profile.Proofs.Select(proof => proof.Case).Distinct(StringComparer.Ordinal).Count() == profile.Proofs.Length,
             "TranslationAdmissionIncomplete", "Exactly one independent receipt for every required case is necessary.");
@@ -114,5 +118,9 @@ internal static class TranslationProductionAdmission
                 "TranslationAdmissionIncomplete", "Missing, synthetic, foreign-key or foreign-package evidence for " + name + ".");
             EngineeringIdentityGuard.Sha256(proof!.EvidenceSha256, "admissionEvidenceSha256");
         }
+        // The second packet cannot be satisfied by citing the first packet's receipt again.
+        var defaultMode = profile.Proofs.Where(proof => DefaultModeCases.Contains(proof.Case)).Select(proof => proof.EvidenceSha256).Distinct(StringComparer.Ordinal).ToArray();
+        Require(defaultMode.Length == 0 || defaultMode.Length == 1 && profile.Proofs.All(proof => DefaultModeCases.Contains(proof.Case) || proof.EvidenceSha256 != defaultMode[0]),
+            "TranslationAdmissionIncomplete", "The default-mode interruption packet needs its own retained evidence.");
     }
 }

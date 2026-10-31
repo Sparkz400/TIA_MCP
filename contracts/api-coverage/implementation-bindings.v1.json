@@ -2902,8 +2902,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationAdmission.cs",
-      "sha256": "77c904af1f6e3c9f68ddf4f5dca9fe9437e4e79f3cb5cdb0774428d2fa1fda52",
-      "bytes": 7127
+      "sha256": "013df0a7a99684496a649ddcf830798bfcb389e775a8f64379851f195939ac34",
+      "bytes": 8594
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationImport.cs",
@@ -3322,13 +3322,13 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationProductionAdmission.cs",
-      "sha256": "3c4ff9e43505a0db39708cac3a83d1c6f7fc36dbda5a4681bc532bea55b7647f",
-      "bytes": 9991
+      "sha256": "fe23d7a73cf292f1bd98f3caf9b86ce29bcde9931a4a895e8a09c7a87407e4d4",
+      "bytes": 11105
     },
     {
       "path": "src/TiaMcp.Translations/TranslationProductionRegistry.cs",
-      "sha256": "ec841526deb71c27ee9da2324ed3b094c713d88a1b4f6e1d9d6d0de2b365e096",
-      "bytes": 10485
+      "sha256": "4750bfdcc472321854b55991c1f9c7b48de6950c1eda7341a04cdd88add02424",
+      "bytes": 11992
     },
     {
       "path": "src/TiaMcp.Translations/TranslationReconciliation.cs",
