@@ -29,11 +29,15 @@ TIA MCP stays pre-1.0 until the [TODO](../TODO.md) is closed; until then every r
    ```
 
 5. [`release.yml`](../../.github/workflows/release.yml) reruns the offline and Explorer
-   workflows, builds the offline bundle with `scripts/Package.ps1 -Offline`, verifies it with
-   `scripts/Verify-TiaMcpBundle.ps1 -Strict`, refuses a tag that differs from the bundle's
-   `productVersion` or a CHANGELOG without its section, and creates a draft release (marked
-   pre-release before 1.0) with the ZIP, its `.zip.sha256` and the manifest, using the CHANGELOG
-   section as notes.
+   workflows, then a read-only `build` job builds the offline bundle with
+   `scripts/Package.ps1 -Offline`, verifies it with `scripts/Verify-TiaMcpBundle.ps1 -Strict`,
+   refuses a tag that differs from the bundle's `productVersion` or a CHANGELOG without its
+   section, and, from 1.0 on, refuses unless the release ledger says `releaseReady` and the
+   matrix has no open or deferred cell (`scripts/release_matrix.py --release-gate`). It uploads
+   the ZIP, its `.zip.sha256`, the manifest and the notes as a workflow artifact. A separate
+   `draft` job, the only one with a write token, checks the ZIP against its hash, expands it and
+   runs `Verify-TiaMcpBundle.ps1 -Strict` on the expanded ZIP, then creates a draft release
+   (marked pre-release before 1.0) using the CHANGELOG section as notes. It never publishes.
 6. Review the draft: download the ZIP, compare its SHA-256, expand it and run
    `scripts/Verify-TiaMcpBundle.ps1 -BundlePath <folder> -Strict`, then publish it on GitHub.
 

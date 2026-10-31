@@ -1,7 +1,9 @@
 """Keep the frozen release matrix in step with the catalog and its classification rules."""
 import unittest
 
-from release_matrix import MATRIX, ROOT, build, owners, render, support
+import json
+
+from release_matrix import LEDGER, MATRIX, ROOT, build, disposition_errors, owners, release_gate_errors, render, support
 
 
 def feature(implementation="implemented", qualification="verified", availability="conditional"):
@@ -34,6 +36,20 @@ class ReleaseMatrixTests(unittest.TestCase):
         self.assertEqual(matrix["summary"]["cells"].get("blocked", 0), blocked)
         opened = sum(len(row["cells"]) for row in matrix["rows"] if row["support"] == "unqualified")
         self.assertEqual(matrix["summary"]["cells"]["open"], opened)
+
+    def test_blocked_rows_match_ledger_dispositions(self):
+        dispositions = json.loads((ROOT / LEDGER).read_text(encoding="utf-8"))["dispositions"]
+        self.assertEqual(disposition_errors(build()["rows"], dispositions), [])
+        rows = [{"featureId": "a", "support": "unavailable_target"}, {"featureId": "b", "support": "shipped"}]
+        self.assertEqual(disposition_errors(rows, [{"featureId": "a"}]), [])
+        self.assertEqual(len(disposition_errors(rows, [])), 1)  # blocked without a disposition
+        self.assertEqual(len(disposition_errors(rows, [{"featureId": "a"}, {"featureId": "b"}])), 1)  # disposition without a blocked row
+
+    def test_release_gate_blocks_unfinished_1_0(self):
+        matrix = {"summary": {"cells": {"open": 2, "deferred": 1}}}
+        self.assertEqual(release_gate_errors("0.9.0", {"releaseReady": False}, matrix), [])
+        self.assertEqual(len(release_gate_errors("1.0.0", {"releaseReady": False}, matrix)), 3)
+        self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True}, {"summary": {"cells": {"bound": 9}}}), [])
 
     def test_only_verified_features_bind_cells(self):
         for row in build()["rows"]:

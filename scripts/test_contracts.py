@@ -44,6 +44,8 @@ def claim_errors(features, evidence, root=ROOT):
                 if a.startswith("evidence/") and retained(a)]
         return [r for r in rows if r.get("schema") == "tia-mcp.evidence-summary.v1" and r.get("evidenceId") == proof
                 and r.get("outcome") == "passed" and r.get("runs") and all(run["completed"] for run in r["runs"])]
+    lost_file = root / "evidence" / "raw-reports-lost.json"
+    lost = {(r["evidenceId"], r["sha256"]) for r in json.loads(lost_file.read_text(encoding="utf-8"))["runs"]} if lost_file.is_file() else set()
     errors = []
     for identifier, feature in features.items():
         status = feature["qualification"]["status"]
@@ -62,8 +64,13 @@ def claim_errors(features, evidence, root=ROOT):
                     if not on_history(str(source.get("commit", ""))):
                         errors.append(f"{identifier}: {proof} source commit {source.get('commit')} is not an ancestor of HEAD")
             exercised = {tool for rows in passed for r in rows for run in r["runs"] for tool in run["toolsPassed"]}
+            # A run whose raw report is lost cannot be re-audited; it may not be the only support for a tool.
+            audited = {tool for rows in passed for r in rows for run in r["runs"]
+                       if (r["evidenceId"], run["sha256"]) not in lost for tool in run["toolsPassed"]}
             if set(feature["mcpTools"]) - exercised:
                 errors.append(f"{identifier}: verified tools not exercised {sorted(set(feature['mcpTools']) - exercised)}")
+            elif set(feature["mcpTools"]) - audited:
+                errors.append(f"{identifier}: tools rest only on lost raw reports {sorted(set(feature['mcpTools']) - audited)}")
             native_gates = NATIVE_GATES & set(feature.get("acceptanceCriteria", []))
             # Native gates need every bound tool exercised by native proofs; a Host-only record cannot stand in.
             native = {tool for proof, rows in zip(proofs, passed) if HOST_ONLY not in proof
@@ -192,7 +199,7 @@ class ClaimErrorTests(unittest.TestCase):
         (self.root / f"evidence/{name}.json").write_text(json.dumps({
             "schema": "tia-mcp.evidence-summary.v1", "evidenceId": proof, "outcome": outcome,
             "source": self.source if source is None else source,
-            "runs": [{"completed": outcome == "passed", "toolsPassed": list(tools)}]}), encoding="utf-8")
+            "runs": [{"completed": outcome == "passed", "sha256": name, "toolsPassed": list(tools)}]}), encoding="utf-8")
         self.evidence[proof] = {"artifacts": [f"evidence/{name}.json"]}
 
     def feature(self, status, proofs, availability="conditional", tools=("block_read",)):
@@ -210,6 +217,14 @@ class ClaimErrorTests(unittest.TestCase):
 
     def test_verified_tools_must_be_exercised(self):
         self.assertEqual(len(self.errors("verified", ["kept"], tools=("block_read", "xref_query"))), 1)
+
+    def test_verified_tools_cannot_rest_only_on_lost_raw_reports(self):
+        self.summary("old", "local.old", tools=("xref_query",))
+        feature = self.feature("verified", ["kept", "local.old"], tools=("block_read", "xref_query"))
+        self.assertEqual(claim_errors(feature, self.evidence, self.root), [])
+        (self.root / "evidence/raw-reports-lost.json").write_text(
+            json.dumps({"runs": [{"evidenceId": "local.old", "report": "r.json", "sha256": "old"}]}), encoding="utf-8")
+        self.assertEqual(len(claim_errors(feature, self.evidence, self.root)), 1)
 
     def test_host_only_evidence_cannot_close_native_gates(self):
         self.summary("hostonly", "local.hostonly.x")
