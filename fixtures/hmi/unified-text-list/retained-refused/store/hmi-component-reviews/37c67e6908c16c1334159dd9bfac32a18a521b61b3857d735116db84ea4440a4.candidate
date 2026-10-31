@@ -1,0 +1,63 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "TextChars":
+        RangeType: Decimal
+        Entries:
+          "Quote":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Quote"
+          "Whitespace":
+            Type: SingleValue
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Whitespace"
+          "Unicode":
+            Type: SingleValue
+            Value: 2
+            FromValue: 2
+            ToValue: 2
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Unicode"
+          "Empty":
+            Type: SingleValue
+            Value: 3
+            FromValue: 3
+            ToValue: 3
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Empty"
+          "Yaml":
+            Type: SingleValue
+            Value: 4
+            FromValue: 4
+            ToValue: 4
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Yaml"
+      "NulText":
+        RangeType: Decimal
+        Entries:
+          "Nul":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Nul"
+      "SeparatorText":
+        RangeType: Decimal
+        Entries:
+          "Separators":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: false
+            Text: "ProbeTextsTexts.Separators"

@@ -1,0 +1,46 @@
+#Version: 2.0
+
+TextLibraries:
+  MyTextLibrary:
+    Type: Text
+    Languages:
+    - en-US
+    - de-DE
+    DefaultLanguage: en-US
+    Entries:
+      Text_0:
+        Text:
+        - Qualification off
+        - Qualifikation aus
+      Text_1:
+        Text:
+        - Qualification ready
+        - Qualifikation bereit
+      Text_2:
+        Text:
+        - |-
+          Stopped 😀
+          No native execution
+        - Idle Deutsch
+      Text_3:
+        Text:
+        - Active
+        - Active Deutsch
+      Text_4:
+        Text:
+        - Stopped
+        - Gestoppt
+      Text_5:
+        Text:
+        - |-
+          Running 😀
+          Explicit supplied output
+        - Läuft
+      Text_6:
+        Text:
+        - Run
+        - Läuft
+      Text_7:
+        Text:
+        - Run
+        - Läuft

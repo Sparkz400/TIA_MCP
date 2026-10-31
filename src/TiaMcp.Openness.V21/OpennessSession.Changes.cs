@@ -80,7 +80,7 @@ namespace TiaMcp.Openness.V21
                 change.Preview["baseFingerprint"] = change.BaseFingerprint;
                 change.Preview["fingerprintScope"] = "Project save state; hardware identities and network configuration; exposed software scopes, user-block identities/native fingerprints, type/tag-table metadata and selected mutation attributes. Protected blocks reached through native generated system groups use identity/modified/protection/consistency metadata instead of generated payload checksums; owning PLC safety signatures and runtime-group metadata are included. Unexposed vendor data and generated payload bytes are not covered.";
                 if (change.Kind.StartsWith("opcua_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " OPC UA kinds additionally cover each PLC's server interface group: user and SIMATIC interface names, enabled state and native modification time, reference namespaces, and role mappings with namespace permissions. Interface and namespace content is covered only through native modification times.";
-                if (change.Kind == "hmi_engineering") change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
+                if (change.Kind == "hmi_engineering" || change.Kind == "hmi_text_list_import") change.Preview["fingerprintScope"] += " HMI engineering additionally requires a complete family-specific native content manifest across discovered project HMI targets; partial HMI export or explorer metadata hashes cannot authorize apply or recovery.";
                 if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " VCI kinds additionally cover every workspace group path, each workspace's root, language and library policy, and every mapping's native identity, directory, file name and format. Files below the workspace root are pinned separately by preview.vci.filesSha256 and rechecked before the checkpoint.";
                 if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) change.Preview["fingerprintScope"] += " Certificate kinds additionally cover the selected local store (certificate Id, subject common name, validity end, private-key presence flag) and every certificate reference read on its device. Certificate bytes and key material are not fingerprinted.";
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
@@ -133,7 +133,7 @@ namespace TiaMcp.Openness.V21
             if (!compile && change.Kind == "graphical_typed_edit") throw new BridgeException("InvalidRequest", "Typed graphical edits always require native compilation.");
             if (!compile && change.Kind == "source_upsert" && change.Payload.Value<string>("language")?.ToUpperInvariant() == "SIMATIC_SD") throw new BridgeException("InvalidRequest", "Native graphical document imports require compilation.");
             if (save && !compile) throw new BridgeException("InvalidRequest", "Saving applied changes requires compile=true.");
-            if (change.Kind == "hmi_engineering" && (!compile || !save))
+            if ((change.Kind == "hmi_engineering" || change.Kind == "hmi_text_list_import") && (!compile || !save))
                 throw new BridgeException("InvalidRequest", "HMI engineering requires compile=true and save=true; native readback and preservation remain mandatory.");
             if (change.Kind == "db_snapshot_load_actual" && (compile || save))
                 throw new BridgeException("InvalidRequest", "Actual-value loads change no project content; use compile=false and save=false so the applied PLCSIM route is never saved.");
@@ -200,10 +200,12 @@ namespace TiaMcp.Openness.V21
                             if (after.Path != compileOnlyPlc.Path || !Equals(after.Software, compileOnlyPlc.Software))
                                 throw new BridgeException("CompileScopeChanged", "The selected PLC changed during compilation.");
                         }
-                        if (!CompilationEvidenceRules.IsSuccessful(change.Compilation))
+                        // A text-list import must leave the HMI device's compiler problems as the compile before the import found them.
+                        if (change.Kind == "hmi_text_list_import" ? !HmiTextListImportRules.CompileProblemsUnchanged(change.HmiEvidence["baselineCompile"] as JObject, change.Compilation)
+                            : !CompilationEvidenceRules.IsSuccessful(change.Compilation))
                             throw new BridgeException("CompileFailed", "The change was applied but compilation failed or its diagnostic evidence is incomplete. Recovery archive and changed project state are retained.");
                     }
-                    if (change.Kind == "hmi_engineering") VerifyHmiEngineeringPreservation(change, project);
+                    if (change.Kind == "hmi_engineering" || change.Kind == "hmi_text_list_import") VerifyHmiEngineeringPreservation(change, project);
                     if (change.Kind == "software_unit_create_from") RequireUnrenamedUnitMembers(change);
                     VerifyHardwarePreservation(change, project);
                     if (new[] { "graphical_typed_edit", "graphical_operand_set", "graphical_network_patch", "graphical_network_insert", "call_parameter_set", "call_connection_set", "graph_import" }.Contains(change.Kind))
@@ -305,7 +307,7 @@ namespace TiaMcp.Openness.V21
                 if (wasScratchProject) _scratchProject = restored;
                 change.RecoveredProject = ProjectInfo(restored);
                 if (OpcUaPayloadFields.ContainsKey(change.Kind)) _opcUaRoleCacheProcess = _processId;
-                if (change.Kind == "hmi_engineering") VerifyHmiEngineeringRecovery(change, restored);
+                if (change.Kind == "hmi_engineering" || change.Kind == "hmi_text_list_import") VerifyHmiEngineeringRecovery(change, restored);
                 VerifyHardwareRecovery(change, restored);
                 change.State = "restored";
                 change.Stages.Add("checkpoint_retrieved_to_new_directory");
@@ -324,6 +326,7 @@ namespace TiaMcp.Openness.V21
         private JObject PrepareEngineeringMutation(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return PrepareHmiEngineeringMutation(change, project);
+            if (change.Kind == "hmi_text_list_import") return PrepareHmiTextListImportMutation(change, project);
             var payload = change.Payload;
             var preview = new JObject { ["effects"] = new JArray(), ["warnings"] = new JArray() };
             var effects = (JArray)preview["effects"];
@@ -826,6 +829,7 @@ namespace TiaMcp.Openness.V21
         private void ApplyEngineeringMutation(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") { ApplyHmiEngineeringMutation(change, project); return; }
+            if (change.Kind == "hmi_text_list_import") { ApplyHmiTextListImportMutation(change, project); return; }
             var payload = change.Payload;
             switch (change.Kind)
             {
@@ -1174,6 +1178,7 @@ namespace TiaMcp.Openness.V21
         private JObject CompileEngineeringChange(EngineeringChange change, Project project)
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
+            if (change.Kind == "hmi_text_list_import") return CompileHmiTextListTarget(project, (JObject)change.Payload["target"]);
             if (IsCompileOnlyKind(change.Kind) && change.Kind != "plc_compile") return CompileOnly(change, project);
             if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
                 return CompileDeviceProject(project);
@@ -1336,7 +1341,7 @@ namespace TiaMcp.Openness.V21
             snapshot["software"] = software;
             snapshot["safety"] = safetyStates;
             if (opcUa != null) snapshot["opcUa"] = opcUa;
-            if (change.Kind == "hmi_engineering") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
+            if (change.Kind == "hmi_engineering" || change.Kind == "hmi_text_list_import") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
             if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
             if (change.Kind.StartsWith("connection_", StringComparison.Ordinal)) snapshot["connections"] = ConnectionFingerprint(project, change.Payload);
             if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind);

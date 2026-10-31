@@ -1,0 +1,13 @@
+#Version: 2.0
+TextLibraries:
+  "ProbeNamesTexts":
+    Type: Text
+    Languages:
+      - "en-US"
+      - "de-DE"
+    DefaultLanguage: "en-US"
+    Entries:
+      "T":
+        Text:
+          - "Name"
+          - "Name DE"

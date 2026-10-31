@@ -35,25 +35,10 @@ internal static partial class Program
         string projectPath = null, checkpoint = Path.Combine(Output, "checkpoint.zap21"), final = Path.Combine(Output, "final.zap21");
         OwnedPortal("authoring", portal =>
         {
-            var project = portal.Projects.Create(new DirectoryInfo(Path.Combine(Output, "p")), "TiaMcpTl_" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            var project = SeedTextListFixture(portal, "MTP700 Unified Comfort", "TiaMcpTl_", out var sw);
             try
             {
-                projectPath = project.Path.FullName; Report["projectPath"] = projectPath;
-                Report["languages"] = ConfigureResourceLanguages(project);
-                var selected = portal.HardwareCatalog.Find("MTP700 Unified Comfort").Where(item => item.TypeName == "MTP700 Unified Comfort")
-                    .OrderByDescending(item => item.Version).ThenBy(item => item.TypeIdentifier, StringComparer.Ordinal).First();
-                Report["selectedTarget"] = new JObject { ["typeIdentifier"] = selected.TypeIdentifier, ["version"] = selected.Version?.ToString(), ["typeName"] = selected.TypeName };
-                var device = project.Devices.CreateWithItem(selected.TypeIdentifier, null, "HmiDevice_A");
-                var sw = Items(device.DeviceItems).Select(item => item.GetService<SoftwareContainer>()?.Software)
-                    .Single(item => item != null && item.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified.", StringComparison.Ordinal));
-                // Screens, a tag, start screen, an alarm, a screen event script and the documented bilingual peer list.
-                Report["seed"] = Seed(sw, Output); Persist();
-                Report["baseline"] = Inspect(sw, Output, "baseline");
-                Report["baselineRepeat"] = Inspect(sw, Output, "repeat");
-                Report["compileBaseline"] = Compile(new[] { sw }); Persist();
-                project.Save();
-                project.Archive(new DirectoryInfo(Output), "checkpoint.zap21", ProjectArchivationMode.Compressed);
-                Report["checkpoint"] = new JObject { ["path"] = checkpoint, ["sha256"] = Hash(checkpoint) }; Persist();
+                projectPath = project.Path.FullName;
                 for (int index = 0; index < main.Length; index++) { ((JArray)Report["imports"]).Add(ImportPair(sw, main[index], "i" + index)); Persist(); }
                 // No-change roundtrip: the whole native export goes back in through the same import.
                 var last = (JObject)((JArray)Report["imports"]).Last["export"];
@@ -89,6 +74,59 @@ internal static partial class Program
         });
         Report["cleanup"] = "owned-portals-exited";
         Report["completed"] = ((JArray)Report["portals"]).All(row => row.Value<bool?>("exitVerified") == true);
+        Persist();
+        Console.WriteLine(new JObject { ["report"] = Path.Combine(Output, "native-report.json"), ["completed"] = Report["completed"] }.ToString(Newtonsoft.Json.Formatting.None));
+        return Report.Value<bool>("completed") ? 0 : 1;
+    }
+
+    // Both languages, two screens with items, a tag, the start screen, a discrete alarm, a Loaded script and the documented
+    // peer list; walked twice, compiled, saved and archived as checkpoint.zap21. The caller closes the project.
+    private static Project SeedTextListFixture(TiaPortal portal, string typeName, string prefix, out Software sw)
+    {
+        var project = portal.Projects.Create(new DirectoryInfo(Path.Combine(Output, "p")), prefix + Guid.NewGuid().ToString("N").Substring(0, 8));
+        try
+        {
+            Report["projectPath"] = project.Path.FullName;
+            Report["languages"] = ConfigureResourceLanguages(project);
+            var selected = portal.HardwareCatalog.Find(typeName).Where(item => string.Equals(item.TypeName, typeName, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(item => item.Version).ThenBy(item => item.TypeIdentifier, StringComparer.Ordinal).First();
+            Report["selectedTarget"] = new JObject { ["typeIdentifier"] = selected.TypeIdentifier, ["version"] = selected.Version?.ToString(), ["typeName"] = selected.TypeName };
+            var device = project.Devices.CreateWithItem(selected.TypeIdentifier, null, "HmiDevice_A");
+            sw = Items(device.DeviceItems).Select(item => item.GetService<SoftwareContainer>()?.Software)
+                .Single(item => item != null && item.GetType().FullName.StartsWith("Siemens.Engineering.HmiUnified.", StringComparison.Ordinal));
+            Report["seed"] = Seed(sw, Output); Persist();
+            Report["baseline"] = Inspect(sw, Output, "baseline");
+            Report["baselineRepeat"] = Inspect(sw, Output, "repeat");
+            Report["compileBaseline"] = Compile(new[] { sw }); Persist();
+            project.Save();
+            string checkpoint = Path.Combine(Output, "checkpoint.zap21");
+            project.Archive(new DirectoryInfo(Output), "checkpoint.zap21", ProjectArchivationMode.Compressed);
+            Report["checkpoint"] = new JObject { ["path"] = checkpoint, ["sha256"] = Hash(checkpoint) }; Persist();
+            return project;
+        }
+        catch { project.Close(); throw; }
+    }
+
+    // textlist-fixture: only the seeded, archived baseline, for the production hmi_text_list_import runner
+    // (scripts/qualify_hmi_text_list_route.py). No import; one owned Portal, which must exit.
+    private static int TextListFixtureOnly(string outputPath, string profile)
+    {
+        string typeName = profile == "unified-comfort" ? "MTP700 Unified Comfort" : profile == "unified-pc" ? "WinCC Unified PC RT"
+            : throw new ArgumentException("textlist-fixture takes unified-comfort or unified-pc.");
+        Output = Path.GetFullPath(outputPath);
+        if (Directory.Exists(Output) || File.Exists(Output)) throw new InvalidOperationException("Choose a new output directory; existing evidence is never overwritten.");
+        for (var parent = new DirectoryInfo(Path.GetDirectoryName(Output)); parent != null; parent = parent.Parent)
+            if (parent.Exists && (parent.Attributes & FileAttributes.ReparsePoint) != 0) throw new InvalidOperationException("Output ancestry cannot contain reparse points.");
+        Directory.CreateDirectory(Output);
+        TextListFixture = true; PositiveFixture = true; CurrentProfile = profile;
+        Report = new JObject { ["schemaVersion"] = 1, ["mode"] = "textlist-fixture", ["profile"] = profile, ["completed"] = false, ["startedUtc"] = DateTime.UtcNow.ToString("O"),
+            ["scope"] = "Newly created owned " + typeName + " text-list fixture, archived before any import",
+            ["seederSha256"] = Hash(System.Reflection.Assembly.GetExecutingAssembly().Location),
+            ["assembly"] = typeof(TiaPortal).Assembly.FullName, ["runtimeVerified"] = false, ["scriptsExecuted"] = false, ["portals"] = new JArray(), ["cleanup"] = "pending" };
+        Persist();
+        OwnedPortal("fixture", portal => SeedTextListFixture(portal, typeName, "TiaMcpTf_", out _).Close());
+        Report["cleanup"] = "owned-portals-exited";
+        Report["completed"] = Report["checkpoint"] != null && ((JArray)Report["portals"]).All(row => row.Value<bool?>("exitVerified") == true);
         Persist();
         Console.WriteLine(new JObject { ["report"] = Path.Combine(Output, "native-report.json"), ["completed"] = Report["completed"] }.ToString(Newtonsoft.Json.Formatting.None));
         return Report.Value<bool>("completed") ? 0 : 1;

@@ -11,5 +11,6 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiPreservationRules.cs" Link="HmiPreservationRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiRecipeRules.cs" Link="HmiRecipeRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs" Link="HmiAssemblyIdentityRules.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/HmiTextListImportRules.cs" Link="HmiTextListImportRules.cs" />
   </ItemGroup>
 </Project>

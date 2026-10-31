@@ -174,6 +174,11 @@ namespace TiaMcp.Openness.V21
                     AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + path.Substring(exported.Length + 1).Replace('\\', '/'), path, artifacts);
             }
             missing.Add("Unified tag tables were exported using their documented native composition export. Export stability, full dependency closure and unrelated-resource preservation remain unqualified.");
+            // The complete paired text-list export; it re-exports byte-identically (local.hmi.text-list-import.20261029).
+            string lists = Path.Combine(directory, "text-lists");
+            Directory.CreateDirectory(lists);
+            foreach (string path in ExportUnifiedTextLists(target.Software, lists))
+                AddHmiArtifact(target.Path + "/textListExport/" + Path.GetFileName(path), path, artifacts);
             // No Screen.Export exists in V21: compare typed readback of every exposed node instead, keyed by its hmi_inspect path.
             var walk = new HmiModelWalk(new ScanBudget(Math.Max(0, 45000 - typed.Count)));
             walk.Capture(hmi, target.Path, HmiModelRoots);
@@ -857,8 +862,10 @@ namespace TiaMcp.Openness.V21
         private void VerifyHmiEngineeringPreservation(EngineeringChange change, Project project)
         {
             var after = CaptureHmiEngineeringScope(change, project, "after");
-            RequireHmiCompleteScope(after); RequireHmiCompleteScope(change.HmiBeforeManifest);
-            var beforeHashes = ((JObject)change.HmiBeforeManifest["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
+            // A text-list import is compared with its compiled pre-import capture; recovery still compares with the checkpoint's.
+            var reference = change.Kind == "hmi_text_list_import" ? (JObject)change.HmiEvidence["preImport"] : change.HmiBeforeManifest;
+            RequireHmiCompleteScope(after); RequireHmiCompleteScope(reference);
+            var beforeHashes = ((JObject)reference["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             var afterHashes = ((JObject)after["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             // Until an operation-specific artifact delta has native qualification,
             // every other artifact is required to be identical, including unknowns.
@@ -866,8 +873,11 @@ namespace TiaMcp.Openness.V21
             string operation = change.Payload.Value<string>("operation");
             try
             {
+                // A text-list import may change only the text lists, which the import readback compared by meaning.
+                if (change.Kind == "hmi_text_list_import")
+                    HmiPreservationRules.RequireUnrelatedPreservedOutsidePrefixes(beforeHashes, afterHashes, changed + "/textLists/", changed + "/textListExport/");
                 // Tag creation changes the table's export files and adds the created tag's typed nodes, both keyed below its objectPath.
-                if (operation == "tag_create" || operation == "external_tag_create")
+                else if (operation == "tag_create" || operation == "external_tag_create")
                     HmiPreservationRules.RequireUnrelatedPreservedOutside(beforeHashes, afterHashes, changed + "/export/", changed + "/tags/" + Segment(change.Payload.Value<string>("name")));
                 else if (operation == "connection_create" || operation == "object_create" || operation == "screen_create" || operation == "item_create" || operation == "dynamization_set" || operation == "event_handler_set")
                     HmiPreservationRules.RequireOnlyCreatedSubtree(beforeHashes, afterHashes, HmiCreatedPath(change.Payload));

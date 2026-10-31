@@ -1,0 +1,14 @@
+{
+  "source": "Native V21 Update 3 exports and Host-authored candidates of run artifacts/q/tl4 (frozen commit 47491ab), curated as local.hmi.text-list-import.20261029; MTP700 Unified Comfort, en-US/de-DE. Synthetic qualification texts only.",
+  "use": "Each sequence starts from its baseline export; every import's candidate lists read back exactly and every other list is unchanged, as the native oracle found (227 checks, no failures).",
+  "sequences": [
+    { "baseline": "n/baseline", "imports": [
+      { "candidate": "c/m0", "export": "n/i0" }, { "candidate": "c/m1", "export": "n/i1" }, { "candidate": "c/m2", "export": "n/i2" },
+      { "candidate": "c/m3", "export": "n/i3" }, { "candidate": "c/m4", "export": "n/i4" }, { "candidate": "c/m5", "export": "n/i5" },
+      { "candidate": "c/m6", "export": "n/i6" }, { "candidate": "c/m7", "export": "n/i7" }, { "candidate": "c/m8", "export": "n/i8" },
+      { "candidate": "c/m9", "export": "n/i9" } ] },
+    { "baseline": "n/baseline", "imports": [
+      { "candidate": "c/p0", "export": "n/p0" }, { "candidate": "c/p1", "export": "n/p1" }, { "candidate": "c/p2", "export": "n/p2" },
+      { "candidate": "c/p3", "export": "n/p3" }, { "candidate": "c/p4", "export": "n/p4" } ] }
+  ]
+}

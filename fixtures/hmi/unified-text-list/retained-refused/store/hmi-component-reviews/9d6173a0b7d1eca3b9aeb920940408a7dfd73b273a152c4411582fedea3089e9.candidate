@@ -1,0 +1,13 @@
+#Version: 2.0
+TextLibraries:
+  "ProbeValuesTexts":
+    Type: Text
+    Languages:
+      - "en-US"
+      - "de-DE"
+    DefaultLanguage: "en-US"
+    Entries:
+      "T":
+        Text:
+          - "Value"
+          - "Value DE"

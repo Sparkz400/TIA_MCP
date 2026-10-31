@@ -1,0 +1,16 @@
+#Version: 2.0
+
+TextListContainers:
+  DeviceTextList:
+    ResourceListType: TextList
+    ResourceLists:
+      QualificationStates:
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_0
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_1

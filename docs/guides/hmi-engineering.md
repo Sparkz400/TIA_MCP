@@ -4,6 +4,8 @@ Classic ordinary screen inspection now uses the six public screen scopes and ret
 
 The `hmi_engineering` change kind uses the existing `change_prepare`, `change_apply`, `change_status` and `change_restore` lifecycle. Payloads follow [hmi-engineering.v1.schema.json](../../contracts/hmi-engineering.v1.schema.json). This implementation contains family-specific operation bodies and fail-closed preservation gates. An implemented body is not native qualification or current target availability.
 
+Unified text lists are imported by the separate change kind `hmi_text_list_import`, the only Unified write the closed preservation gate lets through (31 October 2026, `unified-comfort` and `unified-pc` only); see [importing a text-list candidate](../reference/unified-text-list-authoring.md#importing-a-candidate-into-a-project).
+
 ## Implemented candidates
 
 | Family | Operation | Native implementation and boundary |

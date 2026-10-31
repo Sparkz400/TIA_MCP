@@ -3749,6 +3749,12 @@
       "obligations": [
         "D07"
       ]
+    },
+    {
+      "featureId": "change.hmi_text_list_import",
+      "obligations": [
+        "X07"
+      ]
     }
   ],
   "manualResiduals": [

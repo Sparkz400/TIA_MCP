@@ -22,7 +22,7 @@ class InterruptionMatrixTests(unittest.TestCase):
         routes = {kind: q.reconciliation_class(kind) for kind in kinds}
         self.assertEqual({"project", "hardware", "target", "library"}, set(routes.values()))
         # Every engineering route has a native representative; library transactions use qualify_library_interruption.py.
-        represented = {q.reconciliation_class(kind) for kind, _, _ in q.KINDS.values()}
+        represented = {q.reconciliation_class(kind) for kind, *_ in q.KINDS.values()}
         self.assertEqual({"project", "hardware", "target"}, represented)
 
     def test_kind_sets_match_the_worker(self):
@@ -43,6 +43,24 @@ class InterruptionMatrixTests(unittest.TestCase):
             self.assertFalse(any(trigger(terminal) for trigger, _ in q.POINTS.values()), terminal)
         self.assertEqual("host", q.POINTS["host"][1])
 
+    def test_text_list_points_split_import_and_readback(self):
+        journals = {
+            "ckpt": {"state": "checkpointing", "stages": []},
+            "imp": {"state": "applying", "stages": ["recovery_archive_created", "hmi_baseline_compiled"]},
+            "read": {"state": "applying", "stages": ["hmi_baseline_compiled", "hmi_text_list_import_returned"]},
+            "comp": {"state": "applying", "stages": ["hmi_text_list_import_returned", "hmi_text_lists_read_back_exactly", "hmi_precise_readback_verified", "mutation_applied"]},
+            "save": {"state": "applying", "stages": ["mutation_applied", "compile_finished", "hmi_unrelated_content_preserved", "changed_project_saved"]},
+        }
+        for name, journal in journals.items():
+            for mode, prefix in (("worker", ""), ("host", "h")):
+                hits = [point for point, (trigger, m) in q.TEXT_LIST_POINTS.items() if m == mode and trigger(journal)]
+                expected = [name] if mode == "worker" else [{"ckpt": "hckp", "imp": "himp", "read": "hred", "save": "hsav"}[name]] if name != "comp" else []
+                self.assertEqual(expected, hits, (name, mode))
+        # The baseline compile precedes the import; a kill there is neither the import nor its readback.
+        self.assertFalse(any(trigger({"state": "applying", "stages": ["recovery_archive_created"]}) for point, (trigger, _) in q.TEXT_LIST_POINTS.items() if point in ("imp", "read", "himp", "hred")))
+        for terminal in ({"state": "applied", "stages": ["changed_project_saved"]}, {"state": "prepared"}, {}):
+            self.assertFalse(any(trigger(terminal) for trigger, _ in q.TEXT_LIST_POINTS.values()), terminal)
+
     def test_expected_outcomes(self):
         for kind in ("source_upsert", "hardware_plug", "to_create", "tag_set"):
             self.assertEqual({"released": False, "effectPersisted": False}, q.expected_outcome(kind, "ckpt"))
@@ -52,10 +70,15 @@ class InterruptionMatrixTests(unittest.TestCase):
         self.assertEqual({"released": True, "project": "verifiedApplied", "effectPersisted": True}, q.expected_outcome("source_upsert", "host"))
         self.assertEqual({"released": True, "project": "verifiedApplied", "effectPersisted": True}, q.expected_outcome("hardware_plug", "host"))
         self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome("to_create", "host"))
+        # The text-list import is a target kind: Host loss at any boundary leaves the worker to finish and save; held for review.
+        for point in ("imp", "read"):
+            self.assertEqual({"released": True, "project": "unchanged", "effectPersisted": False}, q.expected_outcome("hmi_text_list_import", point))
+        for point in ("hckp", "himp", "hred", "hsav"):
+            self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome("hmi_text_list_import", point))
 
     def test_scenario_names_stay_short(self):
         # The reconciliation retrieve root (base/scenario/ar_<12>) must stay within the worker's 70-character limit.
-        self.assertEqual(15, len(q.KIND_SCENARIOS))
+        self.assertEqual(24, len(q.KIND_SCENARIOS))
         self.assertTrue(all(len(name) <= 7 for name in q.KIND_SCENARIOS))
         self.assertFalse(set(q.KIND_SCENARIOS) & set(q.SCENARIOS))
 

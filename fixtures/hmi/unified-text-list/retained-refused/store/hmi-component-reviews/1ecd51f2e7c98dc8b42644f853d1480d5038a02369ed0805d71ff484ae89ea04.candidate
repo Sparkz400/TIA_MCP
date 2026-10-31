@@ -1,0 +1,95 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "EntryTypes":
+        RangeType: Decimal
+        Entries:
+          "Low":
+            Type: To
+            Value: -1
+            ToValue: -1
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+          "Middle":
+            Type: Range
+            Value: 0
+            FromValue: 0
+            ToValue: 10
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+          "High":
+            Type: From
+            Value: 11
+            FromValue: 11
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+      "Int32Bounds":
+        RangeType: Decimal
+        Entries:
+          "Min":
+            Type: SingleValue
+            Value: -2147483648
+            FromValue: -2147483648
+            ToValue: -2147483648
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+          "Max":
+            Type: SingleValue
+            Value: 2147483647
+            FromValue: 2147483647
+            ToValue: 2147483647
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+      "BeyondInt32":
+        RangeType: Decimal
+        Entries:
+          "Below":
+            Type: SingleValue
+            Value: -2147483649
+            FromValue: -2147483649
+            ToValue: -2147483649
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+          "Above":
+            Type: SingleValue
+            Value: 2147483648
+            FromValue: 2147483648
+            ToValue: 2147483648
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+      "BoolDefault":
+        RangeType: Bool
+        Entries:
+          "False":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: true
+            Text: "ProbeValuesTexts.T"
+          "True":
+            Type: SingleValue
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"
+      "BitDefault":
+        RangeType: BitNumber
+        Entries:
+          "Bit0":
+            Type: SingleValue
+            Value: 0
+            FromValue: 0
+            ToValue: 0
+            IsDefaultEntry: true
+            Text: "ProbeValuesTexts.T"
+          "Bit5":
+            Type: SingleValue
+            Value: 5
+            FromValue: 5
+            ToValue: 5
+            IsDefaultEntry: false
+            Text: "ProbeValuesTexts.T"

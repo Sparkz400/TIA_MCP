@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "3f9d9a8185e311e253632511266754d45ef56cb2b2d37408ddec666b7b404a09",
+    "catalogSha256": "911ee6c7bd4af458c2359ef279a40bf68de8dd4f68fb7af44ae1778100899714",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -12,19 +12,19 @@
     21
   ],
   "summary": {
-    "features": 469,
+    "features": 470,
     "support": {
       "deferred": 8,
       "limited": 310,
       "shipped": 127,
       "unavailable_target": 5,
-      "unqualified": 19
+      "unqualified": 20
     },
     "cells": {
       "blocked": 31,
       "bound": 1995,
       "deferred": 24,
-      "open": 108
+      "open": 115
     },
     "openCellsByOwner": {
       "D06": {
@@ -49,7 +49,7 @@
       },
       "X07": {
         "role": "HMI",
-        "open": 9
+        "open": 16
       },
       "X08": {
         "role": "HMI",
@@ -10114,6 +10114,59 @@
       "owners": [
         "X07",
         "X08"
+      ],
+      "evidenceIds": [],
+      "cells": [
+        {
+          "gate": "AC-identity",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-completeness",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-evidence",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preview",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-native",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-recovery",
+          "status": "open",
+          "evidenceIds": []
+        },
+        {
+          "gate": "AC-preserve",
+          "status": "open",
+          "evidenceIds": []
+        }
+      ]
+    },
+    {
+      "featureId": "change.hmi_text_list_import",
+      "domain": "hmi",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_status",
+        "change_restore"
+      ],
+      "changeKind": "hmi_text_list_import",
+      "support": "unqualified",
+      "owners": [
+        "X07"
       ],
       "evidenceIds": [],
       "cells": [

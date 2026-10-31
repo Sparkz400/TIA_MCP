@@ -192,3 +192,40 @@ content/consumer review and native preservation qualification are therefore stil
 required before importing a candidate. PyYAML is a test-only dependency; its
 [SafeLoader documentation](https://pyyaml.org/wiki/PyYAMLDocumentation) describes the
 non-executing parser used by the oracle. No parser dependency is added to the Host.
+
+## Importing a candidate into a project
+
+Change kind `hmi_text_list_import` imports one retained candidate pair through the shared
+`change_prepare`/`change_apply`/`change_restore` admission. It is the only Unified write
+the closed HMI preservation gate lets through (maintainer decision of 31 October 2026), and
+only for the `unified-comfort` and `unified-pc` profiles. It is not natively qualified yet.
+
+```json
+{ "kind": "hmi_text_list_import", "payload": { "schemaVersion": 1, "target": "<hmiDevice identity from hmi_inspect section=devices>",
+  "expectedContentHash": "<contentHash>", "recordId": "<author or set recordId>", "outputId": "<set output, sets only>" } }
+```
+
+- The Host reopens the record with full revalidation and applies the refusals above to it,
+  also to records published before they existed. The worker only receives the exact
+  candidate pair; a client-supplied candidate is refused.
+- Prepare captures the complete Unified scope of every HMI in the project. A first prepare
+  with any `expectedContentHash` returns `StaleRevision` with
+  `details.baseline.contentHash`; review it and prepare again with that hash. The
+  candidate's languages must equal the project's active languages
+  (`HmiTextListLanguageMismatch`). The preview lists the `created` and `replaced` lists; a
+  replaced list loses its old content. No other list is renamed or deleted.
+- Apply needs `compile=true` and `save=true`. It compiles the HMI device, imports the pair,
+  and reads the whole export back: the candidate lists must equal the candidate and every
+  other list must be unchanged, compared by meaning as the native oracle compares them.
+  Everything else in the HMI capture must be unchanged, and the device's compiler errors and
+  warnings must be unchanged by the import. Then the project is saved.
+- `change_restore` retrieves the checkpoint into a new directory and requires the complete
+  HMI content of the pre-change capture.
+- An interrupted apply is never replayed. Worker loss before the save releases the unchanged
+  project; a lost save or a Host loss holds the admission for review
+  (`engineering_admission_reconcile`).
+
+Native runners: [`qualify_hmi_text_list_route.py`](../../scripts/qualify_hmi_text_list_route.py)
+(apply, refusals, restore, fresh reopen per profile) and the `tl-*` scenarios of
+[`qualify_interruption.py`](../../scripts/qualify_interruption.py) (worker and Host loss at
+the checkpoint, import, readback and save).

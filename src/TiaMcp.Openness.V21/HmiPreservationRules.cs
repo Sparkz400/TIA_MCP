@@ -152,6 +152,16 @@ namespace TiaMcp.Model
                     throw new ArgumentException("PreservationMismatch: unrelated HMI content changed: " + pair.Key);
         }
 
+        // Artifacts below the given prefixes may change, appear or disappear; every other artifact must stay identical.
+        internal static void RequireUnrelatedPreservedOutsidePrefixes(IDictionary<string, string> before, IDictionary<string, string> after, params string[] prefixes)
+        {
+            if (prefixes == null || prefixes.Length == 0 || prefixes.Any(p => string.IsNullOrEmpty(p) || !p.EndsWith("/", StringComparison.Ordinal)))
+                throw new ArgumentException("The prepared preservation delta is contradictory.");
+            Func<KeyValuePair<string, string>, bool> outside = pair => !prefixes.Any(p => pair.Key.StartsWith(p, StringComparison.Ordinal));
+            RequireUnrelatedPreserved(before.Where(outside).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal),
+                after.Where(outside).ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal), Array.Empty<string>(), Array.Empty<string>());
+        }
+
         // A created object may add only its own typed-readback subtree, which must appear and never pre-exist.
         internal static void RequireOnlyCreatedSubtree(IDictionary<string, string> before, IDictionary<string, string> after, string createdObjectPath)
         {
