@@ -353,9 +353,15 @@ def resolve(run, label, take, comparison, remote_files, result_files, native_con
     prepared = run.prepare(label, "vci_conflict_resolve", payload, preview, shown=shown)
     run.finish(label, "vci_conflict_resolve", prepared, changed=list(changed), check=verify, restore=restore)
     if not restore:
-        refuse = lambda: run.h.call_error("change_apply", run.h.apply_args(prepared))
-        run.h.stage("an applied resolution is never applied again: " + label,
-                    lambda: require(refuse().get("code") == "InvalidChangeState", "A second apply was not refused") or "InvalidChangeState")
+        def once():
+            # A second apply under a new idempotency key refuses; the change keeps its single recorded outcome.
+            before = run.h.tool("change_status", {"changeId": prepared["changeId"]})
+            error = run.h.call_error("change_apply", run.h.apply_args(prepared))
+            after = run.h.tool("change_status", {"changeId": prepared["changeId"]})
+            require(error.get("code") == "IdempotencyConflict" and after["state"] == "applied" and after["stages"] == before["stages"]
+                    and after["afterFingerprint"] == before["afterFingerprint"], "A second apply was not refused: %s" % error)
+            return error["code"]
+        run.h.stage("an applied resolution is never applied again: " + label, once)
     return prepared
 
 
