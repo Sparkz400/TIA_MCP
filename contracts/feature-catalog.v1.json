@@ -22119,7 +22119,7 @@
         "status": "partial",
         "limitations": [
           "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified.",
-          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; it is compiled and packaged only, not natively qualified."
+          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; one native selection handoff is verified (local.addin.companion.20261029)."
         ]
       },
       "qualification": {
@@ -22164,7 +22164,7 @@
         "status": "partial",
         "limitations": [
           "Supplied V21 projectTree/devicesAndNetworks selections only. Exact saved reference binding does not authenticate the producer or establish live/native identity. Native companion, library selections, workflow hooks, package signing and UI lifecycle remain unimplemented or unqualified.",
-          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; it is compiled and packaged only, not natively qualified."
+          "27 October 2026: the V21 project-tree companion (feature addin_companion) can now produce these selections and hand them over the opt-in pipe receiver once the Host is started with --addin-enrollment; one native selection handoff is verified (local.addin.companion.20261029)."
         ]
       },
       "qualification": {

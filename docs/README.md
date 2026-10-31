@@ -43,7 +43,7 @@ Every catalog evidence record is cited by a feature. Records no feature cites an
 move verbatim to a retired list: 38 old records in catalog 0.4.68
 ([list](history/catalog-evidence-retired-20261028.json)) and 53 superseded or doc-only
 records in 0.4.69 ([list](history/catalog-evidence-retired-20261029.json)) and 23 replaced
-or superseded records in 0.4.70 ([list](history/catalog-evidence-retired-20261029-reruns.json)); their
+or superseded records in 0.4.70 ([list](history/catalog-evidence-retired-20261029-reruns.json)) and the records retired in 0.4.84 ([list](history/catalog-evidence-retired-20261030.json)); their
 summaries stay in `evidence/`. Three records from before 24 October still cite
 `artifacts/` paths directly; only unverified features cite them, and their files are
 listed as lost. Prose records per run are under [verification](#verification).
@@ -105,11 +105,11 @@ Earlier ledgers:
 - [Explorer qualification](verification/project-explorer-qualification.md), [configured I/O](verification/project-explorer-io-qualification.md), [large projects](verification/project-explorer-large-qualification.md)
 - [Metadata index tests](verification/project-index-store-tests.md)
 - [Deployment reliability](verification/deployment-reliability-status.md), [session recovery](verification/session-reliability.md)
+- [Pre-release security review](verification/security-review-20261030.md)
 
 Records no other page links to:
 
 - Typed LAD/FBD runs: [route profiles](verification/typed-lad-fbd-route-profiles-20261025.md), [routes](verification/typed-lad-fbd-routes-20261025.md), [created multi-instance runtime](verification/typed-lad-fbd-route-runtime-createmulti-20261026.md), wave 9 batches [w9q](verification/typed-lad-fbd-w9q-20261028.md), [w9q4](verification/typed-lad-fbd-w9q4-20261028.md), [w9q5](verification/typed-lad-fbd-w9q5-20261028.md), cross-scope [xsqo](verification/typed-lad-fbd-xsqo-20261028.md); [typed resolution](verification/typed-resolution-20261012.md), [resolution p15](verification/typed-resolution-p15-qualification.md), [captured component storage p15](verification/component-captured-storage-p15.md)
-- Security: [pre-release security review](verification/security-review-20261030.md)
 - Runtime and startup: [first native startup](verification/first-native-startup-20261023.md), [long-soak wave 3](verification/runtime-long-wave3-20261020.md), [UA before/after comparison](verification/ua-comparison-20261025.md)
 - Other: [explorer relationship scope](verification/project-explorer-relationship-native-20261024.md), [RT Professional attempt](verification/hmi-rt-professional-20261025.md), [publication review](verification/publication-review-20261023.md), [parallel offline continuation](verification/parallel-resume-20261016.md), [translation Host workflow](verification/translation-host-workflow-20261016.md)
 
@@ -128,7 +128,7 @@ current counts instead of treating older counts or checklists as current.
 - [13 October 1.0 release checklist](history/1.0-release-checklist-20261013.md) (checkboxes not maintained), [15 October handoffs](history/active-handoffs-20261015.md)
 - 16–17 October: [completion audit](history/completion-audit-20261016.md), [recheck](history/completion-recheck-20261016.md), [assignments](history/completion-assignments-20261016.md), [execution without Siemens products](history/offline-execution-20261016.md), [offline scope reconciliation](history/offline-scope-reconciliation-20261017.md)
 - 21–24 October: [fifth](history/parallel-wave5-20261021.md) and [sixth parallel increments](history/parallel-wave6-20261021.md), [overnight report](history/overnight-report-20261022.md), [parallel completion plan](history/parallel-completion-20261024.md)
-- Retired catalog evidence records: [28 October](history/catalog-evidence-retired-20261028.json), [29 October](history/catalog-evidence-retired-20261029.json), [29 October re-runs](history/catalog-evidence-retired-20261029-reruns.json)
+- Retired catalog evidence records: [28 October](history/catalog-evidence-retired-20261028.json), [29 October](history/catalog-evidence-retired-20261029.json), [29 October re-runs](history/catalog-evidence-retired-20261029-reruns.json), [30 October](history/catalog-evidence-retired-20261030.json)
 
 ## Maintaining these docs
 

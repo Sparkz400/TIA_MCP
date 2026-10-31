@@ -6,7 +6,7 @@ The tools themselves are listed by `feature_catalog`.
 
 ## Tool groups (`--toolsets`)
 
-By default the Host advertises every tool, about 290 on a normal build, and the `tools/list`
+By default the Host advertises every tool, about 300 on a normal build, and the `tools/list`
 reply is about 600 KB, more than half of it [output schemas](#titles-and-output-schemas). Many MCP clients limit the number of tools per server or per request, and every
 advertised tool costs model context. Start the Host with `--toolsets` to advertise only the
 groups a task needs:
@@ -53,7 +53,7 @@ otherwise, so a new tool needs a prefix in `src/TiaMcp.Host/ToolGroups.cs` and a
 ## Titles and output schemas
 
 Every tool has a short human-readable `title` for client UIs. On a normal build 85 tools also
-advertise an `outputSchema`, 45 of the 179 read-only ones among them. Each schema is `anyOf` the tool's result
+advertise an `outputSchema`, read-only ones among them. Each schema is `anyOf` the tool's result
 and its refusal, so both validate: a refusal is `{"error": {"code", "message", ...}}` with
 `isError`, described by the contract's own error definition or the Host's generic one. The
 schemas come from three sources:
@@ -140,5 +140,5 @@ the result, and a failed notification never changes the outcome of the call.
 [`Directory.Build.props`](../../Directory.Build.props) (pre-1.0, for example `0.9.0`); `serverInfo.title`
 is `TIA MCP`. The bundled feature catalog version, the data contract version that `feature_catalog`
 also returns, is advertised as `capabilities.experimental["tiaMcp/featureCatalog"].version`
-(for example `0.4.82`). Release bundles record the product version in `manifest.json`
+(for example `0.4.86`). Release bundles record the product version in `manifest.json`
 ([releasing](../guides/releasing.md)).

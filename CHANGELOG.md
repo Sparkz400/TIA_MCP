@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.82`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.86`.
 
 ### Added
 
@@ -17,18 +17,23 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `serverInfo.version` and release bundles; a tag-triggered workflow drafts a GitHub release with
   the verified offline bundle ([releasing](docs/guides/releasing.md)).
 - **MCP surface:** `--toolsets` tool groups, a title on every tool, four workflow prompts
-  (`safe_change`, `project_health`, `block_test`, `diagnose_fault`), progress heartbeats and output
-  schemas for 33 workflow tools ([MCP surface](docs/reference/mcp-surface.md)).
+  (`safe_change`, `project_health`, `block_test`, `diagnose_fault`), progress heartbeats, resource
+  templates (artifacts, saved reviews, feature catalog), completions, client logging and output
+  schemas for 85 tools ([MCP surface](docs/reference/mcp-surface.md)).
 - **Engineering changes** through the prepare/apply/restore workflow: hardware families and CPU
-  parameters, device and project compile, tag tables, software units, PLC documents, project copy
+  parameters, device and project compile, tag tables, software units (rename and create from a unit
+  master copy), motion connections, PLC documents, project copy
   and compare, connections, alarms, GRAPH, CAx import and export, OPC UA server interfaces and role
   mappings, web server and certificates, safety F-parameters and F-block import, block protection
-  through a credential route, watch and force tables, library maintenance and combined PLC library
+  and the CPU protection level through a credential route, watch and force tables, library maintenance and combined PLC library
   integration, and further typed LAD/FBD families including cross-unit calls.
-- **Simulation and online:** online download to the owned PLCSIM instance, virtual time, event
-  injection (OB40, OB82, OB83, OB86, OB55), memory reset and storage archives, DB snapshots,
+- **Simulation and online:** online download to the owned PLCSIM instance, batch signal reads and
+  writes, byte and bit area access and bounded state observation (`sim_read_signals`,
+  `sim_write_signals`, `sim_area_read`, `sim_area_write`, `sim_observe`), virtual time, event
+  injection (OB40, OB82, OB83, OB86), memory reset and storage archives, DB snapshots,
   `plc_online_compare` and `plc_station_upload`, runtime OPC UA and Web API against PLCSIM over
   TCP/IP, and read-only live monitoring of watch and force tables (`watch_table_monitor`).
+- **Test Suite:** application test runs on an owned PLCSIM instance (TS-Q02 qualification mode).
 - **HMI:** Unified text-list authoring and generation whose candidates import exactly through V21;
   Unified and Classic HMI read and authoring routes.
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
@@ -56,10 +61,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 422 of 462 catalog features are verified; 141 release-matrix cells are open
+- 437 of 469 catalog features are verified; 108 release-matrix cells are open
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
 - V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
-  through Openness, an OPC UA reference-namespace import crashes TIA, and the CPU protection level
-  needs a password no route accepts.
+  through Openness, an OPC UA reference-namespace import crashes TIA, and V21 refuses the CPU protection
+  level while UMAC runtime access is enabled (its password has a credential route).
 - Release assets are the offline bundle only; the engineering bundle with native workers is built
   on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures.

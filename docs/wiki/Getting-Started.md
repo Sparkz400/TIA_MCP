@@ -43,7 +43,7 @@ Combined library install: on every Host, `change_apply` installs a prepared PLC 
 
 Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll); one native selection handoff is verified (`local.addin.companion.20261029`).
 
-The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--library-limits-file` or `--no-native-workers`; start the Host directly for those. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options).
+The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply` or `--library-limits-file`; start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options).
 
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)
@@ -66,7 +66,7 @@ Configure a stdio server with your actual checkout path:
 
 Then ask the client: *Use `tia_discover` to list the available TIA Portal sessions.* For a command-line check, run `python .\scripts\smoke_mcp.py`.
 
-The Host advertises about 290 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
+The Host advertises about 300 tools. If your client limits tools per server, add `"--toolsets", "core,simulation"` (or other groups) to `args`. The server also offers workflow prompts such as `safe_change` and `block_test`. Groups, prompts, resources, completions, logging and progress notifications are described in [MCP surface](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/mcp-surface.md).
 
 ## Next steps
 
