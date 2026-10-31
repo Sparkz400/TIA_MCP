@@ -25,13 +25,14 @@ namespace TiaMcp.Openness.V21
 
         private JObject SharedMutationBegin(JObject args)
         {
+            // An unsupported project version is refused before any native call, attachment and the exclusive-access lease included.
+            if (args.Value<string>("operation") == "project_upgrade" && args["arguments"] is JObject upgrade)
+                ProjectUpgradeRules.SourceVersion(upgrade.Value<string>("path"), upgrade.Value<string>("expectedSha256"), out _);
             EnsureAttached();
             if (_sharedMutationLease != null || _watchLease != null) throw new BridgeException("ResourceBusy", "A native mutation already owns exclusive access.");
             string operation = ChangeText(args, "operation", 64);
             if (!IsSharedMutation(operation)) throw new BridgeException("InvalidRequest", "This operation has no shared mutation scope adapter.");
             var arguments = args["arguments"] as JObject ?? throw new BridgeException("InvalidRequest", "Exact mutation arguments are required.");
-            // An unsupported project version is refused before any native call, the exclusive-access lease included.
-            if (operation == "project_upgrade") ProjectUpgradeRules.SourceVersion(arguments.Value<string>("path"), arguments.Value<string>("expectedSha256"), out _);
             _sharedMutationOperation = operation; _sharedMutationArguments = (JObject)arguments.DeepClone();
             _sharedMutationToken = Guid.NewGuid().ToString("N"); _sharedMutationDispatched = false; _sharedMutationDestinations.Clear();
             try
@@ -293,7 +294,7 @@ namespace TiaMcp.Openness.V21
             {
                 if (!_ownsPortal || _portal.Projects.Count != 0) throw new BridgeException("ProjectIsolationRequired", "Project upgrade requires this worker's empty Portal.");
                 var source = ProjectUpgradeSource(args); string destination = ProjectUpgradeDestination(args);
-                ProjectUpgradeRules.Plan(destination, source.Path, source.Archive);
+                ProjectUpgradeRules.Plan(destination, source.Path, source.Archive, source.Name);
                 add(source.Archive ? "workspace" : "project", source.Archive ? source.Path : source.Folder, "readUpgradeSource");
                 observation["sourceSha256"] = source.SourceSha256;
                 absent("project", "upgradeDestination", destination);

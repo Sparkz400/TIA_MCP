@@ -7,15 +7,21 @@ that records success and an unchanged source, the input copy must be unchanged a
 returned. The upgraded copy then reopens in a fresh owned Portal with the same device, PLC and block inventory, which must
 equal the inventory pinned per example (block consistency is the compile state). An example V21 cannot upgrade must fail
 with its pinned native reason, an unchanged source, its owned copy retained and its admission returned. A V13 archive is
-refused before any native call: no admission and no upgrade directory.
+refused before any native call (no admission, no upgrade directory), and so is the same archive renamed to .zap14 by its
+content. Errors reading an original name only the example and the error type. At the end every example copy and upgraded
+project is removed (they carry the examples' own history, which names the folders they were once upgraded in) and the run
+directory is checked for any parent folder name of an original.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
+import re
 import shutil
+import time
 
 from library_native_harness import Harness, require
 
@@ -49,11 +55,28 @@ def is_archive(path):
     return path.suffix.lower().startswith(".zap")
 
 
+def linked(path):
+    """A symbolic link, junction or other reparse point, judged without following it."""
+    return path.is_symlink() or bool(getattr(os.stat(path, follow_symlinks=False), "st_file_attributes", 0) & 0x400)
+
+
+def guarded(name, operation):
+    """Work on an original: an OS error is reported by example name and error type only, never with its path."""
+    try:
+        return operation()
+    except (OSError, shutil.Error) as error:
+        raise RuntimeError("%s: %s" % (name, type(error).__name__)) from None
+
+
 def fingerprint(path):
-    """What a source holds: an archive's bytes, or every file (relative name and bytes) of a project file's folder."""
+    """What a source holds: an archive's bytes, or every file (relative name and bytes) of a project file's folder.
+    Links and junctions are refused before anything is read or copied."""
+    require(not linked(path), "A source file is a link")
     if is_archive(path):
         return {"files": 1, "bytes": path.stat().st_size, "sha256": sha256(path)}
-    files = sorted(p for p in path.parent.rglob("*") if p.is_file())
+    entries = sorted(path.parent.rglob("*"))
+    require(not linked(path.parent) and not any(linked(p) for p in entries), "A source folder holds a link or junction")
+    files = [p for p in entries if p.is_file()]
     digest = hashlib.sha256()
     for p in files:
         digest.update(p.relative_to(path.parent).as_posix().encode() + b"\0" + hashlib.sha256(p.read_bytes()).digest())
@@ -62,22 +85,21 @@ def fingerprint(path):
 
 def public(paths, table):
     """Every public example exactly once, by file name; anything else is refused before it is read."""
-    names = sorted(p.name for p in paths)
-    require(names == sorted(table), "Pass exactly these examples: %s (got %s)" % (sorted(table), names))
+    require(sorted(p.name for p in paths) == sorted(table), "Pass exactly these examples once each: %s" % sorted(table))
     require(all(p.is_file() for p in paths), "An example file is missing")
     return {p.name: p for p in paths}
 
 
 def stage_input(run, original):
     """Copy an example into the run's inputs (an archive alone, a project with its whole folder); the copy must equal it."""
-    target = run / "inputs" / original.stem
+    target, before = run / "inputs" / original.stem, fingerprint(original)
     if is_archive(original):
         target.mkdir(parents=True)
         shutil.copy2(original, target / original.name)
     else:
         shutil.copytree(original.parent, target)
     copy = target / original.name
-    require(fingerprint(copy) == fingerprint(original), "The input copy differs from its example")
+    require(fingerprint(copy) == before, "The input copy differs from its example")
     return copy
 
 
@@ -151,22 +173,28 @@ def unchanged(label, path, before):
 
 
 def refuse(h, original):
-    """V13 is refused before any native call: no admission and no upgrade directory appear, the copy stays unchanged."""
-    copy = Path(h.stage("copy %s into the run's inputs" % original.name, lambda: str(stage_input(h.directory, original))))
+    """V13 is refused before any native call: no admission and no upgrade directory appear, the copy stays unchanged. The
+    same archive renamed to .zap14 is refused by the release of its project file."""
+    copy = Path(h.stage("copy %s into the run's inputs" % original.name, lambda: str(guarded(original.name, lambda: stage_input(h.directory, original)))))
     before, known = fingerprint(copy), admissions(h.directory)
     h.owned_portal("refusal")
     error = h.stage("refuse the %s upgrade" % REFUSED[original.name], lambda: h.call_error("project_upgrade", {"path": str(copy), "expectedSha256": sha256(copy)}))
     require(error.get("code") == "ProjectVersionUnsupported", "Expected ProjectVersionUnsupported: %s" % error)
     require(admissions(h.directory) == known and not (h.directory / "upgrades").exists(), "The refusal created an admission or an upgrade directory")
     unchanged("The V13 input copy", copy, before)
-    missing = h.stage("refuse a missing archive", lambda: h.call_error("project_upgrade", {"path": str(copy.with_suffix(".zap14")), "expectedSha256": "0" * 64}))
+    missing = h.stage("refuse a missing archive", lambda: h.call_error("project_upgrade", {"path": str(copy.with_name("Missing.zap14")), "expectedSha256": "0" * 64}))
     require(missing.get("code") == "ProjectNotFound" and admissions(h.directory) == known, "Expected ProjectNotFound without an admission: %s" % missing)
-    return {"error": {k: error.get(k) for k in ("code", "message")}, "inputCopy": before}
+    renamed = copy.with_suffix(".zap14")
+    shutil.copyfile(copy, renamed)
+    content = h.stage("refuse the V13 archive renamed to .zap14", lambda: h.call_error("project_upgrade", {"path": str(renamed), "expectedSha256": sha256(renamed)}))
+    require(content.get("code") == "ProjectVersionUnsupported" and admissions(h.directory) == known and not (h.directory / "upgrades").exists(),
+            "Expected ProjectVersionUnsupported by content without an admission: %s" % content)
+    return {"error": {k: error.get(k) for k in ("code", "message")}, "renamed": {k: content.get(k) for k in ("code", "message")}, "inputCopy": before}
 
 
 def upgrade(h, original):
     name, spec = original.name, EXAMPLES[original.name]
-    copy = Path(h.stage("copy %s into the run's inputs" % name, lambda: str(stage_input(h.directory, original))))
+    copy = Path(h.stage("copy %s into the run's inputs" % name, lambda: str(guarded(name, lambda: stage_input(h.directory, original)))))
     before = fingerprint(copy)
     h.stage("close the session before upgrading " + name, lambda: h.tool("tia_detach"))
     h.owned_portal("upgrade " + name)
@@ -205,12 +233,47 @@ def paths_fit(run, names):
     return longest
 
 
+def remove_copies(run):
+    """Only the report is evidence: the example copies and upgraded projects carry the examples' own history (earlier
+    conversion logs and the project database name the folders the examples were once upgraded in), so they are removed."""
+    for name in ("inputs", "upgrades"):
+        for attempt in range(10):  # A just-closed owned Portal can hold its project files for a few seconds.
+            try:
+                shutil.rmtree(run / name, ignore_errors=False) if (run / name).exists() else None
+                break
+            except OSError:
+                time.sleep(3)
+        require(not (run / name).exists(), "Could not remove the run's %s" % name)
+    return sorted(p.name for p in run.iterdir())
+
+
+def leaks(run, originals):
+    """How many files under the run name a folder above an example (its parent folders, as a path segment); the folder
+    names themselves are never recorded. A project's own folder is the public example name and is allowed."""
+    names = {parent.name for path in originals for parent in path.resolve().parents
+             if parent.name and (is_archive(path) or parent != path.resolve().parent)}
+    pattern = re.compile("(?:^|[\\\\/\"'])(?:%s)(?:$|[\\\\/\"'])" % "|".join(re.escape(n) for n in sorted(names)), re.IGNORECASE)
+    return sum(1 for f in run.rglob("*") if f.is_file() and pattern.search(f.read_bytes().decode("utf-8", "replace")))
+
+
 def body(h):
+    try:
+        qualify(h)
+    finally:
+        try:
+            h.tool("tia_detach")
+        finally:
+            h.report["remainingRunEntries"] = remove_copies(h.directory)
+    originals = [Path(p) for p in h.args.source] + [Path(h.args.refused)]
+    h.stage("no file under the run names a folder above an example", lambda: require(leaks(h.directory, originals) == 0, "A run file names a folder above an example") or 0)
+
+
+def qualify(h):
     h.report["longestUpgradeDirectory"] = paths_fit(h.directory, EXAMPLES)
     sources = public([Path(p) for p in h.args.source], EXAMPLES)
     refused = public([Path(h.args.refused)], REFUSED)
     originals = {**sources, **refused}
-    before = {name: h.stage("hash the original " + name, lambda p=path: fingerprint(p)) for name, path in originals.items()}
+    before = {name: h.stage("hash the original " + name, lambda n=name, p=path: guarded(n, lambda: fingerprint(p))) for name, path in originals.items()}
     h.report["examples"] = {name: dict(before[name], version=EXAMPLES[name]["version"] if name in EXAMPLES else REFUSED[name]) for name in originals}
     h.report["refusal"] = refuse(h, refused["TinyMySQLClient.zap13"])
     results, failures = {}, []
@@ -224,7 +287,7 @@ def body(h):
         h.persist()
     def originals_unchanged():
         for name, path in originals.items():
-            unchanged(name, path, before[name])
+            guarded(name, lambda: unchanged(name, path, before[name]))
         return len(originals)
     h.stage("every original example is unchanged", originals_unchanged)
     h.stage("every example upgraded and reopened or refused as pinned", lambda: require(not failures, "Failed: %s" % failures) or len(results))

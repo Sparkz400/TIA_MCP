@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f7145f1d4029c41d7e2c4b61a9d223a41fb0f64b08d9cf16c2203c644e121ac7",
-      "bytes": 1432982
+      "sha256": "b76fe5e6e9850b6bb21d2ef79d3c1fa032b03d9e24536a24a39b7452719fc11d",
+      "bytes": 1433636
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2742,8 +2742,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectUpgrade.cs",
-      "sha256": "f528f24c2904b3edb153617692d4bbeda9697ab0b65cc1543525f2457e0ca562",
-      "bytes": 7201
+      "sha256": "21ba311d73646e76a3a7decc30d457c9fbb74e0883fe830f7f993c704d946e1c",
+      "bytes": 7816
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Projects.cs",
@@ -2792,8 +2792,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "6f5f2460d9de4496fe2ecc19fab5980b6d52c387652f63e9f9ecd25d964dc56f",
-      "bytes": 30530
+      "sha256": "e9a1547721d54a1a7da1402adb70eede49d94781a9dfa8e74edefcf133b0d2a8",
+      "bytes": 30632
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
@@ -3057,8 +3057,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ProjectUpgradeRules.cs",
-      "sha256": "6543896fd5db57607fa8a915bc5528090264ad7d48f3b694cf3e46cdd300da0d",
-      "bytes": 5804
+      "sha256": "c6e2773ca9b3256135d6eb8af4a2fbe3ee6136ee6799189220f2902ac192a042",
+      "bytes": 10146
     },
     {
       "path": "src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs",

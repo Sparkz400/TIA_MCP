@@ -1,11 +1,21 @@
 """Offline checks for the project_upgrade qualifier's pure logic."""
+import argparse
 import json
+import os
 from pathlib import Path
 import tempfile
+import traceback
 import unittest
+from unittest import mock
 
-from qualify_project_upgrade import (EXAMPLES, fingerprint, inventory_view, paths_fit, pinned, public, refuse, refusal_view, released,
-                                     stage_input, upgrade_view)
+from library_native_harness import Harness
+from qualify_project_upgrade import (EXAMPLES, REFUSED, body, fingerprint, inventory_view, leaks, paths_fit, pinned, public, refuse,
+                                     refusal_view, released, remove_copies, stage_input, upgrade_view)
+
+try:
+    import _winapi
+except ImportError:  # Not Windows.
+    _winapi = None
 
 SPEC = {"version": "V16", "format": "project", "project": "Demo_V21"}
 REFUSAL = EXAMPLES["DigitalTwinAtEducation_TIAProject_Basic_V16.ap16"]
@@ -206,7 +216,9 @@ class RefusalTests(Folder):
         h = FakeHarness(self.root / "run", {"code": "ProjectVersionUnsupported", "message": "m"})
         outcome = refuse(h, original)
         self.assertEqual(outcome["error"]["code"], "ProjectVersionUnsupported")
-        self.assertEqual(h.calls, ["tia_start", ("project_upgrade", "TinyMySQLClient.zap13"), ("project_upgrade", "TinyMySQLClient.zap14")])
+        self.assertEqual(h.calls, ["tia_start", ("project_upgrade", "TinyMySQLClient.zap13"), ("project_upgrade", "Missing.zap14"),
+                                   ("project_upgrade", "TinyMySQLClient.zap14")])
+        self.assertEqual(outcome["renamed"]["code"], "ProjectVersionUnsupported")
 
     def test_refusal_that_wrote_fails(self):
         original = write(self.root / "src" / "TinyMySQLClient.zap13", b"v13")
@@ -217,6 +229,64 @@ class RefusalTests(Folder):
                    "admission": lambda: admission(run, "4" * 32, "returned")}[effect]
             with self.subTest(error=error, effect=effect), self.assertRaises(AssertionError):
                 refuse(FakeHarness(run, {"code": error}, act), original)
+
+
+
+class LinkTests(Folder):
+    @unittest.skipUnless(_winapi and hasattr(_winapi, "CreateJunction"), "Windows junctions only")
+    def test_a_junction_in_a_project_folder_is_refused_before_copying(self):
+        marker = write(self.root / "proj" / "Demo.ap16")
+        write(self.root / "elsewhere" / "secret.txt")
+        _winapi.CreateJunction(str(self.root / "elsewhere"), str(self.root / "proj" / "Link"))
+        with self.assertRaises(AssertionError):
+            stage_input(self.root / "run", marker)
+        self.assertFalse((self.root / "run" / "inputs").exists())
+
+
+class PrivacyTests(Folder):
+    @unittest.skipUnless(_winapi, "Windows file sharing only")
+    def test_an_unreadable_original_names_only_the_example_in_the_report(self):
+        # Originals below a private parent folder; the first one is locked against reading by another handle.
+        parent = self.root / "Secret Parent"
+        paths = []
+        for name in EXAMPLES:
+            paths.append(write(parent / name) if name.endswith(".zap14") else write(parent / Path(name).stem / name))
+        refused = write(parent / "TinyMySQLClient.zap13")
+        locked = next(p for p in paths if p.suffix == ".zap14")
+        handle = _winapi.CreateFile(str(locked), 0x80000000, 0, 0, 3, 0x80, 0)
+        run = self.root / "run"
+        run.mkdir()
+        h = Harness.__new__(Harness)
+        h.directory, h.client, h.report = run, None, {"steps": []}
+        h.args = argparse.Namespace(source=[str(p) for p in paths], refused=str(refused))
+        h.tool = lambda name, arguments=None: {}
+        try:
+            # The run directory of a test lives in a long temporary path; the path check is not under test here.
+            with mock.patch("qualify_project_upgrade.paths_fit", lambda run, names: 0), self.assertRaises(RuntimeError) as caught:
+                body(h)
+            h.report["failure"], h.report["traceback"] = str(caught.exception), "".join(traceback.format_exception(caught.exception))
+        finally:
+            _winapi.CloseHandle(handle)
+        h.persist()
+        text = (run / "qualification.json").read_text(encoding="utf-8")
+        self.assertIn("TinyMySQLClient_V14_1.zap14: PermissionError", text)
+        self.assertNotIn("Secret Parent", text)
+        self.assertNotIn(str(self.root), text.replace("\\\\", "\\"))
+
+
+class CleanupTests(Folder):
+    def test_copies_are_removed_and_leaks_counted_by_folder_segment(self):
+        run = self.root / "run"
+        write(run / "inputs" / "Demo" / "Logs" / "ConversionLog.xml", b"D:\\Secret Parent\\Demo")
+        write(run / "upgrades" / "u_1" / "Demo_V21" / "Demo_V21.ap21")
+        write(run / "qualification.json", b'{"hashScope": "Archive bytes", "name": "TinyMySQLClient"}')
+        self.assertEqual(remove_copies(run), ["qualification.json"])
+        originals = [self.root / "Archiv" / "Ex" / "Ex.ap16", self.root / "Secret Parent" / "A.zap14"]
+        self.assertEqual(leaks(run, originals), 0)
+        write(run / "admission.json", b'{"path": "C:\\\\x\\\\Secret Parent\\\\A.zap14"}')
+        write(run / "host.log", b"read D:/y/Archiv/Ex/Ex.ap16")
+        write(run / "example.json", b'{"folder": "Ex"}')  # A project's own folder is the public example name.
+        self.assertEqual(leaks(run, originals), 2)
 
 
 if __name__ == "__main__":

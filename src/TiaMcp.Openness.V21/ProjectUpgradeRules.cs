@@ -1,17 +1,24 @@
 #nullable disable
 using System;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Openness.V21
 {
-    /// <summary>Pure project_upgrade rules: they read no file and make no native call.</summary>
+    /// <summary>project_upgrade rules without any native call; only plain file reads.</summary>
     internal static class ProjectUpgradeRules
     {
         // V15.1 projects carry .ap15_1; every other release keeps its major number (V14 SP1 is .ap14).
         private static readonly Regex Supported = new Regex(@"^\.(z?)ap(1[4-9]|20|15_1)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         private static readonly Regex AnyRelease = new Regex(@"^\.z?ap\d+(_\d+)?$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        private static readonly Regex Marker = new Regex("<Data\\s[^>]*\\bType=\"Project\"[^>]*>", RegexOptions.CultureInvariant);
+        private const int MarkerBytes = 64 * 1024;
+        private const long MaximumLogBytes = 16L * 1024 * 1024;
 
         internal sealed class Layout { internal string Root, CopyDirectory, Input, Target, Receipt, Upgraded; }
 
@@ -26,20 +33,67 @@ namespace TiaMcp.Openness.V21
             {
                 if (!AnyRelease.IsMatch(extension))
                     throw new BridgeException("InvalidRequest", "A .ap14-.ap20 project file (V15.1: .ap15_1) or a .zap14-.zap20 archive is required.");
-                throw new BridgeException("ProjectVersionUnsupported", "project_upgrade upgrades V14 to V20 projects and archives. V13 and older are refused before any native call; " +
-                    "V21 projects open with project_open or project_retrieve, and newer projects cannot be down-converted.");
+                throw Unsupported();
             }
             archive = match.Groups[1].Value.Length == 1;
             return "V" + match.Groups[2].Value.Replace('_', '.');
+        }
+
+        private static BridgeException Unsupported(string detail = "") => new BridgeException("ProjectVersionUnsupported",
+            "project_upgrade upgrades V14 to V20 projects and archives. V13 and older are refused before any native call; " +
+            "V21 projects open with project_open or project_retrieve, and newer projects cannot be down-converted." + detail);
+
+        /// <summary>
+        /// The project name its marker declares, after checking that its ProjectCompatibilityVersion is the version the file
+        /// name claims. A project file is its own marker; an archive must hold exactly one top-level .apNN marker of its own release.
+        /// </summary>
+        internal static string MarkerName(string path, bool archive, string version)
+        {
+            string text;
+            if (archive)
+            {
+                using (var zip = ZipFile.OpenRead(path))
+                {
+                    var markers = zip.Entries.Where(e => e.FullName.IndexOfAny(new[] { '/', '\\' }) < 0 && AnyRelease.IsMatch(Path.GetExtension(e.FullName))).ToList();
+                    if (markers.Count != 1) throw new BridgeException("InvalidRequest", "A project archive must hold exactly one top-level project file.");
+                    if (!string.Equals(Path.GetExtension(markers[0].FullName), Path.GetExtension(path).Remove(1, 1), StringComparison.OrdinalIgnoreCase)) throw Unsupported(" The archived project file is of another release.");
+                    using (var stream = markers[0].Open()) text = Head(stream);
+                }
+            }
+            else using (var stream = File.OpenRead(path)) text = Head(stream);
+            var marker = Marker.Match(text);
+            var declared = Regex.Match(marker.Value, "\\bProjectCompatibilityVersion=\"(\\d+)\\.(\\d+)\\.", RegexOptions.CultureInvariant);
+            var name = Regex.Match(marker.Value, "\\bName=\"([^\"]+)\"", RegexOptions.CultureInvariant);
+            if (!declared.Success || !name.Success) throw new BridgeException("InvalidRequest", "The project file declares no project name and compatibility version.");
+            string actual = "V" + declared.Groups[1].Value + (declared.Groups[2].Value == "0" ? "" : "." + declared.Groups[2].Value);
+            if (actual != version) throw Unsupported(" The project declares " + actual + ", not the " + version + " its file name claims.");
+            string value = WebUtility.HtmlDecode(name.Groups[1].Value);
+            if (value.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || value.Trim() != value) throw new BridgeException("InvalidRequest", "The declared project name is not a valid folder name.");
+            return value;
+        }
+
+        private static string Head(Stream stream)
+        {
+            var buffer = new byte[MarkerBytes]; int read = 0, count;
+            while (read < buffer.Length && (count = stream.Read(buffer, read, buffer.Length - read)) > 0) read += count;
+            return Encoding.UTF8.GetString(buffer, 0, read);
+        }
+
+        /// <summary>A project folder is copied whole, so it may hold no other project or archive at its top level or below.</summary>
+        internal static void RequireSingleProject(string folder, string projectFile)
+        {
+            foreach (string path in Directory.EnumerateFiles(folder, "*", SearchOption.AllDirectories))
+                if (AnyRelease.IsMatch(Path.GetExtension(path)) && !string.Equals(Path.GetFullPath(path), Path.GetFullPath(projectFile), StringComparison.OrdinalIgnoreCase))
+                    throw new BridgeException("InvalidRequest", "The project folder holds another project or archive; give the project its own folder.");
         }
 
         /// <summary>
         /// The owned layout under a new root. Observed on V21 (31 October 2026): OpenWithUpgrade saves the upgrade next to the
         /// project folder as &lt;folder&gt;_V21/&lt;folder&gt;_V21.ap21, named after the folder, so the folder is copied under its own name.
         /// RetrieveWithUpgrade retrieves the archive (copied into s) into w/&lt;name&gt; and saves w/&lt;name&gt;_V21/&lt;name&gt;_V21.ap21,
-        /// named after the archived project, which the archive file name need not match.
+        /// named after the archived project (projectName), which the archive file name need not match.
         /// </summary>
-        internal static Layout Plan(string root, string path, bool archive)
+        internal static Layout Plan(string root, string path, bool archive, string projectName)
         {
             root = Path.GetFullPath(root).TrimEnd('\\', '/');
             string folder = Path.GetFullPath(Path.GetDirectoryName(path)).TrimEnd('\\', '/'), folderName = Path.GetFileName(folder);
@@ -49,24 +103,16 @@ namespace TiaMcp.Openness.V21
             var layout = new Layout { Root = root, CopyDirectory = Path.Combine(root, archive ? "s" : folderName), Receipt = Path.Combine(root, "upgrade-receipt.json") };
             layout.Input = Path.Combine(layout.CopyDirectory, Path.GetFileName(path));
             layout.Target = archive ? Path.Combine(root, "w") : root;
-            // For an archive the project name is only known after retrieval; its file name is the estimate.
-            string name = (archive ? Path.GetFileNameWithoutExtension(path) : folderName) + "_V21";
-            if (!archive) layout.Upgraded = Path.Combine(root, name, name + ".ap21");
+            string name = (archive ? projectName : folderName) + "_V21";
+            layout.Upgraded = Path.Combine(layout.Target, name, name + ".ap21");
             if (Path.Combine(layout.Target, name).Length > EngineeringPaths.MaximumProjectDirectoryLength)
                 throw new BridgeException("ProjectPathTooLong", "TIA limits the upgraded project directory to 143 characters. Use a shorter artifacts directory or project name; nothing was copied.");
             return layout;
         }
 
         /// <summary>Whether TIA returned the upgraded V21 project exactly where the observed layout puts it.</summary>
-        internal static bool InLayout(Layout layout, string upgraded)
-        {
-            if (string.IsNullOrEmpty(upgraded) || !string.Equals(Path.GetExtension(upgraded), ".ap21", StringComparison.OrdinalIgnoreCase)) return false;
-            upgraded = Path.GetFullPath(upgraded);
-            if (layout.Upgraded != null) return string.Equals(upgraded, layout.Upgraded, StringComparison.OrdinalIgnoreCase);
-            string directory = Path.GetDirectoryName(upgraded), name = Path.GetFileName(directory);
-            return string.Equals(Path.GetDirectoryName(directory), layout.Target, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(name, Path.GetFileNameWithoutExtension(upgraded), StringComparison.OrdinalIgnoreCase) && name.EndsWith("_V21", StringComparison.OrdinalIgnoreCase);
-        }
+        internal static bool InLayout(Layout layout, string upgraded) =>
+            !string.IsNullOrEmpty(upgraded) && string.Equals(Path.GetFullPath(upgraded), layout.Upgraded, StringComparison.OrdinalIgnoreCase);
 
         /// <summary>TIA's conversion log: its project success marker and message counts.</summary>
         internal static JObject ConversionLog(string text) => new JObject
@@ -75,5 +121,27 @@ namespace TiaMcp.Openness.V21
             ["errors"] = Regex.Matches(text, "MessageClass=\"Error\"").Count,
             ["warnings"] = Regex.Matches(text, "MessageClass=\"Warning\"").Count,
         };
+
+        /// <summary>
+        /// The conversion logs (ConversionLog_*_to_21.*.xml) and .ap21 files TIA left under root. Evidence only: a failure to
+        /// collect it is recorded as evidenceFailure and never replaces TIA's own outcome; logs over 16 MiB are listed, not parsed.
+        /// </summary>
+        internal static JObject Evidence(string root, Func<FileInfo, JObject> artifact)
+        {
+            var result = new JObject { ["upgradeLogs"] = new JArray(), ["upgradedProjects"] = new JArray() };
+            try
+            {
+                foreach (string path in Directory.GetFiles(root, "ConversionLog_*_to_21.*.xml", SearchOption.AllDirectories).Take(10))
+                {
+                    var file = new FileInfo(path); var log = artifact(file);
+                    if (file.Length <= MaximumLogBytes) log.Merge(ConversionLog(File.ReadAllText(path)));
+                    else log["parsed"] = false;
+                    ((JArray)result["upgradeLogs"]).Add(log);
+                }
+                result["upgradedProjects"] = new JArray(Directory.GetFiles(root, "*.ap21", SearchOption.AllDirectories).Take(10));
+            }
+            catch (Exception error) { result["evidenceFailure"] = error.GetType().Name + ": " + error.Message; }
+            return result;
+        }
     }
 }
