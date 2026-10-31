@@ -7,10 +7,10 @@ blocks, types, tag tables and technology objects of every PLC must equal the bas
 then deleted (its checkpoint archives stay, and its size and project-file SHA-256 are recorded), and the matrix stops with
 a recorded diskSpace boundary when free space falls below MIN_FREE_BYTES.
 
-CPUs: the scratch CPU 1511-1 PN V4.1 plus two catalog entries recorded on this PC, a CPU 1511C-1 PN V2.6 (an S7-1500 of the
-V2 firmware line with onboard high-speed counters; hardware_catalog_search in local.hardware.20261024) and a CPU 1214C
-DC/DC/DC V4.7 (S7-1200, added in local.cpu_memory_bytes.rerun.20261028), both added with configureScratchSecurity; a CPU
-the installed catalog lacks is recorded as notInCatalog. Families and candidate versions follow Siemens' V21 overview of
+CPUs: the scratch CPU 1511-1 PN V4.1, a CPU 1511C-1 PN V2.6 (an S7-1500 of the V2 firmware line with onboard high-speed
+counters; its catalog identity is unverified until this probe records it) and a CPU 1214C DC/DC/DC V4.7 (S7-1200, added in
+local.cpu_memory_bytes.rerun.20261028), both added with configureScratchSecurity; a CPU the installed catalog lacks is
+recorded as notInCatalog. Families and candidate versions follow Siemens' V21 overview of
 technology objects and versions; per CPU and family the versions are tried newest first until one is accepted. All motion
 objects of a CPU share one technology version, so after TO_PositioningAxis the other motion families are tried only at its
 accepted version (the newest candidate when none was accepted).
