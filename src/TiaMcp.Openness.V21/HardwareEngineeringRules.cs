@@ -276,6 +276,7 @@ namespace TiaMcp.Openness.V21
                 if (shared == (peers.Count == 0)) Fail("A shared-device assignment, and only one, names the PLCs of the interface's other assigned connectors.");
                 var ownersBefore = new HashSet<string>(peers, StringComparer.Ordinal) { payload.Value<string>("addressControllerOwnerPath") };
                 var ownersAfter = disconnect ? peers : ownersBefore;
+                var sharedItems = (payload["sharedSubmodules"] as JArray ?? new JArray()).Select(item => item.Value<string>()).ToArray();
                 foreach (var planned in RemoteIoCompanionContract.ExpectedRows(payload)) expected.Add(planned.DeepClone());
                 int sharing = 0;
                 foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal)))
@@ -322,6 +323,10 @@ namespace TiaMcp.Openness.V21
                         var owners = (JArray)actualRow["addresses"][i]["owners"];
                         if (owners.Count > 1 || owners.Any(owner => !ownersAfter.Contains(owner.Value<string>()))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
                         addresses[i]["owners"] = owners.DeepClone();
+                        // A shared submodule that moves to the selected PLC takes a start address in that PLC's address space (discovery hw4).
+                        if (shared && !disconnect && sharedItems.Any(item => InTree(row, item)) && owners.Count == 1 && owners[0].Value<string>() == payload.Value<string>("addressControllerOwnerPath")
+                            && JToken.DeepEquals(addresses[i]["ioType"], actualRow["addresses"][i]["ioType"]) && JToken.DeepEquals(addresses[i]["lengthBits"], actualRow["addresses"][i]["lengthBits"]))
+                            addresses[i]["startAddress"] = actualRow["addresses"][i]["startAddress"].DeepClone();
                     }
                 }
             }
@@ -431,7 +436,15 @@ namespace TiaMcp.Openness.V21
                     foreach (string name in new[] { "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" })
                         if (now["attributes"]?[name] != null) row["attributes"][name] = now["attributes"][name].DeepClone(); else (row["attributes"] as JObject)?.Remove(name);
                     var addresses = (JArray)row["addresses"]; var observed = now["addresses"] as JArray ?? new JArray();
-                    if (observed.Count != addresses.Count) Fail("The selected subtree's address ranges changed.");
+                    // OutsideOfProject releases the subtree's addresses from this project; PLC gives them back, owned by the target (discovery hw4).
+                    if (observed.Count != addresses.Count)
+                    {
+                        bool released = access == "OutsideOfProject" && observed.Count == 0;
+                        bool restored = access == "PLC" && addresses.Count == 0 && observed.All(address => (address["owners"] as JArray)?.Count == 1 && address["owners"][0].Value<string>() == payload.Value<string>("assignmentTargetPath"));
+                        if (!released && !restored) Fail("The selected subtree's address ranges changed.");
+                        row["addresses"] = observed.DeepClone();
+                        continue;
+                    }
                     for (int i = 0; i < addresses.Count; i++)
                     {
                         var owners = observed[i]["owners"] as JArray ?? new JArray();

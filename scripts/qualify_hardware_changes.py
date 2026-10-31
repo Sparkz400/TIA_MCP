@@ -329,6 +329,11 @@ def rack(run, device, head):
     return racks[0]
 
 
+def hw_under(run, path, state):
+    """The hardware keys at or below one exact path (a module and its submodule)."""
+    return [key for key in under(path)(None, state) if key.startswith("hw:")]
+
+
 def head_items(run, device, head):
     """Every hardware key of an IO device's head subtree: the assignment sets SharedDeviceAccessType PLC on each."""
     return lambda applied, state: [key for key in under(run.path(device, "items", head))(applied, state) if key.startswith("hw:")]
@@ -396,7 +401,9 @@ def shared_device(run):
     run.apply("share %s with ScratchPLC" % SP.device, "network_io_assign", payload,
               {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True}]},
               shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-              plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller], added=generated, boundary=True) is not None
+              # SpDi3 takes the scratch CPU's address space (its start moves, hw4).
+              plc=scratch_plc(run), changed=lambda applied, state: ["hw:" + device, "hw:" + controller] + hw_under(run, run.path(SP.device, "items", "SpDi3"), state),
+              added=generated, boundary=True) is not None
 
 
 def unshare(run):
@@ -421,7 +428,7 @@ def shared_access(run, name, access, shared, external=None, target=None, restore
     shown = {**payload, "addressControllerOwnerPaths": owners, **({"ioDeviceInterfacePath": interface} if external else {})}
     return run.apply("set %s's shared-device access %s%s" % (name, access, " with %d external controller(s)" % external if external else ""), "hardware_shared_device_access", payload,
                      {"effects": [{"hardwarePath": module, "accessAfter": access}]}, shown=shown,
-                     changed=["hw:" + module] + (["hw:" + interface] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
+                     changed=lambda applied, state: hw_under(run, module, state) + (["hw:" + interface] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
                      restore=restore, boundary=True) is not None
 
 
@@ -445,7 +452,9 @@ def mrp(run, interface, role, domain=None, create=False, restore=False):
     payload = {"hardwarePath": interface, "role": role, **({"domainName": domain} if domain else {}), **({"createDomain": True} if create else {})}
     effect = {"hardwarePath": interface, "roleAfter": role, "createDomain": create, **({"domainAfter": domain} if domain else {})}
     label = "MRP %s %s%s%s" % (interface.split("/devices/", 1)[1].split("/", 1)[0], role, " in " + domain if domain else "", ", restored" if restore else "")
-    return run.apply(label, "network_mrp_set", payload, {"effects": [effect]}, changed=["hw:" + interface],
+    # A ring role declares RingPort true on the interface's ports and NotInRing withdraws it (hw4): a recorded side effect.
+    ring_port = lambda category, key: category == "changed" and key.startswith("hw:" + interface + "/items/Port_")
+    return run.apply(label, "network_mrp_set", payload, {"effects": [effect]}, changed=["hw:" + interface], tolerated=ring_port,
                      rows={"hw:" + interface: {"network": {"mrp": [{"role": role, **({"domain": domain} if domain else {})}]}}}, restore=restore, boundary=True) is not None
 
 
@@ -685,8 +694,8 @@ def phase_a(run):
     # SpDi3 becomes the scratch CPU's submodule of the shared device; SpDi4 (slot 3, continuing the potential group) goes outside the project.
     plug(run, "SpDi4", 3, sp, older)
     run.shared = shared_device(run)
-    # TIA may require an IO controller outside the project before a module is accessed there.
-    run.access = shared_access(run, "SpDi4", "OutsideOfProject", run.shared) or shared_access(run, "SpDi4", "OutsideOfProject", run.shared, external=1)
+    # Without an external IO controller TIA warns "The number of IO controllers outside the project ... is 0" (hw4), so one is configured.
+    run.access = shared_access(run, "SpDi4", "OutsideOfProject", run.shared, external=1) or shared_access(run, "SpDi4", "OutsideOfProject", run.shared)
     topology_refusals(run)
     run.ring = ring(run)
     gsd_device(run)

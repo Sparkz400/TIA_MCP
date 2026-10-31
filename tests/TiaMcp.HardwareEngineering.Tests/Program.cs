@@ -410,6 +410,19 @@ Check("shared access to another target than requested rejected", "hardware_share
     rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); });
 Check("shared access target change outside the subtree rejected", "hardware_shared_device_access", accessPlc, rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[0]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, false,
     rows => { AccessBase(rows); Inputs(rows, "PLC", true, "/cpu1"); rows[0]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1"; });
+// OutsideOfProject releases the subtree's addresses (hw4); PLC brings them back owned by the target, and nothing else may appear.
+Check("shared access outside the project releases the addresses", "hardware_shared_device_access", access, rows => { Outside(rows); rows[1]["addresses"] = new JArray(); }, true, AccessBase);
+Check("shared access back to a PLC restores its addresses", "hardware_shared_device_access", accessPlc,
+    rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 3, ["lengthBits"] = 8, ["owners"] = new JArray("/cpu2") }); }, true,
+    rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); rows[1]["addresses"] = new JArray(); });
+Check("restored addresses owned by another PLC rejected", "hardware_shared_device_access", accessPlc,
+    rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 3, ["lengthBits"] = 8, ["owners"] = new JArray("/cpu1") }); }, false,
+    rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); rows[1]["addresses"] = new JArray(); });
+// A shared submodule moving to the new PLC takes an address in that PLC's space (hw4); other items keep theirs.
+var sharedWithModule = (JObject)shared.DeepClone(); sharedWithModule["sharedSubmodules"] = new JArray(module);
+Check("shared submodule takes a new address of the new PLC", "network_io_assign", sharedWithModule, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["startAddress"] = 2; rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, true, SharedBase);
+Check("address move outside the shared submodules rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["startAddress"] = 2; rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedBase);
+Check("shared submodule resizing its address rejected", "network_io_assign", sharedWithModule, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["lengthBits"] = 32; rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedBase);
 // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change, and only then may it change.
 void AccessExternalBase(JArray rows) { AccessBase(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 0; }
 var accessExternal = (JObject)access.DeepClone(); accessExternal["externalIoControllers"] = 1; accessExternal["ioDeviceInterfacePath"] = remote;
