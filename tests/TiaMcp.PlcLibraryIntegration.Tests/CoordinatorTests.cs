@@ -359,20 +359,9 @@ internal static class CoordinatorTests
         // Admission reconcile of a crashed combined apply: its step workspace (changes/c/<8 hex>) resolves with the steps' own records.
         test("admission reconcile resolves a crashed combined apply's step workspace from its step records", () => {
             var s = new Scenario(create: false); string workspace = Path.Combine(s.Root, "changes", "c", "05d85a35");
-            string Hash(string path) => Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
             string Reconcile(out string basis, JObject evidence = null) => PlcComponentCoordinator.ReconcileWorkspace(workspace, evidence ?? new JObject(), out basis);
             Equal("unchanged", Reconcile(out _));
-            var coordinator = PlcComponentCoordinator.Create(workspace, s.PreparedPlan, s.Ops); coordinator.Advance(); coordinator.Advance(coordinator.Status()["library"]["prepared"].Value<string>("previewHash"));
-            // The crash came during the import step: its journal records the archive it wrote before the mutation.
-            string library = Path.Combine(workspace, "change-lib-" + new string('a', 32)); Directory.CreateDirectory(library);
-            string archive = Path.Combine(library, "before.zap21"); File.WriteAllText(archive, "pre-import project");
-            var preview = new JObject { ["kind"] = "library_instantiate" };
-            LibraryJournalStore.Write(Path.Combine(library, "journal.json"), new JObject { ["changeId"] = "lib-" + new string('a', 32), ["preview"] = preview,
-                ["previewHash"] = LibraryJournalStore.Hash(preview.ToString(Formatting.None)), ["state"] = "applying",
-                ["checkpoints"] = new JArray(new JObject { ["kind"] = "project", ["archivePath"] = archive, ["sha256"] = Hash(archive) }) });
-            string typed = Path.Combine(workspace, "change-" + new string('b', 32)); Directory.CreateDirectory(typed);
-            string typedArchive = Path.Combine(typed, "before.zap21"); File.WriteAllText(typedArchive, "pre-typed project");
-            File.WriteAllText(Path.Combine(typed, "journal.json"), new JObject { ["changeId"] = new string('b', 32), ["recoveryArchive"] = typedArchive, ["recoveryArchiveSha256"] = Hash(typedArchive) }.ToString());
+            string typedArchive = StepWorkspace(s, workspace);
             var evidence = new JObject();
             Equal("verifiedApplied", Reconcile(out _, evidence)); Equal("library_applied", evidence["coordinatorStates"][0].Value<string>()); Equal(2, ((JArray)evidence["checkpointArchives"]).Count);
             // A partial archive its step never recorded holds; so does a changed recorded archive or a tampered coordinator journal.
@@ -384,6 +373,26 @@ internal static class CoordinatorTests
             var envelope = JObject.Parse(File.ReadAllText(journal)); envelope["record"]["state"] = "installation_verified"; File.WriteAllText(journal, envelope.ToString());
             Equal(null, Reconcile(out var tampered)); Equal(true, tampered.StartsWith("Coordinator journal", StringComparison.Ordinal));
         });
+        // The walk never follows a reparse point and admits only what the combined apply writes there.
+        test("admission reconcile holds a junctioned step workspace or subdirectory and stray content", () => {
+            var s = new Scenario(create: false); string changes = Path.Combine(s.Root, "changes", "c");
+            string Reconcile(string workspace, out string basis) => PlcComponentCoordinator.ReconcileWorkspace(workspace, new JObject(), out basis);
+            string real = Path.Combine(changes, "11111111"); StepWorkspace(s, real); Equal("verifiedApplied", Reconcile(real, out _));
+            string linked = Path.Combine(changes, "22222222"); Junction(linked, real);
+            Equal(null, Reconcile(linked, out var root)); Equal(true, root.Contains("is a reparse point"));
+            string elsewhere = Path.Combine(s.Root, "elsewhere", "change-" + new string('d', 32)); Directory.CreateDirectory(elsewhere);
+            Junction(Path.Combine(real, "change-" + new string('d', 32)), elsewhere);
+            Equal(null, Reconcile(real, out var child)); Equal(true, child.Contains("change-" + new string('d', 32)) && child.Contains("is a reparse point"));
+            Directory.Delete(Path.Combine(real, "change-" + new string('d', 32))); Equal("verifiedApplied", Reconcile(real, out _));
+            foreach (var stray in new[] { Path.Combine(real, "notes.txt"), Path.Combine(real, "change-" + new string('b', 32), "copy.zap21"), Path.Combine(real, "captures", "loose.xml") })
+            {
+                File.WriteAllText(stray, "stray"); Equal(null, Reconcile(real, out var reason)); Equal(true, reason.Contains("is not one the combined apply writes"));
+                File.Delete(stray);
+            }
+            string strayDirectory = Path.Combine(real, "change-" + new string('b', 32), "before"); Directory.CreateDirectory(strayDirectory);
+            Equal(null, Reconcile(real, out _)); Directory.Delete(strayDirectory); Equal("verifiedApplied", Reconcile(real, out _));
+            Directory.Delete(linked); // removes the junction itself, never its target
+        });
         test("planOnly steps cannot be dispatched by coordinator", () => {
             var s = new Scenario(create: false); s.PreparedPlan["preview"]["integrationPlan"]["steps"][1]["planOnly"] = true; s.RehashPlan();
             Reject("ComponentPlanBlocked", () => PlcComponentCoordinator.Create(s.Root, s.PreparedPlan, s.Ops)); Equal(0, s.Ops.Applies);
@@ -391,6 +400,36 @@ internal static class CoordinatorTests
     }
 
     private static void Equal<T>(T expected, T actual) { if (!Equals(expected, actual)) throw new Exception($"Expected {expected}; got {actual}"); }
+
+    // A crashed combined apply's step workspace in the 31 October layout: the coordinator after the import step, the import step's
+    // claim, journal, recorded archive, lock manifest and checks, the typed step's journal, recorded archive and exports, readback captures.
+    private static string StepWorkspace(Scenario s, string workspace)
+    {
+        string Hash(string path) => Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));
+        var coordinator = PlcComponentCoordinator.Create(workspace, s.PreparedPlan, s.Ops); coordinator.Advance(); coordinator.Advance(coordinator.Status()["library"]["prepared"].Value<string>("previewHash"));
+        File.WriteAllText(Path.Combine(workspace, "library-key-" + new string('e', 64) + ".claim"), "lib-" + new string('a', 32));
+        string library = Path.Combine(workspace, "change-lib-" + new string('a', 32)); Directory.CreateDirectory(library);
+        string archive = Path.Combine(library, "before.zap21"); File.WriteAllText(archive, "pre-import project");
+        var preview = new JObject { ["kind"] = "library_instantiate" };
+        LibraryJournalStore.Write(Path.Combine(library, "journal.json"), new JObject { ["changeId"] = "lib-" + new string('a', 32), ["preview"] = preview,
+            ["previewHash"] = LibraryJournalStore.Hash(preview.ToString(Formatting.None)), ["state"] = "applying",
+            ["checkpoints"] = new JArray(new JObject { ["kind"] = "project", ["archivePath"] = archive, ["sha256"] = Hash(archive) }) });
+        File.WriteAllText(Path.Combine(library, "library-lock.v1.json"), "{}"); File.WriteAllText(Path.Combine(library, "version-check-" + new string('f', 32) + ".xml"), "<x/>");
+        string typed = Path.Combine(workspace, "change-" + new string('b', 32)); Directory.CreateDirectory(typed);
+        string typedArchive = Path.Combine(typed, "before.zap21"); File.WriteAllText(typedArchive, "pre-typed project");
+        File.WriteAllText(Path.Combine(typed, "journal.json"), new JObject { ["changeId"] = new string('b', 32), ["recoveryArchive"] = typedArchive, ["recoveryArchiveSha256"] = Hash(typedArchive) }.ToString());
+        File.WriteAllText(Path.Combine(typed, "requested.xml"), "<x/>");
+        string capture = Path.Combine(workspace, "captures", "component-read-" + new string('9', 32)); Directory.CreateDirectory(capture);
+        File.WriteAllText(Path.Combine(capture, "caller.xml"), "<x/>");
+        return typedArchive;
+    }
+
+    private static void Junction(string link, string target)
+    {
+        var start = new System.Diagnostics.ProcessStartInfo("cmd.exe", "/c mklink /J \"" + link + "\" \"" + target + "\"") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
+        using var process = System.Diagnostics.Process.Start(start); process.WaitForExit();
+        if (process.ExitCode != 0 || (File.GetAttributes(link) & FileAttributes.ReparsePoint) == 0) throw new Exception("Could not create the test junction " + link);
+    }
     private static void Reject(string code, Action action) { try { action(); } catch (PlcComponentException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
     private static void Throws<T>(Action action) where T : Exception { try { action(); } catch (T) { return; } throw new Exception("Expected " + typeof(T).Name); }
 

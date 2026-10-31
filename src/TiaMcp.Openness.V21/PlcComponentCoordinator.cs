@@ -408,23 +408,46 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["planChangeId"] = prepared["changeId"].DeepClone(), ["planPreviewHash"] = prepared["previewHash"].DeepClone(), ["projectPath"] = preview["projectPath"].DeepClone(), ["payload"] = preview["payload"].DeepClone(), ["plan"] = plan.DeepClone() };
         }
 
-        /// <summary>Admission reconciliation of a production combined apply's step workspace, worker-owned scratch of its steps: every
-        /// coordinator journal must verify its own hash, and every checkpoint archive must be recorded with its hash by the step journal
-        /// beside it, so the steps' own records account for what was written. "unchanged", "verifiedApplied" or null (held, basis is why).</summary>
+        /// <summary>Admission reconciliation of a production combined apply's step workspace, worker-owned scratch of its steps. The walk
+        /// never follows a reparse point and admits only entries the combined apply writes; every coordinator journal must verify its own
+        /// hash, and every checkpoint archive must be recorded with its hash by the step journal beside it, so the steps' own records
+        /// account for what was written. "unchanged", "verifiedApplied" or null (held, basis is why).</summary>
         internal static string ReconcileWorkspace(string workspace, JObject evidence, out string basis)
         {
-            if (File.Exists(workspace)) { basis = "The step workspace path is a file."; return null; }
-            if (!Directory.Exists(workspace) || !Directory.EnumerateFileSystemEntries(workspace).Any())
+            FileAttributes attributes;
+            // GetAttributes reads the entry itself: a junction or symbolic link is reported, not followed.
+            try { attributes = File.GetAttributes(workspace); }
+            catch (Exception error) when (error is FileNotFoundException || error is DirectoryNotFoundException)
             { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
+            if ((attributes & FileAttributes.ReparsePoint) != 0) { basis = "The step workspace " + workspace + " is a reparse point; its content may live elsewhere."; return null; }
+            if ((attributes & FileAttributes.Directory) == 0) { basis = "The step workspace path is a file."; return null; }
+            var journals = new System.Collections.Generic.List<string>(); var archives = new System.Collections.Generic.List<string>(); int count = 0;
+            var pending = new System.Collections.Generic.Stack<Tuple<DirectoryInfo, string>>();
+            pending.Push(Tuple.Create(new DirectoryInfo(workspace), "root"));
+            while (pending.Count > 0)
+            {
+                var next = pending.Pop();
+                foreach (var entry in next.Item1.EnumerateFileSystemInfos())
+                {
+                    if (++count > 20000) { basis = "The step workspace holds more than 20000 entries."; return null; }
+                    if ((entry.Attributes & FileAttributes.ReparsePoint) != 0) { basis = "Workspace entry " + entry.FullName + " is a reparse point; its content may live elsewhere."; return null; }
+                    string role = WorkspaceEntry(next.Item2, entry);
+                    if (role == null) { basis = "Workspace entry " + entry.FullName + " is not one the combined apply writes."; return null; }
+                    if (entry is DirectoryInfo directory) pending.Push(Tuple.Create(directory, role));
+                    else if (role == "journal") journals.Add(entry.FullName);
+                    else if (role == "archive") archives.Add(entry.FullName);
+                }
+            }
+            if (count == 0) { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
             var states = new JArray(); evidence["coordinatorStates"] = states;
-            foreach (string journal in Directory.GetFiles(workspace, "component-journal.json", SearchOption.AllDirectories))
+            foreach (string journal in journals)
             {
                 try { states.Add(ReadChecked(journal).Value<string>("state")); }
                 catch (Exception error) when (error is PlcComponentException || error is IOException || error is JsonException)
                 { basis = "Coordinator journal " + journal + " is unreadable or its hash differs: " + error.Message; return null; }
             }
-            var archives = new JArray(); evidence["checkpointArchives"] = archives;
-            foreach (string archive in Directory.GetFiles(workspace, "*.za?21", SearchOption.AllDirectories))
+            var recordedArchives = new JArray(); evidence["checkpointArchives"] = recordedArchives;
+            foreach (string archive in archives)
             {
                 string directory = Path.GetDirectoryName(archive), name = Path.GetFileName(directory), path = Path.Combine(directory, "journal.json"), hash = FileHash(archive);
                 bool recorded = false;
@@ -433,7 +456,7 @@ namespace TiaMcp.Openness.V21
                     if (name.StartsWith("change-lib-", StringComparison.Ordinal))
                         recorded = (LibraryJournalStore.Read(path, name.Substring("change-".Length))["checkpoints"] as JArray ?? new JArray()).OfType<JObject>()
                             .Any(c => SamePath(c.Value<string>("archivePath"), archive) && c.Value<string>("sha256") == hash);
-                    else if (name.StartsWith("change-", StringComparison.Ordinal) && File.Exists(path) && new FileInfo(path).Length <= 8 * 1024 * 1024)
+                    else if (File.Exists(path) && new FileInfo(path).Length <= 8 * 1024 * 1024)
                     {
                         var step = JObject.Parse(File.ReadAllText(path));
                         recorded = "change-" + step.Value<string>("changeId") == name && SamePath(step.Value<string>("recoveryArchive"), archive) && step.Value<string>("recoveryArchiveSha256") == hash;
@@ -441,10 +464,33 @@ namespace TiaMcp.Openness.V21
                 }
                 catch (Exception error) when (error is IOException || error is InvalidDataException || error is JsonException) { recorded = false; }
                 if (!recorded) { basis = "Checkpoint archive " + archive + " is missing from, or differs from, its step journal."; return null; }
-                archives.Add(new JObject { ["path"] = archive, ["sha256"] = hash });
+                recordedArchives.Add(new JObject { ["path"] = archive, ["sha256"] = hash });
             }
-            basis = "Worker-owned step scratch of the combined apply: every coordinator journal verifies its hash and every checkpoint archive is recorded with its hash by its step journal.";
+            basis = "Worker-owned step scratch of the combined apply: only its own entries, every coordinator journal verifies its hash and every checkpoint archive is recorded with its hash by its step journal.";
             return "verifiedApplied";
+        }
+
+        // The role of an entry the combined apply writes in its workspace, or null. The root holds the coordinator, its project lock,
+        // the import step's idempotency claim, the two step directories and the readback captures (layout of the 31 October run).
+        private static string WorkspaceEntry(string parent, FileSystemInfo entry)
+        {
+            string name = entry.Name; bool directory = entry is DirectoryInfo;
+            Func<string, bool> match = pattern => System.Text.RegularExpressions.Regex.IsMatch(name, pattern);
+            switch (parent)
+            {
+                case "root":
+                    if (directory) return match(@"\Acomponent-[0-9a-f]{32}\z") ? "coordinator" : match(@"\Achange-lib-[0-9a-f]{32}\z") ? "libraryStep"
+                        : match(@"\Achange-[0-9a-f]{32}\z") ? "typedStep" : name == "captures" ? "captures" : null;
+                    return match(@"\Acomponent-project-[0-9a-f]{64}\.lock\z") || match(@"\Alibrary-key-[0-9a-f]{64}\.claim\z") ? "file" : null;
+                case "coordinator": return !directory && name == "component-journal.json" ? "journal" : null;
+                case "captures": return directory && match(@"\Acomponent-read-[0-9a-f]{32}\z") ? "capture" : null;
+                case "capture": return !directory && match(@"\A[A-Za-z0-9_-]+\.xml\z") ? "file" : null;
+                case "libraryStep": case "typedStep":
+                    if (directory) return null;
+                    if (name == "before.zap21") return "archive";
+                    return name == "journal.json" || match(@"\A[A-Za-z0-9_-]+\.xml\z") || parent == "libraryStep" && name == "library-lock.v1.json" ? "file" : null;
+                default: return null;
+            }
         }
         private static bool SamePath(string left, string right) =>
             !string.IsNullOrEmpty(left) && Path.IsPathRooted(left) && string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);

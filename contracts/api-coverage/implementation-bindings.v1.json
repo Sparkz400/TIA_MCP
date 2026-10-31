@@ -2982,8 +2982,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentCoordinator.cs",
-      "sha256": "ee0f5d2223caebd2642e8777801c09ccf7f1f0b2b07c9b4bfbeaf5689fca98e2",
-      "bytes": 42083
+      "sha256": "d83a7b1ece9a31c5f7561de5c805eefc59a6eca3a2c0a39cec6d591fb6526875",
+      "bytes": 45675
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
