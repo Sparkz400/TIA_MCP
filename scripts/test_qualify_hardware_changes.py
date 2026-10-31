@@ -102,6 +102,14 @@ class HardwareChangeTests(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     run.apply("step", "network_mrp_set", {}, boundary=True)
 
+    def test_shared_device_reports_whether_it_applied(self):
+        run = q.Run.__new__(q.Run)
+        run.base, calls = "/projects/P/devices/", []
+        for result, expected in (({"changeId": "c"}, True), (None, False)):
+            run.apply = lambda *args, result=result, **kwargs: calls.append(kwargs["removed"]) or result
+            self.assertIs(expected, q.shared_device(run))
+        self.assertEqual([q.constant(run, q.SP, "HwSpHead~SpDi3")], calls[0])  # hw5: SpDi3's HwPeerCpu system constant goes.
+
     def test_ring_opens_the_line_sets_roles_then_relinks_and_closes(self):
         closed, calls, _ = self.ring()
         self.assertTrue(closed)

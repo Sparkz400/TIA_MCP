@@ -398,23 +398,13 @@ def shared_device(run):
     payload = {"hardwarePath": device, "connectorIndex": 1, "controllerHardwarePath": controller, "controllerIndex": 0, "createIoSystemName": SHARED_IO, "sharedDevice": True,
                "sharedSubmodules": [run.path(SP.device, "items", "SpDi3")]}
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, SCRATCH, SP.prefix), constant(run, SCRATCH, "Local~" + SHARED_IO)))]
-    run.apply("share %s with ScratchPLC" % SP.device, "network_io_assign", payload,
-              {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True}]},
-              shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-              # SpDi3 takes the scratch CPU's address space (its start moves, hw4).
-              plc=scratch_plc(run), changed=lambda applied, state: ["hw:" + device, "hw:" + controller] + hw_under(run, run.path(SP.device, "items", "SpDi3"), state),
-              added=generated, boundary=True) is not None
-
-
-def unshare(run):
-    """The shared connector leaves the scratch CPU's IO system again; connector 0 stays with HwPeerCpu."""
-    device = run.path(SP.device, "items", *SP.interface)
-    payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True}
-    removed = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
-    run.apply("unshare %s from ScratchPLC" % SP.device, "network_io_assign", payload,
-              {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "disconnect": True, "sharedDevice": True}]},
-              shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-              plc=scratch_plc(run), changed=["hw:" + device, "hw:" + run.path("ScratchStation", "items", "ScratchPLC", "items", "PROFINET%20interface_1")], removed=removed, restore=True, boundary=True)
+    submodule = run.path(SP.device, "items", "SpDi3", "items", "SpDi3")
+    return run.apply("share %s with ScratchPLC" % SP.device, "network_io_assign", payload,
+                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True}]},
+                     shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
+                     # SpDi3's submodule takes the scratch CPU's address space (its start moves, hw4) and its HwPeerCpu system constant goes (hw5).
+                     plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller, "hw:" + submodule], removed=[constant(run, SP, SP.prefix + "SpDi3")],
+                     added=generated, boundary=True) is not None
 
 
 def shared_access(run, name, access, shared, external=None, target=None, restore=False):
@@ -429,6 +419,8 @@ def shared_access(run, name, access, shared, external=None, target=None, restore
     return run.apply("set %s's shared-device access %s%s" % (name, access, " with %d external controller(s)" % external if external else ""), "hardware_shared_device_access", payload,
                      {"effects": [{"hardwarePath": module, "accessAfter": access}]}, shown=shown,
                      changed=lambda applied, state: hw_under(run, module, state) + (["hw:" + interface] if external else []), rows={"hw:" + module: {"attributes": {"SharedDeviceAccessType": access}}},
+                     removed=[constant(run, SP, SP.prefix + name)] if access == "OutsideOfProject" else (),
+                     added=[constant(run, SP, SP.prefix + name)] if access == "PLC" and target == run.path("HwPeer", "items", "HwPeerCpu") else (),
                      restore=restore, boundary=True) is not None
 
 
@@ -725,13 +717,14 @@ def phase_b(run):
         replace(run, first, after, module, restore=True, station=station_)
         if station_.device in pairs:
             link(run, "hardware_port_disconnect", 1, restore=True, pair=pairs[station_.device], label=station_.device + " Port_1")
-        delete(run, first, restore=True, station=station_, changed=timing(run, station_))
+        # With SpDi3 shared to the scratch CPU and SpDi4 outside the project, SpDi is HwPeerCpu's last ET 200SP module: its connector's
+        # update time returns to 128 ms (hw5).
+        last = station_.device == SP.device and run.shared and run.access
+        delete(run, first, restore=True, station=station_, changed=["hw:" + run.path(SP.device, "items", *SP.interface)] if last else timing(run, station_))
     if run.ring:
         mrp(run, interfaces(run)[0], "ManagerAuto", restore=True)
     if run.access:
         shared_access(run, "SpDi4", "PLC", run.shared, target=run.path("HwPeer", "items", "HwPeerCpu"), restore=True)
-    if run.shared:
-        unshare(run)
     # Last: its tag stays in the project, so the pre-change state of the replacement includes it.
     address_change(run)
 
