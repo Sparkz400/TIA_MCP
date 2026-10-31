@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "977a7c2fda48811c8a0f2c1965f41451ee938413010e1e0e688f31fdb111b02d",
-      "bytes": 1440883
+      "sha256": "176a3392aab60c654be837490476549f0bf77bd4061a989e130a3ce9fff649ea",
+      "bytes": 1441177
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1612,8 +1612,8 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitProcess.cs",
-      "sha256": "c2cabe204abc322231bf913e92c3c8bde0704e0f03fad96a6de3683dcd083e92",
-      "bytes": 15667
+      "sha256": "16bcbfd23122b5829711ca256b5ce643118b88ee826efd39d893e853a4f82b86",
+      "bytes": 16601
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitRemote.cs",
@@ -2937,8 +2937,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
-      "sha256": "024b13b0f2cd8a40268960d5e33c6bfc37076f313ed0c73266488871a5ae09cb",
-      "bytes": 46163
+      "sha256": "b6fc6adac136b348354d53d3c0ea5d7d73e146ae24d6bd0d69d4f9737c5c8cb4",
+      "bytes": 46291
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.WatchAuthoring.cs",
@@ -43466,8 +43466,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/GitProcess.cs",
           "name": "NoLinks",
-          "line": 111,
-          "endLine": 115,
+          "line": 121,
+          "endLine": 125,
           "sha256": "e104d60e73fff1c7fa83d8117d6391b8b008f46e27f32900afb5a86a65ca983d"
         },
         {

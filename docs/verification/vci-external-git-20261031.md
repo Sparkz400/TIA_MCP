@@ -17,8 +17,10 @@ Offline checks only; the native round trip is pending.
   plus only the remote's protocol. Push is a compare-and-swap fast-forward;
   fetch validates the remote tree before a fast-forward checkout. A local
   remote must pass the runner's own `[core]`-only config allowlist (bare) and
-  indirection checks with no active hooks, when read and again immediately
-  before dispatch. UNC paths are refused in every spelling, including `//server/share`.
+  indirection checks with no active hooks, no packed replace refs and no `.git`
+  entry (Git's local lookup enters `<remote>/.git` first), when read and again
+  immediately before dispatch. Only drive-letter paths are accepted, so UNC and
+  device spellings (`//server/share`, `\\?\`, `\??\`) are refused.
 - Store records `vci:push:` and `vci:fetch:` with hash-linked journals; a
   fetched revision is accepted wherever a committed revision is
   ([`VciWorkspaceStore.Remote.cs`](../../src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Remote.cs)).
@@ -34,7 +36,7 @@ Offline checks only; the native round trip is pending.
 
 | Suite | Result | Covers |
 | --- | --- | --- |
-| `tests/TiaMcp.VersionControl.Workflow.Tests` (real Git) | 138 checks | Remote parsing incl. `//server/share` and `\\server\share`; push, CAS refusal, restart reopen; fetch fast-forward, exact blobs, unchanged parent, history; non-fast-forward push and fetch refusals; remote hook, five config redirections (separate-line and same-line `hooksPath`, `[core][include]`, `alternateRefsCommand`, another section) for push and fetch, `objects/info/alternates`, `.gitattributes`; resolution payload for all three takes with the native hash and workspace, and nine refusals |
+| `tests/TiaMcp.VersionControl.Workflow.Tests` (real Git) | 146 checks | Remote parsing incl. `//server/share`, `\\server\share`, `\\?\` and `\??\`; an inner `<remote>/.git` repository with a hook and a `gitdir:` file, each for push and fetch (the hook never runs, the gitdir target is never reached); packed `refs/replace`; push, CAS refusal, restart reopen; fetch fast-forward, exact blobs, unchanged parent, history; non-fast-forward push and fetch refusals; remote hook, five config redirections (separate-line and same-line `hooksPath`, `[core][include]`, `alternateRefsCommand`, another section) for push and fetch, `objects/info/alternates`, `.gitattributes`; resolution payload for all three takes with the native hash and workspace, and nine refusals |
 | `tests/TiaMcp.HardwareEngineering.Tests` | 264 passed | Pure `VciResolutionRules`: package-file parsing (traversal, absolute, empty, short hash, tampered or missing content, length, repeats, non-objects, bound) and the live-mapping refusals (take/direction, missing native hash, no workspace change, foreign package, stale package, extra file, edited project object, write sets) |
 | `tests/TiaMcp.VersionControl.Tests` (real Git) | 124/124 | Existing runner, durability and repository-selection checks with the extended process signature |
 | `tests/TiaMcp.Library.Tests` | 98 passed | Host option parsing for `--git-remote` and `--git-allow-network-remote` |

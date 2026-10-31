@@ -166,11 +166,13 @@ remote's receive-pack runs its own hooks and configuration, a local remote must
 be a minimal bare repository: the same `[core]`-only configuration allowlist the
 runner applies to its own repositories (no includes, `hooksPath`,
 `alternateRefsCommand` or any other key; `GitUnsupportedConfiguration`), no
-active hooks (`GitExecutableCustomizationRefused`) and no alternates, grafts or
-replace refs (`GitUnsupportedRepository`). It is checked when the remote branch
-is read and again immediately before dispatch; a writer of the remote after
-that check is outside the Host's control. UNC and device paths are refused,
-including the `//server/share` spelling. Without `--git-remote` both tools
+active hooks (`GitExecutableCustomizationRefused`) and no alternates, grafts,
+loose or packed replace refs, or `.git` entry, which Git's local lookup would
+enter before the configured directory (`GitUnsupportedRepository`). It is
+checked when the remote branch is read and again immediately before dispatch; a
+writer of the remote after that check is outside the Host's control. Only
+drive-letter paths are accepted: UNC and device spellings (`\\server\share`,
+`//server/share`, `\\?\`, `\??\`) are refused. Without `--git-remote` both tools
 return `GitRemoteNotConfigured`.
 
 - `vci_push` publishes the exact commit of a committed or fetched revision to

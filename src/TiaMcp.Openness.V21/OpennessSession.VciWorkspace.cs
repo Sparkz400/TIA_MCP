@@ -455,13 +455,16 @@ namespace TiaMcp.Openness.V21
         private static string VciObjectContentHash(IEngineeringObject target, string directory)
         {
             string path = Path.Combine(directory, "vci-object-" + Guid.NewGuid().ToString("N") + ".xml");
-            if (target is PlcBlock block) block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-            else if (target is PlcType type) type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-            else if (target is Siemens.Engineering.SW.Tags.PlcTagTable table) table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-            else if (target is Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDB technology) technology.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
-            else throw new BridgeException("UnsupportedObjectKind", "The mapped object has no native export for a content hash.");
-            try { return ChangeFileHash(path); }
-            finally { File.Delete(path); }
+            try
+            {
+                if (target is PlcBlock block) block.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                else if (target is PlcType type) type.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                else if (target is Siemens.Engineering.SW.Tags.PlcTagTable table) table.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                else if (target is Siemens.Engineering.SW.TechnologicalObjects.TechnologicalInstanceDB technology) technology.Export(new FileInfo(path), ExportOptions.WithDefaults, DocumentInfoOptions.None);
+                else throw new BridgeException("UnsupportedObjectKind", "The mapped object has no native export for a content hash.");
+                return ChangeFileHash(path);
+            }
+            finally { if (File.Exists(path)) File.Delete(path); } // Also a partial file a failed export left.
         }
 
         private static bool VciSafeName(string name) => name.Length <= 128 && name.Trim(' ', '.') == name && name.Length != 0 && name.IndexOfAny(Path.GetInvalidFileNameChars()) < 0

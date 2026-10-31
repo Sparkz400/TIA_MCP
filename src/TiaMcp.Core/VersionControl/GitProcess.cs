@@ -27,10 +27,12 @@ internal static partial class GitSafety
     internal static string PathRoot(string path, bool exists)
     {
         if (!Path.IsPathFullyQualified(path)) throw new BridgeException("GitUnsafePath", "An absolute resource path is required.");
+        // Only a plain drive-letter root: this refuses \\server\share, //server/share, \\?\ and \??\ device spellings alike.
+        if (OperatingSystem.IsWindows() && !Regex.IsMatch(path, "^[A-Za-z]:[\\\\/]", RegexOptions.CultureInvariant))
+            throw new BridgeException("GitUnsafePath", "The local Git profile accepts only drive-letter paths, not UNC or device namespace paths.");
         var full = Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
-        // The normalized form catches //server/share and other spellings that GetFullPath turns into \\server\share.
-        if (OperatingSystem.IsWindows() && (path.StartsWith("\\\\", StringComparison.Ordinal) || full.StartsWith("\\\\", StringComparison.Ordinal)))
-            throw new BridgeException("GitUnsafePath", "The local Git profile does not accept UNC or device namespace paths.");
+        if (OperatingSystem.IsWindows() && !Regex.IsMatch(full, "^[A-Za-z]:\\\\", RegexOptions.CultureInvariant))
+            throw new BridgeException("GitUnsafePath", "The local Git profile accepts only drive-letter paths, not UNC or device namespace paths.");
         if (full == Path.GetPathRoot(full)) throw new BridgeException("GitUnsafePath", "A filesystem root is not an owned Git resource.");
         foreach (var segment in full[Path.GetPathRoot(full)!.Length..].Split(Path.DirectorySeparatorChar))
             VciGuard.Path(segment, 255);
@@ -46,10 +48,18 @@ internal static partial class GitSafety
     // Indirection, unfinished operations and active hooks that a Git process run against this metadata directory would honour.
     internal static void RequireNoIndirection(string metadata)
     {
-        foreach (var unsupported in new[] { "commondir", "gitdir", "shallow", "info/attributes", "info/grafts", "objects/info/alternates", "objects/info/http-alternates",
+        // ".git": for a local path X, Git's non-strict lookup enters X/.git (directory or gitdir file) before X itself.
+        foreach (var unsupported in new[] { ".git", "commondir", "gitdir", "shallow", "info/attributes", "info/grafts", "objects/info/alternates", "objects/info/http-alternates",
             "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "BISECT_LOG", "rebase-apply", "rebase-merge", "refs/replace" })
             if (File.Exists(Path.Combine(metadata, unsupported)) || Directory.Exists(Path.Combine(metadata, unsupported)))
                 throw new BridgeException("GitUnsupportedRepository", "Repository has unsupported indirection, attributes or an unfinished operation: " + unsupported);
+        var packed = Path.Combine(metadata, "packed-refs");
+        if (File.Exists(packed))
+        {
+            if (new FileInfo(packed).Length > 16 << 20) throw new BridgeException("GitLimitExceeded", "packed-refs exceeds 16 MiB.");
+            if (File.ReadLines(packed, Utf8).Any(line => line.Length > 41 && line[40] == ' ' && line[41..].StartsWith("refs/replace/", StringComparison.Ordinal)))
+                throw new BridgeException("GitUnsupportedRepository", "Repository has unsupported indirection: packed refs/replace.");
+        }
         var hooks = Path.Combine(metadata, "hooks");
         if (Directory.Exists(hooks) && Directory.EnumerateFileSystemEntries(hooks).Any(x => !x.EndsWith(".sample", StringComparison.OrdinalIgnoreCase)))
             throw new BridgeException("GitExecutableCustomizationRefused", "Repository hooks require a separate reviewed execution profile.");

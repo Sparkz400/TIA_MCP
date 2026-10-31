@@ -39,6 +39,8 @@ internal static class RemoteChecks
         Reject2("GitRemoteRefused", () => GitRemote.Parse("git@example.invalid:r.git", true));
         Reject2("GitRemoteRefused", () => GitRemote.Parse("file://server/share/r.git", false));
         Reject2("GitUnsafePath", () => GitRemote.Parse("//server/share/r.git", false));
+        Reject2("GitUnsafePath", () => GitRemote.Parse("\\??\\UNC\\server\\share\\r.git", false));
+        Reject2("GitUnsafePath", () => GitRemote.Parse("\\\\?\\" + Path.GetFullPath(bare), false));
         Reject2("GitUnsafePath", () => GitRemote.Parse("\\\\server\\share\\r.git", false));
         Reject2("GitRemoteRefused", () => GitRemote.Parse("ext::sh -c touch% /tmp/pwned", true));
         Check(GitRemote.Parse("https://example.invalid/r.git", true).Protocol == "https", "credential-free https needs the explicit network option");
@@ -134,6 +136,24 @@ internal static class RemoteChecks
         Directory.CreateDirectory(Path.GetDirectoryName(alternates)!); File.WriteAllText(alternates, Path.Combine(root, "elsewhere") + "\n");
         await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
         File.Delete(alternates);
+        // Git's non-strict lookup enters <remote>/.git before <remote>: an inner bare repository with a hook, or a gitdir file.
+        string inner = Path.Combine(bare, ".git"), elsewhere = Path.Combine(fixtureRoot, "elsewhere.git");
+        Plain(fixtureRoot, "init", "--bare", inner);
+        File.WriteAllText(Path.Combine(inner, "hooks", "pre-receive"), "#!/bin/sh\necho ran > \"" + Path.Combine(fixtureRoot, "hook-ran").Replace('\\', '/') + "\"\n");
+        await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
+        await Reject("GitUnsupportedRepository", () => store.FetchAsync("main"));
+        Directory.Delete(inner, true);
+        Plain(fixtureRoot, "init", "--bare", elsewhere);
+        File.WriteAllText(inner, "gitdir: " + elsewhere.Replace('\\', '/') + "\n");
+        await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
+        await Reject("GitUnsupportedRepository", () => store.FetchAsync("main"));
+        File.Delete(inner);
+        Check(!File.Exists(Path.Combine(fixtureRoot, "hook-ran")) && Plain(fixtureRoot, "--git-dir=" + elsewhere, "for-each-ref") == "",
+            "neither the inner repository's hook nor the gitdir target was reached");
+        string packed = Path.Combine(bare, "packed-refs"), packedOriginal = File.Exists(packed) ? File.ReadAllText(packed) : null;
+        File.AppendAllText(packed, new string('a', 40) + " refs/replace/" + new string('b', 40) + "\n");
+        await Reject("GitUnsupportedRepository", () => store.PushAsync(revL, "review/local"));
+        if (packedOriginal is null) File.Delete(packed); else File.WriteAllText(packed, packedOriginal);
         Check(Plain(fixtureRoot, "--git-dir=" + bare, "for-each-ref", "refs/heads/review/local") == "", "refused pushes never created the remote branch");
         File.WriteAllText(Path.Combine(clone, ".gitattributes"), "*.scl filter=evil\n"); Plain(clone, "add", ".gitattributes"); Plain(clone, "commit", "-m", "attributes"); Plain(clone, "push", "origin", "main");
         await Reject("GitExecutableCustomizationRefused", () => store.FetchAsync("main"));
