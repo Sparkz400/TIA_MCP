@@ -4,12 +4,20 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Openness.V21
 {
     /// <summary>Complete global FB instance envelope; never fabricates native storage layout.</summary>
     internal static class TypedGraphicalInstanceTemplate
     {
+        // Captured global or multi-instance templates of one CPU and route. A "qualificationOnly" template (a capture whose
+        // builder qualification is pending) serves only a --component-qualification worker in its own component scratch;
+        // every other typed edit skips it. Any value other than an explicit false counts as qualification-only.
+        internal static System.Collections.Generic.IEnumerable<JObject> Admitted(JObject catalog, string collection, string cpu, string route, bool qualificationScratch) =>
+            (catalog[collection] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu
+                && t.Value<string>("route") == route && (qualificationScratch || t["qualificationOnly"] == null || JToken.DeepEquals(t["qualificationOnly"], new JValue(false))));
+
         internal static XDocument Create(string name, int exactNumber, XDocument callee, XDocument template)
         {
             if (!Regex.IsMatch(name ?? "", @"^[A-Za-z_][A-Za-z0-9_]{0,79}$") || exactNumber < 1 || exactNumber > 65535)

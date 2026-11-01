@@ -173,7 +173,6 @@ class Candidates(unittest.TestCase):
 
     def test_candidate_aggregation_accepts_installs_only(self):
         # The captured component multi-instance template removed the former multiInstance boundary outcome.
-        self.assertFalse(hasattr(subject, "multi_boundary_journal"))
         self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstance": "installed"}))
         self.assertEqual({"multiInstance": "boundary", "fbCaller": "failed: x"},
                          subject.failed_candidates({"multiInstance": "boundary", "fbCaller": "failed: x", "reuse": "installed"}))

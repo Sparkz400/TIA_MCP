@@ -104,7 +104,12 @@ The boundary above is a missing profile, not a V21 refusal. Changes, offline onl
   - softwareUnit route (`TiaMcp_UnitA`): the same interface as `TgpUnit_ComponentGate` with its instance DB. Extraction
     yields `v21.fw41.softwareUnit.component-gate.global-instance.v1`.
 - `extract_typed_graphical_profiles.py` binds both to the captured component FB (`COMPONENT_TEMPLATES`) and skips
-  captured types.
+  captured types. Both are written `qualificationOnly: true` (a new field of `contracts/typed-graphical-profiles.schema.json`);
+  the shared selector `TypedGraphicalInstanceTemplate.Admitted` hands such a template only to a `--component-qualification`
+  worker in its own component scratch, so ordinary typed edits never use it. The unit template is emitted only into
+  `--stage-output` candidates under `artifacts/`; the multi-instance one is deployed. The change that adds its shape to
+  `VerifiedShapes` after the qualification run removes the flag. `TiaMcp.CapturedStorage.Tests` pins that no template
+  references the sc01 `component04-*` storage and that every component-gate template is qualification-only.
 - `qualify_library_integrate_apply.py --candidates` no longer accepts a `multiInstance` boundary.
 
 Still plan-only: a multi-instance in a caller FB that has an instance DB (no captured dependent-DB effect for a structured

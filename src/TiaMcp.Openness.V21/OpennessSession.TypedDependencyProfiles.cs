@@ -23,7 +23,7 @@ namespace TiaMcp.Openness.V21
             var catalog = JObject.Parse(File.ReadAllText(catalogPath));
             string cpu = TypedCpuIdentifier(capture.Plc);
             string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
-            var templates = (catalog["multiInstanceTemplates"] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu && t.Value<string>("route") == route);
+            var templates = TypedGraphicalInstanceTemplate.Admitted(catalog, "multiInstanceTemplates", cpu, route, TypedQualificationScratch(capture.Plc.Project));
             BridgeException last = null;
             foreach (var template in templates)
             {

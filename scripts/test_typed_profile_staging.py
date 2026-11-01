@@ -305,8 +305,8 @@ class CandidateTests(unittest.TestCase):
         self.write_report()
         result, _ = extractor.extract_catalog([self.report_path], stage_output=self.stage)
         [multi] = result["multiInstanceTemplates"]
-        self.assertEqual(("v21.fw41.component-gate.multi-instance.v1", "standard", "Gate", "native/Tgp_ComponentHost_FBD.xml", "native/TiaMcpComponentGate.xml"),
-                         (multi["id"], multi["route"], multi["memberName"], multi["path"], multi["referenceCalleePath"]))
+        self.assertEqual(("v21.fw41.component-gate.multi-instance.v1", "standard", "Gate", "native/Tgp_ComponentHost_FBD.xml", "native/TiaMcpComponentGate.xml", True),
+                         (multi["id"], multi["route"], multi["memberName"], multi["path"], multi["referenceCalleePath"], multi["qualificationOnly"]))
         self.assertEqual([], result["globalInstanceTemplates"])
         self.assertEqual({"native/TiaMcpComponentGate.xml", "native/Tgp_ComponentHost_FBD.xml"},
                          {pathlib.Path(source["path"]).relative_to("artifacts/candidates").as_posix() for source in result["sources"]})
@@ -316,10 +316,13 @@ class CandidateTests(unittest.TestCase):
         self.write_report()
         result, _ = extractor.extract_catalog([], [self.report_path], stage_output=self.root / "artifacts/unit-candidates")
         [unit] = result["globalInstanceTemplates"]
-        self.assertEqual(("v21.fw41.softwareUnit.component-gate.global-instance.v1", "InstanceDB", "native/TgpUnit_ComponentGate_DB.xml", "native/TgpUnit_ComponentGate.xml"),
-                         (unit["id"], unit["blockType"], unit["path"], unit["referenceCalleePath"]))
+        self.assertEqual(("v21.fw41.softwareUnit.component-gate.global-instance.v1", "InstanceDB", "native/TgpUnit_ComponentGate_DB.xml", "native/TgpUnit_ComponentGate.xml", True),
+                         (unit["id"], unit["blockType"], unit["path"], unit["referenceCalleePath"], unit["qualificationOnly"]))
         self.assertEqual([], result["multiInstanceTemplates"])
+        self.assertTrue(result["candidateOnly"])
         self.unchanged()
+        # Deployment extraction never emits the unit template: it has no qualification case yet.
+        self.assertEqual([], extractor.extract([self.report_path], "softwareUnit")["globalInstanceTemplates"])
 
 
 if __name__ == "__main__":

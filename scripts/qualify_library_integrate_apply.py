@@ -68,7 +68,8 @@ CANDIDATES = {
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
 # multiInstance installs through the captured component multi-instance template v21.fw41.component-gate.multi-instance.v1
-# (route-capture-component-storage-packet.v1.json); its former pre-dispatch refusal is no longer an accepted outcome.
+# (route-capture-component-storage-packet.v1.json), which is qualificationOnly: only this run's --component-qualification Host
+# selects it, in its own scratch. Its former pre-dispatch refusal is no longer an accepted outcome.
 
 
 def failed_candidates(outcomes):

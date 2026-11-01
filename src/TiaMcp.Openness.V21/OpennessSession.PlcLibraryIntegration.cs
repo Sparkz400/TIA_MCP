@@ -189,7 +189,7 @@ namespace TiaMcp.Openness.V21
                 var callee = EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)root["artifact"], root.Value<string>("contentSha256")));
                 string catalog = TypedCatalogPath();
                 return NotQualified(PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, plan["instanceDb"].Value<string>("name"),
-                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null)).Select(t => t.Value)));
+                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null), TypedQualificationScratch(change.Project)).Select(t => t.Value)));
             }
             catch (BridgeException error) { return NotQualified(error.Message); }
             catch (PlcComponentException error) { return NotQualified(error.Message); }

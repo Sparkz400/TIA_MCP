@@ -210,12 +210,31 @@ tests.Add(("Document provenance is required absent rather than normalized away",
     var altered = ArtifactOf(Mutate(fb, d => d.Root!.AddFirst(new XElement("DocumentInfo", "provenance"))));
     Reject(() => Build(profile with { ReferenceCallee = altered }, boundFb with { Document = altered }));
 }));
-// The generic builder takes a nested member only from an identical captured prototype; the sc01 storage itself stays out of
-// the ordinary typed catalog (TiaMcp.Tests checks every deployed standard-route template rejects the component FB).
+// The generic builder takes a nested member only from an identical captured prototype, so the sc01 storage stays private by
+// never entering the typed catalog, and component-gate captures stay qualification-only until their shape is verified.
 tests.Add(("Generic builder rejects this nested callee without an identical captured prototype", () => {
     var otherNesting = Mutate(db, d => d.Descendants(ns + "Member").Single(m => (string?)m.Attribute("Name") == "State")
         .Descendants(ns + "Member").Single().SetAttributeValue("Name", "Other"));
     Reject(() => TypedGraphicalInstanceTemplate.Create("NewInstance", 123, fb, otherNesting), "GraphicalInstanceTemplateUnavailable");
+}));
+tests.Add(("No typed catalog template uses the private sc01 storage; component-gate templates are qualification-only", () => {
+    DirectoryInfo? root = new(AppContext.BaseDirectory);
+    while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
+    Require(root != null, "Typed catalog not found");
+    string fixtures = Path.Combine(root!.FullName, "fixtures", "typed-graphical");
+    var privateFiles = Directory.GetFiles(Path.Combine(fixtures, "native"), "component04-*.xml");
+    var privateHashes = privateFiles.Select(f => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(f))).ToLowerInvariant()).ToHashSet();
+    Require(privateFiles.Length == 6 && privateHashes.Count == 6, "The sc01 reference set changed");
+    var catalog = JObject.Parse(File.ReadAllText(Path.Combine(fixtures, "profiles.v1.json")));
+    foreach (string collection in new[] { "creationTemplates", "globalInstanceTemplates", "multiInstanceTemplates" })
+        foreach (JObject entry in catalog[collection] as JArray ?? new JArray())
+        {
+            Require(!new[] { "path", "referenceCalleePath" }.Any(k => (entry.Value<string>(k) ?? "").Contains("component04-")) &&
+                !new[] { "sha256", "referenceCalleeSha256" }.Any(k => privateHashes.Contains(entry.Value<string>(k) ?? "")),
+                "Template " + entry.Value<string>("id") + " references the private sc01 storage");
+            Require(!(entry.Value<string>("id") ?? "").Contains("component-gate") || JToken.DeepEquals(entry["qualificationOnly"], new JValue(true)),
+                "Component-gate template " + entry.Value<string>("id") + " is not qualification-only");
+        }
 }));
 tests.Add(("Changed dependency after prepare is rejected by repeated contract evaluation", () => {
     Build();

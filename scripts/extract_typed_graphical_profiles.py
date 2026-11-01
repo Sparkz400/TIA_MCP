@@ -24,6 +24,7 @@ GLOBAL_STORAGE = {"timer": ("Tgp_GlobalTimer", "IEC_TIMER"), "counter": ("Tgp_Gl
 CROSS_SCOPE_CALLEE = "TiaMcp_UnitA.TgpUnit_NumericFC"
 # The PLC component FB's storage (route-capture-component-storage-packet.v1.json), by route-folded block name: its UDT static
 # maps only onto a reference with that identical member, so these bind the captured component FB, not Tgp_TemplateFB_<language>.
+# Both are emitted qualificationOnly; the unit instance template is emitted only into --stage-output candidates.
 COMPONENT_TEMPLATES = {"Tgp_ComponentHost_FBD": ("multi", "TiaMcpComponentGate", "Gate"),
                        "Tgp_ComponentGate_DB": ("global", "Tgp_ComponentGate", None)}
 
@@ -307,6 +308,8 @@ def extract(reports, route="standard", *, stage_output=None):
                 "referenceCalleeSha256": reference_hash})
         if block in COMPONENT_TEMPLATES:
             kind, reference_name, member = COMPONENT_TEMPLATES[block]
+            if not member and stage_output is None:
+                continue  # the unit instance template has no qualification case yet: inactive candidate staging only
             if reference_name not in observed and stage_output is not None:
                 unresolved_templates.append({"block": block, "missingReference": reference_name, "route": route})
                 continue
@@ -315,7 +318,10 @@ def extract(reports, route="standard", *, stage_output=None):
                 "id": "v21.fw41." + (route + "." if route != "standard" else "") + "component-gate." + kind + "-instance.v1",
                 "tiaVersion": "V21", "cpuFamily": cpu, "route": route, **({"memberName": member} if member else {"blockType": "InstanceDB"}),
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
-                "referenceCalleePath": reference_path.relative_to(template_root).as_posix(), "referenceCalleeSha256": reference_hash})
+                "referenceCalleePath": reference_path.relative_to(template_root).as_posix(), "referenceCalleeSha256": reference_hash,
+                # Only a --component-qualification worker in its own scratch selects it; the change that adds its shape to
+                # PlcComponentQualificationGate.VerifiedShapes after the qualification run removes this flag.
+                "qualificationOnly": True})
     return {"schemaVersion": 1, "profileVersion": "tia-v21-flgnet-v5-1",
         "nativeFormat": {"tia": "V21 Update 2", "step7ApiFileVersion": "2100.0.121.1", "networkNamespace": NET,
                          "interfaceNamespace": INTERFACE, "instructionVersions": ["1.0"],

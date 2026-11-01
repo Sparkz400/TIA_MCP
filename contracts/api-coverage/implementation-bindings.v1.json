@@ -722,8 +722,8 @@
     },
     {
       "path": "contracts/typed-graphical-profiles.schema.json",
-      "sha256": "2c856b1a50801a35b24b8d0a9076c9176b4bb16d285b2bbd58340296ee5da780",
-      "bytes": 6122
+      "sha256": "6b10b527efd0031fed43307899b255d672c5801eb45683c51c16f58b02471c7d",
+      "bytes": 6544
     },
     {
       "path": "contracts/typed-graphical-read.schema.json",
@@ -2777,8 +2777,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcComponentQualification.cs",
-      "sha256": "d8ac810b1dea5ee94ba698e1d8e8b753781a1c90a0b8a4c538c39f6b75f31bad",
-      "bytes": 6559
+      "sha256": "086b56d28d3ca390217cfaaba45f7475bdf84acd11de811a147e11010c46ab7e",
+      "bytes": 7013
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -2787,8 +2787,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
-      "sha256": "16dee2266cf69adf8eceb4f8710eae127e6a229700fb0ab6d758a2a9aecad2a3",
-      "bytes": 28163
+      "sha256": "9245350fc802d82dcb91015d0fc3e2f13a6ad00c7460633c06c6ab7993be1608",
+      "bytes": 28206
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.TypedPreview.cs",
@@ -2987,8 +2987,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedDependencyProfiles.cs",
-      "sha256": "b11e2dd2eedcc8635e3c39c8d632e51cf4ab105e2ce5e799ef737c954ba46289",
-      "bytes": 7220
+      "sha256": "ebbf9cbd9dfd4694b2f4ec2f0b7e3efa1a2d8c99bf6fa0cb94aa6c0dbd899bfc",
+      "bytes": 7148
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedGraphical.cs",
@@ -2997,8 +2997,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs",
-      "sha256": "1598cc2a0696e253bb88a2a7953b7d9649d1ac039286621c739d7185517785d4",
-      "bytes": 37926
+      "sha256": "31aff207316d2c21015f28494d4f652588e7090863055b9741c17fb05fd68884",
+      "bytes": 37903
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.VciWorkspace.cs",
@@ -3217,8 +3217,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalInstanceTemplate.cs",
-      "sha256": "1d2db70101148c0a19680590ab692a15f33ccbaccf40a330a04f96c8bb75440e",
-      "bytes": 6688
+      "sha256": "31bc5b17e09b63d55502c44d6bb835ca5ed67ddf97ceb04c1252aa425f4ead53",
+      "bytes": 7596
     },
     {
       "path": "src/TiaMcp.Openness.V21/TypedGraphicalModel.cs",

@@ -21,7 +21,8 @@
       "id": {"type": "string", "minLength": 1}, "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
       "route": {"enum": ["standard", "softwareUnit", "namespace"]}, "language": {"enum": ["LAD", "FBD"]},
       "path": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "sha256": {"$ref": "#/$defs/hash"},
-      "referenceCalleePath": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "referenceCalleeSha256": {"$ref": "#/$defs/hash"}, "memberName": {"type": "string", "minLength": 1}}},
+      "referenceCalleePath": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "referenceCalleeSha256": {"$ref": "#/$defs/hash"}, "memberName": {"type": "string", "minLength": 1},
+      "qualificationOnly": {"type": "boolean", "description": "true: only a --component-qualification worker in its own component scratch selects this template; removed in the change that verifies its shape."}}},
     "creationTemplate": {"type": "object", "additionalProperties": false, "required": ["id", "tiaVersion", "cpuFamily", "route", "language", "blockType", "path", "sha256"], "properties": {
       "id": {"type": "string", "minLength": 1}, "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
       "route": {"enum": ["standard", "softwareUnit", "namespace"]}, "language": {"enum": ["LAD", "FBD"]}, "blockType": {"enum": ["FC", "FB"]},
@@ -30,7 +31,8 @@
       "id": {"type": "string", "minLength": 1}, "tiaVersion": {"type": "string", "minLength": 1}, "cpuFamily": {"type": "string", "minLength": 1},
       "route": {"enum": ["standard", "softwareUnit", "namespace"]}, "language": {"enum": ["LAD", "FBD"]}, "blockType": {"const": "InstanceDB"},
       "path": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "sha256": {"$ref": "#/$defs/hash"},
-      "referenceCalleePath": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "referenceCalleeSha256": {"$ref": "#/$defs/hash"}}},
+      "referenceCalleePath": {"type": "string", "pattern": "^native/[^/\\\\:]+\\.xml$"}, "referenceCalleeSha256": {"$ref": "#/$defs/hash"},
+      "qualificationOnly": {"type": "boolean", "description": "true: only a --component-qualification worker in its own component scratch selects this template; removed in the change that verifies its shape."}}},
     "profile": {
       "type": "object", "additionalProperties": false,
       "required": ["id", "version", "language", "kind", "tiaVersion", "cpuFamily", "route", "nativeName", "nativeTemplateXml", "sourceSha256", "provenance", "nativeFormatValidated", "engineeringVerified", "preservationVerified", "persistenceVerified", "recoveryVerified", "runtimeVerified", "pins"],

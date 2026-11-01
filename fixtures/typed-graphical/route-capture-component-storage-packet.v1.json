@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "status": "authored-not-executed",
-  "purpose": "Native storage references for the PLC component FB TiaMcpComponentGate, whose UDT static TiaMcpComponentState no scalar typed profile covers: (1) standard route: the FB declared as the multi-instance Gate in an FBD FB, the source of the typed multi-instance template v21.fw41.component-gate.multi-instance.v1 that the component's multiInstance shape needs; (2) softwareUnit route: the same interface in TiaMcp_UnitA with its global instance DB, the source of v21.fw41.softwareUnit.component-gate.global-instance.v1. Each capture runs separately (the runner takes one --unit). Unobserved until captured; nothing here enables a profile or a component shape.",
+  "purpose": "Native storage references for the PLC component FB TiaMcpComponentGate, whose UDT static TiaMcpComponentState no scalar typed profile covers: (1) standard route: the FB declared as the multi-instance Gate in an FBD FB, the source of the typed multi-instance template v21.fw41.component-gate.multi-instance.v1 that the component's multiInstance shape needs, deployed with qualificationOnly: true so that only a --component-qualification worker in its own component scratch selects it until the change that verifies the shape removes the flag; (2) softwareUnit route: the same interface in TiaMcp_UnitA with its global instance DB, the source of v21.fw41.softwareUnit.component-gate.global-instance.v1, staged only as an inactive candidate under artifacts/ until a unit qualification case exists. Each capture runs separately (the runner takes one --unit). Unobserved until captured; nothing here enables a profile or a component shape.",
   "nativeReferenceQualification": false,
   "typedBuilderQualification": false,
   "runtimeQualification": false,
@@ -66,10 +66,11 @@
     }
   ],
   "afterCapture": [
-    "python -B scripts/extract_typed_graphical_profiles.py artifacts/csm/capture.json --route-reports artifacts/csu/capture.json --append"
+    "python -B scripts/extract_typed_graphical_profiles.py artifacts/csm/capture.json --append",
+    "python -B scripts/extract_typed_graphical_profiles.py --route-reports artifacts/csu/capture.json --stage-output artifacts/csus"
   ],
   "expectedTemplates": {
-    "multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"],
-    "globalInstanceTemplates": ["v21.fw41.softwareUnit.component-gate.global-instance.v1"]
+    "deployedQualificationOnly": {"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]},
+    "stagedCandidateOnly": {"globalInstanceTemplates": ["v21.fw41.softwareUnit.component-gate.global-instance.v1"]}
   }
 }

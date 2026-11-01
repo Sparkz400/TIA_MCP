@@ -182,7 +182,7 @@ namespace TiaMcp.Openness.V21
             if (catalogPath == null) throw new BridgeException("InstanceCreationProfileUnavailable", "No deployed native instance creation catalog exists.");
             string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
             BridgeException last = null;
-            foreach (var template in GlobalInstanceTemplates(catalogPath, TypedCpuIdentifier(capture.Plc), route))
+            foreach (var template in GlobalInstanceTemplates(catalogPath, TypedCpuIdentifier(capture.Plc), route, TypedQualificationScratch(capture.Plc.Project)))
             {
                 try
                 {
@@ -196,10 +196,10 @@ namespace TiaMcp.Openness.V21
         }
 
         // Hash-checked global instance templates for one CPU and route, keyed by path; combined apply's pre-claim check reads the same ones.
-        private static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, XDocument>> GlobalInstanceTemplates(string catalogPath, string cpu, string route)
+        private static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, XDocument>> GlobalInstanceTemplates(string catalogPath, string cpu, string route, bool qualificationScratch)
         {
             var catalog = JObject.Parse(File.ReadAllText(catalogPath));
-            foreach (var template in (catalog["globalInstanceTemplates"] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu && t.Value<string>("route") == route).ToArray())
+            foreach (var template in TypedGraphicalInstanceTemplate.Admitted(catalog, "globalInstanceTemplates", cpu, route, qualificationScratch).ToArray())
             {
                 string path = TypedResourcePath(catalogPath, template.Value<string>("path"));
                 if (!File.Exists(path) || ChangeFileHash(path) != template.Value<string>("sha256")) throw new BridgeException("ProfileCatalogInvalid", "Captured native global instance template source hash does not match.");

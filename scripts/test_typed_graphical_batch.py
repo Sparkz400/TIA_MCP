@@ -699,7 +699,11 @@ class RouteCapturePacketTests(unittest.TestCase):
         host = (root / "fixtures/typed-graphical/sources/component-host-fbd.s7dcl").read_text(encoding="utf-8")
         self.assertIn('Gate : "TiaMcpComponentGate";', host)
         self.assertIn('State : "TiaMcp_UnitA.TiaMcpComponentState";', (root / "fixtures/typed-graphical/sources/route-Unit-component-gate.scl").read_text(encoding="utf-8"))
-        self.assertEqual(["v21.fw41.component-gate.multi-instance.v1"], packet["expectedTemplates"]["multiInstanceTemplates"])
+        expected = packet["expectedTemplates"]
+        self.assertEqual({"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]}, expected["deployedQualificationOnly"])
+        self.assertEqual({"globalInstanceTemplates": ["v21.fw41.softwareUnit.component-gate.global-instance.v1"]}, expected["stagedCandidateOnly"])
+        # The unit capture is only ever staged under artifacts/, never appended to the deployed catalog.
+        self.assertTrue(all("--stage-output" in step for step in packet["afterCapture"] if "csu" in step))
 
     def test_type_sources_import_as_types_and_add_only_in_their_scope(self):
         with tempfile.TemporaryDirectory() as directory:
