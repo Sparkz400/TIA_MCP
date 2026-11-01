@@ -163,6 +163,7 @@ internal static partial class Program
             ("Simulator storage retrieve accepts only an unchanged own archive", SimulationRuntimeControlTests.ArchiveRetrieveNeedsOwnUnchangedArchive),
             ("Simulator I/Q/M area access is bounded before any runtime call", SimulationRuntimeControlTests.AreaAccessIsBoundedBeforeTheRuntimeCall),
             ("Simulator signal batches carry primitive values with distinct written symbols", SimulationRuntimeControlTests.SignalBatchesCarryPrimitiveValues),
+            ("Simulator observation event times are explicit UTC", SimulationRuntimeControlTests.EventTimesAreUtc),
             ("Simulator state changes, writes, scenario writes, time, event, storage, batch and area writes require an owned instance", SimulationRuntimeControlTests.WritesRequireAnOwnedInstance),
             ("OPC UA server settings map pinned native attributes and payload forms", OpcUaServerSettingsTests.PinnedFieldsAndPayloadForms),
             ("OPC UA server settings refuse bad values and stale expectations", OpcUaServerSettingsTests.RefusesBadValuesAndStaleExpectations),
