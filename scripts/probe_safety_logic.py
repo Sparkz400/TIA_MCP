@@ -104,6 +104,23 @@ class Lab:
         return {n: (r["value"] if r.get("quality") == "good" else {"quality": r.get("quality")}) for n, r in zip(names, rows)}
 
 
+def online_route(h, lab, ticket):
+    """The online route (change.simulation_download_online) to the same owned instance, as the bounded follow-up when the
+    memory card was refused. It answers only its reviewed download configurations: V21's SafetyProgram configuration ('Load
+    safety program to device') is a safety confirmation and refuses as UnsupportedDownloadConfiguration; nothing is answered
+    beyond that. Returns the prepare or apply refusal, or the applied report."""
+    payload = {"downloadTicket": ticket["downloadTicket"], "credentialMetadataPath": ticket["credentialMetadataPath"],
+               "softwareScope": "all", "dataBlockValues": "reinitialize", "allowStop": True}
+    error, prepared = outcome(h, "change_prepare", {"kind": "simulation_download_online", "plcPath": lab.plc, "payload": payload})
+    if error:
+        return {"stage": "prepare", "error": error}
+    error, applied = outcome(h, "change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
+    readbacks = (applied or {}).get("readbacks") or ((error or {}).get("details") or {}).get("readbacks") or []
+    report = next((r["report"] for r in readbacks if r.get("role") == "owned-simulation-download"), {})
+    return {"stage": "apply", "error": error, "downloadConfigurations": report.get("downloadConfigurations"),
+            "onlineChallenges": report.get("onlineChallenges"), "failure": report.get("failure"), "completed": report.get("completed")}
+
+
 def boundary(h, stage, error):
     h.report["boundary"] = {"stage": stage, "error": error}
     h.report["outcome"] = "boundary"
@@ -177,7 +194,9 @@ def simulate(h, lab, credential, start):
         ticket = {"downloadTicket": created["downloadTicket"], "plcPath": lab.plc, "credentialMetadataPath": credential["credentialMetadataPath"]}
         error, download = outcome(h, "simulation_download", ticket)
         if error:
-            return boundary(h, "simulation_download", error)
+            boundary(h, "simulation_download", error)
+            h.report["onlineRoute"] = h.stage("simulation_download_online after the refused memory card", lambda: online_route(h, lab, ticket))
+            return
         verify_download(download, lab.instance)
         h.report["download"] = {k: download.get(k) for k in ("configurations", "compilation", "download", "programRevision")}
         h.report["generatedProjectSave"] = save_generated_scratch_project(h.tool, download)

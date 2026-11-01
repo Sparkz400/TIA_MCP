@@ -3632,6 +3632,23 @@
         "Runs used the signals runner, not the runtime batch that failed on 23 October; one PC and one PLCSIM Runtime Manager state; no physical PLC.",
         "Run p1 refused at discovery before any card move (Runtime Manager placeholder, no baseline) and is not counted."
       ]
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "422875126abfb81069e0ca31cf1a78d92f2cbc33",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of 42287512 (artifacts/w2bs6, git archive), 26/26 steps, PLCSIM Advanced V8 on Softbus, same fixture as local.safety.logic_plcsim_boundary.20261101: a two-PLC owned scratch (standard CPU 1511-1 PN and CPU 1511F-1 PN with an ET 200SP F-DI), project_simulation_enable compiling all three devices, the changed Main_Safety_RTG1 imported, compiled with the safety program (zero errors) and saved, an owned CPU1511F PLCSIM instance. The offline memory card was refused again by V21 ('Load safety program to device'). The bounded follow-up, change_prepare simulation_download_online to the same owned instance (softwareScope all, reinitialize, allowStop), refused with SimulationTargetMismatch: the online route downloads only to an instance whose generated memory card came from this PLC, so for an F-CPU it cannot start. No safety prompt was answered; the owned instance was released (unregistered)."
+      },
+      "artifacts": [
+        "evidence/local.safety.logic_online_route.20261101.json"
+      ],
+      "limitations": [
+        "The repo's online PLCSIM route is gated by a successful memory card, which V21 refuses for an F-CPU, so V21's online download of a safety program (its SafetyProgram download configuration 'Load safety program to device', selection ConsistentDownload) was not reached; the policy would refuse that safety confirmation anyway.",
+        "No safety acceptance, login, password or confirmation; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
     }
   ],
   "features": [
@@ -8425,15 +8442,16 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "unavailable",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "The public V21 Openness API has no member that moves a PLC block, type, tag table or group: the only move members are HW.HardwareObject.PlugMove and CanPlugMove (device items into another slot); PlcBlock.Parent and PlcBlockUserGroup.Parent are get-only, and every cross-group route (master copy, library type, SimaticML import, external source, documents) creates a new object (docs/verification/block-move-feasibility-20261031.md, offline metadata check of 31 October 2026)."
         ]
       },
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "No bridge operation is exposed. Recreation through block_read and the source_upsert change is a copy: it keeps neither instance DB links, cross-references nor creation data, so it is not offered as a move. Users move blocks in the TIA Portal editor. Closed as unavailable_target by maintainer disposition (31 October 2026, docs/plans/release-obligations-20261015.json).",
+          "Remaining confirmation (non-mutating, not run): target_capabilities on a block, type, tag table and software unit of an owned scratch must list no invocation named Move, Relocate, Reparent, Transfer, Cut or Paste (docs/verification/block-move-feasibility-20261031.md#remaining-check); a match reopens the row for the identity probe the record describes."
         ]
       },
       "qualification": {
@@ -8443,7 +8461,7 @@
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "No implemented adapter."
+          "V21 has no public move for PLC software objects (docs/verification/block-move-feasibility-20261031.md)."
         ]
       },
       "prerequisites": [
@@ -8845,28 +8863,29 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 DownloadProvider (offline Download(DirectoryInfo, ...) and online Download(IConfiguration, ...)) and the SafetyProgram download configuration (Siemens.Engineering.Safety.Download.Configurations.SafetyProgram, selection ConsistentDownload) exist; the offline route refuses an F-CPU and the confirmation is outside the policy."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
-          "Boundary of the memory-card route for F-CPUs (docs/verification/safety-logic-plcsim-20261101.md); the online PLCSIM download route (change.simulation_download_online) is untested for an F-CPU."
+          "No product operation beyond change.safety_import_xml. The partial status covers only that changed-logic import (change.safety_import_xml); no route compiles, loads and runs it on a PLCSIM F-CPU. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
+          "No route loads a safety program into PLCSIM within the project's policy (docs/verification/safety-logic-plcsim-20261101.md): the online route (change.simulation_download_online) needs the owned instance's generated memory card and refused with SimulationTargetMismatch (local.safety.logic_online_route.20261101); behind that gate V21's SafetyProgram download configuration ('Load safety program to device', ConsistentDownload) would be raised next (per its API metadata; not reached natively) and is outside the project's policy, and the worker does not answer it. Closed as unavailable_target by maintainer disposition (1 November 2026, docs/plans/release-obligations-20261015.json)."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.safety.logic_plcsim_boundary.20261101"
+          "local.safety.logic_plcsim_boundary.20261101",
+          "local.safety.logic_online_route.20261101"
         ]
       },
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101); no other route is implemented."
+          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101), and the online route refuses at prepare without a successful card from this PLC (local.safety.logic_online_route.20261101); behind that gate V21's SafetyProgram download configuration ('Load safety program to device', ConsistentDownload) would be raised next (per its API metadata; not reached natively) and is outside the project's policy."
         ]
       },
       "prerequisites": [
@@ -20673,7 +20692,7 @@
           "Native outcomes: a code change downloads in RUN keeping actual values (TIA asks only ConsistentBlocksDownload); a layout change answers DataBlockReinitializationOrKeepActualValues with KeepActualValues or, with reinitialize and allowStop, StopPlcAndReinitialize and returns to RUN; plc_online_compare reports FolderContentsIdentical. change_restore recovers only the project into a new directory: the CPU keeps the downloaded program, and the recovered copy refuses further online downloads with SimulationTargetMismatch.",
           "After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Softbus only, like plc_online_compare.",
           "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
-          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
+          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC, or an instance whose card was refused, failed or never generated, refuses with SimulationTargetMismatch.",
           "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
           "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
         ]

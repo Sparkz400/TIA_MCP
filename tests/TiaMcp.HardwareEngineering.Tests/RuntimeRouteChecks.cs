@@ -73,6 +73,10 @@ internal static class RuntimeRouteChecks
             && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "keepActualValues" })) == "ArgumentException"
             && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "hardware", ["dataBlockValues"] = "keepActualValues", ["allowStop"] = false })) == "ArgumentException"
             && Code(() => SimulationOnlineDownloadRules.Options(new JObject { ["softwareScope"] = "all", ["dataBlockValues"] = "reinitialize", ["allowStop"] = false })) == "ArgumentException");
+        Pass("online download target needs a successful card from this PLC", SimulationOnlineDownloadRules.TargetRefusal(true, true, true) == null
+            && SimulationOnlineDownloadRules.TargetRefusal(false, false, false).Contains("no successful generated memory card")
+            && SimulationOnlineDownloadRules.TargetRefusal(true, false, true).Contains("another project or PLC")
+            && SimulationOnlineDownloadRules.TargetRefusal(true, true, false).Contains("another project or PLC"));
         string Select(string type, bool pre, JObject options, bool running, out string refusal) => SimulationOnlineDownloadRules.Selection(type, pre, SimulationOnlineDownloadRules.Options(options), running, out refusal);
         Pass("consistent blocks and alarm texts download consistently", Select("ConsistentBlocksDownload", true, keep, true, out _) == "ConsistentDownload" && Select("AlarmTextLibrariesDownload", true, keep, true, out _) == "ConsistentDownload");
         Pass("online user management is kept", Select("UserManagementDownload", true, reinitialize, true, out _) == "KeepOnlineUserManagementData");

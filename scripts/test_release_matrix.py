@@ -6,9 +6,9 @@ import json
 from release_matrix import LEDGER, MATRIX, ROOT, build, disposition_errors, owners, release_gate_errors, render, support
 
 
-def feature(implementation="implemented", qualification="verified", availability="conditional"):
+def feature(implementation="implemented", qualification="verified", availability="conditional", api="available"):
     return {"implementation": {"status": implementation}, "qualification": {"status": qualification},
-            "availability": {"status": availability}}
+            "availability": {"status": availability}, "api": {"status": api}}
 
 
 class ReleaseMatrixTests(unittest.TestCase):
@@ -23,6 +23,8 @@ class ReleaseMatrixTests(unittest.TestCase):
         self.assertEqual(support(feature(qualification="failed")), "unqualified")
         self.assertEqual(support(feature(availability="blocked")), "unavailable_target")
         self.assertEqual(support(feature("not_implemented", "unverified")), "deferred")
+        self.assertEqual(support(feature("not_implemented", "unverified", "unsupported")), "deferred")
+        self.assertEqual(support(feature("not_implemented", "unverified", "unsupported", "unavailable")), "unavailable_target")
 
     def test_owner_comes_from_ledger_then_longest_prefix(self):
         self.assertEqual(owners("block_read", {"block_read": ["X11"]}), ["X11"])

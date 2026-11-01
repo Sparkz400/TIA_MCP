@@ -4,9 +4,9 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.88",
-    "catalogSha256": "9729198364cd6dd0847b1c7aea6758cb3078efb173da401eed2d70ccd21f4187",
+    "catalogSha256": "611628275ae16d29d71f6fe430ba7a5cea5c9e40d7b9abc8c19214e1774e609e",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
+    "ledgerSha256": "d70c4096a59f2a65df1b618b39acd8e65a6d9d9cb58ac91ab3ec5d767f54c127"
   },
   "targetTiaVersions": [
     21
@@ -14,16 +14,16 @@
   "summary": {
     "features": 479,
     "support": {
-      "deferred": 4,
+      "deferred": 2,
       "limited": 322,
       "shipped": 129,
-      "unavailable_target": 5,
+      "unavailable_target": 7,
       "unqualified": 19
     },
     "cells": {
-      "blocked": 31,
+      "blocked": 37,
       "bound": 2055,
-      "deferred": 12,
+      "deferred": 6,
       "open": 108
     },
     "openCellsByOwner": {
@@ -5024,7 +5024,7 @@
       "domain": "language",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "unavailable_target",
       "owners": [
         "D07",
         "X11"
@@ -5433,12 +5433,13 @@
       "domain": "safety",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "unavailable_target",
       "owners": [
         "D14"
       ],
       "evidenceIds": [
-        "local.safety.logic_plcsim_boundary.20261101"
+        "local.safety.logic_plcsim_boundary.20261101",
+        "local.safety.logic_online_route.20261101"
       ],
       "cells": [
         {
@@ -27416,6 +27417,21 @@
         {
           "path": "evidence/local.safety.fparameter_discovery.20261031.json",
           "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "422875126abfb81069e0ca31cf1a78d92f2cbc33",
+      "retained": [
+        {
+          "path": "evidence/local.safety.logic_online_route.20261101.json",
+          "sha256": "607c356b5f4a5250b7559b8dbf27ac60e1780ffe28f90dc15f3de772b4e2e528"
         }
       ],
       "notRetained": []

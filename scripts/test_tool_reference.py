@@ -6,7 +6,7 @@ from tool_reference import PAGE, ROOT, build, group_of, group_rules, named_flags
 
 def feature(feature_id, tools, domain="session", prerequisites=()):
     return {"featureId": feature_id, "domain": domain, "title": feature_id, "mcpTools": tools,
-            "prerequisites": list(prerequisites), "api": {}, "implementation": {"status": "implemented"},
+            "prerequisites": list(prerequisites), "api": {"status": "available"}, "implementation": {"status": "implemented"},
             "qualification": {"status": "verified"}, "availability": {"status": "conditional"}}
 
 

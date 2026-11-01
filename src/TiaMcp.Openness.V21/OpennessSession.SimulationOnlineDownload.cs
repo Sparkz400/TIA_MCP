@@ -91,10 +91,12 @@ namespace TiaMcp.Openness.V21
         // The owned instance's generated card came from exactly this project and PLC; another PLC is never downloaded to it.
         private static void RequireOwnedSimulationProgramTarget(JObject marker, PlcSelection plc)
         {
-            var downloaded = ReadSimulationCredentialJson(Path.Combine(marker.Value<string>("storagePath"), "simulation-download.json"), 16 * 1024 * 1024);
-            if (!SimulationDownloadEvidenceRules.IsSuccessfulForInstance(downloaded, marker) || downloaded.Value<string>("plcPath") != plc.Path ||
-                !SameSimulationPath(downloaded["project"]?.Value<string>("path"), ProjectInfo(plc.Project).Value<string>("path")))
-                throw new BridgeException("SimulationTargetMismatch", "The owned instance's generated memory card came from another project or PLC; only that PLC is downloaded to it online.");
+            string reportPath = Path.Combine(marker.Value<string>("storagePath"), "simulation-download.json");
+            // No report means no card was ever generated; a refused card leaves an unsuccessful one (an F-CPU, sl7).
+            var downloaded = File.Exists(reportPath) ? ReadSimulationCredentialJson(reportPath, 16 * 1024 * 1024) : null;
+            string refusal = SimulationOnlineDownloadRules.TargetRefusal(downloaded != null && SimulationDownloadEvidenceRules.IsSuccessfulForInstance(downloaded, marker),
+                downloaded?.Value<string>("plcPath") == plc.Path, SameSimulationPath(downloaded?["project"]?.Value<string>("path"), ProjectInfo(plc.Project).Value<string>("path")));
+            if (refusal != null) throw new BridgeException("SimulationTargetMismatch", refusal);
         }
 
         private BridgeException OwnedSimulationDownload(JObject marker, PlcSelection plc, DeviceItem hardware, string observerDirectory, JObject report, JObject options,

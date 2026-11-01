@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "9729198364cd6dd0847b1c7aea6758cb3078efb173da401eed2d70ccd21f4187",
-      "bytes": 1550726
+      "sha256": "611628275ae16d29d71f6fe430ba7a5cea5c9e40d7b9abc8c19214e1774e609e",
+      "bytes": 1555005
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2892,8 +2892,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationOnlineDownload.cs",
-      "sha256": "a102d386acbb26ea5f1b80c5127061cf5f060206525ce9427a8c2f946dd89bb2",
-      "bytes": 18090
+      "sha256": "bc3cd841893f98febf8ae37340b93a24d8e9f7381f65fe9a4487836158fa44cb",
+      "bytes": 18265
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
@@ -3152,8 +3152,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationOnlineDownloadRules.cs",
-      "sha256": "d7f56f26cad33aea696d46a22708734b6c9d554ac7a33c63040963d186a04891",
-      "bytes": 3376
+      "sha256": "efbe65212c5afe0e44e064d4f8cfc6ade28317573373d29afbb4b591ab4587c5",
+      "bytes": 4134
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationOnlineLogin.cs",
@@ -121168,6 +121168,13 @@
           "artifacts": [
             "evidence/local.safety.logic_plcsim_boundary.20261101.json"
           ]
+        },
+        {
+          "id": "local.safety.logic_online_route.20261101",
+          "profileSha256": "699f3b5b50996227438a4e2f0d85f66e9b345d25e25158f10805a37b0e204757",
+          "artifacts": [
+            "evidence/local.safety.logic_online_route.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -127895,6 +127902,11 @@
       "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
     },
     {
+      "path": "evidence/local.safety.logic_online_route.20261101.json",
+      "state": "observed",
+      "sha256": "607c356b5f4a5250b7559b8dbf27ac60e1780ffe28f90dc15f3de772b4e2e528"
+    },
+    {
       "path": "evidence/local.safety.logic_plcsim_boundary.20261101.json",
       "state": "observed",
       "sha256": "159d5f0d948c435aa454b094a30caeae8a57de72c19cebc9fa3c5f64f50d47e0"
@@ -128726,6 +128738,10 @@
     {
       "id": "local.safety.fparameter_discovery.20261031",
       "profileSha256": "56236e8bd2d02db2ef7b4f260d2f3ae179016775a3bb8e054e6af16e29123e01"
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "profileSha256": "699f3b5b50996227438a4e2f0d85f66e9b345d25e25158f10805a37b0e204757"
     },
     {
       "id": "local.safety.logic_plcsim_boundary.20261101",
