@@ -50,7 +50,8 @@ def network(uid, source, target):
     if source == "TRUE":
         access = '<Access Scope="LiteralConstant" UId="%d"><Constant><ConstantType>Bool</ConstantType><ConstantValue>TRUE</ConstantValue></Constant></Access>' % uid
     elif type(source) is int:
-        access = '<Access Scope="GlobalVariable" UId="%d"><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (uid, source)
+        # V21 accepts an absolute operand only under Scope="Address" (sl4: "The element Address has an invalid scope GlobalVariable").
+        access = '<Access Scope="Address" UId="%d"><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (uid, source)
     else:
         access = '<Access Scope="GlobalVariable" UId="%d"><Symbol><Component Name="%s" /></Symbol></Access>' % (uid, source)
     return ('<NetworkSource><FlgNet xmlns="%s"><Parts>%s<Access Scope="GlobalVariable" UId="%d"><Symbol><Component Name="%s" /></Symbol></Access>'

@@ -47,6 +47,7 @@ class ChangedLogicTests(unittest.TestCase):
         self.assertEqual([["SafeOut"], ["SafeAlive"]], symbols)
         address = networks[0].find(".//" + FLG + "Address")
         self.assertEqual({"Area": "Input", "Type": "Bool", "BitOffset": "16"}, address.attrib)
+        self.assertEqual(["Address", "GlobalVariable"], [a.get("Scope") for a in networks[0].iter(FLG + "Access")])
         self.assertEqual("TRUE", networks[1].find(".//" + FLG + "ConstantValue").text)
         for net in networks:
             self.assertEqual(["Coil"], [part.get("Name") for part in net.iter(FLG + "Part")])
