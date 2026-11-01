@@ -137,7 +137,7 @@ namespace TiaMcp.Openness.V21
                 CaptureHmiArtifact(directory, target.Path + "/screenGlobalElements", artifacts, f => hmi.ScreenGlobalElements.Export(f, ExportOptions.WithDefaults));
             if (hmi.ScreenOverview != null)
                 CaptureHmiArtifact(directory, target.Path + "/screenOverview", artifacts, f => hmi.ScreenOverview.Export(f, ExportOptions.WithDefaults));
-            missing.Add("All exposed Classic screen/template/popup/slide-in/global/overview, tag-table, connection, cycle, script and text/graphic-list exports are captured. The installed HmiTarget has no public alarm composition; embedded/resource dependency closure and export stability still need exact-profile native qualification.");
+            missing.Add(HmiPreservationRules.ClassicExportNote);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]

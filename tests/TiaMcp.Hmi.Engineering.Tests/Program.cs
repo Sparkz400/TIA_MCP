@@ -390,5 +390,6 @@ Check("Classic XML import accepts one exact exported object and refuses other sh
     Assert(HmiEngineeringRules.Gate("unified", "unified-comfort", "classic_xml_import").Value<string>("bridgeImplementation") == "unavailable");
 });
 TextListImportTests.Run(Check);
+GateAdmissionTests.Run(Check);
 Console.WriteLine($"{passed} passed; {failed} failed. These are pure guard/preservation tests, not native qualification.");
 return failed == 0 ? 0 : 1;

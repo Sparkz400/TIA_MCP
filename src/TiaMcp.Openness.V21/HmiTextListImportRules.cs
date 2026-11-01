@@ -79,15 +79,7 @@ namespace TiaMcp.Model
         /// <summary>The Unified capture always records its two standing notes (tag-table export stability; no Screen.Export), so it is
         /// never "complete". This kind accepts exactly those notes and nothing else: no typed read error, no native capture failure,
         /// no Classic gap, no other note. Its content hash is then the observed-artifacts hash.</summary>
-        internal static bool ScopeAccepted(JObject manifest)
-        {
-            if (manifest == null || manifest["nativeFailure"]?.Type is JTokenType type && type != JTokenType.Null || manifest.Value<string>("family") != "unified") return false;
-            var notes = manifest["missingCoverage"] as JArray; var targets = manifest["targets"] as JArray;
-            string observed = manifest.Value<string>("observedArtifactsHash");
-            return notes != null && targets != null && targets.Count > 0 && targets.All(t => t.Value<string>("family") == "unified")
-                && notes.All(n => n.Type == JTokenType.String && ((string)n == HmiPreservationRules.UnifiedTagTableExportNote || (string)n == HmiPreservationRules.UnifiedTypedReadbackNote))
-                && observed != null && observed.Length == 64 && observed.All(Uri.IsHexDigit);
-        }
+        internal static bool ScopeAccepted(JObject manifest) => HmiEngineeringRules.ScopeAccepted("hmi_text_list_import", manifest);
 
         /// <summary>The text-list export skips lists with formatted text (Siemens), so every typed text-list node of the target must
         /// be a list the export holds; otherwise an unexported peer could change unseen.</summary>
