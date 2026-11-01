@@ -816,6 +816,31 @@ internal static class TypedGraphicalTests
         await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalMultiInstanceTemplate.Create("Gate2", "\"TiaMcpComponentGate\"", callee, scalar, child), structured);
     }
 
+    // A caller FB's own instance DB gains the component multi-instance through its captured pair (instance-effects-component.v1.json):
+    // the deployed multi-instance template's declaration maps exactly onto the captured DB member; the generic scalar pair refuses it.
+    internal static async Task ComponentDependentDbFollowsItsCapturedEffect()
+    {
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
+        if (root == null) throw new InvalidOperationException("Missing typed native template corpus.");
+        string typed = Path.Combine(root.FullName, "fixtures", "typed-graphical");
+        XDocument Read(string relative) => EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(typed, relative)));
+        XElement Static(XDocument document, string name) => document.Root!.Elements().Single(e => e.Name.LocalName.StartsWith("SW.Blocks.", StringComparison.Ordinal))
+            .Element("AttributeList")!.Element("Interface")!.Elements().Single().Elements().Single(s => s.Attribute("Name")?.Value == "Static")
+            .Elements().Single(m => m.Attribute("Name")?.Value == name);
+        var manifest = JObject.Parse(File.ReadAllText(Path.Combine(typed, "instance-effects-component.v1.json")));
+        Check.Equal(true, manifest.Value<bool>("qualificationOnly"));
+        string Artifact(string kind) => manifest["artifacts"]![kind]!.Value<string>("path")!.Substring("fixtures/typed-graphical/".Length);
+        var callee = Read("native/TiaMcpComponentGate.xml");
+        var declaration = TypedGraphicalMultiInstanceTemplate.Create("Gate", "\"TiaMcpComponentGate\"", callee, callee, Static(Read("native/Tgp_ComponentHost_FBD.xml"), "Gate"));
+        var member = TypedGraphicalMultiInstanceTemplate.DependentMember(declaration, Static(Read(Artifact("afterCaller")), "Gate"), Static(Read(Artifact("afterInstance")), "Gate"));
+        EngineeringSources.RequireNativePreservation(new XDocument(new XElement("Document", Static(Read(Artifact("afterInstance")), "Gate"))), new XDocument(new XElement("Document", member)));
+        var generic = JObject.Parse(File.ReadAllText(Path.Combine(typed, "instance-effects.v1.json")))["artifacts"]!;
+        string Generic(string kind) => generic[kind]!.Value<string>("path")!.Substring("fixtures/typed-graphical/".Length);
+        await Error("DependencyProfileUnavailable", () => TypedGraphicalMultiInstanceTemplate.DependentMember(declaration,
+            Static(Read(Generic("afterCaller")), "Child"), Static(Read(Generic("afterInstance")), "Child")));
+    }
+
     // A qualificationOnly template (route-capture-component-storage-packet.v1.json, before its shape is verified) is skipped by
     // every ordinary typed edit; only a --component-qualification worker in its own component scratch selects it.
     internal static Task QualificationOnlyTemplatesServeOnlyTheComponentScratch()

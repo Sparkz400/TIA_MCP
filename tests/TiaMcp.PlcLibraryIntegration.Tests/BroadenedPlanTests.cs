@@ -130,6 +130,20 @@ internal static class BroadenedPlanTests
             Equal("DependencyProfileUnavailable", refused.Value<string>("code"));
             Equal("/plc/blocks/Cycle,/plc/blocks/Main_DB", string.Join(",", refused["dependents"].Select(d => (string)d)));
             Equal(true, refused.Value<string>("message").Contains("/plc/blocks/Main_DB") && refused.Value<string>("message").Contains(plan["caller"].Value<string>("blockPath")));
+            // The caller's direct instance DBs have the captured component effect; every other dependent stays refused.
+            Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB" }, new[] { "/plc/blocks/Main_DB" }));
+            Equal("/plc/blocks/Cycle", string.Join(",", PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB", "/plc/blocks/Cycle" },
+                new[] { "/plc/blocks/Main_DB" })["dependents"].Select(d => (string)d)));
+        });
+        test("a multi-instance caller with its own instance DB is its own candidate combination", () => {
+            var f = ReusedMulti();
+            var features = PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, null, true);
+            Equal("dependentInstanceDb+fbCaller+multiInstance+reusedComponent", PlcComponentQualificationGate.ShapeKey(features));
+            Equal(0, PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, new[] { "dependentInstanceDb+fbCaller+multiInstance+reusedComponent" }, true).Count);
+            Equal(true, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, false, true) != null);
+            Equal(null, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, true, true));
+            // Only a multi-instance changes the caller's interface, so a global-DB plan never names the feature.
+            Equal("", string.Join(",", PlcComponentQualificationGate.UnverifiedFeatures(ReusedRoot().Build(), ReusedRoot().Payload, ReusedRoot().Caller, null, true).Properties().Select(p => p.Name)));
         });
         test("the reused-FB multi-instance is exactly the verified combination", () => Equal("fbCaller+multiInstance+reusedComponent",
             PlcComponentQualificationGate.ShapeKey(PlcComponentQualificationGate.UnverifiedFeatures(ReusedMulti().Build(), ReusedMulti().Payload, ReusedMulti().Caller, new string[0]))));

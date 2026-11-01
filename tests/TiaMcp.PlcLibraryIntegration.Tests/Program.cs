@@ -149,8 +149,8 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
     // The target checks (languages, instance profile) are part of that pre-claim refusal, so a refused plan imports and saves nothing.
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     int shape = integration.IndexOf("private JObject PlcCombinedApplyRefusal(LibraryChange change)", StringComparison.Ordinal);
-    int target = integration.IndexOf("PlcCombinedApplyTargetRefusal(change);", shape, StringComparison.Ordinal);
-    int end = integration.IndexOf("private JObject PlcCombinedApplyTargetRefusal(LibraryChange change)", shape, StringComparison.Ordinal);
+    int target = integration.IndexOf("PlcCombinedApplyTargetRefusal(change, dependents, directInstanceDbs);", shape, StringComparison.Ordinal);
+    int end = integration.IndexOf("private JObject PlcCombinedApplyTargetRefusal(LibraryChange change, string[] dependents, string[] directInstanceDbs)", shape, StringComparison.Ordinal);
     if (shape < 0 || target < shape || end < target) throw new Exception("The pre-claim refusal must include the target checks.");
     // The block-number and archive-path checks are pre-claim target checks too, and apply throws each refusal's own code.
     if (source.IndexOf("throw new BridgeException(refusal.Value<string>(\"code\")", apply, StringComparison.Ordinal) < 0) throw new Exception("Apply must throw the refusal's own code.");
@@ -174,8 +174,9 @@ Test("combined-apply refusals precede the admission record, a stale preview stil
         throw new Exception("The combined-apply refusal must follow the scope's own offline, PreviewStale and source checks and run at mutation_begin only.");
     if (admission.Split(new[] { "PlcCombinedApplyRefusal(change)" }, StringSplitOptions.None).Length != 2) throw new Exception("The admission scope evaluates the combined-apply refusal once.");
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
-    if (integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan[\"caller\"].Value<string>(\"blockPath\")))", StringComparison.Ordinal) < 0)
-        throw new Exception("The reused-FB multi-instance target check must refuse the caller's dependents.");
+    if (integration.IndexOf("dependents = TypedDependentPaths(plc, callerPath).ToArray();", StringComparison.Ordinal) < 0 ||
+        integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, dependents, directInstanceDbs)", StringComparison.Ordinal) < 0)
+        throw new Exception("The reused-FB multi-instance target check must refuse the caller's dependents other than its direct instance DBs.");
     string typed = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs"));
     if (typed.IndexOf("foreach (string path in TypedDependentPaths(capture.Plc, capture.CallerPath))", StringComparison.Ordinal) < 0)
         throw new Exception("The typed step and the pre-claim check must share one dependent closure.");
@@ -186,7 +187,7 @@ Test("candidate shapes run only on a qualification Host's owned scratch, and onl
     Equal("earlierPlacement,fbCaller,fbCaller+multiInstance+reusedComponent,ladCaller,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     foreach (string pinned in new[] {
-        "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change))",
+        "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb)",
         "private bool PlcComponentCandidatesAdmitted(LibraryChange change) =>\n            _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;" })
         if (integration.Replace("\r\n", "\n").IndexOf(pinned, StringComparison.Ordinal) < 0) throw new Exception("Candidate admission changed: " + pinned);
     if (integration.Split(new[] { "PlcComponentCandidatesAdmitted(" }, StringSplitOptions.None).Length != 3) throw new Exception("Candidate admission must have exactly one use.");
