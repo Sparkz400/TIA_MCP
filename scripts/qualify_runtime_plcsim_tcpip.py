@@ -620,7 +620,8 @@ def normal(r):
     nodes = [ua_node("Cycles"), ua_node("UaValue")]
     subscribed = acquire(r, "runtime_ua_subscription to its duration", "subscription", {"attemptId": ua, "nodes": nodes, "publishingIntervalMilliseconds": 200,
                          "samplingIntervalMilliseconds": 100, "durationSeconds": 4, "maximumNotifications": 1000})
-    require(subscribed["recordedProgress"]["remoteCleanupConfirmed"], "DeleteSubscriptions was not confirmed")
+    require(subscribed["recordedProgress"]["terminalReason"] == "durationLimit" and subscribed["recordedProgress"]["remoteCleanupConfirmed"],
+            "The subscription did not run to its duration with a confirmed DeleteSubscriptions: %s" % subscribed["recordedProgress"])
     retained(r, "subscription", "subscription", subscribed)
     stopped = acquire(r, "runtime_ua_subscription stopped", "subscription", {"attemptId": ua, "nodes": nodes[:1], "durationSeconds": 60}, stop_after=3)
     require(stopped["recordedProgress"]["terminalReason"] == "stopped", "The subscription did not stop on request: %s" % stopped["recordedProgress"])
