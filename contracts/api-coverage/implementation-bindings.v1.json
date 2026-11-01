@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "b8d789a0adc0b1ff205e7cbd4f1ad0f4bf0bd85a7d70db498ce2720779f764d2",
-      "bytes": 1452055
+      "sha256": "135527115f79383e0c90970795a671b8598df19517c14e4ddc84cd8816fadb38",
+      "bytes": 1455516
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -97286,6 +97286,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.topology.20261101.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.topology_restores.20261101",
+          "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology_restores.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -99193,6 +99200,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.topology.20261101.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.topology_restores.20261101",
+          "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology_restores.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -99236,6 +99250,13 @@
           "profileSha256": "78c27d5645f5cd75ddadec20463d4fb31b388c6d3f2c3e7b810fc4884bb3c343",
           "artifacts": [
             "evidence/local.hardware_changes.topology.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.topology_restores.20261101",
+          "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology_restores.20261101.json"
           ]
         }
       ],
@@ -106100,6 +106121,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.topology.20261101.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.topology_restores.20261101",
+          "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology_restores.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -106143,6 +106171,13 @@
           "profileSha256": "78c27d5645f5cd75ddadec20463d4fb31b388c6d3f2c3e7b810fc4884bb3c343",
           "artifacts": [
             "evidence/local.hardware_changes.topology.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.topology_restores.20261101",
+          "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology_restores.20261101.json"
           ]
         }
       ],
@@ -121324,6 +121359,11 @@
       "sha256": "a1a66d59723b589388ccf541383effe07130b1960f8abf8df508b0c093f8d69a"
     },
     {
+      "path": "evidence/local.hardware_changes.topology_restores.20261101.json",
+      "state": "observed",
+      "sha256": "f7a94b5ac609c579f9e33ecd4eeeea485831f1f539165f8f5859876fc73726f8"
+    },
+    {
       "path": "evidence/local.hmi.bridge.rerun.20261029.json",
       "state": "observed",
       "sha256": "4a682db29aa6102a3a16b03c490d69811d01eb6a1303f4da4aaee86bedec3d9c"
@@ -122148,6 +122188,10 @@
     {
       "id": "local.hardware_changes.topology.20261101",
       "profileSha256": "78c27d5645f5cd75ddadec20463d4fb31b388c6d3f2c3e7b810fc4884bb3c343"
+    },
+    {
+      "id": "local.hardware_changes.topology_restores.20261101",
+      "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703"
     },
     {
       "id": "local.hmi.bridge.rerun.20261029",

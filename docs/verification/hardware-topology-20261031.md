@@ -113,6 +113,23 @@ that bundles the contract and covers:
 - the catalog search naming the plugged module's profile, and a profile refusal of `InformationText`;
 - apply and restore of the shared assignment, `OutsideOfProject`, the `createDomain` manager and the IM 155-5 PN ST client.
 
+### Restore slice run
+
+| Rows | Runner | Build | Result | Evidence |
+| --- | --- | --- | --- | --- |
+| `hardware.catalog_profiles`, `hardware.distributed_io`, `change.network_mrp_set`, `change.hardware_shared_device_access`, `change.network_io_assign` (sharedDevice) | [`qualify_hardware_changes.py`](../../scripts/qualify_hardware_changes.py) `--slice restores` | `artifacts/hf8` (`89b5197f`) | Passed, 113/113 steps | `local.hardware_changes.topology_restores.20261101` |
+
+The first attempt (`artifacts/hw7`, freeze of `e36d24d3`) applied the shared assignment and passed the worker's new
+preservation natively: only SpDi3's subtree changed owner and target. The runner, however, expected SpDi3's submodule row to
+change. With the scratch CPU's address space empty, SpDi3 kept start address 0, so the row did not change. `89b5197f`
+tolerates that row instead of requiring it, and the rerun passed with the following results:
+
+- The catalog search named the DI 8x24VDC ST V1.1 profile, and the profile refused `InformationText`.
+- All four changes were applied and restored to the pre-change state.
+
+With both runs cited, the four rows are verified again. Not exercised natively: the port-link and PLC-to-PLC refusals, and the
+`sharedDevice` disconnect.
+
 ## Discovery passes (not evidence)
 
 Two `--discover` passes ran on 31 October in one owned TIA Portal V21 instance each, from frozen Debug builds (no PLCSIM):

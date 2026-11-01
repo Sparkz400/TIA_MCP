@@ -197,9 +197,9 @@ constants; that kind has no transfer-area preservation check. The interface's
 
 V21 Openness exposes a shared device in two ways, and the bridge reviews both. The
 [hardware runner](../../scripts/qualify_hardware_changes.py) applied both natively and persisted them across a reopen
-(`local.hardware_changes.topology.20261101`, [record](../verification/hardware-topology-20261031.md)); the checkpoint restores of
-the shared assignment and of `OutsideOfProject`, the preservation rules below and the `sharedDevice` disconnect are not yet
-natively exercised.
+(`local.hardware_changes.topology.20261101`, [record](../verification/hardware-topology-20261031.md)), and the restore slice
+(`local.hardware_changes.topology_restores.20261101`) applied the shared assignment under the preservation rules below and
+restored it and `OutsideOfProject`. The `sharedDevice` disconnect is not exercised.
 
 - **Several PLCs of one project.** An IO-device interface has several `IoConnector`s (four on the IM 155-6 PN ST V6.4).
   `network_io_assign` with `sharedDevice: true` connects a further, unassigned connector to another PLC's I/O system while
@@ -252,8 +252,9 @@ prepare refuses a role that would leave a linked port pair with one ring port an
 port is a ring port when it declares `RingPort` true). Preservation adds every interface's MRP instances (name, domain, role, ring ports) and its subnet's MRP domain names to
 the manifest; only the selected instance's role and domain may change, and only `createDomain` adds its domain name. MRP domain attributes (`IsDefault`, `ManagerOutsideOfProjectActive`), domain
 deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed. The topology run applied and
-persisted the domain and all three roles; it restored the second CPU's join and `ManagerAuto` but not the `createDomain` manager
-or the IM 155-5 PN ST client, and the port-link refusal is not natively exercised, so `change.network_mrp_set` stays unverified.
+persisted the domain and all three roles and restored the second CPU's join and `ManagerAuto`; the restore slice
+(`local.hardware_changes.topology_restores.20261101`) restored the `createDomain` manager and the IM 155-5 PN ST client. The
+port-link refusal is not natively exercised.
 
 ## Address-changing replacement
 
@@ -280,8 +281,9 @@ equals it. A write to such a type whose firmware matches none of its profiles, o
 (`AttributeNotWritable`) rather than left unchecked. The hardware runner writes
 `profiles.json` for every type its native run creates, merging every snapshot that shows a type (an attribute declared only in
 some states still enters); a curated run fills the contract. It holds the 13 profiles of
-`local.hardware_changes.topology.20261101`, whose own worker still bundled an empty contract: the profile refusal and the
-`hardware_catalog_search` link below are not yet natively exercised.
+`local.hardware_changes.topology.20261101`, whose own worker still bundled an empty contract; the restore slice
+(`local.hardware_changes.topology_restores.20261101`) ran the profile refusal and the `hardware_catalog_search` link below on a
+worker that bundles them.
 
 `hardware_catalog_search` names an entry's profile in `profile` (`contracts/hardware-catalog-profiles.v1.json#<typeIdentifier>`,
 else null). When the nearest item at or above the written one has a profile, `hardware_attributes`,
@@ -297,9 +299,10 @@ hardware runner: export the I-device GSD with `scripts/qualify_gsd_export.py` (d
 files (GSD), select that folder and install it. The runner then adds the device, assigns it to the second CPU and compiles; without
 it the run records `gsdNotInstalled`, as `local.hardware_changes.topology.20261101` did: the GSD step is not exercised.
 
-`scripts/qualify_hardware_changes.py --slice restores` is the short native run that closes these gaps: on a build that bundles
-the contract, the catalog search must name a profile and a write the profile does not declare must be refused by it, and the
-shared assignment, `OutsideOfProject`, the `createDomain` manager and the IM 155-5 PN ST client are each applied and restored.
+`scripts/qualify_hardware_changes.py --slice restores` is the short native run for the profile gates and the topology restores:
+on a build that bundles the contract, the catalog search must name a profile and a write the profile does not declare must be
+refused by it, and the shared assignment, `OutsideOfProject`, the `createDomain` manager and the IM 155-5 PN ST client are each
+applied and restored (`local.hardware_changes.topology_restores.20261101`).
 
 ## Preservation manifest identity checks
 
