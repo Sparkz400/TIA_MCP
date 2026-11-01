@@ -1,0 +1,104 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.external-tag.route.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T13:38:25+00:00",
+  "source": {
+    "commit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hmi_gate_route.py --profile unified-comfort (desk-configured MTP700 Unified Comfort pair) and --profile unified-pc (seeded WinCC Unified PC RT baseline with its two transfer-password errors), each retrieved into an owned project with a Host started --hmi-change-qualification <profile>: refusals (hmi_engineering kind, HmiNameConflict, TargetIncompatible, foreign PLC, other-HMI connection, scopePath, array or quoted memberPath, unbound prepare); applies of a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, hmi_inspect tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and other-key RecoveryRequired; checkpoint restore; fresh reopen on a production Host. 43/43 checks per profile.",
+  "limitations": [
+    "Two profiles (MTP700 Unified Comfort, WinCC Unified PC RT); root tags and scalar global DB members only; arrays, UDT values, instance DBs and software-unit declarations are not mapped.",
+    "Unified preservation compares the tag-table exports and the typed object model; payloads without a public getter stay uncompared (the kind's standing notes)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4f7f16a4cf11913e5c75a238874c3c83b9580620ddfdcc7aacaeed7ba52ff9e9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "74dc93ae7feafc654ab45cc54ca61c4a9612770a19900d202d398028c0f450ae"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "a0065c9d8bb03709e58f512b8b393320165638d582afa05e2ef908b9f7e42437",
+      "bytes": 83013,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare root tag on HMI_RT_1",
+        "change_apply root tag on HMI_RT_1",
+        "change_prepare DB member on HMI_RT_1",
+        "change_apply DB member on HMI_RT_1",
+        "change_prepare root tag on HMI_RT_2 (its own PLC)",
+        "change_apply root tag on HMI_RT_2 (its own PLC)",
+        "change_restore root tag on HMI_RT_2 (its own PLC)",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "hmi_references",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "5976b146b938b265c479509d3b1d2c7d7b07843ff2d830e9453cff3dc0f658ad",
+      "bytes": 91669,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare root tag on HMI_RT_1",
+        "change_apply root tag on HMI_RT_1",
+        "change_prepare DB member on HMI_RT_1",
+        "change_apply DB member on HMI_RT_1",
+        "change_prepare root tag on HMI_RT_2 (its own PLC)",
+        "change_apply root tag on HMI_RT_2 (its own PLC)",
+        "change_restore root tag on HMI_RT_2 (its own PLC)",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "hmi_references",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

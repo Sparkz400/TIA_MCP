@@ -259,6 +259,21 @@ Check("Classic scalar patch selects export-local owner, preserving duplicate mem
     Reject(() => HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "1", "BackColor", "204, 204, 204", "128, 128, 128"));
     Reject(() => HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "0", "BackColor", "Stale", "128, 128, 128"));
 });
+Check("Only the Unified export helper's two process files are left out of a capture", () => {
+    Assert(HmiPreservationRules.IsExportHelperFile(".ile/ItLikeEs.pid") && HmiPreservationRules.IsExportHelperFile(".ile/ItLikeEs.port"));
+    foreach (string other in new[] { ".ile/other.pid", "ItLikeEs.pid", ".ile/ItLikeEs.pid.bak", "Default tag table.hmi.yml", ".ILE/ItLikeEs.pid" })
+        Assert(!HmiPreservationRules.IsExportHelperFile(other));
+});
+Check("A prepared Classic document keeps the native XML declaration through its file", () => {
+    var native = HmiPreservationRules.ReadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" + xml);
+    var expected = HmiPreservationRules.PatchClassicScalar(native, "Hmi.Screen.Screen", "0", "BackColor", "204, 204, 204", "128, 128, 128");
+    string path = Path.Combine(Path.GetTempPath(), "hmi-expected-" + Guid.NewGuid().ToString("N") + ".xml");
+    try {
+        HmiPreservationRules.WriteXml(expected, path);
+        HmiPreservationRules.RequireExactDocument(HmiPreservationRules.ReadXml(File.ReadAllText(path)), expected);
+        Assert(native.Declaration != null);
+    } finally { File.Delete(path); }
+});
 Check("Classic patch refuses guessed owner types and arbitrary export properties", () => {
     var before = HmiPreservationRules.ReadXml(xml);
     Reject(() => HmiPreservationRules.PatchClassicScalar(before, "Item", "1", "BackColor", "204, 204, 204", "128, 128, 128"));
@@ -390,5 +405,6 @@ Check("Classic XML import accepts one exact exported object and refuses other sh
     Assert(HmiEngineeringRules.Gate("unified", "unified-comfort", "classic_xml_import").Value<string>("bridgeImplementation") == "unavailable");
 });
 TextListImportTests.Run(Check);
+GateAdmissionTests.Run(Check);
 Console.WriteLine($"{passed} passed; {failed} failed. These are pure guard/preservation tests, not native qualification.");
 return failed == 0 ? 0 : 1;

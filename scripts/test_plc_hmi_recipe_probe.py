@@ -48,7 +48,7 @@ class Fake:
             return {"structuredContent": {"changeId": "lib-1", "previewHash": "0" * 64, "preview": {"integrationPlan": {
                 "status": "planned_only", "applySupported": False,
                 "blockers": [{"code": c} for c in ("HmiMemberMappingUnqualified", "HmiScreenItemCreationUnavailable", "HmiPreservationGateClosed")],
-                "steps": [{"kind": k} for k in ("library_instantiate", "graphical_typed_edit", "hmi_engineering")],
+                "steps": [{"kind": k} for k in ("library_instantiate", "graphical_typed_edit", "hmi_external_tag_create")],
                 "hmi": {"target": {"connection": {"plcPath": payload["target"]["plcPath"]}}, "tags": [{"plcSymbol": payload["integration"]["instanceDb"]["name"] + "." + ".".join(tags[0]["source"]["members"])}]}}}}}
         if not self.update_refused: return {"structuredContent": {"changeId": "lib-2"}}
         consumer = {"itemPath": H.format(1) + "/screens/Screen_1/items/MotorSpeedConsumer", "property": "Left"}
