@@ -1177,8 +1177,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
-      "sha256": "3a6d5d48a30f72a4209bc997da5c6529859488d8a61e4cb224152e6b4ddb4d75",
-      "bytes": 29832
+      "sha256": "1efcedc630333e5c58b9c709beb67be76c533ebf3ece890109cbebeee3c5c1a1",
+      "bytes": 31033
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -1192,8 +1192,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
-      "sha256": "03e543c9d2e797db9a0e7df2cbddf9979883aad4635b23570d3f80a64b5693da",
-      "bytes": 16095
+      "sha256": "7e48df470e13670aceaeb77007f2c73d2a904101457b5594abbbd215b70c7552",
+      "bytes": 16593
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationModels.cs",
@@ -1202,8 +1202,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
-      "sha256": "2cbc76805b7fc4a79fd9ea36e6a7f9e981e7fe75c43818d64e6fc9c735a691cd",
-      "bytes": 40626
+      "sha256": "4899f66944d98186f6c74899a7d4c5fbd2da26ad0cb8db38ca75449d4d0c7f19",
+      "bytes": 41223
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringResourceKey.cs",
@@ -1327,8 +1327,8 @@
     },
     {
       "path": "src/TiaMcp.Core/JournalFileReplacement.cs",
-      "sha256": "2cf8880c1dc9ea79342649e141fdc2726bbfd5eaac99a51b1671d3166280933e",
-      "bytes": 1183
+      "sha256": "f9ec12fe2c82649795e87f99e846efd56b162524517e433a96eeef83024bb1ae",
+      "bytes": 1673
     },
     {
       "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
@@ -1352,8 +1352,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PackageStorage.cs",
-      "sha256": "e8f1f850908a2ccdbe78d6503c04a00b78130c11e0e93d6ae8703a4d424d51ac",
-      "bytes": 11038
+      "sha256": "fa4d717d342aeb0f424c9e9120341cdc83ad99306db1ce9426c90cf260be9e05",
+      "bytes": 11997
     },
     {
       "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -1412,8 +1412,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
-      "sha256": "4e06f98940e5ae1a86b936e8464a2aa8a610608cb0f3460c3d12b3fe19069a93",
-      "bytes": 20192
+      "sha256": "51dbe758d5a0582ff2b8fa6941180ba00b8c4eee9889bc280883079b5313d583",
+      "bytes": 21591
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
@@ -1687,8 +1687,8 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
-      "sha256": "ca0a8618ee72c46b49ae59866c4b7dd1aedf35cb32e94939c176f51f42b6c4e7",
-      "bytes": 43034
+      "sha256": "ea5b143a99497be3b56b6916c76431526d4a8432ca9035068246e6250425bdfc",
+      "bytes": 43422
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchAuthoringProfile.cs",
@@ -1757,8 +1757,8 @@
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
-      "sha256": "8be03660d42d102e29d45411fe1f4ccf77801bd306512fb8bbdd38eb707a52d7",
-      "bytes": 8860
+      "sha256": "457beff2406cc27bad816f78888287d77959db4f9312f26fdeb6542f8799d030",
+      "bytes": 9908
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchTablePlanner.cs",
@@ -1962,8 +1962,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeSessions.cs",
-      "sha256": "80cd1b3188e797248d68bf57f5a5ddcf251ef1748c9c3ba81818ae9dc5b91c1f",
-      "bytes": 1765
+      "sha256": "9d85424e5f7790057b675752a9270e06e922f45e36dabb059cc9e317e2769dc5",
+      "bytes": 1770
     },
     {
       "path": "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
@@ -1982,8 +1982,8 @@
     },
     {
       "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
-      "sha256": "da0e750e18ab427d2c0afcf5509645c4ab637a74087f319046d8a659cff57bea",
-      "bytes": 27941
+      "sha256": "5ea2c35fa864b370872f7540cb0da40f0b9036fcd6b7495e0921e231ae3757c4",
+      "bytes": 27831
     },
     {
       "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
@@ -2062,8 +2062,8 @@
     },
     {
       "path": "src/TiaMcp.Host/Security/CredentialRoute.cs",
-      "sha256": "f248e877f4207c29fd5f6cef97539f2dd8e84cefd18040144aadda83bccef2f7",
-      "bytes": 7434
+      "sha256": "62a2962d49003afb375c4e68034001311eccafe33bd82551bf08b6f921f51697",
+      "bytes": 7439
     },
     {
       "path": "src/TiaMcp.Host/Security/CredentialRouteEnvelope.cs",
@@ -2082,8 +2082,8 @@
     },
     {
       "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
-      "sha256": "a0e620d29e8021a862efffa7363edcdcb9613c3262f6bef03b290f97986189d8",
-      "bytes": 18183
+      "sha256": "2235885c20922041dde3618c8fb32345485c5d4e4e32384cd354c2188863b91d",
+      "bytes": 18711
     },
     {
       "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
@@ -2267,8 +2267,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSessionStore.cs",
-      "sha256": "23f33716008c5ee54f2e20eda67d66c6ba6672aec6c68efa500c398413bbb864",
-      "bytes": 28006
+      "sha256": "8df55c6d7cf0eec1cb28aa55f4be7cb72ef260472f01225abf2078126d4b16c5",
+      "bytes": 27554
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaRuntimeSubscriptions.cs",
@@ -3277,8 +3277,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs",
-      "sha256": "9aa5fd8d906a16a02e0031c3ebda7bb9c53eb47b767476cb6b4f5694c49daf2e",
-      "bytes": 13362
+      "sha256": "01161bffae8c3076b390f62ea32ef4a1fec47c7f5fe0d38874a24fac696d7725",
+      "bytes": 13861
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationTicket.cs",
@@ -3297,8 +3297,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.Signals.cs",
-      "sha256": "81aaa3d8e6fe11c00ed553ef3221ff4dd23e85f30d8a0d95aa0819422d79112a",
-      "bytes": 14447
+      "sha256": "3446c683755b663599580151f3962dfc0bc5a39c30ba15ffa3b52e80ebff8abc",
+      "bytes": 14497
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
@@ -3858,8 +3858,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -4359,8 +4359,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -4860,8 +4860,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -5340,8 +5340,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -5788,7 +5788,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -5807,8 +5807,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -5828,8 +5828,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -5918,8 +5918,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -6203,8 +6203,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -6474,8 +6474,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -6711,23 +6711,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 343,
-          "endLine": 343,
-          "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
+          "line": 357,
+          "endLine": 364,
+          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 203,
-          "endLine": 210,
-          "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
+          "line": 210,
+          "endLine": 217,
+          "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 517,
-          "endLine": 527,
-          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
+          "line": 525,
+          "endLine": 535,
+          "sha256": "61583881a0714fa49e5fd5818865fdb5086cc05f6b5f5489ccfb16280490d26a"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -6781,8 +6781,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Write",
-          "line": 163,
-          "endLine": 202,
+          "line": 160,
+          "endLine": 199,
           "sha256": "e55fd0ab927eef7d2ca70fcd8bd3b68632e83509cf69d0727adeca92080f10b4"
         },
         {
@@ -6892,8 +6892,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -7198,8 +7198,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -7469,8 +7469,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -7727,8 +7727,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -7893,8 +7893,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -8247,8 +8247,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -8565,8 +8565,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Inspect",
-          "line": 88,
-          "endLine": 95,
+          "line": 91,
+          "endLine": 98,
           "sha256": "8d033c4bb9e893e2eb6718f6095d2f81ba685f53369f2b001ba2e6af07bccc1a"
         },
         {
@@ -8587,8 +8587,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -8898,8 +8898,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -8927,8 +8927,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -9260,8 +9260,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -9544,8 +9544,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -10510,7 +10510,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -10529,8 +10529,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -10550,8 +10550,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -10564,8 +10564,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 318,
-          "endLine": 323,
+          "line": 341,
+          "endLine": 346,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -11058,6 +11058,13 @@
           "sha256": "fb92493d2991a4f67ad867b8940c3922c2237ed83e8b3e93c4f2608da3253603"
         },
         {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
+          "name": "Failure",
+          "line": 368,
+          "endLine": 381,
+          "sha256": "57571339fea1fcb651161a4951e214874bae183c31118e1e8e4a4ae54530c746"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "Failure",
           "line": 90,
@@ -11408,8 +11415,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -11720,8 +11727,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 318,
-          "endLine": 323,
+          "line": 341,
+          "endLine": 346,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -11864,8 +11871,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -11893,8 +11900,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -12401,8 +12408,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -12671,8 +12678,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -13011,8 +13018,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -13498,8 +13505,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -14090,8 +14097,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -14591,8 +14598,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -15115,8 +15122,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -15594,8 +15601,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -16095,8 +16102,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -16494,8 +16501,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Create",
-          "line": 69,
-          "endLine": 87,
+          "line": 72,
+          "endLine": 90,
           "sha256": "f3967f5b553d764d8181aeeee0c547eff5422014c89f9e17ef434f509f4bde42"
         },
         {
@@ -16525,6 +16532,13 @@
           "line": 185,
           "endLine": 186,
           "sha256": "fb92493d2991a4f67ad867b8940c3922c2237ed83e8b3e93c4f2608da3253603"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
+          "name": "Failure",
+          "line": 368,
+          "endLine": 381,
+          "sha256": "57571339fea1fcb651161a4951e214874bae183c31118e1e8e4a4ae54530c746"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -16975,6 +16989,13 @@
           "line": 185,
           "endLine": 186,
           "sha256": "fb92493d2991a4f67ad867b8940c3922c2237ed83e8b3e93c4f2608da3253603"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
+          "name": "Failure",
+          "line": 368,
+          "endLine": 381,
+          "sha256": "57571339fea1fcb651161a4951e214874bae183c31118e1e8e4a4ae54530c746"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -17457,7 +17478,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -17476,8 +17497,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -17497,8 +17518,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -17578,6 +17599,13 @@
           "line": 185,
           "endLine": 186,
           "sha256": "fb92493d2991a4f67ad867b8940c3922c2237ed83e8b3e93c4f2608da3253603"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
+          "name": "Failure",
+          "line": 368,
+          "endLine": 381,
+          "sha256": "57571339fea1fcb651161a4951e214874bae183c31118e1e8e4a4ae54530c746"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -17708,23 +17736,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 343,
-          "endLine": 343,
-          "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
+          "line": 357,
+          "endLine": 364,
+          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 203,
-          "endLine": 210,
-          "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
+          "line": 210,
+          "endLine": 217,
+          "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 517,
-          "endLine": 527,
-          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
+          "line": 525,
+          "endLine": 535,
+          "sha256": "61583881a0714fa49e5fd5818865fdb5086cc05f6b5f5489ccfb16280490d26a"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -17778,8 +17806,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Write",
-          "line": 163,
-          "endLine": 202,
+          "line": 160,
+          "endLine": 199,
           "sha256": "e55fd0ab927eef7d2ca70fcd8bd3b68632e83509cf69d0727adeca92080f10b4"
         },
         {
@@ -17872,8 +17900,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "BrowseAsync",
-          "line": 209,
-          "endLine": 213,
+          "line": 232,
+          "endLine": 236,
           "sha256": "5adcd38b3b541ef2d6d5d7282ae1b830b8f10e078a04955049f61f8aa1038976"
         },
         {
@@ -17893,8 +17921,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Create",
-          "line": 69,
-          "endLine": 87,
+          "line": 72,
+          "endLine": 90,
           "sha256": "f3967f5b553d764d8181aeeee0c547eff5422014c89f9e17ef434f509f4bde42"
         },
         {
@@ -17917,6 +17945,13 @@
           "line": 185,
           "endLine": 186,
           "sha256": "fb92493d2991a4f67ad867b8940c3922c2237ed83e8b3e93c4f2608da3253603"
+        },
+        {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
+          "name": "Failure",
+          "line": 368,
+          "endLine": 381,
+          "sha256": "57571339fea1fcb651161a4951e214874bae183c31118e1e8e4a4ae54530c746"
         },
         {
           "path": "src/TiaMcp.Host/TiaTools.cs",
@@ -18259,8 +18294,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -19449,8 +19484,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -20224,8 +20259,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -20488,8 +20523,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -21176,8 +21211,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -21453,8 +21488,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Observe",
-          "line": 388,
-          "endLine": 389,
+          "line": 383,
+          "endLine": 384,
           "sha256": "8274beb06fa99ded92f7aa23676434c03f5b82685c0d183a4abf7a4609cf732b"
         },
         {
@@ -21489,8 +21524,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -21981,7 +22016,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -22000,8 +22035,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -22021,8 +22056,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -22043,8 +22078,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -22781,8 +22816,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -23282,8 +23317,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -23980,15 +24015,15 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Query",
-          "line": 193,
-          "endLine": 201,
+          "line": 216,
+          "endLine": 224,
           "sha256": "96a63ff742d2ce257545e0dc6e45495aa18f0c6f7588f46f117b503df10f3ab2"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 318,
-          "endLine": 323,
+          "line": 341,
+          "endLine": 346,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -24209,8 +24244,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -24563,8 +24598,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -24833,8 +24868,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -25154,8 +25189,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -25471,8 +25506,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Inspect",
-          "line": 88,
-          "endLine": 95,
+          "line": 91,
+          "endLine": 98,
           "sha256": "8d033c4bb9e893e2eb6718f6095d2f81ba685f53369f2b001ba2e6af07bccc1a"
         },
         {
@@ -25493,8 +25528,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -25804,8 +25839,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -25833,8 +25868,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -26166,8 +26201,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -26450,8 +26485,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -27349,8 +27384,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -27850,8 +27885,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -28337,8 +28372,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -28600,8 +28635,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -29870,8 +29905,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 318,
-          "endLine": 323,
+          "line": 341,
+          "endLine": 346,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -30070,8 +30105,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Inspect",
-          "line": 88,
-          "endLine": 95,
+          "line": 91,
+          "endLine": 98,
           "sha256": "8d033c4bb9e893e2eb6718f6095d2f81ba685f53369f2b001ba2e6af07bccc1a"
         },
         {
@@ -30099,8 +30134,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -30405,8 +30440,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -30676,8 +30711,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -30961,8 +30996,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -31219,8 +31254,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -31956,8 +31991,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -32436,8 +32471,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -32846,8 +32881,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -33207,8 +33242,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -33484,8 +33519,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -33747,8 +33782,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -34257,8 +34292,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 318,
-          "endLine": 323,
+          "line": 341,
+          "endLine": 346,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -34533,8 +34568,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Inspect",
-          "line": 88,
-          "endLine": 95,
+          "line": 91,
+          "endLine": 98,
           "sha256": "8d033c4bb9e893e2eb6718f6095d2f81ba685f53369f2b001ba2e6af07bccc1a"
         },
         {
@@ -34555,8 +34590,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -34873,8 +34908,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -34902,8 +34937,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -35242,8 +35277,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -35533,8 +35568,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -37835,8 +37870,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Contains",
-          "line": 337,
-          "endLine": 338,
+          "line": 351,
+          "endLine": 352,
           "sha256": "13851655d4cf2a55d9aed6c4b667c53b284e6c9aec81cfeb5697dbed072b5777"
         },
         {
@@ -38094,8 +38129,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Save",
-          "line": 423,
-          "endLine": 432,
+          "line": 418,
+          "endLine": 427,
           "sha256": "c078fa90f5b48a0e8d32eb93151596a5ba7329c29e786fe506fd26f21fa989f2"
         },
         {
@@ -38815,8 +38850,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -39478,8 +39513,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -39979,8 +40014,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -40405,8 +40440,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -41480,8 +41515,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -41975,8 +42010,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 318,
-          "endLine": 323,
+          "line": 341,
+          "endLine": 346,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -42194,8 +42229,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -42285,23 +42320,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 343,
-          "endLine": 343,
-          "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
+          "line": 357,
+          "endLine": 364,
+          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 203,
-          "endLine": 210,
-          "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
+          "line": 210,
+          "endLine": 217,
+          "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 517,
-          "endLine": 527,
-          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
+          "line": 525,
+          "endLine": 535,
+          "sha256": "61583881a0714fa49e5fd5818865fdb5086cc05f6b5f5489ccfb16280490d26a"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -42355,8 +42390,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Write",
-          "line": 163,
-          "endLine": 202,
+          "line": 160,
+          "endLine": 199,
           "sha256": "e55fd0ab927eef7d2ca70fcd8bd3b68632e83509cf69d0727adeca92080f10b4"
         },
         {
@@ -43348,7 +43383,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -43367,8 +43402,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -43388,8 +43423,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -43458,23 +43493,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 343,
-          "endLine": 343,
-          "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
+          "line": 357,
+          "endLine": 364,
+          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 203,
-          "endLine": 210,
-          "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
+          "line": 210,
+          "endLine": 217,
+          "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 517,
-          "endLine": 527,
-          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
+          "line": 525,
+          "endLine": 535,
+          "sha256": "61583881a0714fa49e5fd5818865fdb5086cc05f6b5f5489ccfb16280490d26a"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -43528,8 +43563,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Write",
-          "line": 163,
-          "endLine": 202,
+          "line": 160,
+          "endLine": 199,
           "sha256": "e55fd0ab927eef7d2ca70fcd8bd3b68632e83509cf69d0727adeca92080f10b4"
         },
         {
@@ -44302,8 +44337,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -44644,7 +44679,7 @@
           "name": "Acquire",
           "line": 43,
           "endLine": 60,
-          "sha256": "9d0ca75af70480706783026f01966810fc000d06fab7d9018dbc362b62498564"
+          "sha256": "250152b38effd2e7f0d4c6b4ebdd4f4b1561858555e96344501a146f7d15ed2f"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
@@ -44882,7 +44917,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -44901,8 +44936,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -44922,8 +44957,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -45345,8 +45380,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -45685,8 +45720,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -46187,8 +46222,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -46436,8 +46471,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -46713,8 +46748,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -46971,8 +47006,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -47081,8 +47116,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -47414,8 +47449,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -47725,8 +47760,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -47754,8 +47789,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -48010,8 +48045,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -48511,8 +48546,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -48844,8 +48879,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -49324,8 +49359,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -49574,7 +49609,7 @@
           "name": "Bind",
           "line": 562,
           "endLine": 567,
-          "sha256": "259189187d9e351ac64c302e19ed8eb98179ce1884db49d0a3883d6069a154c8"
+          "sha256": "2355cc1337f420b357129abab379d7c3dc3a77b0df4b2b7d2e6df39cce143bfb"
         },
         {
           "path": "src/TiaMcp.Host/PlcsimTargets.cs",
@@ -49594,8 +49629,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -49864,8 +49899,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Browse",
-          "line": 119,
-          "endLine": 139,
+          "line": 116,
+          "endLine": 136,
           "sha256": "8455bbde7e0218ecfbc4d5212d8762515ba8ad79801499d94db3d527a97861a1"
         },
         {
@@ -49886,8 +49921,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -50398,8 +50433,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -50656,8 +50691,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -50955,8 +50990,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -51464,8 +51499,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -51720,8 +51755,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52004,8 +52039,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52262,8 +52297,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -52379,8 +52414,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52678,8 +52713,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -52942,8 +52977,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -53290,8 +53325,8 @@
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Connect",
           "line": 62,
-          "endLine": 117,
-          "sha256": "55d5a98b36b4674eb1ba549b30845f72de592c2299efe2da6adfb4a8f3a99b87"
+          "endLine": 114,
+          "sha256": "72a12e0dc20eeaea9ce65935f1171be6173eddd941b67e3f550c87fe46abc617"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
@@ -53318,8 +53353,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -53686,8 +53721,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -53942,8 +53977,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Disconnect",
-          "line": 299,
-          "endLine": 317,
+          "line": 296,
+          "endLine": 314,
           "sha256": "4915cf2cfdcc959382e603b1544308bdf103d3d13fded53c8a98595bcf90b028"
         },
         {
@@ -53964,8 +53999,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -54319,8 +54354,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -54794,7 +54829,7 @@
           "name": "Read",
           "line": 531,
           "endLine": 552,
-          "sha256": "6c6be7f789b9084eb30eafcf1fe796f29224111e76052da24324fd3c99f0fc00"
+          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -54813,8 +54848,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Read",
-          "line": 409,
-          "endLine": 422,
+          "line": 404,
+          "endLine": 417,
           "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
         },
         {
@@ -54834,8 +54869,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Read",
-          "line": 124,
-          "endLine": 132,
+          "line": 127,
+          "endLine": 135,
           "sha256": "c4e2e084da7d4541e60471d132144a1d5e78ca0a8374ca902c22cacb6cecca68"
         },
         {
@@ -54856,8 +54891,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -55204,8 +55239,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -55462,8 +55497,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -55761,8 +55796,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -56270,8 +56305,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -56526,8 +56561,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -56810,8 +56845,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57068,8 +57103,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -57185,8 +57220,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57621,8 +57656,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -57879,8 +57914,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -57970,23 +58005,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 343,
-          "endLine": 343,
-          "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
+          "line": 357,
+          "endLine": 364,
+          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 203,
-          "endLine": 210,
-          "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
+          "line": 210,
+          "endLine": 217,
+          "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 517,
-          "endLine": 527,
-          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
+          "line": 525,
+          "endLine": 535,
+          "sha256": "61583881a0714fa49e5fd5818865fdb5086cc05f6b5f5489ccfb16280490d26a"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -58040,8 +58075,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Write",
-          "line": 163,
-          "endLine": 202,
+          "line": 160,
+          "endLine": 199,
           "sha256": "e55fd0ab927eef7d2ca70fcd8bd3b68632e83509cf69d0727adeca92080f10b4"
         },
         {
@@ -58219,8 +58254,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Browse",
-          "line": 119,
-          "endLine": 139,
+          "line": 116,
+          "endLine": 136,
           "sha256": "8455bbde7e0218ecfbc4d5212d8762515ba8ad79801499d94db3d527a97861a1"
         },
         {
@@ -58241,8 +58276,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -58498,8 +58533,8 @@
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Connect",
           "line": 62,
-          "endLine": 117,
-          "sha256": "55d5a98b36b4674eb1ba549b30845f72de592c2299efe2da6adfb4a8f3a99b87"
+          "endLine": 114,
+          "sha256": "72a12e0dc20eeaea9ce65935f1171be6173eddd941b67e3f550c87fe46abc617"
         },
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
@@ -58526,8 +58561,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -58894,8 +58929,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -59143,8 +59178,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Diagnostics",
-          "line": 268,
-          "endLine": 280,
+          "line": 265,
+          "endLine": 277,
           "sha256": "83dcce3ee80712e1df4d9b4421752ba0c59bce13c25a349ab34df5a16aff7407"
         },
         {
@@ -59165,8 +59200,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -59512,8 +59547,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Disconnect",
-          "line": 299,
-          "endLine": 317,
+          "line": 296,
+          "endLine": 314,
           "sha256": "4915cf2cfdcc959382e603b1544308bdf103d3d13fded53c8a98595bcf90b028"
         },
         {
@@ -59534,8 +59569,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -59889,8 +59924,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "ChangeOperatingMode",
-          "line": 205,
-          "endLine": 227,
+          "line": 202,
+          "endLine": 224,
           "sha256": "6faab29d363479ecc33bc069209e179a8c17957092c95be604b0fd1c2e0b7299"
         },
         {
@@ -59911,8 +59946,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -60251,8 +60286,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "ReadValue",
-          "line": 141,
-          "endLine": 160,
+          "line": 138,
+          "endLine": 157,
           "sha256": "b80f4634137493e8f3c86352e8f1aa9dc574f2ec9bfedaf83b28e96ebbae22c2"
         },
         {
@@ -60266,8 +60301,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -60614,8 +60649,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -60872,8 +60907,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -61104,8 +61139,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -61334,23 +61369,23 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 343,
-          "endLine": 343,
-          "sha256": "4039ef353c796168fe10395d16c9dc5ff774d7789a4fd4b7c5a2e4ef3e23d325"
+          "line": 357,
+          "endLine": 364,
+          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 203,
-          "endLine": 210,
-          "sha256": "f94d74bbc9636408ba1443ceb45626f31b0b6c8dfaa0e1d43a41f017ec52934a"
+          "line": 210,
+          "endLine": 217,
+          "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
           "name": "Write",
-          "line": 517,
-          "endLine": 527,
-          "sha256": "ac57d86434508488d949b478786bb00cf1b52237f328d5fe051a1806f31c9066"
+          "line": 525,
+          "endLine": 535,
+          "sha256": "61583881a0714fa49e5fd5818865fdb5086cc05f6b5f5489ccfb16280490d26a"
         },
         {
           "path": "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -61404,8 +61439,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Write",
-          "line": 163,
-          "endLine": 202,
+          "line": 160,
+          "endLine": 199,
           "sha256": "e55fd0ab927eef7d2ca70fcd8bd3b68632e83509cf69d0727adeca92080f10b4"
         },
         {
@@ -61815,8 +61850,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -62459,8 +62494,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -63497,7 +63532,7 @@
               "name": "Observe",
               "line": 171,
               "endLine": 220,
-              "sha256": "36a9155c1003d806b2cb726c1ccba50b2e478d745a9a629ccdb7fa8c5c45b684"
+              "sha256": "86eff2b48dbf40c13a95715e9ef8ae5639db62c530c93bf4229b8ba2b03e8c1d"
             }
           ],
           "reviewState": "static_dispatch_bound",
@@ -65791,8 +65826,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -66292,8 +66327,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -67100,8 +67135,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -67580,8 +67615,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -68081,8 +68116,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -68561,8 +68596,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -70517,8 +70552,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -73136,8 +73171,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -73441,8 +73476,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -73704,8 +73739,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -74030,8 +74065,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -74355,8 +74390,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "Inspect",
-          "line": 88,
-          "endLine": 95,
+          "line": 91,
+          "endLine": 98,
           "sha256": "8d033c4bb9e893e2eb6718f6095d2f81ba685f53369f2b001ba2e6af07bccc1a"
         },
         {
@@ -74377,8 +74412,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -74695,8 +74730,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -74724,8 +74759,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -75073,8 +75108,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -75525,8 +75560,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -76061,8 +76096,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -76802,8 +76837,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -77242,8 +77277,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -77603,6 +77638,13 @@
           "sha256": "fb92493d2991a4f67ad867b8940c3922c2237ed83e8b3e93c4f2608da3253603"
         },
         {
+          "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
+          "name": "Failure",
+          "line": 368,
+          "endLine": 381,
+          "sha256": "57571339fea1fcb651161a4951e214874bae183c31118e1e8e4a4ae54530c746"
+        },
+        {
           "path": "src/TiaMcp.Host/TiaTools.cs",
           "name": "Failure",
           "line": 90,
@@ -77752,8 +77794,8 @@
         {
           "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
           "name": "Status",
-          "line": 282,
-          "endLine": 286,
+          "line": 279,
+          "endLine": 283,
           "sha256": "080d8c5275c61b3af91c046c191cec272654bbfe6f95603ad9226f79b64ef4cc"
         },
         {
@@ -77939,8 +77981,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -78272,8 +78314,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -78612,8 +78654,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -78875,8 +78917,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -79293,8 +79335,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -79563,8 +79605,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -79833,8 +79875,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -80103,8 +80145,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -80367,8 +80409,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -80637,8 +80679,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -80956,8 +80998,8 @@
         {
           "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
           "name": "List",
-          "line": 112,
-          "endLine": 123,
+          "line": 115,
+          "endLine": 126,
           "sha256": "8716b8a95ee096edb8d2e6ee475e08fdde7da3442266e28517766fcc7fe59068"
         },
         {
@@ -80985,8 +81027,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -81255,8 +81297,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -81526,8 +81568,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -81797,8 +81839,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -82060,8 +82102,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -82330,8 +82372,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -82593,8 +82635,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -82934,8 +82976,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -83739,8 +83781,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -85128,8 +85170,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -85629,8 +85671,8 @@
           "path": "src/TiaMcp.Core/WatchTables/WatchTableMonitor.cs",
           "name": "Run",
           "line": 15,
-          "endLine": 64,
-          "sha256": "10a5028b39d531d8c0e3ad43515460b167927e1dba7996a017d4f1bc6eaebc58"
+          "endLine": 65,
+          "sha256": "af2ff1f0d93093114fd6177dee255b1077c9163b4dd39006612529dcf2b11667"
         },
         {
           "path": "src/TiaMcp.Host/AccessTools.cs",
@@ -98198,8 +98240,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -98212,8 +98254,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -99057,6 +99099,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99358,8 +99401,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -99372,8 +99415,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -99453,6 +99496,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99501,6 +99545,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99561,6 +99606,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99618,6 +99664,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99666,6 +99713,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99721,6 +99769,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99781,6 +99830,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99836,6 +99886,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99891,6 +99942,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99935,6 +99987,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -99987,6 +100040,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100035,6 +100089,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100084,6 +100139,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100133,6 +100189,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100182,6 +100239,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100231,6 +100289,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100279,6 +100338,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100327,6 +100387,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100375,6 +100436,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100424,6 +100486,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100472,6 +100535,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100520,6 +100584,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100568,6 +100633,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100615,6 +100681,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100663,6 +100730,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100705,6 +100773,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100747,6 +100816,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100797,6 +100867,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100849,6 +100920,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100901,6 +100973,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -100953,6 +101026,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101247,6 +101321,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101296,6 +101371,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101345,6 +101421,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101394,6 +101471,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101460,6 +101538,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101515,6 +101594,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101573,6 +101653,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101634,6 +101715,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101681,6 +101763,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101729,6 +101812,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101785,6 +101869,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101840,6 +101925,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101911,6 +101997,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -101966,6 +102053,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102021,6 +102109,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102083,6 +102172,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102138,6 +102228,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102193,6 +102284,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102248,6 +102340,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102354,6 +102447,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102456,6 +102550,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102504,6 +102599,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102591,6 +102687,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102639,6 +102736,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102710,6 +102808,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102794,6 +102893,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102893,6 +102993,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -102993,6 +103094,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103062,6 +103164,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103135,6 +103238,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103224,6 +103328,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103272,6 +103377,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103419,6 +103525,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103503,6 +103610,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103571,6 +103679,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103663,6 +103772,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103766,6 +103876,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103817,6 +103928,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103906,6 +104018,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -103981,6 +104094,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104109,6 +104223,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104189,6 +104304,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104247,6 +104363,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104330,6 +104447,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104385,6 +104503,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104433,6 +104552,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104481,6 +104601,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104529,6 +104650,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104577,6 +104699,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104625,6 +104748,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104673,6 +104797,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104728,6 +104853,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104776,6 +104902,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104824,6 +104951,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104872,6 +105000,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104923,6 +105052,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -104971,6 +105101,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105019,6 +105150,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105073,6 +105205,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105115,6 +105248,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105170,6 +105304,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105220,6 +105355,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105276,6 +105412,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105341,6 +105478,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105398,6 +105536,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105453,6 +105592,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105501,6 +105641,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105549,6 +105690,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105597,6 +105739,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105645,6 +105788,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105693,6 +105837,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105741,6 +105886,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105800,6 +105946,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105849,6 +105996,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105897,6 +106045,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105944,6 +106093,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -105991,6 +106141,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106039,6 +106190,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106092,6 +106244,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106140,6 +106293,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106188,6 +106342,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106236,6 +106391,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106284,6 +106440,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106352,6 +106509,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106420,6 +106578,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106474,6 +106633,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106535,6 +106695,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106589,6 +106750,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106637,6 +106799,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106685,6 +106848,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106742,6 +106906,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106790,6 +106955,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106838,6 +107004,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106893,6 +107060,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -106948,6 +107116,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -107003,6 +107172,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -107051,6 +107221,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -107099,6 +107270,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -107147,6 +107319,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -107257,6 +107430,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -108261,6 +108435,7 @@
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
         "src/TiaMcp.Host/OpcUaTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
@@ -108277,8 +108452,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
             "name": "Create",
-            "line": 69,
-            "endLine": 87,
+            "line": 72,
+            "endLine": 90,
             "sha256": "f3967f5b553d764d8181aeeee0c547eff5422014c89f9e17ef434f509f4bde42"
           },
           "literal": "protected-credential.v1",
@@ -108468,8 +108643,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -108482,8 +108657,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -108578,6 +108753,7 @@
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
         "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
         "src/TiaMcp.Host/OpcUaTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/PhysicalRuntimeTools.cs",
         "src/TiaMcp.Host/Security/CredentialVault.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
@@ -108593,8 +108769,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
             "name": "Create",
-            "line": 69,
-            "endLine": 87,
+            "line": 72,
+            "endLine": 90,
             "sha256": "f3967f5b553d764d8181aeeee0c547eff5422014c89f9e17ef434f509f4bde42"
           },
           "literal": "protected-credential.v1",
@@ -110520,8 +110696,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -110534,8 +110710,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -111607,6 +111783,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -112215,6 +112392,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -116472,8 +116650,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -116486,8 +116664,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -116918,8 +117096,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -116932,8 +117110,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -117176,8 +117354,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -117190,8 +117368,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -119878,8 +120056,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v1",
@@ -119892,8 +120070,8 @@
           "sourceAnchor": {
             "path": "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
             "name": "Read",
-            "line": 409,
-            "endLine": 422,
+            "line": 404,
+            "endLine": 417,
             "sha256": "706c2b4228dfff2bafcc7c8e40b7420030766e14664dc295c29691e318456c77"
           },
           "literal": "runtime-web-session.v2",
@@ -122640,6 +122818,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -122923,6 +123102,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -125637,6 +125817,7 @@
         "src/TiaMcp.Host/DeviceInventoryTools.cs",
         "src/TiaMcp.Host/EngineeringTools.cs",
         "src/TiaMcp.Host/OpcUaRuntimeTools.cs",
+        "src/TiaMcp.Host/PhysicalRuntimeSessions.cs",
         "src/TiaMcp.Host/SimulatorTools.cs",
         "src/TiaMcp.Host/TiaTools.cs",
         "src/TiaMcp.Host/TranslationNativeTools.cs",
