@@ -104,7 +104,7 @@
       "decidedBy": "maintainer",
       "date": "2026-11-01",
       "boundary": "V21 and project policy",
-      "reason": "V21's offline DownloadProvider refuses to load the safety program onto a PLCSIM memory card ('Load safety program to device'); the online route (change.simulation_download_online) needs a successful card from this PLC, and behind both V21 raises its SafetyProgram ConsistentDownload confirmation, which the project's policy refuses. Changed F-logic imports and compiles with the safety program, and PLCSIM V8 creates an owned CPU1511F instance, but no permitted route loads it.",
+      "reason": "The closure rests on two observed refusals: V21's offline DownloadProvider refuses to load the safety program onto a PLCSIM memory card ('Load safety program to device'), and the online route (change.simulation_download_online) refuses at prepare with SimulationTargetMismatch because the owned instance has no successful card from this PLC. Behind that gate V21's SafetyProgram download configuration ('Load safety program to device', ConsistentDownload) would be raised next (per its API metadata; not reached natively) and is outside the project's policy. Changed F-logic imports and compiles with the safety program, and PLCSIM V8 creates an owned CPU1511F instance, but no permitted route loads it.",
       "evidenceIds": [
         "local.safety.logic_plcsim_boundary.20261101",
         "local.safety.logic_online_route.20261101"

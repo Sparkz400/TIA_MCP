@@ -4,9 +4,9 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "72ad1a6dd01f206341278f6268e1a8424693e6cfd1521a0743a65428b7b6ee02",
+    "catalogSha256": "77040a311aa1a13ded6870ea6810b311072f2981793f498408a254672ea2e7a2",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "037d2e04c5365d056461fe18d78c10c2cc204dfe71121ff66cced2a53a72b2e4"
+    "ledgerSha256": "d70c4096a59f2a65df1b618b39acd8e65a6d9d9cb58ac91ab3ec5d767f54c127"
   },
   "targetTiaVersions": [
     21

@@ -68,14 +68,17 @@ confirmations. No safety prompt was answered, and no password or login was used.
 
 `safety.logic_changes`: **unavailable_target** (maintainer decision, 1 November 2026; ledger entry in
 [release-obligations-20261015.json](../plans/release-obligations-20261015.json) `dispositions`). Changed F-logic imports
-and compiles with the safety program, and PLCSIM Advanced V8 creates an owned CPU1511F instance. But no route loads a safety program into it within the project's policy:
+and compiles with the safety program, and PLCSIM Advanced V8 creates an owned CPU1511F instance. But no route loads a
+safety program into it within the project's policy. The closure rests on the offline card refusal plus the online prepare
+gate:
 
 - V21's offline `DownloadProvider` memory-card route refuses: "Load safety program to device"
   (`local.safety.logic_plcsim_boundary.20261101`).
-- The online route needs a successful card from this PLC (`SimulationTargetMismatch`,
+- The online route refused at prepare: it needs a successful card from this PLC (`SimulationTargetMismatch`,
   `local.safety.logic_online_route.20261101`). The worker now says so: an instance without a successful card is refused
   as having none, not as holding another PLC's card.
-- Behind both stands V21's `SafetyProgram` download confirmation, which the policy does not answer.
+- Behind that gate, V21's `SafetyProgram` download confirmation would be raised next (per its API metadata; not reached
+  natively). The policy does not answer it.
 
 Proposed TODO text: "[x] `safety.logic_changes` (D14): V21 boundary on 1 November (records
 `local.safety.logic_plcsim_boundary.20261101`, `local.safety.logic_online_route.20261101`,
