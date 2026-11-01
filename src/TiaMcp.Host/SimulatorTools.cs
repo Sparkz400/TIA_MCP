@@ -51,7 +51,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_read", new { instanceId, signals = Array(signals) }, cancellationToken);
 
     [McpServerTool(Name = "sim_write", Destructive = true, OpenWorld = false)]
-    [Description("Write typed simulation stimuli to a local simulated instance this session created or adopted (otherwise OwnedInstanceRequired). writes is an array of {symbol,type,value}. Writes affect the simulated program and may be overwritten by its scan.")]
+    [Description("Write typed simulation stimuli to a local simulated instance this session created or adopted (otherwise OwnedInstanceRequired). writes is an array of {symbol,type,value}. A symbol whose area in the instance's tag list is the output area is refused with InvalidRequest before anything is written: the program writes the outputs. Writes affect the simulated program and may be overwritten by its scan.")]
     public Task<CallToolResult> Write(int instanceId, JsonElement writes, CancellationToken cancellationToken)
         => Call("sim_write", new { instanceId, writes = Array(writes) }, cancellationToken);
 
@@ -61,7 +61,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_read_signals", new { instanceId, signals = Array(signals) }, cancellationToken);
 
     [McpServerTool(Name = "sim_write_signals", Destructive = true, OpenWorld = false)]
-    [Description("Write 1-64 typed symbols of a PLCSIM instance this session created or adopted in one WriteSignals runtime call. writes is an array of {symbol,type,value} with distinct symbols; types as sim_read_signals. Every value is validated before the call; a runtime error on any item fails with PartialSimulationWrite and each item's result. Assignments, not forces: the program scan may overwrite them.")]
+    [Description("Write 1-64 typed symbols of a PLCSIM instance this session created or adopted in one WriteSignals runtime call. writes is an array of {symbol,type,value} with distinct symbols; types as sim_read_signals. Every value is validated before the call, and a batch with any symbol whose tag-list area is the output area is refused whole with InvalidRequest, nothing written; a runtime error on any item fails with PartialSimulationWrite and each item's result. Assignments, not forces: the program scan may overwrite them.")]
     public Task<CallToolResult> WriteSignals(int instanceId, JsonElement writes, CancellationToken cancellationToken)
         => Call("sim_write_signals", new { instanceId, writes = Array(writes) }, cancellationToken);
 
@@ -71,7 +71,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_area_read", new { instanceId, area, offset, length, bit }, cancellationToken);
 
     [McpServerTool(Name = "sim_area_write", Destructive = true, OpenWorld = false)]
-    [Description("Write the input or marker image of a PLCSIM instance this session created or adopted, by address: byte offset and either bytes (1-1024 integers 0-255) or bit (0-7) with a boolean value. Outputs are refused: the program writes the output image every scan. Writes are assignments, never forces; the program may overwrite markers on its next scan.")]
+    [Description("Write the input or marker image of a PLCSIM instance this session created or adopted, by address: byte offset and either bytes (1-1024 integers 0-255) or bit (0-7) with a boolean value. Outputs are refused: the program writes the output image every scan, and the symbolic writes refuse output tags the same way. Writes are assignments, never forces; the program may overwrite markers on its next scan.")]
     public Task<CallToolResult> AreaWrite(int instanceId, string area, int offset, CancellationToken cancellationToken, JsonElement? bytes = null, int? bit = null, bool? value = null)
         => Call("sim_area_write", new { instanceId, area, offset, bytes, bit, value }, cancellationToken);
 
@@ -81,7 +81,7 @@ public sealed class SimulatorTools(SimulatorClient simulator, HostOptions option
         => Call("sim_observe", new { instanceId, windowMs, maxEvents, includeDisplayData }, cancellationToken, windowMs);
 
     [McpServerTool(Name = "sim_test", Destructive = true, OpenWorld = false)]
-    [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Steps with writes and virtualTime:true need an instance this session created or adopted (otherwise OwnedInstanceRequired). Wall-clock polling is not scan-accurate. virtualTime:true runs the scenario in TimespanSynchronized_C: every wait is a StartProcessing span of virtual time, samples are read while the CPU is frozen, elapsedMs is virtual time, and the previous operating mode is restored. Duration/sample bounds are enforced by the adapter; its 90 s execution cap needs a Host --timeout-seconds of at least 105, otherwise InvalidRequest.")]
+    [Description("Execute bounded simulation stimulus/capture/assertion steps and save a report. signals:[{symbol,type}]; steps:[{delayMs,writes:[{symbol,type,value}],assertions:[{symbol,type,operator,expected,tolerance}]}]. Operators eq/ne/gt/gte/lt/lte. Steps with writes and virtualTime:true need an instance this session created or adopted (otherwise OwnedInstanceRequired); a step write to a symbol whose tag-list area is the output area refuses the scenario with InvalidRequest before its first write. Wall-clock polling is not scan-accurate. virtualTime:true runs the scenario in TimespanSynchronized_C: every wait is a StartProcessing span of virtual time, samples are read while the CPU is frozen, elapsedMs is virtual time, and the previous operating mode is restored. Duration/sample bounds are enforced by the adapter; its 90 s execution cap needs a Host --timeout-seconds of at least 105, otherwise InvalidRequest.")]
     public Task<CallToolResult> Test(int instanceId, JsonElement signals, JsonElement steps, CancellationToken cancellationToken, int intervalMs = 100, bool virtualTime = false)
         => Call("sim_test", new { instanceId, signals = Array(signals), steps = Array(steps), intervalMs, virtualTime, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "simulation-tests") }, cancellationToken, TestWaitMs);
 

@@ -175,6 +175,20 @@ namespace TiaMcp.Simulation
             return null;
         }
 
+        /// <summary>The program writes the outputs, so no symbolic write may (as sim_area_write refuses the output area). Returns the first
+        /// symbol that PLCSIM's tag list reports in the Output area, itself or as an element or member of an entry there, or null. The reported
+        /// area decides, never the name. TIA quotes segments ("Tag".x) and the tag list need not; TIA names are unique regardless of case.
+        /// A symbol missing from the tag list is left to PLCSIM, which resolves names through that same list.</summary>
+        public static string OutputSymbol(IReadOnlyList<string> symbols, IEnumerable<(string Name, string Area)> tags)
+        {
+            var outputs = new HashSet<string>(tags.Where(t => t.Area == "Output").Select(t => t.Name.Replace("\"", "")), StringComparer.OrdinalIgnoreCase);
+            return symbols.FirstOrDefault(symbol =>
+            {
+                string key = symbol.Replace("\"", "");
+                return outputs.Contains(key) || Enumerable.Range(1, Math.Max(0, key.Length - 1)).Any(i => (key[i] == '.' || key[i] == '[') && outputs.Contains(key.Substring(0, i)));
+            });
+        }
+
         private static bool Given(JObject item, string name) => item[name] != null && item[name].Type != JTokenType.Null;
 
         private static int UInt16(JObject item, string name, int minimum) => Number(item, name, minimum, ushort.MaxValue);
