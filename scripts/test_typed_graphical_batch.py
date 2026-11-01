@@ -706,7 +706,8 @@ class RouteCapturePacketTests(unittest.TestCase):
         self.assertIn('Gate : "TiaMcpComponentGate";', host)
         self.assertIn('State : "TiaMcp_UnitA.TiaMcpComponentState";', (root / "fixtures/typed-graphical/sources/route-Unit-component-gate.scl").read_text(encoding="utf-8"))
         expected = packet["expectedTemplates"]
-        self.assertEqual({"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]}, expected["deployedQualificationOnly"])
+        self.assertEqual({"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]}, expected["deployedVerified"])
+        self.assertNotIn("deployedQualificationOnly", expected)
         self.assertEqual({"globalInstanceTemplates": ["v21.fw41.softwareUnit.component-gate.global-instance.v1"]}, expected["stagedCandidateOnly"])
         # The unit capture is only ever staged under artifacts/, never appended to the deployed catalog.
         self.assertTrue(all("--stage-output" in step for step in packet["afterCapture"] if "csu" in step))

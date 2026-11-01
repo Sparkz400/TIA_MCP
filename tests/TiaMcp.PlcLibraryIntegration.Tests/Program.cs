@@ -159,13 +159,20 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
 });
 // A refused combined apply (a multi-instance caller with dependents included) is refused while the worker resolves the
 // shared-mutation scope (mutation_begin), so the Host writes no admission record; the dependents are the typed route's own closure.
-Test("combined-apply refusals precede the admission record, and multi-instance dependents are refused", () => {
+Test("combined-apply refusals precede the admission record, a stale preview still gets PreviewStale, and multi-instance dependents are refused", () => {
     string admission = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs")).Replace("\r\n", "\n");
     int resolve = admission.IndexOf("private JObject SharedMutationResolve()", StringComparison.Ordinal);
     int library = admission.IndexOf("if (!_libraryChanges.TryGetValue(id, out var change))", resolve, StringComparison.Ordinal);
-    int refusal = admission.IndexOf("_libraryIntegrateApplyEnabled && change.IdempotencyKey == null\n                            && PlcCombinedApplyRefusal(change) is JObject combinedRefusal)\n                            throw new BridgeException(combinedRefusal.Value<string>(\"code\")", library, StringComparison.Ordinal);
-    int project = admission.IndexOf("add(\"project\", change.Project.Path.FullName, \"checkpointCompileSave\")", library, StringComparison.Ordinal);
-    if (resolve < 0 || library < resolve || refusal < library || project < refusal) throw new Exception("The combined-apply refusal must run in the admission scope before its resources are returned.");
+    int end = admission.IndexOf("var change = GetEngineeringChange(args);", library, StringComparison.Ordinal);
+    // The scope's own refusals keep their codes: an online project, a stale preview and a changed source are refused first.
+    int offline = admission.IndexOf("EnsureProjectOffline(change.Project);", library, StringComparison.Ordinal);
+    int stale = admission.IndexOf("throw new BridgeException(\"PreviewStale\", \"Library resources changed since preview.\");", library, StringComparison.Ordinal);
+    int sources = admission.IndexOf("VerifyLibrarySources(change);", library, StringComparison.Ordinal);
+    // Only at mutation_begin (no scope yet): dispatch re-resolves the scope, and change_apply rechecks under the lease.
+    int refusal = admission.IndexOf("if (_sharedMutationScope == null && change.Kind == \"library_integrate\" && !IsHmiLibraryTarget(change.Payload) && _libraryIntegrateApplyEnabled\n                            && change.IdempotencyKey == null && PlcCombinedApplyRefusal(change) is JObject combinedRefusal)\n                            throw new BridgeException(combinedRefusal.Value<string>(\"code\")", library, StringComparison.Ordinal);
+    if (resolve < 0 || library < resolve || offline < library || stale < offline || sources < stale || refusal < sources || end < refusal)
+        throw new Exception("The combined-apply refusal must follow the scope's own offline, PreviewStale and source checks and run at mutation_begin only.");
+    if (admission.Split(new[] { "PlcCombinedApplyRefusal(change)" }, StringSplitOptions.None).Length != 2) throw new Exception("The admission scope evaluates the combined-apply refusal once.");
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     if (integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan[\"caller\"].Value<string>(\"blockPath\")))", StringComparison.Ordinal) < 0)
         throw new Exception("The reused-FB multi-instance target check must refuse the caller's dependents.");

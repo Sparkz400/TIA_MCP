@@ -72,13 +72,13 @@
   "captured": [
     {"id": "standardMultiInstance", "report": "artifacts/csm/capture.json", "reportSha256": "18b6abff79dac896c2f4d3b00e01795778d073ab6c827b0419dc634e2afbd8b6",
      "completedAtUtc": "2026-11-01T04:06:00.503687+00:00", "status": "passed", "persistenceVerified": true, "sourceCommit": "68eca319",
-     "result": "Gate embeds the UDT static State with its nested Active member; the SCL-authored FB interface equals the library-installed component04-callee interface. Deployed as v21.fw41.component-gate.multi-instance.v1 (qualificationOnly)."},
+     "result": "Gate embeds the UDT static State with its nested Active member; the SCL-authored FB interface equals the library-installed component04-callee interface. Deployed as v21.fw41.component-gate.multi-instance.v1, qualificationOnly until local.library_integrate.candidate_shapes.multi.20261101 verified its shape, then without the flag."},
     {"id": "unitGlobalInstance", "report": "artifacts/csu/capture.json", "reportSha256": "77942a2eece6a6654a8f4059fe945ea20f36c7c897a5b142e526451a1539d4f8",
      "completedAtUtc": "2026-11-01T04:07:33.230248+00:00", "status": "passed", "persistenceVerified": true, "sourceCommit": "68eca319",
      "result": "The DB members equal the FB members, State typed \"TiaMcp_UnitA.TiaMcpComponentState\". Staged only, artifacts/csus/profiles.candidate.v1.json."}
   ],
   "expectedTemplates": {
-    "deployedQualificationOnly": {"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]},
+    "deployedVerified": {"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]},
     "stagedCandidateOnly": {"globalInstanceTemplates": ["v21.fw41.softwareUnit.component-gate.global-instance.v1"]}
   }
 }
