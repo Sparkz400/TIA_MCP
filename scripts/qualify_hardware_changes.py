@@ -851,15 +851,25 @@ def gsd_slice(run):
     compile and its assignment, restored once and applied again. It qualifies only with exactly one installed GSD entry; without
     one it records gsdNotInstalled and fails at once."""
     rows = gsd_entries(run)
+    if not rows:
+        run.h.report["gsdNotInstalled"] = True
+    # Before any mutation: gsd_device would find a second entry only after the prerequisites.
+    run.expect(len(rows) == 1, "gsd", "The GSD slice needs exactly one installed I-device GSD entry (gsdNotInstalled: %s): %s" % (not rows, rows))
     if rows:
         add_cpu(run, "add CPU HwPeer", "HwPeer")
         network(run, scratch=False)
         station(run)
         gsd_device(run, rows, restore=True)
-    else:
-        run.h.report["gsdNotInstalled"] = True
-    run.expect(bool(rows) and bool(run.coverage.get("network_io_assign", {}).get("restored")) and "gsdDevice" in run.h.report, "gsd",
-               "The GSD slice qualifies only with one installed I-device GSD whose assignment applied and restored (gsdNotInstalled: %s)" % run.h.report.get("gsdNotInstalled", False))
+        run.expect(bool(run.coverage.get("network_io_assign", {}).get("restored")) and "gsdDevice" in run.h.report, "gsd",
+                   "The GSD slice qualifies only when the GSD device's assignment applied and restored.")
+
+
+def heading(args):
+    """The report title and limitations of the full run or the selected slice."""
+    title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
+             "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
+             None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
+    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
 
 
 def body(h):
@@ -893,8 +903,5 @@ if __name__ == "__main__":
                         "gsd: only the installed I-device GSD device and what it needs.")
     args = parser.parse_args()
     args.runner = __file__
-    title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
-             "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
-             None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
-    limitations = {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
-    Harness(args, "hw_", title + (" (key discovery, not evidence)" if args.discover else ""), limitations, []).run(body)
+    title, limitations = heading(args)
+    Harness(args, "hw_", title, limitations, []).run(body)
