@@ -195,8 +195,9 @@ constants; that kind has no transfer-area preservation check. The interface's
 
 ## Shared devices
 
-V21 Openness exposes a shared device in two ways, and the bridge reviews both. Neither is natively qualified yet; the
-[hardware runner](../../scripts/qualify_hardware_changes.py) covers them ([record](../verification/hardware-topology-20261031.md)).
+V21 Openness exposes a shared device in two ways, and the bridge reviews both; both are natively qualified with the
+[hardware runner](../../scripts/qualify_hardware_changes.py) (`local.hardware_changes.topology.20261101`,
+[record](../verification/hardware-topology-20261031.md)), except the `sharedDevice` disconnect.
 
 - **Several PLCs of one project.** An IO-device interface has several `IoConnector`s (four on the IM 155-6 PN ST V6.4).
   `network_io_assign` with `sharedDevice: true` connects a further, unassigned connector to another PLC's I/O system while

@@ -2,9 +2,8 @@
 
 The open part of the Hardware/remote I/O item (ET 200SP on a second controller, shared devices, GSD devices,
 address-changing replacements, rings with media redundancy) and the deferred rows `hardware.distributed_io` and
-`hardware.catalog_profiles` are now implemented against the installed V21 PublicAPI. Nothing here is natively qualified
-yet: one native run of the [hardware runner](../../scripts/qualify_hardware_changes.py) covers all of it (below). Drive
-devices stay blocked by D10.
+`hardware.catalog_profiles` are implemented and natively qualified (`local.hardware_changes.topology.20261101`, below), except GSD
+devices (a V21 installation boundary) and the `sharedDevice` disconnect. Drive devices stay blocked by D10.
 
 ## What was built
 
@@ -60,19 +59,32 @@ hardware runner's `gsd_device` step then finds the `GSD:` catalog entry named `T
 (checkpoint, no compile while unassigned), puts its interface on `HwNet` and assigns it to the second CPU's IO system with
 the device compile. Without the installed file it records `gsdNotInstalled` and goes on; that is not a failure.
 
-## Native runs needed
+## Qualification run
 
-One owned TIA Portal V21 instance, one owned scratch project, a frozen `git archive` build of this branch, about 60 to 90
-minutes each:
+| Rows | Runner | Build | Result | Evidence |
+| --- | --- | --- | --- | --- |
+| `change.network_mrp_set`, `change.hardware_shared_device_access`, `change.network_io_assign` (sharedDevice), `change.hardware_replace` (acceptAddressChange), `hardware.catalog_profiles`, `hardware.distributed_io`, with every other hardware kind of the runner | [`qualify_hardware_changes.py`](../../scripts/qualify_hardware_changes.py) | `artifacts/hf6` (`b8885c6c`) | Passed, 460/460 steps | `local.hardware_changes.topology.20261101` |
 
-0. **Prerequisite for the GSD gate** (optional): the one-time manual GSD installation above.
-1. **Key discovery** (not evidence; `scripts/curate_evidence.py` never counts a `discovery` report as completed): `python -B scripts/qualify_hardware_changes.py --host <frozen Host> --worker <frozen worker>
-   --artifacts D:/Entwicklung/TIA_MCP-public/artifacts/<run-id> --run-native --discover --timeout 900`. The new steps' exact
-   state deltas (ET 200SP head items and server, shared-device system constants and address owners, MRP attributes, the
-   DI 32 replacement subtree) are not known before TIA shows them; `--discover` records every difference under `discovered`
-   instead of failing, as the families run's earlier key-discovery pass did.
-2. **Qualification**: the same command without `--discover`, after the expectations are fixed from run 1. Its
-   `profiles.json` fills `contracts/hardware-catalog-profiles.v1.json` once curated.
+One owned TIA Portal V21 instance and one owned scratch project, built and run from a frozen `git archive` copy; nothing
+touched a user project, a PLC or PLCSIM. Every applied kind persisted across a fresh owned Portal reopen, and every new
+kind was applied, refused and restored:
+
+- **ET 200SP on the second CPU:** the IM 155-6 PN ST V6.4 joined HwPeerIo with its generated server module (moved to slot 4).
+  `SpDi3` at slot 1 holds the light BaseUnit and raises the update time to 2 ms; the family modules at slots 2 and 3
+  continue its potential group. Two DI 8x24VDC ST were plugged, commented, replaced (6ES7 131-6BF00 V1.1 to -6BF01 V0.0)
+  and deleted, each with a restore.
+- **Shared device in one project:** connector 1 joined a new IO system `HwScratchIo` of the scratch CPU, and `SpDi3` was
+  assigned to it in the same change. Its address moved into the scratch CPU's space, and its system constant moved tables.
+- **Shared access:** `SpDi4` was set `OutsideOfProject` with one external IO controller (addresses released, constant
+  removed), then restored to `PLC` on the second CPU.
+- **MRP ring:** the roles were set while the members' ports were unlinked, the line was relinked, and the ring was closed;
+  the first client's join and the closure were restored once. `ManagerAuto` was restored after the reopen.
+- **Address-changing replacement:** DI 16x24VDC HF to DI 32x24VDC HF V2.2 was refused as `AddressReferenced` until the tag
+  `HwInput` was acknowledged, then applied (map and tag impact read back) and restored.
+- **GSD:** `gsdNotInstalled` (no installed I-device GSD).
+- **Profiles:** 13 module capability profiles are now in `contracts/hardware-catalog-profiles.v1.json`.
+
+The run used three discovery passes in this slot (hw3 to hw5, below). The `sharedDevice` disconnect is not exercised.
 
 ## Discovery passes (not evidence)
 

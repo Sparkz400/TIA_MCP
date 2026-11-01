@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5574067121890e20d79b2254775e05c318655206274503859d214e2c563ea1c7",
-      "bytes": 1443384
+      "sha256": "1e92abc7a3f50aa2a9b56cc3e4020c90078b08d9db38dbd49202ef2bdfdcd1f4",
+      "bytes": 1448945
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -302,8 +302,8 @@
     },
     {
       "path": "contracts/hardware-catalog-profiles.v1.json",
-      "sha256": "19ef5a38bc15cf35ee625720769e5501ef3395d0e5601a8d8054eef776f053de",
-      "bytes": 43
+      "sha256": "8ce6f12e002e02dfc6766ffd73e17829a66364e94612ec2267a00aa2ce3d541a",
+      "bytes": 416230
     },
     {
       "path": "contracts/hardware-catalog-profiles.v1.schema.json",
@@ -97235,6 +97235,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.families.20261029.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.topology.20261101",
+          "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -97272,7 +97279,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hardware_changes.topology.20261101",
+          "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -99171,6 +99186,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.families.20261029.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.topology.20261101",
+          "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -99208,7 +99230,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hardware_changes.topology.20261101",
+          "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -106063,7 +106093,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hardware_changes.topology.20261101",
+          "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -106099,7 +106137,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hardware_changes.topology.20261101",
+          "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a",
+          "artifacts": [
+            "evidence/local.hardware_changes.topology.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -121273,6 +121319,11 @@
       "sha256": "b30600658a303e425604a9771f01c34a9df2c2752855a95cd6af513fc1e7dc42"
     },
     {
+      "path": "evidence/local.hardware_changes.topology.20261101.json",
+      "state": "observed",
+      "sha256": "a1a66d59723b589388ccf541383effe07130b1960f8abf8df508b0c093f8d69a"
+    },
+    {
       "path": "evidence/local.hmi.bridge.rerun.20261029.json",
       "state": "observed",
       "sha256": "4a682db29aa6102a3a16b03c490d69811d01eb6a1303f4da4aaee86bedec3d9c"
@@ -122093,6 +122144,10 @@
     {
       "id": "local.hardware_changes.families.20261029",
       "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63"
+    },
+    {
+      "id": "local.hardware_changes.topology.20261101",
+      "profileSha256": "759f57d5245e75c4b926f6779d9955ef1d018b7d8202bc8d577902c9765edd2a"
     },
     {
       "id": "local.hmi.bridge.rerun.20261029",
