@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using TiaMcp.Core;
 using TiaMcp.Core.PhysicalRuntime;
 using TiaMcp.Simulation;
@@ -18,11 +19,24 @@ public sealed class PlcsimTargets(SimulatorClient simulator, IBridgeClient engin
             programFingerprint = binding.ProgramFingerprintSha256 is null ? "notObserved" : "boundOnlineFingerprint", physicalPlc = false, nativeQualified = false };
     }
 
-    /// <summary>Refuses unless the endpoint is a controller address of the bound instance, routed through the PLCSIM adapter, and the worker still observes that exact owned instance.</summary>
-    public async Task Require(string bindingSha256, string endpoint)
+    // The adapter each runtime session's endpoint was routed through when it connected (null if undetermined or it changed during the
+    // connect), keyed by "web:"/"ua:" and the attemptId. Sessions never survive a Host restart, so memory is enough.
+    private readonly ConcurrentDictionary<string, string?> connectedRoutes = new(StringComparer.Ordinal);
+
+    /// <summary>Runs one session connect and records the route it was opened on; the first attempt of a session ID is the one kept.</summary>
+    public async Task<T> Connect<T>(string session, string endpoint, Func<Task<T>> connect)
+    {
+        string? before = SimulationNetworkRoute.Adapter(endpoint);
+        try { return await connect(); }
+        finally { string? after = SimulationNetworkRoute.Adapter(endpoint); connectedRoutes.TryAdd(session, before == after ? before : null); }
+    }
+
+    /// <summary>Refuses unless the endpoint is a controller address of the bound instance, routed through the PLCSIM adapter both when the session
+    /// connected and now, and the worker still observes that exact owned instance.</summary>
+    public async Task Require(string bindingSha256, string session, string endpoint)
     {
         var recorded = PlcsimTargetBindings.Read(options.ArtifactsDirectory, bindingSha256);
-        PlcsimTargetBindings.RequireEndpoint(recorded, endpoint, SimulationNetworkRoute.Adapter(endpoint));
+        PlcsimTargetBindings.RequireEndpoint(recorded, endpoint, connectedRoutes.TryGetValue(session, out var connected) ? connected : null, SimulationNetworkRoute.Adapter(endpoint));
         PlcsimTargetBindings.RequireSameInstance(recorded, await Observe(recorded.InstanceId, recorded.InstanceName, recorded.CreationId));
     }
 

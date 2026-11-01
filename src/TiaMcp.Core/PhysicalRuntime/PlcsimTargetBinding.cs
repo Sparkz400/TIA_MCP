@@ -112,6 +112,18 @@ public static class PlcsimTargetBindings
             : "Windows routes the endpoint address through a network adapter other than the PLCSIM Virtual Ethernet Adapter, where a physical PLC can hold the same address. Writes and control are refused; nothing was sent.");
     }
 
+    /// <summary>A session keeps the route it was opened on: one opened while Windows routed the address through another card (a physical PLC)
+    /// stays refused after the PLCSIM adapter becomes the best route. connectedAdapter is SimulationNetworkRoute.Adapter at connect, null when
+    /// undetermined or when it changed during the connect.</summary>
+    public static void RequireEndpoint(PlcsimTargetBinding binding, string endpoint, string? connectedAdapter, string? routeAdapter)
+    {
+        RequireEndpoint(binding, endpoint, routeAdapter);
+        string? connected = SimulationNetworkAdmission.RouteRefusal(connectedAdapter);
+        if (connected is not null) throw new BridgeException(connected, connected == "RuntimeTargetRouteUnverified"
+            ? "The network adapter Windows routed the endpoint address through when this session connected is not known. Disconnect and connect again; nothing was sent."
+            : "This session was connected while Windows routed the endpoint address through a network adapter other than the PLCSIM Virtual Ethernet Adapter, so it may reach a physical PLC. Disconnect and connect again; nothing was sent.");
+    }
+
     public static void RequireSameInstance(PlcsimTargetBinding recorded, PlcsimTargetBinding current)
     {
         if (recorded.InstanceId != current.InstanceId || recorded.InstanceName != current.InstanceName || recorded.CreationId != current.CreationId ||
