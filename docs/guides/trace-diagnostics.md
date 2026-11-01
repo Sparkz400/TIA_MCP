@@ -262,7 +262,10 @@ last two steps have their own tools. The rest reuse existing ones.
    Each `signalId` must be a distinct captured-declaration signal of the case. It is
    re-resolved against the saved review, and `datatype` must equal its declaration
    and fit `type` (the capture rules). The simulator worker rechecks the exact owned
-   instance and Softbus, then reads every signal. If any value differs from
+   instance and Softbus and refuses the request with `InvalidRequest` when PLCSIM's
+   tag list puts a symbol in the output area (see
+   [outputs are read-only](simulation.md#outputs-are-read-only)), then reads every
+   signal. If any value differs from
    `expected`, nothing is written and the result is `preconditionMismatch` with the
    values read. Otherwise each write is sent once in order and read back.
    `readbackMatches` reports each readback. The sequence stops at the first failure

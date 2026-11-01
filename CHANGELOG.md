@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.97`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.101`.
 
 ### Added
 
@@ -208,6 +208,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     - Admission reconcile of a combined apply's step workspace no longer holds on the temporary
       file a crashed journal write leaves; it lists it in the evidence and never reads it.
     - The text-list Host-loss sweep now fails when a run leaves a temporary file behind.
+    - `sim_write`, `sim_write_signals`, `sim_test` step writes and `diagnostic_plcsim_write` refuse a
+      symbol whose area in PLCSIM's tag list is the output area, as `sim_area_write` refuses outputs
+      (`InvalidRequest`, the whole request, before anything is written); inputs, markers, data blocks,
+      timers and counters stay writable. The native recheck is open.
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the

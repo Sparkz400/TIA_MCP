@@ -46,13 +46,13 @@ The simulator MCP tool names match the `sim_*` bridge operations below. Engineer
 | `plc_station_upload` | Engineering operation: `downloadTicket`, optional `runtimeCredentialMetadataPath`, `trustOwnedSimulationCertificate`. Uploads the owned instance's station into a new worker-owned project and returns its path. Shared mutation admission. See [Online compare and station upload](#online-compare-and-station-upload). |
 | `sim_tags` | `instanceId`, optional `filter`, `maxItems` and `refresh`. Reads bounded symbolic tag metadata. |
 | `sim_read` | `instanceId`, `signals` array of `{symbol,type}`. Returns each value's observation and completion time and quality, with error text and code for a bad read. |
-| `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Owned instances only. Validates all values before writing and reports completed writes if a later write fails. |
+| `sim_write` | `instanceId`, `writes` array of `{symbol,type,value}`. Owned instances only. Validates all values and refuses output tags before writing (see [outputs are read-only](#outputs-are-read-only)), and reports completed writes if a later write fails. |
 | `sim_read_signals` | `instanceId`, `signals` array of 1–64 `{symbol,type}` without `string`/`wstring`. Reads them in one `ReadSignals` call; see [Batch signals, process image and observation](#batch-signals-process-image-and-observation). |
-| `sim_write_signals` | `instanceId`, `writes` array of 1–64 `{symbol,type,value}` with distinct symbols. Owned instances only; one `WriteSignals` call. |
+| `sim_write_signals` | `instanceId`, `writes` array of 1–64 `{symbol,type,value}` with distinct symbols. Owned instances only; output tags are refused; one `WriteSignals` call. |
 | `sim_area_read` | `instanceId`, `area` (`input`, `output`, `marker`), `offset`, optional `length` (1–1024, default 1) or `bit` (0–7). Reads process-image bytes or one bit by address. |
 | `sim_area_write` | `instanceId`, `area` (`input`, `marker`), `offset`, then `bytes` (1–1024 values 0–255) or `bit` with a boolean `value`. Owned instances only. |
 | `sim_observe` | `instanceId`, optional `windowMs` (0–60000, default 0), `maxEvents` (1–256, default 64) and `includeDisplayData`. Operating state, mode and display data, plus the operating-state and LED changes within the window. |
-| `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs` and `virtualTime`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. Steps with `writes` and `virtualTime: true` need an owned instance. `virtualTime: true` steps virtual time; see [Virtual time, events and storage](#virtual-time-events-and-storage). |
+| `sim_test` | `instanceId`, `artifactDirectory`, `signals`, `steps`, optional `intervalMs` and `virtualTime`. Applies timed stimuli, captures values, evaluates assertions, and retains a JSON report. Steps with `writes` and `virtualTime: true` need an owned instance; a step write to an output tag refuses the scenario before it starts. `virtualTime: true` steps virtual time; see [Virtual time, events and storage](#virtual-time-events-and-storage). |
 | `sim_time` | `instanceId`, optional `scaleFactor` and `systemTimeUtc`. Reads, or on an owned instance sets and reads back, the virtual clock. |
 | `sim_event` | `instanceId`, optional `event`. Lists the configured hardware-interrupt events and injects one interrupt or fault into an owned instance in RUN. |
 | `sim_storage` | `instanceId`, `artifactDirectory`, `action` (`archive`, `retrieve`), and for retrieve `archivePath` and `expectedSha256`. Archives or restores an owned, powered-off instance's virtual memory card. |
@@ -179,8 +179,8 @@ otherwise), and are refused before any runtime call when a value or bound is inv
 - **Process image by address.** `sim_area_read` reads the input, output or marker image: `length` bytes
   from `offset`, or one `bit`. `sim_area_write` writes `bytes` from `offset`, or one `bit`, into the input
   or marker image. A range beyond the area's size is refused with `InvalidRequest`. Byte order is the
-  PLC's: the first byte of a word is its high byte. Writing outputs is refused: the program writes the
-  output image every scan, so an assignment there would last until the next scan at most. Area writes are
+  PLC's: the first byte of a word is its high byte. Writing outputs is refused (see
+  [outputs are read-only](#outputs-are-read-only)). Area writes are
   assignments, never forces: the program overwrites on its next scan whatever marker it writes itself.
   A CPU 1511 reports 32768 input and output bytes and 16384 marker bytes; an instance that is off reports
   0-byte areas, so every range is refused.
@@ -199,6 +199,19 @@ otherwise), and are refused before any runtime call when a value or bound is inv
 All five were verified natively on one owned Softbus CPU 1511 instance against single `sim_read` calls,
 PLC tags at the addressed bytes, the polled operating state and a separate PLCSIM API client's own log
 (`local.plcsim_signals.20261030`).
+
+### Outputs are read-only
+
+The program writes the outputs, so no simulator write tool assigns one. `sim_area_write` refuses the
+output area, and every symbolic writer (`sim_write`, `sim_write_signals`, the step writes of `sim_test`
+and `diagnostic_plcsim_write`) refuses a symbol whose area in PLCSIM's tag list is `Output`, itself or
+as an element or member of an entry there (`"Out".Member`, `"Out".Arr[2]`). The area PLCSIM reports
+decides, never the name: a DB member called `Output` stays writable, a tag at `%Q` is refused whatever
+it is called. One such symbol refuses the whole request with `InvalidRequest`, the code `sim_area_write`
+uses, and names it in `details.symbol`; nothing is written, and a scenario does not start. Inputs,
+markers, data blocks, timers and counters stay writable as before. A symbol missing from the tag list is
+left to PLCSIM, which resolves names through that same list (`DoesNotExist`, or `NotUpToDate` until
+`sim_tags` refreshes it). The rule is checked offline; its native recheck is open ([TODO](../TODO.md)).
 
 ## Online compare and station upload
 
