@@ -62,7 +62,7 @@ SCENARIOS = {
 # Generic change_apply matrix: one fixture per reconciliation class, killed at each durable journal boundary.
 # Reconciliation depends on the kind only through its fingerprint route, so each class has one representative.
 # Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
-TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hardware_attributes", "tag_set", "constant_set",
+TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hardware_attributes", "tag_set", "constant_set",
                 "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
                 "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
                 "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize", "vci_conflict_resolve",
