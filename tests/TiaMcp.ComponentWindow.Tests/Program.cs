@@ -170,6 +170,17 @@ window = Next(window, "recoveryReconciled", p => p with { State = "recoveryRecon
 Directory.Delete(finished.Manifest.PlanDirectory, true);
 Check(new EngineeringMutationAdmissionStore(finished.Root).Acquire(Scope(Path.Combine(finished.Root, "unrelated")), new('c', 64)).State == "dispatchIntent", "A finished window whose plan is gone does not block unrelated mutations");
 Reject(() => finishedStore.Read(window.Id), "MutationScopeIncomplete");
+// Windows are never removed: past the bound a scan moves finished ones into .archive, where they still read and keep their identity.
+int archiveAbove = EngineeringOperationStore.ArchiveAbove; EngineeringOperationStore.ArchiveAbove = 0;
+try
+{
+    Check(new EngineeringMutationAdmissionStore(finished.Root).Acquire(Scope(Path.Combine(finished.Root, "unrelated-later")), new('c', 64)).State == "dispatchIntent" &&
+        Directory.Exists(Path.Combine(finished.Root, "engineering-component-windows", ".archive", window.Id)), "A scan past the bound archives a finished window");
+    Directory.CreateDirectory(finished.Manifest.PlanDirectory);
+    Check(finishedStore.Read(window.Id).State == "recoveryReconciled", "An archived window still reads by id");
+    Reject(() => finishedStore.Acquire(finished.Manifest), "ComponentReplayRefused");
+}
+finally { EngineeringOperationStore.ArchiveAbove = archiveAbove; }
 // A clock stepped back after the reservation was stamped keeps the next child valid.
 var clock = Fixture(Path.Combine(basis, "clock")); var clockStore = new ComponentQualificationWindowStore(clock.Root);
 var (stamped, clockToken) = clockStore.Acquire(clock.Manifest);

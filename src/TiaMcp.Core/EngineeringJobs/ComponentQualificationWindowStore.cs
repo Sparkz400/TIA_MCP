@@ -49,7 +49,7 @@ public sealed class ComponentQualificationWindowStore
         var occupied = new EngineeringOperationStore(root).PendingResourceKeysUnderLock()
             .Concat(EngineeringMutationAdmissionStore.PendingResourceKeysUnderLock(root));
         if (occupied.Any(a => keys.Any(b => EngineeringResourceKey.Overlaps(a, b)))) Fail("ResourceBusy", "A durable owner already reserves a component resource.");
-        if (Directory.Exists(PackageStorage.Under(directory, manifest.Id))) Fail("ComponentReplayRefused", "A component window identity is never reused.");
+        if (Directory.Exists(Folder(root, manifest.Id))) Fail("ComponentReplayRefused", "A component window identity is never reused.");
         string capability = Convert.ToHexStringLower(RandomNumberGenerator.GetBytes(32));
         using var process = Process.GetCurrentProcess();
         var record = new ComponentWindowReservation(manifest.Id, 0, "active", manifest, ManifestHash(manifest), keys,
@@ -211,17 +211,31 @@ public sealed class ComponentQualificationWindowStore
     private static IEnumerable<ComponentWindowReservation> Records(string root)
     {
         string path = PackageStorage.Under(root, "engineering-component-windows"); if (!Directory.Exists(path)) yield break;
-        var folders = Directory.GetDirectories(path); if (folders.Length > 10000) Fail("OperationStoreLimit", "Too many component reservations.");
+        var folders = Directory.GetDirectories(path); int kept = 0;
         foreach (string folder in folders)
         {
             string name = Path.GetFileName(folder);
-            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit)) continue;
-            yield return ReadUnderLock(root, name, scan: true);
+            if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
+            var record = ReadUnderLock(root, name, scan: true);
+            // Windows are never removed, so past the bound a scan moves finished ones into .archive; the bound counts what stays.
+            if (folders.Length > EngineeringOperationStore.ArchiveAbove && Terminal(record))
+            {
+                EngineeringOperationStore.Archive(folder, PackageStorage.Under(path, ".archive/" + name));
+                if (!Directory.Exists(folder)) continue;
+            }
+            if (++kept > 10000) Fail("OperationStoreLimit", "Too many component reservations.");
+            yield return record;
         }
+    }
+    // A finished window may have moved into .archive (an older Host's scan refuses that folder); ids are unique across both.
+    private static string Folder(string root, string id)
+    {
+        string active = PackageStorage.Under(root, "engineering-component-windows/" + id);
+        return Directory.Exists(active) ? active : PackageStorage.Under(root, "engineering-component-windows/.archive/" + id);
     }
     private static ComponentWindowReservation ReadUnderLock(string root, string id, bool scan = false)
     {
-        PackageStorage.Id(id); string path = PackageStorage.Under(root, "engineering-component-windows/" + id);
+        PackageStorage.Id(id); string path = Folder(root, id);
         if (!Directory.Exists(path)) Fail("OperationNotFound", "Component window was not found.");
         var files = Directory.GetFiles(path, "*.json").Order(StringComparer.Ordinal).ToArray();
         if (files.Length is < 1 or > 96) Fail("JournalInvalid", "Component reservation revisions must be bounded.");

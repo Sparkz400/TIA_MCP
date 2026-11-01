@@ -177,6 +177,8 @@ internal static class EngineeringOperationChecks
             Check(!Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", archived.Id)) && Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", ".archive", archived.Id)) &&
                 finishedStore.Read(archived.Id).State == "succeeded", "A finished operation moves into .archive, out of the growth bound, and still reads by id");
             Check(finishedStore.Prepare(Owned("archived"), "archived").Id == archived.Id, "An archived operation keeps its idempotency key");
+            Check(Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", ".archive", finished.Id)) && finishedStore.Read(finished.Id).State == "succeeded" &&
+                finishedStore.Prepare(Owned("finished"), "finished").Id == finished.Id, "A scan past the bound archives a success that finished in place before, and its key still finds it");
             Reject(() => PackageStorage.Id(".archive"), "InvalidRequest"); // So an older Host's scan refuses the store instead of missing archived keys.
             var recovering = finishedStore.ReserveRecovery(archived.Id, archived.Revision, [new(archived.Plan.Resources[0].ResourceKey, Path.Combine(finishedRoot, "recovered.ap21"))]);
             var rival = finishedStore.Prepare(Owned("archived"), "archived-contender");

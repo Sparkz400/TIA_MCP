@@ -386,14 +386,22 @@ public sealed class EngineeringOperationStore
 
     private IEnumerable<EngineeringOperationRecord> Records()
     {
-        var paths = Directory.GetDirectories(directory);
-        if (paths.Length > 10000) Fail("OperationStoreLimit", "Archive reconciled records before adding operations.");
+        var paths = Directory.GetDirectories(directory); int kept = 0;
         foreach (string path in paths)
         {
             string name = Path.GetFileName(path);
             // A staged prepare never authorizes checkpoint/dispatch and is not a committed operation.
             if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
-            yield return ReadLocked(name, scan: true);
+            var record = ReadLocked(name, scan: true);
+            // Past the bound a scan also archives a finished record left in place (finished before archiving existed), so a store
+            // that grew beyond the limit shrinks instead of refusing every admission; the limit counts what stays.
+            if (paths.Length > ArchiveAbove && Terminal.Contains(record.State))
+            {
+                Archive(path, PackageStorage.Under(archive, name), () => PackageStorage.Save(Marker(record.IdempotencyKey), name));
+                if (!Directory.Exists(path)) continue;
+            }
+            if (++kept > 10000) Fail("OperationStoreLimit", "Archive reconciled records before adding operations.");
+            yield return record;
         }
     }
 
