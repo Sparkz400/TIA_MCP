@@ -89,6 +89,7 @@ a current blocker. Use [TODO](TODO.md) for the current order of work.
 - [HMI plan](plans/hmi-integration-plan.md), [HMI acceptance backlog](plans/hmi-remaining-work.md)
 - [Typed LAD/FBD plan](plans/typed-lad-fbd-builders-plan.md), [typed acceptance backlog](plans/typed-lad-fbd-todo.md)
 - [Project explorer plan](plans/project-explorer-plan.md), [runtime real-server plan](plans/runtime-real-server-plan.md)
+- [X13 interface feasibility](plans/x13-feasibility.md)
 
 ## Verification
 
