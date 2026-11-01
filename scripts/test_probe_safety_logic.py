@@ -36,7 +36,7 @@ FLG = "{%s}" % p.FLG
 
 class ChangedLogicTests(unittest.TestCase):
     def test_two_networks_with_unique_ids(self):
-        changed = p.changed_main(GENERATED, "FdiCh0", "SafeOut", "SafeAlive")
+        changed = p.changed_main(GENERATED, 16, "SafeOut", "SafeAlive")
         ids = re.findall(r' ID="([0-9A-F]+)"', changed)
         self.assertEqual(len(ids), len(set(ids)))
         root = ElementTree.fromstring(changed.encode("utf-8"))
@@ -44,7 +44,9 @@ class ChangedLogicTests(unittest.TestCase):
         self.assertEqual(2, len(units))
         networks = [unit.find("AttributeList/NetworkSource/" + FLG + "FlgNet") for unit in units]
         symbols = [[c.get("Name") for c in n.iter(FLG + "Component")] for n in networks]
-        self.assertEqual([["FdiCh0", "SafeOut"], ["SafeAlive"]], symbols)
+        self.assertEqual([["SafeOut"], ["SafeAlive"]], symbols)
+        address = networks[0].find(".//" + FLG + "Address")
+        self.assertEqual({"Area": "Input", "Type": "Bool", "BitOffset": "16"}, address.attrib)
         self.assertEqual("TRUE", networks[1].find(".//" + FLG + "ConstantValue").text)
         for net in networks:
             self.assertEqual(["Coil"], [part.get("Name") for part in net.iter(FLG + "Part")])
@@ -52,7 +54,7 @@ class ChangedLogicTests(unittest.TestCase):
         self.assertEqual(["F_FBD", "F_FBD"], [u.find("AttributeList/ProgrammingLanguage").text for u in units])
 
     def test_only_an_empty_generated_network_is_changed(self):
-        changed = p.changed_main(GENERATED, "FdiCh0", "SafeOut", "SafeAlive")
+        changed = p.changed_main(GENERATED, 0, "SafeOut", "SafeAlive")
         with self.assertRaises(AssertionError):
             p.changed_main(changed, "FdiCh0", "SafeOut", "SafeAlive")
         with self.assertRaises(AssertionError):
