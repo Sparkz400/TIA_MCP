@@ -908,9 +908,9 @@
       "implementation": "partial_definitions_imports_native_execution_gated",
       "qualification": "native_definitions_application_runs_and_ts_q01_style_qualification_verified_production_style_execution_v21_boundary",
       "releaseAccepted": false,
-      "currentResult": "1 November 2026 (catalog 0.4.97): 23 release-matrix rows (9 shipped, 7 limited, 2 unqualified, 5 unavailable on V21); 83 cells bound, 16 open and 35 blocked. TS-Q01 passed natively in the qualification build with operator scope and license observations (local.testsuite.style-q01.20261101): clean passed, violating assertionFailure, stop between two runs, and lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay; it verifies testsuite_style_job_status, _results and _stop_request. Production style execution is a V21 boundary (maintainer decision, 1 November; five dispositions): V21 Update 3 cannot re-check a style rule's scope at execution time. Application execution passed in the TS-Q02 qualification mode (local.testsuite.application.20261030).",
-      "remainingWork": "16 cells: testsuite_style_job_prepare (it also queues application reviews; no native run has dispatched a job it prepared) and testsuite_system_plan_prepare (system execution has no qualification mode).",
-      "nextAction": "Run a TS-Q02 case that calls testsuite_style_job_prepare on a qualification review and dispatches that job through qualification_testsuite_execute; build a qualification mode for system execution.",
+      "currentResult": "1 November 2026 (catalog 0.4.108): 23 release-matrix rows (10 shipped, 7 limited, 1 unqualified, 5 unavailable on V21); 90 cells bound, 9 open and 35 blocked. TS-Q01 passed natively in the qualification build with operator scope and license observations (local.testsuite.style-q01.20261101): clean passed, violating assertionFailure, stop between two runs, and lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay; it verifies testsuite_style_job_status, _results and _stop_request. Production style execution is a V21 boundary (maintainer decision, 1 November; five dispositions): V21 Update 3 cannot re-check a style rule's scope at execution time. Application execution passed in the TS-Q02 qualification mode (local.testsuite.application.20261030). Two TS-Q02 cases queued the fixture case with testsuite_style_job_prepare from a testsuite_application_plan_prepare review and dispatched that job through qualification_testsuite_execute (passed; failed, recovered and reconciled verifiedRestored), which verifies testsuite_style_job_prepare (local.testsuite.job-prepare.20261101).",
+      "remainingWork": "9 cells: testsuite_system_plan_prepare (system execution has no qualification mode).",
+      "nextAction": "Build a qualification mode for system execution.",
       "ownerRole": "Test Suite",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -928,7 +928,8 @@
         "docs/verification/testsuite-result-review-20261016.md",
         "docs/plans/expansion-plans/native-test-suite.md",
         "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
-        "docs/verification/testsuite-style-q01-20261101.md"
+        "docs/verification/testsuite-style-q01-20261101.md",
+        "docs/verification/testsuite-job-prepare-20261101.md"
       ],
       "packages": [
         "AC-17"
