@@ -129,7 +129,17 @@ namespace TiaMcp.Openness.V21
             return ranges;
         }
 
-        // A tag on an F-I/O address becomes a safety tag; tag_create, tag_set and tag_table_import_xml refuse it before writing.
+        // A tag table from a master copy brings addresses nothing can read before the create, so library_instantiate refuses one while the
+        // PLC owns, or may own, any F-I/O range.
+        private static void RejectFIoMasterCopy(PlcSelection plc, string masterCopy)
+        {
+            if (TagAddressRules.AnyFIo(FIoAddressRanges(plc)) is string fIo)
+                throw new BridgeException("SafetyBoundary", "The tag addresses of master copy " + masterCopy + " cannot be read before it is instantiated (V21 exposes only its content names), and the PLC " +
+                    "owns or may own the F-I/O " + fIo + "; a tag there would become a safety tag, which standard tag changes exclude. Nothing was written. Import the table with " +
+                    "tag_table_import_xml, which checks every address.", new JObject { ["masterCopy"] = masterCopy, ["fIoPath"] = fIo });
+        }
+
+        // A tag on an F-I/O address becomes a safety tag; tag_create, tag_set, tag_table_import_xml and project-ward VCI imports refuse it before writing.
         private static void RejectFIoAddresses(PlcSelection plc, IEnumerable<string> addresses)
         {
             var io = addresses.Where(address => TagAddressRules.Io(address) != null).ToArray();

@@ -1,8 +1,9 @@
 """Probe which technology object types and versions V21 creates on each CPU of one owned scratch (technology.version_profiles).
 
 V21 has no CPU-specific technology type/version catalog, so each matrix cell is a create-and-refuse capture: one to_create
-of TvProbe with unprofiledAcknowledged, applied with checkpoint but without compile or save (an unconnected axis or
-encoder never compiles), read back through technology_read and restored from its own checkpoint. After every restore the
+of TvProbe with unprofiledAcknowledged, applied with checkpoint and without save, read back through technology_read and
+restored from its own checkpoint. Only motion cells compile: change_apply refuses a PLC's first motion object without
+compile (CompileRequired), and the compile of an unconnected axis or encoder then fails after the create. After every restore the
 blocks, types, tag tables and technology objects of every PLC must equal the baseline; the superseded recovered copy is
 then deleted (its checkpoint archives stay, and its size and project-file SHA-256 are recorded), and the matrix stops with
 a recorded diskSpace boundary when free space falls below MIN_FREE_BYTES.
@@ -207,7 +208,7 @@ class Run:
             error, prepared = outcome(h, "change_prepare", {"kind": "to_create", "payload": payload, "plcPath": cpu["plcPath"]})
             if error:
                 return {"outcome": "refusedByProfile" if error.get("code") == "TechnologyVersionRefused" else "refusedAtPrepare", "error": error}
-            error, applied = outcome(h, "change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
+            error, applied = outcome(h, "change_apply", {**h.apply_args(prepared), "compile": family in MOTION[cpu["line"]], "save": False})
             status = applied
             if error:
                 if h.unresolved_admissions():

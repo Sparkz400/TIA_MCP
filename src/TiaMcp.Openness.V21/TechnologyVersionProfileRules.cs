@@ -74,6 +74,16 @@ namespace TiaMcp.Openness.V21
                     " Set unprofiledAcknowledged true to let Siemens validate the pair at creation; a native refusal then requires checkpoint recovery." };
         }
 
+        // The Motion Control families scripts/probe_technology_versions.py creates (S7-1500 and S7-1200 lines).
+        internal static readonly string[] MotionTypes = { "TO_PositioningAxis", "TO_SpeedAxis", "TO_SynchronousAxis", "TO_ExternalEncoder", "TO_MeasuringInput", "TO_OutputCam", "TO_Cam", "TO_CommandTable" };
+
+        /// <summary>True when creating typeIdentifier makes it the PLC's first motion object, given the types of every technology object
+        /// the PLC holds. That create adds the know-how protected MC_Servo and MC_Interpolator OBs, which stay inconsistent until the PLC
+        /// compiles (local.technology.version_profiles.20261031); a later one, after a compiled motion object, does not
+        /// (local.technology.motion_connections.20261030 created its encoder and measuring input without compile).</summary>
+        internal static bool FirstMotionObject(string typeIdentifier, IEnumerable<string> existingTypes) =>
+            MotionTypes.Contains(typeIdentifier, StringComparer.Ordinal) && !existingTypes.Any(type => MotionTypes.Contains(type, StringComparer.Ordinal));
+
         // Version equality, as the native Create(name, type, Version) receives it: "10.0" and "10.00" are one version, "10.0.0" another.
         private static Version DottedVersion(string text) =>
             text != null && Regex.IsMatch(text, @"^\d{1,4}(\.\d{1,4}){1,3}$") && Version.TryParse(text, out var version) ? version : throw Contract.Invalid("version must be dotted numeric: " + text);
