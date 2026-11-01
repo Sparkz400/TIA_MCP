@@ -102,6 +102,7 @@ overall because of a qualifier fault in two other cases, which the rerun fixed
 | `project_retrieve` | **qualified**: released, destination equals archive |
 | `scratch_create` | **qualified as held**: partial project cannot be opened |
 | `library_open` | **qualified**: released before receipt; held with partial working copy |
+| `project_upgrade` | **prepared** (1 November): `pf-*` (project folder, `OpenWithUpgrade`) and `pa-*` (archive, `RetrieveWithUpgrade`) in `scripts/qualify_interruption.py` interrupt it after dispatch intent, during the copy, during the native upgrade and after the upgraded project exists, by worker loss, Host loss and the Host points `host.project_upgrade.beforeDispatch`/`host.project_upgrade`. Expected: absent destination released `unchanged`; completed receipt released `verifiedApplied` (pinned inventory read independently); partial copy or unfinished upgrade held, source still reserved. Native run pending |
 | `simulation_download` | **qualified**: held admission released after a worker crash (`artifacts/f2`) |
 | `simulation_provision_scratch_credential` | **qualified** release path (`local.sim.reconcile.20261024`); refusal paths are managed tests |
 | `watch_authoring_source_negative` | **qualified** with its own reconciler (`qualification_watch_authoring_source_reconcile`) after a Host loss at `host.watch_authoring_source_negative`: released as unchanged, replay refused (`local.watch.source_reconcile.20261028`); qualification-only tool |

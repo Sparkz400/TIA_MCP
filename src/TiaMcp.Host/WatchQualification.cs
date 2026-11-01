@@ -25,20 +25,24 @@ internal sealed class WatchQualificationBridge(IBridgeClient inner, HostOptions 
             input["qualificationMarkerPath"] = marker;
             arguments = input;
         }
+        // A ".beforeDispatch" point fires after the admission's durable dispatch intent, before the native dispatch is sent.
+        if (operation == "mutation_dispatch" && point == "host." + admitted + ".beforeDispatch") Stop(point, marker, null);
         var result = await inner.CallAsync(operation, arguments, cancellationToken);
         // An admitted mutation's Host point fires after its native dispatch returned, before the Host records the outcome.
-        if (point == "host." + (operation == "mutation_dispatch" ? admitted : operation))
-        {
-            using (var file = new FileStream(marker, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
-            {
-                JsonSerializer.Serialize(file, new { point, hostProcessId = Environment.ProcessId,
-                    hostStartedAtUtc = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
-                    response = result, automaticReplay = false }, BridgeProtocol.Json);
-                file.Flush(true);
-            }
-            Environment.Exit(74);
-        }
+        if (point == "host." + (operation == "mutation_dispatch" ? admitted : operation)) Stop(point, marker, result);
         return result;
+    }
+
+    private static void Stop(string point, string marker, JsonElement? response)
+    {
+        using (var file = new FileStream(marker, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+        {
+            JsonSerializer.Serialize(file, new { point, hostProcessId = Environment.ProcessId,
+                hostStartedAtUtc = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
+                response, automaticReplay = false }, BridgeProtocol.Json);
+            file.Flush(true);
+        }
+        Environment.Exit(74);
     }
 }
 

@@ -82,7 +82,7 @@ Qualification-only options register gated test tools and interruption points for
 | Option | Constraint |
 | --- | --- |
 | `--component-qualification` | Registers the component qualification tools and is passed to the engineering worker |
-| `--watch-qualification <point>` | Requires `--component-qualification`; one watch-table interruption point such as `save.after` or `host.watch_apply_native`; adds the watch authoring qualification tools |
+| `--watch-qualification <point>` | Requires `--component-qualification`; one watch-table interruption point such as `save.after` or `host.watch_apply_native`, or the `project_upgrade` Host points `host.project_upgrade.beforeDispatch` and `host.project_upgrade` (before and after its native dispatch); adds the watch authoring qualification tools |
 | `--runtime-qualification <point>` | Requires `--component-qualification`; `ua.write.afterSend` or `web.write.afterSend` ends the Host right after a runtime write is sent |
 | `--testsuite-scope-probe` | Its own sequential Host |
 | `--testsuite-qualification` | Its own sequential Host; only in builds with the `TESTSUITE_QUALIFICATION` constant |

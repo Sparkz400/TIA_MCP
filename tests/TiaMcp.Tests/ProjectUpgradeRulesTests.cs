@@ -140,6 +140,31 @@ internal static class ProjectUpgradeRulesTests
         Check.Equal(false, Directory.Exists(folder));
     }
 
+    internal static Task ReceiptProvesOnlyACompletedUpgradeAtTheLayout()
+    {
+        string root = Path.Combine(Path.GetPathRoot(AppContext.BaseDirectory)!, "tia-upgrade-" + Guid.NewGuid().ToString("N"), "u_12345678");
+        JObject Receipt(string state, string source, string format, string name, string project) => new() { ["state"] = state,
+            ["source"] = new JObject { ["path"] = source, ["format"] = format, ["projectName"] = name }, ["project"] = new JObject { ["path"] = project } };
+        string folder = Path.Combine(root, "Demo_V21", "Demo_V21.ap21"), archive = Path.Combine(root, "w", "Main_V21", "Main_V21.ap21");
+        // A project folder is admitted as its folder, an archive as its file; the receipt must belong to that source.
+        Check.Equal(folder, ProjectUpgradeRules.ReceiptProject(Receipt("upgraded", @"E:\Examples\Demo\Main.ap16", "project", "Main", folder), root, @"E:\Examples\Demo", false));
+        Check.Equal(folder, ProjectUpgradeRules.ReceiptProject(Receipt("upgraded", @"E:\Examples\Demo\Main.ap16", "project", "Main", folder), root, @"E:\Examples\Demo\", false));
+        Check.Equal(archive, ProjectUpgradeRules.ReceiptProject(Receipt("upgraded", @"E:\Examples\Demo_1.zap14", "archive", "Main", archive), root, @"E:\Examples\Demo_1.zap14", true));
+        // An interrupted copy or upgrade, another source, a project outside the observed layout or a missing receipt prove nothing.
+        foreach (var (receipt, source, isArchive) in new (JObject?, string, bool)[] {
+            (Receipt("copying", @"E:\Examples\Demo\Main.ap16", "project", "Main", folder), @"E:\Examples\Demo", false),
+            (Receipt("upgrading", @"E:\Examples\Demo\Main.ap16", "project", "Main", folder), @"E:\Examples\Demo", false),
+            (Receipt("upgraded", @"E:\Examples\Other\Main.ap16", "project", "Main", folder), @"E:\Examples\Demo", false),
+            (Receipt("upgraded", @"E:\Examples\Demo\Main.ap16", "project", "Main", Path.Combine(root, "Demo", "Demo_V21.ap21")), @"E:\Examples\Demo", false),
+            (Receipt("upgraded", @"E:\Examples\Demo\Main.ap16", "project", "Main", Path.Combine(root, "Main_V21", "Main_V21.ap21")), @"E:\Examples\Demo", false),
+            (Receipt("upgraded", @"E:\Examples\Demo_1.zap14", "archive", "Main", archive), @"E:\Examples\Demo_2.zap14", true),
+            (Receipt("upgraded", @"E:\Examples\Demo_1.zap14", "archive", "Demo_1", archive), @"E:\Examples\Demo_1.zap14", true),
+            (Receipt("upgraded", @"E:\Examples\Demo_1.zap14", "archive", "Main", Path.Combine(root, "Main_V21", "Main_V21.ap21")), @"E:\Examples\Demo_1.zap14", true),
+            (new JObject { ["state"] = "upgraded" }, @"E:\Examples\Demo", false), (null, @"E:\Examples\Demo", false) })
+            Check.Equal(null, ProjectUpgradeRules.ReceiptProject(receipt, root, source, isArchive));
+        return Task.CompletedTask;
+    }
+
     internal static Task ConversionLogSummary()
     {
         const string log = "<LogFile projectName=\"Demo\"><MessageCell MessageClass=\"Information\" /><MessageCell MessageClass=\"Warning\" />" +

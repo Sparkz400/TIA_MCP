@@ -114,6 +114,20 @@ namespace TiaMcp.Openness.V21
         internal static bool InLayout(Layout layout, string upgraded) =>
             !string.IsNullOrEmpty(upgraded) && string.Equals(Path.GetFullPath(upgraded), layout.Upgraded, StringComparison.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// The upgraded project an interrupted upgrade's receipt proves to reconciliation: only an "upgraded" receipt of the admitted
+        /// source (the archive, or the folder of the project file) that names the observed layout's .ap21 under root. Otherwise null:
+        /// a partial copy or an unfinished upgrade is held without being opened in TIA. A malformed receipt throws (the caller holds).
+        /// </summary>
+        internal static string ReceiptProject(JObject receipt, string root, string admittedSource, bool archive)
+        {
+            var source = receipt?["source"] as JObject;
+            string path = source?.Value<string>("path"), project = (receipt?["project"] as JObject)?.Value<string>("path");
+            if (receipt?.Value<string>("state") != "upgraded" || string.IsNullOrEmpty(path) || string.IsNullOrEmpty(project)) return null;
+            if (!string.Equals(Path.GetFullPath(archive ? path : Path.GetDirectoryName(path)).TrimEnd('\\', '/'), Path.GetFullPath(admittedSource).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return null;
+            return InLayout(Plan(root, path, archive, source.Value<string>("projectName")), project) ? project : null;
+        }
+
         /// <summary>TIA's conversion log: its project success marker and message counts.</summary>
         internal static JObject ConversionLog(string text) => new JObject
         {
