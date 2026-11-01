@@ -161,6 +161,20 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     on a store with an `.archive` folder); a clock step back no longer fails a dispatch.
   - Release tooling: blocked rows need a disposition, verified features cannot rest on lost raw
     reports only, the Explorer relationship checks run in CI, and a 1.x release tag is gated.
+  - Smaller findings, fixed on 1 November (offline):
+    - Web API passwords are checked without a managed string copy, and the login body is cleared
+      after the exchange.
+    - A `File.Replace` that reports 0x498 finishes the rename instead of losing both journal versions.
+    - Operation, admission and component-window revisions and VCI callback journals are renamed
+      write-through; VCI callbacks are no longer written in place.
+    - A crash during a new vault's first write no longer locks the vault; consumers refuse an
+      unknown vault name (`CredentialUnavailable`) instead of creating its folder.
+    - A logged-in Web or OPC UA session holds the vault lock only for the credential check, so a slow
+      PLC no longer makes a block-protection apply report `CredentialStoreBusy`.
+    - `sim_observe` event times are UTC; `watch_table_monitor` deletes the export its read leaves.
+    - Scans past 1,000 records archive finished ones in every store, component windows included, so
+      a store over 10,000 records shrinks instead of refusing every admission (Hosts older than this
+      change refuse a component-window store with an `.archive` folder).
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the
