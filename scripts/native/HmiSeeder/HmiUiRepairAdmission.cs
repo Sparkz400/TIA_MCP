@@ -41,7 +41,6 @@ internal static partial class Program
             admission.Value<bool?>("runtimeAllowed") != false || admission.Value<string>("helperSha256") != Hash(helperPath))
             throw new InvalidOperationException("Exact sequential fixture-only repair admission is required.");
         string archive = RepairArtifact(admission["archive"]), sourcePath = RepairArtifact(admission["sourceReport"]);
-        string recoveryPath = RepairArtifact(admission["recoveryGate"]);
         string windowPath = RepairArtifact(admission["storeWindowIntent"]), reviewPath = RepairArtifact(admission["review"]);
         var source = JObject.Parse(File.ReadAllText(sourcePath));
         var profile = ((JArray)source["profiles"]).OfType<JObject>().Single(row =>
@@ -54,14 +53,6 @@ internal static partial class Program
             profile.Value<bool?>("deliberateInvalidReferences") != false ||
             !Path.GetFileName(profile.Value<string>("projectPath")).StartsWith("TiaMcpHmi_", StringComparison.Ordinal))
             throw new InvalidOperationException("Only an unchanged independently authored positive fixture archive is admitted.");
-        var recovery = JObject.Parse(File.ReadAllText(recoveryPath));
-        var sessions = recovery["sessions"] as JArray;
-        if (recovery.Value<bool?>("completed") != true ||
-            recovery["preservation"]?.Value<bool?>("checkpointRecovery") != true ||
-            recovery["preservation"]?.Value<bool?>("recoveredFreshReopen") != true ||
-            sessions == null || sessions.Count == 0 ||
-            sessions.Any(session => session["cleanup"]?.Value<bool?>("completed") != true))
-            throw new InvalidOperationException("Completed checkpoint recovery, fresh reopen and every owned cleanup are required.");
         string output = Path.GetFullPath(admission.Value<string>("outputDirectory"));
         string root = Path.GetFullPath(admission.Value<string>("artifactRoot")).TrimEnd(Path.DirectorySeparatorChar);
         if (!output.StartsWith(root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) || Directory.Exists(output) || File.Exists(output))

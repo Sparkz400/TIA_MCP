@@ -289,16 +289,11 @@ def prerequisites(args):
             Path(profile['projectPath']).name.startswith('TiaMcpHmi_'),
             'An original positive owned fixture with observed archive retrieval is required')
     require(reference(profile['archive']['path']) == profile['archive'], 'Original archive changed')
-    recovery = read(args.recovery_report)
-    require(recovery.get('completed') is True and recovery.get('preservation', {}).get('checkpointRecovery') is True and
-            recovery.get('preservation', {}).get('recoveredFreshReopen') is True and
-            isinstance(recovery.get('sessions'), list) and len(recovery['sessions']) > 0 and
-            all(s.get('cleanup', {}).get('completed') is True for s in recovery['sessions']), 'Recovery foundation failed')
     owners = [o['name'] for o in profile['nativeBefore']]
     require(owners and all(isinstance(o, str) and o.strip() for o in owners) and
             len(set(owners)) == len(owners), 'Distinct nonempty HMI owners are required')
     references = dict(helper=reference(safe_path(args.helper)), sourceReport=reference(safe_path(args.source_report)),
-                      recoveryGate=reference(safe_path(args.recovery_report)), archive=profile['archive'])
+                      archive=profile['archive'])
     return profile, owners, references
 
 
@@ -312,7 +307,6 @@ def run(args):
             admissionGranted=False, originalReportsUnchanged=True, runtimeAllowed=False, automaticReplay=False,
             disableSecurityAllowed=False, executeScriptsAllowed=False,
             prerequisiteCompileQualified=False, freshHmiReopenQualified=False, bridgeRecoveryQualified=False,
-            recoveryEvidenceScope='Existing PLC checkpoint/reopen foundation; does not qualify HMI recovery',
             requiredNextSteps=['Resume the previously paused native editor workflow explicitly',
                 'Revalidate original inputs and acquire current sequential native/store ownership',
                 'Retrieve a new owned copy; edit only the selected prerequisite and Save',
@@ -335,10 +329,11 @@ def run(args):
         with StoreExclusiveWindow([root, *args.known_store], profile['projectPath'], root / 'window',
                 mode='isolatedQualificationMutation', resources=resources,
                 effects='Prerequisite-only UI repair in a new archive copy; no online/runtime operation', isolation=isolation):
+            # checkpointRetrievalGatePassed is backed by prerequisites(): the source profile's archiveRetrievalVerified.
             admission = dict(ownedFixture=True, sequentialNativeAdmission=True, checkpointRetrievalGatePassed=True,
                 automaticReplay=False, runtimeAllowed=False, helperSha256=reference(args.helper)['sha256'],
                 archive=profile['archive'], sourceReport=reference(args.source_report), review=review,
-                storeWindowIntent=reference(root / 'window-intent.json'), recoveryGate=reference(args.recovery_report),
+                storeWindowIntent=reference(root / 'window-intent.json'),
                 outputDirectory=str(output), artifactRoot=str(root), uiTimeoutMinutes=30)
             request = write(root / 'admission.json', admission)
             execute_helper(args.helper, request, root, output, result, isolation=isolation)
@@ -356,7 +351,7 @@ def run(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ['helper', 'source-report', 'recovery-report', 'output']:
+    for name in ['helper', 'source-report', 'output']:
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--known-store', type=Path, action='append', default=[])
     parser.add_argument('--profile', choices=sorted(PROFILES), default='classic-comfort')

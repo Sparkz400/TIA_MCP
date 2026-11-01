@@ -9044,8 +9044,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Native bounded family adapters, exact v2 HMI identities, optional module diagnostics, project-model provider registration and evidence relationships are implemented.",
-          "Inspection, engineering, visual and runtime qualification remain separate. See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
+          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0) and change.hmi_compile (one HMI target per change; not yet natively qualified: only a desk-configured fixture compiles, docs/reference/hmi-fixture-preparation.md). Each feature's own limitations bound its claim.",
+          "Not delivered: HMI content writes (change.hmi_engineering stays behind the closed HMI preservation gate), WinCC RT Professional, Classic PLC declaration mapping and visual or runtime acceptance. See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
       },
