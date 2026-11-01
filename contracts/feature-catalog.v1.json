@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.108",
+  "catalogVersion": "0.4.109",
   "targetTiaVersions": [
     21
   ],
@@ -20508,10 +20508,10 @@
           "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
           "One native Run returns one TestResults tree. It is retained losslessly for every reviewed case, but only a single-definition run owns it; lists and groups stay inconclusive per case. Warning and Information states, including inconclusive runtime outcomes, never pass.",
-          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified).",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance, that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, and that the instance was created for TCP/IP, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified), and so is a Softbus instance (PlcsimEndpointUnreachable): it keeps its configured ControllerIP, and the PLCSIM adapter can still hold that subnet with nothing listening (observed 1 November 2026).",
           "StandardSIMATIC interface only, anonymous OPC UA only. UserDefined and SiOME interfaces need SetScope(String, ServerInterfaces, DirectoryInfo) with a hash-pinned interface folder and are not offered. No credential or security-policy argument exists in the V21 API.",
           "SetScope persists the address on every reviewed case after the checkpoint. Preservation and effective scope remain unverified.",
-          "Native blocker (28 October 2026, V21 Update 3): application and system test execution (TestCaseExecutor.Run, SystemTestCaseExecutor.Run) has no qualification mode, and the production profile gate refuses it on Host and worker, so AC-native, AC-recovery, AC-runtime and AC-simulator-lifecycle have no native run. The definitions themselves are qualified (local.testsuite.definitions.20261028). Qualifying execution needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance on Softbus."
+          "Native blocker (1 November 2026, docs/verification/testsuite-system-blocker-20261101.md): system execution has no qualification mode, and the production profile gate and the TS-Q01/TS-Q02 qualification admission refuse system reviews before any native call. A TS-Q03 mode in the TS-Q02 shape is designed but not built, since it cannot run on this PC: OPC UA reaches a PLCSIM Advanced instance only in PLCSIM's TCP/IP mode, an operator setting (this PC is on Softbus); SystemTestCaseExecutor.Run and SetScope take no credential, so the scratch CPU's UMAC-protected OPC UA server would need guest access (the UMAC anonymous user holding OPCUAServerAccess), which is not settable through V21 Openness, so an operator-made seed is needed; and whether Test Suite trusts the CPU's server certificate without a UI prompt is unobserved. The definitions themselves are qualified (local.testsuite.definitions.20261028)."
         ]
       },
       "qualification": {
