@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "a9479b8a3728c7ec20035d41fa2f6b13a79d0c4015b592c8bb08e94ba72fa924",
-      "bytes": 1584927
+      "sha256": "f793c57b3546aa9d5641cda929f5259cb207ea24259e16b9dcef0a6fd75ecc01",
+      "bytes": 1593011
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2417,8 +2417,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiEngineeringRules.cs",
-      "sha256": "cc7c352667f850da11d7b8ae87d7163e33c787e7b168fdc5ba0330887ccece10",
-      "bytes": 36065
+      "sha256": "3e369e40af62dcf57f785efef70a61dbe9949c755e39972f7de4a5108e7ca862",
+      "bytes": 36198
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiInspectionRules.cs",
@@ -2437,8 +2437,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiPreservationRules.cs",
-      "sha256": "49e3db3c7b97afb7ab586c92787bcbc08f2782ea2f065d96f081a59a0b425020",
-      "bytes": 15366
+      "sha256": "36e002473c41f391744a6dd907b41e1d873b57f67011beed3b87636def735b65",
+      "bytes": 16018
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiProjectModelRules.cs",
@@ -2647,8 +2647,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
-      "sha256": "da70a674f242b9b48d285ce345ab2892b209ace9dfaa630d8298f20f33cffb3b",
-      "bytes": 84085
+      "sha256": "842c73b2d916b647cabcda578c7ed22548af2bfcaebc4be47d3b16fa1ed4a588",
+      "bytes": 84210
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiExports.cs",
@@ -3067,8 +3067,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
-      "sha256": "cc18a4027c49c8624c73632f44536ce765b1e38421f35073b6aaa2e562db3421",
-      "bytes": 24581
+      "sha256": "e9b0554f7c81ac4d318d7a7f9d1b55802503d429a8a6a6ba1b4c5ab39cc361df",
+      "bytes": 24636
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcLibraryInstanceCapture.cs",
@@ -90335,8 +90335,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 446,
-              "endLine": 471,
+              "line": 450,
+              "endLine": 475,
               "sha256": "65cc797aa104c4f955a3ac97527713763715cec9ae15d8e6a0731a8dbfa70942"
             },
             {
@@ -91509,8 +91509,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 446,
-              "endLine": 471,
+              "line": 450,
+              "endLine": 475,
               "sha256": "65cc797aa104c4f955a3ac97527713763715cec9ae15d8e6a0731a8dbfa70942"
             },
             {
@@ -92652,8 +92652,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 446,
-              "endLine": 471,
+              "line": 450,
+              "endLine": 475,
               "sha256": "65cc797aa104c4f955a3ac97527713763715cec9ae15d8e6a0731a8dbfa70942"
             },
             {
@@ -93795,8 +93795,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.HmiEngineering.cs",
               "name": "ApplyHmiEngineeringMutation",
-              "line": 446,
-              "endLine": 471,
+              "line": 450,
+              "endLine": 475,
               "sha256": "65cc797aa104c4f955a3ac97527713763715cec9ae15d8e6a0731a8dbfa70942"
             },
             {
@@ -104582,7 +104582,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.classic-import.route.20261101",
+          "profileSha256": "a8595d0174eb07c7f60e9298fb42c7f4e75b0c95c96144a966227071b8afe56f",
+          "artifacts": [
+            "evidence/local.hmi.classic-import.route.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hmi.classic-import.interruption.20261101",
+          "profileSha256": "648f6dd97b769bfae4cbb8b2a919df36094d19e7cbbd541766b332b3997ae087",
+          "artifacts": [
+            "evidence/local.hmi.classic-import.interruption.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -104768,7 +104783,22 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.external-tag.route.20261101",
+          "profileSha256": "5a71361109877613273bd72870dec96bceb7c3a46bcf9e0d215bffd4b8741c71",
+          "artifacts": [
+            "evidence/local.hmi.external-tag.route.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hmi.external-tag.interruption.20261101",
+          "profileSha256": "46823522d6fe53cfd89a95f82dec5b4df82415c62066bcf0c9a9a8ec233ef307",
+          "artifacts": [
+            "evidence/local.hmi.external-tag.interruption.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -114220,6 +114250,20 @@
           "profileSha256": "784880b57481ccc381b978001427915ef1d10b1113002b36d998a7498fd0cad5",
           "artifacts": [
             "evidence/local.hmi.compile.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hmi.classic-import.route.20261101",
+          "profileSha256": "a8595d0174eb07c7f60e9298fb42c7f4e75b0c95c96144a966227071b8afe56f",
+          "artifacts": [
+            "evidence/local.hmi.classic-import.route.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hmi.external-tag.route.20261101",
+          "profileSha256": "5a71361109877613273bd72870dec96bceb7c3a46bcf9e0d215bffd4b8741c71",
+          "artifacts": [
+            "evidence/local.hmi.external-tag.route.20261101.json"
           ]
         }
       ],
@@ -130034,9 +130078,29 @@
       "sha256": "4a682db29aa6102a3a16b03c490d69811d01eb6a1303f4da4aaee86bedec3d9c"
     },
     {
+      "path": "evidence/local.hmi.classic-import.interruption.20261101.json",
+      "state": "observed",
+      "sha256": "50384a2cea48d3a246fbdd09971d193008709152741416cfd0741da9d2e36409"
+    },
+    {
+      "path": "evidence/local.hmi.classic-import.route.20261101.json",
+      "state": "observed",
+      "sha256": "f261ffdcc1fe96915d12329585beb993a0c8348c85e26a29ccb53103ba84340e"
+    },
+    {
       "path": "evidence/local.hmi.compile.20261101.json",
       "state": "observed",
       "sha256": "f3c05f163438e7df08e7d1c88d224f23b3cdef41c18903d7d489fa4b38681575"
+    },
+    {
+      "path": "evidence/local.hmi.external-tag.interruption.20261101.json",
+      "state": "observed",
+      "sha256": "080f1deeb098faccca0d9ab6a0d44f7433279b434952f844e1290df71ffcab4a"
+    },
+    {
+      "path": "evidence/local.hmi.external-tag.route.20261101.json",
+      "state": "observed",
+      "sha256": "09ed6e0116606e3bb6324b3dd4c4d9d0ca97c683915e385d15fefd51c7b5f326"
     },
     {
       "path": "evidence/local.hmi.text-list-import.20261029.json",
@@ -131000,8 +131064,24 @@
       "profileSha256": "1253b6d80b70ba490ec2dc05f2fb706d492b763d4fd6fc5e0baa38077b599886"
     },
     {
+      "id": "local.hmi.classic-import.interruption.20261101",
+      "profileSha256": "648f6dd97b769bfae4cbb8b2a919df36094d19e7cbbd541766b332b3997ae087"
+    },
+    {
+      "id": "local.hmi.classic-import.route.20261101",
+      "profileSha256": "a8595d0174eb07c7f60e9298fb42c7f4e75b0c95c96144a966227071b8afe56f"
+    },
+    {
       "id": "local.hmi.compile.20261101",
       "profileSha256": "784880b57481ccc381b978001427915ef1d10b1113002b36d998a7498fd0cad5"
+    },
+    {
+      "id": "local.hmi.external-tag.interruption.20261101",
+      "profileSha256": "46823522d6fe53cfd89a95f82dec5b4df82415c62066bcf0c9a9a8ec233ef307"
+    },
+    {
+      "id": "local.hmi.external-tag.route.20261101",
+      "profileSha256": "5a71361109877613273bd72870dec96bceb7c3a46bcf9e0d215bffd4b8741c71"
     },
     {
       "id": "local.hmi.text-list-import.20261029",
