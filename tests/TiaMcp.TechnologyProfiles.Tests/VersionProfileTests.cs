@@ -51,6 +51,16 @@ internal static class VersionProfileTests
         Malformed(Document(refusedCell.Replace("\"outcome\":\"refused\"", "\"outcome\":\"substituted\"")), "an unknown outcome");
         Malformed(Document(refusedCell.Replace("\"version\":\"10.0\"", "\"version\":\"latest\"")), "a non-numeric version");
         Malformed(Document("{\"typeIdentifier\":\"PID_Compact\",\"version\":\"3.0\",\"outcome\":\"accepted\",\"evidenceId\":\"e\",\"extra\":1}"), "an unknown cell field");
+
+        // change_apply refuses compile=false with CompileRequired only for the PLC's first motion object.
+        Check(TechnologyVersionProfileRules.FirstMotionObject("TO_PositioningAxis", ["PID_Compact", "High_Speed_Counter"])
+              && TechnologyVersionProfileRules.FirstMotionObject("TO_CommandTable", []), "The first motion object of a PLC needs compile, beside other technology objects");
+        Check(!TechnologyVersionProfileRules.FirstMotionObject("TO_ExternalEncoder", ["PID_Compact", "TO_PositioningAxis"])
+              && !TechnologyVersionProfileRules.FirstMotionObject("TO_SpeedAxis", ["TO_MeasuringInput"]), "A motion object after another one needs no compile");
+        Check(!TechnologyVersionProfileRules.FirstMotionObject("PID_Compact", []) && !TechnologyVersionProfileRules.FirstMotionObject("High_Speed_Counter", [])
+              && !TechnologyVersionProfileRules.FirstMotionObject("to_positioningaxis", []), "Other and differently cased types are not motion objects");
+        var shippedMotion = shipped["cpus"]!.SelectMany(cpu => cpu["cells"]!).Select(cell => (string)cell["typeIdentifier"]!).Where(type => type.StartsWith("TO_", StringComparison.Ordinal)).Distinct();
+        Check(shippedMotion.All(TechnologyVersionProfileRules.MotionTypes.Contains), "Every TO_ type of the shipped profiles is a motion type");
         Console.WriteLine($"PASS technology version profiles: {count} checks.");
     }
 }

@@ -638,7 +638,8 @@ def normal(r):
     nodes = [ua_node("Cycles"), ua_node("UaValue")]
     subscribed = acquire(r, "runtime_ua_subscription to its duration", "subscription", {"attemptId": ua, "nodes": nodes, "publishingIntervalMilliseconds": 200,
                          "samplingIntervalMilliseconds": 100, "durationSeconds": 4, "maximumNotifications": 1000})
-    require(subscribed["recordedProgress"]["remoteCleanupConfirmed"], "DeleteSubscriptions was not confirmed")
+    require(subscribed["recordedProgress"]["terminalReason"] == "durationLimit" and subscribed["recordedProgress"]["remoteCleanupConfirmed"],
+            "The subscription did not run to its duration with a confirmed DeleteSubscriptions: %s" % subscribed["recordedProgress"])
     retained(r, "subscription", "subscription", subscribed)
     stopped = acquire(r, "runtime_ua_subscription stopped", "subscription", {"attemptId": ua, "nodes": nodes[:1], "durationSeconds": 60}, stop_after=3)
     require(stopped["recordedProgress"]["terminalReason"] == "stopped", "The subscription did not stop on request: %s" % stopped["recordedProgress"])
@@ -1021,6 +1022,7 @@ def inventory(r):
     def export():
         der = pinned(r.args.cpu_ip, r.report["pins"]["web"]["sha256"], "Api.Browse")[0]
         path.write_bytes(der)
+        # Not a trust decision (the SHA-256 pin above is): Windows names a certificate-store entry by its SHA-1 thumbprint.
         r.thumbprint = hashlib.sha1(der).hexdigest().upper()
         return {"path": str(path), "sha1": r.thumbprint, "sha256": hashlib.sha256(der).hexdigest()}
     r.stage("export the pinned web server certificate", export)

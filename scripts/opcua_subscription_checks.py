@@ -9,7 +9,7 @@ FIXTURE_OBSERVATIONS = {"SubscriptionCreated", "ItemsCreated", "PublishReturned"
 def verify_subscription(rows, attempt, expected_count=14):
     events = [r["event"] for r in rows]
     created = next(e["created"] for e in events if e["kind"] == "created")
-    require(created["revisedPublishingInterval"] == 200 and created["revisedKeepAliveCount"] == 10 and created["revisedLifetimeCount"] >= 60, "independent revised subscription settings")
+    require(created["revisedPublishingInterval"] == 200 and created["revisedKeepAliveCount"] == 3 and created["revisedLifetimeCount"] >= 60, "independent revised subscription settings")
     require(len(created["items"]) == expected_count + 1 and created["items"][-1]["statusCode"] == "0x80340000" and created["items"][-1]["monitoredItemId"] == 0, "independent per-item failure")
     require(all(i["revisedSamplingInterval"] == 200 and i["revisedQueueSize"] == 4 for i in created["items"][:-1]), "independent revised item settings")
     messages = [e for e in events if e["kind"] == "publish"]

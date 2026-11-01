@@ -11,7 +11,7 @@ namespace TiaMcp.OpcUa.Runtime;
 public sealed record OpcUaSubscriptionRequest(string AttemptId,
     [property: JsonConverter(typeof(OpcUaSubscriptionNodesConverter))] OpcUaRuntimeNode[] Nodes,
     int PublishingIntervalMilliseconds = 100, int SamplingIntervalMilliseconds = 100,
-    uint QueueSize = 16, bool DiscardOldest = true, uint KeepAliveCount = 10, uint LifetimeCount = 30,
+    uint QueueSize = 16, bool DiscardOldest = true, uint KeepAliveCount = 3, uint LifetimeCount = 30,
     int DurationSeconds = 10, int MaximumNotifications = 10000, long MaximumBytes = 64L << 20,
     int MaximumRepublish = 16,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? DiagnosticBindingId = null,

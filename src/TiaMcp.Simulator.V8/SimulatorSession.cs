@@ -283,6 +283,7 @@ namespace TiaMcp.Simulator.V8
             RequireOwned(selected);
             EnsureAdmitted(selected);
             var writes = Signals(args["writes"], true);
+            RefuseOutputs(selected, writes);
             var result = Envelope(selected);
             result["writes"] = ApplyWrites(selected, writes);
             result["note"] = "Values are written to the selected local simulated PLC. Program scans may immediately overwrite them.";
@@ -328,6 +329,7 @@ namespace TiaMcp.Simulator.V8
             var expected = Signals(new JArray(args["writes"].Select(w => new JObject { ["symbol"] = w["symbol"], ["type"] = w["type"], ["value"] = w["expected"] })), true);
             if (writes.Count > 16 || writes.Select(w => w.Symbol).Distinct(StringComparer.Ordinal).Count() != writes.Count)
                 throw new SimulatorException("InvalidRequest", "Provide 1–16 writes with distinct symbols.");
+            RefuseOutputs(selected, writes);
             var result = Envelope(selected);
             var before = Capture(selected, writes);
             result["before"] = before;
@@ -470,16 +472,18 @@ namespace TiaMcp.Simulator.V8
             if (virtualTime) RequireOwned(selected);
             long duration = 0;
             int snapshots = 1;
+            var stepWrites = new List<Signal>();
             foreach (var token in steps)
             {
                 var step = token as JObject ?? throw new SimulatorException("InvalidRequest", "Each scenario step must be an object.");
                 int delay = OptionalInteger(step, "delayMs", 0, 0, 60000);
                 duration += delay;
                 snapshots += Math.Max(1, (delay + interval - 1) / interval);
-                if (step["writes"] != null) Signals(step["writes"], true);
+                if (step["writes"] != null) stepWrites.AddRange(Signals(step["writes"], true));
                 ValidateAssertions(step["assertions"]);
             }
             if (duration > 60000 || snapshots > 500) throw new SimulatorException("ScenarioLimit", "Scenario is limited to 60 seconds and 500 snapshots. Increase intervalMs or reduce steps.");
+            if (stepWrites.Count > 0) RefuseOutputs(selected, stepWrites);
             var report = Envelope(selected);
             report["instance"] = Info(selected);
             report["timing"] = virtualTime ? VirtualTimingBasis : "Wall-clock polling, including API overhead. Not scan-accurate; samples are not atomic across symbols.";
@@ -568,6 +572,16 @@ namespace TiaMcp.Simulator.V8
                 catch (Exception ex) { throw new SimulatorException("PartialSimulationWrite", "Write failed at " + signal.Symbol + ": " + ex.Message, new JObject { ["completedWrites"] = completed, ["failedSymbol"] = signal.Symbol, ["retrySafe"] = false }); }
             }
             return completed;
+        }
+
+        // Every symbolic writer (sim_write, sim_write_signals, sim_test steps, sim_write_owned) calls this before its first write: a symbol
+        // whose tag-list area is Output refuses the whole request, with the code sim_area_write refuses the output area with.
+        private static void RefuseOutputs(Selection selected, IEnumerable<Signal> writes)
+        {
+            string symbol = SimulationRuntimeControl.OutputSymbol(writes.Select(w => w.Symbol).ToList(), selected.Instance.TagInfos.Select(t => (t.Name, t.Area.ToString())));
+            if (symbol != null)
+                throw new SimulatorException("InvalidRequest", symbol + " is in the output area, which the program writes every scan, so outputs are read-only here. Nothing was written.",
+                    new JObject { ["symbol"] = symbol, ["area"] = "Output" });
         }
 
         private static List<Signal> Signals(JToken input, bool writing)

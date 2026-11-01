@@ -145,11 +145,14 @@ def disposition_errors(rows, dispositions):
 
 
 def release_gate_errors(version, ledger, matrix):
-    """From 1.0 on, a release needs a ready ledger and no open or deferred cell."""
+    """From 1.0 on, a release needs a ready ledger, every release obligation accepted and no open or deferred cell."""
     if int(version.split(".")[0]) < 1:
         return []
     cells = matrix["summary"]["cells"]
+    # releaseReady alone is one flag; each obligation's own acceptance must agree with it.
     return ([] if ledger["releaseReady"] else ["ledger releaseReady is false"]) + [
+        f"{o['id']}: release obligation not accepted" for o in ledger["obligations"]
+        if o["releaseObligation"] and o["releaseAccepted"] is not True] + [
         f"{cells.get(state, 0)} {state} cells" for state in ("open", "deferred") if cells.get(state, 0)]
 
 
@@ -160,7 +163,7 @@ def render(matrix):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="fail if the committed matrix is stale")
-    parser.add_argument("--release-gate", metavar="VERSION", help="fail unless VERSION may ship (1.0 and later need releaseReady and no open cells)")
+    parser.add_argument("--release-gate", metavar="VERSION", help="fail unless VERSION may ship (1.0 and later need releaseReady, every obligation accepted and no open or deferred cells)")
     args = parser.parse_args()
     matrix = build()
     ledger = json.loads((ROOT / LEDGER).read_text(encoding="utf-8"))

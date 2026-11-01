@@ -49,9 +49,21 @@ class ReleaseMatrixTests(unittest.TestCase):
 
     def test_release_gate_blocks_unfinished_1_0(self):
         matrix = {"summary": {"cells": {"open": 2, "deferred": 1}}}
-        self.assertEqual(release_gate_errors("0.9.0", {"releaseReady": False}, matrix), [])
-        self.assertEqual(len(release_gate_errors("1.0.0", {"releaseReady": False}, matrix)), 3)
-        self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True}, {"summary": {"cells": {"bound": 9}}}), [])
+        done = {"summary": {"cells": {"bound": 9}}}
+        accepted = [{"id": "F00", "releaseObligation": True, "releaseAccepted": True},
+                    {"id": "F01", "releaseObligation": False, "releaseAccepted": False}]
+        self.assertEqual(release_gate_errors("0.9.0", {"releaseReady": False, "obligations": []}, matrix), [])
+        self.assertEqual(len(release_gate_errors("1.0.0", {"releaseReady": False, "obligations": accepted}, matrix)), 3)
+        self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True, "obligations": accepted}, done), [])
+        # A set flag cannot bypass an unaccepted obligation (audit of 1 November).
+        pending = accepted + [{"id": "F02", "releaseObligation": True, "releaseAccepted": False}]
+        self.assertEqual(release_gate_errors("1.0.0", {"releaseReady": True, "obligations": pending}, done),
+                         ["F02: release obligation not accepted"])
+
+    def test_committed_ledger_fails_the_1_0_gate_per_obligation(self):
+        ledger = json.loads((ROOT / LEDGER).read_text(encoding="utf-8"))
+        errors = release_gate_errors("1.0.0", dict(ledger, releaseReady=True), {"summary": {"cells": {}}})
+        self.assertEqual(len(errors), sum(1 for o in ledger["obligations"] if o["releaseObligation"] and not o["releaseAccepted"]))
 
     def test_only_verified_features_bind_cells(self):
         for row in build()["rows"]:

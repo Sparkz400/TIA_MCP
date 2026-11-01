@@ -55,6 +55,7 @@ namespace TiaMcp.Simulator.V8
             RequireOwned(selected);
             EnsureAdmitted(selected);
             var writes = BatchSignals(args["writes"], true);
+            RefuseOutputs(selected, writes);
             var batch = writes.Select(s => new SDataValueByName { Name = s.Symbol, DataValue = Pack(s) }).ToArray();
             string failure = null;
             try { selected.Instance.WriteSignals(ref batch); }
