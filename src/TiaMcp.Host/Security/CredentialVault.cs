@@ -229,17 +229,17 @@ internal sealed partial class CredentialVault
     }
     private void Publish<T>(string name, T value, bool replace = false)
     {
-        string temp = Path.Combine(root, ".pending-" + Guid.NewGuid().ToString("N"));
+        string temp = Path.Combine(root, ".pending-" + Guid.NewGuid().ToString("N")), destination = Path.Combine(root, name);
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(value, Json);
         if (bytes.Length > MaxRecordBytes) throw Error("CredentialCapacity");
         try
         {
             using (var output = SecureCreate(temp)) { output.Write(bytes); output.Flush(true); }
-            string destination = Path.Combine(root, name);
             if (replace) { CheckFile(destination); JournalFileReplacement.Replace(temp, destination); }
             else File.Move(temp, destination, false);
         }
-        finally { CryptographicOperations.ZeroMemory(bytes); if (File.Exists(temp)) File.Delete(temp); }
+        // A replacement that lost its destination (0x498 and a failed rename) leaves its only copy in the temporary: keep it.
+        finally { CryptographicOperations.ZeroMemory(bytes); if (File.Exists(temp) && (!replace || File.Exists(destination))) File.Delete(temp); }
     }
     private FileStream SecureCreate(string path)
     {

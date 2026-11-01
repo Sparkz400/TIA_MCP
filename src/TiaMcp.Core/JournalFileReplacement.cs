@@ -27,7 +27,20 @@ namespace TiaMcp.Core
                 // ERROR_UNABLE_TO_MOVE_REPLACEMENT without a backup name: ReplaceFile already removed the destination and the
                 // replacement keeps its temporary name, so finishing the rename is the only way not to lose both versions.
                 catch (IOException error) when (error.HResult == unchecked((int)0x80070498) && moveReplacement != null)
-                { moveReplacement(); return; }
+                { MoveReplacement(moveReplacement, delay); return; }
+            }
+        }
+
+        // Same bound; an access, sharing or lock denial (an external reader) is retried. If it still fails, the temporary holds the
+        // only copy: callers keep it while the destination is missing.
+        private static void MoveReplacement(Action move, Action<int> delay)
+        {
+            for (int attempt = 1; ; attempt++)
+            {
+                try { move(); return; }
+                catch (Exception error) when ((error is IOException || error is UnauthorizedAccessException) && attempt < 20 &&
+                    (error.HResult == unchecked((int)0x80070005) || error.HResult == unchecked((int)0x80070020) || error.HResult == unchecked((int)0x80070021)))
+                { delay(Math.Min(10 * attempt, 100)); }
             }
         }
     }
