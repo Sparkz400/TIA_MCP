@@ -417,8 +417,10 @@ def shared_device(run, restore=False):
                                    "sharedSubmodules": [{"hardwarePath": payload["sharedSubmodules"][0], "assignmentTargetBefore": run.path("HwPeer", "items", "HwPeerCpu"),
                                                          "assignmentTargetAfter": run.path("ScratchStation", "items", "ScratchPLC")}]}]},
                      shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-                     # SpDi3's submodule takes the scratch CPU's address space (its start moves, hw4) and its HwPeerCpu system constant goes (hw5).
-                     plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller, "hw:" + submodule], removed=[constant(run, SP, SP.prefix + "SpDi3")],
+                     # SpDi3's submodule takes the scratch CPU's address space and its HwPeerCpu system constant goes (hw5). Its start moves
+                     # only when that address is taken there (hw4, hw6); with the scratch CPU's space empty it stays (hw7).
+                     plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller], removed=[constant(run, SP, SP.prefix + "SpDi3")],
+                     tolerated=lambda category, key: category == "changed" and key == "hw:" + submodule,
                      added=generated, restore=restore, boundary=True) is not None
 
 
