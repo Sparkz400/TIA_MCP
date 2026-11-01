@@ -560,7 +560,7 @@ public sealed class GitWorkspaceRunner
     {
         VciGuard.Hash(expected);
         var current = await InspectAsync(root, token);
-        if (current.Sha256 != expected) throw new BridgeException("PreviewStale", "HEAD, index, configuration or working bytes differ from the reviewed snapshot.");
+        if (!current.Matches(expected)) throw new BridgeException("PreviewStale", "HEAD, index, configuration or working bytes differ from the reviewed snapshot.");
         return current;
     }
     private async Task RequireCleanIndex(GitWorkspaceSnapshot snapshot, CancellationToken token)

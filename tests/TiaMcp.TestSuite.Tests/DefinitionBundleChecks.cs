@@ -114,12 +114,12 @@ internal static class DefinitionBundleChecks
         var largeDefinitions = Enumerable.Range(0, 3).Select(i => Definition("large-" + i, bytes: large, family: "application")).ToArray();
         var largeRun = TestSuiteRunPlanner.Prepare(largeDefinitions, largeDefinitions.Select(c => c.Manifest.Id).ToArray(), [], "systemManaged");
         Reject(() => TestSuiteDefinitionBundle.Capture(largeRun, largeDefinitions), "DefinitionBundleLimit");
-        // This pattern becomes '+' in base64, which the canonical JSON encoder escapes. Account for
-        // the encoded size rather than assuming every base64 character consumes one JSON byte.
+        // This pattern becomes '+' in base64, which RFC 8785 keeps literal: its 16 MiB of base64 fit the 64 MiB bound.
         for (int i = 0; i < large.Length; i += 3) { large[i] = 0xfb; large[i + 1] = 0xef; large[i + 2] = 0xbe; }
-        var escaped = Definition("escaped", bytes: large, family: "application");
-        var escapedRun = TestSuiteRunPlanner.Prepare([escaped], ["escaped"], [], "systemManaged");
-        Reject(() => TestSuiteDefinitionBundle.Capture(escapedRun, [escaped]), "DefinitionBundleLimit");
+        var plus = Definition("plus", bytes: large, family: "application");
+        var plusRun = TestSuiteRunPlanner.Prepare([plus], ["plus"], [], "systemManaged");
+        var plusBundle = TestSuiteDefinitionBundle.Capture(plusRun, [plus]);
+        Check(plusBundle.Bytes.Length < 17 * 1024 * 1024 && !Encoding.UTF8.GetString(plusBundle.Bytes).Contains("\\u002B", StringComparison.Ordinal), "Base64 '+' costs one canonical byte.");
         return new(checks, scaleRestored.DefinitionCount, scaleRestored.OriginalByteCount, scaleRestored.Bytes.Length, captureMs, restoreMs);
     }
 }

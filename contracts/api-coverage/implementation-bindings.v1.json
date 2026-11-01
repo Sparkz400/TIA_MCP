@@ -932,8 +932,8 @@
     },
     {
       "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
-      "sha256": "0c762d9107ce02ca8576a49e3af1e2f9adbf74e3e7780200f3f929b5cb5d055f",
-      "bytes": 15862
+      "sha256": "8937004f982411742fc650740b570ec450cfa5b8f28a431b3c27e60e567b4360",
+      "bytes": 16024
     },
     {
       "path": "src/TiaMcp.Core/ConnectionWorkflowStore.cs",
@@ -1132,8 +1132,13 @@
     },
     {
       "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
-      "sha256": "c6bc1db282105d619f5f0e6ebc55d02d84e6ac2576f4178291ac25ddef8a14a0",
-      "bytes": 1640
+      "sha256": "93b238013d58654458bc9b84eb25ab8ba12cd63a4c4803a11086afd1b1023c5b",
+      "bytes": 8051
+    },
+    {
+      "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+      "sha256": "7c8daa76e4a2f960a17f71b42097002687af295d9daeaf15403f28a978cac780",
+      "bytes": 6799
     },
     {
       "path": "src/TiaMcp.Core/Engineering/CompositeEngineeringCapture.cs",
@@ -1177,8 +1182,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
-      "sha256": "af4c7444edd3c6dc3552464fd5ece864cd5ec7878898c904aa3286c9f9688d2c",
-      "bytes": 31244
+      "sha256": "9346e3b611633637cb6176dd43de466bb3f91bc3ee429f5a372d1b76175adc36",
+      "bytes": 31835
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -1192,8 +1197,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
-      "sha256": "7e48df470e13670aceaeb77007f2c73d2a904101457b5594abbbd215b70c7552",
-      "bytes": 16593
+      "sha256": "05858b98f5aac910968ed95891015b5bee79f60a22654f90be701758b2788cb0",
+      "bytes": 16851
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationModels.cs",
@@ -1202,13 +1207,13 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringOperationStore.cs",
-      "sha256": "4899f66944d98186f6c74899a7d4c5fbd2da26ad0cb8db38ca75449d4d0c7f19",
-      "bytes": 41223
+      "sha256": "95b40e8014187e098b9d5606f39eaa11876469d4f29b07a49f50ef2aa8d01076",
+      "bytes": 41521
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringResourceKey.cs",
-      "sha256": "6e384b0188d8c6be80de274916aad8ff9b33f1cb3164b7268c64da927f6ba8d4",
-      "bytes": 7918
+      "sha256": "0bda9e655b92f2249b1128ee1ef2d1e5658fa01352d64d2b7526608045562bab",
+      "bytes": 8064
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/SimulationProvisionReconciliation.cs",
@@ -1332,8 +1337,8 @@
     },
     {
       "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
-      "sha256": "f058116296ac14c7ba9b2c30d905b05a1014b40a7768868baee61a90718bec48",
-      "bytes": 5736
+      "sha256": "4e8f40223b589f02350a65b2d8ab45393f6678bbd58fcf230e90b80596b868f7",
+      "bytes": 5944
     },
     {
       "path": "src/TiaMcp.Core/OpcUaServerSettings.cs",
@@ -1397,8 +1402,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
-      "sha256": "044ad1cc57a19b4936887c6c1d2c1954a6512e4f62965c42962e168c9455b228",
-      "bytes": 28507
+      "sha256": "a0476f49c4bd181186e2bbbde059da48fe75699582c755d30aa0c6b3fa74326e",
+      "bytes": 28796
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeHandoffReview.cs",
@@ -1472,8 +1477,8 @@
     },
     {
       "path": "src/TiaMcp.Core/Security/ProtectedCredential.cs",
-      "sha256": "953dc717ca6a29f26a0d2bf638199161da868b7a119200ef91459f4d5e7bcec2",
-      "bytes": 3910
+      "sha256": "a0c324c80b29319e9006c2e7514804c962c3f0d55d8f5a08465d383feb327fe1",
+      "bytes": 4028
     },
     {
       "path": "src/TiaMcp.Core/Security/PublicCertificateReview.cs",
@@ -1517,8 +1522,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
-      "sha256": "2af11b43151bd2cbfa12017cef3b33019279e37b732b45f1066e6a791864889e",
-      "bytes": 7103
+      "sha256": "dd51eb717bbc3b9efb9021781c99db2e782699c831387eff6a7ebea06a7a6210",
+      "bytes": 7327
     },
     {
       "path": "src/TiaMcp.Core/TechnologyObjects/TechnologyEncoderReview.cs",
@@ -1567,13 +1572,13 @@
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
-      "sha256": "0cfacf0076d9c6801354079e9e748785b54b5f3930c1d9341d08055df6f34305",
-      "bytes": 8459
+      "sha256": "64b1337cd555412148a63d6969090fc591a2bb4de8ef5818f5be3098071c176d",
+      "bytes": 8405
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
-      "sha256": "bb26246dfe7fefe2db31bccae3906cf477324a2e842ab8db0e85152de93fb01d",
-      "bytes": 13966
+      "sha256": "7abee370815693c960a629e9a56427dba0ef86399e23662143b2baa85b2102a3",
+      "bytes": 14168
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteJobState.cs",
@@ -1597,8 +1602,8 @@
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
-      "sha256": "2acb349c170071b39c50ccd25bd8d12615367a0b9bb3fb4f07e63ebd387139da",
-      "bytes": 29015
+      "sha256": "5aa9d66212cd777daf010abe550177d0f51eacef268b53550e2f8c43f8c7aa0e",
+      "bytes": 29529
     },
     {
       "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleOperation.cs",
@@ -1647,12 +1652,12 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceModels.cs",
-      "sha256": "7099eec678e18d71846d00fd6d9dd7f8cf088e435770f641181a4c3226b7093e",
-      "bytes": 4952
+      "sha256": "453541184b2042fc1332730dd7d97d86beed897d57396e5c6a3d093d9323e1c7",
+      "bytes": 5771
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/GitWorkspaceRunner.cs",
-      "sha256": "6b2b87f5a49660ba5a143c920dd87b60eb879c80287b7632b300a6dcb842e7ac",
+      "sha256": "a0566ab00b36f1232159ec9fe086352257379bd7bc2c381441449824113aae07",
       "bytes": 49859
     },
     {
@@ -1677,18 +1682,18 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Packages.cs",
-      "sha256": "0ddbf2e34afd4c4c9a2c60c90b465de8655aae1e1e8dbb083c365df372fce662",
-      "bytes": 16662
+      "sha256": "57d3f5bd66ac94f52a7161fa59ccc660983f0f2aa48f69653aba9dc142ebbb75",
+      "bytes": 17082
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.Remote.cs",
-      "sha256": "c2eba6a2914f8290d17ebb0a961f21b35ac04646b8ae2ba7d86ffd6247a37612",
-      "bytes": 9190
+      "sha256": "3e9c8ce6564871c41e61cb5c418ebc541f6116c85cee6366796b917035606c17",
+      "bytes": 9189
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
-      "sha256": "3589f3832e1391cbbc6548d7e6d1b53ff6f6a04c26cdc7cb155bbea0b5bb6724",
-      "bytes": 43579
+      "sha256": "2fb475ee2a473061f0d9c88453d241aaefe300a6e4f2193c139b49d85164c27f",
+      "bytes": 43968
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchAuthoringProfile.cs",
@@ -2336,6 +2341,11 @@
       "bytes": 361
     },
     {
+      "path": "src/TiaMcp.Openness.V21/CanonicalJson.cs",
+      "sha256": "235da21e19a93ce730af739ed05feaaa9be34135a5c0cb5c969ffdf938b566e2",
+      "bytes": 3516
+    },
+    {
       "path": "src/TiaMcp.Openness.V21/CapabilityRules.cs",
       "sha256": "20de25c144ed6e48ce7cc17513f79ab5a95b0b4d2a55534c2c07be9caa5158de",
       "bytes": 2165
@@ -2702,8 +2712,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Libraries.cs",
-      "sha256": "703be4df9205c4aa2815890566477d6360ae156fe56f1b5f807b900827bf356d",
-      "bytes": 36863
+      "sha256": "061706ac6cff9c418847445764ba938df66df736ff81db9ced8df06267c8abee",
+      "bytes": 36893
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -2867,8 +2877,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs",
-      "sha256": "233413e069e8b679533213b3b94b616dee79361d608182420f65e47e8d530ce4",
-      "bytes": 31942
+      "sha256": "af7fb16b75817c8e764f7fef568d1446e538db5b39fa831c5e45192d36e4c9af",
+      "bytes": 31626
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Simulation.cs",
@@ -2902,8 +2912,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
-      "sha256": "ee160c3917ca6f38fdbaaf433a9a701a45e829328d0e13e57534489a87de134f",
-      "bytes": 102788
+      "sha256": "9750814aa7e1f341d3e6f80de5838301ed18f2ffc277ac3a407b62e713e7b704",
+      "bytes": 102780
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvisionReconcile.cs",
@@ -3192,8 +3202,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/TiaMcp.Openness.V21.csproj",
-      "sha256": "4798fa1b7f976f93f83759315a75b41c354151369991761ea0da850ca3c1ae8e",
-      "bytes": 6503
+      "sha256": "26d4b177e498d52abbb4bb31859cc06436ca088952939fbd02f01e558bb99976",
+      "bytes": 6605
     },
     {
       "path": "src/TiaMcp.Openness.V21/TranslationAdmissionLedger.cs",
@@ -3412,8 +3422,8 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationImportWorkflow.cs",
-      "sha256": "c57dc0d3512334e68d444a44148351145a2b9d6cb08a3aebc92dda7c12ab5a33",
-      "bytes": 38843
+      "sha256": "715692d775823e308e7c0dfa67c882609cb80380f2cfe0cc3904665e816e96bc",
+      "bytes": 39082
     },
     {
       "path": "src/TiaMcp.Translations/TranslationInspection.cs",
@@ -3442,13 +3452,13 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationRetention.cs",
-      "sha256": "566c2a2e49e00128c7a4437adc1ef53134bafb58311d0a7544d58f67d6116a91",
-      "bytes": 14043
+      "sha256": "be9b1e29111c5b25a3ebc15e80e4d1c61a0819cad56309ca5aa86a2c6608cd95",
+      "bytes": 14085
     },
     {
       "path": "src/TiaMcp.Translations/TranslationReview.cs",
-      "sha256": "7a7b89f60cb739c7c64ed3f8138f31c52fa5b041d21719ba45613bade363903c",
-      "bytes": 19763
+      "sha256": "5f694a1377164e33d1a8c132c081a0e05b46436abcc793a56ac9f268e38cb35f",
+      "bytes": 19996
     },
     {
       "path": "src/TiaMcp.Translations/TranslationTestAccess.cs",
@@ -3472,8 +3482,8 @@
     },
     {
       "path": "src/TiaMcp.Translations/TranslationWorkflowStore.cs",
-      "sha256": "5d0fc237bb75c5bcdb99d5b58b6090bc75b307282d8933458780de5d95168b60",
-      "bytes": 27991
+      "sha256": "fd53225eedddfd3e6a3cb27059a04db52b904ecbf3f5feb6e100ca289154664d",
+      "bytes": 28679
     }
   ],
   "tools": [
@@ -3572,8 +3582,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -4161,14 +4171,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -4210,8 +4220,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -4662,14 +4672,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -4711,8 +4721,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -5784,16 +5794,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -6702,29 +6712,29 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
-          "line": 189,
-          "endLine": 190,
+          "line": 191,
+          "endLine": 192,
           "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Write",
-          "line": 22,
-          "endLine": 39,
-          "sha256": "a3c1080255fed6587d117d43f7b2c167af02946d82ed422fc6c92fbe9c9ec9bd"
+          "line": 91,
+          "endLine": 122,
+          "sha256": "766d6ba8c0740d18115fcd13528a57c4b74ca30f30e79789e2e31f3a3310c0fa"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 357,
-          "endLine": 365,
+          "line": 361,
+          "endLine": 369,
           "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 210,
-          "endLine": 217,
+          "line": 212,
+          "endLine": 219,
           "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
@@ -7690,16 +7700,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -7869,8 +7879,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -8170,6 +8180,13 @@
           "line": 8,
           "endLine": 12,
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -8861,8 +8878,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -9201,8 +9218,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -9850,8 +9867,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -10068,8 +10085,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -10205,8 +10222,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -10352,8 +10369,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -10506,16 +10523,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -10695,8 +10712,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -10897,8 +10914,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -11128,8 +11145,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "VciWorkspaceStore",
-          "line": 26,
-          "endLine": 36,
+          "line": 27,
+          "endLine": 37,
           "sha256": "353685f96c648efbc6eeba654c85eff357114a2dc0a956bb381bed1e889763d8"
         }
       ],
@@ -11391,8 +11408,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -11683,9 +11700,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -11834,8 +11851,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -12210,14 +12227,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -12259,8 +12276,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -12959,8 +12976,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -13811,8 +13828,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -14400,14 +14417,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -14449,8 +14466,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -14909,9 +14926,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -15091,8 +15108,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -15904,14 +15921,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -15953,8 +15970,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -16443,9 +16460,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -16499,8 +16516,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Create",
-          "line": 87,
-          "endLine": 100,
+          "line": 90,
+          "endLine": 103,
           "sha256": "3259633338ad8e4138b945ecb88d5dce5315f15da5bffeb372cb8a52b81412e6"
         },
         {
@@ -16935,9 +16952,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -17153,14 +17170,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -17202,8 +17219,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -17474,16 +17491,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -17727,29 +17744,29 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
-          "line": 189,
-          "endLine": 190,
+          "line": 191,
+          "endLine": 192,
           "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Write",
-          "line": 22,
-          "endLine": 39,
-          "sha256": "a3c1080255fed6587d117d43f7b2c167af02946d82ed422fc6c92fbe9c9ec9bd"
+          "line": 91,
+          "endLine": 122,
+          "sha256": "766d6ba8c0740d18115fcd13528a57c4b74ca30f30e79789e2e31f3a3310c0fa"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 357,
-          "endLine": 365,
+          "line": 361,
+          "endLine": 369,
           "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 210,
-          "endLine": 217,
+          "line": 212,
+          "endLine": 219,
           "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
@@ -17919,8 +17936,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Create",
-          "line": 87,
-          "endLine": 100,
+          "line": 90,
+          "endLine": 103,
           "sha256": "3259633338ad8e4138b945ecb88d5dce5315f15da5bffeb372cb8a52b81412e6"
         },
         {
@@ -18263,8 +18280,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -18589,6 +18606,13 @@
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
         },
         {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
+        },
+        {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
           "line": 278,
@@ -18814,8 +18838,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Plan",
-          "line": 71,
-          "endLine": 71,
+          "line": 72,
+          "endLine": 72,
           "sha256": "760f9733ba9cd691c77ac3c3df3442cf1563f9d0b1c8ac95fd3b4413418a7e5e"
         },
         {
@@ -18945,8 +18969,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
-          "line": 124,
-          "endLine": 165,
+          "line": 127,
+          "endLine": 168,
           "sha256": "0a57c730507ba069a444d11870b51d1a443385fd27e4a2623273aeb5147a7fe4"
         },
         {
@@ -19426,8 +19450,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Plan",
-          "line": 71,
-          "endLine": 71,
+          "line": 72,
+          "endLine": 72,
           "sha256": "760f9733ba9cd691c77ac3c3df3442cf1563f9d0b1c8ac95fd3b4413418a7e5e"
         },
         {
@@ -19996,8 +20020,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
-          "line": 124,
-          "endLine": 165,
+          "line": 127,
+          "endLine": 168,
           "sha256": "0a57c730507ba069a444d11870b51d1a443385fd27e4a2623273aeb5147a7fe4"
         },
         {
@@ -20228,8 +20252,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -20862,8 +20886,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Plan",
-          "line": 71,
-          "endLine": 71,
+          "line": 72,
+          "endLine": 72,
           "sha256": "760f9733ba9cd691c77ac3c3df3442cf1563f9d0b1c8ac95fd3b4413418a7e5e"
         },
         {
@@ -20966,6 +20990,13 @@
           "line": 8,
           "endLine": 12,
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -21180,8 +21211,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -21837,8 +21868,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
-          "line": 124,
-          "endLine": 165,
+          "line": 127,
+          "endLine": 168,
           "sha256": "0a57c730507ba069a444d11870b51d1a443385fd27e4a2623273aeb5147a7fe4"
         },
         {
@@ -22012,16 +22043,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -22417,8 +22448,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Plan",
-          "line": 71,
-          "endLine": 71,
+          "line": 72,
+          "endLine": 72,
           "sha256": "760f9733ba9cd691c77ac3c3df3442cf1563f9d0b1c8ac95fd3b4413418a7e5e"
         },
         {
@@ -22530,8 +22561,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -23119,14 +23150,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -23168,8 +23199,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -23946,8 +23977,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -24055,9 +24086,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Serialize",
-          "line": 11,
-          "endLine": 18,
-          "sha256": "e538edb0bc2a6da7f1bc4c76569f6bb81c285317623fc62264d9a0e2b6ed415d"
+          "line": 20,
+          "endLine": 20,
+          "sha256": "213c6b2b0259abfd96141a5157499d763f81e616e031566696609201f9903107"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -24220,8 +24251,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -24521,6 +24552,13 @@
           "line": 8,
           "endLine": 12,
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -25802,8 +25840,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -26142,8 +26180,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -26791,8 +26829,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -26993,8 +27031,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -27687,14 +27725,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -27736,8 +27774,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -28941,8 +28979,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -29482,8 +29520,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -29721,8 +29759,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Exists",
-          "line": 70,
-          "endLine": 70,
+          "line": 71,
+          "endLine": 71,
           "sha256": "094c0778efa5d43f5a2b58f47392937560541f30646ef90ca3af2131dac07c49"
         },
         {
@@ -29875,8 +29913,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -29966,9 +30004,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Serialize",
-          "line": 11,
-          "endLine": 18,
-          "sha256": "e538edb0bc2a6da7f1bc4c76569f6bb81c285317623fc62264d9a0e2b6ed415d"
+          "line": 20,
+          "endLine": 20,
+          "sha256": "213c6b2b0259abfd96141a5157499d763f81e616e031566696609201f9903107"
         },
         {
           "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -31217,16 +31255,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -31565,8 +31603,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -31793,14 +31831,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -31842,8 +31880,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -32857,8 +32895,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -33165,6 +33203,13 @@
           "line": 8,
           "endLine": 12,
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -34220,8 +34265,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -34276,8 +34321,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -34332,9 +34377,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Serialize",
-          "line": 11,
-          "endLine": 18,
-          "sha256": "e538edb0bc2a6da7f1bc4c76569f6bb81c285317623fc62264d9a0e2b6ed415d"
+          "line": 20,
+          "endLine": 20,
+          "sha256": "213c6b2b0259abfd96141a5157499d763f81e616e031566696609201f9903107"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -34437,8 +34482,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -34871,8 +34916,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -35218,8 +35263,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -35874,8 +35919,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -35986,8 +36031,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -36098,8 +36143,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -36301,8 +36346,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -36794,8 +36839,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -37554,8 +37599,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -37875,8 +37920,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Contains",
-          "line": 351,
-          "endLine": 352,
+          "line": 354,
+          "endLine": 355,
           "sha256": "13851655d4cf2a55d9aed6c4b667c53b284e6c9aec81cfeb5697dbed072b5777"
         },
         {
@@ -38015,8 +38060,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -38071,8 +38116,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -38249,6 +38294,13 @@
           "line": 8,
           "endLine": 12,
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
+        },
+        {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -39816,14 +39868,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -39865,8 +39917,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -40382,8 +40434,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "ExecuteNext",
-          "line": 143,
-          "endLine": 227,
+          "line": 145,
+          "endLine": 229,
           "sha256": "d4368ad8f8dc6842fd52c4a8e306bf0441cb3cafbc5c4d9f440d73f189a1c98e"
         },
         {
@@ -40403,16 +40455,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -40712,7 +40764,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -40724,8 +40776,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -41183,8 +41235,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Reconcile",
-          "line": 260,
-          "endLine": 275,
+          "line": 262,
+          "endLine": 277,
           "sha256": "a054f21ee9428b643c16a207f6e8742bb92f065c4eaa4c6888971a62daa47359"
         },
         {
@@ -41429,8 +41481,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Recover",
-          "line": 237,
-          "endLine": 258,
+          "line": 239,
+          "endLine": 260,
           "sha256": "55539922765d23798adf9ea3ea495987a67eb1134a3b59b04bc103defb555df8"
         },
         {
@@ -41478,16 +41530,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -41807,8 +41859,8 @@
         {
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "new",
-          "line": 54,
-          "endLine": 54,
+          "line": 59,
+          "endLine": 59,
           "sha256": "a668afecbae27a3aa5be5af428786889ceaa6655c8b5a8ef2d2670058d9d3739"
         },
         {
@@ -41863,8 +41915,8 @@
         {
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "new",
-          "line": 66,
-          "endLine": 66,
+          "line": 71,
+          "endLine": 71,
           "sha256": "3748c75e957472ec83222ad5c713fe6597a1fad22fdc1b5e5a04341b78f197eb"
         },
         {
@@ -42043,9 +42095,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Serialize",
-          "line": 11,
-          "endLine": 18,
-          "sha256": "e538edb0bc2a6da7f1bc4c76569f6bb81c285317623fc62264d9a0e2b6ed415d"
+          "line": 20,
+          "endLine": 20,
+          "sha256": "213c6b2b0259abfd96141a5157499d763f81e616e031566696609201f9903107"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -42164,8 +42216,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Flush",
-          "line": 348,
-          "endLine": 348,
+          "line": 351,
+          "endLine": 351,
           "sha256": "b1cb64e1f34591c4b68b344e0eba37e022a9609afbbe87e750f5a96b3e1dc095"
         },
         {
@@ -42192,16 +42244,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -42311,29 +42363,29 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
-          "line": 189,
-          "endLine": 190,
+          "line": 191,
+          "endLine": 192,
           "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Write",
-          "line": 22,
-          "endLine": 39,
-          "sha256": "a3c1080255fed6587d117d43f7b2c167af02946d82ed422fc6c92fbe9c9ec9bd"
+          "line": 91,
+          "endLine": 122,
+          "sha256": "766d6ba8c0740d18115fcd13528a57c4b74ca30f30e79789e2e31f3a3310c0fa"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 357,
-          "endLine": 365,
+          "line": 361,
+          "endLine": 369,
           "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 210,
-          "endLine": 217,
+          "line": 212,
+          "endLine": 219,
           "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
@@ -42599,9 +42651,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -42788,8 +42840,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -42830,9 +42882,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Sha256",
-          "line": 20,
-          "endLine": 20,
-          "sha256": "786b700add454c6e384bed96c898288633d4f2e907c086666755a61b3f8e0708"
+          "line": 22,
+          "endLine": 22,
+          "sha256": "5f8d8e072a3a9a4c4be4733ef8dfab669130c3921f36cc8f09a6039b03727b28"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/EngineeringIdentity.cs",
@@ -43120,9 +43172,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -43169,8 +43221,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Flush",
-          "line": 348,
-          "endLine": 348,
+          "line": 351,
+          "endLine": 351,
           "sha256": "b1cb64e1f34591c4b68b344e0eba37e022a9609afbbe87e750f5a96b3e1dc095"
         },
         {
@@ -43192,7 +43244,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -43204,8 +43256,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -43379,16 +43431,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -43442,9 +43494,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Sha256",
-          "line": 20,
-          "endLine": 20,
-          "sha256": "786b700add454c6e384bed96c898288633d4f2e907c086666755a61b3f8e0708"
+          "line": 22,
+          "endLine": 22,
+          "sha256": "5f8d8e072a3a9a4c4be4733ef8dfab669130c3921f36cc8f09a6039b03727b28"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/EngineeringIdentity.cs",
@@ -43484,29 +43536,29 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
-          "line": 189,
-          "endLine": 190,
+          "line": 191,
+          "endLine": 192,
           "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Write",
-          "line": 22,
-          "endLine": 39,
-          "sha256": "a3c1080255fed6587d117d43f7b2c167af02946d82ed422fc6c92fbe9c9ec9bd"
+          "line": 91,
+          "endLine": 122,
+          "sha256": "766d6ba8c0740d18115fcd13528a57c4b74ca30f30e79789e2e31f3a3310c0fa"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 357,
-          "endLine": 365,
+          "line": 361,
+          "endLine": 369,
           "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 210,
-          "endLine": 217,
+          "line": 212,
+          "endLine": 219,
           "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
@@ -43715,8 +43767,8 @@
         {
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "new",
-          "line": 54,
-          "endLine": 54,
+          "line": 59,
+          "endLine": 59,
           "sha256": "a668afecbae27a3aa5be5af428786889ceaa6655c8b5a8ef2d2670058d9d3739"
         },
         {
@@ -43771,8 +43823,8 @@
         {
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "new",
-          "line": 66,
-          "endLine": 66,
+          "line": 71,
+          "endLine": 71,
           "sha256": "3748c75e957472ec83222ad5c713fe6597a1fad22fdc1b5e5a04341b78f197eb"
         },
         {
@@ -43922,8 +43974,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Reconcile",
-          "line": 260,
-          "endLine": 275,
+          "line": 262,
+          "endLine": 277,
           "sha256": "a054f21ee9428b643c16a207f6e8742bb92f065c4eaa4c6888971a62daa47359"
         },
         {
@@ -44049,9 +44101,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Sha256",
-          "line": 20,
-          "endLine": 20,
-          "sha256": "786b700add454c6e384bed96c898288633d4f2e907c086666755a61b3f8e0708"
+          "line": 22,
+          "endLine": 22,
+          "sha256": "5f8d8e072a3a9a4c4be4733ef8dfab669130c3921f36cc8f09a6039b03727b28"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/EngineeringIdentity.cs",
@@ -44124,8 +44176,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Recover",
-          "line": 237,
-          "endLine": 258,
+          "line": 239,
+          "endLine": 260,
           "sha256": "55539922765d23798adf9ea3ea495987a67eb1134a3b59b04bc103defb555df8"
         },
         {
@@ -44241,9 +44293,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Sha256",
-          "line": 20,
-          "endLine": 20,
-          "sha256": "786b700add454c6e384bed96c898288633d4f2e907c086666755a61b3f8e0708"
+          "line": 22,
+          "endLine": 22,
+          "sha256": "5f8d8e072a3a9a4c4be4733ef8dfab669130c3921f36cc8f09a6039b03727b28"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/EngineeringIdentity.cs",
@@ -44300,16 +44352,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -44726,7 +44778,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -44738,8 +44790,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -44913,16 +44965,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -45349,8 +45401,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -45675,8 +45727,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
-          "line": 124,
-          "endLine": 165,
+          "line": 127,
+          "endLine": 168,
           "sha256": "0a57c730507ba069a444d11870b51d1a443385fd27e4a2623273aeb5147a7fe4"
         },
         {
@@ -46024,14 +46076,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -46073,8 +46125,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -46969,16 +47021,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -47425,8 +47477,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -47723,8 +47775,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -48348,14 +48400,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -48397,8 +48449,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -48820,8 +48872,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -49612,8 +49664,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Bind",
-          "line": 562,
-          "endLine": 567,
+          "line": 565,
+          "endLine": 570,
           "sha256": "2355cc1337f420b357129abab379d7c3dc3a77b0df4b2b7d2e6df39cce143bfb"
         },
         {
@@ -50325,8 +50377,8 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Require",
-          "line": 191,
-          "endLine": 192,
+          "line": 193,
+          "endLine": 194,
           "sha256": "e2285f0ef01fdbf622af2727b97b02ef2c15804235fe0ef443ae5ea9d9ccb344"
         },
         {
@@ -50388,8 +50440,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Require",
-          "line": 309,
-          "endLine": 309,
+          "line": 312,
+          "endLine": 312,
           "sha256": "e16e83f28b30364e36b482a569749990c085856d50a1192a9d976f71873be880"
         },
         {
@@ -50416,8 +50468,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Require",
-          "line": 520,
-          "endLine": 520,
+          "line": 523,
+          "endLine": 523,
           "sha256": "b3c06feff9f81e929816aeb6b4af28deaf08fdfd2ec287ebb7e7591f67b33e64"
         },
         {
@@ -50654,16 +50706,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -50945,8 +50997,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
-          "line": 124,
-          "endLine": 165,
+          "line": 127,
+          "endLine": 168,
           "sha256": "0a57c730507ba069a444d11870b51d1a443385fd27e4a2623273aeb5147a7fe4"
         },
         {
@@ -51301,14 +51353,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -51350,8 +51402,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -52260,16 +52312,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -54825,16 +54877,16 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 528,
-          "endLine": 530,
+          "line": 531,
+          "endLine": 533,
           "sha256": "47813a22194b79be57ce0e5f2441107eb591fab2b4c7a9f196a86e68dec6605c"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Read",
-          "line": 531,
-          "endLine": 552,
-          "sha256": "e6b8f008a8925868e761af0a3fd2554babf59e08ea9a482543391de34ff390ba"
+          "line": 534,
+          "endLine": 555,
+          "sha256": "a9666569798c01bdcf0468ae1ed8896b5c1ec7c4a85b2537f4f1927d88e8b070"
         },
         {
           "path": "src/TiaMcp.Host/ArtifactTools.cs",
@@ -55460,16 +55512,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -55751,8 +55803,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Export",
-          "line": 124,
-          "endLine": 165,
+          "line": 127,
+          "endLine": 168,
           "sha256": "0a57c730507ba069a444d11870b51d1a443385fd27e4a2623273aeb5147a7fe4"
         },
         {
@@ -56107,14 +56159,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -56156,8 +56208,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -57066,16 +57118,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -57548,8 +57600,8 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Require",
-          "line": 191,
-          "endLine": 192,
+          "line": 193,
+          "endLine": 194,
           "sha256": "e2285f0ef01fdbf622af2727b97b02ef2c15804235fe0ef443ae5ea9d9ccb344"
         },
         {
@@ -57611,8 +57663,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Require",
-          "line": 309,
-          "endLine": 309,
+          "line": 312,
+          "endLine": 312,
           "sha256": "e16e83f28b30364e36b482a569749990c085856d50a1192a9d976f71873be880"
         },
         {
@@ -57639,8 +57691,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Require",
-          "line": 520,
-          "endLine": 520,
+          "line": 523,
+          "endLine": 523,
           "sha256": "b3c06feff9f81e929816aeb6b4af28deaf08fdfd2ec287ebb7e7591f67b33e64"
         },
         {
@@ -57877,16 +57929,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -57996,29 +58048,29 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
-          "line": 189,
-          "endLine": 190,
+          "line": 191,
+          "endLine": 192,
           "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Write",
-          "line": 22,
-          "endLine": 39,
-          "sha256": "a3c1080255fed6587d117d43f7b2c167af02946d82ed422fc6c92fbe9c9ec9bd"
+          "line": 91,
+          "endLine": 122,
+          "sha256": "766d6ba8c0740d18115fcd13528a57c4b74ca30f30e79789e2e31f3a3310c0fa"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 357,
-          "endLine": 365,
+          "line": 361,
+          "endLine": 369,
           "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 210,
-          "endLine": 217,
+          "line": 212,
+          "endLine": 219,
           "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
@@ -60870,16 +60922,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -61360,29 +61412,29 @@
         {
           "path": "src/TiaMcp.Core/CompositeEngineeringWorkflowStore.cs",
           "name": "Write",
-          "line": 189,
-          "endLine": 190,
+          "line": 191,
+          "endLine": 192,
           "sha256": "29a81e49d95938d2a99124d3c4c75f0baaa3e966b513daf5b4620b017d89687a"
         },
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Write",
-          "line": 22,
-          "endLine": 39,
-          "sha256": "a3c1080255fed6587d117d43f7b2c167af02946d82ed422fc6c92fbe9c9ec9bd"
+          "line": 91,
+          "endLine": 122,
+          "sha256": "766d6ba8c0740d18115fcd13528a57c4b74ca30f30e79789e2e31f3a3310c0fa"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
-          "line": 357,
-          "endLine": 365,
+          "line": 361,
+          "endLine": 369,
           "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
           "name": "Write",
-          "line": 210,
-          "endLine": 217,
+          "line": 212,
+          "endLine": 219,
           "sha256": "4714d8f2eac071885363ed42310302bfd6f241d9b9c80b879e8ff86390a1fd89"
         },
         {
@@ -61652,14 +61704,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -61701,8 +61753,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -62232,8 +62284,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Parse",
-          "line": 417,
-          "endLine": 426,
+          "line": 420,
+          "endLine": 429,
           "sha256": "6c2a414aafb5f2dcf0623b31a10b6cc5c947c20a8d1bf75fb0e7190e3f4aded9"
         },
         {
@@ -62800,8 +62852,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -62912,8 +62964,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -63024,8 +63076,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -65540,8 +65592,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -66129,14 +66181,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -66178,8 +66230,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -66633,8 +66685,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -66937,14 +66989,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -66986,8 +67038,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -67918,14 +67970,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -67967,8 +68019,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -68902,8 +68954,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -69014,8 +69066,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -69100,9 +69152,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "ReadReview",
-          "line": 67,
-          "endLine": 89,
-          "sha256": "8cf85730de4bb84fe4720e643861117040ff5411c379a5ed3980e1793f008871"
+          "line": 68,
+          "endLine": 68,
+          "sha256": "6beb6367a17bec0af1ded41cfd42a33dcdb113e487f374aaa10fab7e72a1a1b7"
         },
         {
           "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -69591,8 +69643,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "ExecuteNext",
-          "line": 143,
-          "endLine": 227,
+          "line": 145,
+          "endLine": 229,
           "sha256": "d4368ad8f8dc6842fd52c4a8e306bf0441cb3cafbc5c4d9f440d73f189a1c98e"
         },
         {
@@ -69680,8 +69732,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "MarkInterrupted",
-          "line": 229,
-          "endLine": 235,
+          "line": 231,
+          "endLine": 237,
           "sha256": "e40d1447744253a22d3c70524dd794b8fc8ad5699ba07470d96beadeb192a545"
         },
         {
@@ -69765,7 +69817,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -69777,8 +69829,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -69966,8 +70018,8 @@
         {
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "new",
-          "line": 54,
-          "endLine": 54,
+          "line": 59,
+          "endLine": 59,
           "sha256": "a668afecbae27a3aa5be5af428786889ceaa6655c8b5a8ef2d2670058d9d3739"
         },
         {
@@ -70022,8 +70074,8 @@
         {
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "new",
-          "line": 66,
-          "endLine": 66,
+          "line": 71,
+          "endLine": 71,
           "sha256": "3748c75e957472ec83222ad5c713fe6597a1fad22fdc1b5e5a04341b78f197eb"
         },
         {
@@ -70168,8 +70220,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Reconcile",
-          "line": 260,
-          "endLine": 275,
+          "line": 262,
+          "endLine": 277,
           "sha256": "a054f21ee9428b643c16a207f6e8742bb92f065c4eaa4c6888971a62daa47359"
         },
         {
@@ -70309,8 +70361,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Recover",
-          "line": 237,
-          "endLine": 258,
+          "line": 239,
+          "endLine": 260,
           "sha256": "55539922765d23798adf9ea3ea495987a67eb1134a3b59b04bc103defb555df8"
         },
         {
@@ -70426,9 +70478,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Results",
-          "line": 277,
-          "endLine": 296,
-          "sha256": "85cbef0f4d6b37de489e5b8bcb0d883ec6a6e212d3858c8dd0e7fb94302a92a8"
+          "line": 279,
+          "endLine": 299,
+          "sha256": "0c20b193195c1e13fe9e35981bfcf19e6334b954da93fdda8f326b04f5e89330"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteTools.cs",
@@ -70515,16 +70567,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -70695,8 +70747,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "RequestStop",
-          "line": 131,
-          "endLine": 141,
+          "line": 133,
+          "endLine": 143,
           "sha256": "d75e3bf417372d4d738eb646653443b5be516bfc487195863818202faa5aeb41"
         },
         {
@@ -70788,9 +70840,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "ReadReview",
-          "line": 67,
-          "endLine": 89,
-          "sha256": "8cf85730de4bb84fe4720e643861117040ff5411c379a5ed3980e1793f008871"
+          "line": 68,
+          "endLine": 68,
+          "sha256": "6beb6367a17bec0af1ded41cfd42a33dcdb113e487f374aaa10fab7e72a1a1b7"
         },
         {
           "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -71109,9 +71161,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "ReadReview",
-          "line": 67,
-          "endLine": 89,
-          "sha256": "8cf85730de4bb84fe4720e643861117040ff5411c379a5ed3980e1793f008871"
+          "line": 68,
+          "endLine": 68,
+          "sha256": "6beb6367a17bec0af1ded41cfd42a33dcdb113e487f374aaa10fab7e72a1a1b7"
         },
         {
           "path": "src/TiaMcp.Host/TestSuiteTools.cs",
@@ -71256,8 +71308,8 @@
         {
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "new",
-          "line": 54,
-          "endLine": 54,
+          "line": 59,
+          "endLine": 59,
           "sha256": "a668afecbae27a3aa5be5af428786889ceaa6655c8b5a8ef2d2670058d9d3739"
         },
         {
@@ -71312,8 +71364,8 @@
         {
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "new",
-          "line": 66,
-          "endLine": 66,
+          "line": 71,
+          "endLine": 71,
           "sha256": "3748c75e957472ec83222ad5c713fe6597a1fad22fdc1b5e5a04341b78f197eb"
         },
         {
@@ -71481,8 +71533,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -71567,9 +71619,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "ReadReview",
-          "line": 67,
-          "endLine": 89,
-          "sha256": "8cf85730de4bb84fe4720e643861117040ff5411c379a5ed3980e1793f008871"
+          "line": 68,
+          "endLine": 68,
+          "sha256": "6beb6367a17bec0af1ded41cfd42a33dcdb113e487f374aaa10fab7e72a1a1b7"
         },
         {
           "path": "src/TiaMcp.Core/AccessWorkflowStore.cs",
@@ -72777,6 +72829,13 @@
           "sha256": "ce2efb8303bf55504e6fc0150ac0513ef35635dfa5957c44bfd81f703ea859ef"
         },
         {
+          "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
+          "name": "Compare",
+          "line": 97,
+          "endLine": 102,
+          "sha256": "c7e5a4185dc0bbe6561d36210c7ce6cf4990daf388eecf36fecac736991cc338"
+        },
+        {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
           "line": 278,
@@ -72955,7 +73014,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -72967,8 +73026,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -73452,8 +73511,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -74013,9 +74072,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -74693,8 +74752,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -75508,9 +75567,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -75974,9 +76033,9 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Capture",
-          "line": 46,
-          "endLine": 78,
-          "sha256": "36d489bd3e7e3943b45153ef243330ae6ed775c1b815f44c629ff525a7d88009"
+          "line": 45,
+          "endLine": 77,
+          "sha256": "4097e77e8f8b81736aa3ba103ea956b2ee9c96569c3683e10d15fdcf32ff1e05"
         },
         {
           "path": "src/TiaMcp.Core/VersionControl/VciModels.cs",
@@ -76032,7 +76091,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -76044,8 +76103,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -76527,8 +76586,8 @@
         {
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "new",
-          "line": 54,
-          "endLine": 54,
+          "line": 59,
+          "endLine": 59,
           "sha256": "a668afecbae27a3aa5be5af428786889ceaa6655c8b5a8ef2d2670058d9d3739"
         },
         {
@@ -76583,8 +76642,8 @@
         {
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "new",
-          "line": 66,
-          "endLine": 66,
+          "line": 71,
+          "endLine": 71,
           "sha256": "3748c75e957472ec83222ad5c713fe6597a1fad22fdc1b5e5a04341b78f197eb"
         },
         {
@@ -76778,8 +76837,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Reconcile",
-          "line": 260,
-          "endLine": 275,
+          "line": 262,
+          "endLine": 277,
           "sha256": "a054f21ee9428b643c16a207f6e8742bb92f065c4eaa4c6888971a62daa47359"
         },
         {
@@ -77239,8 +77298,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Recover",
-          "line": 237,
-          "endLine": 258,
+          "line": 239,
+          "endLine": 260,
           "sha256": "55539922765d23798adf9ea3ea495987a67eb1134a3b59b04bc103defb555df8"
         },
         {
@@ -77757,16 +77816,16 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Status",
-          "line": 102,
-          "endLine": 106,
+          "line": 105,
+          "endLine": 109,
           "sha256": "624d18d40ca34f9214f1e77cf7e266c0ccd3a827f74120ba0af002785c646012"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Status",
-          "line": 118,
-          "endLine": 129,
-          "sha256": "f048f970998ed3cd63127a93ca1caad69648f96b0efeba98f13f8116c978c3fa"
+          "line": 120,
+          "endLine": 131,
+          "sha256": "783b19fc2a2b63a541bab906f19e389d1f5b177ee0a28dd4f18f5b0a8687b928"
         },
         {
           "path": "src/TiaMcp.Core/WatchTables/WatchTableAuthoring.cs",
@@ -77917,7 +77976,7 @@
           "name": "Prepare",
           "line": 39,
           "endLine": 64,
-          "sha256": "992d82e1d43415ac0496afb15b639fe429829644500b1ddf9c687d6ee90c8a3e"
+          "sha256": "150514b909a65a2e81099f77ed9f65ebcc46066023b30a15e6aa10d7932f0de5"
         },
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitions.cs",
@@ -77929,8 +77988,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Prepare",
-          "line": 91,
-          "endLine": 116,
+          "line": 93,
+          "endLine": 118,
           "sha256": "46c72808830c50b2d2f4be89ce5c36b1c44c8d994b301c1702572ea355ac1d72"
         },
         {
@@ -78255,8 +78314,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
           "name": "Reconcile",
-          "line": 260,
-          "endLine": 275,
+          "line": 262,
+          "endLine": 277,
           "sha256": "a054f21ee9428b643c16a207f6e8742bb92f065c4eaa4c6888971a62daa47359"
         },
         {
@@ -78595,8 +78654,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -79223,8 +79282,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -79311,8 +79370,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadArtifact",
-          "line": 297,
-          "endLine": 314,
+          "line": 300,
+          "endLine": 317,
           "sha256": "8e2bb6f4709d89c649ffb61c2e57c69a5306291a34cec81cf2c5e501653d3e7e"
         },
         {
@@ -79595,9 +79654,9 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "BranchesAsync",
-          "line": 238,
-          "endLine": 261,
-          "sha256": "6873b3040faa4920cc449d9d470f11f6afd49231214183a6a5da88b2a3bb978c"
+          "line": 241,
+          "endLine": 264,
+          "sha256": "1980bf85f1bfaec867ab4b53ff08bab2efb5c17a070bd37c631efbff0b326286"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -79865,9 +79924,9 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "CommitAsync",
-          "line": 140,
-          "endLine": 173,
-          "sha256": "ab57f2d96e159ccf9200a47e6fc170ae00f27fa0dc58d0e520207edfbba6c319"
+          "line": 141,
+          "endLine": 176,
+          "sha256": "9b40b6e6d449fdf858e90a9c4a4327ed161d97cf9ee7b33ded85ae5c83728c73"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -80399,8 +80458,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReadFile",
-          "line": 316,
-          "endLine": 322,
+          "line": 319,
+          "endLine": 325,
           "sha256": "9f4b9c73d0a183d5213620aa6ce448ada7bbb06c7c5a77279e9e654c2b48faee"
         },
         {
@@ -80669,9 +80728,9 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "HistoryAsync",
-          "line": 222,
-          "endLine": 236,
-          "sha256": "c43eb37bd04946f8bc3d3d085169e2cab76d556c634b07b7f4597ce60afa7bc4"
+          "line": 225,
+          "endLine": 239,
+          "sha256": "055f9420220154fec4d2e57eabcc63c90cf288808c3e46e7027aad26ea451db9"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -80961,8 +81020,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "List",
-          "line": 343,
-          "endLine": 371,
+          "line": 346,
+          "endLine": 374,
           "sha256": "8cacd9d3d425457c34395d737e468f12f77307c4e4a71f0ac2252c9022074342"
         },
         {
@@ -81287,9 +81346,9 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "MaterializeAsync",
-          "line": 263,
-          "endLine": 295,
-          "sha256": "7cd3b18fa6c921d9d57437799c30cdc6d3b33e4cab66ed3b7a1b3bb840eb604a"
+          "line": 266,
+          "endLine": 298,
+          "sha256": "6fced8c5c8e799d6253990df55e84c3f3090191962f69d1cd1cf8643880f4ec0"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -82092,8 +82151,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "PrepareAsync",
-          "line": 38,
-          "endLine": 122,
+          "line": 39,
+          "endLine": 123,
           "sha256": "352127f562fd9eb28fce4bdc2a3eca1110b76e834cf866e87d6afe5de8f51b0e"
         },
         {
@@ -82364,7 +82423,7 @@
           "name": "PushAsync",
           "line": 16,
           "endLine": 35,
-          "sha256": "dba001e7cd21d63b82bc8958ed17261e9e9810ca07748a5c663f40ed6bb47a09"
+          "sha256": "bbbe00e24e2eee928cb79597ae80dc59d46b15c2a400131fbb296e8f5208e195"
         },
         {
           "path": "src/TiaMcp.Core/SimulationCardMoveRetry.cs",
@@ -82625,8 +82684,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "ReconcileAsync",
-          "line": 203,
-          "endLine": 220,
+          "line": 206,
+          "endLine": 223,
           "sha256": "f3fa1ccf76fa15def07edc92f5528df50241ee17bba36af68c3cd3b81dd3e5b4"
         },
         {
@@ -82917,8 +82976,8 @@
         {
           "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
           "name": "Reopen",
-          "line": 175,
-          "endLine": 201,
+          "line": 178,
+          "endLine": 204,
           "sha256": "fcf3b0a309df3d80365475113617debeb97643583c8f7f4719c314295c202903"
         },
         {
@@ -83282,8 +83341,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -83988,9 +84047,9 @@
         {
           "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
           "name": "Serialize",
-          "line": 11,
-          "endLine": 18,
-          "sha256": "e538edb0bc2a6da7f1bc4c76569f6bb81c285317623fc62264d9a0e2b6ed415d"
+          "line": 20,
+          "endLine": 20,
+          "sha256": "213c6b2b0259abfd96141a5157499d763f81e616e031566696609201f9903107"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -85473,14 +85532,14 @@
           "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
           "name": "Page",
           "line": 25,
-          "endLine": 53,
-          "sha256": "c9acfde061ece211a9063a9118bd32109a85d1c9cf82812eae231270ea0961e4"
+          "endLine": 58,
+          "sha256": "da5b1f1a7b126bc5ab0e0d491da65fdff98a0cd42ef81514e864f6c1cd062fc1"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/RuntimeCaptureStore.cs",
           "name": "Page",
-          "line": 107,
-          "endLine": 121,
+          "line": 110,
+          "endLine": 124,
           "sha256": "946da078c6aa1557f80ae7b63f2df2a38c1a911cc27628593c323613c1d91205"
         },
         {
@@ -85522,8 +85581,8 @@
           "path": "src/TiaMcp.Core/TeamcenterReviewStore.cs",
           "name": "Page",
           "line": 32,
-          "endLine": 65,
-          "sha256": "0490f4a7f3d0e8a0f8f6fcdf556297065571b5b0b12b91b6bfa54e84a85ea00e"
+          "endLine": 70,
+          "sha256": "38ad3a7aa38dc35ebfbb546fc7ba3a12bddafef096afb11bc3c0316fbb7c6651"
         },
         {
           "path": "src/TiaMcp.Core/TechnologyProfileWorkflowStore.cs",
@@ -85977,8 +86036,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -86097,8 +86156,8 @@
         {
           "path": "src/TiaMcp.Core/TestSuite/TestSuiteDefinitionBundle.cs",
           "name": "Limit",
-          "line": 134,
-          "endLine": 134,
+          "line": 133,
+          "endLine": 133,
           "sha256": "48c246a4306a8e97b1997b34697754673cf0b71862fd151bb7596149b53891eb"
         },
         {
@@ -96055,7 +96114,7 @@
               "name": "LibraryDirectoryHash",
               "line": 421,
               "endLine": 438,
-              "sha256": "cda7089e62b7b1608980d966ee2ddb359fd6f4453640415dd011a7c3062806b5"
+              "sha256": "8daa31d051f4dc894f97100b68ce7bd8717a47c31868eee26acfc8454def269f"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryUpgrade.cs",
@@ -96131,7 +96190,7 @@
               "name": "LibraryDirectoryHash",
               "line": 421,
               "endLine": 438,
-              "sha256": "cda7089e62b7b1608980d966ee2ddb359fd6f4453640415dd011a7c3062806b5"
+              "sha256": "8daa31d051f4dc894f97100b68ce7bd8717a47c31868eee26acfc8454def269f"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
@@ -101062,6 +101121,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/Inventory/InventoryModels.cs",
@@ -111421,6 +111481,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/Inventory/InventoryModels.cs",
@@ -112674,6 +112735,7 @@
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
         "src/TiaMcp.Core/Diagnostics/TraceNumber.cs",
         "src/TiaMcp.Core/Drives/DriveProfileReview.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/Engineering/CompositeEngineeringReview.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
@@ -113846,6 +113908,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/Inventory/InventoryModels.cs",
@@ -116125,6 +116188,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/Inventory/InventoryModels.cs",
@@ -117628,6 +117692,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/Inventory/InventoryModels.cs",
@@ -127287,6 +127352,7 @@
         "src/TiaMcp.Core/Diagnostics/DiagnosticRuntimeAcquisitions.cs",
         "src/TiaMcp.Core/Diagnostics/DiagnosticUaComparisons.cs",
         "src/TiaMcp.Core/Diagnostics/TraceComparison.cs",
+        "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
         "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
         "src/TiaMcp.Core/GraphWorkflowStore.cs",
         "src/TiaMcp.Core/Inventory/InventoryModels.cs",

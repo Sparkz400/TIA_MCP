@@ -114,7 +114,7 @@ internal sealed class TranslationRetention
         string receipt = PathFor(kind, id, "receipt.json");
         Require(File.Exists(receipt), "TranslationPublicationIncomplete", "Publication has no completion receipt. Retained files are not a completed candidate. List the record to inspect publication state; use a new review for a retry.");
         var record = Parse<TranslationRecord>(Encoding.UTF8.GetString(ReadBounded(receipt, JsonLimit)));
-        Require(record.SchemaVersion == 1 && record.Kind == kind && record.Id == id && RecordHash(record) == record.RecordSha256 &&
+        Require(record.SchemaVersion == 1 && record.Kind == kind && record.Id == id && CanonicalJson.Matches(record.RecordSha256, Node(record with { RecordSha256 = "" })) &&
             record.Artifacts.Length <= 10 && record.Inputs.Length <= 3,
             "TranslationIntegrityFailure", "Retained translation receipt identity or digest differs.");
         Require(record.Artifacts.Select(a => a.Name).Distinct(StringComparer.Ordinal).Count() == record.Artifacts.Length,

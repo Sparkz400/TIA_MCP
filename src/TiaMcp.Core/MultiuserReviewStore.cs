@@ -31,8 +31,13 @@ public sealed class MultiuserReviewStore(string artifactsRoot)
         var envelope = JsonNode.Parse(ProjectReviewStore.ReadArtifact(artifactsRoot, artifact, ReportLimit))!.AsObject();
         if ((string?)envelope["schemaVersion"] != "multiuser-review-record.v1") throw new BridgeException("InvalidMultiuserObservation", "Unexpected record schema.");
         var request = MultiuserReview.Parse(ProjectReviewStore.ReadArtifact(artifactsRoot, envelope["input"]!.AsObject(), MultiuserReview.InputLimit));
-        var expected = MultiuserReview.Build(request);
-        if (!JsonNode.DeepEquals(expected, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input.");
+        // A report saved before RFC 8785 re-derives its identity keys in the form it was written with.
+        var expected = CanonicalJson.Compatible(() =>
+        {
+            var built = MultiuserReview.Build(request);
+            if (!JsonNode.DeepEquals(built, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input.");
+            return built;
+        });
         var result = Summary(envelope, artifact);
         if (section == "summary") return result;
         var source = expected[section]!.AsArray();

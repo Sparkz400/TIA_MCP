@@ -95,7 +95,7 @@ namespace TiaMcp.Openness.V21
                 ["projectArchive"] = null, ["nativeScope"] = _sharedMutationScope.DeepClone(),
                 ["markerSha256"] = SharedMutationHash(marker),
                 ["generatedCardReportSha256"] = SharedMutationHash(downloaded),
-                ["generatedCardReportHashPolicy"] = "SHA-256 of ordinal-key-sorted compact Newtonsoft JSON; array order preserved",
+                ["generatedCardReportHashPolicy"] = "SHA-256 of RFC 8785 canonical JSON; integers keep their exact digits",
                 ["storageMetadata"] = SimulationProvisionTreeMetadata(storage),
                 ["originalCardManifest"] = expectedFiles.DeepClone(),
                 ["opaqueStorageContentsRead"] = false, ["fullStorageBytePreservationVerified"] = false,

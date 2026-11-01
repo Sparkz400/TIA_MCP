@@ -39,12 +39,17 @@ public sealed class TeamcenterReviewStore(string artifactsRoot)
         if ((string?)envelope["schemaVersion"] != "teamcenter-review-record.v1") throw new BridgeException("InvalidTeamcenterObservation", "Unexpected record schema.");
         var request = TeamcenterReview.Parse(ProjectReviewStore.ReadArtifact(artifactsRoot, envelope["input"]!.AsObject(), TeamcenterReview.InputLimit));
         var manifests = envelope["manifests"]!.AsObject(); var usedManifests = new HashSet<string>(StringComparer.Ordinal);
-        var expected = TeamcenterReview.Build(request, reference => {
-            if (!manifests.ContainsKey(reference)) throw new BridgeException("ArtifactChanged", "Retained manifest is missing.");
-            usedManifests.Add(reference); return ProjectReviewStore.ReadArtifact(artifactsRoot, manifests[reference]!.AsObject(), TeamcenterReview.ManifestLimit);
+        // A report saved before RFC 8785 re-derives its identity keys in the form it was written with.
+        var expected = CanonicalJson.Compatible(() =>
+        {
+            var built = TeamcenterReview.Build(request, reference => {
+                if (!manifests.ContainsKey(reference)) throw new BridgeException("ArtifactChanged", "Retained manifest is missing.");
+                usedManifests.Add(reference); return ProjectReviewStore.ReadArtifact(artifactsRoot, manifests[reference]!.AsObject(), TeamcenterReview.ManifestLimit);
+            });
+            if (usedManifests.Count != manifests.Count) throw new BridgeException("ArtifactChanged", "Unexpected unreferenced manifest evidence.");
+            if (!JsonNode.DeepEquals(built, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input.");
+            return built;
         });
-        if (usedManifests.Count != manifests.Count) throw new BridgeException("ArtifactChanged", "Unexpected unreferenced manifest evidence.");
-        if (!JsonNode.DeepEquals(expected, envelope["report"])) throw new BridgeException("ArtifactChanged", "Report differs from its retained input.");
         var result = Summary(envelope, artifact);
         if (section == "summary") return result;
         var source = expected[section]!.AsArray();

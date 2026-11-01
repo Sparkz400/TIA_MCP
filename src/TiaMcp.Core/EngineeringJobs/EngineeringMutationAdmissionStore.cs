@@ -149,7 +149,7 @@ public sealed class EngineeringMutationAdmissionStore
         if (current.ResourceKeys is null || current.ResourceKeys.Count != current.Scope.Resources.Count || live && !ScopeKeys(current.Scope).SequenceEqual(current.ResourceKeys) || current.Reconciliation is null)
             throw new BridgeException("JournalInvalid", "Mutation resource keys differ from their exact scope.");
         bool valid = previous is null ? current.State == "dispatchIntent" && current.PreviousSha256 is null && current.Response is null && current.Reconciliation.Count == 0
-            : current.PreviousSha256 == Hash(previous) && current.RequestSha256 == previous.RequestSha256 && Hash(current.Scope) == Hash(previous.Scope) &&
+            : Matches(current.PreviousSha256, previous) && current.RequestSha256 == previous.RequestSha256 && Hash(current.Scope) == Hash(previous.Scope) &&
               current.RecordedAt >= previous.RecordedAt && (previous.State == "dispatchIntent" && current.State is "returned" or "outcomeUnknown" or "reconciled" ||
               previous.State == "outcomeUnknown" && current.State == "reconciled");
         if (!valid) throw new BridgeException("JournalInvalid", "Mutation admission transition or immutable scope changed.");
@@ -207,6 +207,8 @@ public sealed class EngineeringMutationAdmissionStore
     }
     private static T Freeze<T>(T value) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, BridgeProtocol.Json), BridgeProtocol.Json)!;
     private static string Hash<T>(T value) => CanonicalJson.Sha256(JsonSerializer.SerializeToNode(value, BridgeProtocol.Json) ?? JsonValue.Create("null")!);
+    // Revisions written before RFC 8785 keep verifying against the hash form they were written with.
+    private static bool Matches<T>(string? stored, T value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
     private static void Write(EngineeringMutationAdmission record, string directory)
     {
         string path = PackageStorage.Under(directory, record.Revision.ToString("D8") + ".json");

@@ -4,6 +4,7 @@ using TiaMcp.Core.Engineering;
 
 // Contention checks (also in the probe children below) hold a store lock past this short bound; one check widens it.
 PackageStorage.LockWait = TimeSpan.FromMilliseconds(250);
+if (args.Length > 0 && args[0] == "--canonical-only") { CanonicalJsonChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--multiuser-only") { MultiuserReviewChecks.Run(); return; }
 if (args.Length > 0 && args[0] == "--teamcenter-only") { TeamcenterReviewChecks.Run(); return; }
 if (args.Length == 1 && args[0] == "--watch-authoring-only") { await WatchAuthoringChecks.Run(); return; }
@@ -56,8 +57,9 @@ Check(CanonicalJson.Serialize(JsonNode.Parse("{\"z\":1,\"a\":{\"y\":2,\"b\":null
 Check(CanonicalJson.Sha256(JsonNode.Parse("{\"z\":1,\"a\":2}")!) == CanonicalJson.Sha256(JsonNode.Parse("{\"a\":2,\"z\":1}")!), "Property order does not change identity");
 Check(CanonicalJson.Sha256(JsonNode.Parse("[1,2]")!) != CanonicalJson.Sha256(JsonNode.Parse("[2,1]")!), "Row order changes identity");
 Check(CanonicalJson.Sha256(JsonNode.Parse("{\"a\":null}")!) != CanonicalJson.Sha256(JsonNode.Parse("{}")!), "Unknown versus absent stays distinct");
-Check(CanonicalJson.Sha256(JsonNode.Parse("[1]")!) != CanonicalJson.Sha256(JsonNode.Parse("[1.0]")!), "Numeric source representation preserved");
+Check(CanonicalJson.Sha256(JsonNode.Parse("[1000]")!) == CanonicalJson.Sha256(JsonNode.Parse("[1e3]")!), "Numbers hash by value (RFC 8785)");
 Console.WriteLine($"PASS Engineering identity and canonical capture contracts: {passed} checks; no native execution.");
+CanonicalJsonChecks.Run();
 EngineeringOperationChecks.Run();
 MultiuserReviewChecks.Run();
 TeamcenterReviewChecks.Run();

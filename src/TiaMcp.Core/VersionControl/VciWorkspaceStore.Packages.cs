@@ -162,7 +162,10 @@ public sealed partial class VciWorkspaceStore
             mapping.EnumerationComplete, new VciLimits(MaxFiles, 1000, Limits.MaxTotalBytes));
     }
 
-    private (ManifestReceipt Receipt, VciManifest Manifest) LoadManifest(string reference)
+    // Records retained before RFC 8785 re-derive with the form they were written with.
+    private (ManifestReceipt Receipt, VciManifest Manifest) LoadManifest(string reference) => CanonicalJson.Compatible(() => LoadManifestExact(reference));
+    private (ComparisonReceipt Receipt, VciConflictReport Report) LoadComparison(string reference) => CanonicalJson.Compatible(() => LoadComparisonExact(reference));
+    private (ManifestReceipt Receipt, VciManifest Manifest) LoadManifestExact(string reference)
     {
         var entry = Read<ManifestReceipt>(reference, "manifest");
         VerifyArtifacts(entry.Directory, entry.Value.Artifacts, "mapping.json", "manifest.json");
@@ -172,7 +175,7 @@ public sealed partial class VciWorkspaceStore
         return (entry.Value, manifest);
     }
 
-    private (ComparisonReceipt Receipt, VciConflictReport Report) LoadComparison(string reference)
+    private (ComparisonReceipt Receipt, VciConflictReport Report) LoadComparisonExact(string reference)
     {
         var entry = Read<ComparisonReceipt>(reference, "comparison"); VerifyArtifacts(entry.Directory, entry.Value.Artifacts, "inputs.json", "comparison.json");
         var receipt = entry.Value;
