@@ -1,5 +1,5 @@
-"""Native qualification of change kinds hmi_classic_import, hmi_external_tag_create and hmi_screen_create, the HMI writes that
-pass the closed preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
+"""Native qualification of change kinds hmi_classic_import, hmi_external_tag_create, hmi_screen_create and
+hmi_dynamization_create, the HMI writes that pass the closed preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
 
 One profile per run, on a qualification Host (--hmi-change-qualification <profile>) in a copy its own worker retrieves. Since the
 three profiles passed (1 November 2026) the gate admits them in production, also on that Host (ADMISSION):
@@ -7,6 +7,8 @@ three profiles passed (1 November 2026) the gate admits them in production, also
   (--fixture <configured.zap21> of scripts/prepare_hmi_fixture_ui.py, checked by qualify_engineering_gaps.prepared_archive);
 - hmi_screen_create (--kind) runs on the same Unified fixtures: a new screen sized like Overview_A on HMI_RT_1, an IOField on it
   and a button on HMI_RT_2's Overview_B;
+- hmi_dynamization_create (--kind) first creates the items it binds through hmi_screen_create (setup, before the reference), then
+  binds ProcessValue to a PLC tag, a global DB member and an internal tag; readback includes the hmi_references chain;
 - unified-pc has no configured fixture yet (ruling R4): --seeded-report names the HmiSeeder qualify report
   (artifacts/q/hps/native-report.json) whose positive baseline (two HMIs, two PLCs, integrated connections, LinkedSignal and
   LinkedDbValue) is retrieved as that report recorded it. Its two encrypted-transfer password errors stay; the kind's compile
@@ -53,7 +55,8 @@ BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "S
 SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "QualificationButton"
 # The admission the gate reports for each kind on its profiles: production since its native qualification passed (the qualifying
 # runs of local.hmi.*.route.20261101 saw "qualification"); "qualification" while a kind has no production profile.
-ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "qualification"}
+ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "qualification",
+             "hmi_dynamization_create": "qualification"}
 
 
 def digest(raw):
@@ -122,11 +125,21 @@ def outside(found, family, roots):
     return [row for row in found if not intended(row)]
 
 
-def unintended(before, after, family, hmi_path=None, roots=()):
+def masked(snapshot, fields):
+    """The snapshot without the row fields an intended change may write (objectPath -> top-level row field), such as the
+    dynamizations metadata hmi_inspect attaches to an item row; every other field of that row stays compared."""
+    return {label: {**section, "rows": {path: ({k: v for k, v in row.items() if k != fields[path]} if path in fields else row) for path, row in section["rows"].items()}}
+            for label, section in snapshot.items()}
+
+
+def unintended(before, after, family, hmi_path=None, roots=(), fields=None):
     """Per HMI, every difference outside the intended delta of hmi_path; every other HMI must be identical."""
     found = {}
     for path in sorted(set(before) | set(after)):
-        rows_ = differences(before.get(path, {}), after.get(path, {}))
+        old, new = before.get(path, {}), after.get(path, {})
+        if path == hmi_path and fields:
+            old, new = masked(old, fields), masked(new, fields)
+        rows_ = differences(old, new)
         extra = outside(rows_, family, roots) if path == hmi_path else rows_
         if extra:
             found[path] = extra[:20]
@@ -427,13 +440,98 @@ def screen_cases(fx):
             created_item("HMI_RT_2", "Overview_B", BUTTON, "HmiButton", {"left": 40, "top": 120, "width": 120, "height": 48})]
 
 
-# Kind: family, profiles, fixture, refusals before any write, applies in order, and an unbound reopen probe of the production gate.
-KINDS = {"hmi_classic_import": ("classic", ("classic-comfort",), classic_fixture, classic_refusals, classic_cases,
-                                lambda fx: scalar(fx["HMI_RT_1"]["Overview_B"], ALTERNATE)),
-         "hmi_external_tag_create": ("unified", ("unified-comfort", "unified-pc"), unified_fixture, unified_refusals, unified_cases,
-                                     lambda fx: external(fx["HMI_RT_1"], "QualificationReopen", "root")),
-         "hmi_screen_create": ("unified", ("unified-comfort", "unified-pc"), screen_fixture, screen_refusals, screen_cases,
-                               lambda fx: screen_payload(fx["HMI_RT_1"], "QualificationReopen"))}
+# --- Unified tag dynamizations (hmi_dynamization_create) --------------------------------------------------------------------
+
+# The items the binding route creates (hmi_screen_create) and the tag each one's ProcessValue is bound to; the gauge stays unbound
+# for the reopen probe. LinkedSignal is a root PLC tag, LinkedDbValue a global DB member, SharedValue an internal tag.
+BOUND = (("HMI_RT_1", "Overview_A", FIELD, "HmiIOField", "LinkedSignal"), ("HMI_RT_1", "Overview_A", "QualificationBar", "HmiBar", "LinkedDbValue"),
+         ("HMI_RT_2", "Overview_B", FIELD, "HmiIOField", "SharedValue"), ("HMI_RT_2", "Overview_B", "QualificationGauge", "HmiGauge", None))
+
+
+def binding_fixture(client, hmis):
+    """screen_fixture plus, per HMI, its LinkedSignal, LinkedDbValue and SharedValue tags."""
+    fx = screen_fixture(client, hmis)
+    for name, device in hmis.items():
+        tags = {r["name"]: r for r in rows(client, device, "tags").values() if r["identity"]["kind"] == "hmiTag"}
+        require({"LinkedSignal", "LinkedDbValue", "SharedValue"} <= set(tags), name + " lacks LinkedSignal, LinkedDbValue or SharedValue")
+        fx[name]["tags"] = tags
+    return fx
+
+
+def binding_setup(fx):
+    """Each BOUND item, created through hmi_screen_create in a free rectangle below the seeded items."""
+    return [("%s %s on %s %s" % (item_type, item, hmi, screen), "hmi_screen_create",
+             item_payload(fx[hmi]["screens"][screen], item, item_type, {"left": 20, "top": 160 + 70 * (index % 2), "width": 160, "height": 50}))
+            for index, (hmi, screen, item, item_type, _) in enumerate(BOUND)]
+
+
+def bound_item(client, hmis, fx, hmi, screen, name):
+    screen_path = fx[hmi]["screens"][screen]["identity"]["objectPath"]
+    found = rows(client, hmis[hmi], "items", screenPath=screen_path).get(screen_path + "/items/" + name)
+    require(found is not None, "The setup item %s is missing on %s %s" % (name, hmi, screen))
+    return found
+
+
+def binding_payload(item, tag, prop="ProcessValue", **changes):
+    binding = {"property": prop, "tagIdentity": tag["identity"], "dataType": tag["properties"]["DataType"]}
+    binding.update(changes)
+    return {"schemaVersion": 1, "operation": "dynamization_set", "target": item["identity"], "bindings": [binding]}
+
+
+def binding_refusals(client, hmis, fx):
+    kind, f = "hmi_dynamization_create", fx["HMI_RT_1"]
+    field = bound_item(client, hmis, fx, "HMI_RT_1", "Overview_A", FIELD)
+    signal, other = f["tags"]["LinkedSignal"], fx["HMI_RT_2"]["tags"]["SharedValue"]
+    wrong = "Bool" if signal["properties"]["DataType"] != "Bool" else "Int"
+    return [("the same binding payload as hmi_engineering", "hmi_engineering", binding_payload(field, signal), "HmiPreservationUnavailable"),
+            ("an operation outside the kind (event_handler_set)", kind, {"schemaVersion": 1, "operation": "event_handler_set", "target": field["identity"],
+                                                                        "eventType": "Tapped", "script": "// refused"}, "InvalidRequest"),
+            ("Visible by a tag that is not Bool", kind, binding_payload(field, signal, "Visible") if wrong == "Bool" else binding_payload(field, f["tags"]["SharedValue"], "Visible"), "InvalidRequest"),
+            ("a property outside ProcessValue, Visible and Enabled", kind, binding_payload(field, signal, "Left"), "InvalidRequest"),
+            ("a tag of the other HMI", kind, binding_payload(field, other), "InvalidRequest"),
+            ("a dataType other than the tag's", kind, binding_payload(field, signal, dataType=wrong), "InvalidRequest"),
+            ("ProcessValue of a rectangle", kind, binding_payload(next(r for r in rows(client, hmis["HMI_RT_1"], "items", screenPath=f["screens"]["Overview_A"]["identity"]["objectPath"]).values()
+                                                                if r["name"] == "RepeatedItem"), signal), "HmiAttributeUnavailable")]
+
+
+def binding_cases(fx):
+    """ProcessValue of each bound BOUND item; the readback reads the item's dynamization and the hmi_references chain item -> HMI tag
+    (and, for a PLC-backed tag, its resolved PLC declaration)."""
+    def bound(hmi, screen, name, item_type, tag_name):
+        def build(client, hmis):
+            item, tag = bound_item(client, hmis, fx, hmi, screen, name), fx[hmi]["tags"][tag_name]
+            path, tag_path = item["identity"]["objectPath"], tag["identity"]["objectPath"]
+
+            def verify(client):
+                row = bound_item(client, hmis, fx, hmi, screen, name)
+                found = [d for d in row.get("dynamizations") or [] if d.get("property") == "ProcessValue"]
+                values = (found[0].get("properties") or {}) if len(found) == 1 else {}
+                edges = client.tool("hmi_references", {"request": {"schemaVersion": 1, "target": hmis[hmi]["identity"], "limit": 200, "maxVisited": 50000}})["relationships"]
+                chain = [(e.get("resolution"), (e.get("target") or {}).get("objectPath")) for e in edges
+                         if e.get("relation") == "hmiScreenItemTag" and e.get("sourcePath") == path and e.get("sourceProperty") == "Dynamizations/ProcessValue/Tag"]
+                plc = sum(e.get("relation") == "hmiPlcDeclaration" and e.get("sourcePath") == tag_path and e.get("resolution") == "resolved" for e in edges)
+                observed = {"tag": values.get("Tag"), "type": values.get("DynamizationType"), "indirect": values.get("UseIndirectAddressing"), "chain": chain, "plcDeclarations": plc}
+                expected = {"tag": tag_name, "type": "Tag", "indirect": False, "chain": [("resolved", tag_path)], "plcDeclarations": 1 if tag_name != "SharedValue" else 0}
+                return observed == expected, None if observed == expected else {"expected": expected, "observed": observed}
+            return {"label": "ProcessValue of %s %s on %s <- %s" % (item_type, name, hmi, tag_name), "hmi": hmi, "payload": binding_payload(item, tag),
+                    "roots": [path + "/dynamizations/ProcessValue"], "fields": {path: "dynamizations"}, "verify": verify}
+        return build
+    return [bound(*row) for row in BOUND if row[4]]
+
+
+def binding_reopen(client, hmis, fx):
+    return binding_payload(bound_item(client, hmis, fx, "HMI_RT_2", "Overview_B", "QualificationGauge"), fx["HMI_RT_2"]["tags"]["SharedValue"])
+
+
+# Kind: family, profiles, fixture, setup applies (label, kind, payload) before the reference, refusals before any write, applies
+# in order, and an unbound reopen probe of the production gate (client, hmis, fx).
+KINDS = {"hmi_classic_import": ("classic", ("classic-comfort",), classic_fixture, lambda fx: [], classic_refusals, classic_cases,
+                                lambda client, hmis, fx: scalar(fx["HMI_RT_1"]["Overview_B"], ALTERNATE)),
+         "hmi_external_tag_create": ("unified", ("unified-comfort", "unified-pc"), unified_fixture, lambda fx: [], unified_refusals, unified_cases,
+                                     lambda client, hmis, fx: external(fx["HMI_RT_1"], "QualificationReopen", "root")),
+         "hmi_screen_create": ("unified", ("unified-comfort", "unified-pc"), screen_fixture, lambda fx: [], screen_refusals, screen_cases,
+                               lambda client, hmis, fx: screen_payload(fx["HMI_RT_1"], "QualificationReopen")),
+         "hmi_dynamization_create": ("unified", ("unified-comfort", "unified-pc"), binding_fixture, binding_setup, binding_refusals, binding_cases, binding_reopen)}
 
 
 # --- Change calls ------------------------------------------------------------------------------------------------------------
@@ -508,7 +606,7 @@ def run(args, connect, watch=lambda pid: None):
     process-exit watcher of the owned TIA (OwnedTiaProcessWatcher)."""
     profile = args.profile
     kind = getattr(args, "kind", None) or PROFILES[profile][1]
-    family, profiles, fixture_of, refusals_of, cases_of, reopen_of = KINDS[kind]
+    family, profiles, fixture_of, setup_of, refusals_of, cases_of, reopen_of = KINDS[kind]
     require(profile in profiles, "Change kind %s runs on %s, not %s" % (kind, " and ".join(profiles), profile))
     report = {"schemaVersion": 1, "completed": False, "nativeExecuted": True, "runtimeVerified": False, "kind": kind, "profile": profile,
               "checks": [], "failures": [], "steps": [], "replays": [], "lifetimes": [], "toolCalls": []}
@@ -535,6 +633,10 @@ def run(args, connect, watch=lambda pid: None):
         hmis = devices(client, family)
         gate(all(d.get("profile") == profile for d in hmis.values()), "Both fixture HMIs have the native profile " + profile, {n: d.get("profile") for n, d in hmis.items()})
         fx = fixture_of(client, hmis)
+        # Setup changes (another admitted kind) create what the kind under test needs; they precede the reference.
+        for label, setup_kind, payload in setup_of(fx):
+            applied = step("setup " + label, client.tool("change_apply", apply_arguments(prepare(client, setup_kind, payload))))
+            gate(applied.get("state") == "applied", "Setup applied: " + label, {"state": applied.get("state"), "failure": applied.get("failure")})
         reference = snapshots(client, hmis, project)
 
         # 1. Refusals before any write.
@@ -586,7 +688,7 @@ def run(args, connect, watch=lambda pid: None):
             ok, detail = case["verify"](client)
             gate(ok, "Independent readback of the target: " + label, detail)
             after = snapshots(client, hmis, project)
-            extra = unintended(reference, after, family, device["hmiPath"], case["roots"])
+            extra = unintended(reference, after, family, device["hmiPath"], case["roots"], case.get("fields"))
             if index == 0 and evidence.get("baselineCompileChangedCapture") is True:
                 # The worker compares with its compiled capture; differences of the first compile are recorded, not attributed.
                 report["firstCompileChangedRows"] = extra
@@ -636,7 +738,7 @@ def run(args, connect, watch=lambda pid: None):
         gate(not changed, "Fresh reopen: hmi_inspect equals the last applied state", changed)
         # Unbound, so an admitted prepare stops at StaleRevision after the gate; its details carry the gate. Before a kind has a
         # production profile the production Host refuses it at the gate (HmiPreservationUnavailable, admission null).
-        error = refusal(fresh, kind, reopen_of(fixture_of(fresh, hmis)))
+        error = refusal(fresh, kind, reopen_of(fresh, hmis, fixture_of(fresh, hmis)))
         admission = (error.get("details") or {}).get("gate") or {}
         production = ADMISSION[kind] == "production"
         gate(error.get("code") == ("StaleRevision" if production else "HmiPreservationUnavailable") and admission.get("available") is production
