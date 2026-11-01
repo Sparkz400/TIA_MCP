@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "cd4c160a16e7a368a72998771c7a7ea24cf193c2e4b14fbb2a1fca50291cc2da",
-      "bytes": 1643903
+      "sha256": "f7d7a839654b8a9b0e909dcadfea9e59310ebc13309b8529d4676edd768c2a65",
+      "bytes": 1644554
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1502,8 +1502,8 @@
     },
     {
       "path": "src/TiaMcp.Core/SimulationNetworkAdmission.cs",
-      "sha256": "af54928f7fcc79ea8ea52ab74fedd0277f023544c3aff15a2697dd3ebcb8c2e7",
-      "bytes": 4871
+      "sha256": "07631982d43bb13861c2563a35d956a35f480b80bc78989978a98a015a599a1d",
+      "bytes": 5337
     },
     {
       "path": "src/TiaMcp.Core/SimulationNetworkRoute.cs",
@@ -2137,8 +2137,8 @@
     },
     {
       "path": "src/TiaMcp.Host/TestSuiteTools.cs",
-      "sha256": "3807f66a278f2daee3fb74a19306057b0f47fb77534ad5cdbda5265c6b582965",
-      "bytes": 15223
+      "sha256": "fd633444a9a04ad6b74ebf37711c0c6946bbb4c53fa5bb8982f74783055abb69",
+      "bytes": 15310
     },
     {
       "path": "src/TiaMcp.Host/TiaMcp.Host.csproj",
@@ -2987,8 +2987,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
-      "sha256": "16a30be068b5cb20ceb4d6dabe4d0583de934ef31ae83ae050eb0ffe3f570239",
-      "bytes": 5676
+      "sha256": "62a9953d704a7f5167556a1d9e4c209a6c490cd9e18a5450affcf15d02c09ca8",
+      "bytes": 5958
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.TranslationAdmission.cs",
@@ -90190,8 +90190,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "PrepareTestSuiteSystemImport",
-              "line": 48,
-              "endLine": 65,
+              "line": 50,
+              "endLine": 67,
               "sha256": "e5868884083a791183b66463db51e5990a28765bdb8f479b2729f9402346648b"
             },
             {
@@ -90581,8 +90581,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "ApplyTestSuiteSystemImport",
-              "line": 67,
-              "endLine": 77,
+              "line": 69,
+              "endLine": 79,
               "sha256": "81d853ca485c2dedb46ca243584a3e0ae643b8e6aaa21157cbb1a0e4b5275c02"
             },
             {
@@ -91378,8 +91378,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "PrepareTestSuiteSystemImport",
-              "line": 48,
-              "endLine": 65,
+              "line": 50,
+              "endLine": 67,
               "sha256": "e5868884083a791183b66463db51e5990a28765bdb8f479b2729f9402346648b"
             },
             {
@@ -91769,8 +91769,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "ApplyTestSuiteSystemImport",
-              "line": 67,
-              "endLine": 77,
+              "line": 69,
+              "endLine": 79,
               "sha256": "81d853ca485c2dedb46ca243584a3e0ae643b8e6aaa21157cbb1a0e4b5275c02"
             },
             {
@@ -92535,8 +92535,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "PrepareTestSuiteSystemImport",
-              "line": 48,
-              "endLine": 65,
+              "line": 50,
+              "endLine": 67,
               "sha256": "e5868884083a791183b66463db51e5990a28765bdb8f479b2729f9402346648b"
             },
             {
@@ -92926,8 +92926,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "ApplyTestSuiteSystemImport",
-              "line": 67,
-              "endLine": 77,
+              "line": 69,
+              "endLine": 79,
               "sha256": "81d853ca485c2dedb46ca243584a3e0ae643b8e6aaa21157cbb1a0e4b5275c02"
             },
             {
@@ -93692,8 +93692,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "PrepareTestSuiteSystemImport",
-              "line": 48,
-              "endLine": 65,
+              "line": 50,
+              "endLine": 67,
               "sha256": "e5868884083a791183b66463db51e5990a28765bdb8f479b2729f9402346648b"
             },
             {
@@ -94083,8 +94083,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "ApplyTestSuiteSystemImport",
-              "line": 67,
-              "endLine": 77,
+              "line": 69,
+              "endLine": 79,
               "sha256": "81d853ca485c2dedb46ca243584a3e0ae643b8e6aaa21157cbb1a0e4b5275c02"
             },
             {
@@ -98853,8 +98853,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "PrepareTestSuiteSystemImport",
-              "line": 48,
-              "endLine": 65,
+              "line": 50,
+              "endLine": 67,
               "sha256": "e5868884083a791183b66463db51e5990a28765bdb8f479b2729f9402346648b"
             }
           ]
@@ -98873,8 +98873,8 @@
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.TestSuiteSystem.cs",
               "name": "ApplyTestSuiteSystemImport",
-              "line": 67,
-              "endLine": 77,
+              "line": 69,
+              "endLine": 79,
               "sha256": "81d853ca485c2dedb46ca243584a3e0ae643b8e6aaa21157cbb1a0e4b5275c02"
             }
           ]

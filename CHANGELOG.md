@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.108`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.109`.
 
 ### Added
 
@@ -186,6 +186,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- A Test Suite system-test endpoint also needs a TCP/IP instance: a Softbus instance keeps its
+  configured controller address and the PLCSIM adapter can still route to it with nothing
+  listening, so it now refuses with `PlcsimEndpointUnreachable`. No build dispatches system tests
+  yet, so this is checked offline only.
 - `drive_telegram_set` refused every prepare with `ExpectedValueMismatch`: telegram rows carried a
   string-typed null that never equals the null of the echoed `expectedTelegrams`; they now carry real
   JSON nulls (`local.drives.index.20261101`).
@@ -286,6 +290,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   refused; the online route needs a card from the PLC), V21 Openness neither creates nor
   exposes WinCC RT Professional, and V21 Update 3 cannot re-check a Test Suite style rule's scope at
   execution time, so production style execution is unavailable (only the TS-Q01 qualification mode runs).
+- Test Suite system tests have no qualification mode: they need PLCSIM's TCP/IP mode and, since V21
+  takes no OPC UA credential, a guest-access seed made at the desk
+  ([record](docs/verification/testsuite-system-blocker-20261101.md)).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
 - `library_instantiate` and `software_unit_create_from` recognize a master-copy tag TIA renamed by

@@ -120,6 +120,13 @@ internal static class SimulationNetworkAdmissionTests
         foreach (string other in new[] { "Intel(R) Ethernet Connection I219-LM", "", "PLCSIM" })
             Check.Equal("RuntimeTargetNotOwnedPlcsim", SimulationNetworkAdmission.RouteRefusal(other));
         Check.Equal("RuntimeTargetRouteUnverified", SimulationNetworkAdmission.RouteRefusal(null));
+        // A system test endpoint also needs a TCP/IP instance: the route refusal comes first, then a Softbus ticket.
+        const string plcsim = "Siemens PLCSIM Virtual Ethernet Adapter";
+        Check.Equal(null, SimulationNetworkAdmission.EndpointRefusal(plcsim, "TCPIP"));
+        foreach (string softbus in new[] { "Softbus", null, "tcpip", "None" })
+            Check.Equal("PlcsimEndpointUnreachable", SimulationNetworkAdmission.EndpointRefusal(plcsim, softbus));
+        Check.Equal("RuntimeTargetNotOwnedPlcsim", SimulationNetworkAdmission.EndpointRefusal("Intel(R) Ethernet Connection I219-LM", "Softbus"));
+        Check.Equal("RuntimeTargetRouteUnverified", SimulationNetworkAdmission.EndpointRefusal(null, "TCPIP"));
         Check.Equal(null, SimulationNetworkRoute.Adapter("opc.tcp://plc.example:4840"));
         // Both write paths decide on Windows' route: the Host runtime gate and the Test Suite system-test endpoint.
         var root = new DirectoryInfo(AppContext.BaseDirectory);
@@ -139,7 +146,7 @@ internal static class SimulationNetworkAdmissionTests
             Check.Equal(true, start >= 0 && gate > start && gate < ua.IndexOf(send, start, StringComparison.Ordinal));
         }
         string system = Source("TiaMcp.Openness.V21", "OpennessSession.TestSuiteSystem.cs");
-        int guard = system.IndexOf("SimulationNetworkAdmission.RouteRefusal(SimulationNetworkRoute.Adapter(serverAddress))", StringComparison.Ordinal);
+        int guard = system.IndexOf("SimulationNetworkAdmission.EndpointRefusal(SimulationNetworkRoute.Adapter(serverAddress), SimulationTicket.Interface(SimulationTicket.Decode(ticket)))", StringComparison.Ordinal);
         Check.Equal(true, guard > system.IndexOf("private JObject TestSuiteOwnedEndpoint(", StringComparison.Ordinal) && guard < system.IndexOf("return simulator;", StringComparison.Ordinal));
         return Task.CompletedTask;
     }
