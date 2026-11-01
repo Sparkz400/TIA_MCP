@@ -211,7 +211,11 @@ it is called. One such symbol refuses the whole request with `InvalidRequest`, t
 uses, and names it in `details.symbol`; nothing is written, and a scenario does not start. Inputs,
 markers, data blocks, timers and counters stay writable as before. A symbol missing from the tag list is
 left to PLCSIM, which resolves names through that same list (`DoesNotExist`, or `NotUpToDate` until
-`sim_tags` refreshes it). The rule is checked offline; its native recheck is open ([TODO](../TODO.md)).
+`sim_tags` refreshes it). Rechecked natively on 1 November 2026 on an owned PLCSIM Advanced V8 instance
+(`local.sim.output-refusal.20261101`): `sim_write` of an output tag, quoted and unquoted, a `sim_write_signals`
+batch with one output tag among a marker and a DB member, and a `sim_test` step writing an output tag were
+refused and wrote nothing, `sim_test` saved no report, and a marker, a DB member and an input still wrote.
+`diagnostic_plcsim_write` shares the check but has no native run.
 
 ## Online compare and station upload
 

@@ -5,7 +5,7 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.103`: 481 features, 463 verified, 18 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.105`: 481 features, 463 verified, 18 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 132 shipped, 331 limited, 4 unqualified, 12 unavailable on V21, 2 deferred |
 | Matrix cells | 2,120 bound, **22 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, D10 against `0.4.95` and D06 against `0.4.97` |
@@ -72,7 +72,7 @@ profiles and the shared-device/MRP hardware topology were added and natively qua
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
 recorded V21 boundaries. Later on 1 November: the six TS-Q01 Test Suite style cases passed natively with the operator at the desk, which verifies three
 style-job tools, and production style execution became a V21 boundary (catalog 0.4.97); the `project_upgrade` interruption cases passed natively
-(16/16) and combined apply gained a multi-instance shape. Two admission gaps were closed offline (catalog 0.4.103): a first motion object without compile and F-I/O tag addresses from VCI packages and library master copies now refuse before any write. Drive objects whose number Startdrive cannot read
+(16/16) and combined apply gained a multi-instance shape. Two admission gaps were closed (catalog 0.4.103) and rechecked natively with the symbolic output-write refusal (catalog 0.4.105): a first motion object without compile and F-I/O tag addresses from VCI packages and library master copies now refuse before any write. Drive objects whose number Startdrive cannot read
 are addressed by container index, and the three D10 drive rows are verified on a G120C PN (catalog 0.4.95; the
 drive object number left the recorded boundaries). In a desk session the Explorer roundtrip passed
 in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "930a06a56a4375b0308eb207188ee2a6466c37250b9ffc0e5fcda02411d229f9",
-      "bytes": 1619121
+      "sha256": "9c414ca6271ccc791a1c282f1d5b745ebad95ad36f54988bae65d3e387baff63",
+      "bytes": 1627908
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -106085,6 +106085,13 @@
           "artifacts": [
             "evidence/local.library_units.namespace.dependency.20261101.json"
           ]
+        },
+        {
+          "id": "local.safety.fio-routes.20261101",
+          "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
+          "artifacts": [
+            "evidence/local.safety.fio-routes.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -108563,6 +108570,13 @@
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
           ]
+        },
+        {
+          "id": "local.safety.fio-routes.20261101",
+          "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
+          "artifacts": [
+            "evidence/local.safety.fio-routes.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -108660,6 +108674,13 @@
           "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1",
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.safety.fio-routes.20261101",
+          "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
+          "artifacts": [
+            "evidence/local.safety.fio-routes.20261101.json"
           ]
         }
       ],
@@ -108811,6 +108832,13 @@
           "profileSha256": "605c81f58d53968f9bf8166dcbc6cab24981367c4454265ab638712c1144bab1",
           "artifacts": [
             "evidence/local.plc_object_mutations.rerun.20261028.json"
+          ]
+        },
+        {
+          "id": "local.safety.fio-routes.20261101",
+          "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
+          "artifacts": [
+            "evidence/local.safety.fio-routes.20261101.json"
           ]
         }
       ],
@@ -109145,6 +109173,13 @@
           "profileSha256": "603d00841971b70eb27809803cd000603a80a01d97d7489010c7528aeb8d6bfc",
           "artifacts": [
             "evidence/local.technology.version_profiles.20261031.json"
+          ]
+        },
+        {
+          "id": "local.technology.first-motion.20261101",
+          "profileSha256": "b3f5140452fd7c241a196f1aa3e3752b8006e38578eb19f25102c7d13839f71a",
+          "artifacts": [
+            "evidence/local.technology.first-motion.20261101.json"
           ]
         }
       ],
@@ -109739,6 +109774,13 @@
           "profileSha256": "fcaed3208f3caf0691fb0940043b20d44a419401f473fa858542ddd9f20e30d5",
           "artifacts": [
             "evidence/local.vci_git.20261031.json"
+          ]
+        },
+        {
+          "id": "local.safety.fio-routes.20261101",
+          "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a",
+          "artifacts": [
+            "evidence/local.safety.fio-routes.20261101.json"
           ]
         }
       ],
@@ -125015,6 +125057,13 @@
           "artifacts": [
             "evidence/local.plcsim_gaps.20261029.json"
           ]
+        },
+        {
+          "id": "local.sim.output-refusal.20261101",
+          "profileSha256": "346c2cd0cb19b534fccff72f4148e31ab21ef89edaf5d6919e61790db96fe08a",
+          "artifacts": [
+            "evidence/local.sim.output-refusal.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -125089,6 +125138,13 @@
           "artifacts": [
             "evidence/local.runtime.frozen.20261024.json"
           ]
+        },
+        {
+          "id": "local.sim.output-refusal.20261101",
+          "profileSha256": "346c2cd0cb19b534fccff72f4148e31ab21ef89edaf5d6919e61790db96fe08a",
+          "artifacts": [
+            "evidence/local.sim.output-refusal.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -125131,6 +125187,13 @@
           "profileSha256": "cffdee1ad3018fbbb9282b6e0b8c4ebdb80fc39371a75cdc874ee2259a788f47",
           "artifacts": [
             "evidence/local.plcsim_signals.20261030.json"
+          ]
+        },
+        {
+          "id": "local.sim.output-refusal.20261101",
+          "profileSha256": "346c2cd0cb19b534fccff72f4148e31ab21ef89edaf5d6919e61790db96fe08a",
+          "artifacts": [
+            "evidence/local.sim.output-refusal.20261101.json"
           ]
         }
       ],
@@ -125828,6 +125891,13 @@
           "profileSha256": "603d00841971b70eb27809803cd000603a80a01d97d7489010c7528aeb8d6bfc",
           "artifacts": [
             "evidence/local.technology.version_profiles.20261031.json"
+          ]
+        },
+        {
+          "id": "local.technology.first-motion.20261101",
+          "profileSha256": "b3f5140452fd7c241a196f1aa3e3752b8006e38578eb19f25102c7d13839f71a",
+          "artifacts": [
+            "evidence/local.technology.first-motion.20261101.json"
           ]
         }
       ],
@@ -131075,6 +131145,11 @@
       "sha256": "0dd198c55e2711a7097c52e622d1eec8c4d32adcec0213d90591e12dcb560120"
     },
     {
+      "path": "evidence/local.safety.fio-routes.20261101.json",
+      "state": "observed",
+      "sha256": "05700c823e212c30b7e4698199703a1abe55f7647323390130fefa4e273daf3c"
+    },
+    {
       "path": "evidence/local.safety.fparameter_discovery.20261031.json",
       "state": "observed",
       "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
@@ -131110,6 +131185,11 @@
       "sha256": "878e9514d47bb2616a92b6b188c0308fb86a92f8839e8be59a3df840bd434c6f"
     },
     {
+      "path": "evidence/local.sim.output-refusal.20261101.json",
+      "state": "observed",
+      "sha256": "350528c414043d65ec7468280b80eeafd3f10fe63636a612f94cfe0fcc19ee8a"
+    },
+    {
       "path": "evidence/local.sim.provision.20261024.json",
       "state": "observed",
       "sha256": "805bf5a116fd67619dd06045d5aeb05af37e44426b3897910d09f79efa2f34cd"
@@ -131138,6 +131218,11 @@
       "path": "evidence/local.software_units.lifecycle.20261030.json",
       "state": "observed",
       "sha256": "61bddb6880085a07d04c1832131554f4e7918952e5840fdbbcbde55be82c926f"
+    },
+    {
+      "path": "evidence/local.technology.first-motion.20261101.json",
+      "state": "observed",
+      "sha256": "ca2a57ed0dbe245ab405a3bf6c8d8ffe39466a94b2a9662d007d78e34a7ddddc"
     },
     {
       "path": "evidence/local.technology.motion_connections.20261030.json",
@@ -131988,6 +132073,10 @@
       "profileSha256": "619abb75a6897820c6e846289f62af816f4201c253e31585815bc0f764899ce8"
     },
     {
+      "id": "local.safety.fio-routes.20261101",
+      "profileSha256": "c4f379e28d6f5998c6b83b077c1f8eddd417d2811fbcec49040b3544f22c709a"
+    },
+    {
       "id": "local.safety.fparameter_discovery.20261031",
       "profileSha256": "56236e8bd2d02db2ef7b4f260d2f3ae179016775a3bb8e054e6af16e29123e01"
     },
@@ -132016,6 +132105,10 @@
       "profileSha256": "b56649fd5ba528b4c1faf7883ad513c591d243bcf876941e35f061a1d66d196d"
     },
     {
+      "id": "local.sim.output-refusal.20261101",
+      "profileSha256": "346c2cd0cb19b534fccff72f4148e31ab21ef89edaf5d6919e61790db96fe08a"
+    },
+    {
       "id": "local.sim.provision.20261024",
       "profileSha256": "0865a9b40d426150bbdd5d706ef87d0bcf64c51eeb3620c297d9049f9da61913"
     },
@@ -132038,6 +132131,10 @@
     {
       "id": "local.software_units.lifecycle.20261030",
       "profileSha256": "4e72436a83f251085ddcb8cce81e004a3cb3e80771649b9e27220cf05233e8c6"
+    },
+    {
+      "id": "local.technology.first-motion.20261101",
+      "profileSha256": "b3f5140452fd7c241a196f1aa3e3752b8006e38578eb19f25102c7d13839f71a"
     },
     {
       "id": "local.technology.motion_connections.20261030",

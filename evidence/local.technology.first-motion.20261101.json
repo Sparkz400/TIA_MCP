@@ -1,0 +1,147 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.technology.first-motion.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T20:32:45+00:00",
+  "source": {
+    "commit": "4a0dea8787aae7636587f017afff5791c9e67f9b",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Two runs on a frozen Debug build of 0f4ef125 (artifacts/an1, git archive). First motion object (1 November audit fix), scripts/qualify_first_motion.py, 12/12 steps, in an owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 with no technology object: to_create of TO_PositioningAxis 10.0 previewed firstMotionObject with its warning; change_apply with compile=false refused with CompileRequired, and the change stayed prepared with no stage and no before.zap21, no admission stayed open, and technology_read and the program inventory equalled the baseline; the axis with parameters {\"VirtualAxis.Mode\": 1} then applied with checkpoint, compile (0 errors) and save; TO_ExternalEncoder 10.0 previewed without firstMotionObject, applied with compile=false and save=false, and change_restore retrieved its checkpoint into a new directory whose project holds the axis only. Profile rerun, scripts/probe_technology_versions.py, 50/50 steps, motion cells now compiled: the 45 cells of local.technology.version_profiles.20261031 on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7 gave the same result, 21 accepted with the same type and version and the 24 recorded refusals refused at prepare by the embedded profile (TechnologyVersionRefused); the 10 accepted motion creates applied with compile, 9 of them failed that compile as unconnected (CompileFailed after the create, TO_CommandTable 8.0 compiled), and all 21 accepted cells were restored in place by change_restore, none by discarding the Portal.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN V4.1 for the refusal; the rule's other motion families and CPUs are checked offline only.",
+    "The profile rerun re-created only the accepted cells natively; the recorded refusals were refused by the embedded profile at prepare, not by V21's Create.",
+    "Engineering only: nothing downloaded, no axis moves, encoders and axes stay unconnected."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "c65d5c00592c229342ccc1887e78baaa0926626c692b18ebcc909ec77ffe94a8"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "853580c6f90b1a805273b88f24a5c06966d556f41e55b61e2df14ff33359bb76"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "ba88214cf72e4508337711d31657923b0fe1987f82c2f0250a23b6104969752e",
+      "bytes": 138887,
+      "completed": true,
+      "steps": [
+        "start owned TIA first motion",
+        "create owned scratch first motion",
+        "baseline: no technology object",
+        "prepare the first motion object TO_PositioningAxis 10.0",
+        "refuse change_apply compile=false: CompileRequired before the checkpoint",
+        "prepare the first motion object as a virtual axis",
+        "apply to_create",
+        "technology_read shows the compiled axis",
+        "prepare a later motion object TO_ExternalEncoder 10.0",
+        "apply TO_ExternalEncoder without compile",
+        "technology_read shows the axis and the encoder",
+        "change_restore of the encoder into a new directory"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "software_inspect",
+        "technology_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    },
+    {
+      "report": "qualification.json",
+      "sha256": "8e69acebb6e54b24c357eb6987e22db72eb68a00b1ab0913d34ec956de925a70",
+      "bytes": 315934,
+      "completed": true,
+      "steps": [
+        "start owned TIA technology versions",
+        "create owned scratch technology versions",
+        "add CPU 1511C-1 PN",
+        "add CPU 1214C DC/DC/DC",
+        "baseline program and technology state",
+        "probe PID_Compact 3.0 on CPU 1511-1 PN",
+        "probe PID_3Step 3.0 on CPU 1511-1 PN",
+        "probe PID_3Step 2.3 on CPU 1511-1 PN",
+        "probe PID_Temp 1.2 on CPU 1511-1 PN",
+        "probe PID_Temp 1.1 on CPU 1511-1 PN",
+        "probe TO_PositioningAxis 10.0 on CPU 1511-1 PN",
+        "probe TO_SpeedAxis 10.0 on CPU 1511-1 PN",
+        "probe TO_SynchronousAxis 10.0 on CPU 1511-1 PN",
+        "probe TO_ExternalEncoder 10.0 on CPU 1511-1 PN",
+        "probe TO_MeasuringInput 10.0 on CPU 1511-1 PN",
+        "probe TO_OutputCam 10.0 on CPU 1511-1 PN",
+        "probe TO_Cam 10.0 on CPU 1511-1 PN",
+        "probe High_Speed_Counter 5.0 on CPU 1511-1 PN",
+        "probe PID_Compact 3.0 on CPU 1511C-1 PN",
+        "probe PID_Compact 2.4 on CPU 1511C-1 PN",
+        "probe PID_3Step 3.0 on CPU 1511C-1 PN",
+        "probe PID_3Step 2.3 on CPU 1511C-1 PN",
+        "probe PID_Temp 1.2 on CPU 1511C-1 PN",
+        "probe PID_Temp 1.1 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 10.0 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 9.0 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 8.0 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 7.0 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 6.0 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 5.0 on CPU 1511C-1 PN",
+        "probe TO_PositioningAxis 4.0 on CPU 1511C-1 PN",
+        "probe TO_SpeedAxis 4.0 on CPU 1511C-1 PN",
+        "probe TO_SynchronousAxis 4.0 on CPU 1511C-1 PN",
+        "probe TO_ExternalEncoder 4.0 on CPU 1511C-1 PN",
+        "probe TO_MeasuringInput 4.0 on CPU 1511C-1 PN",
+        "probe TO_OutputCam 4.0 on CPU 1511C-1 PN",
+        "probe TO_Cam 4.0 on CPU 1511C-1 PN",
+        "probe High_Speed_Counter 5.0 on CPU 1511C-1 PN",
+        "probe PID_Compact 3.0 on CPU 1214C DC/DC/DC",
+        "probe PID_Compact 2.4 on CPU 1214C DC/DC/DC",
+        "probe PID_Compact 2.3 on CPU 1214C DC/DC/DC",
+        "probe PID_3Step 3.0 on CPU 1214C DC/DC/DC",
+        "probe PID_3Step 2.3 on CPU 1214C DC/DC/DC",
+        "probe PID_Temp 1.2 on CPU 1214C DC/DC/DC",
+        "probe PID_Temp 1.1 on CPU 1214C DC/DC/DC",
+        "probe TO_PositioningAxis 10.0 on CPU 1214C DC/DC/DC",
+        "probe TO_PositioningAxis 9.0 on CPU 1214C DC/DC/DC",
+        "probe TO_PositioningAxis 8.0 on CPU 1214C DC/DC/DC",
+        "probe TO_CommandTable 8.0 on CPU 1214C DC/DC/DC",
+        "probe TO_SpeedAxis 8.0 on CPU 1214C DC/DC/DC"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hardware_catalog_search",
+        "project_inventory",
+        "software_inspect",
+        "technology_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}
