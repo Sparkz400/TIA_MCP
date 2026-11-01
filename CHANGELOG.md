@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.104`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.105`.
 
 ### Added
 
@@ -142,7 +142,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   WorkspaceToProject and a project-ward `vci_conflict_resolve` of a tag table apply the same rule to
   the incoming package, and `library_instantiate` refuses a tag-table master copy while the PLC owns
   any F-I/O range (V21 cannot read a master copy's addresses before the create); before, these
-  ended in checkpoint recovery.
+  ended in checkpoint recovery. Rechecked natively on an F-CPU with ET 200SP F-DI, except the
+  `vci_conflict_resolve` route (`local.safety.fio-routes.20261101`).
 - Combined `library_integrate` apply refuses before any claim when a block number the import would
   take is already used (`ComponentBlockNumberOccupied`) or a step checkpoint or recovery path would
   exceed TIA's 143 characters (`ComponentPathTooLong`); its steps run in a short workspace
@@ -153,7 +154,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `unprofiledAcknowledged` (`TechnologyVersionUnprofiled` otherwise). `change_apply` refuses a PLC's
   first motion object with `compile=false` (`CompileRequired`, nothing written): its generated
   MC_Servo and MC_Interpolator stay inconsistent without a compile, and the change failed after the
-  create with `FingerprintUnavailable` and could not be restored in place.
+  create with `FingerprintUnavailable` and could not be restored in place. Rechecked natively, with
+  the technology version probe's compiled motion cells (`local.technology.first-motion.20261101`).
 - `safety.logic_changes` and `block.move` are closed as `unavailable_target`: V21's offline
   `DownloadProvider` refuses the PLCSIM card and the online route refuses at prepare without a card
   from this PLC; V21 has no block move API. The release matrix counts an unavailable API with an
@@ -230,7 +232,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     - `sim_write`, `sim_write_signals`, `sim_test` step writes and `diagnostic_plcsim_write` refuse a
       symbol whose area in PLCSIM's tag list is the output area, as `sim_area_write` refuses outputs
       (`InvalidRequest`, the whole request, before anything is written); inputs, markers, data blocks,
-      timers and counters stay writable. The native recheck is open.
+      timers and counters stay writable. Rechecked natively for `sim_write`, `sim_write_signals` and
+      `sim_test` (`local.sim.output-refusal.20261101`); `diagnostic_plcsim_write` has no native run.
     - A component-window step whose request had emoji, certain control characters or a number such
       as `1e3` was refused: the Host and the worker hashed it differently. Both now use RFC 8785.
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
@@ -268,5 +271,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   execution time, so production style execution is unavailable (only the TS-Q01 qualification mode runs).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
+- `library_instantiate` of a tag-table master copy: TIA renames a tag whose name the PLC already
+  uses (`McProbe(1)`), and the change reports applied, since its readback checks only the table.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built
   on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures.

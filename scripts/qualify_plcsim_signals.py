@@ -10,6 +10,11 @@ writes are read back symbolically (tags at the written addresses and the program
 by address; observed operating-state changes match the polled state (sim_status) and the log of a separate PowerShell
 process that drives the instance through its own PLCSIM API connection. Another such process registers and holds a
 foreign instance for the ownership refusals and unregisters it at the end, also after a failure.
+
+Output tags are read-only to every symbolic writer: sim_write of SigOutWord (quoted and unquoted), a sim_write_signals batch
+with SigOutByte among a marker and a DB member, and a sim_test step writing SigOutByte refuse as InvalidRequest naming the
+output symbol; single sim_read calls show nothing written and sim_test leaves no report. A marker, a DB member and an
+input written by one sim_write still read back.
 """
 from __future__ import annotations
 
@@ -109,7 +114,9 @@ CRITERIA = {
     "sim_read_signals": {"AC-identity": "Unselected instances refuse as SimulationNotSelected; string types as UnsupportedSignalType before any runtime call.",
                          "AC-runtime": "One ReadSignals call returns every primitive type equal to independent single sim_read reads; a missing symbol is a bad item with its runtime code.",
                          "AC-evidence": "This report."},
-    "sim_write_signals": {"AC-identity": "A foreign (unowned) instance refuses as OwnedInstanceRequired; invalid batches refuse before any write.",
+    "sim_write": {"AC-identity": "An output tag, quoted or unquoted, refuses as InvalidRequest naming it, nothing written; a marker, a DB member and an input write and read back."},
+    "sim_test": {"AC-identity": "A step write to an output tag refuses the scenario as InvalidRequest before any write, and no report is saved."},
+    "sim_write_signals": {"AC-identity": "A foreign (unowned) instance refuses as OwnedInstanceRequired; invalid batches and a batch with an output tag refuse before any write.",
                           "AC-runtime": "One WriteSignals call writes every primitive type including its range limits, read back by single sim_read calls.",
                           "AC-evidence": "This report."},
     "sim_area_read": {"AC-identity": "Ranges beyond the area refuse as InvalidRequest.", "AC-runtime": "Input, output and marker bytes and bits equal symbolic reads of tags at those addresses.",
@@ -253,6 +260,7 @@ def body(h):
 
         signals(h, lab)
         areas(h, lab)
+        outputs(h, lab)
         observe(h, lab)
         foreign_instance(h, lab, foreign)
 
@@ -390,6 +398,50 @@ def areas(h, lab):
     refuse(h, "a timer area", "sim_area_read", {"instanceId": instance, "area": "timer", "offset": 0}, ["InvalidRequest"])
     unchanged = h.stage("refused area writes wrote nothing", lambda: lab.single("SigMarker", "SigInByte"))
     require(unchanged == {"SigMarker": 1234, "SigInByte": 0xA4}, "A refused area write changed values: %s" % unchanged)
+
+
+def other(value):
+    """A value of every integer signal type that differs from value."""
+    return 5 if value != 5 else 6
+
+
+def outputs(h, lab):
+    """Symbolic writes to output tags refuse whole, naming the output symbol, and write nothing (1 November audit fix)."""
+    instance = lab.instance["id"]
+    def refused(label, tool, arguments, name, unchanged):
+        def check():
+            before = lab.single(*unchanged)
+            error = h.call_error(tool, {"instanceId": instance, **arguments})
+            details = error.get("details") or {}
+            require(error.get("code") == "InvalidRequest" and str(details.get("symbol")).replace('"', "") == name and details.get("area") == "Output" and name in (error.get("message") or ""),
+                    "Expected InvalidRequest naming %s, observed %s" % (name, error))
+            after = lab.single(*unchanged)
+            require(after == before, "The refused write changed values: %s -> %s" % (before, after))
+            return {"error": error, "before": before, "after": after}
+        return h.stage("refuse %s: %s" % (tool, label), check)
+    bare = lab.symbols["SigOutWord"].replace('"', "")
+    for label, symbol in (("the output tag SigOutWord quoted", '"%s"' % bare), ("the output tag SigOutWord unquoted", bare)):
+        write = {**lab.signal("SigOutWord"), "symbol": symbol, "value": other(lab.single("SigOutWord")["SigOutWord"])}
+        refused(label, "sim_write", {"writes": [write]}, "SigOutWord", ("SigOutWord",))
+    current = lab.single("SigMarker", "VInt", "SigOutByte")
+    batch = [{**lab.signal(n), "value": other(current[n])} for n in ("SigMarker", "VInt", "SigOutByte")]
+    refused("a batch with the output tag SigOutByte", "sim_write_signals", {"writes": batch}, "SigOutByte", ("SigMarker", "VInt", "SigOutByte"))
+    reports = h.directory / "simulation-tests"
+    saved = sorted(p for p in reports.rglob("*") if p.is_file()) if reports.exists() else []
+    step = {"writes": [{**lab.signal("SigOutByte"), "value": other(current["SigOutByte"])}]}
+    refused("a step writing the output tag SigOutByte", "sim_test", {"signals": [lab.signal("SigOutByte")], "steps": [step]}, "SigOutByte", ("SigOutByte",))
+    def no_report():
+        files = sorted(p for p in reports.rglob("*") if p.is_file()) if reports.exists() else []
+        require(files == saved, "The refused sim_test saved a report: %s" % sorted(set(files) - set(saved)))
+        return [str(p) for p in files]
+    h.stage("the refused sim_test saved no report", no_report)
+    def writable():
+        values = {"SigMarker": 4321, "VInt": -1234, "SigInByte": 0x5A}
+        h.tool("sim_write", {"instanceId": instance, "writes": [{**lab.signal(n), "value": v} for n, v in values.items()]})
+        read = lab.single(*values)
+        require(read == values, "sim_write of a marker, a DB member and an input did not read back: %s != %s" % (read, values))
+        return read
+    h.report["symbolicWritesStillWritable"] = h.stage("sim_write of a marker, a DB member and an input reads back", writable)
 
 
 def states(result):
