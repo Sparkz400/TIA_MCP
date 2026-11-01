@@ -907,6 +907,12 @@ internal static class TypedGraphicalTests
         Check.Equal("instance-effects.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("standard"));
         Check.Equal("instance-effects-softwareUnit.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("softwareUnit"));
         Check.Equal("instance-effects-namespace.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("namespace"));
+        // Another CPU's manifests never share the first target's file names (cpu_slug in extract_typed_graphical_profiles.py).
+        const string second = "OrderNumber:6ES7 513-1AM03-0AB0/V4.1";
+        Check.Equal("instance-effects.6es7-513-1am03-0ab0-v4-1.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("standard", false, second));
+        Check.Equal("instance-effects-iec-softwareUnit.6es7-513-1am03-0ab0-v4-1.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("softwareUnit", true, second));
+        Check.Equal("instance-effects-transitive.6es7-513-1am03-0ab0-v4-1.v1.json", TypedGraphicalMultiInstanceTemplate.TransitiveManifestName("standard", second));
+        Check.Equal("instance-effects-iec.v1.json", TypedGraphicalMultiInstanceTemplate.EffectManifestName("standard", true, TypedGraphicalMultiInstanceTemplate.BaseCpu));
         return Task.CompletedTask;
     }
 

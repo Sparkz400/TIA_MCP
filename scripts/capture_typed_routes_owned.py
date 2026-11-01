@@ -1,4 +1,4 @@
-"""Capture authored native routes in a fresh SHA-bound owned archive retrieval.
+"""Capture authored native routes in a fresh SHA-bound owned archive retrieval, or in a new owned scratch of an exact CPU.
 
 No typed builder, previous-project open, physical PLC or simulator is used.
 Every source is admitted separately; failed/uncertain operations never replay.
@@ -115,16 +115,18 @@ def verify_reference_additions(before, after, names, scope, namespace, modifies=
 def capture(args):
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
-    archive = args.archive.resolve()
-    require(archive.is_relative_to((ROOT / "artifacts").resolve()) and archive.suffix.lower() == ".zap21",
-            "Source archive must be under repository artifacts.")
-    require(hashlib.sha256(archive.read_bytes()).hexdigest() == args.sha256, "Source archive hash differs.")
+    archive = args.archive.resolve() if args.archive else None
+    if archive:
+        require(archive.is_relative_to((ROOT / "artifacts").resolve()) and archive.suffix.lower() == ".zap21",
+                "Source archive must be under repository artifacts.")
+        require(hashlib.sha256(archive.read_bytes()).hexdigest() == args.sha256, "Source archive hash differs.")
     specifications = [authored_reference(path, args.unit) for path in args.sources]
     declare_changes(specifications, args.modify, args.observe)
     require(len({row[0]["sourcePath"] for row in specifications}) == len(specifications), "Sources may be admitted only once.")
     report = {"schemaVersion": 1, "origin": "independently_authored_native_references", "builderUsed": False,
         "startedAtUtc": utc_now(), "completed": False, "runtimeVerified": False, "physicalPlcAccess": False,
-        "calls": [], "fixtures": [], "sourceArchive": {"path": str(archive), "sha256": args.sha256},
+        "calls": [], "fixtures": [], **({"sourceArchive": {"path": str(archive), "sha256": args.sha256}} if archive
+                                        else {"scratchCpu": args.cpu_type_identifier}),
         "remainingSources": [row[0]["sourcePath"] for row in specifications],
         "payloadHashPolicy": PAYLOAD_HASH_POLICY}
     harness_paths = [pathlib.Path(__file__).resolve(), pathlib.Path(__file__).with_name("typed_graphical_owned_session.py").resolve(),
@@ -145,8 +147,13 @@ def capture(args):
             report["status"] = "stopped_by_request"
             return 2
         report["started"] = session.invoke("tia_start")
-        report["retrieved"] = session.invoke("project_retrieve", {"archivePath": str(archive), "expectedSha256": args.sha256})
-        report["currentProject"] = report["retrieved"]["project"]
+        if archive:
+            report["retrieved"] = session.invoke("project_retrieve", {"archivePath": str(archive), "expectedSha256": args.sha256})
+            report["currentProject"] = report["retrieved"]["project"]
+        else:  # a target-specific capture: a fresh scratch whose catalog CPU is exactly the requested one
+            report["scratch"] = session.invoke("tia_create_scratch", {"cpuTypeIdentifier": args.cpu_type_identifier})
+            require(report["scratch"]["selectedCpu"]["typeIdentifier"] == args.cpu_type_identifier, "The scratch CPU differs from the requested one.")
+            report["currentProject"] = report["scratch"]["project"]
         report["hardware"] = session.invoke("hardware_inspect", {"maxItems": 2000})
         report["inventory"] = complete_inventory(session.invoke)
         selected = (lambda row: row["kind"] == "softwareUnit" and row["name"] == args.unit) if args.unit else (lambda row: row["kind"] == "plc")
@@ -251,9 +258,11 @@ def capture(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, fromfile_prefix_chars="@")
     parser.add_argument("sources", type=pathlib.Path, nargs="+")
-    for name in ("host", "worker", "output", "archive"):
+    for name in ("host", "worker", "output"):
         parser.add_argument("--" + name, type=pathlib.Path, required=True)
-    parser.add_argument("--sha256", required=True)
+    parser.add_argument("--archive", type=pathlib.Path, help="SHA-bound baseline archive to retrieve.")
+    parser.add_argument("--sha256")
+    parser.add_argument("--cpu-type-identifier", help="Instead of an archive: a new owned scratch of this exact catalog CPU (standard route only).")
     parser.add_argument("--unit", default="TiaMcp_UnitA", help="Software unit to capture into; an empty value selects the standard PLC program scope.")
     parser.add_argument("--stop-file", type=pathlib.Path)
     parser.add_argument("--timeout", type=int, default=300)
@@ -264,4 +273,8 @@ if __name__ == "__main__":
     options = parser.parse_args()
     if not 5 <= options.timeout <= 930:
         parser.error("--timeout must be within 5..930 seconds.")
+    if bool(options.archive) == bool(options.cpu_type_identifier) or bool(options.archive) != bool(options.sha256):
+        parser.error("Select either --archive with --sha256 or --cpu-type-identifier.")
+    if options.cpu_type_identifier and options.unit:
+        parser.error("A scratch capture has no software unit: pass --unit ''.")
     raise SystemExit(capture(options))

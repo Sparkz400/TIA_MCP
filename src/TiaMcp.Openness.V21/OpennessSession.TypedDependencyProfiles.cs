@@ -64,8 +64,9 @@ namespace TiaMcp.Openness.V21
             string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
             string type = (string)declaration.Attribute("Datatype");
             bool system = TypedGraphicalMultiInstanceTemplate.SystemInstanceTypes.Contains(type);
-            var profile = ReadTypedEffectManifest(capture, catalogPath, route, TypedGraphicalMultiInstanceTemplate.EffectManifestName(route, system));
-            if (transitive) ReadTypedEffectManifest(capture, catalogPath, route, TypedGraphicalMultiInstanceTemplate.TransitiveManifestName(route));
+            string cpu = TypedCpuIdentifier(capture.Plc);
+            var profile = ReadTypedEffectManifest(capture, catalogPath, route, TypedGraphicalMultiInstanceTemplate.EffectManifestName(route, system, cpu));
+            if (transitive) ReadTypedEffectManifest(capture, catalogPath, route, TypedGraphicalMultiInstanceTemplate.TransitiveManifestName(route, cpu));
             var resources = (JObject)profile["artifacts"];
             var caller = ReadTypedProfileResource(capture, catalogPath, resources["afterCaller"].Value<string>("path"), resources["afterCaller"].Value<string>("sha256"));
             var instance = ReadTypedProfileResource(capture, catalogPath, resources["afterInstance"].Value<string>("path"), resources["afterInstance"].Value<string>("sha256"));

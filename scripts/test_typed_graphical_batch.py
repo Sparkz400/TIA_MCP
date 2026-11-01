@@ -17,7 +17,7 @@ from qualify_typed_resolution import unqualified_outer_fixture, verify_untouched
 from run_conformance import native_document, structural_xml
 from qualify_typed_tag_ambiguity import verify_native_setup
 from capture_typed_routes_owned import declare_changes, authored_reference, verify_reference_additions, require_clean_compile, type_namespace
-from extract_typed_graphical_profiles import COMPONENT_TEMPLATES
+from extract_typed_graphical_profiles import COMPONENT_TEMPLATES, cpu_slug
 from prepare_crossunit_capture_archive import block_access, capture_command
 from qualify_typed_multi_dependency import verify_append
 from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRuntimeBackend, file_inventory, inventory_difference
@@ -562,6 +562,30 @@ class RouteCapturePacketTests(unittest.TestCase):
             names.extend(entry["names"])
         self.assertEqual(["TgpUnit_GlobalTimer", "TgpNamespace_TemplateFB_LAD", "TgpNamespace_TemplateFB_FBD"], names)
         self.assertFalse(set(names) & {name for entry in main["sources"] for name in entry["names"]})
+
+    def test_second_cpu_packet_captures_unchanged_standard_sources_in_scratches_of_that_cpu(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/second-cpu-capture-packet.v1.json").read_bytes())
+        self.assertEqual(cpu_slug(packet["cpuTypeIdentifier"]), packet["cpuSlug"])
+        hashes = {entry["path"]: entry["sha256"] for entry in packet["sources"]}
+        for output, run in packet["runs"].items():
+            command = run["command"]
+            self.assertEqual(packet["cpuTypeIdentifier"], command[command.index("--cpu-type-identifier") + 1])
+            self.assertEqual("", command[command.index("--unit") + 1])
+            specifications = [authored_reference(root / path, "") for path in run["argsFile"]]
+            flags = command[command.index("--unit") + 2::2]  # only --modify/--observe pairs follow the scope
+            declare_changes(specifications, [v for k, v in zip(command, command[1:]) if k == "--modify"],
+                            [v for k, v in zip(command, command[1:]) if k == "--observe"])
+            for path, (entry, _, _) in zip(run["argsFile"], specifications):
+                self.assertEqual(hashes[path], entry["fileSha256"])
+                self.assertEqual("standard", entry["route"])
+            self.assertLessEqual(set(flags), {"--modify", "--observe"})
+        cases = json.loads((root / "fixtures/typed-graphical/second-cpu-cases.v1.json").read_bytes())["cases"]
+        folder = "fixtures/typed-graphical/native/" + packet["cpuSlug"] + "/"
+        for case in cases:
+            self.assertEqual(packet["cpuTypeIdentifier"], case["cpuTypeIdentifier"])
+            self.assertTrue(case["engineeringOnly"])
+            self.assertTrue(all(path.startswith(folder) for path in [case["referenceXml"]] + [d["path"] for d in case.get("dependencyXmls", [])]))
 
     def test_iec_route_packet_covers_exactly_its_captured_route_references(self):
         root = pathlib.Path(__file__).resolve().parents[1]

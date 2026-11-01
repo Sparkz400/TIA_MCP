@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 1,
+  "status": "authored-not-executed",
+  "cpuTypeIdentifier": "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+  "cpuSlug": "6es7-513-1am03-0ab0-v4-1",
+  "purpose": "Standard-route references of the base typed families on a second CPU (Boolean, Int compare, FC/FB calls, creation/instance templates, TON/TOF/TP, CTU/CTD/CTUD with global storage) and its three dependent-effect pairs, each run in a new owned scratch of that CPU. Unobserved until captured; enables nothing.",
+  "sources": [
+    {
+      "path": "fixtures/typed-graphical/sources/boolean-lad.s7dcl",
+      "sha256": "2b81c4204a91cb1d60dbdb289bc9148119613bbb47620cc26784e78b51b6ee18"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/boolean-fbd.s7dcl",
+      "sha256": "5882d37c2078a26ea506f72daf2fb8d69432015342bdae40c788c9f861a0fc95"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/and-fbd.s7dcl",
+      "sha256": "ad37a8126d4a8839f555a46122a4972901f6dd3814bb32f8a89bf12038861e50"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/not-fbd.s7dcl",
+      "sha256": "bb4fa03823dc7ac0b15472ec2873f631841031526533b64d140a73ac922f66ed"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/not-one-fbd.s7dcl",
+      "sha256": "25dcb050ced5c7f902c062ecc7ca14cabdc999897ba4963321d269fe7f70e826"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/eq-lad.s7dcl",
+      "sha256": "4314d3b5e4a803414dcf028ae765472351395bc63fa02526b042a80de060d255"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ne-lad.s7dcl",
+      "sha256": "3635df848f7e8fc15d83d5b12bedbc8b814115d042d170e92aa6d0caf21d2744"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/lt-lad.s7dcl",
+      "sha256": "5d81566191570edf1c39c6cba0d5d5fe8a6526be161d77d1c10f166c4f617f84"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/le-lad.s7dcl",
+      "sha256": "f73ace3ed8334e38f97333ee4e905471f36906a8430a05e5e1dc669a835e0fe6"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/gt-lad.s7dcl",
+      "sha256": "a9d4adf2de24c345bdf955d9d3b15bee5da8cbf35f07e111c91037ff02febc94"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ge-lad.s7dcl",
+      "sha256": "d5be380b19b56f4de10aec004f25cd14c664e77e2a019b5b37fa85f0209fa629"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/eq-fbd.s7dcl",
+      "sha256": "437b9e1c2fe3766b88688b5fda5919222dbdfc4183d410e65071b4425a7c8aff"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ne-fbd.s7dcl",
+      "sha256": "9a293525bce83204ddd7a7e08b578817d8843dcfbfd5cd9295e1ac9d808d4f25"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/lt-fbd.s7dcl",
+      "sha256": "69fce93839d995979bbbf46736de9ea6c925219b9e8a094c03f2f7f851e1d02a"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/le-fbd.s7dcl",
+      "sha256": "7cea5ebd71d9fc93390ab6977c291900265d666651d08fd366c9f304f7117143"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/gt-fbd.s7dcl",
+      "sha256": "1f95d1b876dcdfb65e2dc640ea2d26ef0f17bcbdf94981719aba8e2bf9cd4214"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ge-fbd.s7dcl",
+      "sha256": "70f594f8485e41843bbe41662bfe95bc914bb8e2f89541caf0cd070fef46d68b"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/fc-lad.s7dcl",
+      "sha256": "91c5c3ea122626ad27cc1166589a2a23f67cade2318b8e68527085d7067b3d07"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/fc-fbd.s7dcl",
+      "sha256": "d7be5160850857814a56cd943d660b8df88a2e3a2854c39100607c5e41485f02"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/fb-multi-lad.s7dcl",
+      "sha256": "63ba6d363cfe6af9f928768c7b4c818c742dd07e472da387bf4d896d5fa3ced0"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/fb-multi-fbd.s7dcl",
+      "sha256": "4710f949e89d68f103367011833ff6c600bf01ba5ad69dd49484d93f909ada9c"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/fb-global-lad.s7dcl",
+      "sha256": "013fbdd16252636b924a0265b0da59466277ed93c958cac52e56dcf43a3ca2e7"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/fb-global-fbd.s7dcl",
+      "sha256": "a20a49880ca71273e0606d5227e79789c10d9b80c2782b77cfc2a90878225d52"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/numeric-callees.scl",
+      "sha256": "4ad4591431a86c9c5a76b5e1d42708e8ccde578d9eac87556d9bf2936b3b44c1"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/numeric-fc-lad.s7dcl",
+      "sha256": "d9f9048089f783543662b3321fc93d81aa9f68200b091b1820ade4825052da06"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/numeric-fc-fbd.s7dcl",
+      "sha256": "d55b974caaa514b521a44a8f141a80f1ec4e4ba23c06db5462023cb84fe46a6a"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/numeric-fb-lad.s7dcl",
+      "sha256": "16a5545c7e5ac7b2ba9da871c9d83ce94a30e23588b92354386c428c0af3f61f"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/numeric-fb-fbd.s7dcl",
+      "sha256": "f1c54571d1b17260f7af478792db73216496e190bc2674d4881495843d80c9fc"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/template-fc-lad.s7dcl",
+      "sha256": "94d444bfc53aa9c0080ed3d3acf1e085baf4f582f85d045f0ac58f9b6a5d21f8"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/template-fc-fbd.s7dcl",
+      "sha256": "53cc2985b43dd1fd3a035f93685d2086d78b4a8dfb731e1fb0fc1f444fe75d9d"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/template-fb-lad.s7dcl",
+      "sha256": "a1d62a71fffba7c7dab14e21753d2c0bf1c7a7063ce1ef751341b8c14d58e48f"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/template-fb-fbd.s7dcl",
+      "sha256": "d9f5bfa958d91ca31c2e5fa44e309ae58aa2c113f78cf3a906915d2a68425c23"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-template-fb-lad.scl",
+      "sha256": "4d9b254584060a453a4e18c6da268752922cf83902718d8f4112c256b9429a2e"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-template-fb-fbd.scl",
+      "sha256": "5e803beee872b3bf85c2bea4a917cd2381db36b0776ba51ec36980a943362398"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/multi-template-fb-lad.scl",
+      "sha256": "0cd0ddc23ba355ae7a37d605ac19b7723f530d706eb3e03a160ffb4cc0e39a52"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/multi-template-fb-fbd.scl",
+      "sha256": "3daefa0e94fa3e5849a9513a61a4c879a60e92dcdd995fbcc67896f76002acdc"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-timer-storage.scl",
+      "sha256": "93e6fabe2408e71f00d117034525e79ac6acef557ba8cc5d6178e64b3ffdc561"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ton-lad.s7dcl",
+      "sha256": "72c734758f64472a359bf0878d230e9824d258d11658deddc27b6e24a908f2c5"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ton-global-lad.s7dcl",
+      "sha256": "5fedc4e997caedcfeb3358741b1c53a8cd15a516137debc4b1259e25e75af59a"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tof-lad.s7dcl",
+      "sha256": "a6243fc1a34d5e4c3ef4abd24f42390a67ba964b5fe659aa90d7ea5cf50fa515"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tof-global-lad.s7dcl",
+      "sha256": "ea4c44898c6b805809cf285a95e09c4c7f7f4f20ff54cee563499b75621e7865"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tp-lad.s7dcl",
+      "sha256": "9450060f199fbcd111322cd460a51776bea6cb7d0af7aef5ede931c74aba9d5b"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tp-global-lad.s7dcl",
+      "sha256": "3e853ee97cc28ea1e5f1170304cf65d6178bf95d224af956c839fa7dd046699d"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ton-fbd.s7dcl",
+      "sha256": "91c24c562701705b5c615f855776884c4b6719c1ec040f929568feb436279664"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ton-global-fbd.s7dcl",
+      "sha256": "35eb44ff44d8042a1e5a9bb56290d0b7306aaee4bd1bd611f8dd0ee48a5f66dc"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tof-fbd.s7dcl",
+      "sha256": "e178f6aa50db764da340941cb3d4185deb0f03aab780dad747e67ed0120a16d4"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tof-global-fbd.s7dcl",
+      "sha256": "df076a9951a8318f8c238f4a66f74e4df533c4cffbd5637d4773ad8ef46727b4"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tp-fbd.s7dcl",
+      "sha256": "2117e5588f4e097a4c2a8f7e23726fbfda9518165caa34542e8c5b7199f6403f"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/tp-global-fbd.s7dcl",
+      "sha256": "1a1f498dcaa9d2d5356b34c1d5e2b8fbcf5cabd4084f7b785a23ad986b5c7b87"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/global-counter-storage.scl",
+      "sha256": "08cb923d573d435a21b9efe814c8a0d1760b1dfbeb9371397542916de344d2b4"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctu-lad.s7dcl",
+      "sha256": "72d3f80fec37c312ef2d8897c8db9e4b0edaa6c8aeff2f4a44142c54643ac8b7"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctu-global-lad.s7dcl",
+      "sha256": "e22f66430d42dd973b3327ea23f0937df1eba5c9b3083a5c79207eb74753c1ea"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctd-lad.s7dcl",
+      "sha256": "1752301e3683d96cf9fffef1337ff64cc518b28cde3a03682c9c99a4327e93d8"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctd-global-lad.s7dcl",
+      "sha256": "cc9a910835a0dbb870be87e31ffc139339be935858fe69706471a4048cd801e8"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctud-lad.s7dcl",
+      "sha256": "bc16b8d7a227b211b4da9a38c22f1a50ddf77bfb84511d50e44df6d3dcb907ae"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctud-global-lad.s7dcl",
+      "sha256": "088c68c9eaefb39b69e9dc294596b28f0c0e3fad594bb0e5b787757c7745fc41"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctu-fbd.s7dcl",
+      "sha256": "f6c30b977385bca92d771fcf16cdb7a266255207a217616ef96c8c804b453443"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctu-global-fbd.s7dcl",
+      "sha256": "0724246e2046505c42ac3373c73ba2b86d38061c62d7762ac5a6b3858f203523"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctd-fbd.s7dcl",
+      "sha256": "28ffa6036e7938c17919823ff8c0f88d8ad66a88694a45d7833dc8c9685c6712"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctd-global-fbd.s7dcl",
+      "sha256": "cfcfa17924390b1db8f92fbbb303f76e9be66f32f89b1bba67fd1b9ae298a1a4"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctud-fbd.s7dcl",
+      "sha256": "9f3cedc1c405a3203a0c022c3450832154fe60f744aad67c907cb819f26a7055"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/ctud-global-fbd.s7dcl",
+      "sha256": "d3a9493163554c463b2e9f2752b44dc9def454e7378c4a34eabbb39ef8c39d21"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/template-fb-lad.s7dcl",
+      "sha256": "a1d62a71fffba7c7dab14e21753d2c0bf1c7a7063ce1ef751341b8c14d58e48f"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/instance-effect-before.scl",
+      "sha256": "c7535f0a8765984c1b68bfecc259b1f3c1310f66a43679686720dc2ab4896c07"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/instance-effect-after.scl",
+      "sha256": "7ea256e1b65bcbacaa2017c5b263d9307063de8c14f0cb26ceee43be4cb9ebb9"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/iec-effect-before.scl",
+      "sha256": "6ac7ba89402df3fd17c35a776315ebf1b74295d200ee026e66a46e217822a489"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/iec-effect-after.scl",
+      "sha256": "405e0bac8a7466e50aeaa5d00eb1b45fc4cdd54d2202b19663c60e101c4c1a20"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/transitive-effect-before.scl",
+      "sha256": "e1216e18cf2b20cab1b2adf5da717e3860af20fcc7ddaf9439297f13f82f392c"
+    },
+    {
+      "path": "fixtures/typed-graphical/sources/transitive-effect-after.scl",
+      "sha256": "a386707c119f4039286f41c3f76d439a7abbb109fe043116e98b400e7e8a124d"
+    }
+  ],
+  "runs": {
+    "artifacts/c2a": {
+      "argsFile": [
+        "fixtures/typed-graphical/sources/boolean-lad.s7dcl",
+        "fixtures/typed-graphical/sources/boolean-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/and-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/not-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/not-one-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/eq-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ne-lad.s7dcl",
+        "fixtures/typed-graphical/sources/lt-lad.s7dcl",
+        "fixtures/typed-graphical/sources/le-lad.s7dcl",
+        "fixtures/typed-graphical/sources/gt-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ge-lad.s7dcl",
+        "fixtures/typed-graphical/sources/eq-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ne-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/lt-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/le-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/gt-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ge-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/fc-lad.s7dcl",
+        "fixtures/typed-graphical/sources/fc-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/fb-multi-lad.s7dcl",
+        "fixtures/typed-graphical/sources/fb-multi-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/fb-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/fb-global-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/numeric-callees.scl",
+        "fixtures/typed-graphical/sources/numeric-fc-lad.s7dcl",
+        "fixtures/typed-graphical/sources/numeric-fc-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/numeric-fb-lad.s7dcl",
+        "fixtures/typed-graphical/sources/numeric-fb-fbd.s7dcl"
+      ],
+      "command": [
+        "python",
+        "-B",
+        "scripts/capture_typed_routes_owned.py",
+        "@artifacts/c2a.args",
+        "--host",
+        "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+        "--worker",
+        "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+        "--output",
+        "artifacts/c2a",
+        "--cpu-type-identifier",
+        "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+        "--unit",
+        ""
+      ]
+    },
+    "artifacts/c2b": {
+      "argsFile": [
+        "fixtures/typed-graphical/sources/template-fc-lad.s7dcl",
+        "fixtures/typed-graphical/sources/template-fc-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/template-fb-lad.s7dcl",
+        "fixtures/typed-graphical/sources/template-fb-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/global-template-fb-lad.scl",
+        "fixtures/typed-graphical/sources/global-template-fb-fbd.scl",
+        "fixtures/typed-graphical/sources/multi-template-fb-lad.scl",
+        "fixtures/typed-graphical/sources/multi-template-fb-fbd.scl"
+      ],
+      "command": [
+        "python",
+        "-B",
+        "scripts/capture_typed_routes_owned.py",
+        "@artifacts/c2b.args",
+        "--host",
+        "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+        "--worker",
+        "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+        "--output",
+        "artifacts/c2b",
+        "--cpu-type-identifier",
+        "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+        "--unit",
+        ""
+      ]
+    },
+    "artifacts/c2c": {
+      "argsFile": [
+        "fixtures/typed-graphical/sources/global-timer-storage.scl",
+        "fixtures/typed-graphical/sources/ton-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ton-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/tof-lad.s7dcl",
+        "fixtures/typed-graphical/sources/tof-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/tp-lad.s7dcl",
+        "fixtures/typed-graphical/sources/tp-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ton-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ton-global-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/tof-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/tof-global-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/tp-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/tp-global-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/global-counter-storage.scl",
+        "fixtures/typed-graphical/sources/ctu-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ctu-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ctd-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ctd-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ctud-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ctud-global-lad.s7dcl",
+        "fixtures/typed-graphical/sources/ctu-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ctu-global-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ctd-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ctd-global-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ctud-fbd.s7dcl",
+        "fixtures/typed-graphical/sources/ctud-global-fbd.s7dcl"
+      ],
+      "command": [
+        "python",
+        "-B",
+        "scripts/capture_typed_routes_owned.py",
+        "@artifacts/c2c.args",
+        "--host",
+        "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+        "--worker",
+        "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+        "--output",
+        "artifacts/c2c",
+        "--cpu-type-identifier",
+        "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+        "--unit",
+        ""
+      ]
+    },
+    "artifacts/c2d": {
+      "argsFile": [
+        "fixtures/typed-graphical/sources/template-fb-lad.s7dcl",
+        "fixtures/typed-graphical/sources/instance-effect-before.scl",
+        "fixtures/typed-graphical/sources/instance-effect-after.scl",
+        "fixtures/typed-graphical/sources/iec-effect-before.scl",
+        "fixtures/typed-graphical/sources/iec-effect-after.scl",
+        "fixtures/typed-graphical/sources/transitive-effect-before.scl",
+        "fixtures/typed-graphical/sources/transitive-effect-after.scl"
+      ],
+      "command": [
+        "python",
+        "-B",
+        "scripts/capture_typed_routes_owned.py",
+        "@artifacts/c2d.args",
+        "--host",
+        "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe",
+        "--worker",
+        "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe",
+        "--output",
+        "artifacts/c2d",
+        "--cpu-type-identifier",
+        "OrderNumber:6ES7 513-1AM03-0AB0/V4.1",
+        "--unit",
+        "",
+        "--modify",
+        "instance-effect-after.scl:Tgp_InstanceEffect",
+        "--observe",
+        "instance-effect-after.scl:Tgp_InstanceEffect_DB",
+        "--modify",
+        "iec-effect-after.scl:Tgp_IecEffect",
+        "--observe",
+        "iec-effect-after.scl:Tgp_IecEffect_DB",
+        "--modify",
+        "transitive-effect-after.scl:Tgp_NestEffect",
+        "--observe",
+        "transitive-effect-after.scl:Tgp_NestParent",
+        "--observe",
+        "transitive-effect-after.scl:Tgp_NestGrand",
+        "--observe",
+        "transitive-effect-after.scl:Tgp_NestEffect_DB",
+        "--observe",
+        "transitive-effect-after.scl:Tgp_NestParent_DB",
+        "--observe",
+        "transitive-effect-after.scl:Tgp_NestGrand_DB"
+      ]
+    }
+  },
+  "afterCapture": [
+    "python -B scripts/extract_typed_graphical_profiles.py artifacts/c2a/capture.json artifacts/c2b/capture.json artifacts/c2c/capture.json --stage-output artifacts/c2s",
+    "python -B scripts/audit_typed_profile_candidates.py --catalog artifacts/c2s/profiles.candidate.v1.json --capture artifacts/c2a/capture.json --capture artifacts/c2b/capture.json --capture artifacts/c2c/capture.json --output artifacts/c2s/audit.json",
+    "python -B scripts/extract_typed_instance_effects.py artifacts/c2d/capture.json artifacts/c2d/capture.json",
+    "python -B scripts/extract_typed_instance_effects.py artifacts/c2d/capture.json artifacts/c2d/capture.json --iec",
+    "python -B scripts/extract_typed_transitive_effects.py artifacts/c2d/capture.json"
+  ]
+}

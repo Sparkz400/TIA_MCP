@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from extract_typed_graphical_profiles import effect_name, report_cpu, report_name
 from smoke_mcp import ROOT
 
 EFFECT, PARENT, GRAND = "Tgp_NestEffect", "Tgp_NestParent", "Tgp_NestGrand"
@@ -77,7 +78,7 @@ def verify(documents, appended, prefix="Tgp_", namespace=""):
 def extract(capture_path, route="standard"):
     report = json.loads(capture_path.read_text(encoding="utf-8"))
     assert report["completed"] and report["builderUsed"] is False
-    suffix = "" if route == "standard" else "-" + route
+    name = effect_name("instance-effects-transitive", route, report_cpu(report))
     packet = json.loads((ROOT / ("fixtures/typed-graphical/route-capture-transitive-effect-" + ("standard-" if route == "standard" else "")
                                  + "packet.v1.json")).read_text(encoding="utf-8"))
     scope = packet if route == "standard" else next(r for r in packet["routes"] if r["route"] == route)
@@ -86,15 +87,13 @@ def extract(capture_path, route="standard"):
     fixtures = [e for e in report["fixtures"] if prefix + "NestEffect" in e["names"]]
     assert len(fixtures) == 2, "The capture needs exactly one before and one after source of the route."
     appended = tuple(m["name"] for m in scope["members"])
-    directory = ROOT / ("fixtures/typed-graphical/native/instance-effects-transitive" + suffix)
+    directory = ROOT / ("fixtures/typed-graphical/native/" + name)
     directory.mkdir(exist_ok=True)
     result = {"schemaVersion": 1, "builderUsed": False, "nativeImportCompileVerified": True, "engineeringVerified": False,
               "preservationVerified": False, "persistenceVerified": False, "recoveryVerified": False, "runtimeVerified": False,
               "tiaVersion": "V21", "route": route, **({"namespace": namespace} if namespace else {}),
               "changedFb": scope["chain"][0]["fb"], "chain": scope["chain"],
-              "cpuFamily": report["scratch"]["selectedCpu"]["typeIdentifier"] if "scratch" in report else next(
-                  a["value"] for item in report["hardware"]["items"] if item.get("classification") == "CPU"
-                  for a in item["attributes"] if a["name"] == "TypeIdentifier"),
+              "cpuFamily": report_cpu(report),
               "artifacts": {}, "sources": {}}
     documents = {}
     for phase, entry in zip(("before", "after"), fixtures):
@@ -109,13 +108,13 @@ def extract(capture_path, route="standard"):
             target.write_bytes(raw)
             documents[(phase, export["name"])] = ET.fromstring(raw)
             result["artifacts"][phase + ":" + export["name"]] = {"path": target.relative_to(ROOT).as_posix(),
-                "sha256": hashlib.sha256(raw).hexdigest(), "captureReport": capture_path.relative_to(ROOT).as_posix()}
+                "sha256": hashlib.sha256(raw).hexdigest(), "captureReport": report_name(capture_path)}
     hosts = verify(documents, appended, prefix, namespace)
     result["nativeObservedEffect"] = {"appendedMembers": [dict(m) for m in scope["members"]], "nestedHostsPerDependent": hosts,
         "rule": "Each member typed as the changed FB, at any depth of a parent FB or instance DB, appends every new member to its "
                 "nested Static section in the direct instance-DB shape without the top-level AttributeList, Remanence and Accessibility.",
         "existingFullPayloadPreserved": True}
-    target = ROOT / ("fixtures/typed-graphical/instance-effects-transitive" + suffix + ".v1.json")
+    target = ROOT / ("fixtures/typed-graphical/" + name + ".v1.json")
     target.write_bytes((json.dumps(result, indent=2) + "\n").encode("utf-8"))
     return result
 
