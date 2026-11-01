@@ -12,8 +12,9 @@ Every refusal must come from change_prepare as SafetyBoundary naming the F-DI, a
 - tag_table_import_xml of a new table FioImport with one tag there; McTags with McProbe at %M60.0 imports into the standard PLC.
 - vci_synchronize WorkspaceToProject of FioTags, mapped by export in SimaticML to a workspace outside the project and the
   artifact store, after its package was edited from %M40.0 to %I<start>.0; edited to %M41.0, it applies.
-- library_instantiate of a master copy of McTags into the F-PLC; into the standard PLC, after its own McTags was renamed,
-  it applies and McTags reads back with McProbe.
+- library_instantiate of a master copy of McTags into the F-PLC; into the standard PLC, after its own McProbe and McTags
+  were deleted, it applies and McTags reads back with McProbe. (Renaming the table instead left McProbe in the PLC, and
+  TIA then created the master copy's tag as McProbe(1), run fr_eeb8be6f.)
 Last, a probe records whether a tag table mapped in each other VCI format still synchronizes project-ward after a
 bit-memory edit (the F-I/O rule reads the package as SimaticML).
 """
@@ -155,7 +156,8 @@ def library_routes(h, plc, standard, s):
                 "destinationComposition": "tagTables", "target": {"plcPath": target}}
     # Either F-DI may be named: a master copy is refused by any F-I/O range of the PLC.
     refuse(h, "a tag-table master copy into the F-PLC", "library_instantiate", instantiate(plc), {}, module=FDI[:-1])
-    change(h, "tag_table_rename", {"tagTablePath": source, "newName": MC_TABLE + "Old"}, s)
+    change(h, "tag_delete", {"tagTablePath": source, "memberName": MC_TAG, "dependencyPolicy": "rejectReferenced"}, s)
+    change(h, "tag_table_delete", {"tagTablePath": source}, s)
     change(h, "library_instantiate", instantiate(standard), {})
     h.stage("the instantiated %s reads back on the standard PLC" % MC_TABLE, lambda: has_tag(h, standard, MC_TABLE, [MC_TAG, "Bool", "%M60.0", False]))
 
