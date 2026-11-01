@@ -32,6 +32,13 @@ internal static class RuntimeAdvertisedProfileChecks
                         Encoding.UTF8.GetBytes("\"synthetic-profile-password\""), CancellationToken.None);
                     if (action is "verify" or "verifyAgain") await client.VerifySessionAsync(user, mode, CancellationToken.None);
                     if (action == "verifyAgain") await client.VerifySessionAsync(user, mode, CancellationToken.None);
+                    if (action == "verifyCancelled")
+                    {
+                        using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
+                        try { await client.VerifySessionAsync(user, mode, cancelled.Token); throw new BridgeException("CancellationNotObserved", "The cancelled verification returned."); }
+                        catch (BridgeException failure) when (failure.Code == "RuntimeCancelled") { }
+                        await client.VerifySessionAsync(user, mode, CancellationToken.None);
+                    }
                 }
             }
         }

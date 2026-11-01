@@ -188,6 +188,8 @@ public sealed class WebRuntimeClient : IDisposable
             ApplyPolicy(info);
             Profile = Profile with { SessionInfoObserved = true, SessionUser = user, SessionAuthenticationMode = observedMode };
         }
+        // A caller's cancellation (a stopped capture) proves nothing about the session; only a failed check retires it (run rgn2).
+        catch (BridgeException cancelled) when (cancelled.Code == "RuntimeCancelled") { throw; }
         catch { SessionUnusable = true; throw; }
     }
 

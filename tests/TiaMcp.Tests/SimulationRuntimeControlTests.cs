@@ -134,6 +134,23 @@ internal static class SimulationRuntimeControlTests
         return Task.CompletedTask;
     }
 
+    // The area PLCSIM's tag list reports decides, never the name: a DB member called Output stays writable, a tag called Marker at %Q does not.
+    internal static Task SymbolicOutputWritesAreRefusedByTheirTagListArea()
+    {
+        var tags = new (string, string)[] { ("Marker", "Output"), ("SigOutWord", "Output"), ("OutStruct", "Output"), ("SigInByte", "Input"),
+            ("SigMarker", "Marker"), ("SigDb.Output", "DataBlock"), ("SigDb.VInt", "DataBlock"), ("SigDb.Arr", "DataBlock"), ("T1", "Timer") };
+        Check.Equal("\"Marker\"", SimulationRuntimeControl.OutputSymbol(["\"Marker\""], tags));
+        Check.Equal("sigoutword", SimulationRuntimeControl.OutputSymbol(["sigoutword"], tags));
+        Check.Equal("\"OutStruct\".Member", SimulationRuntimeControl.OutputSymbol(["\"OutStruct\".Member"], tags));
+        Check.Equal("OutStruct[1]", SimulationRuntimeControl.OutputSymbol(["OutStruct[1]"], tags));
+        // A batch with one output among inputs, markers and DB members is refused as a whole, naming that symbol.
+        Check.Equal("\"SigOutWord\"", SimulationRuntimeControl.OutputSymbol(["\"SigInByte\"", "\"SigMarker\"", "\"SigDb\".VInt", "\"SigOutWord\""], tags));
+        Check.Equal(null, SimulationRuntimeControl.OutputSymbol(["\"SigInByte\"", "\"SigMarker\"", "\"SigDb\".Output", "\"SigDb\".Arr[3]", "T1"], tags));
+        // Only a whole segment is a parent; a symbol missing from the tag list is left to PLCSIM.
+        Check.Equal(null, SimulationRuntimeControl.OutputSymbol(["\"SigOutWordCopy\"", "\"OutStructDb\".Member", "\"Missing\".X"], tags));
+        return Task.CompletedTask;
+    }
+
     internal static Task EventTimesAreUtc()
     {
         // The native shape: an Unspecified V8 event time already holds UTC and only gains its zone; a Local one is converted.
@@ -186,6 +203,16 @@ internal static class SimulationRuntimeControlTests
         }
         foreach (string method in new[] { "JObject SignalsRead(", "JObject AreaRead(", "JObject Observe(" })
             Check.Equal(false, System.Text.RegularExpressions.Regex.IsMatch(Body(signals, method), @"\.Write|\.Run\(|\.Stop\(|\.Power|OperatingMode\s*=|MemoryReset"));
+        // Every symbolic writer refuses outputs from the tag list before its first read or write, so a refused request writes nothing.
+        foreach (var (text, method, access) in new[] { (session, "JObject Write(", "ApplyWrites("), (session, "JObject WriteOwned(", "Capture("),
+                     (session, "JObject Test(", "ApplyWrites("), (signals, "JObject SignalsWrite(", "Instance.WriteSignals(") })
+        {
+            string body = Body(text, method);
+            int refusal = body.IndexOf("RefuseOutputs(selected, ", StringComparison.Ordinal);
+            Check.Equal(true, refusal > 0 && body.IndexOf(access, StringComparison.Ordinal) > refusal);
+        }
+        Check.Equal(true, Body(session, "static void RefuseOutputs(").Contains("selected.Instance.TagInfos.Select(t => (t.Name, t.Area.ToString()))", StringComparison.Ordinal)
+            && Body(session, "static void RefuseOutputs(").Contains("new SimulatorException(\"InvalidRequest\"", StringComparison.Ordinal));
         return Task.CompletedTask;
     }
 }

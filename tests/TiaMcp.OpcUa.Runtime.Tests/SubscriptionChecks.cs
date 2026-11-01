@@ -28,7 +28,7 @@ internal static class SubscriptionChecks
             File.WriteAllText(Path.Combine(root,"healthy-status.json"),status.GetRawText());
             File.WriteAllText(Path.Combine(root,"healthy-events.json"),Json(events).GetRawText());
             var created=events.Single(x=>x.Kind=="created").Created!;
-            check(created.RevisedPublishingInterval==200 && created.RevisedLifetimeCount>=60 && created.RevisedKeepAliveCount==10,"Original revised subscription parameters");
+            check(created.RevisedPublishingInterval==200 && created.RevisedLifetimeCount>=60 && created.RevisedKeepAliveCount==3,"Original revised subscription parameters");
             check(created.Items.All(x=>x.Node.Identifier=="absent" || x.RevisedSamplingInterval==200 && x.RevisedQueueSize==4),"Original revised monitored-item parameters");
             check(created.Items[^1].StatusCode=="0x80340000" && created.Items[^1].MonitoredItemId==0,"Missing monitored item explicit partial failure");
             var values=events.SelectMany(x=>x.Notifications??[]).ToDictionary(x=>x.Value.Node.Identifier,x=>x.Value);
@@ -52,8 +52,8 @@ internal static class SubscriptionChecks
             await Refuse(()=>subscriptions.Start(capture,request with {DurationSeconds=11},default),"UaSubscriptionRequestChanged",check);
             await Refuse(()=>subscriptions.Start(Id(),request with {Nodes=[request.Nodes[0],request.Nodes[0]]},default),"UaSubscriptionInvalid",check);
             await Refuse(()=>subscriptions.Start(Id(),request with {MaximumRepublish=65},default),"UaSubscriptionInvalid",check);
-            // 1000 ms x 10 keep-alives would reach the ten-second Publish deadline on a quiet signal.
-            await Refuse(()=>subscriptions.Start(Id(),request with {PublishingIntervalMilliseconds=1000},default),"UaSubscriptionKeepAliveLimit",check);
+            // 1000 ms x 5 keep-alives passes the four-second budget inside the ten-second Publish deadline on a quiet signal.
+            await Refuse(()=>subscriptions.Start(Id(),request with {PublishingIntervalMilliseconds=1000,KeepAliveCount=5},default),"UaSubscriptionKeepAliveLimit",check);
             check(server.Audit.Count==audit,"Invalid subscription admission sends no services");
             string active=Id();await subscriptions.Start(active,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:30,KeepAliveCount:1),default);
             await Refuse(()=>sessions.Read(attempt,[FixtureServer.Node("bool")]),"UaSessionAcquisitionBusy",check);
@@ -93,11 +93,16 @@ internal static class SubscriptionChecks
                 check(bound.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()==(budget==0?"sequenceGapLimit":"notificationLimit"),"Exact retransmission allowance "+budget+" distinguishes exhausted pending gap from complete recovery");
             }
             server.Mode="subscriptionLongKeepAlive";string slow=Id();
-            await subscriptions.Start(slow,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:5),default);
+            await subscriptions.Start(slow,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:5,KeepAliveCount:5),default);
             var revised=await End(subscriptions,slow);var revisedRows=Events(subscriptions,revised);
             check(revisedRows.Any(x=>x.Kind=="failure" && x.ErrorCode=="UaSubscriptionKeepAliveLimit") && !revisedRows.Any(x=>x.Kind=="publish") &&
                 revised.GetProperty("recordedProgress").GetProperty("remoteCleanupConfirmed").GetBoolean() && (await sessions.Status(attempt)).State=="connected",
                 "A server-revised keep-alive past the Publish budget deletes the subscription before any Publish");
+            // The default keep-alive count fits the same 1000 ms revision, as PLCSIM Advanced V8 revises (run rgn1).
+            string fits=Id();await subscriptions.Start(fits,new(attempt,[FixtureServer.Node("bool")],DurationSeconds:3),default);
+            var fitted=await End(subscriptions,fits);
+            check(fitted.GetProperty("recordedProgress").GetProperty("terminalReason").GetString()=="durationLimit" && !Events(subscriptions,fitted).Any(x=>x.Kind=="failure"),
+                "The default keep-alive count survives a server revision to 1000 ms");
             server.Mode="normal";
             await RetainedControls(root,sessions,capture,status,check);
             var next=typeof(OpcUaRuntimeSubscriptions).GetMethod("Next",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic)!;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.99",
+  "catalogVersion": "0.4.103",
   "targetTiaVersions": [
     21
   ],
@@ -3136,6 +3136,23 @@
         "Guest access and operator seeds were not used; guest access is not settable through V21 Openness.",
         "plc_online_compare, plc_station_upload and the discovery baseline stay Softbus-only.",
         "Earlier runs of the same window on 6c6701d and 029c347 found the defects fixed up to 1181f33 (vault contention between a UA subscription and a web capture); they are not curated."
+      ]
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "10d6294f",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py --mode normal with Debug builds of 10d6294f on an owned PLCSIM Advanced V8 TCP/IP instance (scratch CPU 1511-1 PN at 192.168.0.1): runtime_ua_write, runtime_web_write and runtime_web_operating_mode (RUN to STOP and back) pass with sessions connected through the PLCSIM Virtual Ethernet Adapter (connect-time route gate), their stale-precondition refusals hold, UA subscriptions with the default three keep-alives run to their duration although the server revises the publishing interval to 1000 ms, and a Web API capture stopped mid-run leaves its session usable for the following RUN/STOP; independent oracle without issues. 95/95 steps."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+      ],
+      "limitations": [
+        "The refusal of a session opened through another network card is covered offline only; this PC has no second route to the CPU address.",
+        "One PLCSIM instance and CPU; physical PLCs stay out of scope."
       ]
     },
     {
@@ -6443,7 +6460,8 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Bounded public-API coverage; see target_capabilities and operation documentation."
+          "Bounded public-API coverage; see target_capabilities and operation documentation.",
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
         ]
       },
       "qualification": {
@@ -6487,7 +6505,8 @@
         "limitations": [
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "Steps with writes and virtualTime=true need an instance this worker created or adopted (OwnedInstanceRequired). virtualTime=true runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor."
+          "Steps with writes and virtualTime=true need an instance this worker created or adopted (OwnedInstanceRequired). virtualTime=true runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor.",
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
         ]
       },
       "qualification": {
@@ -22736,7 +22755,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -22781,7 +22801,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -23007,7 +23028,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -24477,7 +24499,8 @@
         "limitations": [
           "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
           "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
-          "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028) with one FB instance's Bool Enable: a wrong expected value returns preconditionMismatch without dispatching; a write and its restoring write each read back and the program reacts; refusals without acknowledgeWrite, for a signal outside the case, a datatype differing from the declaration and while a capture holds the instance."
+          "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028) with one FB instance's Bool Enable: a wrong expected value returns preconditionMismatch without dispatching; a write and its restoring write each read back and the program reacts; refusals without acknowledgeWrite, for a signal outside the case, a datatype differing from the declaration and while a capture holds the instance.",
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
         ]
       },
       "qualification": {
@@ -24753,7 +24776,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -25245,7 +25269,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -26600,7 +26625,8 @@
           "Instances this worker created or adopted only, in their admitted network mode (Softbus, or the operator's TCP/IP single-adapter mode); other selections refuse with OwnedInstanceRequired before any runtime call.",
           "1-64 distinct symbols of the sim_read_signals types; every value is validated before the call. A failed item fails the call with PartialSimulationWrite and each item's result; items not reported failed may have been written.",
           "Assignments, not forces; the program scan may overwrite them.",
-          "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written."
+          "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written.",
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
         ]
       },
       "qualification": {
