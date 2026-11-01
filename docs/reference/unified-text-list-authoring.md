@@ -196,7 +196,7 @@ non-executing parser used by the oracle. No parser dependency is added to the Ho
 ## Importing a candidate into a project
 
 Change kind `hmi_text_list_import` imports one retained candidate pair through the shared
-`change_prepare`/`change_apply`/`change_restore` admission. It is the only HMI write the
+`change_prepare`/`change_apply`/`change_restore` admission. It was the first HMI write the
 closed HMI preservation gate admits in production (maintainer decision of 31 October 2026). It is
 admitted for the `unified-comfort` and `unified-pc` profiles, which passed native qualification
 on 31 October; any other profile needs a Host started with `--hmi-text-list-qualification
