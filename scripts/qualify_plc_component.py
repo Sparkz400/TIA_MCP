@@ -32,8 +32,24 @@ FIXTURES = ROOT / "fixtures/libraries/component-qualification"
 FIXTURE_CALLER = json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))["caller"]
 KIND = "library_component_qualification"
 # --canonical-hash-probe adds these to every advance request. The worker hashes the request and ignores it otherwise, so the step passes
-# only if the Host's and the worker's RFC 8785 hashes agree on non-ASCII text (sent \u-escaped) and on numbers sent as 1e+16 and 1000.0.
-HASH_PROBE = {"reviewNote": "Pr\u00fcfung \u00c4\u00d6\u00dc \u00df \u8a66\u9a13 \U0001f600", "reviewWeight": 1e16, "reviewScale": 1000.0}
+# only if the Host's and the worker's RFC 8785 hashes agree on a non-ASCII name and text (sent \u-escaped) and on the number literals
+# 1e3 and 2.2250738585072012e-308. json.dumps cannot spell those, so they travel as "<raw>...</raw>" strings that RawNumbers writes
+# as the literal number on the wire.
+HASH_PROBE = {"reviewNote": "Pr\u00fcfung \u00c4\u00d6\u00dc \u00df \u8a66\u9a13 \U0001f600", "pr\u00fcfName\u540d\u524d": "\u00c9tape \u2116 1",
+              "reviewWeight": "<raw>1e3</raw>", "reviewTiny": "<raw>2.2250738585072012e-308</raw>"}
+RAW_NUMBER = re.compile(r'"<raw>(-?[0-9][0-9.eE+-]*)</raw>"')
+
+
+class RawNumbers:
+    """smoke_mcp's json, writing every "<raw>number</raw>" string as that number literal."""
+    def __getattr__(self, name):
+        return getattr(json, name)
+
+    @staticmethod
+    def dumps(value, **options):
+        return RAW_NUMBER.sub(r"\1", json.dumps(value, **options))
+
+
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "qualification_component_window")
 
 
@@ -879,9 +895,12 @@ def main():
     source_mode.add_argument("--reuse-source-report", type=Path, help="Reuse only native04's exact committed archive in a new consumer; never author/reopen/resume the old attempt.")
     parser.add_argument("--reuse-source-report-sha256", help="Required exact reviewed SHA256 of --reuse-source-report.")
     parser.add_argument("--known-store-root", type=Path, action="append", default=[], help="Additional known retained engineering store; locked in canonical order for the component window.")
-    parser.add_argument("--canonical-hash-probe", action="store_true", help="Add non-ASCII text and exponent numbers to every advance request (RFC 8785 Host/worker hash agreement).")
+    parser.add_argument("--canonical-hash-probe", action="store_true", help="Add a non-ASCII name and text and the literals 1e3 and 2.2250738585072012e-308 to every advance request (RFC 8785 Host/worker hash agreement).")
     args = parser.parse_args()
     require(5 <= args.timeout <= 900, "Timeout must be 5..900 seconds.")
+    if args.canonical_hash_probe:
+        import smoke_mcp
+        smoke_mcp.json = RawNumbers()
     require(not args.recover_from_report or not args.reuse_source_report_sha256, "Source-reuse hash cannot accompany checkpoint-only recovery.")
     run = ComponentRun(args)
     if args.recover_from_report: run.run_recovery(args.recover_from_report)
