@@ -58,6 +58,12 @@ foreach (var changed in new[] { context with { Endpoint = "https://other.example
 Fails(() => WebRuntimeProtocol.Validate(context with { Endpoint = "https://PLC.example" }), "RuntimeIdentityInvalid");
 Fails(() => WebRuntimeProtocol.Read(context, selected, "12"), "RuntimeIdentityInvalid");
 Fails(() => WebRuntimeProtocol.Symbol(context, " ", "simple", metadata), "RuntimeIdentityInvalid");
+// A Web API password is checked without a managed string copy; the format rules stay those of the former GetString check.
+WebRuntimeClient.ValidatePassword(Encoding.UTF8.GetBytes("\"p\\u00e4ss \\ud83d\\ude00 \\\"x\\\" \u03a9\""));
+WebRuntimeClient.ValidatePassword(Encoding.UTF8.GetBytes("\"" + new string('a', 32 * 1024 - 2) + "\""));
+foreach (byte[] bad in new[] { "42", "null", "{\"p\":\"x\"}", "\"a\" \"b\"", "\"unterminated", "\"\\ud800\"", "\"\\udc00x\"", "\"" + new string('a', 32 * 1024 - 1) + "\"" }
+    .Select(Encoding.UTF8.GetBytes).Append([(byte)'"', 0xff, (byte)'"']).Append([(byte)'"', 0xed, 0xa0, 0x80, (byte)'"']))
+    Fails(() => WebRuntimeClient.ValidatePassword(bad), "RuntimeCredentialFormatInvalid");
 Fails(() => WebRuntimeProtocol.Symbol(context, "\ud800", "simple", metadata), "RuntimeIdentityInvalid");
 Fails(() => WebRuntimeProtocol.Symbol(context, "x\n", "simple", metadata), "RuntimeIdentityInvalid");
 Fails(() => WebRuntimeProtocol.Symbol(context, new string('x', 4097), "simple", metadata), "RuntimeIdentityInvalid");

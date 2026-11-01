@@ -82,7 +82,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             foreach (var old in retired) File.Delete(PathFor(old.AttemptId));
             // A new ID cannot bypass an unresolved login for the same endpoint in this artifact root.
             if (records.Any(r => r.Context.Endpoint == login.Endpoint && !Resolved(r.State))) throw Error("RuntimeEndpointSessionUnresolved");
-            var vault = Vault(login); vault.Use(login.Credential, binding, ValidatePassword);
+            var vault = Vault(login); vault.Use(login.Credential, binding, bytes => WebRuntimeClient.ValidatePassword(bytes));
             var context = WebRuntimeProtocol.Context(login.Endpoint, attemptId, Guid.NewGuid().ToString("N"), login.PeerCertificateSha256);
             var status = new RuntimeSessionStatus(attemptId, hostId, context, login, "connecting", null, false, [], "permissionUnknown");
             Save(status, create: true);
@@ -93,10 +93,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                 client.ValidateLoginMode(login.User, login.Mode);
                 // Keep the vault lock through the trusted consumer: retirement cannot race secret use.
                 Consume(vault,login.Credential, binding, bytes =>
-                {
-                    ValidatePassword(bytes);
-                    client.LoginAsync(attemptId, login.User, login.Mode, bytes, cancellationToken).GetAwaiter().GetResult();
-                });
+                    client.LoginAsync(attemptId, login.User, login.Mode, bytes, cancellationToken).GetAwaiter().GetResult());
                 await client.VerifySessionAsync(login.User, login.Mode, cancellationToken);
                 var permissions = await client.PermissionsAsync(cancellationToken);
                 status = status with { State = "connected", PeerVerified = client.PeerVerified, Methods = client.Methods, Profile = client.Profile,
@@ -383,12 +380,6 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         }
     }
     private static CredentialVault Vault(RuntimeLoginSelection login) => CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName));
-    private static void ValidatePassword(byte[] bytes)
-    {
-        using var password = JsonDocument.Parse(bytes, new JsonDocumentOptions { MaxDepth = 1 });
-        if (password.RootElement.ValueKind != JsonValueKind.String || bytes.Length > 32*1024) throw Error("RuntimeCredentialFormatInvalid");
-        _ = new System.Text.UTF8Encoding(false,true).GetByteCount(password.RootElement.GetString()!);
-    }
     private RuntimeSessionStatus Observe(RuntimeSessionStatus status) => live.ContainsKey(status.AttemptId) || Resolved(status.State) ? status :
         status with { State = "hostEndedRemoteUnknown" };
     private static bool Resolved(string state) => state is "closed" or "notConnected" or "abandonedRemoteUnknown";
