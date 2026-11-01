@@ -20,6 +20,12 @@ namespace TiaMcp.Openness.V21
             return new JObject { ["softwareScope"] = scope, ["dataBlockValues"] = values, ["allowStop"] = payload.Value<bool>("allowStop") };
         }
 
+        /// <summary>Why an owned instance cannot take this PLC's online download, or null. The route needs the instance's successful
+        /// generated memory card from exactly this project and PLC; a missing or failed card is not another PLC's card.</summary>
+        internal static string TargetRefusal(bool cardSucceeded, bool samePlc, bool sameProject) =>
+            !cardSucceeded ? "The owned instance has no successful generated memory card (simulation_download was refused, failed or not run); the online route downloads only to an instance whose card came from this PLC."
+            : !samePlc || !sameProject ? "The owned instance's generated memory card came from another project or PLC; only that PLC is downloaded to it online." : null;
+
         /// <summary>The selection for one configuration, or null with the refusal code. PlcMasterSecretPassword is answered by the caller.</summary>
         internal static string Selection(string type, bool preDownload, JObject options, bool wasRunning, out string refusal)
         {

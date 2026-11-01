@@ -4,9 +4,9 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "90cd1546e27d70ee224dad0ad91113d03092572017fcdcb426a2b89aec324ab0",
+    "catalogSha256": "72ad1a6dd01f206341278f6268e1a8424693e6cfd1521a0743a65428b7b6ee02",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
+    "ledgerSha256": "037d2e04c5365d056461fe18d78c10c2cc204dfe71121ff66cced2a53a72b2e4"
   },
   "targetTiaVersions": [
     21
@@ -14,16 +14,16 @@
   "summary": {
     "features": 469,
     "support": {
-      "deferred": 6,
+      "deferred": 4,
       "limited": 312,
       "shipped": 127,
-      "unavailable_target": 5,
+      "unavailable_target": 7,
       "unqualified": 19
     },
     "cells": {
-      "blocked": 31,
+      "blocked": 37,
       "bound": 2001,
-      "deferred": 18,
+      "deferred": 12,
       "open": 108
     },
     "openCellsByOwner": {
@@ -4973,7 +4973,7 @@
       "domain": "language",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "unavailable_target",
       "owners": [
         "D07",
         "X11"
@@ -5350,7 +5350,7 @@
       "domain": "safety",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "unavailable_target",
       "owners": [
         "D14"
       ],

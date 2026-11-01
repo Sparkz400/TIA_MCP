@@ -107,7 +107,8 @@ one `plc_online_compare` uses: a current ticket (15 minutes from `sim_create`) a
 registered local Softbus instance already powered in STOP or RUN, one addressable endpoint at the
 instance's own address, PN/IE / PLCSIM (1) with one target interface, TLS answered `NonTrusted` and only the
 generated runtime-user login answered. The PLC must be the one whose generated card the instance holds
-(`simulation-download.json`); another PLC refuses with `SimulationTargetMismatch`.
+(`simulation-download.json`); another PLC, or an instance whose card was refused, failed or never generated
+(as for an F-CPU), refuses with `SimulationTargetMismatch`.
 
 `DownloadProvider.Download` runs with `DownloadOptions.Software` (`softwareScope: "all"`) or
 `SoftwareOnlyChanges` (`"changes"`), never with hardware. Every download configuration is answered from the

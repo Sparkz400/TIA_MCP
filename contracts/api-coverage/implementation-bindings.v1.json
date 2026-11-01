@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "90cd1546e27d70ee224dad0ad91113d03092572017fcdcb426a2b89aec324ab0",
-      "bytes": 1452206
+      "sha256": "72ad1a6dd01f206341278f6268e1a8424693e6cfd1521a0743a65428b7b6ee02",
+      "bytes": 1453748
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2842,8 +2842,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationOnlineDownload.cs",
-      "sha256": "a102d386acbb26ea5f1b80c5127061cf5f060206525ce9427a8c2f946dd89bb2",
-      "bytes": 18090
+      "sha256": "bc3cd841893f98febf8ae37340b93a24d8e9f7381f65fe9a4487836158fa44cb",
+      "bytes": 18265
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.SimulationProvision.cs",
@@ -3097,8 +3097,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationOnlineDownloadRules.cs",
-      "sha256": "d7f56f26cad33aea696d46a22708734b6c9d554ac7a33c63040963d186a04891",
-      "bytes": 3376
+      "sha256": "efbe65212c5afe0e44e064d4f8cfc6ade28317573373d29afbb4b591ab4587c5",
+      "bytes": 4134
     },
     {
       "path": "src/TiaMcp.Openness.V21/SimulationOnlineLogin.cs",

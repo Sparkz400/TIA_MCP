@@ -5,8 +5,9 @@ cell per acceptance criterion. A cell is bound only when the feature is verified
 and then names the evidence records and the hashes of their retained artifacts.
 Every other cell is open, except in two support classes summarized apart. Cells of
 unavailable_target rows are blocked: they do not count toward 1.0 (maintainer decision,
-29 October 2026; the ledger's dispositions records each row). Cells of deferred (not
-implemented) rows are deferred: not open cells, but still 1.0 work, listed in docs/TODO.md.
+29 October 2026; the ledger's dispositions records each row). A feature V21 has no API for is
+unavailable_target even when not implemented. Cells of deferred (not implemented) rows are
+deferred: not open cells, but still 1.0 work, listed in docs/TODO.md.
 Owners come from the release-obligation ledger; features added after the ledger take the
 owner of their feature-name prefix.
 """
@@ -49,6 +50,9 @@ PREFIX_OWNERS = {
 
 def support(feature):
     """Classify a feature the way release checklist section 1 asks."""
+    # No V21 API route at all (block.move): a target boundary, not unbuilt 1.0 work.
+    if feature["api"]["status"] == "unavailable" and feature["availability"]["status"] in ("unsupported", "blocked"):
+        return "unavailable_target"
     if feature["implementation"]["status"] == "not_implemented":
         return "deferred"
     if feature["availability"]["status"] in ("unsupported", "blocked"):
