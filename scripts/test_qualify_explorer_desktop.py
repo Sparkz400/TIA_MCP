@@ -1,5 +1,6 @@
 """Offline checks of the desktop roundtrip gates in qualify_explorer_desktop.py; nothing here starts TIA or a product."""
 import copy
+import re
 import unittest
 
 import qualify_explorer_desktop as q
@@ -93,6 +94,18 @@ class DesktopRoundtripTests(unittest.TestCase):
         for remote in ('<script src="https://cdn.example/x.js"></script>', "<link href=//cdn.example/x.css>", "<style>@import url('https://x/y.css')</style>"):
             with self.assertRaises(AssertionError):
                 q.offline_html(remote)
+
+    def test_product_host_gets_only_the_roundtrip_toolsets(self):
+        import argparse
+        from pathlib import Path
+        args = argparse.Namespace(worker=Path("w.exe"))
+        self.assertEqual(["--toolsets", "core,explorer"], q.host_arguments(args, Path("r"), q.PRODUCT_TOOLSETS)[-2:])
+        self.assertNotIn("--toolsets", q.host_arguments(args, Path("r")))
+        groups = (Path(__file__).resolve().parents[1] / "src/TiaMcp.Host/ToolGroups.cs").read_text(encoding="utf-8")
+        rules = [(p, g.strip('"')) for p, g in re.findall(r'\("([a-z_0-9]+)", ("?\w+"?)\)', groups.split("Rules =")[1].split("];")[0])]
+        for tool in ("tia_start", "tia_create_scratch", "project_open", "block_read", "tia_detach", "project_model_capture",
+                     "project_model_verify", "project_model_details", "project_model_export"):
+            self.assertIn(next(g for p, g in rules if tool.startswith(p)), q.PRODUCT_TOOLSETS.split(",") + ["base"], tool)
 
 
 if __name__ == "__main__":
