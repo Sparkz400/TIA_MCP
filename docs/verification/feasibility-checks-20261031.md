@@ -183,7 +183,7 @@ limitation, with the physical-PLC row (B05) as the other route.
 Replace the OPC UA client box in "Capability gaps found on 29 October" with:
 
 > - [ ] **OPC UA client** (X13): `HistoryRead` is a V21 boundary: the S7-1500 server's profile has no
->   historical-access facet ([record](verification/opcua-history-read-feasibility-20261031.md)). Method
+>   historical-access facet ([record](opcua-history-read-feasibility-20261031.md)). Method
 >   `Call` and Alarms & Conditions are implementable (the pinned client library has `CallAsync` and
 >   `ConditionRefresh`; the server has the Method and A&C facets from firmware V2.5 and V2.9) and wait for the
->   `runtime_ua_*` tools plus one PLCSIM probe each ([note](verification/feasibility-checks-20261031.md)).
+>   `runtime_ua_*` tools plus one PLCSIM probe each ([note](feasibility-checks-20261031.md)).
