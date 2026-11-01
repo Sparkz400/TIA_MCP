@@ -39,8 +39,9 @@ import time
 
 URI, MIME = "ui://tia-project-explorer/view.html", "text/html;profile=mcp-app"
 FIELDS = {"schemaVersion", "snapshotId", "sessionGeneration", "projectPath", "nodeId", "objectPath"}
-# E1 accepts the same codes for a reference reused after a disconnect.
-STALE = {"SessionMismatch", "StaleSelection", "SnapshotInvalidated", "SnapshotNotFound"}
+# E1 accepts the same codes for a reference reused after a disconnect; ModelInvalidated is the store's code once tia_detach
+# invalidated the snapshot.
+STALE = {"SessionMismatch", "StaleSelection", "SnapshotInvalidated", "SnapshotNotFound", "ModelInvalidated"}
 BLOCK_FIELDS = ("path", "name", "number", "kind", "programmingLanguage")
 QUESTIONS = (("rendered", "Did the Explorer render inside the product's chat after project_model_capture?"),
              ("noNetwork", "Did the developer tools show no network request from the Explorer view?"),

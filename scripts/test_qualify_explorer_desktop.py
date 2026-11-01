@@ -52,6 +52,7 @@ class DesktopRoundtripTests(unittest.TestCase):
         self.assertEqual("Visual Studio Code", found["clientInfo"]["name"])
         order = found["order"]
         self.assertTrue(order["capture"] < order["sent"] < order["details"] < order["detach"] < order["reused"])
+        self.assertEqual("ModelInvalidated", q.review(roundtrip(reused=error("ModelInvalidated")))["staleCode"])
 
     def test_view_details_before_the_send_do_not_count_as_the_agents_call(self):
         records = roundtrip(details_ref={**REF, "nodeId": "n8"})
