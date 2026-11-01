@@ -131,6 +131,16 @@ try { var node = JsonNode.Parse(header)!; node["userSid"] = "S-1-5-18"; File.Wri
 finally { File.WriteAllBytes(headerPath, header); }
 try { File.Move(headerPath, headerPath + ".held"); Reject(() => vault.Inspect(first.Reference, binding), "CredentialUnavailable", "Lost vault metadata never silently creates a replacement identity"); }
 finally { File.Move(headerPath + ".held", headerPath); }
+{
+    // A crash during a new vault's first header write leaves only its .pending- file; the vault still opens and writes its header.
+    string crashed = Path.Combine(output, "crashed-first-write"); var fresh = new CredentialVault(crashed);
+    File.WriteAllBytes(Path.Combine(crashed, ".pending-" + Guid.NewGuid().ToString("N")), [1]);
+    Check(fresh.Create(binding, secret).State == "active" && File.Exists(Path.Combine(crashed, "vault.json")), "An unpublished first header write does not lock the vault");
+    // Consumers open only an existing vault: an unknown name refuses and creates nothing.
+    string unknown = Path.Combine(output, "unknown-vault");
+    Reject(() => CredentialVault.Existing(unknown), "CredentialUnavailable", "A consumer refuses a vault that was never created");
+    Check(!Directory.Exists(unknown) && CredentialVault.Existing(crashed).List().Count == 1, "An unknown vault leaves no folder; an existing one opens");
+}
 string copiedRoot = Path.Combine(output, "copied-vault"); var copied = new CredentialVault(copiedRoot);
 foreach (var path in Directory.EnumerateFiles(root)) { if (Path.GetFileName(path) == ".lock") continue; string target = Path.Combine(copiedRoot, Path.GetFileName(path)); File.Copy(path, target); var acl = new FileSecurity(); acl.SetSecurityDescriptorSddlForm(new FileInfo(path).GetAccessControl().GetSecurityDescriptorSddlForm(AccessControlSections.Access | AccessControlSections.Owner), AccessControlSections.Access | AccessControlSections.Owner); new FileInfo(target).SetAccessControl(acl); }
 Reject(() => copied.Inspect(first.Reference, binding), "CredentialUnavailable", "Copied store cannot silently rebind to a different path");

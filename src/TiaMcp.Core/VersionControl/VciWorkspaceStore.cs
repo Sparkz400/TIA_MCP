@@ -535,7 +535,7 @@ public sealed partial class VciWorkspaceStore
             var intent = JsonSerializer.Deserialize<GitOperationBinding>(ReadBytes(Path.Combine(directory, "intent.json")), BridgeProtocol.Json);
             Require(intent is not null && intent.Operation == operation && intent.RepositoryRoot == repository && expected(intent),
                 "VciIntegrityFailure", "Journal intent differs from the retained record.");
-            var paths = Directory.EnumerateFiles(directory).Where(p => Path.GetFileName(p) != "intent.json").Order(StringComparer.Ordinal).Take(6).ToArray();
+            var paths = Directory.EnumerateFiles(directory, "*.json").Where(p => Path.GetFileName(p) != "intent.json").Order(StringComparer.Ordinal).Take(6).ToArray();
             Require(paths.Length <= 5, "VciIntegrityFailure", "Unexpected callback count.");
             string? priorHash = null; GitOperationRecord? previousRecord = null; int count = 0;
             foreach (var path in paths)
@@ -563,7 +563,13 @@ public sealed partial class VciWorkspaceStore
         {
             Require(binding is null && !Directory.Exists(directory), "RecoveryRequired", "Journal invocation cannot be reopened for replay.");
             PackageStorage.EnsureNoLinks(directory); Directory.CreateDirectory(directory); binding = value;
-            WriteNew(Path.Combine(directory, "intent.json"), value);
+            Publish(Path.Combine(directory, "intent.json"), value);
+        }
+        // A crash mid-write leaves only a .tmp beside the records, never a torn callback that makes the whole journal unreadable.
+        private static void Publish<T>(string path, T value)
+        {
+            string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            WriteNew(temporary, value); PackageStorage.MoveDurably(temporary, path);
         }
         public Task RecordAsync(GitOperationRecord record, CancellationToken token)
         {
@@ -571,8 +577,9 @@ public sealed partial class VciWorkspaceStore
             Require(binding is not null && record.BindingSha256 == binding.Sha256 && record.RepositoryRoot == binding.RepositoryRoot &&
                 record.Operation == binding.Operation && (latest is null || record.OperationId == latest.OperationId), "VciJournalMismatch", "Callback differs from admitted local intent.");
             Require(Allowed(binding.Operation, latest?.Phase, record.Phase), "VciJournalSequence", "Invalid callback sequence.");
-            string path = Path.Combine(directory, (++sequence).ToString("D4") + ".json");
-            WriteNew(path, new { sequence, previousSha256 = previous, record }); previous = PackageStorage.FileHash(path); latest = record;
+            // The number advances only once its record is published, so a later outcomeUnknown takes the slot of a failed one.
+            string path = Path.Combine(directory, (sequence + 1).ToString("D4") + ".json");
+            Publish(path, new { sequence = sequence + 1, previousSha256 = previous, record }); sequence++; previous = PackageStorage.FileHash(path); latest = record;
             return Task.CompletedTask;
         }
     }

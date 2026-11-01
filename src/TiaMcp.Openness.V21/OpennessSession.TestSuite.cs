@@ -252,8 +252,7 @@ namespace TiaMcp.Openness.V21
                 var after = Capture(); Equal(baseline, after);
                 var preservation = Save(Path.Combine(directory, "preservation-after.json"), after);
                 project.Save(); string path = project.Path.FullName, beforeEpoch = owner._testSuiteEpoch;
-                project.Close(); project = owner._portal.Projects.Open(new FileInfo(path));
-                owner._scratchProject = project; owner._testSuiteEpoch = Guid.NewGuid().ToString("N");
+                Reopen(path); owner._testSuiteEpoch = Guid.NewGuid().ToString("N");
                 owner._watchEpoch = Guid.NewGuid().ToString("N"); owner._projectIndexes.Invalidate("testsuiteFreshReopen");
                 var reopened = Capture(); Equal(baseline, reopened);
                 Save(Path.Combine(directory, "fresh-reopen.json"), new JObject { ["beforeEpoch"] = beforeEpoch,
@@ -321,6 +320,14 @@ namespace TiaMcp.Openness.V21
                     ["tables"] = new JArray(((JArray)snapshot["tables"]).Select(t => new JObject { ["kind"] = t["kind"], ["group"] = t["group"], ["name"] = t["name"], ["sha256"] = t["semanticSha256"] })),
                     ["definitions"] = StylePrerequisiteProbe.CaptureDefinitions(project, NewDirectory("definitions")),
                     ["coverage"] = "Exposed single-PLC engineering exports and Test Suite definitions; not yet a qualified complete project preservation profile." };
+            }
+            // The reopened project keeps exactly the ownership the closed one held: scratch status only if it was the scratch
+            // (a watch-owned project never gains it); watch ownership is bound to the path and survives on its own.
+            private void Reopen(string path)
+            {
+                bool scratch = owner._scratchProject != null && project.Equals(owner._scratchProject);
+                project.Close(); project = owner._portal.Projects.Open(new FileInfo(path));
+                if (scratch) owner._scratchProject = project;
             }
             private static void Equal(JObject before, JObject after)
             { if (!StyleUiEvidence.SameContent(before, after)) throw new BridgeException("PreservationFailed", "Native project preservation manifests differ."); }

@@ -18,7 +18,7 @@ internal sealed class CredentialRoute(IBridgeClient inner, Func<string, Credenti
 {
     // Purposes a worker may request: block know-how/write passwords and the CPU protection level's full-access password.
     private static readonly string[] Purposes = ["blockProtection", "cpuProtection"];
-    private readonly Func<string, CredentialVault> open = vaults ?? (name => new CredentialVault(CredentialVault.UserRoot(name)));
+    private readonly Func<string, CredentialVault> open = vaults ?? (name => CredentialVault.Existing(CredentialVault.UserRoot(name)));
     private string? lease;
     private List<(string Slot, byte[] Envelope)>? envelopes;
 

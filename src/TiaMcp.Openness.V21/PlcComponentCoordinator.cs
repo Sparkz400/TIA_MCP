@@ -422,7 +422,7 @@ namespace TiaMcp.Openness.V21
             { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
             if ((attributes & FileAttributes.ReparsePoint) != 0) { basis = "The step workspace " + workspace + " is a reparse point; its content may live elsewhere."; return null; }
             if ((attributes & FileAttributes.Directory) == 0) { basis = "The step workspace path is a file."; return null; }
-            var journals = new System.Collections.Generic.List<string>(); var archives = new System.Collections.Generic.List<string>(); int count = 0;
+            var journals = new System.Collections.Generic.List<string>(); var archives = new System.Collections.Generic.List<string>(); var temporaries = new JArray(); int count = 0;
             var pending = new System.Collections.Generic.Stack<Tuple<DirectoryInfo, string>>();
             pending.Push(Tuple.Create(new DirectoryInfo(workspace), "root"));
             while (pending.Count > 0)
@@ -437,9 +437,12 @@ namespace TiaMcp.Openness.V21
                     if (entry is DirectoryInfo directory) pending.Push(Tuple.Create(directory, role));
                     else if (role == "journal") journals.Add(entry.FullName);
                     else if (role == "archive") archives.Add(entry.FullName);
+                    else if (role == "temporary") temporaries.Add(entry.FullName);
                 }
             }
             if (count == 0) { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
+            // Never read: the journal beside it is still the last committed record.
+            if (temporaries.Count != 0) evidence["journalTemporaries"] = temporaries;
             var states = new JArray(); evidence["coordinatorStates"] = states;
             foreach (string journal in journals)
             {
@@ -472,7 +475,8 @@ namespace TiaMcp.Openness.V21
         }
 
         // The role of an entry the combined apply writes in its workspace, or null. The root holds the coordinator, its project lock,
-        // the import step's idempotency claim, the two step directories and the readback captures (layout of the 31 October run).
+        // the import step's idempotency claim, the two step directories and the readback captures (layout of the 31 October run),
+        // plus the temporary a journal write leaves when it crashes before its rename (LibraryJournalStore, WriteChangeJournal).
         private static string WorkspaceEntry(string parent, FileSystemInfo entry)
         {
             string name = entry.Name; bool directory = entry is DirectoryInfo;
@@ -483,12 +487,13 @@ namespace TiaMcp.Openness.V21
                     if (directory) return match(@"\Acomponent-[0-9a-f]{32}\z") ? "coordinator" : match(@"\Achange-lib-[0-9a-f]{32}\z") ? "libraryStep"
                         : match(@"\Achange-[0-9a-f]{32}\z") ? "typedStep" : name == "captures" ? "captures" : null;
                     return match(@"\Acomponent-project-[0-9a-f]{64}\.lock\z") || match(@"\Alibrary-key-[0-9a-f]{64}\.claim\z") ? "file" : null;
-                case "coordinator": return !directory && name == "component-journal.json" ? "journal" : null;
+                case "coordinator": return directory ? null : name == "component-journal.json" ? "journal" : match(@"\Acomponent-journal\.json\.[0-9a-f]{32}\.tmp\z") ? "temporary" : null;
                 case "captures": return directory && match(@"\Acomponent-read-[0-9a-f]{32}\z") ? "capture" : null;
                 case "capture": return !directory && match(@"\A[A-Za-z0-9_-]+\.xml\z") ? "file" : null;
                 case "libraryStep": case "typedStep":
                     if (directory) return null;
                     if (name == "before.zap21") return "archive";
+                    if (parent == "libraryStep" ? match(@"\Ajournal\.json\.[0-9a-f]{32}\.tmp\z") : name == "journal.json.new") return "temporary";
                     return name == "journal.json" || match(@"\A[A-Za-z0-9_-]+\.xml\z") || parent == "libraryStep" && name == "library-lock.v1.json" ? "file" : null;
                 default: return null;
             }

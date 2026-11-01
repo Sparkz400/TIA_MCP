@@ -127,6 +127,10 @@ File.WriteAllText(callbackPath, File.ReadAllText(callbackPath).Replace("verified
 await Reject("VciIntegrityFailure", () => Task.FromResult(store.Reopen(Text(fixedReceipt, "recordRef"))));
 File.WriteAllBytes(callbackPath, savedCallback);
 Check(Text(Json(store.Reopen(Text(fixedReceipt, "recordRef"))), "state") == "committed", "restored exact callback revalidates committed receipt");
+// Callbacks are published by rename: a crash mid-write leaves only a temporary file, and the committed records still read.
+Check(Directory.EnumerateFiles(Path.Combine(failureDirectory, "commit-journal")).All(p => p.EndsWith(".json", StringComparison.Ordinal)), "a finished callback journal holds no temporary file");
+File.WriteAllText(Path.Combine(failureDirectory, "commit-journal", "0005.json." + Guid.NewGuid().ToString("N") + ".tmp"), "{\"seq");
+Check(Text(Json(store.Reopen(Text(fixedReceipt, "recordRef"))), "state") == "committed", "a torn callback left by a crash does not make the journal unreadable");
 var unsafeConfig = Json(await store.PrepareAsync([new("config.txt")], author, "config test", revision));
 string unsafeRef = Text(unsafeConfig, "recordRef"), unsafeDirectory = Path.Combine(root, "vci-workspaces", "records", unsafeRef.Split(':')[2]);
 File.AppendAllText(Path.Combine(unsafeDirectory, "repository", ".git", "config"), "\n[alias]\n dangerous = !echo no\n");

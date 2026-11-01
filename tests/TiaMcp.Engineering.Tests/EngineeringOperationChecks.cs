@@ -177,6 +177,8 @@ internal static class EngineeringOperationChecks
             Check(!Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", archived.Id)) && Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", ".archive", archived.Id)) &&
                 finishedStore.Read(archived.Id).State == "succeeded", "A finished operation moves into .archive, out of the growth bound, and still reads by id");
             Check(finishedStore.Prepare(Owned("archived"), "archived").Id == archived.Id, "An archived operation keeps its idempotency key");
+            Check(Directory.Exists(Path.Combine(finishedRoot, "engineering-operations", ".archive", finished.Id)) && finishedStore.Read(finished.Id).State == "succeeded" &&
+                finishedStore.Prepare(Owned("finished"), "finished").Id == finished.Id, "A scan past the bound archives a success that finished in place before, and its key still finds it");
             Reject(() => PackageStorage.Id(".archive"), "InvalidRequest"); // So an older Host's scan refuses the store instead of missing archived keys.
             var recovering = finishedStore.ReserveRecovery(archived.Id, archived.Revision, [new(archived.Plan.Resources[0].ResourceKey, Path.Combine(finishedRoot, "recovered.ap21"))]);
             var rival = finishedStore.Prepare(Owned("archived"), "archived-contender");
@@ -207,7 +209,23 @@ internal static class EngineeringOperationChecks
             catch(BridgeException error) when(error.Code=="InvalidResourceKey") { continue; }
             throw new Exception("Caller-supplied device namespaces must remain refused");
         }
-        Console.WriteLine("PASS long resource paths: existing file, case alias, absent descendant and refused device namespaces");
+        // Revision renames are write-through and keep File.Move's semantics: no silent overwrite, an explicit replace, long paths.
+        string revision=Path.Combine(directory,"000001.json"),temporary=revision+".tmp";
+        File.WriteAllText(temporary,"first");PackageStorage.MoveDurably(temporary,revision);
+        File.WriteAllText(temporary,"second");
+        try { PackageStorage.MoveDurably(temporary,revision); throw new Exception("A durable rename must not overwrite a committed revision"); }
+        catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
+        PackageStorage.MoveDurably(temporary,revision,replace:true);
+        if(File.ReadAllText(revision)!="second" || File.Exists(temporary)) throw new Exception("A durable replace must publish the new bytes");
+        // Revision 0 is a whole staged directory: it renames the same way and never lands on an existing record.
+        string staged=Path.Combine(directory,".preparing-record"),record=Path.Combine(directory,"record");
+        Directory.CreateDirectory(staged);File.WriteAllText(Path.Combine(staged,"000000.json"),"intent");
+        PackageStorage.MoveDurably(staged,record);
+        if(Directory.Exists(staged) || File.ReadAllText(Path.Combine(record,"000000.json"))!="intent") throw new Exception("A durable directory rename must publish the staged record");
+        Directory.CreateDirectory(staged);
+        try { PackageStorage.MoveDurably(staged,record); throw new Exception("A durable directory rename must not replace a published record"); }
+        catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
+        Console.WriteLine("PASS long resource paths: existing file, case alias, absent descendant, refused device namespaces and durable renames");
     }
 
     private static string Child(string root, string id, bool acquire = false)

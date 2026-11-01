@@ -82,7 +82,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
             foreach (var old in retired) File.Delete(PathFor(old.AttemptId));
             // A new ID cannot bypass an unresolved login for the same endpoint in this artifact root.
             if (records.Any(r => r.Context.Endpoint == login.Endpoint && !Resolved(r.State))) throw Error("RuntimeEndpointSessionUnresolved");
-            var vault = Vault(login); vault.Use(login.Credential, binding, ValidatePassword);
+            var vault = Vault(login); vault.Use(login.Credential, binding, bytes => WebRuntimeClient.ValidatePassword(bytes));
             var context = WebRuntimeProtocol.Context(login.Endpoint, attemptId, Guid.NewGuid().ToString("N"), login.PeerCertificateSha256);
             var status = new RuntimeSessionStatus(attemptId, hostId, context, login, "connecting", null, false, [], "permissionUnknown");
             Save(status, create: true);
@@ -93,10 +93,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
                 client.ValidateLoginMode(login.User, login.Mode);
                 // Keep the vault lock through the trusted consumer: retirement cannot race secret use.
                 Consume(vault,login.Credential, binding, bytes =>
-                {
-                    ValidatePassword(bytes);
-                    client.LoginAsync(attemptId, login.User, login.Mode, bytes, cancellationToken).GetAwaiter().GetResult();
-                });
+                    client.LoginAsync(attemptId, login.User, login.Mode, bytes, cancellationToken).GetAwaiter().GetResult());
                 await client.VerifySessionAsync(login.User, login.Mode, cancellationToken);
                 var permissions = await client.PermissionsAsync(cancellationToken);
                 status = status with { State = "connected", PeerVerified = client.PeerVerified, Methods = client.Methods, Profile = client.Profile,
@@ -344,13 +341,16 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         var login = entry.Status.Login;
         try
         {
-            Consume(Vault(login),login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ =>
+            // Only the credential's state is checked under the vault lock; the session's requests run after it is released,
+            // so a slow PLC cannot hold other vault users (block protection) past their bounded wait.
+            Vault(login).Use(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ => { });
+            if (Failure(() =>
             {
                 entry.Client.VerifySessionAsync(login.User,login.Mode,cancellationToken).GetAwaiter().GetResult();
                 var status = entry.Status with { Profile = entry.Client.Profile };
                 Save(status); entry.Status = status;
                 action();
-            });
+            }) is { } failure) throw Error(failure);
         }
         catch (Exception error) when (entry.Client.SessionUnusable)
         {
@@ -361,30 +361,25 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
     private static void Consume(CredentialVault vault,CredentialReference reference,CredentialBinding binding,Action<byte[]> action)
     {
         string? failure=null;
-        vault.Use(reference,binding,bytes =>
-        {
-            try { action(bytes); }
-            catch (Exception error)
-            {
-                // Only fixed codes escape the vault consumer; never retain its exception or message.
-                failure = error is BridgeException e && e.Code is
-                    "RuntimePermissionDenied" or "RuntimeSymbolMetadataChanged" or "RuntimeResponseInvalid" or "RuntimeResponseLimit" or
-                    "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
-                    "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
-                    "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
-                    or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
-                    ? e.Code : "RuntimeOperationFailed";
-            }
-        });
+        vault.Use(reference,binding,bytes => failure = Failure(() => action(bytes)));
         if (failure is not null) throw Error(failure);
     }
-    private static CredentialVault Vault(RuntimeLoginSelection login) => new(CredentialVault.UserRoot(login.VaultName));
-    private static void ValidatePassword(byte[] bytes)
+    // Only fixed codes escape a session request; never retain its exception or message.
+    private static string? Failure(Action action)
     {
-        using var password = JsonDocument.Parse(bytes, new JsonDocumentOptions { MaxDepth = 1 });
-        if (password.RootElement.ValueKind != JsonValueKind.String || bytes.Length > 32*1024) throw Error("RuntimeCredentialFormatInvalid");
-        _ = new System.Text.UTF8Encoding(false,true).GetByteCount(password.RootElement.GetString()!);
+        try { action(); return null; }
+        catch (Exception error)
+        {
+            return error is BridgeException e && e.Code is
+                "RuntimePermissionDenied" or "RuntimeSymbolMetadataChanged" or "RuntimeResponseInvalid" or "RuntimeResponseLimit" or
+                "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
+                "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
+                "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
+                or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
+                ? e.Code : "RuntimeOperationFailed";
+        }
     }
+    private static CredentialVault Vault(RuntimeLoginSelection login) => CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName));
     private RuntimeSessionStatus Observe(RuntimeSessionStatus status) => live.ContainsKey(status.AttemptId) || Resolved(status.State) ? status :
         status with { State = "hostEndedRemoteUnknown" };
     private static bool Resolved(string state) => state is "closed" or "notConnected" or "abandonedRemoteUnknown";

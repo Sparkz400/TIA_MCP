@@ -20,6 +20,7 @@ public static class WatchTableMonitor
         // Ownership first: it is the cheap refusal. Native simulator calls are never cancelled; a cancelled bridge call faults the simulator worker.
         var identity = await simulator.CallAsync("sim_identity", new { instanceId, instanceName, creationId }, CancellationToken.None);
         var snapshot = await engineering.CallAsync("watch_read", new { tableName, projectName, plcPath, group, targetKind = forceTable ? "forceTable" : null }, token);
+        DropExport(snapshot);
         var target = snapshot.GetProperty("target");
         var all = target.GetProperty("rows");
         var lookups = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
@@ -109,6 +110,18 @@ public static class WatchTableMonitor
             value["ordinal"] = r.Ordinal;
             return (JsonNode?)value;
         }).ToArray());
+    }
+
+    // The monitor uses only the snapshot's rows; the export folder watch_read leaves for review would otherwise pile up, one per call.
+    private static void DropExport(JsonElement snapshot)
+    {
+        if (!snapshot.TryGetProperty("receipt", out var receipt) || receipt.ValueKind != JsonValueKind.Object || Text(receipt, "path") is not { } path) return;
+        string folder = Path.GetDirectoryName(Path.GetFullPath(path))!, parent = Path.GetDirectoryName(folder)!;
+        // Only the worker's own export layout: <artifacts>/watch-observations/w_<12 hex>/snapshot.json.
+        if (Path.GetFileName(path) != "snapshot.json" || Path.GetFileName(parent) != "watch-observations" ||
+            !System.Text.RegularExpressions.Regex.IsMatch(Path.GetFileName(folder), "^w_[0-9a-f]{12}$")) return;
+        try { PackageStorage.DeleteOwned(parent, folder); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or BridgeException) { } // A leftover export is clutter only.
     }
 
     private static string? Text(JsonElement row, string name) =>

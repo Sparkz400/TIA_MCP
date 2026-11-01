@@ -31,6 +31,14 @@ internal static class ManifestPublicationTests
             Check.Equal(2, attempts); Check.Equal(1, waits);
             Check.Equal(false, File.Exists(f.Source)); Check.Equal("next", File.ReadAllText(f.Target));
         }
+        // A component-window revision publishes through the write-through rename; its held-handle errors keep the same bounded retry.
+        {
+            using var f = new Fixture(false); int attempts = 0, waits = 0;
+            using var handle = new FileStream(f.Source, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            PackageStorage.PublishFile(f.Source, f.Target, (source, target) => { attempts++; PackageStorage.MoveDurably(source, target); },
+                milliseconds => { waits++; handle.Dispose(); });
+            Check.Equal(2, attempts); Check.Equal(1, waits); Check.Equal("next", File.ReadAllText(f.Target));
+        }
         return Task.CompletedTask;
     }
 

@@ -43,7 +43,7 @@ Force edits are expanded document profiles. The ForceValue, Address and DisplayF
 `watch_table_monitor` shows the current values of a table's rows on a PLCSIM Advanced instance this Host owns. Pass the table selector of `watch_table_read` (`tableName`, `group`, `forceTable`, optional `projectName`/`plcPath`) and the owned instance: `instanceId`, `instanceName` and the `creationId` it was created or adopted with.
 
 1. The ownership check runs first; a foreign instance, name or `creationId` is refused before anything is read.
-2. The table is read offline as `watch_table_read` does, so TIA Portal must not be online with the PLC (`OfflineRequired`).
+2. The table is read offline as `watch_table_read` does, so TIA Portal must not be online with the PLC (`OfflineRequired`). The export folder that read leaves under `watch-observations` is deleted once the rows are taken; the result does not refer to it.
 3. Rows `offset` to `offset + count` (`count` 1 to 64) resolve by symbol against the instance's own tag list. TIA writes `"DB".Member`, PLCSIM may write `DB.Member`; both sides are compared without quotes, and the tag list's spelling is what is read.
 4. The resolved symbols are read `samples` times (1 to 20), `intervalMs` apart (100 to 5000).
 

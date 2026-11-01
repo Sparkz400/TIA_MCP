@@ -86,7 +86,7 @@ namespace TiaMcp.Openness.V21
                 project.Save(); var after = Capture(); Equal(baseline, after);
                 var preservation = Save(Path.Combine(directory, "preservation-after.json"), after);
                 string path = project.Path.FullName, beforeEpoch = owner._testSuiteEpoch;
-                project.Close(); project = owner._portal.Projects.Open(new FileInfo(path)); owner._scratchProject = project;
+                Reopen(path);
                 owner._testSuiteEpoch = Guid.NewGuid().ToString("N"); owner._watchEpoch = Guid.NewGuid().ToString("N");
                 owner._projectIndexes.Invalidate("testsuiteFreshReopen");
                 var reopened = Capture(); Equal(baseline, reopened);

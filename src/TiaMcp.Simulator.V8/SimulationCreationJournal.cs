@@ -63,7 +63,8 @@ namespace TiaMcp.Simulator.V8
                 { stream.Write(envelope, 0, envelope.Length); stream.Flush(true); }
                 TiaMcp.Core.JournalFileReplacement.Replace(temporary, path);
             }
-            finally { if (File.Exists(temporary)) File.Delete(temporary); }
+            // A replacement that lost its destination (0x498 and a failed rename) leaves its only copy in the temporary: keep it.
+            finally { if (File.Exists(temporary) && File.Exists(path)) File.Delete(temporary); }
         }
 
         internal static JObject Read(string root, string id)

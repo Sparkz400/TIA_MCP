@@ -66,6 +66,9 @@ internal sealed partial class CredentialVault
         _ = new CredentialVault(parent);
         return Path.Combine(parent, name);
     }
+    // Consumers open only a vault the credential command created: an unknown vault name refuses and leaves no folder behind.
+    internal static CredentialVault Existing(string path) =>
+        File.Exists(Path.Combine(path, "vault.json")) ? new CredentialVault(path) : throw Error("CredentialUnavailable");
     internal CredentialStatus Create(CredentialBinding binding, byte[] secret)
     {
         ValidateBinding(binding);
@@ -180,8 +183,10 @@ internal sealed partial class CredentialVault
         string path = Path.Combine(root, "vault.json");
         if (!File.Exists(path) && !Directory.Exists(path))
         {
-            // Never invent a new owner after losing metadata for an existing store.
-            if (Directory.EnumerateFileSystemEntries(root).Any(p => Path.GetFileName(p) != ".lock")) throw Error("CredentialUnavailable");
+            // Never invent a new owner after losing metadata for an existing store. A .pending- file is an unpublished write
+            // (a crash during this first header write leaves one), never stored state.
+            if (Directory.EnumerateFileSystemEntries(root).Any(p => Path.GetFileName(p) != ".lock" && !Path.GetFileName(p).StartsWith(".pending-", StringComparison.Ordinal)))
+                throw Error("CredentialUnavailable");
             Publish("vault.json", new VaultHeader("protected-credential-vault.v1", Guid.NewGuid().ToString("N"), user.Value));
         }
         var header = ReadJson<VaultHeader>(path);
@@ -224,17 +229,17 @@ internal sealed partial class CredentialVault
     }
     private void Publish<T>(string name, T value, bool replace = false)
     {
-        string temp = Path.Combine(root, ".pending-" + Guid.NewGuid().ToString("N"));
+        string temp = Path.Combine(root, ".pending-" + Guid.NewGuid().ToString("N")), destination = Path.Combine(root, name);
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(value, Json);
         if (bytes.Length > MaxRecordBytes) throw Error("CredentialCapacity");
         try
         {
             using (var output = SecureCreate(temp)) { output.Write(bytes); output.Flush(true); }
-            string destination = Path.Combine(root, name);
             if (replace) { CheckFile(destination); JournalFileReplacement.Replace(temp, destination); }
             else File.Move(temp, destination, false);
         }
-        finally { CryptographicOperations.ZeroMemory(bytes); if (File.Exists(temp)) File.Delete(temp); }
+        // A replacement that lost its destination (0x498 and a failed rename) leaves its only copy in the temporary: keep it.
+        finally { CryptographicOperations.ZeroMemory(bytes); if (File.Exists(temp) && (!replace || File.Exists(destination))) File.Delete(temp); }
     }
     private FileStream SecureCreate(string path)
     {

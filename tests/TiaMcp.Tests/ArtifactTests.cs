@@ -41,6 +41,30 @@ internal static partial class Program
             Check.Equal(retryable ? 1450 : 0, delays.Sum());
         }
 
+        // 0x498 without a backup: the destination is already gone, so the replacement is renamed into place once, never retried.
+        calls = 0; delays.Clear(); int moves = 0;
+        JournalFileReplacement.Replace(() => { calls++; throw new IOException("rename failed", unchecked((int)0x80070498)); }, delays.Add, () => moves++);
+        Check.Equal(1, calls); Check.Equal(1, moves); Check.Equal(0, delays.Count);
+        Exception? partial = null;
+        try { JournalFileReplacement.Replace(() => throw new IOException("partial replacement", unchecked((int)0x80070499)), delays.Add, () => moves++); }
+        catch (IOException error) { partial = error; }
+        Check.Equal(true, partial is not null && moves == 1);
+        // The follow-up rename waits out an access, sharing or lock denial within the same bound; any other failure is not retried.
+        var rename = new IOException("rename failed", unchecked((int)0x80070498));
+        foreach (Exception held in new Exception[] { new UnauthorizedAccessException(), new IOException("sharing", unchecked((int)0x80070020)), new IOException("lock", unchecked((int)0x80070021)) })
+        {
+            moves = 0; delays.Clear();
+            JournalFileReplacement.Replace(() => throw rename, delays.Add, () => { if (++moves < 3) throw held; });
+            Check.Equal(3, moves); Check.Equal("10,20", string.Join(",", delays));
+        }
+        foreach (var (failure, attempts) in new (Exception, int)[] { (new UnauthorizedAccessException(), 20), (new IOException("exists", unchecked((int)0x800700B7)), 1) })
+        {
+            moves = 0; delays.Clear(); Exception? lost = null;
+            try { JournalFileReplacement.Replace(() => throw rename, delays.Add, () => { moves++; throw failure; }); }
+            catch (Exception error) { lost = error; }
+            Check.Equal(true, ReferenceEquals(failure, lost)); Check.Equal(attempts, moves);
+        }
+
         calls = 0;
         var interrupted = new OperationCanceledException();
         try

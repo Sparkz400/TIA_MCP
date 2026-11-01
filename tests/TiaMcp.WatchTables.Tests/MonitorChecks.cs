@@ -10,6 +10,7 @@ internal static class MonitorChecks
         ("Monitor resolves rows against the target tag list and samples only reads", Resolution),
         ("Monitor bounds and ownership refuse before any table read", Refusals),
         ("Monitor refuses a sim_read answer for other symbols", ForeignAnswer),
+        ("Monitor drops only its own watch_read export folder", Export),
     ];
 
     private static readonly JsonObject[] Rows = [
@@ -88,10 +89,28 @@ internal static class MonitorChecks
         Code("PlcsimResponseInvalid", () => Run(engineering, simulator));
     }
 
+    private static void Export()
+    {
+        string root = Path.Combine(Path.GetTempPath(), "monitor-export-" + Guid.NewGuid().ToString("N"));
+        string owned = Path.Combine(root, "watch-observations", "w_0123456789ab"), other = Path.Combine(root, "elsewhere", "w_0123456789ab");
+        foreach (string folder in new[] { owned, other })
+        { Directory.CreateDirectory(folder); File.WriteAllText(Path.Combine(folder, "snapshot.json"), "{}"); File.WriteAllText(Path.Combine(folder, "watch-0.xml"), "<x/>"); }
+        try
+        {
+            foreach (string folder in new[] { owned, other })
+            {
+                var (engineering, simulator, _) = Workers(receipt: Path.Combine(folder, "snapshot.json"));
+                Equal("Monitored", Run(engineering, simulator)["table"]!["name"]!.GetValue<string>());
+            }
+            True(!Directory.Exists(owned) && Directory.Exists(Path.Combine(root, "watch-observations")) && File.Exists(Path.Combine(other, "watch-0.xml")));
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
     private static JsonObject Run(IBridgeClient engineering, IBridgeClient simulator, int offset = 0, int count = 32, int samples = 1, int intervalMs = 100) =>
         WatchTableMonitor.Run(engineering, simulator, "Monitored", null, null, "root", false, 7, "owned", new string('a', 32), offset, count, samples, intervalMs, default).GetAwaiter().GetResult();
 
-    private static (IBridgeClient, IBridgeClient, List<(string Op, JsonObject Args)>) Workers(string? identityError = null, bool foreign = false)
+    private static (IBridgeClient, IBridgeClient, List<(string Op, JsonObject Args)>) Workers(string? identityError = null, bool foreign = false, string? receipt = null)
     {
         var calls = new List<(string Op, JsonObject Args)>();
         var engineering = new Bridge((op, args) =>
@@ -99,7 +118,8 @@ internal static class MonitorChecks
             calls.Add((op, args));
             return new JsonObject { ["target"] = new JsonObject { ["kind"] = "watch", ["group"] = "root", ["name"] = args["tableName"]!.GetValue<string>(), ["semanticSha256"] = new string('b', 64),
                 ["isConsistent"] = true, ["rows"] = new JsonArray(Rows.Select(r => (JsonNode?)r.DeepClone()).ToArray()) },
-                ["observation"] = new JsonObject { ["reference"] = new JsonObject { ["object"] = new JsonObject { ["kind"] = "watchTable" } } } };
+                ["observation"] = new JsonObject { ["reference"] = new JsonObject { ["object"] = new JsonObject { ["kind"] = "watchTable" } } },
+                ["receipt"] = receipt is null ? null : new JsonObject { ["path"] = receipt } };
         });
         var simulator = new Bridge((op, args) =>
         {

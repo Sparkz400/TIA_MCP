@@ -25,6 +25,31 @@ internal static class JournalDirectoryPublicationTests
         return Task.CompletedTask;
     }
 
+    // Revision 0 (a dispatch intent) of the operation, admission and component-window stores goes through the default overload:
+    // its rename is write-through, and a real held handle is still waited out by the bounded retry.
+    internal static Task DefaultIsDurableAndRetried()
+    {
+        string relative = Path.Combine("src", "TiaMcp.Core", "PackageStorage.cs");
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, relative))) root = root.Parent;
+        string source = File.ReadAllText(Path.Combine(root?.FullName ?? throw new InvalidOperationException("Core source missing."), relative));
+        Check.Equal(true, source.Contains("PublishDirectory(staging, destination, (source, target) => MoveDurably(source, target), Thread.Sleep);", StringComparison.Ordinal));
+        foreach (string store in new[] { "EngineeringOperationStore.cs", "EngineeringMutationAdmissionStore.cs", "ComponentQualificationWindowStore.cs" })
+            Check.Equal(true, System.Text.RegularExpressions.Regex.IsMatch(File.ReadAllText(Path.Combine(root.FullName, "src", "TiaMcp.Core", "EngineeringJobs", store)),
+                @"PackageStorage\.PublishDirectory\(staging, PackageStorage\.Under\(directory, [\w.]+\)\);"));
+        if (!OperatingSystem.IsWindows()) return Task.CompletedTask;
+        using var f = new Fixture();
+        var handle = CreateFileW(f.Source, 0x80000000, 3, IntPtr.Zero, 3, 0x02000000, IntPtr.Zero);
+        Check.Equal(false, handle.IsInvalid);
+        var release = Task.Delay(60).ContinueWith(_ => handle.Dispose()); var clock = System.Diagnostics.Stopwatch.StartNew();
+        PackageStorage.PublishDirectory(f.Source, f.Destination);
+        release.Wait();
+        Check.Equal(true, clock.ElapsedMilliseconds >= 40); // the held directory refused the rename until its handle closed
+        Check.Equal(false, Directory.Exists(f.Source));
+        Check.Equal("complete journal", File.ReadAllText(Path.Combine(f.Destination, "record.json")));
+        return Task.CompletedTask;
+    }
+
     internal static async Task BoundsAndNoOverwrite()
     {
         using var f = new Fixture(); int attempts = 0, waits = 0;
