@@ -3816,6 +3816,18 @@
       "obligations": [
         "X07"
       ]
+    },
+    {
+      "featureId": "change.hmi_classic_import",
+      "obligations": [
+        "X07"
+      ]
+    },
+    {
+      "featureId": "change.hmi_external_tag_create",
+      "obligations": [
+        "X08"
+      ]
     }
   ],
   "manualResiduals": [

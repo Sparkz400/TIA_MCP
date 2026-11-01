@@ -18,7 +18,7 @@
       "docs/history/status-log.md",
       "docs/TODO.md"
     ],
-    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md)."
+    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md). On 1 November 2026 X07, X08, B03 and B04 were refreshed against catalog 0.4.92: the HMI gate kinds passed natively, and WinCC RT Professional became a recorded V21 boundary (no matrix row)."
   },
   "release": "1.0",
   "releaseReady": false,
@@ -92,7 +92,7 @@
       "decidedBy": "maintainer",
       "date": "2026-10-29",
       "boundary": "V21 and repository gate",
-      "reason": "Behind the closed HMI preservation gate: V21 has no Screen.Export, so payloads without a public getter stay uncompared and no profile has passed every preservation, compile, persistence, recovery and visual gate.",
+      "reason": "Behind the closed HMI preservation gate: V21 has no Screen.Export, so payloads without a public getter stay uncompared and no profile has passed every preservation, compile, persistence, recovery and visual gate. Since 1 November Classic classic_xml_import and BackColor go through change.hmi_classic_import and Unified external_tag_create through change.hmi_external_tag_create, each with its own qualification gate; under hmi_engineering every operation stays refused.",
       "evidenceIds": []
     },
     {
@@ -1733,12 +1733,12 @@
       "title": "Classic HMI full supported breadth",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_inspection_backcolor_write_families_missing",
-      "qualification": "native_readonly_text_list_route_and_compile_passed",
+      "implementation": "partial_inspection_classic_import_backcolor_write_families_missing",
+      "qualification": "native_readonly_text_list_compile_and_classic_import_passed",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.79): 10 release-matrix rows (4 shipped, 3 limited, 2 unqualified, 1 unavailable on V21); 29 cells bound, 9 open and 7 blocked. hmi_text_list_author and hmi_text_list_generate_set are verified: their candidates import exactly through V21 HmiTextListComposition.Import via the independent seeder, and both refuse the content V21 would silently change (local.hmi.text-list-import.20261029). change.hmi_compile cannot pass on created panels, which have no start screen (29 October); on 1 November it passed on fixtures configured in the editor (TP700 Comfort, MTP700 Unified Comfort; local.hmi.compile.20261101), and hmi.engineering is verified. change.hmi_engineering is blocked behind the closed preservation gate (dispositions).",
-      "remainingWork": "Classic families beyond the qualified profiles; an RT Professional target.",
-      "nextAction": "Obtain an RT Professional target.",
+      "currentResult": "1 November 2026 (catalog 0.4.92): 12 release-matrix rows (4 shipped, 7 limited, 1 unavailable on V21); 52 cells bound, 0 open and 7 blocked. change.hmi_classic_import (Classic classic_xml_import of a screen or tag table and the screen BackColor) passed its route and interruption runs on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, local.hmi.classic-import.interruption.20261101) and production admits classic-comfort; change.hmi_text_list_import and change.hmi_compile are verified; change.hmi_engineering stays blocked behind the closed preservation gate (dispositions). WinCC RT Professional is a recorded V21 boundary (1 November 2026): a station the operator created with a screen in the TIA UI opens through Openness as a PC station with only SIMATIC PC station and Stationmanager, hmi_inspect finds no HMI device, and CanPlugNew had refused the application in every slot (25 October); V21 Openness neither creates nor exposes it (docs/verification/hmi-rt-professional-20261025.md).",
+      "remainingWork": "Classic profiles beyond TP700 Comfort (WinCC RT Advanced, Basic) and Classic object types beyond screens and tag tables, each under its own box or not advertised; Classic PLC declaration mapping; visual and runtime acceptance.",
+      "nextAction": "Qualify the Classic writes beyond TP700 Comfort screens and tag tables under their own TODO boxes, or keep them unadvertised.",
       "ownerRole": "HMI",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1781,12 +1781,12 @@
       "title": "Unified HMI full supported breadth",
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
-      "implementation": "partial_inspection_gated_writes_families_missing",
-      "qualification": "native_readonly_prepare_passed_apply_open",
+      "implementation": "partial_inspection_text_list_external_tag_writes_families_missing",
+      "qualification": "native_readonly_text_list_and_external_tag_passed",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.76): 9 release-matrix rows (3 shipped, 2 limited, 3 unqualified, 1 unavailable on V21); 19 cells bound, 13 open and 7 blocked. Unified text lists have no worker import route yet (V21 has HmiTextListComposition.Import; in progress). change.hmi_engineering is blocked behind the closed preservation gate (dispositions).",
-      "remainingWork": "hmi.engineering and the two text-list rows; Unified writes behind the closed preservation gate (V21 has no Screen.Export); visual and runtime acceptance on Unified Comfort and Unified PC.",
-      "nextAction": "Finish the Unified text-list import route; close the Unified preservation gate or record the V21 boundary.",
+      "currentResult": "1 November 2026 (catalog 0.4.92): 10 release-matrix rows (4 shipped, 5 limited, 1 unavailable on V21); 39 cells bound, 0 open and 7 blocked. change.hmi_external_tag_create (PLC-backed Unified tags) passed its route and interruption runs on the desk-configured MTP700 Unified Comfort pair and the seeded WinCC Unified PC RT baseline (local.hmi.external-tag.route.20261101, local.hmi.external-tag.interruption.20261101) and production admits unified-comfort and unified-pc; change.hmi_text_list_import is verified on both since 31 October; change.hmi_engineering stays blocked behind the closed preservation gate (dispositions).",
+      "remainingWork": "Unified writes beyond text lists and external tags stay behind the closed preservation gate (V21 has no Screen.Export); visual and runtime acceptance on Unified Comfort and Unified PC.",
+      "nextAction": "Decide per Unified operation whether it may follow the standing-notes precedent, or record the V21 boundary.",
       "ownerRole": "HMI",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -2246,14 +2246,14 @@
     {
       "id": "B03",
       "title": "Native UI pause and HMI prerequisites",
-      "current": "Bridge retrieval, read-only inspection, Explorer and persistence/recovery passed for five HMI profiles (25 October). The Unified preservation gate stays closed, Unified text lists have no worker import route yet (V21 has HmiTextListComposition.Import; in progress), and RT Professional and other families lack eligible targets.",
+      "current": "Bridge retrieval, read-only inspection, Explorer and persistence/recovery passed for five HMI profiles (25 October). The Unified text-list import (31 October), the Classic screen/tag-table import and BackColor, and Unified external tags (1 November) passed natively past the preservation gate on their qualified profiles; every other HMI write stays behind it. WinCC RT Professional is a recorded V21 boundary (not exposed by Openness, 1 November); other families lack eligible targets.",
       "resolution": "Obtain supported configured fixtures/public routes; native UI requires explicit resume, then independent visual/lifecycle evidence.",
       "releaseBlocking": true
     },
     {
       "id": "B04",
       "title": "Optional products licenses schemas and fixtures",
-      "current": "A STEP 7 Safety license is active (28 October). SiVArc, RT Professional, Test Suite execution prerequisites, the licensed AX trace package and a drive device-compile route are still absent or unobserved.",
+      "current": "A STEP 7 Safety license is active (28 October). SiVArc, Test Suite execution prerequisites, the licensed AX trace package and a drive device-compile route are still absent or unobserved.",
       "resolution": "Maintain acquisition/installation/license/schema/fixture checklist per operation; validate supplied prerequisites before qualification.",
       "releaseBlocking": true
     },

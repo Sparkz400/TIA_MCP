@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.91",
+  "catalogVersion": "0.4.92",
   "targetTiaVersions": [
     21
   ],
@@ -719,7 +719,77 @@
       ],
       "limitations": [
         "Only desk-configured fixtures compile: HMI targets created through Openness have no start screen (Classic) or transfer password (Unified).",
-        "Other devices, WinCC RT Advanced, Basic, Unified PC and RT Professional are not qualified."
+        "Other devices, WinCC RT Advanced, Basic and Unified PC are not qualified; WinCC RT Professional is not exposed by V21 Openness (1 November 2026)."
+      ]
+    },
+    {
+      "id": "local.hmi.classic-import.route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "TP700 Comfort (V21 Update 3), desk-configured pair",
+        "sourceCommit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+        "passedScope": "Build gh4 = 10763a35. scripts/qualify_hmi_gate_route.py --profile classic-comfort on the desk-configured TP700 Comfort pair (configured.zap21, retrieved into an owned project) with a Host started --hmi-change-qualification classic-comfort: refusals before any write (hmi_engineering with the same payload, wrong operation or family, non-canonical color, template/popup/global-element import, other name or root type, DTD or two roots, unbound prepare, compile=false/save=false, a stale preview); applies of BackColor on both HMIs' Overview_A, a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, unchanged compiler problems (none), the target's independent export carrying exactly the intended delta and every other export unchanged, same-key replay and other-key RecoveryRequired; checkpoint restore; fresh reopen on a production Host (equal reads, kind refused with admission null). 63/63 checks."
+      },
+      "artifacts": [
+        "evidence/local.hmi.classic-import.route.20261101.json"
+      ],
+      "limitations": [
+        "One profile (TP700 Comfort, V21 Update 3) on a desk-configured fixture; screens and tag tables only; other Classic object types, profiles and runtime behaviour are not qualified.",
+        "The XML import readback ignores DocumentInfo, export-local IDs and formatting; every other export is compared after Created-only normalization."
+      ]
+    },
+    {
+      "id": "local.hmi.classic-import.interruption.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "TP700 Comfort (V21 Update 3), desk-configured pair",
+        "sourceCommit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+        "passedScope": "Build gh4 = 10763a35. scripts/qualify_interruption.py ci-* on the desk-configured TP700 Comfort pair: worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases."
+      },
+      "artifacts": [
+        "evidence/local.hmi.classic-import.interruption.20261101.json"
+      ],
+      "limitations": [
+        "BackColor on one screen only; one profile."
+      ]
+    },
+    {
+      "id": "local.hmi.external-tag.route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+        "passedScope": "Build gh4 = 10763a35. scripts/qualify_hmi_gate_route.py --profile unified-comfort (desk-configured MTP700 Unified Comfort pair) and --profile unified-pc (seeded WinCC Unified PC RT baseline with its two transfer-password errors), each retrieved into an owned project with a Host started --hmi-change-qualification <profile>: refusals (hmi_engineering kind, HmiNameConflict, TargetIncompatible, foreign PLC, other-HMI connection, scopePath, array or quoted memberPath, unbound prepare); applies of a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, hmi_inspect tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and other-key RecoveryRequired; checkpoint restore; fresh reopen on a production Host. 43/43 checks per profile."
+      },
+      "artifacts": [
+        "evidence/local.hmi.external-tag.route.20261101.json"
+      ],
+      "limitations": [
+        "Two profiles (MTP700 Unified Comfort, WinCC Unified PC RT); root tags and scalar global DB members only; arrays, UDT values, instance DBs and software-unit declarations are not mapped.",
+        "Unified preservation compares the tag-table exports and the typed object model; payloads without a public getter stay uncompared (the kind's standing notes)."
+      ]
+    },
+    {
+      "id": "local.hmi.external-tag.interruption.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+        "passedScope": "Build gh4 = 10763a35. scripts/qualify_interruption.py et-* on the desk-configured MTP700 Unified Comfort pair and the seeded WinCC Unified PC RT baseline: worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases per profile."
+      },
+      "artifacts": [
+        "evidence/local.hmi.external-tag.interruption.20261101.json"
+      ],
+      "limitations": [
+        "A root PLC tag on one HMI only; two profiles."
       ]
     },
     {
@@ -3049,22 +3119,6 @@
       ]
     },
     {
-      "id": "local.library_units.namespace.dependency.20261101",
-      "status": "passed",
-      "profile": {
-        "tiaVersion": 21,
-        "machine": "PCNico",
-        "sourceCommit": "c54d0be1174777c376ce5d35c5ff1ba4a7bd4c32",
-        "passedScope": "scripts/qualify_library_units.py --run-native at c54d0be1 (build c54d0be1 frozen at artifacts/w4nd, --artifacts artifacts/lu4, 117/117 steps): the namespace sequence of local.library_units.namespace.rerun.20261031 plus an FB type instantiated with an explicit namespace together with the UDT it needs, which library_instantiate creates in the same change: the preview lists both as created, the FB carries the namespace and the UDT keeps its type's (empty) namespace, compile 0 errors, both read back through software_inspect, equal after a fresh reopen, and the change's checkpoint restored into a new TIA removes both."
-      },
-      "artifacts": [
-        "evidence/local.library_units.namespace.dependency.20261101.json"
-      ],
-      "limitations": [
-        "One FB/UDT pair in one software unit of one S7-1500; a dependency with its own namespace and nested dependency chains are not exercised."
-      ]
-    },
-    {
       "id": "local.runtime.plcsim-tcpip.20261029",
       "status": "passed",
       "profile": {
@@ -3803,6 +3857,22 @@
       "limitations": [
         "The repo's online PLCSIM route is gated by a successful memory card, which V21 refuses for an F-CPU, so V21's online download of a safety program (its SafetyProgram download configuration 'Load safety program to device', selection ConsistentDownload) was not reached; the policy would refuse that safety confirmation anyway.",
         "No safety acceptance, login, password or confirmation; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
+    },
+    {
+      "id": "local.library_units.namespace.dependency.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "c54d0be1174777c376ce5d35c5ff1ba4a7bd4c32",
+        "passedScope": "scripts/qualify_library_units.py --run-native at c54d0be1 (build c54d0be1 frozen at artifacts/w4nd, --artifacts artifacts/lu4, 117/117 steps): the namespace sequence of local.library_units.namespace.rerun.20261031 plus an FB type instantiated with an explicit namespace together with the UDT it needs, which library_instantiate creates in the same change: the preview lists both as created, the FB carries the namespace and the UDT keeps its type's (empty) namespace, compile 0 errors, both read back through software_inspect, equal after a fresh reopen, and the change's checkpoint restored into a new TIA removes both."
+      },
+      "artifacts": [
+        "evidence/local.library_units.namespace.dependency.20261101.json"
+      ],
+      "limitations": [
+        "One FB/UDT pair in one software unit of one S7-1500; a dependency with its own namespace and nested dependency chains are not exercised."
       ]
     }
   ],
@@ -9113,8 +9183,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0) and change.hmi_compile (one HMI target per change, on desk-configured TP700 Comfort and MTP700 Unified Comfort fixtures). Each feature's own limitations bound its claim.",
-          "Not delivered: HMI content writes (change.hmi_engineering stays behind the closed HMI preservation gate), WinCC RT Professional, Classic PLC declaration mapping and visual or runtime acceptance. See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
+          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0), change.hmi_classic_import (Classic screen and tag-table import and screen BackColor on TP700 Comfort), change.hmi_external_tag_create (PLC-backed Unified tags on MTP700 Unified Comfort and WinCC Unified PC RT) and change.hmi_compile (one HMI target per change, on desk-configured TP700 Comfort and MTP700 Unified Comfort fixtures). Each feature's own limitations bound its claim.",
+          "Not delivered: other HMI content writes (change.hmi_engineering stays behind the closed HMI preservation gate), Classic PLC declaration mapping and visual or runtime acceptance. WinCC RT Professional is not exposed by V21 Openness (1 November 2026: a station created in the TIA UI shows no HMI software through Openness). See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
       },
@@ -9123,7 +9193,9 @@
         "evidenceIds": [
           "local.hmi.bridge.rerun.20261029",
           "local.hmi.text-list-import.route.20261031",
-          "local.hmi.compile.20261101"
+          "local.hmi.compile.20261101",
+          "local.hmi.classic-import.route.20261101",
+          "local.hmi.external-tag.route.20261101"
         ]
       },
       "availability": {
@@ -13001,7 +13073,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional and Classic PLC declaration mapping are not qualified.",
+          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional is not exposed by V21 Openness (1 November 2026); Classic PLC declaration mapping is not qualified.",
           "Independent per-device/runtime native qualification is recorded separately in docs/verification/hmi-qualification.md.",
           "Classic alarm composition is unavailable; Classic items use retained native XML. Script bodies are read only on explicit source inspection and are never executed.",
           "Unknown/protected/missing targets and per-section bounds remain explicit; metadata is not a complete content fingerprint.",
@@ -13049,7 +13121,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional and Classic PLC declaration mapping are not qualified.",
+          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional is not exposed by V21 Openness (1 November 2026); Classic PLC declaration mapping is not qualified.",
           "Exact native object endpoints or native foreign-key semantics are required. Same names do not prove PLC ownership or declaration binding.",
           "Dynamic scripts, unsupported XML binding shapes, incomplete member mappings and missing native cross-reference providers remain unresolved.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
@@ -13094,7 +13166,7 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional and Classic PLC declaration mapping are not qualified.",
+          "Read-only use qualified natively for Classic Comfort, RT Advanced, Basic, Unified Comfort and Unified PC through the production bridge (local.hmi.bridge.20261025). WinCC RT Professional is not exposed by V21 Openness (1 November 2026); Classic PLC declaration mapping is not qualified.",
           "Assembly/version evidence, bridge implementation, native qualification and current target availability are independent facts.",
           "Assembly presence does not establish a WinCC engineering license; target access/protection is operation-specific.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
@@ -13140,6 +13212,7 @@
         "status": "partial",
         "limitations": [
           "Classic BackColor scalar and whole-object XML import and Unified tag/external-tag/connection/alarm/log/runtime-settings/screen/item/dynamization/event-handler/property/placement/binding bodies use existing prepare/apply/status/restore. No current profile has passed every preservation/compile/persistence/recovery/visual gate.",
+          "1 November: the separate change kinds hmi_classic_import (Classic classic_xml_import of a screen or tag table, and the screen BackColor scalar_property_set) and hmi_external_tag_create (Unified external_tag_create) carry these three operations; both passed native qualification and production admits them on classic-comfort, and on unified-comfort and unified-pc (change.hmi_classic_import, change.hmi_external_tag_create). Under kind hmi_engineering every operation stays refused with HmiPreservationUnavailable.",
           "Unified external_tag_create (26 October): exact same-HMI connection and root PLC tag identities; prepare proves the PLC owner from native CommunicationManagement endpoints and the exact scalar type, apply sets Connection then PlcTag and verifies the natively derived name/type/symbolic access/PLC name. The prepare-only native probe passed on Unified Comfort (local.hmi.external-tag-prepare.20261026): owner/tag/type proof reached the closed gate and name, type and foreign-PLC requests were refused. Apply stays behind the closed Unified preservation gate and is unqualified; Unified PC, arrays, whole UDT values, software-unit tags and Classic external tags are not covered; global DB members and connection creation follow (27 October).",
           "Unified HMI writes beyond screens (27 October): external_tag_create also accepts an exact root global DB identity (kind block) plus an unquoted memberPath; prepare exports the DB and requires exactly one declared member with no array on its path and an exactly matching scalar type, then writes the natively observed dotted spelling (DB.Member, as in the HmiSeeder LinkedDbValue fixture). Struct/UDT sub-members qualify only when the DB export declares them; arrays, quoted or indexed names, instance/array DBs and software-unit DBs are refused. connection_create (target the HMI as kind hmiDevice) calls HmiSoftware.Connections.Create(name) only when exactly one valid native CommunicationManagement HMI endpoint pair of that LocalConnectionName has exactly one partner PLC; Partner/Station/Node are read-only in V21, so apply requires the readback Partner to equal the proven PLC software name and a nonempty CommunicationDriver. Whether Create derives the partner from an existing endpoint pair (or the HMI already lists that connection) is unobserved; the Partner-to-PLC-name mapping is an assumption that fails closed. object_create (DiscreteAlarms, AnalogAlarms, DataLogs, AlarmLogs) uses the composition's Create(name) and object_properties_set edits an exact alarm (hmiAlarm), log or runtime settings (hmiModelNode at its hmi_inspect section=model path); both use per-family allowlists of documented typed setters (alarms: RaisedStateTag, RaisedStateTagBitNumber, TriggerMode, Condition, AlarmClass, Priority, Origin, Area; logs: Settings.LogMaxSize, Settings.StorageFolder; runtime settings: StartScreen, ScreenResolution) with exact typed readback, and require RaisedStateTag, AlarmClass and StartScreen to name an existing tag, alarm class or top-level screen of the same HMI. Faceplate explicit/existing_binding_set now also binds a PLC-backed HMI tag when its connection owner, SymbolicAccess, exact root tag or global DB member declaration and type are proven natively; other nonempty connections stay refused. The existing whole-HMI typed capture already covers connections, alarms, logs and runtime settings; creates may add only the created object's own subtree, edits only the target node. Gaps: text/graphic lists and script modules have no Create or writable typed property in V21, only paired-file directory Import/Export; text lists import through the separate change kind hmi_text_list_import, graphic lists and script modules get no write; AnalogAlarm.ConditionValue (System.Object), MultilingualText event/info texts, parameter tags and trigger addresses are not settable here; connection driver/InitialAddress authoring for non-integrated connections is not offered. All new operations sit behind the same closed Unified preservation gate. Compiled against the V21 PublicAPI only; not natively qualified.",
           "Classic classic_xml_import (27 October): imports a supplied or edited native export of one exact Classic object with ImportOptions.Override through its owning composition: ScreenComposition, ScreenTemplateComposition, ScreenPopupComposition, ScreenSlideinComposition, HmiTarget.ImportScreenGlobalElements/ImportScreenOverview, TagTableComposition, TextListComposition, GraphicListComposition, VBScriptComposition, CycleComposition and ConnectionComposition. Prepare requires one exported Hmi.* root of the same native type and Name, refuses library-linked screens/scripts and retains the current export as backup; apply re-exports the re-found object and requires equality with the supplied document apart from DocumentInfo/formatting, then the whole-HMI preservation check requires every other export unchanged. Cycles have no inspection kind and are addressed as kind hmiCycle by their preservation-capture path; the capture now keys slide-ins by SlideinType, matching inventory paths. The operation has its own unverified gate and stays refused for every profile. Compiled against the V21 PublicAPI only; not natively qualified.",
@@ -26871,6 +26944,114 @@
       "prerequisites": [
         "Installed TIA V21 Openness with WinCC Unified",
         "A retained hmi_text_list_author or hmi_text_list_generate_set record"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "change.hmi_classic_import",
+      "domain": "hmi",
+      "title": "Import a Classic screen or tag table, or set a screen BackColor",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_classic_import",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "Installed V21 Classic public API used by the hmi_engineering bodies: Screen.Export and TagTable.Export (ExportOptions.WithDefaults); ScreenComposition (screen folder and screen user folder) and TagTableComposition Import(FileInfo, ImportOptions.Override) and Find(name); the HmiTarget's ICompilable service."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "payload: the hmi_engineering payload (contracts/hmi-engineering.v1.schema.json) of operation classic_xml_import (target an exact Classic screen or tag table from hmi_inspect; xml the complete supplied or edited native export of that one object) or scalar_property_set (target an exact Classic screen; properties {BackColor: canonical \"R, G, B\"}). Another operation or a Unified target refuses with InvalidRequest; the same payload under kind hmi_engineering stays refused with HmiPreservationUnavailable.",
+          "Prepare captures every Classic HMI of the project (every exposed screen, template, popup, slide-in, global-elements, overview, tag-table, connection, cycle, script and text/graphic-list export). The capture is accepted only with the standing Classic export note (no public alarm composition; dependency closure and export stability unqualified); a capture failure, any other note or a Unified HMI in the project refuses with HmiPreservationUnavailable, and the content hash is the observed-artifacts hash. expectedContentHash must equal it; a StaleRevision refusal returns it. classic_xml_import admits only screens and tag tables (templates, popups, slide-ins, global elements, overview, scripts, lists, cycles and connections refuse with HmiPreservationUnavailable), requires one exported Hmi.* root of the same native type and Name (XmlScopeMismatch) and refuses library-linked screens; BackColor patches the exact exported scalar of the screen's own export.",
+          "Apply requires compile=true and save=true. After the checkpoint it compiles the HmiTarget and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) imports with ImportOptions.Override through the owning composition and re-exports the re-found object: BackColor must read back as the prepared patched document apart from DocumentInfo/Created, an XML import as the supplied document apart from DocumentInfo, export-local object IDs and formatting. Every other export of the compiled capture must stay identical with the same artifact set, only the target's own export may differ, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
+          "Gate: this kind only, for these two operations; production admits classic-comfort, the profile whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Classic. Every other profile, operation and Classic object type stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
+          "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.classic-import.route.20261101",
+          "local.hmi.classic-import.interruption.20261101"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an owned project whose HMIs are all Classic, the target a Classic Comfort one whose capture shows only the standing export note and that compiles without problems, and a worker-owned TIA instance for change_restore."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness with WinCC Classic (Comfort)",
+        "An exact Classic screen or tag-table identity from hmi_inspect"
+      ],
+      "acceptanceCriteria": [
+        "AC-identity",
+        "AC-completeness",
+        "AC-evidence",
+        "AC-preview",
+        "AC-native",
+        "AC-recovery",
+        "AC-preserve"
+      ]
+    },
+    {
+      "featureId": "change.hmi_external_tag_create",
+      "domain": "hmi",
+      "title": "Create a PLC-backed Unified HMI tag",
+      "mcpTools": [
+        "change_prepare",
+        "change_apply",
+        "change_restore"
+      ],
+      "changeKind": "hmi_external_tag_create",
+      "api": {
+        "status": "available",
+        "reasons": [
+          "V21 public API (Siemens.Engineering.WinCCUnified.xml): HmiTagComposition.Create(String)/Find with HmiTag.Connection and PlcTag setters and DataType/PlcName/AccessMode readback; HmiTagTable.Tags.Export(DirectoryInfo); native CommunicationManagement endpoints for the integrated connection's PLC owner; GlobalDB.Export for DB member declarations; Device.GetService<ICompilable>() (Unified HmiSoftware exposes no compiler service). The prepare-only native probe of the hmi_engineering body passed on Unified Comfort (local.hmi.external-tag-prepare.20261026)."
+        ]
+      },
+      "implementation": {
+        "status": "partial",
+        "limitations": [
+          "payload: the hmi_engineering payload (contracts/hmi-engineering.v1.schema.json) of operation external_tag_create: target an exact Unified tag table, name, a primitive scalar dataType, an exact same-HMI connection identity and an exact plcTag identity (a root PLC tag-table tag, or a root global DB with an unquoted memberPath). Another operation or a Classic target refuses with InvalidRequest; the same payload under kind hmi_engineering stays refused with HmiPreservationUnavailable.",
+          "Prepare captures the Unified scope of every HMI in the project (tag-table and paired text-list exports, typed readback of every node). The capture is accepted only with the two standing Unified coverage notes (tag-table export stability, no Screen.Export); a typed read error, a capture failure or a Classic HMI refuses with HmiPreservationUnavailable, and the content hash is the observed-artifacts hash. expectedContentHash must equal it; a StaleRevision refusal returns it. The tag name must be free in the HMI (HmiNameConflict); the connection's PLC owner is proven from native CommunicationManagement endpoints (a foreign PLC refuses with DependencyUnresolved) and the requested type must equal the PLC declaration type (TargetIncompatible).",
+          "Apply requires compile=true and save=true. After the checkpoint it compiles the owning HMI device and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) creates the tag, sets Connection then PlcTag and requires the natively derived name, type, symbolic access, connection, PLC tag and PLC name. Outside the target table's export files and the created tag's own typed subtree (<table>/tags/<name>) the compiled capture must stay identical, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
+          "Gate: this kind only, for this operation; production admits unified-comfort and unified-pc, the profiles whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Unified. Every other profile and operation stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
+          "Arrays, strings, whole UDT/struct values, quoted or indexed member paths, software-unit declarations, non-integrated connections and Classic external tags are not mapped. On both fixtures the create left the table and connection nodes unchanged and added no compiler problem; the rules still refuse either. PLC communication, runtime and visual behavior are not verified.",
+          "Native, 1 November (build 10763a35): the route passed on the desk-configured MTP700 Unified Comfort pair and on the seeded WinCC Unified PC RT baseline with its two encrypted-transfer password errors (local.hmi.external-tag.route.20261101, 43/43 checks each): every refusal before any write; a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and another key refused RecoveryRequired; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.external-tag.interruption.20261101, 8/8 each). Qualified on these two fixtures only; other devices and customer projects are not covered."
+        ]
+      },
+      "qualification": {
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.external-tag.route.20261101",
+          "local.hmi.external-tag.interruption.20261101"
+        ]
+      },
+      "availability": {
+        "status": "conditional",
+        "reasons": [
+          "Requires an owned project whose HMIs are all Unified, the target a Unified Comfort or Unified PC one whose capture shows only the two standing notes, an integrated connection to the owning PLC, and a worker-owned TIA instance for change_restore."
+        ]
+      },
+      "prerequisites": [
+        "Installed TIA V21 Openness with WinCC Unified",
+        "An integrated HMI connection to the PLC that declares the tag"
       ],
       "acceptanceCriteria": [
         "AC-identity",

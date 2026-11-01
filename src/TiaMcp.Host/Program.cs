@@ -18,6 +18,7 @@ try
     if (options.TestSuiteScopeProbe) workerArguments.Add("--testsuite-scope-probe");
     if (options.TranslationQualification) workerArguments.Add("--translation-qualification");
     if (options.HmiTextListQualificationProfile is { } profile) workerArguments.AddRange(["--hmi-text-list-qualification", profile]);
+    if (options.HmiChangeQualificationProfile is { } changeProfile) workerArguments.AddRange(["--hmi-change-qualification", changeProfile]);
     if (options.LibraryIntegrateApply) workerArguments.Add("--enable-library-integrate-apply");
 #if TESTSUITE_QUALIFICATION
     if (options.TestSuiteQualification) workerArguments.Add("--testsuite-qualification");

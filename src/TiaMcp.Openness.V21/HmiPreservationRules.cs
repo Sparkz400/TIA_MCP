@@ -14,14 +14,24 @@ namespace TiaMcp.Model
     internal static class HmiPreservationRules
     {
         internal const int PolicyVersion = 1;
-        // The two coverage notes every Unified capture records; hmi_text_list_import accepts exactly these (HmiTextListImportRules.ScopeAccepted).
+        // The two coverage notes every Unified capture records; hmi_text_list_import and hmi_external_tag_create accept exactly these (HmiEngineeringRules.StandingNotes).
         internal const string UnifiedTagTableExportNote = "Unified tag tables were exported using their documented native composition export. Export stability, full dependency closure and unrelated-resource preservation remain unqualified.";
         internal const string UnifiedTypedReadbackNote = "Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.";
+        // The coverage note every Classic capture records once per target; hmi_classic_import accepts exactly it (HmiEngineeringRules.StandingNotes).
+        internal const string ClassicExportNote = "All exposed Classic screen/template/popup/slide-in/global/overview, tag-table, connection, cycle, script and text/graphic-list exports are captured. The installed HmiTarget has no public alarm composition; embedded/resource dependency closure and export stability still need exact-profile native qualification.";
+
         internal static string Hash(string value)
         {
             using (var sha = SHA256.Create())
                 return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value))).Replace("-", "").ToLowerInvariant();
         }
+
+        // TIA's Unified export helper keeps its process ID and port in the export folder while it runs (route run hr5): process
+        // metadata that a capture finds only when it races the helper. Exactly these two names; anything else stays content.
+        internal static bool IsExportHelperFile(string relative) => relative == ".ile/ItLikeEs.pid" || relative == ".ile/ItLikeEs.port";
+
+        // XDocument.ToString drops the XML declaration that TIA's exports carry and RequireExactDocument compares (route run hr1).
+        internal static void WriteXml(XDocument document, string path) => document.Save(path, SaveOptions.DisableFormatting);
 
         internal static XDocument ReadXml(string xml)
         {

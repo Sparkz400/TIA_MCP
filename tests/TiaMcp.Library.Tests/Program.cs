@@ -522,6 +522,19 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         catch (ArgumentException) { continue; }
         throw new Exception("CLI accepted " + string.Join(" ", refused));
     }
+    // hmi_classic_import and hmi_external_tag_create admit one named profile on their own native Host.
+    foreach (var profile in new[] { "classic-comfort", "unified-comfort", "unified-pc" })
+        Equal(profile, HostOptions.Parse(["--hmi-change-qualification", profile]).HmiChangeQualificationProfile);
+    Equal(null, HostOptions.Parse([]).HmiChangeQualificationProfile);
+    foreach (var refused in new[] { new[] { "--hmi-change-qualification", "classic-comfort", "--no-native-workers" }, new[] { "--hmi-change-qualification", "classic-basic" },
+        new[] { "--hmi-change-qualification", "unified-pc", "--hmi-text-list-qualification", "unified-pc" }, new[] { "--hmi-text-list-qualification", "unified-pc", "--hmi-change-qualification", "unified-pc" },
+        new[] { "--hmi-change-qualification", "classic-comfort", "--translation-qualification" }, new[] { "--hmi-change-qualification", "classic-comfort", "--component-qualification" },
+        new[] { "--hmi-change-qualification", "unified-pc", "--hmi-change-qualification", "unified-pc" }, new[] { "--hmi-change-qualification" } })
+    {
+        try { HostOptions.Parse(refused); }
+        catch (ArgumentException) { continue; }
+        throw new Exception("CLI accepted " + string.Join(" ", refused));
+    }
     // project_upgrade's Host-loss points (scripts/qualify_interruption.py) exist only on a component qualification Host.
     foreach (var point in new[] { "host.project_upgrade", "host.project_upgrade.beforeDispatch" })
         Equal(point, HostOptions.Parse(["--component-qualification", "--watch-qualification", point]).WatchQualificationPoint);
