@@ -26,7 +26,10 @@ CERTS = {"plc": {"sha256": "1" * 64, "subjectCommonName": "PLC-1", "subjectAlter
          "ua": {"sha256": "3" * 64, "subjectCommonName": "PLC-1/OPCUA", "subjectAlternativeNames": [{"type": "Uri", "value": URI}]}}
 DER = b"fake web server certificate"
 # device-inventory: the fake CPU's Modules.Browse children per hwid (None: the top level) and its I&M0; the interface answers 1103.
-NODES = {None: [{"hwid": 49, "name": "ScratchPLC", "type": "module", "subtype": "cpu"}],
+# As PLCSIM answers (X10 run x10r): the station carries the CPU's name and nests the CPU under children, at the top and for its hwid.
+STATION = [{"hwid": 32, "name": "ScratchPLC", "type": "device", "subtype": "central_device",
+            "children": [{"hwid": 49, "name": "ScratchPLC", "type": "module", "subtype": "cpu", "has_children": True}]}]
+NODES = {None: STATION, 32: STATION,
          49: [{"hwid": 64, "name": "PROFINET interface_1", "type": "submodule", "subtype": "interface"}], 64: []}
 IM0 = {49: {"order_number": "6ES7 511-1AL03-0AB0 ", "serial_number": "S V-L0X12345", "hardware_revision": 3,
             "software_revision": {"type": "V", "major": 4, "minor": 1, "patch": 0}}}

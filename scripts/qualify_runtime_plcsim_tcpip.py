@@ -983,19 +983,30 @@ def snapshot(r):
     return {"snapshotId": page["snapshot"]["snapshotId"], "rows": rows}
 
 
+def flatten(nodes):
+    """Browsed nodes with their nested children: PLCSIM answers Modules.Browse with the station node and its CPU under children."""
+    for node in nodes:
+        yield node
+        yield from flatten(node.get("children") or [])
+
+
 def bind_rows(rows, nodes):
-    """The CPU row first, then every row whose name is unique in the snapshot and among the browsed nodes, bound to that node (at most 32)."""
+    """The CPU row bound to the one cpu node of its name (PLCSIM gives the station the CPU's name too), then every other row whose name
+    is unique in the snapshot and among the other browsed modules and submodules, bound to that node (at most 32)."""
     def unique(names):
         return {n for n in names if names.count(n) == 1}
-    names, online = unique([row["name"] for row in rows]), unique([node.get("name") for node in nodes])
-    online = {node["name"]: node for node in nodes if node.get("name") in online}
+    names = unique([row["name"] for row in rows])
     cpus = [row for row in rows if row["kind"] == "cpu"]
-    require(len(cpus) == 1 and cpus[0]["name"] in names and online.get(cpus[0]["name"], {}).get("subtype") == "cpu",
-            "Expected one CPU row named like one online cpu node: %s, %s" % ([row["name"] for row in cpus], sorted(online)))
-    cpu = cpus[0]
-    bindings = [{"rowId": row["rowId"], "hardwareId": online[row["name"]]["hwid"]} for row in [cpu] + [row for row in rows if row is not cpu]
-                if row["name"] in names and row["name"] in online][:32]
-    return cpu["rowId"], online[cpu["name"]]["hwid"], bindings
+    cpu_nodes = [node for node in nodes if cpus and node.get("subtype") == "cpu" and node.get("name") == cpus[0]["name"]]
+    require(len(cpus) == 1 and cpus[0]["name"] in names and len(cpu_nodes) == 1,
+            "Expected one CPU row named like one online cpu node: %s, %s" % ([row["name"] for row in cpus], sorted({n.get("name") for n in nodes if n.get("subtype") == "cpu"})))
+    cpu, cpu_node = cpus[0], cpu_nodes[0]
+    others = [node for node in nodes if node is not cpu_node and node.get("type") != "device"]
+    online = unique([node.get("name") for node in others])
+    online = {node["name"]: node for node in others if node.get("name") in online}
+    bindings = [{"rowId": cpu["rowId"], "hardwareId": cpu_node["hwid"]}] + [{"rowId": row["rowId"], "hardwareId": online[row["name"]]["hwid"]}
+                for row in rows if row is not cpu and row["name"] in names and row["name"] in online]
+    return cpu["rowId"], cpu_node["hwid"], bindings[:32]
 
 
 def agree(issues):
@@ -1065,7 +1076,7 @@ def inventory(r):
                 tool = r.client.request("tools/call", {"name": "device_online_browse", "arguments": {"endpoint": endpoint, **session, **subtree}})
                 rows.append({"hardwareId": hwid, "tool": {"isError": bool(tool.get("isError")), "structuredContent": tool.get("structuredContent")},
                              "pinned": pinned_call(r, "Modules.Browse", {"mode": "children", **({} if hwid is None else {"hwid": hwid})})})
-                for node in [] if tool.get("isError") else tool["structuredContent"]["result"]["nodes"]:
+                for node in [] if tool.get("isError") else flatten(tool["structuredContent"]["result"]["nodes"]):
                     if isinstance(node.get("hwid"), int) and node["hwid"] not in seen:
                         seen.add(node["hwid"])
                         queue.append(node["hwid"])
@@ -1075,7 +1086,7 @@ def inventory(r):
         r.stage("device_online_browse equals the pinned Modules.Browse", lambda: agree([i for row in browsed for i in oracle.browse_issues(row)]))
 
         def identify():
-            nodes = {n["hwid"]: n for row in browsed if not row["tool"]["isError"] for n in row["tool"]["structuredContent"]["result"]["nodes"]
+            nodes = {n["hwid"]: n for row in browsed if not row["tool"]["isError"] for n in flatten(row["tool"]["structuredContent"]["result"]["nodes"])
                      if isinstance(n.get("hwid"), int)}
             row_id, hwid, bindings = bind_rows(captured["rows"], list(nodes.values()))
             tool = r.tool("device_identify", {"snapshotId": captured["snapshotId"], "endpoint": endpoint, "controllerRowId": row_id,
