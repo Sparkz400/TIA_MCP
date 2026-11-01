@@ -141,10 +141,10 @@ option registers or admits the tool only on a qualification Host.
 | `composite_engineering_rebind_plan` | Plan technology-object rebinds after a declared hardware replacement | limited | reviews |  |  |
 | `composite_engineering_reopen` | Revalidate a retained combined engineering review | limited | reviews |  |  |
 | `composite_engineering_review` | Retain combined supplied engineering mappings | limited | reviews |  |  |
-| `device_identify` | Read actual device and module I&M0 identification | unqualified | runtime |  |  |
+| `device_identify` | Read actual device and module I&M0 identification | limited | runtime |  |  |
 | `device_inventory` | Capture and page device/module inventory | shipped | runtime |  |  |
 | `device_inventory_export` | Export device inventory to CSV and Excel | shipped | runtime |  |  |
-| `device_online_browse` | Browse online controller module identifiers | unqualified | runtime |  |  |
+| `device_online_browse` | Browse online controller module identifiers | limited | runtime |  |  |
 | `hardware_catalog_search` | Search installed catalog identifiers | shipped | core |  | `hardware.catalog_profiles` |
 | `hardware_gsd_export` | Export an I-device GSD file | limited | core |  |  |
 | `hardware_inspect` | Read configured hardware attributes and addresses | limited | core |  | `hardware.distributed_io` |

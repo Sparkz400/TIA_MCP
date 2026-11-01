@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "ca27693772ba8efb064fa345b1d9ca96053b59f53ae988bf29d4078341f37d82",
-      "bytes": 1575765
+      "sha256": "6a4f4d777fa9b34eba94d0d10ccccf23d2e92e58adef765aa7591fa064d735ff",
+      "bytes": 1580296
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1322,8 +1322,8 @@
     },
     {
       "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
-      "sha256": "e2fb76d8d705594389105449b50d16a3b0caf6f883d87f236be60f500a13264d",
-      "bytes": 12542
+      "sha256": "091e67266015f9b63da64d283c65ab51afb21bb2ce4d42b799cabfb3a5bb1492",
+      "bytes": 12938
     },
     {
       "path": "src/TiaMcp.Core/JournalFileReplacement.cs",
@@ -11046,8 +11046,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Failure",
-          "line": 94,
-          "endLine": 103,
+          "line": 93,
+          "endLine": 102,
           "sha256": "3be209a30c59fa285c016ebdd395cee0cfa8aef67c1d335e36b6e71bed195fee"
         },
         {
@@ -16487,8 +16487,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Create",
-          "line": 16,
-          "endLine": 16,
+          "line": 15,
+          "endLine": 15,
           "sha256": "ffeff57d34e4393ff8c3fb6214688b12b88d241d06cfd2bbc3f8aa7e128481f0"
         },
         {
@@ -16522,8 +16522,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Failure",
-          "line": 94,
-          "endLine": 103,
+          "line": 93,
+          "endLine": 102,
           "sha256": "3be209a30c59fa285c016ebdd395cee0cfa8aef67c1d335e36b6e71bed195fee"
         },
         {
@@ -16634,8 +16634,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "IdentifyAsync",
-          "line": 74,
-          "endLine": 92,
+          "line": 73,
+          "endLine": 91,
           "sha256": "c30642d07dc8d62157c22803bbc9f708728d34ab975f1e56767f503aff20439d"
         },
         {
@@ -16648,15 +16648,15 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "NodeAsync",
-          "line": 64,
-          "endLine": 72,
+          "line": 63,
+          "endLine": 71,
           "sha256": "5392df06aaca1f63e430a32edbb3403fbb3968a977f0495c541b9ad41a5417aa"
         },
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "ProbeAsync",
-          "line": 45,
-          "endLine": 52,
+          "line": 44,
+          "endLine": 51,
           "sha256": "5cf6f65b71329a908833c3caeb2db6533f62d1003147ddd3536153c78c664a5b"
         },
         {
@@ -16697,8 +16697,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "ValidateEndpoint",
-          "line": 36,
-          "endLine": 43,
+          "line": 35,
+          "endLine": 42,
           "sha256": "1e336e32343d446957bf5196e851a55ae6ae260f2e6495bc3463457732ce044c"
         }
       ],
@@ -16979,8 +16979,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Failure",
-          "line": 94,
-          "endLine": 103,
+          "line": 93,
+          "endLine": 102,
           "sha256": "3be209a30c59fa285c016ebdd395cee0cfa8aef67c1d335e36b6e71bed195fee"
         },
         {
@@ -17589,8 +17589,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Failure",
-          "line": 94,
-          "endLine": 103,
+          "line": 93,
+          "endLine": 102,
           "sha256": "3be209a30c59fa285c016ebdd395cee0cfa8aef67c1d335e36b6e71bed195fee"
         },
         {
@@ -17893,8 +17893,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "BrowseAsync",
-          "line": 54,
-          "endLine": 62,
+          "line": 53,
+          "endLine": 61,
           "sha256": "29006b2039b478360e122fa181fb0dec3fc8732fb2f50be00cab94f3ddaa5370"
         },
         {
@@ -17907,8 +17907,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Create",
-          "line": 16,
-          "endLine": 16,
+          "line": 15,
+          "endLine": 15,
           "sha256": "ffeff57d34e4393ff8c3fb6214688b12b88d241d06cfd2bbc3f8aa7e128481f0"
         },
         {
@@ -17935,8 +17935,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Failure",
-          "line": 94,
-          "endLine": 103,
+          "line": 93,
+          "endLine": 102,
           "sha256": "3be209a30c59fa285c016ebdd395cee0cfa8aef67c1d335e36b6e71bed195fee"
         },
         {
@@ -18047,8 +18047,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "ProbeAsync",
-          "line": 45,
-          "endLine": 52,
+          "line": 44,
+          "endLine": 51,
           "sha256": "5cf6f65b71329a908833c3caeb2db6533f62d1003147ddd3536153c78c664a5b"
         },
         {
@@ -77626,8 +77626,8 @@
         {
           "path": "src/TiaMcp.Core/Inventory/SiemensWebIdentity.cs",
           "name": "Failure",
-          "line": 94,
-          "endLine": 103,
+          "line": 93,
+          "endLine": 102,
           "sha256": "3be209a30c59fa285c016ebdd395cee0cfa8aef67c1d335e36b6e71bed195fee"
         },
         {
@@ -108476,7 +108476,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.device_inventory.online.20261101",
+          "profileSha256": "1e1b311952239cdd5847dac2d0f08bd2fde8dda902e0b2d6fcc475c8183a5863",
+          "artifacts": [
+            "evidence/local.device_inventory.online.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -108793,7 +108801,15 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.device_inventory.online.20261101",
+          "profileSha256": "1e1b311952239cdd5847dac2d0f08bd2fde8dda902e0b2d6fcc475c8183a5863",
+          "artifacts": [
+            "evidence/local.device_inventory.online.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -127675,6 +127691,11 @@
       "sha256": "e412155f02aefd9f7fd8086c5b4c053433a043c38fe9f27080a5a580ded19dd9"
     },
     {
+      "path": "evidence/local.device_inventory.online.20261101.json",
+      "state": "observed",
+      "sha256": "c78df72164b0b37f319cffb33ca1080eae2762838a325846b1e5fc0cf1123a9e"
+    },
+    {
       "path": "evidence/local.drives.probe.20261030.json",
       "state": "observed",
       "sha256": "04ecd11b7a9581451818e1f08ec50bf0ff2bed78e49c78ef09b43ba9fe0ad232"
@@ -128666,6 +128687,10 @@
     {
       "id": "local.cpu_memory_bytes.rerun.20261028",
       "profileSha256": "d1db5e378b0114d16e18d71d825c275bfb249414f5e3822d8fdd70997407f734"
+    },
+    {
+      "id": "local.device_inventory.online.20261101",
+      "profileSha256": "1e1b311952239cdd5847dac2d0f08bd2fde8dda902e0b2d6fcc475c8183a5863"
     },
     {
       "id": "local.drives.probe.20261030",
