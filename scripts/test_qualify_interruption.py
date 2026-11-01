@@ -1,7 +1,10 @@
 """Offline checks of the change_apply interruption matrix in qualify_interruption.py."""
 import json
 import pathlib
+import queue
 import re
+import shutil
+import tempfile
 import unittest
 
 import qualify_interruption as q
@@ -95,6 +98,91 @@ class InterruptionMatrixTests(unittest.TestCase):
         self.assertEqual(25, len(q.KIND_SCENARIOS))
         self.assertTrue(all(len(name) <= 7 for name in q.KIND_SCENARIOS))
         self.assertFalse(set(q.KIND_SCENARIOS) & set(q.SCENARIOS))
+        self.assertEqual(16, len(q.UPGRADE_SCENARIOS))
+        self.assertTrue(all(len(name) <= 7 for name in q.UPGRADE_SCENARIOS))
+        self.assertFalse(set(q.UPGRADE_SCENARIOS) & (set(q.SCENARIOS) | set(q.KIND_SCENARIOS)))
+
+
+class UpgradeInterruptionTests(unittest.TestCase):
+    def setUp(self):
+        self.root = pathlib.Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def stage(self, receipt=None, projects=(), admitted=True, destination="u_12345678"):
+        if admitted:
+            folder = self.root / "engineering-admissions" / ("a" * 32)
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / "00000000.json").write_text(json.dumps({"state": "dispatchIntent", "scope": {"operation": "project_upgrade"}}), encoding="utf-8")
+        if destination:
+            (self.root / "upgrades" / destination).mkdir(parents=True, exist_ok=True)
+        if receipt:
+            (self.root / "upgrades" / destination / "upgrade-receipt.json").write_text(json.dumps({"state": receipt}), encoding="utf-8")
+        for project in projects:
+            path = self.root / "upgrades" / destination / project
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("x", encoding="utf-8")
+
+    def fired(self, mode):
+        return {p for p, (trigger, m, _) in q.UPGRADE_POINTS.items() if trigger and (m == mode) and trigger(self.root)}
+
+    def test_triggers_follow_the_durable_receipt(self):
+        self.assertEqual(set(), self.fired("worker") | self.fired("host"))
+        self.stage(destination=None)
+        self.assertEqual(({"int"}, set()), (self.fired("worker"), self.fired("host")))
+        self.assertEqual("absent", q.upgrade_state(self.root))
+        self.stage()
+        self.assertEqual("unreceipted", q.upgrade_state(self.root))
+        for receipt, worker, host in (("copying", {"int", "cpy"}, {"hcpy"}), ("upgrading", {"int", "upg"}, {"hupg"})):
+            self.stage(receipt)
+            self.assertEqual((receipt, worker, host), (q.upgrade_state(self.root), self.fired("worker"), self.fired("host")))
+        # TIA's project at the observed layout, before and after the completed receipt.
+        self.stage("upgrading", ["Demo/Demo.ap15", "Demo/Logs/x.ap21", "Demo_V21/Demo_V21.ap21"])
+        self.assertEqual({"int", "upg", "prj"}, self.fired("worker"))
+        self.assertEqual(["Demo_V21.ap21"], [p.name for p in q.upgraded_projects(self.root)])
+        self.stage("upgraded")
+        self.assertEqual(("upgraded", {"int", "prj"}), (q.upgrade_state(self.root), self.fired("worker")))
+
+    def test_archive_layout_and_a_second_destination(self):
+        self.stage("upgraded", ["s/Demo_1.zap14", "w/Demo/Demo.ap14", "w/Demo_V21/Demo_V21.ap21"])
+        self.assertEqual(["w/Demo_V21/Demo_V21.ap21"], [p.relative_to(self.root / "upgrades" / "u_12345678").as_posix() for p in q.upgraded_projects(self.root)])
+        self.stage(destination="u_87654321", admitted=False)
+        with self.assertRaises(AssertionError):
+            q.upgrade_state(self.root)
+
+    def test_outcomes_follow_the_state(self):
+        self.assertEqual({"released": True, "destination": "unchanged"}, q.upgrade_outcome("absent"))
+        self.assertEqual({"released": True, "destination": "verifiedApplied"}, q.upgrade_outcome("upgraded"))
+        for state in ("unreceipted", "copying", "upgrading", None):
+            self.assertEqual({"released": False, "destination": None}, q.upgrade_outcome(state))
+        # Each boundary's accepted states: Host loss always ends in the worker's completed upgrade, the intent point in nothing.
+        outcomes = {p: {q.upgrade_outcome(s)["destination"] for s in states} for p, (_, _, states) in q.UPGRADE_POINTS.items()}
+        self.assertEqual({"int": {"unchanged", None}, "cpy": {None}, "upg": {None}, "prj": {None, "verifiedApplied"}, "hint": {"unchanged"},
+                          "hcpy": {"verifiedApplied"}, "hupg": {"verifiedApplied"}, "hret": {"verifiedApplied"}}, outcomes)
+
+    def test_host_point_wait_fails_fast_on_an_answer(self):
+        class Client:
+            def __init__(self, lines, code):
+                self.lines, self.process = queue.Queue(), type("P", (), {"poll": lambda _: code})()
+                for line in lines:
+                    self.lines.put(line)
+        self.assertFalse(q.host_stopped(Client(['{"jsonrpc":"2.0","method":"notifications/message"}'], None), 7))
+        self.assertTrue(q.host_stopped(Client(['{"jsonrpc":"2.0","id":6,"result":{}}', None], 74), 7))
+        with self.assertRaises(RuntimeError):
+            q.host_stopped(Client(['{"jsonrpc":"2.0","id":7,"result":{"isError":true}}'], None), 7)
+
+    def test_host_points_exist_and_examples_are_pinned(self):
+        text = (ROOT / "src/TiaMcp.Host/HostOptions.cs").read_text(encoding="utf-8")
+        accepted = set(re.findall(r'"([a-z_.A-Z]+)"', re.search(r"watchQualificationPoint is not \((.*?)\)\)", text, re.S).group(1)))
+        modes = {mode for _, mode, _ in q.UPGRADE_POINTS.values()}
+        self.assertEqual({"worker", "host", "host.project_upgrade", "host.project_upgrade.beforeDispatch"}, modes)
+        self.assertLessEqual(modes - {"worker", "host"}, accepted)
+        for name in q.UPGRADE_EXAMPLES.values():
+            self.assertEqual({"version", "format", "project", "inventory"}, set(q.UPGRADE_PINS[name]))
+        # base/<scenario>/ar_<12> stays within the reconciler's 70 characters and the upgrade within TIA's 143 for a short base.
+        base = pathlib.Path(r"D:\Entwicklung\TIA_MCP-public\artifacts\pi")
+        for name, (prefix, _) in q.UPGRADE_SCENARIOS.items():
+            self.assertLessEqual(len(str(base / name / ("ar_" + "0" * 12))), 70)
+            self.assertLessEqual(q.paths_fit(base / name, [q.UPGRADE_EXAMPLES[prefix]]), 143)
 
 
 if __name__ == "__main__":

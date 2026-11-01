@@ -342,7 +342,8 @@ internal static partial class Program
             ("Project upgrade summarizes the conversion log's project success marker and message counts", ProjectUpgradeRulesTests.ConversionLogSummary),
             ("Project upgrade reads the real version and project name from the project marker, not the file name", ProjectUpgradeRulesTests.MarkerDeclaresTheRealVersion),
             ("Project upgrade refuses a project folder holding another project or archive", ProjectUpgradeRulesTests.FolderHoldsOneProject),
-            ("Project upgrade evidence collection records its own failure and never replaces TIA's outcome", ProjectUpgradeRulesTests.EvidenceNeverReplacesTheOutcome)
+            ("Project upgrade evidence collection records its own failure and never replaces TIA's outcome", ProjectUpgradeRulesTests.EvidenceNeverReplacesTheOutcome),
+            ("Project upgrade reconciliation trusts only a completed receipt of the admitted source at the observed layout", ProjectUpgradeRulesTests.ReceiptProvesOnlyACompletedUpgradeAtTheLayout)
         ];
         if (typedGraphicalOnly) tests = tests.Where(test => test.Name.StartsWith("Typed ", StringComparison.Ordinal)).ToArray();
         if (bridgeOnly) tests = tests.Where(test => test.Name.StartsWith("Bridge ", StringComparison.Ordinal)).ToArray();

@@ -522,6 +522,16 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
         catch (ArgumentException) { continue; }
         throw new Exception("CLI accepted " + string.Join(" ", refused));
     }
+    // project_upgrade's Host-loss points (scripts/qualify_interruption.py) exist only on a component qualification Host.
+    foreach (var point in new[] { "host.project_upgrade", "host.project_upgrade.beforeDispatch" })
+        Equal(point, HostOptions.Parse(["--component-qualification", "--watch-qualification", point]).WatchQualificationPoint);
+    foreach (var refused in new[] { new[] { "--watch-qualification", "host.project_upgrade" }, new[] { "--component-qualification", "--watch-qualification", "host.project_copy" },
+        new[] { "--component-qualification", "--watch-qualification", "host.watch_apply_native.beforeDispatch" } })
+    {
+        try { HostOptions.Parse(refused); }
+        catch (ArgumentException) { continue; }
+        throw new Exception("CLI accepted " + string.Join(" ", refused));
+    }
 });
 Test("CLI Git remote is local by default and needs an explicit option for credential-free https", work =>
 {

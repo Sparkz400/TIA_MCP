@@ -135,7 +135,7 @@ public sealed record HostOptions(string WorkerPath, string ArtifactsDirectory, s
             if (watchQualificationPoint is not ("none" or "checkpoint.beforeArchive" or "checkpoint.afterArchive" or
                 "import.before" or "import.after" or "save.before" or "save.after" or "retrieve.before" or "retrieve.after" or
                 "host.watch_checkpoint" or "host.watch_apply_native" or "host.watch_restore_native" or
-                "host.watch_authoring_source_negative"))
+                "host.watch_authoring_source_negative" or "host.project_upgrade" or "host.project_upgrade.beforeDispatch"))
                 throw new ArgumentException("Unknown watch qualification interruption point.");
         }
         if (runtimeQualificationPoint is not null && !componentQualification)

@@ -102,6 +102,7 @@ overall because of a qualifier fault in two other cases, which the rerun fixed
 | `project_retrieve` | **qualified**: released, destination equals archive |
 | `scratch_create` | **qualified as held**: partial project cannot be opened |
 | `library_open` | **qualified**: released before receipt; held with partial working copy |
+| `project_upgrade` | **qualified** (`local.project_upgrade.interruption.20261101`): 16 of 16 cases of `scripts/qualify_interruption.py` on owned copies of a V15 project folder (`pf-*`, `OpenWithUpgrade`) and a V14 SP1 archive (`pa-*`, `RetrieveWithUpgrade`). Worker loss at dispatch intent: released, destination never created. Worker loss during the copy, during the native upgrade and after the `.ap21` appeared: held, the project not opened, the source still reserved (`ResourceBusy`). Host stop before dispatch: released unchanged. Host loss during the copy and the upgrade, and Host stop after the native reply: released `verifiedApplied`, pinned inventory read again. No replay; every case hit its intended durable state |
 | `simulation_download` | **qualified**: held admission released after a worker crash (`artifacts/f2`) |
 | `simulation_provision_scratch_credential` | **qualified** release path (`local.sim.reconcile.20261024`); refusal paths are managed tests |
 | `watch_authoring_source_negative` | **qualified** with its own reconciler (`qualification_watch_authoring_source_reconcile`) after a Host loss at `host.watch_authoring_source_negative`: released as unchanged, replay refused (`local.watch.source_reconcile.20261028`); qualification-only tool |
@@ -130,5 +131,9 @@ on the same workflow in qualification mode (`local.translation.native.20261028`,
   Host. Power loss, disk faults and remote transport are not exercised.
 - The save-time rule trusts the checkpoint archive's file write time; the archive's
   hash is verified, its timestamp is not.
+- `project_upgrade` reconciliation trusts its worker-written upgrade receipt once it is
+  bound to the recomputed source hash and the observed layout; a receipt edited inside the
+  owned artifacts tree after the interruption is trusted, the same residual as other
+  receipts and journals.
 - Fingerprints exclude generated payload bytes and unexposed vendor data; library
   revisions do not cover unexposed document content.
