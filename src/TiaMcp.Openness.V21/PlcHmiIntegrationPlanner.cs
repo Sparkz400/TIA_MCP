@@ -149,7 +149,7 @@ namespace TiaMcp.Openness.V21
                     if (plcTag == null) Fail("IntegrationTagMissing", "Mapped PLC tag is not a unique root tag of the target PLC: " + source.Value<string>("tagPath"));
                     RequireType(name, dataType, plcTag.Value<string>("dataType"));
                     row["plcSymbol"] = plcTag.Value<string>("name");
-                    steps.Add(new JObject { ["order"] = steps.Count + 1, ["kind"] = "hmi_engineering", ["operation"] = "external_tag_create", ["requiresFreshPreparation"] = true, ["requiresFreshIdentity"] = true,
+                    steps.Add(new JObject { ["order"] = steps.Count + 1, ["kind"] = "hmi_external_tag_create", ["operation"] = "external_tag_create", ["requiresFreshPreparation"] = true, ["requiresFreshIdentity"] = true,
                         ["request"] = new JObject { ["hmiPath"] = hmi["hmiPath"].DeepClone(), ["tagTable"] = hmi["tagTable"].DeepClone(), ["connection"] = hmi["connection"].DeepClone(), ["name"] = name, ["dataType"] = dataType, ["plcTagPath"] = source["tagPath"].DeepClone() },
                         ["mustWaitFor"] = "PLC installation readback; resolve exact hmi_inspect identities for the tag table, connection and PLC tag." });
                 }
@@ -179,7 +179,7 @@ namespace TiaMcp.Openness.V21
                 screens.Add(item.DeepClone());
                 blockers.Add(new JObject { ["code"] = "HmiScreenItemCreationUnavailable", ["item"] = item["itemName"].DeepClone(), ["message"] = "No qualified operation creates a bound Unified screen item." });
             }
-            blockers.Add(new JObject { ["code"] = "HmiPreservationGateClosed", ["message"] = "Unified production apply stays behind the closed preservation gate; HMI steps can only be prepared." });
+            blockers.Add(new JObject { ["code"] = "HmiPreservationGateClosed", ["message"] = "Combined apply stays refused: bound screen items stay behind the closed preservation gate; each HMI tag is its own hmi_external_tag_create change." });
             return Plan(payload, blockers, steps, new JObject { ["plc"] = plcPlan, ["hmi"] = new JObject { ["target"] = observed.DeepClone(), ["tags"] = tags, ["screenItems"] = screens } });
         }
 

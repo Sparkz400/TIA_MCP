@@ -15,8 +15,10 @@ namespace TiaMcp.Openness.V21
         // --hmi-text-list-qualification <profile>: admits that profile only in a project this worker created or retrieved.
         internal string HmiTextListQualificationProfile { get; set; }
         private readonly HashSet<string> _retrievedProjectPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private string TextListQualificationProfile(Project project) => HmiTextListQualificationProfile != null && _ownsPortal &&
-            (WatchOwnsScratch(project) || _retrievedProjectPaths.Contains(project.Path.FullName)) ? HmiTextListQualificationProfile : null;
+        private string TextListQualificationProfile(Project project) => OwnedQualificationProfile(HmiTextListQualificationProfile, project);
+        // A qualification profile applies only in a worker-owned Portal, to a project this worker created or retrieved.
+        private string OwnedQualificationProfile(string profile, Project project) => profile != null && _ownsPortal &&
+            (WatchOwnsScratch(project) || _retrievedProjectPaths.Contains(project.Path.FullName)) ? profile : null;
 
         // Change kind hmi_text_list_import: a Host-resolved hmi_text_list_author/generate_set candidate pair imported through
         // HmiTextListComposition.Import, the route the independent seeder qualified (local.hmi.text-list-import.20261029).

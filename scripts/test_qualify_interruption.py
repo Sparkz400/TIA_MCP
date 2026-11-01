@@ -78,6 +78,40 @@ class InterruptionMatrixTests(unittest.TestCase):
     def test_text_list_scenarios_run_on_the_qualification_host(self):
         self.assertEqual(["--hmi-text-list-qualification", "unified-comfort"], q.text_list_host_arguments())
 
+    def test_gate_points_split_the_compile_and_the_write(self):
+        journals = {
+            "ckpt": {"state": "checkpointing", "stages": []},
+            # Killed during the baseline compile: hmi_baseline_compiled and hmi_native_write_started follow back to back.
+            "mut": {"state": "applying", "stages": ["prechange_project_saved", "recovery_archive_created"]},
+            "wrt": {"state": "applying", "stages": ["recovery_archive_created", "hmi_baseline_compiled", "hmi_native_write_started"]},
+            "comp": {"state": "applying", "stages": ["hmi_native_write_started", "hmi_precise_readback_verified", "mutation_applied"]},
+            "save": {"state": "applying", "stages": ["mutation_applied", "compile_finished", "hmi_unrelated_content_preserved", "changed_project_saved"]},
+        }
+        host = {"ckpt": ["hckp"], "wrt": ["hwrt"], "save": ["hsav"], "mut": [], "comp": []}
+        for name, journal in journals.items():
+            for mode in ("worker", "host"):
+                hits = [point for point, (trigger, m) in q.GATE_POINTS.items() if m == mode and trigger(journal)]
+                self.assertEqual([name] if mode == "worker" else host[name], hits, (name, mode))
+        between = {"state": "applying", "stages": ["recovery_archive_created", "hmi_baseline_compiled"]}
+        self.assertEqual([], [point for point, (trigger, _) in q.GATE_POINTS.items() if trigger(between)])
+        for terminal in ({"state": "applied", "stages": ["changed_project_saved"]}, {"state": "prepared"}, {}):
+            self.assertFalse(any(trigger(terminal) for trigger, _ in q.GATE_POINTS.values()), terminal)
+
+    def test_gate_applied_stages_pass_every_boundary_once(self):
+        from qualify_hmi_gate_route import APPLIED_STAGES
+        hit = set()
+        for n in range(len(APPLIED_STAGES) + 1):
+            journal = {"state": "applying", "stages": APPLIED_STAGES[:n]}
+            hit |= {p for p, (trigger, m) in q.GATE_POINTS.items() if m == "worker" and trigger(journal)}
+        self.assertEqual({"mut", "wrt", "comp", "save"}, hit)
+        self.assertFalse(any(trigger({"state": "applied", "stages": APPLIED_STAGES}) for trigger, _ in q.GATE_POINTS.values()))
+
+    def test_gate_scenarios_run_on_the_change_qualification_host(self):
+        self.assertEqual(["--hmi-change-qualification", "unified-comfort"], q.gate_host_arguments())
+        self.assertEqual({"ci": "hmi_classic_import", "et": "hmi_external_tag_create"}, {p: q.KINDS[p][0] for p in q.GATE_PROFILES})
+        self.assertTrue(all(q.reconciliation_class(q.KINDS[p][0]) == "target" for p in q.GATE_PROFILES))
+        self.assertEqual({"ci-" + p for p in q.GATE_POINTS} | {"et-" + p for p in q.GATE_POINTS}, {n for n in q.KIND_SCENARIOS if n[:2] in q.GATE_PROFILES})
+
     def test_expected_outcomes(self):
         for kind in ("source_upsert", "hardware_plug", "to_create", "tag_set"):
             self.assertEqual({"released": False, "effectPersisted": False}, q.expected_outcome(kind, "ckpt"))
@@ -92,10 +126,17 @@ class InterruptionMatrixTests(unittest.TestCase):
             self.assertEqual({"released": True, "project": "unchanged", "effectPersisted": False}, q.expected_outcome("hmi_text_list_import", point))
         for point in ("hckp", "himp", "hred", "hsav"):
             self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome("hmi_text_list_import", point))
+        # The two gate kinds are target kinds too: a killed baseline compile or native write releases the unchanged project.
+        for kind in ("hmi_classic_import", "hmi_external_tag_create"):
+            self.assertEqual({"released": False, "effectPersisted": False}, q.expected_outcome(kind, "ckpt"))
+            for point in ("mut", "wrt", "comp"):
+                self.assertEqual({"released": True, "project": "unchanged", "effectPersisted": False}, q.expected_outcome(kind, point))
+            for point in ("save", "hckp", "hwrt", "hsav"):
+                self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome(kind, point))
 
     def test_scenario_names_stay_short(self):
         # The reconciliation retrieve root (base/scenario/ar_<12>) must stay within the worker's 70-character limit.
-        self.assertEqual(25, len(q.KIND_SCENARIOS))
+        self.assertEqual(41, len(q.KIND_SCENARIOS))
         self.assertTrue(all(len(name) <= 7 for name in q.KIND_SCENARIOS))
         self.assertFalse(set(q.KIND_SCENARIOS) & set(q.SCENARIOS))
         self.assertEqual(16, len(q.UPGRADE_SCENARIOS))

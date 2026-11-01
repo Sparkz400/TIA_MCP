@@ -62,7 +62,7 @@ SCENARIOS = {
 # Generic change_apply matrix: one fixture per reconciliation class, killed at each durable journal boundary.
 # Reconciliation depends on the kind only through its fingerprint route, so each class has one representative.
 # Kinds whose outcome fingerprint needs prepared in-memory targets (AdmissionReconcileRules.cs keeps the same set).
-TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hardware_attributes", "tag_set", "constant_set",
+TARGET_KINDS = {"hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hardware_attributes", "tag_set", "constant_set",
                 "block_attributes_set", "project_attributes_set", "connection_set", "software_unit_publication_set",
                 "db_snapshot_create", "db_snapshot_load_actual", "simulation_download_online", "testsuite_application_import", "testsuite_system_import",
                 "vci_workspace_create", "vci_workspace_delete", "vci_mapping_add", "vci_mapping_remove", "vci_synchronize", "vci_conflict_resolve",
@@ -104,13 +104,20 @@ TEXT_LIST_APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created
                             "hmi_unrelated_content_preserved", "changed_project_saved"]  # As journaled by a complete apply (run artifacts/ti1).
 TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp": (_IMPORTING, "worker"), "read": (_READING, "worker"), "comp": POINTS["comp"],
                     "save": POINTS["save"], "hckp": (POINTS["ckpt"][0], "host"), "himp": (_IMPORTING, "host"), "hred": (_READING, "host"), "hsav": (POINTS["save"][0], "host")}
+# hmi_classic_import and hmi_external_tag_create journal hmi_baseline_compiled and hmi_native_write_started back to back after the
+# baseline compile, and mutation_applied after the native write and its readback: worker loss during the compile (mut) and during
+# the write (wrt), Host loss at the checkpoint, the write and the save. The complete stages are qualify_hmi_gate_route.APPLIED_STAGES.
+_WRITING = lambda j: j.get("state") == "applying" and "hmi_native_write_started" in stages(j) and "mutation_applied" not in stages(j)
+GATE_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "wrt": (_WRITING, "worker"), "comp": POINTS["comp"], "save": POINTS["save"],
+               "hckp": (POINTS["ckpt"][0], "host"), "hwrt": (_WRITING, "host"), "hsav": (POINTS["save"][0], "host")}
+GATE_PROFILES = {"ci": ("classic-comfort",), "et": ("unified-comfort", "unified-pc")}  # The --hmi-fixture-profile each prefix runs on.
 
 
 def expected_outcome(kind, point):
     """Exact reconciliation and the effect an independent fresh read must find in the original project."""
     if point == "ckpt":
         return {"released": False, "effectPersisted": False}  # No complete hash-recorded checkpoint.
-    if point in ("mut", "comp", "imp", "read"):
+    if point in ("mut", "comp", "imp", "read", "wrt"):
         return {"released": True, "project": "unchanged", "effectPersisted": False}  # Never saved after the checkpoint.
     if point == "save":
         return {"released": False, "effectPersisted": True}  # Saved, but no applied outcome was journaled.
@@ -157,7 +164,7 @@ def technology_present(client):
     return TO_NAME in {o["name"] for o in read["technologyObjects"]}
 
 
-HMI_FIXTURE = None  # --hmi-fixture: an HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios.
+HMI_FIXTURE = None  # --hmi-fixture: the HMI fixture archive of the tl-*, ci-* and et-* scenarios.
 HMI_FIXTURE_PROFILE = "unified-comfort"  # --hmi-fixture-profile: the fixture's profile, admitted by the qualification Host.
 TEXT_LIST = "EntryTypes"  # Created by the boundary-values candidate.
 
@@ -166,8 +173,8 @@ def setup_scratch(scenario, client):
     scenario.step("tia_create_scratch", client.tool("tia_create_scratch"))
 
 
-def setup_text_list(scenario, client):
-    require(HMI_FIXTURE is not None, "tl-* scenarios need --hmi-fixture (HmiSeeder textlist-fixture checkpoint.zap21)")
+def setup_hmi_fixture(scenario, client):
+    require(HMI_FIXTURE is not None, "tl-*, ci-* and et-* scenarios need --hmi-fixture")
     scenario.step("project_retrieve HMI fixture", client.tool("project_retrieve", {
         "archivePath": str(HMI_FIXTURE), "expectedSha256": hashlib.sha256(HMI_FIXTURE.read_bytes()).hexdigest()}))
 
@@ -175,6 +182,37 @@ def setup_text_list(scenario, client):
 def text_list_host_arguments():
     """The qualification-only admission of the fixture's profile (the production gate ships with no profile)."""
     return ["--hmi-text-list-qualification", HMI_FIXTURE_PROFILE]
+
+
+def gate_host_arguments():
+    """The qualification-only admission of hmi_classic_import and hmi_external_tag_create (no production profile yet)."""
+    return ["--hmi-change-qualification", HMI_FIXTURE_PROFILE]
+
+
+def prepare_classic_import(scenario, client):
+    """BackColor of HMI_RT_1/Overview_A on the configured Classic Comfort fixture."""
+    from qualify_hmi_gate_route import BACKCOLOR, classic_fixture, devices, prepare, scalar
+    row = classic_fixture(client, devices(client, "classic"))["HMI_RT_1"]["Overview_A"]
+    return scenario.step("change_prepare hmi_classic_import", prepare(client, "hmi_classic_import", scalar(row, BACKCOLOR)))
+
+
+def classic_import_present(client):
+    from qualify_hmi_gate_route import BACKCOLOR, classic_fixture, devices, export, root_attribute
+    hmis = devices(client, "classic")
+    return root_attribute(export(client, hmis["HMI_RT_1"], classic_fixture(client, hmis)["HMI_RT_1"]["Overview_A"]), "BackColor") == BACKCOLOR
+
+
+def prepare_external_tag(scenario, client):
+    """A root PLC tag on HMI_RT_1 (QualificationExternal -> its PLC's SharedSignal)."""
+    from qualify_hmi_gate_route import EXTERNAL, devices, external, prepare, unified_fixture
+    fixture = unified_fixture(client, devices(client, "unified"))["HMI_RT_1"]
+    return scenario.step("change_prepare hmi_external_tag_create", prepare(client, "hmi_external_tag_create", external(fixture, EXTERNAL, "root")))
+
+
+def external_tag_present(client):
+    from qualify_hmi_gate_route import EXTERNAL, devices, rows
+    device = devices(client, "unified")["HMI_RT_1"]
+    return any(r["identity"]["kind"] == "hmiTag" and r["name"] == EXTERNAL for r in rows(client, device, "tags").values())
 
 
 def prepare_text_list(scenario, client):
@@ -193,7 +231,9 @@ def text_list_present(client):
 KINDS = {"su": ("source_upsert", prepare_source, source_present, setup_scratch, POINTS),
          "hw": ("hardware_plug", prepare_hardware, hardware_present, setup_scratch, POINTS),
          "to": ("to_create", prepare_technology, technology_present, setup_scratch, POINTS),
-         "tl": ("hmi_text_list_import", prepare_text_list, text_list_present, setup_text_list, TEXT_LIST_POINTS)}
+         "tl": ("hmi_text_list_import", prepare_text_list, text_list_present, setup_hmi_fixture, TEXT_LIST_POINTS),
+         "ci": ("hmi_classic_import", prepare_classic_import, classic_import_present, setup_hmi_fixture, GATE_POINTS),
+         "et": ("hmi_external_tag_create", prepare_external_tag, external_tag_present, setup_hmi_fixture, GATE_POINTS)}
 KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix, row in KINDS.items() for point in row[4]}
 
 # project_upgrade (X01) of the two small public examples, each copied into its scenario's inputs as qualify_project_upgrade.py does.
@@ -399,6 +439,9 @@ class Scenario:
         trigger, mode = points[point]
         if prefix == "tl":
             self.host_arguments = text_list_host_arguments()
+        elif prefix in GATE_PROFILES:
+            require(HMI_FIXTURE_PROFILE in GATE_PROFILES[prefix], f"{prefix}-* scenarios run on --hmi-fixture-profile {' or '.join(GATE_PROFILES[prefix])}")
+            self.host_arguments = gate_host_arguments()
         expected = self.report["expected"] = expected_outcome(kind, point)
         self.report.update({"kind": kind, "point": point, "reconciliationClass": reconciliation_class(kind)})
         client = self.client()
@@ -461,10 +504,14 @@ class Scenario:
         require(persisted == expected["effectPersisted"], f"Independent read found effectPersisted={persisted}")
         self.report.update({"effectPersisted": persisted, "checkpointRecovered": bool(archive_hash) and expected["released"],
                             "journalStagesAtEnd": stages(final), "journalStateAtEnd": final.get("state")})
-        if prefix == "tl" and mode == "host":
-            # After Host loss the worker finishes alone: the journal must end applied with every stage of a complete import.
-            require(final.get("state") == "applied" and stages(final) == TEXT_LIST_APPLIED_STAGES,
-                    f"The worker did not complete the text-list apply after Host loss: {final.get('state')} {stages(final)}")
+        if mode == "host" and (prefix == "tl" or prefix in GATE_PROFILES):
+            # After Host loss the worker finishes alone: the journal must end applied with every stage of a complete apply.
+            from qualify_hmi_gate_route import APPLIED_STAGES
+            require(final.get("state") == "applied" and stages(final) == (TEXT_LIST_APPLIED_STAGES if prefix == "tl" else APPLIED_STAGES),
+                    f"The worker did not complete the {kind} apply after Host loss: {final.get('state')} {stages(final)}")
+        if mode == "worker" and prefix in GATE_PROFILES:
+            # The kill landed inside its boundary (mut: during the baseline compile, before the two back-to-back stages).
+            require(trigger(final), f"The worker was not stopped inside the {point} boundary: {final.get('state')} {stages(final)}")
         self.report["passed"] = True
         return self.report
 
@@ -827,8 +874,10 @@ def main():
                         help="An original public example for the pf-*/pa-* scenarios (TinyMySQLClient_V15.ap15, TinyMySQLClient_V14_1.zap14); only read and copied")
     parser.add_argument("--existing", nargs=2, action="append", default=[], metavar=("ARTIFACTS", "ADMISSION_ID"))
     parser.add_argument("--report", type=pathlib.Path, required=True)
-    parser.add_argument("--hmi-fixture", type=pathlib.Path, help="HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios")
-    parser.add_argument("--hmi-fixture-profile", choices=("unified-comfort", "unified-pc"), default="unified-comfort")
+    parser.add_argument("--hmi-fixture", type=pathlib.Path,
+                        help="tl-*: an HmiSeeder textlist-fixture checkpoint.zap21; ci-*/et-*: a configured.zap21 (scripts/prepare_hmi_fixture_ui.py) or, "
+                             "for unified-pc, the seeded HmiSeeder baseline (artifacts/q/hps/unified-pc/baseline.zap21)")
+    parser.add_argument("--hmi-fixture-profile", choices=("classic-comfort", "unified-comfort", "unified-pc"), default="unified-comfort")
     args = parser.parse_args()
     global HMI_FIXTURE, HMI_FIXTURE_PROFILE
     HMI_FIXTURE = args.hmi_fixture.resolve(strict=True) if args.hmi_fixture else None
