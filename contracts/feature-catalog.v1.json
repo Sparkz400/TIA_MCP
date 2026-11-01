@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.87",
+  "catalogVersion": "0.4.88",
   "targetTiaVersions": [
     21
   ],
@@ -3595,6 +3595,24 @@
         "Only the offline DownloadProvider memory-card route (simulation_download) was tried; the online PLCSIM download route (simulation_download_online) is untested for an F-CPU.",
         "No safety acceptance, login or password; the scratch user's fail-safe access exists in the owned scratch only."
       ]
+    },
+    {
+      "id": "local.provision.card_move.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "2ebc9e2c078dcf7c0ba10ad877cff0472e1dd019",
+        "passedScope": "Five owned scratch credential-provisioning runs (scripts/qualify_plcsim_signals.py with the discovery baseline taken before registration, Debug build of 074d1fb2) on an owned Softbus PLCSIM V8 instance with the card-move diagnostics of b2ef8818 and the UTC row time. Each run made six card moves, every one on its first attempt with no refusal, no HRESULT and no holder query: the 0x80070005 card-staging refusal of 23 October did not reproduce in 5 instrumented runs."
+      },
+      "artifacts": [
+        "evidence/local.provision.card_move.20261101.json"
+      ],
+      "limitations": [
+        "A non-reproduction is not a fix: the cause of the single 23 October refusal stays unidentified; the diagnostics name the holder if it recurs.",
+        "Runs used the signals runner, not the runtime batch that failed on 23 October; one PC and one PLCSIM Runtime Manager state; no physical PLC.",
+        "Run p1 refused at discovery before any card move (Runtime Manager placeholder, no baseline) and is not counted."
+      ]
     }
   ],
   "features": [
@@ -5490,7 +5508,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.sim.provision.20261024",
-          "local.runtime.timers.20261029"
+          "local.runtime.timers.20261029",
+          "local.provision.card_move.20261101"
         ]
       },
       "availability": {
@@ -5538,7 +5557,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_diagnostics.20261028"
+          "local.plcsim_diagnostics.20261028",
+          "local.provision.card_move.20261101"
         ]
       },
       "availability": {
