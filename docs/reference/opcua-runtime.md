@@ -58,7 +58,7 @@ An expired or not-yet-valid identity remains inspectable but refuses new connect
 
 ## Server methods, conditions and history
 
-`runtime_ua_call` calls one method component of an object in the PLC namespace; on an S7-1500 these are the methods a user program provides with `OPC_UA_ServerMethodPre` and `OPC_UA_ServerMethodPost` (the ua-services run records which methods the namespace exposes). It takes `bindingSha256` and `acknowledgeCall` and passes the same owned-PLCSIM gate as `runtime_ua_write` before anything is sent. `objectNode` is the method's instance (the instance DB, for example `"ServerMethod_DB"`) and `methodNode` the Method that `runtime_ua_browse` lists below it. The Host then checks, on the server, that:
+`runtime_ua_call` calls one method component of an object in the PLC namespace; on an S7-1500 these are the methods a user program provides with `OPC_UA_ServerMethodPre` and `OPC_UA_ServerMethodPost`. It takes `bindingSha256` and `acknowledgeCall` and passes the same owned-PLCSIM gate as `runtime_ua_write` before anything is sent. `objectNode` is the method's instance (the instance DB, for example `"ServerMethod_DB"`) and `methodNode` the Method that `runtime_ua_browse` lists below it. The Host then checks, on the server, that:
 
 - both nodes are in the PLC namespace `http://www.siemens.com/simatic-s7-opcua` and the server has that namespace, so standard server methods (`ConditionRefresh`, `Acknowledge`, `GetMonitoredItems`) and other namespaces refuse with `UaMethodNotServerMethod` (the session check also requires namespace index 0 to be the standard OPC UA namespace);
 - a bounded browse finds the method as a `HasComponent` child of the object (`UaMethodNotServerMethod`; more than 64 methods is `UaMethodSetLimit`);
