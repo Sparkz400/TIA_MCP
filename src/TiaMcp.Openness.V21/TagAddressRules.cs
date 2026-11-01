@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace TiaMcp.Openness.V21
 {
-    // A PLC tag on an F-I/O address becomes a safety tag in TIA. tag_create decides this before creating anything by
-    // comparing the requested absolute address with the F-I/O address ranges of the selected PLC.
+    // A PLC tag on an F-I/O address becomes a safety tag in TIA. tag_create, tag_set and tag_table_import_xml decide this before
+    // writing anything by comparing each requested absolute address with the F-I/O address ranges of the selected PLC.
     internal static class TagAddressRules
     {
         // International (I/Q) and German (E/A) mnemonics; bit, byte, word, double word and long word accesses.
@@ -26,6 +27,10 @@ namespace TiaMcp.Openness.V21
             int bytes = "BWDL".IndexOf(char.ToUpperInvariant(match.Groups["size"].Value[0])) switch { 0 => 1, 1 => 2, 2 => 4, _ => 8 };
             return (ioType, int.Parse(match.Groups["start"].Value) * 8, bytes * 8);
         }
+
+        /// <summary>Every PLC tag's LogicalAddress in a SimaticML tag-table document (user constants have none).</summary>
+        internal static string[] TagTableAddresses(XDocument document) =>
+            document.Descendants("SW.Tags.PlcTag").Select(tag => tag.Element("AttributeList")?.Element("LogicalAddress")?.Value).Where(address => address != null).ToArray();
 
         /// <summary>The first F-I/O range (ioType, start byte, length in bits, path) the address overlaps, or null.</summary>
         internal static string FIoOverlap(string logicalAddress, IEnumerable<(string IoType, int StartByte, int LengthBits, string Path)> fIoRanges)

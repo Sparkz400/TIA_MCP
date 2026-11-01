@@ -104,6 +104,7 @@ namespace TiaMcp.Openness.V21
                 if (attrs.Count == 0) throw new BridgeException("InvalidRequest", "attributes must contain at least one editable field.");
                 var allow = new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal);
                 if (attrs["Name"] != null) RejectTagNameCollision(change, plc, ChangeText(attrs, "Name", 128), member);
+                if (change.Kind == "tag_set" && attrs["LogicalAddress"] != null) RejectFIoAddresses(plc, new[] { ChangeText(attrs, "LogicalAddress", 1024) });
                 change.AttributeTarget = member;
                 ((JArray)preview["effects"]).Add(new JObject { ["memberName"] = change.Payload["memberName"], ["attributes"] = PrepareAttributes(member, attrs, allow) });
             }
@@ -122,7 +123,12 @@ namespace TiaMcp.Openness.V21
                 if (table.Tags.Any(item => item.Name == name) || table.UserConstants.Any(item => item.Name == name))
                     throw new BridgeException("MutationVerificationFailed", "Deleted member still exists.");
             }
-            else ApplyAttributes(member, ChangeObject(change.Payload, "attributes"), new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal));
+            else
+            {
+                var attrs = ChangeObject(change.Payload, "attributes");
+                if (change.Kind == "tag_set" && attrs["LogicalAddress"] != null) RejectFIoAddresses(plc, new[] { ChangeText(attrs, "LogicalAddress", 1024) });
+                ApplyAttributes(member, attrs, new HashSet<string>(new[] { "Name", "DataTypeName", change.Kind == "constant_set" ? "Value" : "LogicalAddress" }, StringComparer.Ordinal));
+            }
         }
 
         private static void RejectTagNameCollision(EngineeringChange change, PlcSelection plc, string name, IEngineeringObject except)
@@ -153,10 +159,8 @@ namespace TiaMcp.Openness.V21
             bool constant = change.Kind == "constant_create";
             string name = ChangeText(change.Payload, "name", 128), type = ChangeText(change.Payload, "dataTypeName", 256), detail = ChangeText(change.Payload, constant ? "value" : "logicalAddress", 1024);
             RejectTagNameCollision(change, plc, name, null);
-            // A tag on an F-I/O address becomes a safety tag; refuse before creating anything (sl3 created it, then refused).
-            if (!constant && TagAddressRules.Io(detail) != null && TagAddressRules.FIoOverlap(detail, FIoAddressRanges(plc)) is string fIo)
-                throw new BridgeException("SafetyBoundary", "The address " + detail + " lies in the address range of the F-I/O " + fIo +
-                    "; a tag there becomes a safety tag, which generic tag creation excludes. Nothing was created.", new JObject { ["logicalAddress"] = detail, ["fIoPath"] = fIo });
+            // Before creating anything (native run sl3 created the tag, then refused it as a safety tag).
+            if (!constant) RejectFIoAddresses(plc, new[] { detail });
             if (!apply) return;
             if (constant)
             {

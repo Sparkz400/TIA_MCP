@@ -577,6 +577,7 @@ namespace TiaMcp.Openness.V21
                     if (types) PrepareTypeTargets(change, plc, effects);
                     else
                     {
+                        RejectFIoAddresses(plc, TagAddressRules.TagTableAddresses(document));
                         var allTables = AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags).ToArray();
                         var importedSymbols = document.Descendants().Where(element => element.Name == "SW.Tags.PlcTag" || element.Name == "SW.Tags.PlcUserConstant")
                             .Select(element => element.Element("AttributeList")?.Element("Name")?.Value).ToArray();
@@ -984,6 +985,7 @@ namespace TiaMcp.Openness.V21
                     VerifyExpectedTypesExist(change, SelectPlc(change.Selector));
                     break;
                 case "tag_table_import_xml":
+                    RejectFIoAddresses(SelectPlc(change.Selector), TagAddressRules.TagTableAddresses(EngineeringSources.ReadXml(File.ReadAllText(change.InputPath))));
                     MutationTagGroup(change, SelectPlc(change.Selector)).TagTables.Import(new FileInfo(change.InputPath), ImportOptions.Override);
                     if (change.ObjectNames.Any(name => !MutationTagGroup(change, SelectPlc(change.Selector)).TagTables.Any(table => string.Equals(table.Name, name, StringComparison.OrdinalIgnoreCase))))
                         throw new BridgeException("ImportVerificationFailed", "Not all expected tag tables exist in the selected destination after import.");

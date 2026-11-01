@@ -21,6 +21,16 @@ internal static class TagAddressChecks
         Check(TagAddressRules.FIoOverlap("%I11.3", ranges) == "/fdq" && TagAddressRules.FIoOverlap("%Q3.7", ranges) == "/fdi", "direction and range select the F-I/O");
         Check(TagAddressRules.FIoOverlap("%Q4.0", ranges) == null && TagAddressRules.FIoOverlap("%M0.0", ranges) == null, "other directions and bit memory never overlap");
         Check(TagAddressRules.FIoOverlap("%I0.0", new[] { ("Input", 0, 0, "/empty") }) == null, "a zero-length range overlaps nothing");
+
+        // tag_table_import_xml checks every imported tag's address; user constants carry none.
+        var table = System.Xml.Linq.XDocument.Parse("<Document><SW.Tags.PlcTagTable ID=\"0\"><ObjectList>" +
+            "<SW.Tags.PlcTag ID=\"1\" CompositionName=\"Tags\"><AttributeList><DataTypeName>Bool</DataTypeName><LogicalAddress>%M200.0</LogicalAddress><Name>A</Name></AttributeList></SW.Tags.PlcTag>" +
+            "<SW.Tags.PlcTag ID=\"2\" CompositionName=\"Tags\"><AttributeList><DataTypeName>Bool</DataTypeName><LogicalAddress>%I1.0</LogicalAddress><Name>B</Name></AttributeList></SW.Tags.PlcTag>" +
+            "<SW.Tags.PlcUserConstant ID=\"3\" CompositionName=\"UserConstants\"><AttributeList><DataTypeName>Int</DataTypeName><Name>C</Name><Value>1</Value></AttributeList></SW.Tags.PlcUserConstant>" +
+            "</ObjectList></SW.Tags.PlcTagTable></Document>");
+        var addresses = TagAddressRules.TagTableAddresses(table);
+        Check(addresses.SequenceEqual(new[] { "%M200.0", "%I1.0" }), "a tag-table document yields every tag's address and no constant");
+        Check(addresses.Select(a => TagAddressRules.FIoOverlap(a, ranges)).Where(path => path != null).SequenceEqual(new[] { "/fdi" }), "the imported F-DI address is the one that overlaps");
         return count;
     }
 }

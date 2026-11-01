@@ -129,6 +129,18 @@ namespace TiaMcp.Openness.V21
             return ranges;
         }
 
+        // A tag on an F-I/O address becomes a safety tag; tag_create, tag_set and tag_table_import_xml refuse it before writing.
+        private static void RejectFIoAddresses(PlcSelection plc, IEnumerable<string> addresses)
+        {
+            var io = addresses.Where(address => TagAddressRules.Io(address) != null).ToArray();
+            if (io.Length == 0) return;
+            var ranges = FIoAddressRanges(plc);
+            foreach (var address in io)
+                if (TagAddressRules.FIoOverlap(address, ranges) is string fIo)
+                    throw new BridgeException("SafetyBoundary", "The address " + address + " lies in the address range of the F-I/O " + fIo +
+                        "; a tag there becomes a safety tag, which standard tag changes exclude. Nothing was written.", new JObject { ["logicalAddress"] = address, ["fIoPath"] = fIo });
+        }
+
         // The catalog type of an F-I/O: its own, else its direct parent module's (an ET 200SP F-I/O item has none). Never a rack's.
         private static string FIoModuleTypeIdentifier(DeviceItem item) =>
             FParameterAllowlistRules.ModuleKey(item.TypeIdentifier, (item.Parent as DeviceItem)?.TypeIdentifier)
