@@ -21,6 +21,8 @@ capture always left that session reusable. Explicit disconnect, a new attempt
 and a fresh symbol selection are required; neither the production repair nor
 the harness may revive the old session or automatically replay acquisition.
 
+> **Superseded 1 November 2026:** a caller's cancellation during identity verification no longer retires the session. The session stays connected and re-verifies before its next request, so nothing runs on an unverified session; every failed check still retires it. Stopping a capture could otherwise retire the session at random (route-gate run rgn2). Evidence: `local.runtime.plcsim-tcpip.route-gate.20261101`.
+
 Separately, the poller treated a completed delay as proof that its scheduled
 time had arrived. An early callback could therefore acquire a slot early, even
 one at the exact duration boundary. The failed live receipt does not record the

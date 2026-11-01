@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "a22ec8d6d4253dceb88395ec44a207d19391687aa33201229309bdced008a85c",
-      "bytes": 1615922
+      "sha256": "a2a95d6ee4bbe872d6ab67bd03c65f2d4c5c0a5de20b6a4063a88867a9c25355",
+      "bytes": 1617495
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -1412,8 +1412,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
-      "sha256": "51dbe758d5a0582ff2b8fa6941180ba00b8c4eee9889bc280883079b5313d583",
-      "bytes": 21591
+      "sha256": "71e9d611479cd0317ebd6bc43117aacb61d5d0ff5e3b6bef3fcbef4d2688589a",
+      "bytes": 21820
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
@@ -1972,8 +1972,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
-      "sha256": "bbc6381f8a226ccedabe6ee2c80d575466e7652d0bcee326d300672518b0c42d",
-      "bytes": 5610
+      "sha256": "c3cb98f481c396d628fbb871cc69f77132e70bb5aa9b297395eb5906a08c1877",
+      "bytes": 5711
     },
     {
       "path": "src/TiaMcp.Host/OpcUaTools.cs",
@@ -2277,8 +2277,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionContracts.cs",
-      "sha256": "cc65afb84d97f85ea9ceea713d36ad9fe8701a5f625fa5b119b488d6ec92b022",
-      "bytes": 12804
+      "sha256": "09f3198f51dc08893950e7cadcfa6d4642fc0585e6fbef3be2792896f86e9642",
+      "bytes": 12803
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionStore.cs",
@@ -10569,8 +10569,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -11732,8 +11732,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -17905,8 +17905,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "BrowseAsync",
-          "line": 232,
-          "endLine": 236,
+          "line": 234,
+          "endLine": 238,
           "sha256": "5adcd38b3b541ef2d6d5d7282ae1b830b8f10e078a04955049f61f8aa1038976"
         },
         {
@@ -24020,15 +24020,15 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Query",
-          "line": 216,
-          "endLine": 224,
+          "line": 218,
+          "endLine": 226,
           "sha256": "96a63ff742d2ce257545e0dc6e45495aa18f0c6f7588f46f117b503df10f3ab2"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -29910,8 +29910,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -34297,8 +34297,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -42015,8 +42015,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -120951,6 +120951,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -123240,6 +123247,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -123463,6 +123477,13 @@
           "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47",
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
+          ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
           ]
         }
       ],
@@ -123824,6 +123845,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -124027,6 +124055,13 @@
           "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47",
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
+          ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
           ]
         }
       ],
@@ -130950,6 +130985,11 @@
       "sha256": "1e07b43e2efd5a4cac3c520dd652c1b419d382853ee8ac506a71e9c94632449c"
     },
     {
+      "path": "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json",
+      "state": "observed",
+      "sha256": "97f4a1963ce37719139324aa91099ccb9b53f08ba5c9378c717cbe9dd3263db2"
+    },
+    {
       "path": "evidence/local.runtime.plcsim-ua-services.20261031.json",
       "state": "observed",
       "sha256": "fada8ebdec9415ffe67f6c3683f4236294a8769851d888aaf112a1cdb45687f4"
@@ -131859,6 +131899,10 @@
     {
       "id": "local.runtime.plcsim-tcpip.20261029",
       "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47"
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+      "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441"
     },
     {
       "id": "local.runtime.plcsim-ua-services.20261031",

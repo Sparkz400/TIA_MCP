@@ -186,19 +186,19 @@ def run_capture_cancellation_check(client, attempt, selection, state, output, ch
                 check(entered.wait(5), 'Identity verification entered the explicit cancellation gate')
                 status = wait(identity)
                 observed = client.tool('runtime_web_status', dict(attemptId=attempt))
-                check(observed['state'] == 'remoteSessionUnknown' and observed['errorCode'] == 'RuntimeCancelled'
-                      and observed['readAvailability'] == 'permissionUnknown', 'Cancelled identity verification keeps the old session unusable')
+                # A caller's cancellation is not a failed check: the session stays connected and re-verifies before its next request.
+                check(observed['state'] == 'connected', 'Cancelled identity verification keeps the session usable')
                 check(state['calls'][before:] == ['Api.GetSessionInfo'], 'Cancelled identity verification dispatches no value read or automatic login')
-                extra['invalidatedSession'] = observed
-                refused_id = uuid.uuid4().hex
-                refused_before = len(state['calls'])
-                extra['oldAttemptRefusal'] = capture_call(client, 'start', dict(captureId=refused_id, request=request), check, 'RuntimeSessionUnavailable')
-                check(len(state['calls']) == refused_before and not (output/'store/runtime-captures'/refused_id).exists(),
-                      'Unusable old attempt refuses before network dispatch or new capture intent')
-                extra['refusedCaptureId'] = refused_id
+                extra['cancelledSession'] = observed
             finally:
                 released.set()
                 state.pop('sessionInfoGate', None)
+            reused_before = len(state['calls'])
+            extra['reusedRead'] = client.tool('runtime_web_read', dict(attemptId=attempt, selectionId=selection))
+            extra['reusedCalls'] = state['calls'][reused_before:]
+            calls = extra['reusedCalls']
+            check(calls[:1] == ['Api.GetSessionInfo'] and calls[-1:] == ['PlcProgram.Read'] and 'Api.Login' not in calls,
+                  'The kept session re-verifies its identity before the next value read, without login')
             rows = call('page', snapshotRef=status['snapshotRef'])['rows']
             check(status['recordedProgress']['terminalReason'] == 'durationLimit'
                   and len([r for r in rows if r['kind'] == 'read']) == 1

@@ -88,6 +88,8 @@ full loopback workflow passes 1,605 checks with four explicitly isolated
 cancellation scenarios, seven sequencing mutation controls, the existing
 lifecycle oracle and 62 actual prior-capture compatibility checks. Its retained
 receipt is `artifacts/runtime-capture-sequencing-20261020/verification.json`.
+
+> **Superseded 1 November 2026:** a caller's cancellation during identity verification no longer retires the session. The session stays connected and re-verifies before its next request, so nothing runs on an unverified session; every failed check still retires it. Stopping a capture could otherwise retire the session at random (route-gate run rgn2). Evidence: `local.runtime.plcsim-tcpip.route-gate.20261101`.
 The repaired integration freeze above passes full offline validation. Identity
 invalidation remains unchanged.
 

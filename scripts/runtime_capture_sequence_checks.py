@@ -53,10 +53,11 @@ def verify(document, rpc_methods):
         reason = 'stopped' if row['scenario'] == 'explicitStop' else 'durationLimit'
         assert status['recordedProgress']['terminalReason'] == reason
         if row['scenario'] == 'verificationCancellation':
-            assert observed == scenario['invalidatedSession']
-            assert observed['state'] == 'remoteSessionUnknown' and observed['errorCode'] == 'RuntimeCancelled'
-            assert scenario['oldAttemptRefusal']['error']['code'] == 'RuntimeSessionUnavailable'
-            assert rpc_methods[selected_end:captured_end] == ['Api.GetSessionInfo']
+            # A cancelled verification keeps the session; its next read re-verifies first and never logs in again.
+            assert scenario['cancelledSession']['state'] == observed['state'] == 'connected'
+            reused = scenario['reusedCalls']
+            assert reused[:1] == ['Api.GetSessionInfo'] and reused[-1:] == ['PlcProgram.Read']
+            assert rpc_methods[selected_end:captured_end] == ['Api.GetSessionInfo'] + reused
             reads = [r for r in original['rows'] if r['kind'] == 'read']
             assert len(reads) == 1 and reads[0]['errorCode'] == 'RuntimeCancelled' and reads[0]['readResultJson'] is None
     assert not document['nativeQualified']
@@ -67,7 +68,7 @@ def negative_controls(document, rpc_methods):
     for name, mutate in (
         ('reused old attempt', lambda d: d['scenarios'][1]['connected'].update(attemptId=d['scenarios'][0]['connected']['attemptId'])),
         ('reused old selection', lambda d: d['scenarios'][1]['selection'].update(selectionId=d['scenarios'][0]['selection']['selectionId'])),
-        ('invented healthy cancelled session', lambda d: d['scenarios'][1]['observed'].update(state='connected')),
+        ('invented unusable cancelled session', lambda d: d['scenarios'][1]['observed'].update(state='remoteSessionUnknown')),
         ('omitted explicit close', lambda d: d['scenarios'][0]['closed'].update(state='connected')),
         ('cross-session capture intent', lambda d: d['scenarios'][1]['capture']['request'].update(attemptId=d['scenarios'][0]['connected']['attemptId'])),
         ('rewritten original cancellation', lambda d: d['scenarios'][1]['capture']['status']['recordedProgress'].update(terminalReason='sampleLimit')),

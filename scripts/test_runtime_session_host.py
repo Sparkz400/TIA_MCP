@@ -169,7 +169,7 @@ def main():
         check(call(c,'read',{**readargs,'representation':'raw'})['value']==[0,255,17],'Raw byte read')
         retained_captures=run_capture_checks(c,attempt,sid,state,out,check)
         # Every deliberate cancellation gets one explicitly requested fresh session.
-        # Cancellation may invalidate identity verification; no scenario resumes it.
+        # A cancelled identity verification keeps the session, which re-verifies before its next request.
         sequence={'nativeQualified':False,'scenarios':[]}
         sequence['ordinarySessionClosed']=call(c,'disconnect',dict(attemptId=attempt))
         check(sequence['ordinarySessionClosed']['state']=='closed','Close ordinary capture session before deliberate cancellation scenarios')
