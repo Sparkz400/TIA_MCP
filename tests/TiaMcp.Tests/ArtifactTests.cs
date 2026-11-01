@@ -41,6 +41,15 @@ internal static partial class Program
             Check.Equal(retryable ? 1450 : 0, delays.Sum());
         }
 
+        // 0x498 without a backup: the destination is already gone, so the replacement is renamed into place once, never retried.
+        calls = 0; delays.Clear(); int moves = 0;
+        JournalFileReplacement.Replace(() => { calls++; throw new IOException("rename failed", unchecked((int)0x80070498)); }, delays.Add, () => moves++);
+        Check.Equal(1, calls); Check.Equal(1, moves); Check.Equal(0, delays.Count);
+        Exception? partial = null;
+        try { JournalFileReplacement.Replace(() => throw new IOException("partial replacement", unchecked((int)0x80070499)), delays.Add, () => moves++); }
+        catch (IOException error) { partial = error; }
+        Check.Equal(true, partial is not null && moves == 1);
+
         calls = 0;
         var interrupted = new OperationCanceledException();
         try
