@@ -144,15 +144,31 @@ multi-instance whose caller has dependents, with `DependencyProfileUnavailable`,
 route's own closure (`TypedDependentPaths`, shared with `CaptureTypedDependents`): the caller's instance DBs, embedding
 parents and their users. The worker's shared-mutation scope resolution evaluates the same pre-claim refusal for every
 unclaimed combined apply, so `mutation_begin` fails, the Host writes no admission record and nothing becomes
-`recovery_required`. `qualify_library_integrate_apply.py --candidates` at dc805b70 (frozen `artifacts/w4d`,
-`artifacts/ic6/ia69883`) passed (`local.library_integrate.candidate_shapes.dependents.20261101`):
+`recovery_required`. Since 195f63a3 this runs after the scope's own offline, PreviewStale and source checks (which keep
+their codes) and at `mutation_begin` only. The first candidate run at dc805b70 (`artifacts/ic6`) passed with the earlier
+placement; its record is retired to `docs/history/catalog-evidence-retired-20261101.json`. At 195f63a3 (frozen
+`artifacts/w4f`):
 
-- the six cases above installed again;
-- `multiInstanceDependents`: `TiaMcpComponentHost` with its own `TiaMcpComponentHost_DB` previewed `eligible: false` with
-  `refusalCode` `DependencyProfileUnavailable` naming that DB, and `change_apply` was refused "before admission" with that
-  code;
-- the Host's admission records were unchanged, the plan stayed prepared without a claim, and the scratch equalled its
-  baseline.
+- `qualify_library_integrate_apply.py --candidates` (`artifacts/ic7/ie57b80`) passed
+  (`local.library_integrate.candidate_shapes.dependents.rerun.20261101`):
+  - the six cases above installed again;
+  - `multiInstanceDependents`: `TiaMcpComponentHost` with its own `TiaMcpComponentHost_DB` previewed `eligible: false`
+    with `refusalCode` `DependencyProfileUnavailable` naming that DB, and `change_apply` was refused "before admission"
+    with that code;
+  - the Host's admission records were the same before and after, the plan stayed prepared without a claim, and the
+    scratch equalled its baseline.
+- The verified-flow regression without `--candidates` (`artifacts/ir2/i9ca1e1`) passed
+  (`local.library_integrate.combined_apply.regression.20261101`):
+  - the standalone and existing FBD FC installs passed every gate;
+  - the FBD OB caller, the FBD FB caller with a multi-instance of a freshly imported FB, and that plan on a Host without
+    the former flag were each refused with `PlcIntegrationNotQualified` and their preview texts, prefixed "Combined apply
+    refused before admission";
+  - each refusal left the Host's admission records unchanged and the plan prepared;
+  - every admission record of the run ended `returned`, and no journal was `recovery_required`.
+- An earlier attempt at 4f03c1ef (`artifacts/ir1`, not curated) stopped at `defaultHost`: the runner's `refusals()` left
+  `multiInstance` set, so the standalone plan became a multi-instance plan (`InvalidIntegrationRecipe`). Its three
+  refusals had already passed with the expected codes. 166f9fd6 starts each case from the base manifest and makes
+  `refused_apply` check the pre-admission message and the admission records.
 
 The structured dependent-DB effect itself is not captured.
 

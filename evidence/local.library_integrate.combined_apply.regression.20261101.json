@@ -1,0 +1,70 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.combined_apply.regression.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T06:08:15+00:00",
+  "source": {
+    "commit": "195f63a375a43e6ea382706c95de56580b23a377",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py without --candidates at 195f63a3 (frozen artifacts/w4f, --artifacts artifacts/ir2), owned de-DE-only CPU 1511-1 PN V4.1 scratch projects: standalone and existing FBD FC installs passed every gate; the FBD OB caller and the FBD FB caller with a multi-instance of a freshly imported FB (former flag), and the same FB multi-instance plan on a Host without the former flag, were each refused with PlcIntegrationNotQualified and the message 'Combined apply refused before admission: ...', with the Host's admission records the same before and after, the plan still prepared without a claim and the project unchanged.",
+  "limitations": [
+    "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4bf625b2f8cde84edff5e50f14e7aeac334fc00a9a1728c6a155a1d90559d60f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "974db1eebceffb22d5d385cc21de17cc632c6c5a7aa421cbb6b5bbbdae854c37"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "74486ba2b567f0204d62975deec19f023fcb4642363110d0710d72de20d20e0e",
+      "bytes": 7423181,
+      "completed": true,
+      "steps": [
+        "author",
+        "install:createStandaloneFc",
+        "install:existing",
+        "refusals",
+        "defaultHost"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}
