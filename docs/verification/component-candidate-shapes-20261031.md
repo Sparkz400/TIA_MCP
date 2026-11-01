@@ -139,6 +139,23 @@ was gone afterwards):
 `VerifiedShapes` now lists `fbCaller+multiInstance+reusedComponent`, and the template is deployed without
 `qualificationOnly`.
 
+A caller FB with dependents is refused before admission (dc805b70). `PlcCombinedApplyTargetRefusal` refuses a reused-FB
+multi-instance whose caller has dependents, with `DependencyProfileUnavailable`, naming them. The dependents are the typed
+route's own closure (`TypedDependentPaths`, shared with `CaptureTypedDependents`): the caller's instance DBs, embedding
+parents and their users. The worker's shared-mutation scope resolution evaluates the same pre-claim refusal for every
+unclaimed combined apply, so `mutation_begin` fails, the Host writes no admission record and nothing becomes
+`recovery_required`. `qualify_library_integrate_apply.py --candidates` at dc805b70 (frozen `artifacts/w4d`,
+`artifacts/ic6/ia69883`) passed (`local.library_integrate.candidate_shapes.dependents.20261101`):
+
+- the six cases above installed again;
+- `multiInstanceDependents`: `TiaMcpComponentHost` with its own `TiaMcpComponentHost_DB` previewed `eligible: false` with
+  `refusalCode` `DependencyProfileUnavailable` naming that DB, and `change_apply` was refused "before admission" with that
+  code;
+- the Host's admission records were unchanged, the plan stayed prepared without a claim, and the scratch equalled its
+  baseline.
+
+The structured dependent-DB effect itself is not captured.
+
 ## Clean rerun — 31 October 2026
 
 Frozen Debug builds of the worker, Host and `LibraryUnitSeeder` under `artifacts/` (no subst drive), one owned TIA

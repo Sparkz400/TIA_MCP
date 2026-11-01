@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.88",
-    "catalogSha256": "4f43ec88fbe570cb0cfa97f58cce95c77309df469d8ae4863ebcaf1320fe58c5",
+    "catalogSha256": "97ad7bb13bcb5efc3a4fd85ea215f06f0bf062e5e0b8069de6bdb823d579ff4d",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -8426,7 +8426,8 @@
         "local.library_integrate.candidate_shapes.rerun.20261031",
         "local.library_integrate.combined_apply.regression.20261031",
         "local.typed.component-storage-capture.20261101",
-        "local.library_integrate.candidate_shapes.multi.20261101"
+        "local.library_integrate.candidate_shapes.multi.20261101",
+        "local.library_integrate.candidate_shapes.dependents.20261101"
       ],
       "cells": [
         {
@@ -8437,7 +8438,8 @@
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
             "local.typed.component-storage-capture.20261101",
-            "local.library_integrate.candidate_shapes.multi.20261101"
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.20261101"
           ]
         },
         {
@@ -8448,7 +8450,8 @@
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
             "local.typed.component-storage-capture.20261101",
-            "local.library_integrate.candidate_shapes.multi.20261101"
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.20261101"
           ]
         },
         {
@@ -8459,7 +8462,8 @@
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
             "local.typed.component-storage-capture.20261101",
-            "local.library_integrate.candidate_shapes.multi.20261101"
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.20261101"
           ]
         },
         {
@@ -8470,7 +8474,8 @@
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
             "local.typed.component-storage-capture.20261101",
-            "local.library_integrate.candidate_shapes.multi.20261101"
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.20261101"
           ]
         },
         {
@@ -8481,7 +8486,8 @@
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
             "local.typed.component-storage-capture.20261101",
-            "local.library_integrate.candidate_shapes.multi.20261101"
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.20261101"
           ]
         },
         {
@@ -8492,7 +8498,8 @@
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
             "local.typed.component-storage-capture.20261101",
-            "local.library_integrate.candidate_shapes.multi.20261101"
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.20261101"
           ]
         }
       ]
@@ -26623,6 +26630,21 @@
         {
           "path": "evidence/local.library_intake.20261024.json",
           "sha256": "90c46e1cba75cb9806b021e87ade9470975c0b0110cf9753a2f3bb3b6cde95e4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.dependents.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "dc805b70d0d081ccb39c32ec13e0b03edcc44144",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.candidate_shapes.dependents.20261101.json",
+          "sha256": "675786c1149c613876060ed681c92b8b5971e2274d52248546bb124daa6857d6"
         }
       ],
       "notRetained": []
