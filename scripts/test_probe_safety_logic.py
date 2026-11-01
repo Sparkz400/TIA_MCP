@@ -36,7 +36,7 @@ FLG = "{%s}" % p.FLG
 
 class ChangedLogicTests(unittest.TestCase):
     def test_two_networks_with_unique_ids(self):
-        changed = p.changed_main(GENERATED, "FdiCh0", "SafeOut", "SafeAlive")
+        changed = p.changed_main(GENERATED, 16, "SafeOut", "SafeAlive")
         ids = re.findall(r' ID="([0-9A-F]+)"', changed)
         self.assertEqual(len(ids), len(set(ids)))
         root = ElementTree.fromstring(changed.encode("utf-8"))
@@ -44,7 +44,10 @@ class ChangedLogicTests(unittest.TestCase):
         self.assertEqual(2, len(units))
         networks = [unit.find("AttributeList/NetworkSource/" + FLG + "FlgNet") for unit in units]
         symbols = [[c.get("Name") for c in n.iter(FLG + "Component")] for n in networks]
-        self.assertEqual([["FdiCh0", "SafeOut"], ["SafeAlive"]], symbols)
+        self.assertEqual([["SafeOut"], ["SafeAlive"]], symbols)
+        address = networks[0].find(".//" + FLG + "Address")
+        self.assertEqual({"Area": "Input", "Type": "Bool", "BitOffset": "16"}, address.attrib)
+        self.assertEqual(["Address", "GlobalVariable"], [a.get("Scope") for a in networks[0].iter(FLG + "Access")])
         self.assertEqual("TRUE", networks[1].find(".//" + FLG + "ConstantValue").text)
         for net in networks:
             self.assertEqual(["Coil"], [part.get("Name") for part in net.iter(FLG + "Part")])
@@ -52,7 +55,7 @@ class ChangedLogicTests(unittest.TestCase):
         self.assertEqual(["F_FBD", "F_FBD"], [u.find("AttributeList/ProgrammingLanguage").text for u in units])
 
     def test_only_an_empty_generated_network_is_changed(self):
-        changed = p.changed_main(GENERATED, "FdiCh0", "SafeOut", "SafeAlive")
+        changed = p.changed_main(GENERATED, 0, "SafeOut", "SafeAlive")
         with self.assertRaises(AssertionError):
             p.changed_main(changed, "FdiCh0", "SafeOut", "SafeAlive")
         with self.assertRaises(AssertionError):
@@ -76,6 +79,22 @@ class ClassifyTests(unittest.TestCase):
         self.assertEqual(4, p.input_start(rows, "/m"))
         with self.assertRaises(AssertionError):
             p.input_start(rows + [{"path": "/m/items/x", "addresses": [{"ioType": "Input", "startAddress": 8}]}], "/m")
+
+
+
+class SimulationCompileTests(unittest.TestCase):
+    receipt = {"errorCount": 0, "targetIdentityPolicy": "device-path-v1",
+               "targets": [{"targetPath": "/projects/P/devices/ScratchStation"}, {"targetPath": "/projects/P/devices/TiaMcpFStation"}]}
+
+    def test_every_device_compiled(self):
+        self.assertEqual(["/projects/P/devices/ScratchStation", "/projects/P/devices/TiaMcpFStation"],
+                         p.simulation_compiled(self.receipt, ["/projects/P/devices/ScratchStation", "/projects/P/devices/TiaMcpFStation"]))
+
+    def test_a_plc_compile_or_an_error_fails(self):
+        for receipt in ({**self.receipt, "targets": self.receipt["targets"][1:]}, {**self.receipt, "errorCount": 1},
+                        {"errorCount": 0, "targets": [{"target": "/projects/P/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"}]}):
+            with self.assertRaises(AssertionError):
+                p.simulation_compiled(receipt, ["/projects/P/devices/ScratchStation", "/projects/P/devices/TiaMcpFStation"])
 
 
 if __name__ == "__main__":

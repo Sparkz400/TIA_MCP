@@ -3561,6 +3561,40 @@
         "One Unified PC fixture with en-US/de-DE enabled for runtime; other devices and customer projects were not interrupted.",
         "Host loss and a lost save hold the admission for review (target kind); the reconciler does not verify the applied text lists."
       ]
+    },
+    {
+      "id": "local.project_simulation.multi_plc.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d681ece1653cec0e41a1880d9bc9883b90491c10",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of d681ece1 (artifacts/w2bs4, git archive), 24/24 steps, in an owned scratch holding the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) with an ET 200SP station and two F-DI 8x24VDC HF. project_simulation_enable with no plcPath applied in this two-PLC project with checkpoint, a compile of every device (ScratchStation, TiaMcpFStation, TiaMcpRemoteIo; zero errors, device-path-v1 receipt) and save, where the one-PLC compile of earlier builds refused AmbiguousTarget (sl1) or left the other PLC inconsistent so the fingerprint refused (sl2). Then safety_inspect (no safety password, not logged on), two standard tags and a safety_import_xml of Main_Safety_RTG1 with two F-FBD networks: V21 refused the import natively ('The element Address has an invalid scope GlobalVariable', the probe's own XML for the absolute F-DI input) and the change was restored from its checkpoint. PLCSIM was not reached."
+      },
+      "artifacts": [
+        "evidence/local.project_simulation.multi_plc.20261101.json"
+      ],
+      "limitations": [
+        "Covers project_simulation_enable in a project with two PLCs (enable only) and the restore of a natively refused safety import; no F-logic behavior, PLCSIM download or F-I/O injection.",
+        "The scratch user's fail-safe access exists in the owned scratch only; no safety login, password, acceptance or download."
+      ]
+    },
+    {
+      "id": "local.safety.logic_plcsim_boundary.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a7740570057b1f4f36ec839dd6b6a463ff63cedb",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of a7740570 (artifacts/w2bs5, git archive), 25/25 steps, PLCSIM Advanced V8 on Softbus. Owned scratch with the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF (input start byte 0). project_simulation_enable without plcPath compiled all three devices with zero errors; safety_inspect showed no safety password and no login. safety_import_xml re-imported Main_Safety_RTG1 changed to two F-FBD networks (SafeOut %M100.0 := F-DI channel 0 by absolute address %I0.0, SafeAlive %M100.1 := TRUE) with checkpoint, device compile including the safety program (zero errors) and save; the F-runtime group kept FOB_RTG1/Main_Safety_RTG1. sim_create created an owned PLCSIM instance of ECPUType CPU1511F (license OK). simulation_download compiled the F-PLC (safety program consistent, zero errors), presented no download configuration callback, and then V21's offline DownloadProvider refused: EngineeringTargetInvocationException 'Error when calling method Download of type Siemens.Engineering.Download.DownloadProvider. An error has occured during download: Load safety program to device'. No memory card was written; the owned instance was released (unregistered). This is the boundary of the offline memory-card route for an F-CPU: the changed F-logic compiles but cannot be loaded into PLCSIM this way, so F-logic behavior and F-I/O injection were not reached."
+      },
+      "artifacts": [
+        "evidence/local.safety.logic_plcsim_boundary.20261101.json"
+      ],
+      "limitations": [
+        "Only the offline DownloadProvider memory-card route (simulation_download) was tried; the online PLCSIM download route (simulation_download_online) is untested for an F-CPU.",
+        "No safety acceptance, login or password; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
     }
   ],
   "features": [
@@ -6755,7 +6789,8 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026)."
         ]
       },
       "qualification": {
@@ -8157,6 +8192,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified in an owned scratch project (local.project_simulation.20261028): IsSimulationDuringBlockCompilationEnabled switched on and off with checkpoint, compile and save, read back through a fresh preparation (no read tool exposes it), fresh-Portal reopen and checkpoint restore; a payload without the explicit flag is refused.",
+          "Apply compiles every device of the project (the device compile of safety_import_xml), because the setting leaves every PLC's blocks to recompile; with only one PLC compiled, a project with two PLCs refused AmbiguousTarget without plcPath and FingerprintUnavailable with it (probe_safety_logic.py runs sl1 and sl2, 1 November 2026). A plcPath is accepted but no longer narrows the compile. Natively verified without plcPath in a two-PLC project (standard and F-CPU, three devices compiled with zero errors; local.project_simulation.multi_plc.20261101).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
@@ -8164,7 +8200,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.project_simulation.20261028"
+          "local.project_simulation.20261028",
+          "local.project_simulation.multi_plc.20261101"
         ]
       },
       "availability": {
@@ -8776,17 +8813,20 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py probes changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8 (import, device compile, simulation_download, RUN, F-DI input through sim_area_write, the F-logic's outputs read back) and records a V8 or V21 refusal as the boundary; its native run is pending."
+          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
+          "Boundary of the memory-card route for F-CPUs (docs/verification/safety-logic-plcsim-20261101.md); the online PLCSIM download route (change.simulation_download_online) is untested for an F-CPU."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.safety.logic_plcsim_boundary.20261101"
+        ]
       },
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "No implemented adapter."
+          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101); no other route is implemented."
         ]
       },
       "prerequisites": [
@@ -9454,7 +9494,8 @@
           "Native qualification is limited to the exact operations and fixture profile in the linked evidence; broader profiles and runtime behavior remain unqualified.",
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "A preceding write that changes another requested attribute type causes refusal before that later setter; split dependent edits into separately reviewed changes. Earlier setters can already have taken effect.",
-          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
+          "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
+          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026)."
         ]
       },
       "qualification": {
@@ -9667,7 +9708,7 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
-          "Safety units are rejected; a created tag that native TIA reports as IsSafety fails verification and requires checkpoint recovery.",
+          "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
           "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
         ]
       },

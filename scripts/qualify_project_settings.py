@@ -58,7 +58,7 @@ def project(properties):
 
 class Run(StateRun):
     """The access runner's apply/refuse/restore gates over the PLC program and project_properties."""
-    plc_compiled = KINDS  # The project-scoped changes still compile the PLC software.
+    plc_compiled = ("project_languages_set",)  # project_simulation_enable compiles every device (it changes how every PLC compiles).
 
     def __init__(self, h):
         super().__init__(h)

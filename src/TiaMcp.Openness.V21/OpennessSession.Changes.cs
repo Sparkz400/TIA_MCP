@@ -580,6 +580,7 @@ namespace TiaMcp.Openness.V21
                     if (types) PrepareTypeTargets(change, plc, effects);
                     else
                     {
+                        RejectFIoAddresses(plc, TagAddressRules.TagTableAddresses(document));
                         var allTables = AllTagTables(ResolveSoftwareScope(plc, change.ScopePath).Tags).ToArray();
                         var importedSymbols = document.Descendants().Where(element => element.Name == "SW.Tags.PlcTag" || element.Name == "SW.Tags.PlcUserConstant")
                             .Select(element => element.Element("AttributeList")?.Element("Name")?.Value).ToArray();
@@ -998,6 +999,7 @@ namespace TiaMcp.Openness.V21
                     VerifyExpectedTypesExist(change, SelectPlc(change.Selector));
                     break;
                 case "tag_table_import_xml":
+                    RejectFIoAddresses(SelectPlc(change.Selector), TagAddressRules.TagTableAddresses(EngineeringSources.ReadXml(File.ReadAllText(change.InputPath))));
                     MutationTagGroup(change, SelectPlc(change.Selector)).TagTables.Import(new FileInfo(change.InputPath), ImportOptions.Override);
                     if (change.ObjectNames.Any(name => !MutationTagGroup(change, SelectPlc(change.Selector)).TagTables.Any(table => string.Equals(table.Name, name, StringComparison.OrdinalIgnoreCase))))
                         throw new BridgeException("ImportVerificationFailed", "Not all expected tag tables exist in the selected destination after import.");
@@ -1209,7 +1211,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
             if (change.Kind == "hmi_text_list_import") return CompileHmiTextListTarget(project, (JObject)change.Payload["target"]);
             if (IsCompileOnlyKind(change.Kind) && change.Kind != "plc_compile") return CompileOnly(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "network_mrp_set" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
+            if (CompileOnlyRules.CompilesEveryDevice(change.Kind) || PlcAlarmProjectKinds.Contains(change.Kind))
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {

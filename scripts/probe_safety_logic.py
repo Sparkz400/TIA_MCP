@@ -2,11 +2,12 @@
 
 Fixture: an owned scratch with a CPU 1511F-1 PN added with configureScratchSecurity and failsafeRuntimeAccess (its generated
 scratch user holds Full access including fail-safe; scratch only) and probe_safety_kinds' ET 200SP station with F-DI
-8x24VDC HF; project simulation enabled; standard tags FdiCh0 (channel 0 of the F-DI at its input start address), SafeOut
-(%M100.0) and SafeAlive (%M100.1) in the F-PLC's default tag table.
+8x24VDC HF; project simulation enabled after both PLCs exist (its apply must compile every device); standard tags SafeOut
+(%M100.0) and SafeAlive (%M100.1) in the F-PLC's default tag table. Channel 0 of the F-DI is read by its absolute input
+address: a generic tag on an F-I/O address becomes a safety tag, which tag_create refuses (SafetyBoundary, run sl3).
 
 The changed F-logic replaces the empty network of the generated main safety block Main_Safety_RTG1 through
-change.safety_import_xml with two F-FBD networks, SafeOut := FdiCh0 and SafeAlive := TRUE, applied with checkpoint, device
+change.safety_import_xml with two F-FBD networks, SafeOut := %I<start>.0 and SafeAlive := TRUE, applied with checkpoint, device
 compile (the safety program included) and save. The F-PLC is then downloaded to an owned PLCSIM instance
 (simulation_download with the F-CPU's generated credential), provisioned, powered on and put to RUN. SafeAlive TRUE shows the
 changed F-logic runs; sim_area_write then drives the F-DI channel-0 input bit TRUE, FALSE and TRUE, and SafeOut must follow,
@@ -45,9 +46,14 @@ LIMITATIONS = [
 
 
 def network(uid, source, target):
-    """One F-FBD network: target := source, where source is a global tag name or the literal TRUE."""
-    access = ('<Access Scope="LiteralConstant" UId="%d"><Constant><ConstantType>Bool</ConstantType><ConstantValue>TRUE</ConstantValue></Constant></Access>' % uid
-              if source == "TRUE" else '<Access Scope="GlobalVariable" UId="%d"><Symbol><Component Name="%s" /></Symbol></Access>' % (uid, source))
+    """One F-FBD network: target := source, where source is the literal TRUE, an input bit offset (int, absolute %I) or a tag name."""
+    if source == "TRUE":
+        access = '<Access Scope="LiteralConstant" UId="%d"><Constant><ConstantType>Bool</ConstantType><ConstantValue>TRUE</ConstantValue></Constant></Access>' % uid
+    elif type(source) is int:
+        # V21 accepts an absolute operand only under Scope="Address" (sl4: "The element Address has an invalid scope GlobalVariable").
+        access = '<Access Scope="Address" UId="%d"><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (uid, source)
+    else:
+        access = '<Access Scope="GlobalVariable" UId="%d"><Symbol><Component Name="%s" /></Symbol></Access>' % (uid, source)
     return ('<NetworkSource><FlgNet xmlns="%s"><Parts>%s<Access Scope="GlobalVariable" UId="%d"><Symbol><Component Name="%s" /></Symbol></Access>'
             '<Part Name="Coil" UId="%d" /></Parts><Wires><Wire UId="%d"><IdentCon UId="%d" /><NameCon UId="%d" Name="in" /></Wire>'
             '<Wire UId="%d"><IdentCon UId="%d" /><NameCon UId="%d" Name="operand" /></Wire></Wires></FlgNet></NetworkSource>'
@@ -103,8 +109,17 @@ def boundary(h, stage, error):
     h.report["outcome"] = "boundary"
 
 
+def simulation_compiled(compile, devices):
+    """project_simulation_enable's compile receipt must cover every device of the project, with no error: the setting changes
+    how every PLC compiles (sl1 refused AmbiguousTarget and sl2 FingerprintUnavailable while it compiled one PLC)."""
+    compiled = {target.get("targetPath") for target in compile.get("targets") or []}
+    require(compile.get("errorCount") == 0 and compile.get("targetIdentityPolicy") == "device-path-v1" and set(devices) <= compiled,
+            "project_simulation_enable did not compile every device without error: %s" % {k: compile.get(k) for k in ("errorCount", "requiredTargets")})
+    return sorted(compiled)
+
+
 def body(h):
-    h.owned_scratch("safety logic")
+    standard = h.owned_scratch("safety logic")
     fcpu = h.report["fCpu"] = catalog(h, "1511F-1 PN", "1511F-1 PN", "6ES7 ")[0]
     _, added = change(h, "hardware_add", {"typeIdentifier": fcpu["typeIdentifier"], "deviceName": STATION, "itemName": "TiaMcpFPlc",
                                           "configureScratchSecurity": True, "failsafeRuntimeAccess": True}, {})
@@ -115,17 +130,19 @@ def body(h):
     rows = [row for item in h.tool("project_inventory", {"maxItems": 2000})["hardware"] if item["path"].startswith(modules[FDI])
             for row in h.tool("hardware_inspect", {"hardwarePath": item["path"], "maxItems": 2000})["items"]]
     start = h.report["fdiInputStart"] = input_start(rows, modules[FDI])
+    # Enabled with both PLCs in the project and no plcPath: its apply must compile every device.
+    _, enabled = change(h, "project_simulation_enable", {"enabled": True}, {})
+    h.report["simulationCompile"] = simulation_compiled(enabled["compile"], [p.split("/items/", 1)[0] for p in (standard, plc)])
     safety = h.stage("safety_inspect of the F-PLC", lambda: h.tool("safety_inspect", {"plcPath": plc, "maxItems": 2000}))
     h.report["safetyProgram"] = {k: safety.get(k) for k in ("isPasswordSet", "isLoggedOn")}
-    h.apply("project_simulation_enable", {"enabled": True})
     tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]
     default = [t for t in tables if any(c.get("kind") == "system" for c in t.get("constants", []))]
     require(len(default) == 1, "Expected one default tag table: %s" % [t["name"] for t in tables])
-    for name, address in {**TAGS, "FdiCh0": "%%I%d.0" % start}.items():
+    for name, address in TAGS.items():
         h.apply("tag_create", {"tagTablePath": default[0]["path"], "name": name, "dataTypeName": "Bool", "logicalAddress": address})
 
     xml = h.tool("block_read", {"plcPath": plc, "blockName": MAIN})["xml"]
-    payload = {"xml": changed_main(xml, "FdiCh0", "SafeOut", "SafeAlive"), "expectedBlockNames": [MAIN], "safetyAcknowledged": True}
+    payload = {"xml": changed_main(xml, start * 8, "SafeOut", "SafeAlive"), "expectedBlockNames": [MAIN], "safetyAcknowledged": True}
     def imported():
         error, prepared = outcome(h, "change_prepare", {"kind": "safety_import_xml", "payload": payload, "plcPath": plc})
         if error:
@@ -173,7 +190,7 @@ def simulate(h, lab, credential, start):
                 observed = h.tool("sim_observe", {"instanceId": lab.instance["id"]})
                 return boundary(h, "sim_state " + action, {"error": error, "state": state if not error else None, "observe": observed})
         tags = h.tool("sim_tags", {"instanceId": lab.instance["id"], "maxItems": 2000})["tags"]
-        for name in (*TAGS, "FdiCh0"):
+        for name in TAGS:
             found = [t for t in tags if t["symbol"].replace('"', "") == name]
             require(len(found) == 1, "PLCSIM tag %s is missing or ambiguous" % name)
             lab.symbols[name] = found[0]["symbol"]
@@ -185,9 +202,10 @@ def simulate(h, lab, credential, start):
         for value in (True, False, True):
             h.tool("sim_area_write", {"instanceId": lab.instance["id"], "area": "input", "offset": start, "bit": 0, "value": value})
             time.sleep(1.0)
-            read = lab.read("SafeOut", "FdiCh0", *(t["symbol"] for t in members))
+            read = lab.read("SafeOut", *(t["symbol"] for t in members))
+            read["inputImage"] = h.tool("sim_area_read", {"instanceId": lab.instance["id"], "area": "input", "offset": start, "bit": 0})["value"]
             qbad = [v for k, v in read.items() if k.replace('"', "").endswith(".QBAD")]
-            observation["steps"].append({"written": value, "safeOut": read["SafeOut"], "inputImage": read["FdiCh0"], "qbad": qbad[0] if qbad else None, "fIoDb": read})
+            observation["steps"].append({"written": value, "safeOut": read["SafeOut"], "inputImage": read["inputImage"], "qbad": qbad[0] if qbad else None, "fIoDb": read})
         h.report["observation"] = observation
         h.report["outcome"] = classify(observation)
         for action in ("stop", "powerOff"):

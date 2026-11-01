@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "f0f5f2c8b51311901d7b9a4f3bb2818008e1487caefec269cb2c64390078b137",
+    "catalogSha256": "6b1c5e822dcbcae3f56ae3eb3321ada1d8b289c30ea0cb2eade4d6d88f6c5eb7",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -4778,49 +4778,56 @@
         "L03"
       ],
       "evidenceIds": [
-        "local.project_simulation.20261028"
+        "local.project_simulation.20261028",
+        "local.project_simulation.multi_plc.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         }
       ]
@@ -5417,7 +5424,9 @@
       "owners": [
         "D14"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.safety.logic_plcsim_boundary.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -27172,6 +27181,21 @@
       "notRetained": []
     },
     {
+      "id": "local.project_simulation.multi_plc.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "d681ece1653cec0e41a1880d9bc9883b90491c10",
+      "retained": [
+        {
+          "path": "evidence/local.project_simulation.multi_plc.20261101.json",
+          "sha256": "26e3407e637c57eac2736eb4c5f689ca8fb2b450c9d28e359b4cb8e0d22819c0"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.project_upgrade.20261031",
       "status": "passed",
       "profile": {
@@ -27349,6 +27373,21 @@
         {
           "path": "evidence/local.safety.fparameter_discovery.20261031.json",
           "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety.logic_plcsim_boundary.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "a7740570057b1f4f36ec839dd6b6a463ff63cedb",
+      "retained": [
+        {
+          "path": "evidence/local.safety.logic_plcsim_boundary.20261101.json",
+          "sha256": "159d5f0d948c435aa454b094a30caeae8a57de72c19cebc9fa3c5f64f50d47e0"
         }
       ],
       "notRetained": []
