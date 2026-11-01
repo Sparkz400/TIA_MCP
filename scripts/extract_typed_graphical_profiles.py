@@ -22,6 +22,16 @@ GLOBAL_STORAGE = {"timer": ("Tgp_GlobalTimer", "IEC_TIMER"), "counter": ("Tgp_Gl
                   "TONR": ("Tgp_GlobalTonr", "IEC_TIMER"), "R_TRIG": ("Tgp_GlobalRTrig", "R_TRIG"), "F_TRIG": ("Tgp_GlobalFTrig", "F_TRIG")}
 # The callee every cross-scope caller names absolutely (route-capture-crossscope-call-packet.v1.json).
 CROSS_SCOPE_CALLEE = "TiaMcp_UnitA.TgpUnit_NumericFC"
+# The PLC component FB's storage (route-capture-component-storage-packet.v1.json), by route-folded block name: its UDT static
+# maps only onto a reference with that identical member, so these bind the captured component FB, not Tgp_TemplateFB_<language>.
+# The unit instance template is emitted only into --stage-output candidates, qualificationOnly; the multi-instance one is verified.
+COMPONENT_TEMPLATES = {"Tgp_ComponentHost_FBD": ("multi", "TiaMcpComponentGate", "Gate"),
+                       "Tgp_ComponentGate_DB": ("global", "Tgp_ComponentGate", None)}
+
+
+def report_name(path):
+    """A capture report may sit in another checkout's artifacts tree (the main checkout); name it relative to that checkout."""
+    return path.relative_to(next((p for p in path.parents if (p / "TiaMcp.slnx").exists()), ROOT)).as_posix()
 
 
 def authored_source(entry):
@@ -74,6 +84,8 @@ def extract(reports, route="standard", *, stage_output=None):
                 continue
             source_path = authored_source(entry)
             for exported in entry["exports"]:
+                if exported.get("kind", "block") != "block":
+                    continue  # a captured dependency type or tag table is no block template
                 records = [row["result"] for row in report["calls"] if row["tool"] == "block_read" and
                            row.get("status") == "passed" and row["result"]["block"]["name"] == exported["name"]]
                 if stage_output is not None:
@@ -105,7 +117,7 @@ def extract(reports, route="standard", *, stage_output=None):
                     if (first is None or first["transportSourceSha256"] != entry["sha256"] or first["changeId"] == entry["changeId"]
                             or native_payload_hash(target.read_text(encoding="utf-8-sig")) != native_payload_hash(raw.decode("utf-8-sig"))):
                         raise ValueError("Candidate native filename collision; select exact source/route identities: " + str(target))
-                    first.setdefault("confirmingCaptures", []).append({"captureReport": report_path.relative_to(ROOT).as_posix(),
+                    first.setdefault("confirmingCaptures", []).append({"captureReport": report_name(report_path),
                         "changeId": entry["changeId"], "sha256": hashlib.sha256(raw).hexdigest()})
                     continue
                 target.write_bytes(raw)
@@ -116,7 +128,7 @@ def extract(reports, route="standard", *, stage_output=None):
                 record = {"path": target.relative_to(ROOT).as_posix(), "sha256": source_hash,
                     "authoredSourcePath": source_path.relative_to(ROOT).as_posix(), "authoredSourceSha256": hashlib.sha256(source_bytes).hexdigest(),
                     "transportSourceSha256": entry["sha256"], "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
-                    "captureReport": report_path.relative_to(ROOT).as_posix(), "changeId": entry["changeId"],
+                    "captureReport": report_name(report_path), "changeId": entry["changeId"],
                     "nativeImportCompileVerified": True, "builderUsed": False, "runtimeVerified": False}
                 if entry.get("authoredFormat") == "native_xml_template_derivation":
                     record["authoredFormat"] = entry["authoredFormat"]
@@ -294,6 +306,22 @@ def extract(reports, route="standard", *, stage_output=None):
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
                 "referenceCalleePath": reference_path.relative_to(template_root).as_posix(),
                 "referenceCalleeSha256": reference_hash})
+        if block in COMPONENT_TEMPLATES:
+            kind, reference_name, member = COMPONENT_TEMPLATES[block]
+            if not member and stage_output is None:
+                continue  # the unit instance template has no qualification case yet: inactive candidate staging only
+            if reference_name not in observed and stage_output is not None:
+                unresolved_templates.append({"block": block, "missingReference": reference_name, "route": route})
+                continue
+            _, reference_path, reference_hash, _ = observed[reference_name]
+            (multi_instance_templates if member else global_instance_templates).append({
+                "id": "v21.fw41." + (route + "." if route != "standard" else "") + "component-gate." + kind + "-instance.v1",
+                "tiaVersion": "V21", "cpuFamily": cpu, "route": route, **({"memberName": member} if member else {"blockType": "InstanceDB"}),
+                "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
+                "referenceCalleePath": reference_path.relative_to(template_root).as_posix(), "referenceCalleeSha256": reference_hash,
+                # The multi-instance template's shape is verified (local.library_integrate.candidate_shapes.multi.20261101); the unit
+                # one stays qualificationOnly, so only a --component-qualification worker in its own scratch would select it.
+                **({} if member else {"qualificationOnly": True})})
     return {"schemaVersion": 1, "profileVersion": "tia-v21-flgnet-v5-1",
         "nativeFormat": {"tia": "V21 Update 2", "step7ApiFileVersion": "2100.0.121.1", "networkNamespace": NET,
                          "interfaceNamespace": INTERFACE, "instructionVersions": ["1.0"],

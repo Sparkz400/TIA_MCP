@@ -157,6 +157,15 @@ internal static class MutationAdmissionChecks
         var dispatcher = new WatchTableDispatcher(successfulNative, dispatcherRoot);
         var result = await dispatcher.CallAsync("change_apply", new { changeId = "synthetic", previewHash = new string('1', 64) });
         Check(result.GetProperty("legacyShape").GetString() == "preserved" && successfulNative.Calls.SequenceEqual(["mutation_begin", "mutation_dispatch", "mutation_end"]), "Legacy dispatch uses native scope lease and preserves response shape");
+        // A worker refusal while resolving the scope (a refused combined apply, e.g. DependencyProfileUnavailable) writes no admission
+        // record and dispatches nothing: the Host acquires an admission only from a resolved scope.
+        string refusedRoot = Path.Combine(root, "refused-at-begin"); Directory.CreateDirectory(refusedRoot);
+        var refusedNative = new AdmissionNative(Scope(Path.Combine(refusedRoot, "refused.ap21"))) {
+            BeginError = new BridgeOperationException("DependencyProfileUnavailable", "Combined apply refused before admission", JsonSerializer.SerializeToElement(new { state = "prepared" })) };
+        try { await new WatchTableDispatcher(refusedNative, refusedRoot).CallAsync("change_apply", new { changeId = "lib-refused", previewHash = new string('2', 64) }); throw new Exception("Expected scope refusal"); }
+        catch (BridgeException error) when (error.Code == "DependencyProfileUnavailable") { passed++; }
+        Check(refusedNative.Calls.SequenceEqual(["mutation_begin"]) && (!Directory.Exists(Path.Combine(refusedRoot, "engineering-admissions"))
+            || Directory.GetFileSystemEntries(Path.Combine(refusedRoot, "engineering-admissions")).Length == 0), "A scope refusal writes no admission record and never dispatches");
         var failedNative = new AdmissionNative(Scope(Path.Combine(dispatcherRoot, "failed.ap21"))) { FailDispatch = true };
         try { await new WatchTableDispatcher(failedNative, dispatcherRoot).CallAsync("change_apply", new { changeId = "synthetic-failure" }); throw new Exception("Expected transport failure"); }
         catch (IOException) { passed++; }
@@ -279,11 +288,13 @@ internal static class MutationAdmissionChecks
         internal EngineeringMutationScope Scope => scope;
         internal bool FailDispatch;
         internal Exception? DispatchError;
+        internal Exception? BeginError;
         internal JsonElement? Arguments;
         internal List<string> Calls { get; } = [];
         public Task<JsonElement> CallAsync(string operation, object? arguments = null, CancellationToken cancellationToken = default)
         {
             Calls.Add(operation);
+            if (operation == "mutation_begin" && BeginError is not null) throw BeginError;
             if (operation == "mutation_begin") Arguments = JsonSerializer.SerializeToElement(arguments, BridgeProtocol.Json);
             if (operation == "mutation_dispatch" && FailDispatch) throw new IOException("Synthetic lost native response");
             if (operation == "mutation_dispatch" && DispatchError is not null) throw DispatchError;

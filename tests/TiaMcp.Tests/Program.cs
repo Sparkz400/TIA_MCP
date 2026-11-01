@@ -307,6 +307,8 @@ internal static partial class Program
             ("Typed replacement retains known native instruction and wire IDs", TypedGraphicalCorpusTests.ReplacementRetainsKnownNativeIds),
             ("Typed SUB/DIV read and replace TIA's Card-less import form", TypedGraphicalCorpusTests.NonExpandableMathReadsWithoutExportedCard),
             ("Typed global FB instances retain native storage defaults without guessing layouts", TypedGraphicalTests.GlobalInstanceTemplatesRetainObservedDefaults),
+            ("Typed structured members map only onto an identical captured member", TypedGraphicalTests.StructuredMembersMapOnlyOntoIdenticalCapturedMembers),
+            ("Typed qualification-only templates serve only the component qualification scratch", TypedGraphicalTests.QualificationOnlyTemplatesServeOnlyTheComponentScratch),
             ("Typed factories preserve every captured scalar creation and instance default", TypedGraphicalTests.CapturedCreationAndInstanceDefaultsRemainComplete),
             ("Typed captured branches preserve the complete native XML after replacement", TypedGraphicalCorpusTests.CapturedBranchRoundtripPreservesCompleteNativeXml),
             ("Typed inserted networks allocate native UIds within their own network", TypedGraphicalCorpusTests.NewNetworkIdsAreNativeScoped),

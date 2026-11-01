@@ -182,7 +182,7 @@ namespace TiaMcp.Openness.V21
             if (catalogPath == null) throw new BridgeException("InstanceCreationProfileUnavailable", "No deployed native instance creation catalog exists.");
             string route = TypedRoute(ResolveSoftwareScope(capture.Plc, capture.Change.ScopePath), capture.Change.Namespace);
             BridgeException last = null;
-            foreach (var template in GlobalInstanceTemplates(catalogPath, TypedCpuIdentifier(capture.Plc), route))
+            foreach (var template in GlobalInstanceTemplates(catalogPath, TypedCpuIdentifier(capture.Plc), route, TypedQualificationScratch(capture.Plc.Project)))
             {
                 try
                 {
@@ -196,10 +196,10 @@ namespace TiaMcp.Openness.V21
         }
 
         // Hash-checked global instance templates for one CPU and route, keyed by path; combined apply's pre-claim check reads the same ones.
-        private static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, XDocument>> GlobalInstanceTemplates(string catalogPath, string cpu, string route)
+        private static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, XDocument>> GlobalInstanceTemplates(string catalogPath, string cpu, string route, bool qualificationScratch)
         {
             var catalog = JObject.Parse(File.ReadAllText(catalogPath));
-            foreach (var template in (catalog["globalInstanceTemplates"] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu && t.Value<string>("route") == route).ToArray())
+            foreach (var template in TypedGraphicalInstanceTemplate.Admitted(catalog, "globalInstanceTemplates", cpu, route, qualificationScratch).ToArray())
             {
                 string path = TypedResourcePath(catalogPath, template.Value<string>("path"));
                 if (!File.Exists(path) || ChangeFileHash(path) != template.Value<string>("sha256")) throw new BridgeException("ProfileCatalogInvalid", "Captured native global instance template source hash does not match.");
@@ -218,13 +218,15 @@ namespace TiaMcp.Openness.V21
             var matches = capture.Blocks.Where(b => b.Item is FB && QualifiedName(b.Item) == type.Trim('"') && (ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == capture.Change.ScopePath || ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == calleeScope)).ToArray();
             if (matches.Length != 1 || matches[0].Path != path) throw new BridgeException("AmbiguousInstanceType", "The native declaration cannot uniquely identify the selected FB across the complete PLC index.");
         }
-        private void CaptureTypedDependents(TypedResolutionCapture capture, XElement declaration, JObject preview)
+        // Every block an interface change of the caller reaches: the closure over instance, type-instance and use edges.
+        // The combined apply's pre-claim check uses the same closure (PlcCombinedApplyTargetRefusal).
+        private System.Collections.Generic.List<string> TypedDependentPaths(PlcSelection plc, string callerPath)
         {
-            if (!capture.Blocks.Any(b => b.Path == capture.CallerPath)) return;
-            var analysis = ReadNativeAnalysis(new JObject { ["projectName"] = capture.Plc.Project.Name, ["plcPath"] = capture.Plc.Path, ["maxItems"] = 2000 });
+            var analysis = ReadNativeAnalysis(new JObject { ["projectName"] = plc.Project.Name, ["plcPath"] = plc.Path, ["maxItems"] = 2000 });
             if (analysis.IndexTruncated || analysis.Budget.Truncated || analysis.Warnings.Count > 0)
                 throw new BridgeException("DependencyUnresolved", "Interface-changing typed edits require complete native dependent coverage.");
-            var affected = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal) { capture.CallerPath };
+            var affected = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal) { callerPath };
+            var order = new System.Collections.Generic.List<string>();
             bool grew;
             do
             {
@@ -233,10 +235,16 @@ namespace TiaMcp.Openness.V21
                 {
                     if (!new[] { ReferenceType.InstanceType, ReferenceType.TypeInstance, ReferenceType.Uses, ReferenceType.UsedBy }.Contains(edge.Relation)) continue;
                     var actor = edge.Actor?.BlockPath; var subject = edge.Subject?.BlockPath;
-                    if (subject != null && actor != null && affected.Contains(subject) && affected.Add(actor)) grew = true;
+                    if (subject != null && actor != null && affected.Contains(subject) && affected.Add(actor)) { order.Add(actor); grew = true; }
                 }
             } while (grew);
-            foreach (string path in affected.Where(p => p != capture.CallerPath))
+            return order;
+        }
+
+        private void CaptureTypedDependents(TypedResolutionCapture capture, XElement declaration, JObject preview)
+        {
+            if (!capture.Blocks.Any(b => b.Path == capture.CallerPath)) return;
+            foreach (string path in TypedDependentPaths(capture.Plc, capture.CallerPath))
             {
                 var block = capture.Blocks.SingleOrDefault(b => b.Path == path) ?? throw new BridgeException("DependencyUnresolved", "A dependent native block lacks exact identity.");
                 capture.Export(block);

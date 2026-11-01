@@ -1,0 +1,70 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.multi.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T04:34:08+00:00",
+  "source": {
+    "commit": "9febd4dfe1c38ccdbb04612c9703a22ef61a7ead",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates at 9febd4df (frozen artifacts/w4c, --artifacts artifacts/ic5) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive: ladStandalone, ladExisting, fbCaller, earlierPlacement, reuse and multiInstance all installed through change_apply with every gate (exact candidateFeatures, coordinator installation_verified with one initial checkpoint, export/inventory diff, native caller insertion proof, call oracle, exact project-library versions, fresh reopen, 0-error compile, change_restore of the initial checkpoint into a new location, checked after retrieval and after reopen). multiInstance: after a verified standalone install, a multi-instance Gate of the reused installed TiaMcpComponentGate in the existing FBD FB TiaMcpComponentHost (FB30, no instance DB): candidateFeatures exactly fbCaller, multiInstance and reusedComponent, one typed step whose multi-instance declaration came from the qualificationOnly captured template v21.fw41.component-gate.multi-instance.v1 (local.typed.component-storage-capture.20261101), caller proof with one new Static member Gate and following IDs 8->D, 9->E, and the typed step's own archive as checkpoint.",
+  "limitations": [
+    "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+    "multiInstance qualifies only the exact shape fbCaller+multiInstance+reusedComponent with an FBD FB caller that has no instance DB and is not embedded elsewhere; a structured dependent-DB effect is not captured, and a multi-instance after a fresh import stays refused before the claim."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "2ff06352804cdf146aebf72be33d1be8ed2988fcf568e13092be4ee62a4386f2"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "fac27a9a6325fa731a9eadce51d6a478bb6cb77453304fa8890cbc7c37a2fb31"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "cc03b8eacf93fb364d59357a417fc64d092264bb4d0123b81174fefbb8ec0ebd",
+      "bytes": 13602191,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:ladStandalone",
+        "candidate:ladExisting",
+        "candidate:fbCaller",
+        "candidate:earlierPlacement",
+        "candidate:reuse",
+        "candidate:multiInstance"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

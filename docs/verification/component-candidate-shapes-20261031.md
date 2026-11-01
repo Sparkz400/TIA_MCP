@@ -2,8 +2,9 @@
 
 Status: builders, offline tests and clean native reruns done. A first native attempt on 31 October is **not evidence**
 (both runs ended with a failed outcome); the [clean reruns](#clean-rerun--31-october-2026) passed. `ladCaller`,
-`fbCaller`, `earlierPlacement` and `reusedComponent` are verified shapes since then; `multiInstance` and every
-combination stay candidates ([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
+`fbCaller`, `earlierPlacement` and `reusedComponent` are verified shapes since then. Since 1 November the combination
+`fbCaller+multiInstance+reusedComponent` is verified too ([component storage capture](#component-storage-capture-and-multi-instance--1-november-2026));
+every other multi-instance and combination stays a candidate ([combined apply](../guides/plc-library-integration-recipes.md#combined-apply)).
 
 ## Component shapes
 
@@ -87,6 +88,89 @@ their summaries (`evidence/local.library_integrate.candidate_shapes.20261031.jso
 - Library namespaces: a namespaced UDT root reused by a namespaced FB, and a namespaced master copy, passed per step.
   V21 imports a `NAMESPACE` SCL source into the unit but resolves unqualified names in it against the root namespace, so
   the OB-rooted caller failed. The runner now qualifies every namespaced reference.
+
+## Component storage capture and multi-instance — 1 November 2026
+
+The boundary above was a missing profile, not a V21 refusal. Changes:
+
+- `TypedGraphicalMultiInstanceTemplate.MapDeclaration` and `TypedGraphicalInstanceTemplate.Create` accept a structured
+  (UDT) member when a captured reference member or prototype is identical to it, nested declaration included; the
+  captured storage is copied as before. Any other structured member keeps its earlier refusal, and start or default
+  values stay refused (`TiaMcp.Tests`, "Typed structured members map only onto an identical captured member").
+- [`route-capture-component-storage-packet.v1.json`](../../fixtures/typed-graphical/route-capture-component-storage-packet.v1.json)
+  holds two `capture_typed_routes_owned.py` runs, which now admit `.udt` sources through `type_source_upsert`:
+  - standard route: the component UDT and FB from `fixtures/libraries/component-qualification`, then the FBD FB
+    `Tgp_ComponentHost_FBD` declaring the multi-instance `Gate : "TiaMcpComponentGate"`. Extraction yields
+    `v21.fw41.component-gate.multi-instance.v1`, the profile the `multiInstance` shape needs;
+  - softwareUnit route (`TiaMcp_UnitA`): the same interface as `TgpUnit_ComponentGate` with its instance DB. Extraction
+    yields `v21.fw41.softwareUnit.component-gate.global-instance.v1`.
+- `extract_typed_graphical_profiles.py` binds both to the captured component FB (`COMPONENT_TEMPLATES`) and skips
+  captured types. Both are written `qualificationOnly: true` (a new field of `contracts/typed-graphical-profiles.schema.json`);
+  the shared selector `TypedGraphicalInstanceTemplate.Admitted` hands such a template only to a `--component-qualification`
+  worker in its own component scratch, so ordinary typed edits never use it. The unit template is emitted only into
+  `--stage-output` candidates under `artifacts/`; the multi-instance one was deployed with the flag until its shape was
+  verified, and the verifying change removed it. `TiaMcp.CapturedStorage.Tests` pins that no template references the sc01
+  `component04-*` storage and that every unverified component-gate template is qualification-only.
+- `qualify_library_integrate_apply.py --candidates` no longer accepts a `multiInstance` boundary.
+
+Still plan-only: a multi-instance in a caller FB that has an instance DB (no captured dependent-DB effect for a structured
+member), and software-unit destinations. The unit capture removes only the storage cause; component readback still covers
+the standard scope only, unit tags stay a V21 boundary, a library instance keeps an empty namespace unless one is set
+explicitly while the unit-route template needs the FB in the unit's namespace, and another unit's FB still gets no new
+storage (`InstanceCreationRouteUnsupported`).
+
+Native runs, 1 November (no PLCSIM, no Openness prompt, owned scratch projects only; every Portal, Host and worker started
+was gone afterwards):
+
+- Captures at 68eca319 (frozen `artifacts/w4b`), both `passed` with a fresh-process reopen equal to the saved state
+  (`local.typed.component-storage-capture.20261101`):
+  - `artifacts/csm`: the UDT, the FB and `Tgp_ComponentHost_FBD`. The captured `Gate` member embeds the UDT static
+    `State` with its nested `Active`, and the SCL-authored FB interface equals the library-installed
+    `component04-callee.xml` interface. Extracted into the catalog at 9febd4df.
+  - `artifacts/csu`: the unit UDT, `TgpUnit_ComponentGate` and its DB. The DB members equal the FB members, with `State`
+    typed `"TiaMcp_UnitA.TiaMcpComponentState"`. Staged only (`artifacts/csus`).
+- `qualify_library_integrate_apply.py --candidates` at 9febd4df (frozen `artifacts/w4c`, `artifacts/ic5/ibf2824`)
+  passed (`local.library_integrate.candidate_shapes.multi.20261101`): all six cases installed. `multiInstance` (a
+  multi-instance `Gate` of the reused installed FB in `TiaMcpComponentHost`) had `candidateFeatures` exactly `fbCaller`,
+  `multiInstance` and `reusedComponent`, one typed step through the captured template, the caller proof with exactly one
+  new Static member `Gate` (following IDs 8->D, 9->E), the call oracle, exact library versions, a fresh reopen, a 0-error
+  compile and a restore of the typed step's own checkpoint.
+
+`VerifiedShapes` now lists `fbCaller+multiInstance+reusedComponent`, and the template is deployed without
+`qualificationOnly`.
+
+A caller FB with dependents is refused before admission (dc805b70). `PlcCombinedApplyTargetRefusal` refuses a reused-FB
+multi-instance whose caller has dependents, with `DependencyProfileUnavailable`, naming them. The dependents are the typed
+route's own closure (`TypedDependentPaths`, shared with `CaptureTypedDependents`): the caller's instance DBs, embedding
+parents and their users. The worker's shared-mutation scope resolution evaluates the same pre-claim refusal for every
+unclaimed combined apply, so `mutation_begin` fails, the Host writes no admission record and nothing becomes
+`recovery_required`. Since 195f63a3 this runs after the scope's own offline, PreviewStale and source checks (which keep
+their codes) and at `mutation_begin` only. The first candidate run at dc805b70 (`artifacts/ic6`) passed with the earlier
+placement; its record is retired to `docs/history/catalog-evidence-retired-20261101.json`. At 195f63a3 (frozen
+`artifacts/w4f`):
+
+- `qualify_library_integrate_apply.py --candidates` (`artifacts/ic7/ie57b80`) passed
+  (`local.library_integrate.candidate_shapes.dependents.rerun.20261101`):
+  - the six cases above installed again;
+  - `multiInstanceDependents`: `TiaMcpComponentHost` with its own `TiaMcpComponentHost_DB` previewed `eligible: false`
+    with `refusalCode` `DependencyProfileUnavailable` naming that DB, and `change_apply` was refused "before admission"
+    with that code;
+  - the Host's admission records were the same before and after, the plan stayed prepared without a claim, and the
+    scratch equalled its baseline.
+- The verified-flow regression without `--candidates` (`artifacts/ir2/i9ca1e1`) passed
+  (`local.library_integrate.combined_apply.regression.20261101`):
+  - the standalone and existing FBD FC installs passed every gate;
+  - the FBD OB caller, the FBD FB caller with a multi-instance of a freshly imported FB, and that plan on a Host without
+    the former flag were each refused with `PlcIntegrationNotQualified` and their preview texts, prefixed "Combined apply
+    refused before admission";
+  - each refusal left the Host's admission records unchanged and the plan prepared;
+  - every admission record of the run ended `returned`, and no journal was `recovery_required`.
+- An earlier attempt at 4f03c1ef (`artifacts/ir1`, not curated) stopped at `defaultHost`: the runner's `refusals()` left
+  `multiInstance` set, so the standalone plan became a multi-instance plan (`InvalidIntegrationRecipe`). Its three
+  refusals had already passed with the expected codes. 166f9fd6 starts each case from the base manifest and makes
+  `refused_apply` check the pre-admission message and the admission records.
+
+The structured dependent-DB effect itself is not captured.
 
 ## Clean rerun — 31 October 2026
 

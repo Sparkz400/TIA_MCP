@@ -219,6 +219,13 @@ namespace TiaMcp.Openness.V21
                         observation["idempotentReadback"] = returnedApply;
                         if (!returnedApply && observation.Value<string>("fingerprint") != change.Preview.Value<string>("fingerprint")) throw new BridgeException("PreviewStale", "Library resources changed since preview.");
                         VerifyLibrarySources(change);
+                        // A refused combined apply mutates nothing: refuse it with change_apply's own pre-claim decision before the Host
+                        // writes an admission record (e.g. DependencyProfileUnavailable for a multi-instance caller with dependents).
+                        // Only at mutation_begin (no scope yet): dispatch re-resolves the scope, and change_apply rechecks under the lease.
+                        if (_sharedMutationScope == null && change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload) && _libraryIntegrateApplyEnabled
+                            && change.IdempotencyKey == null && PlcCombinedApplyRefusal(change) is JObject combinedRefusal)
+                            throw new BridgeException(combinedRefusal.Value<string>("code"), "Combined apply refused before admission: " + combinedRefusal.Value<string>("message") +
+                                " No admission record, idempotency claim, checkpoint or native mutation was written or dispatched.", LibraryChangeView(change));
                     }
                 }
                 else

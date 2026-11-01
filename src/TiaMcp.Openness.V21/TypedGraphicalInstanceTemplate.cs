@@ -4,12 +4,20 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Openness.V21
 {
     /// <summary>Complete global FB instance envelope; never fabricates native storage layout.</summary>
     internal static class TypedGraphicalInstanceTemplate
     {
+        // Captured global or multi-instance templates of one CPU and route. A "qualificationOnly" template (a capture whose
+        // builder qualification is pending) serves only a --component-qualification worker in its own component scratch;
+        // every other typed edit skips it. Any value other than an explicit false counts as qualification-only.
+        internal static System.Collections.Generic.IEnumerable<JObject> Admitted(JObject catalog, string collection, string cpu, string route, bool qualificationScratch) =>
+            (catalog[collection] as JArray ?? new JArray()).OfType<JObject>().Where(t => t.Value<string>("tiaVersion") == "V21" && t.Value<string>("cpuFamily") == cpu
+                && t.Value<string>("route") == route && (qualificationScratch || t["qualificationOnly"] == null || JToken.DeepEquals(t["qualificationOnly"], new JValue(false))));
+
         internal static XDocument Create(string name, int exactNumber, XDocument callee, XDocument template)
         {
             if (!Regex.IsMatch(name ?? "", @"^[A-Za-z_][A-Za-z0-9_]{0,79}$") || exactNumber < 1 || exactNumber > 65535)
@@ -48,14 +56,17 @@ namespace TiaMcp.Openness.V21
                 var to = targetSections.Elements().Single(s => (string)s.Attribute("Name") == sectionName);
                 var prototypes = to.Elements().ToArray();
                 var members = from.Elements().ToArray();
-                if (members.Any(member => member.Name.LocalName != "Member" || member.Descendants().Any(e => e.Name.LocalName == "Member" || e.Name.LocalName == "StartValue" || e.Name.LocalName == "DefaultValue")))
-                    Fail("Structured declarations and custom start values need their own independently observed storage profile.");
+                const string structuredRefusal = "Structured declarations and custom start values need their own independently observed storage profile.";
+                if (members.Any(member => member.Name.LocalName != "Member" || member.Descendants().Any(e => e.Name.LocalName == "StartValue" || e.Name.LocalName == "DefaultValue")))
+                    Fail(structuredRefusal);
                 foreach (var member in members)
                 {
                     string type = (string)member.Attribute("Datatype");
                     var matching = prototypes.Where(p => p.Name == member.Name && (string)p.Attribute("Datatype") == type).ToArray();
+                    // The whole member is compared, so a structured (UDT) member needs a captured prototype with the identical nested storage.
                     if (matching.Length == 0 || !matching.Any(p => SameMemberDefaults(p, member)))
-                        Fail("No observed matching native instance declaration defaults for " + sectionName + "/" + type + ".");
+                        Fail(member.Descendants().Any(e => e.Name.LocalName == "Member") ? structuredRefusal
+                            : "No observed matching native instance declaration defaults for " + sectionName + "/" + type + ".");
                 }
                 to.ReplaceNodes(members.Select(member => new XElement(member)));
             }

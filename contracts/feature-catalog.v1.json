@@ -2091,6 +2091,73 @@
       ]
     },
     {
+      "id": "local.typed.component-storage-capture.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "68eca319a1fa7bfcbd6e33de1914dea4527f2495",
+        "passedScope": "scripts/capture_typed_routes_owned.py, both captures of route-capture-component-storage-packet.v1.json (frozen 68eca319, artifacts/csm and artifacts/csu), each in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline. Standard route: the component UDT TiaMcpComponentState (type_source_upsert) and FB TiaMcpComponentGate from the component-qualification fixture sources, then the FBD FB Tgp_ComponentHost_FBD declaring the multi-instance Gate : \"TiaMcpComponentGate\". softwareUnit route (TiaMcp_UnitA): the same UDT and interface in the unit namespace as TgpUnit_ComponentGate with its instance DB. Every source compiled clean and saved, added exactly its declared objects in the selected scope and namespace, and the saved state matched a fresh-process reopen. The captured Gate member embeds the UDT static State with its nested Active member; the SCL-authored FB interface equals the library-installed component04-callee interface, and the unit DB members equal the unit FB members."
+      },
+      "artifacts": [
+        "evidence/local.typed.component-storage-capture.20261101.json"
+      ],
+      "limitations": [
+        "Native reference capture only. The standard multi-instance template v21.fw41.component-gate.multi-instance.v1 is the source of the multiInstance combined-apply shape; the unit instance template v21.fw41.softwareUnit.component-gate.global-instance.v1 is staged only (artifacts/csus) and has no qualification case.",
+        "No dependent instance-DB effect of a structured multi-instance member was captured: a caller FB with its own instance DB stays refused."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.multi.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9febd4dfe1c38ccdbb04612c9703a22ef61a7ead",
+        "passedScope": "Combined-apply candidate cases (scripts/qualify_library_integrate_apply.py --candidates at 9febd4df, frozen artifacts/w4c, --artifacts artifacts/ic5) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. ladStandalone, ladExisting, fbCaller, earlierPlacement and reuse installed again as in local.library_integrate.candidate_shapes.rerun.20261031. multiInstance: after a verified standalone install, a multi-instance Gate of the reused installed TiaMcpComponentGate in the existing FBD FB TiaMcpComponentHost (FB30, no instance DB) installed through change_apply: preview candidateFeatures exactly fbCaller, multiInstance and reusedComponent, one typed step whose multi-instance declaration came from the captured template v21.fw41.component-gate.multi-instance.v1 (local.typed.component-storage-capture.20261101, then qualificationOnly), coordinator installation_verified with the typed step's own archive as the single checkpoint, the native caller insertion proof with exactly one new Static member Gate and following IDs 8->D, 9->E, the call oracle on the LocalVariable instance, the project library holding exactly the released versions, a fresh reopen, a 0-error compile, and change_restore of that checkpoint into a new location in a fresh owned Portal equal to the first installation after retrieval and after reopen."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.multi.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+        "Qualifies only the exact shape fbCaller+multiInstance+reusedComponent with an FBD FB caller that has no instance DB and is not embedded elsewhere; no structured dependent-DB effect is captured, and a multi-instance after a fresh import stays refused before the claim."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.dependents.rerun.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "195f63a375a43e6ea382706c95de56580b23a377",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates at 195f63a3 (frozen artifacts/w4f, --artifacts artifacts/ic7) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: ladStandalone, ladExisting, fbCaller, earlierPlacement, reuse and multiInstance installed with every gate (exact candidateFeatures, installation_verified with one initial checkpoint, export/inventory diff, caller insertion proof, call oracle, library versions, reopen, 0-error compile, restore of the initial checkpoint). multiInstanceDependents: after a verified standalone install, TiaMcpComponentHost (FB30) got its own instance DB TiaMcpComponentHost_DB; the reused-FB multi-instance plan previewed combinedApply.eligible=false with refusalCode DependencyProfileUnavailable naming that DB in refusalDetails.dependents; change_apply was refused with DependencyProfileUnavailable and the message \"Combined apply refused before admission: ...\"; the Host's admission records were the same before and after; the plan stayed prepared without an idempotency claim; the scratch snapshot equalled the baseline."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.dependents.rerun.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+        "Covers a caller FB with its own global instance DB; an embedding parent FB falls under the same dependent closure but was not exercised natively."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "195f63a375a43e6ea382706c95de56580b23a377",
+        "passedScope": "scripts/qualify_library_integrate_apply.py without --candidates at 195f63a3 (frozen artifacts/w4f, --artifacts artifacts/ir2), owned de-DE-only CPU 1511-1 PN V4.1 scratch projects: the standalone FBD FC and existing FBD FC installs passed every gate (preview eligible, one change_apply, export/inventory diff of exactly the planned additions, project library versions, reopen, 0-error compile, restore of the initial checkpoint after retrieval and after reopen). Refusals with the former flag: an FBD OB caller (\"OB insertion is refused\") and an existing FBD FB caller with a multi-instance of a freshly imported FB (the multi-instance refusal) were refused with PlcIntegrationNotQualified and the message \"Combined apply refused before admission: ...\", the Host's admission records the same before and after each refused change_apply, each plan still prepared without an idempotency claim, and the project unchanged. A Host without the former flag reported combined apply, previewed the standalone FBD plan eligible and refused the FB multi-instance plan the same way."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.regression.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1."
+      ]
+    },
+    {
       "id": "local.library_integrate.combined_apply.regression.20261031",
       "status": "passed",
       "profile": {
@@ -11420,7 +11487,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
+          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -11438,7 +11505,9 @@
         "evidenceIds": [
           "local.library_integrate.combined_apply.rerun.20261028",
           "local.library_integrate.candidate_shapes.rerun.20261031",
-          "local.library_integrate.combined_apply.regression.20261031"
+          "local.library_integrate.combined_apply.regression.20261031",
+          "local.library_integrate.combined_apply.regression.20261101",
+          "local.library_integrate.candidate_shapes.multi.20261101"
         ]
       },
       "availability": {
@@ -11480,11 +11549,11 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031).",
+          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals, and local.library_integrate.combined_apply.regression.20261101 after the pre-admission refusal). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031). Since 1 November also a multi-instance of the reused installed FB and UDT in an existing FBD FB caller without an instance DB, through the captured multi-instance template v21.fw41.component-gate.multi-instance.v1 (local.library_integrate.candidate_shapes.multi.20261101; capture local.typed.component-storage-capture.20261101).",
           "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
-          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single-feature shapes ladCaller, fbCaller, earlierPlacement and reusedComponent are verified (PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; combinations of these features (for example a LAD FB caller or a LAD FC with an earlier placement), multi-instances, partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Combinations and multi-instances with a reused FB have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. A multi-instance of the captured component ends before any dispatch: the typed multi-instance profiles refuse its structured UDT static (InstanceCreationProfileUnavailable).",
-          "Before any claim it also refuses with its own code: ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
-          "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
+          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single-feature shapes ladCaller, fbCaller, earlierPlacement and reusedComponent and the combination fbCaller+multiInstance+reusedComponent are verified (PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; combinations of these features (for example a LAD FB caller or a LAD FC with an earlier placement), other multi-instances (after a fresh import), partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. Typed templates map a structured (UDT) member only onto a captured reference member with the identical nested declaration.",
+          "Before any claim it also refuses with its own code: DependencyProfileUnavailable (naming the dependents) when a multi-instance's caller FB has dependents (its instance DBs, embedding parents and their users, the typed route's dependent closure), because no captured dependent-DB effect covers the component's structured member; capturing that effect is not done (local.library_integrate.candidate_shapes.dependents.rerun.20261101). ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
+          "Every combined-apply refusal is decided while the worker resolves the shared-mutation scope at mutation_begin, after the scope's own offline, PreviewStale and source checks (which keep their codes), so the Host writes no admission record and nothing becomes recovery_required (local.library_integrate.combined_apply.regression.20261101). The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects."
@@ -11495,7 +11564,11 @@
         "evidenceIds": [
           "local.library_integrate.combined_apply.rerun.20261028",
           "local.library_integrate.candidate_shapes.rerun.20261031",
-          "local.library_integrate.combined_apply.regression.20261031"
+          "local.library_integrate.combined_apply.regression.20261031",
+          "local.library_integrate.combined_apply.regression.20261101",
+          "local.typed.component-storage-capture.20261101",
+          "local.library_integrate.candidate_shapes.multi.20261101",
+          "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
         ]
       },
       "availability": {

@@ -7,9 +7,9 @@ library, peer and existing FBD FC callers, mapped tags) and its independent orac
 Each eligible plan is applied once; a failed or uncertain apply is never replayed or
 restored automatically. A failed step is retained as failed, never converted to success.
 
---candidates qualifies the shapes that have a builder but no native evidence yet (LAD and FB callers, an earlier
-placement, reuse of the installed FB and a multi-instance with it). Only a --component-qualification Host admits them,
-in its own owned scratch; each case is independent and stops only itself.
+--candidates runs the candidate cases (LAD and FB callers, an earlier placement, reuse of the installed FB and a
+multi-instance with it; each a verified shape since 1 November) on a --component-qualification Host, which also admits
+shapes without native evidence, in its own owned scratch; each case is independent and stops only itself.
 """
 from __future__ import annotations
 import argparse
@@ -35,8 +35,9 @@ FLAG = "--enable-library-integrate-apply"
 CANDIDATE_FLAG = "--component-qualification"
 COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/before")
 REFUSED = "PlcIntegrationNotQualified"
-# FB callers are verified since 31 October, multi-instances are not: the refusal cases prepare an FB caller with a multi-instance.
-FB_REFUSAL = "Only new global instance DBs are verified; multi-instances stay plan-only."
+# FB callers are verified since 31 October and a multi-instance of the reused FB since 1 November; a multi-instance after a fresh
+# import is not, so the refusal cases prepare an FB caller with a multi-instance of the FB they import.
+FB_REFUSAL = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only."
 HOST_FB = "TiaMcpComponentHost"
 # The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
 # (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
@@ -67,22 +68,27 @@ CANDIDATES = {
     "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
-# The typed route's multi-instance profiles do not cover an FB with a structured (UDT) static; a refusal before any
-# dispatch is then recorded as that boundary, never as a pass.
-MULTI_BOUNDARY = ("InstanceCreationProfileUnavailable", "GraphicalInstanceTemplateUnavailable")
-
-
-def multi_boundary_journal(journal):
-    """The recorded multi-instance boundary only: a listed storage-profile refusal at typed preparation with nothing dispatched."""
-    failure, summary = journal.get("failure") or {}, journal.get("combinedApply") or {}
-    return (failure.get("code") in MULTI_BOUNDARY and failure.get("failedStep") == "prepare_graphical_typed_edit"
-            and summary.get("libraryStepDispatched") is False and summary.get("typedStepDispatched") is False)
+# multiInstance installs through the captured component multi-instance template v21.fw41.component-gate.multi-instance.v1
+# (route-capture-component-storage-packet.v1.json); it passed natively on 1 November, so its preview names no candidate feature.
+# multiInstanceDependents gives the Host FB its own instance DB first: that dependent has no captured effect, so the plan must be
+# refused before admission (DependencyProfileUnavailable), with no admission record and the scratch unchanged.
+HOST_DB = HOST_FB + "_DB"
+HOST_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (HOST_DB, HOST_FB)
+DEPENDENTS_REFUSED = "DependencyProfileUnavailable"
+# The worker's message for a combined apply refused while it resolves the shared-mutation scope (OpennessSession.SharedMutationAdmission).
+BEFORE_ADMISSION = "Combined apply refused before admission: "
+REFUSED_CASES = {"multiInstanceDependents"}
 
 
 def failed_candidates(outcomes):
-    """Every candidate case that did not install; only multiInstance may instead end at its recorded boundary."""
-    return {name: outcome for name, outcome in outcomes.items()
-            if not (outcome == "installed" or name == "multiInstance" and outcome == "boundary")}
+    """Every candidate case that did not reach its outcome: installed, or refused for the refusal cases."""
+    return {name: outcome for name, outcome in outcomes.items() if outcome != ("refused" if name in REFUSED_CASES else "installed")}
+
+
+def admission_records(root):
+    """Every shared-mutation admission record the Host wrote under its artifact root, archived ones included."""
+    base = Path(root) / "engineering-admissions"
+    return sorted(p.name for folder in (base, base / ".archive") if folder.is_dir() for p in folder.iterdir() if p.is_dir() and p.name != ".archive")
 
 
 def two_network_fc(peer_xml, name, number):
@@ -267,14 +273,18 @@ class IntegrateApplyRun(ComponentRun):
         prepared = self.call("change_prepare", {"kind": "library_integrate", "payload": payload})
         return prepared, self.review_plan(prepared, payload, caller, caller_recipe["mode"] == "existing")
 
-    def refused_apply(self, prepared):
-        """One change_apply that must be refused before any claim; the plan stays prepared."""
+    def refused_apply(self, prepared, code=REFUSED):
+        """One change_apply that must be refused before admission (since dc805b70 the worker refuses while resolving the
+        shared-mutation scope, so the Host writes no admission record) and before any claim; the plan stays prepared."""
+        admissions = admission_records(self.output)
         try:
             result = self.call("change_apply", step_request(prepared))
         except NativeToolError as error:
-            detail = refusal(error)
+            detail = refusal(error, code)
         else:
             raise RuntimeError("change_apply installed a plan that must be refused: " + str(result.get("state")))
+        require((detail.get("message") or "").startswith(BEFORE_ADMISSION), "The apply was not refused before admission: " + str(detail.get("message")))
+        require(admission_records(self.output) == admissions, "The refused apply wrote an admission record.")
         status = self.call("change_status", {"changeId": prepared["changeId"]})
         require(status.get("state") == "prepared" and not (status.get("journal") or {}).get("idempotencyKeyHash"),
                 "A refused apply changed the plan's durable state.")
@@ -363,14 +373,17 @@ class IntegrateApplyRun(ComponentRun):
         case["compileVerified"] = True; self.persist()
         self.restore(case, prepared, checkpoint, baseline, out, restored_versions)
 
-    def reuse(self, name, archive, released, multi=False):
+    def reuse(self, name, archive, released, multi=False, dependents=False):
         """Candidate: a first verified install, then a plan that reuses the installed FB (exact proofs, no import step), either
-        in a second new FBD FC with a new global DB or as a multi-instance in an existing FB caller."""
+        in a second new FBD FC with a new global DB or as a multi-instance in an existing FB caller. With dependents the FB
+        caller has its own instance DB, and the multi-instance must be refused before admission."""
         self.use({"callerMode": "createStandaloneFc"})
         case, out = self.case(name, True), self.output / name
         scratch, opened, plc = self.stage_consumer(archive, released)
         if multi:
             self.host_fb(plc)
+        if dependents:
+            self.apply("source_upsert", {"language": "SCL", "source": HOST_DB_SOURCE, "expectedBlockNames": [HOST_DB]})
         baseline = snapshot(self.call, out / "before-first")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         first, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
@@ -381,12 +394,9 @@ class IntegrateApplyRun(ComponentRun):
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-        features = ["reusedComponent", "fbCaller", "multiInstance"] if multi else []
-        try:
-            applied, record = self.apply_combined(case, prepared, baseline, features)
-        except NativeToolError as error:
-            if multi and self.multi_boundary(case, out, baseline, error): return
-            raise
+        if dependents:
+            return self.dependents_refused(case, out, prepared, baseline, plc + "/blocks/" + HOST_DB, opened)
+        applied, record = self.apply_combined(case, prepared, baseline, [])
         after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
         self.call("library_close", {"libraryId": opened["libraryId"]})
         # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.
@@ -395,17 +405,17 @@ class IntegrateApplyRun(ComponentRun):
                 "The reuse checkpoint is not the typed step's own archive.")
         self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after, sorted(version_key(n, pin) for n, pin in released.items()))
 
-    def multi_boundary(self, case, out, baseline, error):
-        """True when the typed route's storage profiles refused the multi-instance before any dispatch: the recorded boundary,
-        with the project unchanged. Any other failure stays a failure."""
-        journal = (case.get("failureStatus") or {}).get("journal") or {}
-        case["boundary"] = {"error": str(error), "failure": journal.get("failure"), "combinedApply": journal.get("combinedApply")}; self.persist()
-        if not multi_boundary_journal(journal):
-            return False
+    def dependents_refused(self, case, out, prepared, baseline, host_db, opened):
+        """The preview already refuses with DependencyProfileUnavailable, naming the caller's instance DB; change_apply is
+        refused before admission (no admission record), the plan stays prepared and the scratch is unchanged."""
+        block = case["combinedApply"] = require_combined_preview(prepared["preview"], refusal="The multi-instance caller ")
+        require(block.get("refusalCode") == DEPENDENTS_REFUSED and host_db in (block.get("refusalDetails") or {}).get("dependents", []),
+                "The preview does not refuse the caller's instance DB as a dependent: " + str(block.get("refusalDetails")))
+        case["refusal"] = self.refused_apply(prepared, DEPENDENTS_REFUSED)
         assert_snapshot(baseline, snapshot(self.call, out / "after-refusal"))
-        case.update(outcome="boundary", projectUnchanged=True); self.persist()
+        case.update(outcome="refused", admissionWritten=False, projectUnchanged=True); self.persist()
+        self.call("library_close", {"libraryId": opened["libraryId"]})
         self.session.close()
-        return True
 
     def restore(self, case, prepared, checkpoint, baseline, out, restored_versions=()):
         self.session.close()
@@ -446,7 +456,7 @@ class IntegrateApplyRun(ComponentRun):
 
     def refusals(self, archive, released):
         """Flag on: an FBD OB caller and an existing FBD FB caller with a multi-instance are refused at apply with no project change."""
-        self.manifest["callerMode"] = "createStandaloneFc"
+        self.use({"callerMode": "createStandaloneFc"})  # each case starts from the base manifest, no multiInstance left over
         case, out = self.case("refusals", True), self.output / "refusals"
         scratch, opened, plc = self.stage_consumer(archive, released)
         exports = [artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
@@ -472,7 +482,7 @@ class IntegrateApplyRun(ComponentRun):
         """Host without the former flag: combined apply is the default, so the standalone FBD plan previews eligible (the
         install steps already applied it; it is not applied again) and an FB caller plan with an unverified multi-instance is
         refused with no change."""
-        self.manifest["callerMode"] = "createStandaloneFc"
+        self.use({"callerMode": "createStandaloneFc"})  # each case starts from the base manifest, no multiInstance left over
         self.session.client_factory = host_client(False)
         case, out = self.case("defaultHost", False), self.output / "defaultHost"
         scratch, opened, plc = self.stage_consumer(archive, released)
@@ -495,7 +505,8 @@ class IntegrateApplyRun(ComponentRun):
         """Every candidate case on the qualification Host, each in its own owned scratch; one failure stops only its case."""
         self.session.client_factory = candidate_client
         cases = [(name, lambda n=name: self.install(n, archive, released, *CANDIDATES[n])) for name in CANDIDATES]
-        cases += [("reuse", lambda: self.reuse("reuse", archive, released)), ("multiInstance", lambda: self.reuse("multiInstance", archive, released, True))]
+        cases += [("reuse", lambda: self.reuse("reuse", archive, released)), ("multiInstance", lambda: self.reuse("multiInstance", archive, released, True)),
+                  ("multiInstanceDependents", lambda: self.reuse("multiInstanceDependents", archive, released, True, True))]
         for name, operation in cases:
             try:
                 self.step("candidate:" + name, operation)
