@@ -207,7 +207,15 @@ internal static class EngineeringOperationChecks
             catch(BridgeException error) when(error.Code=="InvalidResourceKey") { continue; }
             throw new Exception("Caller-supplied device namespaces must remain refused");
         }
-        Console.WriteLine("PASS long resource paths: existing file, case alias, absent descendant and refused device namespaces");
+        // Revision renames are write-through and keep File.Move's semantics: no silent overwrite, an explicit replace, long paths.
+        string revision=Path.Combine(directory,"000001.json"),temporary=revision+".tmp";
+        File.WriteAllText(temporary,"first");PackageStorage.MoveDurably(temporary,revision);
+        File.WriteAllText(temporary,"second");
+        try { PackageStorage.MoveDurably(temporary,revision); throw new Exception("A durable rename must not overwrite a committed revision"); }
+        catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
+        PackageStorage.MoveDurably(temporary,revision,replace:true);
+        if(File.ReadAllText(revision)!="second" || File.Exists(temporary)) throw new Exception("A durable replace must publish the new bytes");
+        Console.WriteLine("PASS long resource paths: existing file, case alias, absent descendant, refused device namespaces and durable renames");
     }
 
     private static string Child(string root, string id, bool acquire = false)

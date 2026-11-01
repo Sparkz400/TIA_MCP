@@ -523,7 +523,7 @@ public sealed class EngineeringOperationStore
         string temp = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         using (var stream = new FileStream(temp, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { stream.Write(bytes); stream.Flush(true); }
-        File.Move(temp, path, false);
+        PackageStorage.MoveDurably(temp, path);
     }
 
     private FileStream Lock() => PackageStorage.Lock(Path.Combine(directory, "store.lock"));

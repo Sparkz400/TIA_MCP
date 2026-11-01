@@ -206,6 +206,6 @@ public sealed class EngineeringMutationAdmissionStore
         string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { JsonSerializer.Serialize(stream, record, BridgeProtocol.Json); stream.Flush(true); }
-        File.Move(temporary, path, false);
+        PackageStorage.MoveDurably(temporary, path);
     }
 }

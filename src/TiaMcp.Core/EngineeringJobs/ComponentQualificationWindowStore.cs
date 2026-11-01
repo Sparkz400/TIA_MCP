@@ -340,7 +340,14 @@ public sealed class ComponentQualificationWindowStore
     private static ComponentWindowChild[] ReplaceLast(IReadOnlyList<ComponentWindowChild> values, ComponentWindowChild next) => values.Take(values.Count - 1).Append(next).ToArray();
     private static T Freeze<T>(T value) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, BridgeProtocol.Json), BridgeProtocol.Json)!;
     private static string Hash<T>(T value) => CanonicalJson.Sha256(JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
-    private static void Write(ComponentWindowReservation r, string directory) => PackageStorage.Save(Path.Combine(directory, r.Revision.ToString("D8") + ".json"), r);
+    private static void Write(ComponentWindowReservation r, string directory)
+    {
+        string path = Path.Combine(directory, r.Revision.ToString("D8") + ".json"), temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        PackageStorage.EnsureNoLinks(path);
+        using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+        { JsonSerializer.Serialize(stream, r, BridgeProtocol.Json); stream.Flush(true); }
+        PackageStorage.MoveDurably(temporary, path);
+    }
     [System.Diagnostics.CodeAnalysis.DoesNotReturn]
     private static void Fail(string code, string message) => throw new BridgeException(code, message);
 }

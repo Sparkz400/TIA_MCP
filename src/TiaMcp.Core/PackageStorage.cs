@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -127,6 +128,18 @@ internal static class PackageStorage
 
     internal static void PublishFile(string temporary, string destination) =>
         PublishFile(temporary, destination, (source, target) => File.Move(source, target, true), Thread.Sleep);
+
+    // For revision and callback journals. MOVEFILE_WRITE_THROUGH: the rename is on disk when this returns, so a record counted as
+    // committed (a dispatch intent) survives a power loss; File.Move can leave the new directory entry in the cache.
+    internal static void MoveDurably(string source, string destination, bool replace = false)
+    {
+        if (!OperatingSystem.IsWindows()) { File.Move(source, destination, replace); return; }
+        if (!MoveFileEx(@"\\?\" + Path.GetFullPath(source), @"\\?\" + Path.GetFullPath(destination), (replace ? 1u : 0u) | 8u))
+            throw new IOException("The file could not be renamed.", Marshal.GetHRForLastWin32Error());
+    }
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "MoveFileExW", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool MoveFileEx(string existing, string target, uint flags);
 
     internal static void PublishFile(string temporary, string destination, Action<string, string> move, Action<int> delay)
     {
