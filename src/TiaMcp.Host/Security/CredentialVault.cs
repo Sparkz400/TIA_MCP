@@ -66,6 +66,9 @@ internal sealed partial class CredentialVault
         _ = new CredentialVault(parent);
         return Path.Combine(parent, name);
     }
+    // Consumers open only a vault the credential command created: an unknown vault name refuses and leaves no folder behind.
+    internal static CredentialVault Existing(string path) =>
+        File.Exists(Path.Combine(path, "vault.json")) ? new CredentialVault(path) : throw Error("CredentialUnavailable");
     internal CredentialStatus Create(CredentialBinding binding, byte[] secret)
     {
         ValidateBinding(binding);
@@ -180,8 +183,10 @@ internal sealed partial class CredentialVault
         string path = Path.Combine(root, "vault.json");
         if (!File.Exists(path) && !Directory.Exists(path))
         {
-            // Never invent a new owner after losing metadata for an existing store.
-            if (Directory.EnumerateFileSystemEntries(root).Any(p => Path.GetFileName(p) != ".lock")) throw Error("CredentialUnavailable");
+            // Never invent a new owner after losing metadata for an existing store. A .pending- file is an unpublished write
+            // (a crash during this first header write leaves one), never stored state.
+            if (Directory.EnumerateFileSystemEntries(root).Any(p => Path.GetFileName(p) != ".lock" && !Path.GetFileName(p).StartsWith(".pending-", StringComparison.Ordinal)))
+                throw Error("CredentialUnavailable");
             Publish("vault.json", new VaultHeader("protected-credential-vault.v1", Guid.NewGuid().ToString("N"), user.Value));
         }
         var header = ReadJson<VaultHeader>(path);

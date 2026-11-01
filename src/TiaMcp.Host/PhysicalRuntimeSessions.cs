@@ -378,7 +378,7 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         });
         if (failure is not null) throw Error(failure);
     }
-    private static CredentialVault Vault(RuntimeLoginSelection login) => new(CredentialVault.UserRoot(login.VaultName));
+    private static CredentialVault Vault(RuntimeLoginSelection login) => CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName));
     private static void ValidatePassword(byte[] bytes)
     {
         using var password = JsonDocument.Parse(bytes, new JsonDocumentOptions { MaxDepth = 1 });
