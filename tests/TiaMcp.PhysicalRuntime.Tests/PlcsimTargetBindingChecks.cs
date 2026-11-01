@@ -40,6 +40,11 @@ public static class PlcsimTargetBindingChecks
         Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", "Intel(R) Ethernet Connection I219-LM"), "RuntimeTargetNotOwnedPlcsim");
         Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", ""), "RuntimeTargetNotOwnedPlcsim");
         Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", null), "RuntimeTargetRouteUnverified");
+        // A session keeps the route it connected on: opened through a plant card, it stays refused after the PLCSIM adapter became the best route.
+        PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", Plcsim, Plcsim);
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", "Intel(R) Ethernet Connection I219-LM", Plcsim), "RuntimeTargetNotOwnedPlcsim");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", null, Plcsim), "RuntimeTargetRouteUnverified");
+        Fails(() => PlcsimTargetBindings.RequireEndpoint(tcpip, "https://192.168.0.1", Plcsim, "Intel(R) Ethernet Connection I219-LM"), "RuntimeTargetNotOwnedPlcsim");
         Fails(() => PlcsimTargetBindings.RequireSameInstance(tcpip, tcpip with { CommunicationInterface = "Softbus" }), "PlcsimTargetBindingStale");
 
         Check(PlcsimTargetBindings.Covers(binding, "https://192.168.0.10") && PlcsimTargetBindings.Covers(binding, "opc.tcp://10.0.0.1:4840/"), "Owned controller addresses bind Web and UA endpoints");

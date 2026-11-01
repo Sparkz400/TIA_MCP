@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.89`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.90`.
 
 ### Added
 
@@ -145,7 +145,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     `sim_release` without `deleteOwned` refuse while a capture holds the instance, and a release
     retries a failed capture-mode restore.
   - Runtime writes, RUN/STOP and Test Suite system tests need Windows to route the endpoint through
-    the PLCSIM virtual adapter (`RuntimeTargetRouteUnverified`, `RuntimeTargetNotOwnedPlcsim`).
+    the PLCSIM virtual adapter (`RuntimeTargetRouteUnverified`, `RuntimeTargetNotOwnedPlcsim`). A Web
+    or OPC UA session also needs that route from when it connected, so one opened to a physical PLC
+    stays refused after the PLCSIM adapter becomes the best route.
   - Cancelling a `sim_*` call no longer breaks the simulator bridge; waits that cannot end inside
     `--timeout-seconds` are refused.
   - `library_package_stage` `hostPath` accepts only library archives and library folders.

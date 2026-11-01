@@ -13,12 +13,12 @@ namespace TiaMcp.Host;
 public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions options, PlcsimTargets targets)
 {
     [McpServerTool(Name = "runtime_ua_write", ReadOnly = false, Destructive = true, OpenWorld = true)]
-    [Description("Write 1..16 scalar Value attributes through this Host's owned UA session whose opc.tcp endpoint is a controller address of a runtime_plcsim_bind binding (bindingSha256), routed by Windows through the PLCSIM Virtual Ethernet Adapter; the simulator worker must still observe that exact owned instance. Physical PLCs, unbound endpoints and a route through another network card are refused with RuntimeTargetNotOwnedPlcsim (an undetermined route with RuntimeTargetRouteUnverified) before anything is sent. Requires acknowledgeWrite=true and no running acquisition on the session. writes:[{node,encoding,expected,value}] use runtime_ua_read's exact encoding and value forms (boolean, decimalInteger, roundTripFloat/Double, string); every expected must equal the current read or nothing is written (preconditionMismatch). Values convert to the node's observed built-in type, one Write call is sent, then an independent read reports per-item status codes and readbackMatches. Unknown outcomes are never retried. No arrays, structures, forcing, method calls or credentials in results.")]
+    [Description("Write 1..16 scalar Value attributes through this Host's owned UA session whose opc.tcp endpoint is a controller address of a runtime_plcsim_bind binding (bindingSha256), routed by Windows through the PLCSIM Virtual Ethernet Adapter when the session connected and now; the simulator worker must still observe that exact owned instance. Physical PLCs, unbound endpoints and a route through another network card are refused with RuntimeTargetNotOwnedPlcsim (an undetermined route with RuntimeTargetRouteUnverified) before anything is sent. Requires acknowledgeWrite=true and no running acquisition on the session. writes:[{node,encoding,expected,value}] use runtime_ua_read's exact encoding and value forms (boolean, decimalInteger, roundTripFloat/Double, string); every expected must equal the current read or nothing is written (preconditionMismatch). Values convert to the node's observed built-in type, one Write call is sent, then an independent read reports per-item status codes and readbackMatches. Unknown outcomes are never retried. No arrays, structures, forcing, method calls or credentials in results.")]
     public Task<CallToolResult> Write(string attemptId, string bindingSha256, OpcUaRuntimeWriteItem[] writes, bool acknowledgeWrite, CancellationToken cancellationToken) =>
         Run(async () =>
         {
             if (!acknowledgeWrite) throw new BridgeException("RuntimeAcknowledgementRequired", "Set the explicit acknowledgement flag; nothing was sent.");
-            await targets.Require(bindingSha256, (await sessions.Store.Status(attemptId, cancellationToken)).Selection.Endpoint);
+            await targets.Require(bindingSha256, "ua:" + attemptId, (await sessions.Store.Status(attemptId, cancellationToken)).Selection.Endpoint);
             return await sessions.Store.Write(attemptId, writes, cancellationToken,
                 RuntimeQualification.AfterSend(options, "ua.write.afterSend", new { attemptId, bindingSha256, writes }));
         });
@@ -30,7 +30,7 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
         Run(async () =>
         {
             if (!acknowledgeCall) throw new BridgeException("RuntimeAcknowledgementRequired", "Set the explicit acknowledgement flag; nothing was sent.");
-            await targets.Require(bindingSha256, (await sessions.Store.Status(attemptId, cancellationToken)).Selection.Endpoint);
+            await targets.Require(bindingSha256, "ua:" + attemptId, (await sessions.Store.Status(attemptId, cancellationToken)).Selection.Endpoint);
             return await sessions.Store.Call(attemptId, objectNode, methodNode, inputs, cancellationToken);
         });
 
@@ -74,7 +74,7 @@ public sealed class OpcUaRuntimeTools(OpcUaRuntimeSessions sessions, HostOptions
     [McpServerTool(Name = "runtime_ua_connect", ReadOnly = false, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeStatus))]
     [Description("Create one owned, read-only OPC UA session at an explicit endpoint. Require exact server application URI and leaf SHA256, valid certificate hostname/time/key usage, Basic256Sha256 SignAndEncrypt, anonymous or protected username authentication. Supply a new 32-lowercase-hex attemptId. Reusing an attempt observes its retained outcome without replay. Unresolved same-endpoint attempts block fresh IDs. Polling or subscriptions require their separate explicit start tools. No scans, downgrade, writes, methods or automatic reconnect. Physical qualification remains unverified.")]
     public Task<CallToolResult> Connect(string attemptId, OpcUaRuntimeSelection selection, CancellationToken cancellationToken) =>
-        Run(async () => await sessions.Store.Connect(attemptId, selection, cancellationToken));
+        Run(async () => await targets.Connect("ua:" + attemptId, selection.Endpoint, () => sessions.Store.Connect(attemptId, selection, cancellationToken)));
     [McpServerTool(Name = "runtime_ua_browse", ReadOnly = true, Destructive = false, OpenWorld = true, UseStructuredContent = true, OutputSchemaType = typeof(OpcUaRuntimeBrowseResult))]
     [Description("Browse bounded immediate hierarchical references in this Host's owned UA session, using exact namespace URI and canonical numeric/string/guid/opaque identifier. At most 256 references and 16 pages; truncation and continuation cleanup are explicit. External server references are unsupported, not followed.")]
     public Task<CallToolResult> Browse(string attemptId, OpcUaRuntimeNode node, CancellationToken cancellationToken, int maximum = 256) =>
