@@ -26,6 +26,9 @@ namespace TiaMcp.Model
                 return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value))).Replace("-", "").ToLowerInvariant();
         }
 
+        // XDocument.ToString drops the XML declaration that TIA's exports carry and RequireExactDocument compares (route run hr1).
+        internal static void WriteXml(XDocument document, string path) => document.Save(path, SaveOptions.DisableFormatting);
+
         internal static XDocument ReadXml(string xml)
         {
             if (xml == null || Encoding.UTF8.GetByteCount(xml) > 32 * 1024 * 1024)

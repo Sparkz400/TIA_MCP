@@ -276,7 +276,7 @@ namespace TiaMcp.Openness.V21
             string observed = owners[0].Element("AttributeList")?.Element("BackColor")?.Value;
             var expected = HmiPreservationRules.PatchClassicScalar(document, "Hmi.Screen.Screen", (string)owners[0].Attribute("ID"), "BackColor", observed, value);
             change.InputPath = Path.Combine(change.Directory, "hmi-classic-expected.xml");
-            File.WriteAllText(change.InputPath, expected.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
+            HmiPreservationRules.WriteXml(expected, change.InputPath);
             change.InputHash = ChangeFileHash(change.InputPath);
             change.Backups.Add(new JObject { ["role"] = "hmi-classic-before", ["artifact"] = ChangeArtifact(before) });
             return new JObject { ["objectPath"] = change.Payload["target"]["objectPath"].DeepClone(), ["property"] = "BackColor", ["before"] = observed, ["after"] = value };
