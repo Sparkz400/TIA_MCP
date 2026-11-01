@@ -209,6 +209,93 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertNotIn("gsdNotInstalled", run.h.report)
         self.assertEqual(interface, run.h.report["gsdDevice"]["hardwarePath"])
 
+    def gsd_slice(self, entries, coverage, device=True, strict=False):
+        """gsd_slice with stubbed steps: the calls in order and the report. strict: expect raises on failure, as in a qualification run."""
+        self.calls = calls = []  # Kept on the test, so a raising run still shows what it did.
+        run = q.Run.__new__(q.Run)
+        run.base, run.current, run.coverage = "/projects/P/devices/", {"view": {}}, coverage
+        run.h = type("H", (), {"report": {}, "args": None})()
+        def expect(ok, label, message, detail=None):
+            calls.append(("expect", bool(ok)))
+            if strict and not ok:
+                raise AssertionError(message)
+        run.expect = expect
+        def gsd_device(run, rows=None, restore=False):
+            calls.append(("gsd_device", rows, restore))
+            if device:
+                run.h.report["gsdDevice"] = {}
+        def entries_of(run):
+            run.h.report["gsdCatalog"] = entries
+            return entries
+        stubs = {"gsd_entries": entries_of, "add_cpu": lambda run, label, name, **k: calls.append(("add_cpu", name)),
+                 "network": lambda run, scratch=True: calls.append(("network", scratch)), "station": lambda run: calls.append(("station",)), "gsd_device": gsd_device}
+        saved = {name: getattr(q, name) for name in stubs}
+        try:
+            for name, stub in stubs.items():
+                setattr(q, name, stub)
+            q.gsd_slice(run)
+        finally:
+            for name, original in saved.items():
+                setattr(q, name, original)
+        return calls, run.h.report
+
+    def test_gsd_slice_runs_only_what_the_gsd_device_needs(self):
+        entry, restored = [{"typeIdentifier": "GSD:X/D/DAP1"}], {"network_io_assign": {"restored": ["assign HwGsd to HwPeerCpu, restored"]}}
+        calls, report = self.gsd_slice(entry, restored)
+        # The CPU, HwNet without the scratch CPU, HwPeerIo (ET 200MP), then the GSD device with its assignment restored.
+        self.assertEqual([("expect", True), ("add_cpu", "HwPeer"), ("network", False), ("station",), ("gsd_device", entry, True), ("expect", True)], calls)
+        self.assertNotIn("gsdNotInstalled", report)
+        # The final gate needs both the assignment's restore and the recorded device.
+        self.assertEqual(("expect", False), self.gsd_slice(entry, {}, device=False)[0][-1])
+        self.assertEqual(("expect", False), self.gsd_slice(entry, {})[0][-1])
+        self.assertEqual(("expect", False), self.gsd_slice(entry, restored, device=False)[0][-1])
+        # Without an installed GSD nothing changes the project: gsdNotInstalled is recorded and the gate fails.
+        calls, report = self.gsd_slice([], {})
+        self.assertEqual([("expect", False)], calls)
+        self.assertEqual({"gsdCatalog": [], "gsdNotInstalled": True}, report)
+        # Two entries fail before any mutation.
+        with self.assertRaises(AssertionError):
+            self.gsd_slice(entry * 2, restored, strict=True)
+        self.assertEqual([("expect", False)], self.calls)
+
+    def test_body_runs_the_selected_slice_with_its_limitations(self):
+        args = type("A", (), {"slice": "gsd", "discover": False})()
+        ran, h = [], type("H", (), {"report": {}, "args": args, "owned_scratch": lambda self, name: None,
+                                    "tool": lambda self, name, arguments=None: {"projects": [{"path": "P.ap21", "name": "P"}]}})()
+        saved = q.gsd_slice, q.Run.snap
+        try:
+            q.gsd_slice, q.Run.snap = (lambda run: ran.append(run.base)), (lambda self, label: {"view": {}})
+            q.body(h)
+        finally:
+            q.gsd_slice, q.Run.snap = saved
+        self.assertEqual(["/projects/P/devices/"], ran)
+        title, limitations = q.heading(args)
+        self.assertIs(q.GSD_SLICE_LIMITATIONS, limitations)
+        self.assertIn("GSD device", title)
+        self.assertIs(q.SLICE_LIMITATIONS, q.heading(type("A", (), {"slice": "restores", "discover": True})())[1])
+        self.assertIs(q.LIMITATIONS, q.heading(type("A", (), {"slice": None, "discover": False})())[1])
+
+    def test_gsd_device_restores_its_assignment_once_before_applying_it(self):
+        run = q.Run.__new__(q.Run)
+        run.h, run.base, calls = type("H", (), {"report": {}})(), "/projects/P/devices/", []
+        interface = run.base + "HwGsd/items/HwGsdHead/items/PROFINET%20interface"
+        def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
+            calls.append((label, expected.get("restore", False), expected.get("deferred", False)))
+            if kind == "hardware_add":
+                run.current = {"view": {"hw:" + interface: {"network": {"ioConnectors": [{}], "nodes": [{"name": "X1"}]}}}}
+        run.apply, run.current = apply, {"view": {}}
+        q.gsd_device(run, [{"typeIdentifier": "GSD:X/D/DAP1"}], restore=True)
+        self.assertEqual([("add GSD device HwGsd", False, True), ("put HwGsd on HwNet", False, True),
+                          ("assign HwGsd to HwPeerCpu, restored", True, False), ("assign HwGsd to HwPeerCpu", False, False)], calls)
+        self.assertEqual({}, run.h.report.get("gsdCatalog", {}))  # Given rows are not searched again.
+
+    def test_network_can_leave_the_scratch_cpu_off_hwnet(self):
+        run, labels = q.Run.__new__(q.Run), []
+        run.base, run.apply = "/projects/P/devices/", lambda label, *a, **k: labels.append(label)
+        q.network(run, scratch=False)
+        q.network(run)
+        self.assertEqual(["put HwPeerCpu on HwNet", "put HwPeerCpu on HwNet", "put ScratchPLC on HwNet"], labels)
+
     def test_rack_is_the_one_root_item_beside_the_head(self):
         run = q.Run.__new__(q.Run)
         run.base = "/projects/P/devices/"

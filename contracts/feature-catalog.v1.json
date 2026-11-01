@@ -1379,6 +1379,27 @@
       ]
     },
     {
+      "id": "local.gsd_transfer_areas.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "7efef756a7e51cf8b8f02524fe25ba6038e64dac",
+        "passedScope": "scripts/qualify_gsd_export.py on a frozen Debug build of 7efef756 (artifacts/gf1, git archive), 80/80 steps, in one owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21: X1 put on subnet GsdNet; the PROFINET interface made an I-device with hardware_attributes (InterfaceOperatingMode 'IoController, IoDevice') without compile or save; hardware_transfer_area_create added the controller-device areas TiaMcpArea, TiaMcpSpare and TiaMcpTemp and hardware_transfer_area_delete removed TiaMcpTemp, each with asserted preview, checkpoint, device compile, configured-hardware preservation including every I-device interface's transfer areas, save and change_status; hardware_inspect, device_inventory and the PLC's program state differ in exactly the intended keys. hardware_gsd_export (designation TiaMcpIDevice) then wrote GSDML.xml (7823 bytes, SHA-256 a1adccde69bc8ffb546e7cfa7d1e5b3af2906216146c27c1852123a1bffa1561, GSDML schema V2.45, no graphics) from the only item reporting gsdExportAvailable and changed nothing. A fresh owned Portal reopen shows the identical state (except the compile-derived CalculatedBandwidthForCyclicIoData) and exports the byte-identical GSDML; from that state a create, a delete and the switch back to IoController are each restored from their checkpoints into copies equal to the reopened state, and the last copy exports the same GSDML. Typed refusals (HardwareNotFound, UnsupportedCapability, InvalidRequest, ObjectExists, ObjectNotFound) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.gsd_transfer_areas.20261101.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is IO controller and I-device on a subnet without a higher-level IO controller; no shared device or controller assignment.",
+        "Controller-device (CD) transfer areas only, with the direction, lengths and local addresses TIA chooses; F-CD, PROFIsafe, shared-device and mapping-rule areas and direction or length edits are not exercised.",
+        "The I-device mode change applies without compile or save because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it. Switching back to IoController with hardware_attributes removes the areas and their system constants.",
+        "The GSDML is Siemens output: checked as well-formed XML naming the designation, not installed in a TIA catalog or imported into another tool here. Engineering only; nothing is downloaded and no PROFINET communication is observed."
+      ]
+    },
+    {
       "id": "local.gsd_transfer_areas.20261028",
       "status": "passed",
       "profile": {
@@ -4800,7 +4821,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.gsd_transfer_areas.20261028"
+          "local.gsd_transfer_areas.20261028",
+          "local.gsd_transfer_areas.20261101"
         ]
       },
       "availability": {
@@ -13851,7 +13873,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.gsd_transfer_areas.20261028"
+          "local.gsd_transfer_areas.20261028",
+          "local.gsd_transfer_areas.20261101"
         ]
       },
       "availability": {
@@ -13903,7 +13926,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.gsd_transfer_areas.20261028"
+          "local.gsd_transfer_areas.20261028",
+          "local.gsd_transfer_areas.20261101"
         ]
       },
       "availability": {

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "5d116a9fc1036a448328584a7a1dec9a139684663caa7529b246f8923c85d89f",
-      "bytes": 1564282
+      "sha256": "5e6d6127616e49f0c43f1e2372e802827fb4d44ff9dc484848d3f95388e38bd4",
+      "bytes": 1567300
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -102147,6 +102147,13 @@
           "artifacts": [
             "evidence/local.gsd_transfer_areas.20261028.json"
           ]
+        },
+        {
+          "id": "local.gsd_transfer_areas.20261101",
+          "profileSha256": "fd4087beb763a0bdeaa63bb58614124f19371385ad0b131835899204f9dd7c52",
+          "artifacts": [
+            "evidence/local.gsd_transfer_areas.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102194,6 +102201,13 @@
           "profileSha256": "0cf5b375467fb21a188c05db71ee7bd3dd66f6eb75aa58f9cd0cf9217372b3ba",
           "artifacts": [
             "evidence/local.gsd_transfer_areas.20261028.json"
+          ]
+        },
+        {
+          "id": "local.gsd_transfer_areas.20261101",
+          "profileSha256": "fd4087beb763a0bdeaa63bb58614124f19371385ad0b131835899204f9dd7c52",
+          "artifacts": [
+            "evidence/local.gsd_transfer_areas.20261101.json"
           ]
         }
       ],
@@ -111655,6 +111669,13 @@
           "profileSha256": "0cf5b375467fb21a188c05db71ee7bd3dd66f6eb75aa58f9cd0cf9217372b3ba",
           "artifacts": [
             "evidence/local.gsd_transfer_areas.20261028.json"
+          ]
+        },
+        {
+          "id": "local.gsd_transfer_areas.20261101",
+          "profileSha256": "fd4087beb763a0bdeaa63bb58614124f19371385ad0b131835899204f9dd7c52",
+          "artifacts": [
+            "evidence/local.gsd_transfer_areas.20261101.json"
           ]
         }
       ],
@@ -127459,6 +127480,11 @@
       "sha256": "c669ed82fd0551d88e59fc080c082e3001ae0b1b7e3ebdc0bcbb1a7f3f22c939"
     },
     {
+      "path": "evidence/local.gsd_transfer_areas.20261101.json",
+      "state": "observed",
+      "sha256": "554703c5bc1cac8cafdfa63009e4055802095ef3e4cd2fc6f7f081491f95fba4"
+    },
+    {
       "path": "evidence/local.hardware.20261024.json",
       "state": "observed",
       "sha256": "e0b51d539feaafddb8ccbdf0bb2ba9d8d590af0ce408d150cc72ea777209d02a"
@@ -128412,6 +128438,10 @@
     {
       "id": "local.gsd_transfer_areas.20261028",
       "profileSha256": "0cf5b375467fb21a188c05db71ee7bd3dd66f6eb75aa58f9cd0cf9217372b3ba"
+    },
+    {
+      "id": "local.gsd_transfer_areas.20261101",
+      "profileSha256": "fd4087beb763a0bdeaa63bb58614124f19371385ad0b131835899204f9dd7c52"
     },
     {
       "id": "local.hardware.20261024",
