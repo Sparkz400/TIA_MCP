@@ -3300,6 +3300,23 @@
         "Only the offline DownloadProvider memory-card route (simulation_download) was tried; the online PLCSIM download route (simulation_download_online) is untested for an F-CPU.",
         "No safety acceptance, login or password; the scratch user's fail-safe access exists in the owned scratch only."
       ]
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "422875126abfb81069e0ca31cf1a78d92f2cbc33",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of 42287512 (artifacts/w2bs6, git archive), 26/26 steps, PLCSIM Advanced V8 on Softbus, same fixture as local.safety.logic_plcsim_boundary.20261101: a two-PLC owned scratch (standard CPU 1511-1 PN and CPU 1511F-1 PN with an ET 200SP F-DI), project_simulation_enable compiling all three devices, the changed Main_Safety_RTG1 imported, compiled with the safety program (zero errors) and saved, an owned CPU1511F PLCSIM instance. The offline memory card was refused again by V21 ('Load safety program to device'). The bounded follow-up, change_prepare simulation_download_online to the same owned instance (softwareScope all, reinitialize, allowStop), refused with SimulationTargetMismatch: the online route downloads only to an instance whose generated memory card came from this PLC, so for an F-CPU it cannot start. No safety prompt was answered; the owned instance was released (unregistered)."
+      },
+      "artifacts": [
+        "evidence/local.safety.logic_online_route.20261101.json"
+      ],
+      "limitations": [
+        "The repo's online PLCSIM route is gated by a successful memory card, which V21 refuses for an F-CPU, so V21's online download of a safety program (its SafetyProgram download configuration 'Load safety program to device', selection ConsistentDownload) was not reached; the policy would refuse that safety confirmation anyway.",
+        "No safety acceptance, login, password or confirmation; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
     }
   ],
   "features": [
@@ -8449,19 +8466,20 @@
         "status": "not_implemented",
         "limitations": [
           "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
-          "Boundary of the memory-card route for F-CPUs (docs/verification/safety-logic-plcsim-20261101.md); the online PLCSIM download route (change.simulation_download_online) is untested for an F-CPU."
+          "No route loads a safety program into PLCSIM within the project's policy (docs/verification/safety-logic-plcsim-20261101.md): the online route (change.simulation_download_online) needs the owned instance's generated memory card and refused with SimulationTargetMismatch (local.safety.logic_online_route.20261101), and behind both routes V21 raises its SafetyProgram download confirmation ('Load safety program to device', ConsistentDownload), which the worker does not answer. Proposed disposition: unavailable_target."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.safety.logic_plcsim_boundary.20261101"
+          "local.safety.logic_plcsim_boundary.20261101",
+          "local.safety.logic_online_route.20261101"
         ]
       },
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101); no other route is implemented."
+          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101); the online route requires that card (local.safety.logic_online_route.20261101) and V21's safety download confirmation is outside the policy."
         ]
       },
       "prerequisites": [

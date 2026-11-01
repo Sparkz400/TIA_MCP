@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "834c5c42ebb42a1ee29faea8b276f3af0013d2ed5aa07cc2566672c97ad6c273",
-      "bytes": 1449900
+      "sha256": "90cd1546e27d70ee224dad0ad91113d03092572017fcdcb426a2b89aec324ab0",
+      "bytes": 1452206
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -115184,6 +115184,13 @@
           "artifacts": [
             "evidence/local.safety.logic_plcsim_boundary.20261101.json"
           ]
+        },
+        {
+          "id": "local.safety.logic_online_route.20261101",
+          "profileSha256": "699f3b5b50996227438a4e2f0d85f66e9b345d25e25158f10805a37b0e204757",
+          "artifacts": [
+            "evidence/local.safety.logic_online_route.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -121600,6 +121607,11 @@
       "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
     },
     {
+      "path": "evidence/local.safety.logic_online_route.20261101.json",
+      "state": "observed",
+      "sha256": "607c356b5f4a5250b7559b8dbf27ac60e1780ffe28f90dc15f3de772b4e2e528"
+    },
+    {
       "path": "evidence/local.safety.logic_plcsim_boundary.20261101.json",
       "state": "observed",
       "sha256": "159d5f0d948c435aa454b094a30caeae8a57de72c19cebc9fa3c5f64f50d47e0"
@@ -122364,6 +122376,10 @@
     {
       "id": "local.safety.fparameter_discovery.20261031",
       "profileSha256": "56236e8bd2d02db2ef7b4f260d2f3ae179016775a3bb8e054e6af16e29123e01"
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "profileSha256": "699f3b5b50996227438a4e2f0d85f66e9b345d25e25158f10805a37b0e204757"
     },
     {
       "id": "local.safety.logic_plcsim_boundary.20261101",

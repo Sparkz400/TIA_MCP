@@ -1,0 +1,93 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety.logic_online_route.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T03:29:21+00:00",
+  "source": {
+    "commit": "422875126abfb81069e0ca31cf1a78d92f2cbc33",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/probe_safety_logic.py on a frozen Debug build of 42287512 (artifacts/w2bs6, git archive), 26/26 steps, PLCSIM Advanced V8 on Softbus, same fixture as local.safety.logic_plcsim_boundary.20261101: a two-PLC owned scratch (standard CPU 1511-1 PN and CPU 1511F-1 PN with an ET 200SP F-DI), project_simulation_enable compiling all three devices, the changed Main_Safety_RTG1 imported, compiled with the safety program (zero errors) and saved, an owned CPU1511F PLCSIM instance. The offline memory card was refused again by V21 ('Load safety program to device'). The bounded follow-up, change_prepare simulation_download_online to the same owned instance (softwareScope all, reinitialize, allowStop), refused with SimulationTargetMismatch: the online route downloads only to an instance whose generated memory card came from this PLC, so for an F-CPU it cannot start. No safety prompt was answered; the owned instance was released (unregistered).",
+  "limitations": [
+    "The repo's online PLCSIM route is gated by a successful memory card, which V21 refuses for an F-CPU, so V21's online download of a safety program (its SafetyProgram download configuration 'Load safety program to device', selection ConsistentDownload) was not reached; the policy would refuse that safety confirmation anyway.",
+    "No safety acceptance, login, password or confirmation; the scratch user's fail-safe access exists in the owned scratch only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e46efc1e6a88b624338643512aaae73526710a9593ded6696e3000b9f00a7302"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d106fbe12f2e7cb7cf3efc8b20dd1658420b66025f095a357e81126ed7628d0f"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "06b36296e26b6480c60742e313457641595ba2fdaa274a004fa24ec1ea5a417e"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "2f7e8c8e68f1e8dbc5709140a9c2b6eaf9260867a0e959f16e002e25090fa208",
+      "bytes": 822900,
+      "completed": true,
+      "steps": [
+        "start owned TIA safety logic",
+        "create owned scratch safety logic",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_move",
+        "apply hardware_move",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "safety_inspect of the F-PLC",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "safety_import_xml of the changed F-logic",
+        "simulation_download_online after the refused memory card",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "safety_inspect",
+        "sim_create",
+        "sim_release",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "simulation_download"
+      ]
+    }
+  ]
+}

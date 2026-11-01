@@ -8,6 +8,7 @@ commit:
 | --- | --- | --- |
 | `local.project_simulation.multi_plc.20261101` | `d681ece1` (w2bs4) | 24/24 steps; V21 refused the probe's F-FBD import (absolute operand under the wrong scope) |
 | `local.safety.logic_plcsim_boundary.20261101` | `a7740570` (w2bs5) | 25/25 steps; the boundary below |
+| `local.safety.logic_online_route.20261101` | `42287512` (w2bs6) | 26/26 steps; the online route, below |
 
 Earlier runs on the way: sl1/sl2 (`project_simulation_enable` compiled only one PLC, fixed in 4c87ae29), sl3 (a tag on
 the F-DI address became a safety tag, fixed by addressing the channel directly and by the prepare-time refusal in
@@ -44,15 +45,37 @@ No memory card was written. The owned instance was released (unregistered) and i
 therefore compiles, but it cannot be loaded into PLCSIM through the memory-card route. F-CPU RUN, F-logic behavior, F-I/O
 injection and passivation were not reached.
 
+## Online route
+
+The controller ruled one bounded probe of the online PLCSIM route before closing the row. Run sl7 repeated the fixture, and
+V21 refused the memory card again. The probe then prepared `change.simulation_download_online` to the same owned instance
+(`softwareScope` all, `dataBlockValues` reinitialize, `allowStop` true), which refused at prepare:
+
+> SimulationTargetMismatch: The owned instance's generated memory card came from another project or PLC; only that PLC is downloaded to it online.
+
+The online route downloads only to an instance whose generated memory card came from exactly this PLC. Its owned-instance
+identity, credential provisioning and TLS trust all build on that card. For an F-CPU, V21 refuses the card, so the online
+route cannot start. The refusal text names a different project or PLC, but here no successful card exists at all; the
+message could say so.
+
+Behind that gate, V21 Openness exposes a safety download configuration,
+`Siemens.Engineering.Safety.Download.Configurations.SafetyProgram` ("Load safety program to device"), with the single
+selection `ConsistentDownload`. An online download of the F-PLC would raise it. The worker answers only its reviewed
+configurations and refuses this one (`UnsupportedDownloadConfiguration`), as the project's policy refuses safety
+confirmations. No safety prompt was answered, and no password or login was used.
+
 ## Proposed disposition (for the maintainer)
 
-`safety.logic_changes`: the offline memory-card route is a V21 boundary for F-CPUs; Openness cannot load a safety program
-this way (`local.safety.logic_plcsim_boundary.20261101`). The only other route is an online download to an owned PLCSIM
-instance (`change.simulation_download_online`), which is untested for an F-CPU. It would have to answer the safety
-download prompts without a password, and the worker refuses unknown download configurations today.
+`safety.logic_changes`: **unavailable_target**. Changed F-logic imports and compiles with the safety program, and PLCSIM
+Advanced V8 creates an owned CPU1511F instance. But no route loads a safety program into it within the project's policy:
 
-Choose one:
+- V21's offline `DownloadProvider` memory-card route refuses: "Load safety program to device"
+  (`local.safety.logic_plcsim_boundary.20261101`).
+- The online route needs that card (`SimulationTargetMismatch`, `local.safety.logic_online_route.20261101`).
+- Behind both stands V21's `SafetyProgram` download confirmation, which the policy does not answer.
 
-- (a) Close the row as `unavailable_target`, with this record as the evidence.
-- (b) Keep it open for one feasibility probe of the online route on an F-CPU. A refusal or an unhandled safety prompt
-  there would close it the same way.
+Proposed TODO text: "[x] `safety.logic_changes` (D14): V21 boundary on 1 November (records
+`local.safety.logic_plcsim_boundary.20261101`, `local.safety.logic_online_route.20261101`,
+[record](verification/safety-logic-plcsim-20261101.md)). Changed F-logic imports and compiles; V21 cannot load a safety
+program into a PLCSIM memory card, the online route requires that card, and V21's SafetyProgram download confirmation is
+outside the project's policy. Closed as unavailable_target."
