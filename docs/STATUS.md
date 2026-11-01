@@ -72,7 +72,7 @@ profiles and the shared-device/MRP hardware topology were added and natively qua
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
 recorded V21 boundaries. Later on 1 November: the six TS-Q01 Test Suite style cases passed natively with the operator at the desk, which verifies three
 style-job tools, and production style execution became a V21 boundary (catalog 0.4.97); the `project_upgrade` interruption cases passed natively
-(16/16) and combined apply gained a multi-instance shape. Two admission gaps were closed (catalog 0.4.103) and rechecked natively with the symbolic output-write refusal (catalog 0.4.105): a first motion object without compile and F-I/O tag addresses from VCI packages and library master copies now refuse before any write. Drive objects whose number Startdrive cannot read
+(16/16) and combined apply gained a multi-instance shape. Two admission gaps were closed (catalog 0.4.103) and rechecked natively with the symbolic output-write refusal (catalog 0.4.105): a first motion object without compile and F-I/O tag addresses from VCI packages and library master copies now refuse before any write. The Host and the worker now hash with one canonical form, RFC 8785 (catalog 0.4.104, offline). Drive objects whose number Startdrive cannot read
 are addressed by container index, and the three D10 drive rows are verified on a G120C PN (catalog 0.4.95; the
 drive object number left the recorded boundaries). In a desk session the Explorer roundtrip passed
 in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an

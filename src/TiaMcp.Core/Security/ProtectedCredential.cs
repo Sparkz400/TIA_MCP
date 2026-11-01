@@ -15,7 +15,8 @@ public static class ProtectedCredentialGuard
     public static string BindingHash(CredentialBinding binding)
     {
         ValidateBinding(binding);
-        return CanonicalJson.Sha256(JsonSerializer.SerializeToNode(binding, BridgeProtocol.Json)!);
+        // Stored references and the vault's DPAPI entropy carry this value, so it keeps the pre-RFC 8785 form.
+        return CanonicalJson.LegacySha256(JsonSerializer.SerializeToNode(binding, BridgeProtocol.Json)!);
     }
     public static void ValidateBinding(CredentialBinding binding)
     {

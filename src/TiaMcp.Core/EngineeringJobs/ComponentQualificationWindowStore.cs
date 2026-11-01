@@ -149,12 +149,15 @@ public sealed class ComponentQualificationWindowStore
         if (r.Children.Count == 6 && r.Children.All(c => c.State is "returned" or "reconciled")) return "observeOriginal";
         return r.Children.Count >= 2 ? "recover" : null;
     }
-    public static string NativeHash(JsonNode value)
+    /// <summary>The worker's hash of the same manifest or request (RFC 8785, <see cref="CanonicalJson"/>).</summary>
+    public static string NativeHash(JsonNode value) => CanonicalJson.Sha256(value);
+    // Reservations stored before RFC 8785 bound the manifest with this relaxed-escaping form.
+    private static string LegacyManifestHash(ComponentWindowManifest manifest)
     {
         JsonNode? Sort(JsonNode? node) => node switch {
             JsonObject obj => new JsonObject(obj.OrderBy(x => x.Key, StringComparer.Ordinal).Select(x => new KeyValuePair<string, JsonNode?>(x.Key, Sort(x.Value)))),
             JsonArray array => new JsonArray(array.Select(Sort).ToArray()), _ => node?.DeepClone() };
-        return TokenHash(Sort(value)!.ToJsonString(new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+        return TokenHash(Sort(JsonSerializer.SerializeToNode(manifest, BridgeProtocol.Json))!.ToJsonString(new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
     }
     public ComponentWindowReservation RequireOwner(string id, string capability)
     { var record = Read(id); Owner(record, capability); if (Terminal(record)) Fail("ComponentReplayRefused", "The component lifetime is terminal."); return record; }
@@ -256,7 +259,7 @@ public sealed class ComponentQualificationWindowStore
     private static void ValidateRecord(string root, ComponentWindowReservation? prior, ComponentWindowReservation r, bool live = true)
     {
         ValidateManifest(root, r.Manifest, live);
-        if (r.Id != r.Manifest.Id || r.ManifestSha256 != ManifestHash(r.Manifest) || r.ResourceKeys is null || live && !Keys(r.Manifest.Resources).SequenceEqual(r.ResourceKeys) ||
+        if (r.Id != r.Manifest.Id || r.ManifestSha256 != ManifestHash(r.Manifest) && r.ManifestSha256 != LegacyManifestHash(r.Manifest) || r.ResourceKeys is null || live && !Keys(r.Manifest.Resources).SequenceEqual(r.ResourceKeys) ||
             r.OwnerHostProcessId <= 0 || r.OwnerHostBirthUtc.Kind != DateTimeKind.Utc || r.Children is null || r.Children.Count > Sequence.Length ||
             r.State is not ("active" or "outcomeUnknown" or "released" or "recoveryReconciled")) Fail("JournalInvalid", "Component reservation scope or state is invalid.");
         EngineeringIdentityGuard.Sha256(r.OwnerCapabilitySha256, "ownerCapabilitySha256");
@@ -283,7 +286,7 @@ public sealed class ComponentQualificationWindowStore
                 Fail("JournalInvalid", "Invalid initial component reservation.");
             return;
         }
-        if (r.PreviousSha256 != Hash(prior) || r.ManifestSha256 != prior.ManifestSha256 || r.OwnerCapabilitySha256 != prior.OwnerCapabilitySha256 ||
+        if (!Matches(r.PreviousSha256, prior) || r.ManifestSha256 != prior.ManifestSha256 || r.OwnerCapabilitySha256 != prior.OwnerCapabilitySha256 ||
             r.RecordedAt < prior.RecordedAt || Terminal(prior) || !prior.InstallationAllowed && r.InstallationAllowed ||
             r.Children.Count < prior.Children.Count || r.Children.Count > prior.Children.Count + 1) Fail("JournalInvalid", "Component immutable identity or ownership transition changed.");
         for (int i = 0; i < Math.Max(0, prior.Children.Count - 1); i++)
@@ -354,6 +357,7 @@ public sealed class ComponentQualificationWindowStore
     private static ComponentWindowChild[] ReplaceLast(IReadOnlyList<ComponentWindowChild> values, ComponentWindowChild next) => values.Take(values.Count - 1).Append(next).ToArray();
     private static T Freeze<T>(T value) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, BridgeProtocol.Json), BridgeProtocol.Json)!;
     private static string Hash<T>(T value) => CanonicalJson.Sha256(JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
+    private static bool Matches<T>(string? stored, T value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
     private static void Write(ComponentWindowReservation r, string directory)
     {
         string path = Path.Combine(directory, r.Revision.ToString("D8") + ".json"), temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";

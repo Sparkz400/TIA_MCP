@@ -168,6 +168,16 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   other with `DriveObjectHandleMismatch`, and add the drive object's identity to the change fingerprint.
 - The Unified HMI preservation capture also covers the complete text-list export, and OPC UA sessions
   also check that namespace 0 is the OPC UA namespace.
+- **Canonical JSON:** the Host and the Openness worker hash with one form, RFC 8785 (JCS), pinned by
+  [shared vectors](fixtures/canonical-json/vectors.v1.json) that both runtimes' tests reproduce byte for
+  byte; integer literals beyond 2^53 keep their exact digits, and a lone surrogate is refused
+  (`InvalidRequest`). Numbers now hash by value (`1.0` as `1`, `1e3` as `1000`), and non-ASCII text
+  and `+ < > & '` stay literal. **Upgrade:** journals, records, Test Suite jobs, VCI manifests and
+  revisions, capture plans and saved reviews written by earlier builds keep verifying in the form they
+  were written with, and external resource keys and credential bindings keep their earlier hashes; a
+  translation review or VCI commit preview prepared before the upgrade is refused with
+  `CanonicalFormChanged` and is prepared again
+  ([hashes stored before RFC 8785](docs/reference/engineering-capture-identities.md#hashes-stored-before-rfc-8785)).
 
 ### Fixed
 
@@ -224,6 +234,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
       (`InvalidRequest`, the whole request, before anything is written); inputs, markers, data blocks,
       timers and counters stay writable. Rechecked natively for `sim_write`, `sim_write_signals` and
       `sim_test` (`local.sim.output-refusal.20261101`); `diagnostic_plcsim_write` has no native run.
+    - A component-window step whose request had emoji, certain control characters or a number such
+      as `1e3` was refused: the Host and the worker hashed it differently. Both now use RFC 8785.
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the

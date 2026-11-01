@@ -162,10 +162,11 @@ public static class TestSuiteRunPlanner
             plan.RequiredDefinitionIds.Length != plan.Definitions.Length || plan.RequiredDefinitionIds.Distinct(StringComparer.Ordinal).Count() != plan.RequiredDefinitionIds.Length ||
             !plan.RequiredDefinitionIds.SequenceEqual(plan.Definitions.Select(d => d.Id)) || plan.DispatchDefinitionIds.Any(id => !plan.RequiredDefinitionIds.Contains(id, StringComparer.Ordinal)))
             throw new BridgeException("InvalidRunPlan", "Missing, duplicated or inconsistent required definition closure.");
-        if (plan.NativeExecutionAuthorized || plan.PlanSha256 != Fingerprint(plan))
+        // A plan fingerprinted before RFC 8785 still verifies; the rebuild below compares in the current form.
+        if (plan.NativeExecutionAuthorized || !CanonicalJson.Matches(plan.PlanSha256, JsonSerializer.SerializeToNode(plan with { PlanSha256 = "" }, BridgeProtocol.Json)!))
             throw new BridgeException("StaleRunPlan", "Run plan changed or incorrectly claims native authorization.");
         var rebuilt = Build(plan.Definitions, plan.DispatchDefinitionIds, plan.ExcludedDefinitionIds, plan.ExecutionMode);
-        if (plan.PlanSha256 != rebuilt.PlanSha256)
+        if (Fingerprint(plan) != rebuilt.PlanSha256)
             throw new BridgeException("InvalidRunPlan", "Closure, blockers or dispatch differ from independently rebuilt plan semantics.");
     }
 }

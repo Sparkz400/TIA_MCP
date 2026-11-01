@@ -56,6 +56,8 @@ public static class TranslationReview
             "WorkbookLimit", "Bounded edit list required.");
         Require(edits.All(e => e is not null && !string.IsNullOrEmpty(e.NativeKey) && !string.IsNullOrEmpty(e.Culture)),
             "InvalidTranslationEdit", "Every proposal requires an exact key and culture.");
+        // The review retains each edit and RFC 8785 refuses a lone surrogate, so such text is refused before reporting.
+        foreach (var edit in edits) if (edit.Value is not null) _ = TranslationWorkbook.EncodeText(edit.Value);
         var rows = new JsonArray();
         var issues = new JsonArray();
         var seen = new HashSet<(string Key, string Culture)>();

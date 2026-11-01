@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "description": "RFC 8785 (JCS) vectors that the Host (TiaMcp.Core.Engineering.CanonicalJson) and the Openness worker (TiaMcp.Openness.V21.CanonicalJson) must both reproduce byte for byte. input is JSON text, or utf16 lists the code units of one string used as a value or a key; canonical is the expected output and sha256 the hash of its UTF-8 bytes; refusal is the expected BridgeException code. Integer literals keep their exact digits beyond 2^53.",
+  "cases": [
+    {
+      "name": "RFC 8785 key order: UTF-16 code units, so the emoji's surrogate sorts before U+FB33",
+      "input": "{\"\\u20ac\":\"Euro Sign\",\"\\r\":\"Carriage Return\",\"\\ufb33\":\"Hebrew Letter Dalet With Dagesh\",\"1\":\"One\",\"\\ud83d\\ude00\":\"Emoji: Grinning Face\",\"\\u0080\":\"Control\",\"\\u00f6\":\"Latin Small Letter O With Diaeresis\"}",
+      "canonical": "{\"\\r\":\"Carriage Return\",\"1\":\"One\",\"\u0080\":\"Control\",\"\u00f6\":\"Latin Small Letter O With Diaeresis\",\"\u20ac\":\"Euro Sign\",\"\ud83d\ude00\":\"Emoji: Grinning Face\",\"\ufb33\":\"Hebrew Letter Dalet With Dagesh\"}",
+      "sha256": "5e321556d22018a9656991a9e94f77ec175fa193e52a2429d312f8419ec8b08c"
+    },
+    {
+      "name": "key order: empty key, case, prefixes and an escaped NUL",
+      "input": "{\"b\":1,\"a\":2,\"\":3,\"aa\":4,\"A\":5,\"ab\":6,\"a\\u0000\":7,\"\\u00e4\":8,\"z\":9}",
+      "canonical": "{\"\":3,\"A\":5,\"a\":2,\"a\\u0000\":7,\"aa\":4,\"ab\":6,\"b\":1,\"z\":9,\"\u00e4\":8}",
+      "sha256": "801509d89f3111143b50f664199ed83289bc1f37aeee4f609c919d152590f84a"
+    },
+    {
+      "name": "nested arrays keep their order; nested objects are sorted",
+      "input": "[[],[[]],[1,[2,[3,[]]]],{\"b\":[{\"d\":1,\"c\":[{\"f\":null,\"e\":true}]}],\"a\":{}}]",
+      "canonical": "[[],[[]],[1,[2,[3,[]]]],{\"a\":{},\"b\":[{\"c\":[{\"e\":true,\"f\":null}],\"d\":1}]}]",
+      "sha256": "da38c5501e121e342e79322498e308cc7e9f72fa2611b580fa6269f733b3ce24"
+    },
+    {
+      "name": "insignificant whitespace is removed",
+      "input": " \n{ \"b\" : { } ,\t\"a\" :[ 1 , 2 ] }\r\n ",
+      "canonical": "{\"a\":[1,2],\"b\":{}}",
+      "sha256": "8c547cce7ccb1b89359479c0b71a0a4b62acfc54a2b2780fd34aaeb75f9e44b7"
+    },
+    {
+      "name": "literals and empty containers",
+      "input": "[true,false,null,\"\",{},[]]",
+      "canonical": "[true,false,null,\"\",{},[]]",
+      "sha256": "ab4291926726cafddcab873d1b47c0986552a67af20a43a44ee291efd7fc8e22"
+    },
+    {
+      "name": "every C0 control character: short forms, otherwise lowercase \\u00xx",
+      "input": "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\"",
+      "canonical": "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\"",
+      "sha256": "f144bcffbdbaea0a670956fb0a3edd44ce6bc4dedc77c30cfc14f40034044739"
+    },
+    {
+      "name": "quote and backslash escaped; an escaped solidus becomes literal",
+      "input": "\"\\\"\\\\\\/\"",
+      "canonical": "\"\\\"\\\\/\"",
+      "sha256": "106814b96b4576ad5efb709458f6a5e1d0b0653cf234738e0ccc6c435bdef084"
+    },
+    {
+      "name": "HTML-sensitive characters, backtick and DEL stay literal",
+      "input": "\"<>&'+`=\\u007f\"",
+      "canonical": "\"<>&'+`=\u007f\"",
+      "sha256": "0e4f83eb7778da2fbc9607bbedd9b4d346095c66b5793f7afe8e605a591f4d32"
+    },
+    {
+      "name": "C1 controls, NEL and the line and paragraph separators stay literal",
+      "input": "\"\\u0080\\u0085\\u009f\\u2028\\u2029\"",
+      "canonical": "\"\u0080\u0085\u009f\u2028\u2029\"",
+      "sha256": "0af728ad87bfb417bfa695de1a263c56fc5a1c57bfeafe4677f40946e900102c"
+    },
+    {
+      "name": "BMP non-ASCII stays literal and is not normalized",
+      "input": "\"\\u00c4\\u00d6\\u00dc\\u00df\\u20ac \\u00e9 e\\u0301 \\u8def\\u5f84 \\u03a9\"",
+      "canonical": "\"\u00c4\u00d6\u00dc\u00df\u20ac \u00e9 e\u0301 \u8def\u5f84 \u03a9\"",
+      "sha256": "e112b7de8231ddb9c4cdfd8fa35e3e628b3773248e8b6dde7886cf4e1b366bf1"
+    },
+    {
+      "name": "emoji as an escaped pair and literally: both literal UTF-8",
+      "input": "\"\\ud83d\\ude00 \ud83d\ude00\"",
+      "canonical": "\"\ud83d\ude00 \ud83d\ude00\"",
+      "sha256": "433646a884a5193ceb2ccb60d969c542c27f58fadbea918adcb651699624d67d"
+    },
+    {
+      "name": "astral plane extremes U+10000 and U+10FFFF",
+      "input": "\"\\ud800\\udc00\\udbff\\udfff\"",
+      "canonical": "\"\ud800\udc00\udbff\udfff\"",
+      "sha256": "f66ee6ebfc339a9a088ba6aad2b9f9220a172ea0d0e26c1997e0eca868d7d0f8"
+    },
+    {
+      "name": "BOM and noncharacters stay literal",
+      "input": "\"\\ufeff\\ufffe\\uffff\"",
+      "canonical": "\"\ufeff\ufffe\uffff\"",
+      "sha256": "e35d426b8e658889cc54f7799e2eabdc8dab16ef78d03bbd1cde2f6a9cc18afe"
+    },
+    {
+      "name": "exponent integers: 1e3 is 1000",
+      "input": "[1e3,1E3,1.0e3,1000.0,1000,1e+3]",
+      "canonical": "[1000,1000,1000,1000,1000,1000]",
+      "sha256": "aa725f102735bc2a91e06e94a4fd69eb9dc82892bcdc5c9bfe3457ec0a06147c"
+    },
+    {
+      "name": "small exponents use lowercase e and no padding",
+      "input": "[1E-7,1e-7,0.0000001,0.000001,1.5e-6,1E-07]",
+      "canonical": "[1e-7,1e-7,1e-7,0.000001,0.0000015,1e-7]",
+      "sha256": "114ef77cedcb27b99a47b9dd1dc681550b7b5cee922216cdefd989c7dce4caac"
+    },
+    {
+      "name": "negative zero is 0",
+      "input": "[-0,-0.0,0.0,0e5,-0e-5]",
+      "canonical": "[0,0,0,0,0]",
+      "sha256": "fd76db5c8ad0929aeca788d3e83adb863069b1dc11c4c707e9c14286388dc970"
+    },
+    {
+      "name": "no trailing zeros; e+ only from 1e21",
+      "input": "[1.50,2.000,1E+2,1e20,1e21,123456789e13,1e-6,1.5e300]",
+      "canonical": "[1.5,2,100,100000000000000000000,1e+21,1.23456789e+21,0.000001,1.5e+300]",
+      "sha256": "5681c2fcdf71947724e8ed422d2cdff9921814683cc4e7b9f5a278035e9a14c7"
+    },
+    {
+      "name": "double extremes",
+      "input": "[4.9406564584124654e-324,5e-324,2.2250738585072014E-308,2.2250738585072009e-308,1.7976931348623157e308,-1.7976931348623157e308]",
+      "canonical": "[5e-324,5e-324,2.2250738585072014e-308,2.225073858507201e-308,1.7976931348623157e+308,-1.7976931348623157e+308]",
+      "sha256": "c66469589681ce5059c32ee8976f8f945cd010d426a5aa56c07b51a714e26102"
+    },
+    {
+      "name": "RFC 8785 appendix B: around 1e21 and 1e23",
+      "input": "[9.999999999999997e22,1e23,1.0000000000000001e23,999999999999999700000.0,999999999999999900000.0,1e21]",
+      "canonical": "[9.999999999999997e+22,1e+23,1.0000000000000001e+23,999999999999999700000,999999999999999900000,1e+21]",
+      "sha256": "3567fec37754141238e52b1896ae28181d5f77e9ef44673d8723572719a386a7"
+    },
+    {
+      "name": "RFC 8785 appendix B: closest of the shortest digits",
+      "input": "[9.999999999999997e-7,0.000001,333333333.3333332,333333333.33333325,333333333.3333333,333333333.3333334,333333333.33333343,-0.0000033333333333333333,1424953923781206.2]",
+      "canonical": "[9.999999999999997e-7,0.000001,333333333.3333332,333333333.33333325,333333333.3333333,333333333.3333334,333333333.33333343,-0.0000033333333333333333,1424953923781206.2]",
+      "sha256": "3585f6ad3ae19fda62039fff49b96b9b661e30bffae33b1dfe5ddfc344bc24d5"
+    },
+    {
+      "name": "binary fractions",
+      "input": "[0.1,0.2,0.30000000000000004,4.35,100.0,0.5,1.25e-1,123.456]",
+      "canonical": "[0.1,0.2,0.30000000000000004,4.35,100,0.5,0.125,123.456]",
+      "sha256": "91631ecf8e545c9e6575731c5ae114093aa256b67a95d90b1bf7a271195c20c9"
+    },
+    {
+      "name": "a fractional 2^53 + 1 is a double and rounds",
+      "input": "[9007199254740992.0,9007199254740993.0,9007199254740992e0]",
+      "canonical": "[9007199254740992,9007199254740992,9007199254740992]",
+      "sha256": "c2c7978bca7537b6a8ea71feda440641a6cb554a2de620b518e7addf70c85257"
+    },
+    {
+      "name": "component window step request from the audit finding",
+      "input": "{\"step\":\"start\",\"request\":{\"limit\":1e3,\"note\":\"Pfad D:\\\\Anlage\\\\S\\u00fcd \\ud83d\\ude00 \\u001f\"},\"manifestSha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}",
+      "canonical": "{\"manifestSha256\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"request\":{\"limit\":1000,\"note\":\"Pfad D:\\\\Anlage\\\\S\u00fcd \ud83d\ude00 \\u001f\"},\"step\":\"start\"}",
+      "sha256": "bca51acf057711e5e53cf6f749d8e305d19e313effbf134d77c7995489262edd"
+    },
+    {
+      "name": "integers keep exact digits beyond 2^53 (JCS would round them; deliberate deviation)",
+      "input": "[9007199254740991,9007199254740992,9007199254740993,-9007199254740993,18446744073709551616,-123456789012345678901234567890]",
+      "canonical": "[9007199254740991,9007199254740992,9007199254740993,-9007199254740993,18446744073709551616,-123456789012345678901234567890]",
+      "sha256": "e966dd75e399ed28471c8013e1bc0d0e884dbcb983e642238be5fb0a6779acba"
+    },
+    {
+      "name": "128 nested arrays below the root are within the depth limit",
+      "input": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "canonical": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "sha256": "bf9ccb2c6b046c499dabdebed2f03905969c04d81b93b7f396977cad5d48cae7"
+    },
+    {
+      "name": "129 nested arrays below the root exceed the depth limit",
+      "input": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "refusal": "TraversalLimit"
+    },
+    {
+      "name": "a lone high surrogate is refused",
+      "utf16": [
+        55296
+      ],
+      "as": "value",
+      "refusal": "InvalidRequest"
+    },
+    {
+      "name": "a lone low surrogate in a key is refused",
+      "utf16": [
+        97,
+        56320
+      ],
+      "as": "key",
+      "refusal": "InvalidRequest"
+    },
+    {
+      "name": "a reversed surrogate pair is refused",
+      "utf16": [
+        56832,
+        55357
+      ],
+      "as": "value",
+      "refusal": "InvalidRequest"
+    },
+    {
+      "name": "a high surrogate at the end is refused",
+      "utf16": [
+        65,
+        55357
+      ],
+      "as": "value",
+      "refusal": "InvalidRequest"
+    }
+  ]
+}

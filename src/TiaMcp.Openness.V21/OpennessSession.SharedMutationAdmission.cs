@@ -377,15 +377,7 @@ namespace TiaMcp.Openness.V21
                 ["observationSha256"] = SharedMutationHash(observation) };
             scope["scopeSha256"] = SharedMutationHash(scope); return scope;
         }
-        private static string SharedMutationHash(JToken token)
-        {
-            JToken Sort(JToken value)
-            {
-                if (value is JObject obj) return new JObject(obj.Properties().OrderBy(p => p.Name, StringComparer.Ordinal).Select(p => new JProperty(p.Name, Sort(p.Value))));
-                if (value is JArray array) return new JArray(array.Select(Sort));
-                return value.DeepClone();
-            }
-            return ChangeHash(Sort(token).ToString(Formatting.None));
-        }
+        // The Host recomputes some of these (component manifest and child request), so both use RFC 8785.
+        private static string SharedMutationHash(JToken token) => CanonicalJson.Sha256(token);
     }
 }

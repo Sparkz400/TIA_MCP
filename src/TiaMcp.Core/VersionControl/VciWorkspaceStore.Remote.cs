@@ -22,7 +22,7 @@ public sealed partial class VciWorkspaceStore
         WriteNew(Path.Combine(entry.Path, "intent.json"), new { kind = "push", revisionRef, remote = configured.Location, branchName, expectedRemoteCommit });
         var journal = new Journal(Path.Combine(entry.Path, "push-journal")); var runner = Runner(journal);
         var before = await runner.InspectAsync(source.Repository, token);
-        Require(before.Sha256 == source.SnapshotSha256, "PreviewStale", "Revision repository changed.");
+        Require(before.Matches(source.SnapshotSha256), "PreviewStale", "Revision repository changed.");
         var binding = GitOperationBinding.Push(before, runner.ControlDirectory, runner.ExecutableSha256, configured.Location, branchName, source.Commit, expectedRemoteCommit);
         journal.Bind(binding);
         GitBranch result;
