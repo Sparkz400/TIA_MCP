@@ -1,13 +1,13 @@
 # Current status
 
 TIA MCP is pre-1.0; use it only with offline projects, copies, scratch projects and
-simulators you own (see the [README](../README.md)). On `main`, 31 October 2026:
+simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.86`: 469 features, 437 verified, 32 unverified ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 127 shipped, 310 limited, 19 unqualified, 5 unavailable on V21, 8 deferred |
-| Matrix cells | 1,995 bound, **108 open**, 31 blocked, 24 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.88`: 479 features, 451 verified, 28 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 129 shipped, 322 limited, 19 unqualified, 5 unavailable on V21, 4 deferred |
+| Matrix cells | 2,055 bound, **108 open**, 31 blocked, 12 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -19,23 +19,28 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 names every row with an open cell.
 
 - **External prerequisites:** an operator at the desktop for the last Test Suite session
-  (TS-Q01), the VMware guest, a V20 library input, RT Professional and other HMI targets, a
-  physical PLC (B05), optional products and licenses such as SiVArc, Test Suite execution
-  prerequisites and the licensed AX trace package (B04), a native trace route (B06),
-  nonproduction Project Server, Teamcenter and UMC endpoints (B10), and installations and SDKs
-  of other TIA versions (B11).
+  (TS-Q01), the Explorer roundtrip in VS Code, compilable Classic and Unified HMI fixtures and
+  the installation of the exported I-device GSD; the VMware guest, a V20 library input, RT
+  Professional and other HMI targets, a physical PLC (B05), optional products and licenses such
+  as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
+  trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
+  UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).
 - **Recorded V21 boundaries:** no public API forces a value (only the TIA Portal UI does), Startdrive cannot read a drive object number added through Openness, the
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
   TIA editor, and the
   CPU protection level is refused while UMAC runtime access is enabled (its password now has a route).
+  Since 31 October also: the PLC's OPC UA server has no `HistoryRead`, no public member moves a
+  PLC block, Openness cannot install a GSD file, and the offline memory-card download cannot load a
+  safety program into PLCSIM (an online route probe is pending).
 - **Rows blocked by decision:** five `unavailable_target` rows (31 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering` and
   the two OPC UA reference-namespace kinds) are blocked and do not count toward 1.0 (decision
   of 29 October; each row's disposition is in the ledger). The three block-protection kinds
   left the blocked set: their credential route was built and verified on 30 October.
-- **Deferred rows:** eight `not_implemented` rows (24 cells) are not open cells but stay 1.0
-  work ([TODO](TODO.md#deferred-rows)).
+- **Deferred rows:** four `not_implemented` rows (12 cells) are not open cells but stay 1.0
+  work ([TODO](TODO.md#deferred-rows)); `block.move` is decided as a V21 boundary, but its
+  disposition is not yet in the catalog.
 - **Release mechanics:** product version 0.9.0 from one source, a CHANGELOG, a draft-only
   release workflow and the 30 October security review are in place; a contract freeze policy,
   the engineering package and the release itself remain ([TODO](TODO.md#release-mechanics-and-policy)).
@@ -57,7 +62,13 @@ record is cited by a feature; records no feature cites any more are in the retir
 
 ## Recent changes
 
-Dated notes, newest first, are in the [status log](history/status-log.md). On
+Dated notes, newest first, are in the [status log](history/status-log.md). From 31 October to
+[1 November](history/status-log.md#1-november-2026): project upgrade, OPC UA method calls and
+conditions, external Git delivery with two-sided conflicts, the Unified text-list import, a
+restricted translation profile, four more combined-apply shapes, technology version and F-parameter
+profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
+0.4.88); HistoryRead, block move, GSD installation and loading a safety program through the PLCSIM
+memory card are recorded V21 boundaries. On
 [31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed
 offline, among them simulator ownership on every write, a PLCSIM route check for runtime writes and
 stores that no longer block on a missing old path; the changed native paths await a native recheck. On

@@ -4,7 +4,7 @@ Only for native work: opening projects, fresh exports, compiling, applying chang
 
 ## Which versions are supported?
 
-TIA Portal **V21** with Openness and PLCSIM Advanced **V8**. Other versions are not supported.
+TIA Portal **V21** with Openness and PLCSIM Advanced **V8**. Other versions are not supported. Older projects (V14–V20) can be upgraded to V21 on an owned copy with `project_upgrade`; the source is never opened, V13 and older are refused, and projects with device types V21 no longer supports fail the upgrade ([project upgrades](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/engineering-workflows.md#project-copies-upgrades-read-only-open-and-plc-compare)).
 
 ## Can I use it on a production PLC or plant?
 

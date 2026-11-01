@@ -43,7 +43,8 @@ Every catalog evidence record is cited by a feature. Records no feature cites an
 move verbatim to a retired list: 38 old records in catalog 0.4.68
 ([list](history/catalog-evidence-retired-20261028.json)) and 53 superseded or doc-only
 records in 0.4.69 ([list](history/catalog-evidence-retired-20261029.json)) and 23 replaced
-or superseded records in 0.4.70 ([list](history/catalog-evidence-retired-20261029-reruns.json)) and the records retired in 0.4.84 ([list](history/catalog-evidence-retired-20261030.json)); their
+or superseded records in 0.4.70 ([list](history/catalog-evidence-retired-20261029-reruns.json)) and the records retired in 0.4.84 ([list](history/catalog-evidence-retired-20261030.json)); two failed-outcome
+summaries of 31 October were never cataloged ([list](history/catalog-evidence-retired-20261031.json)); their
 summaries stay in `evidence/`. Three records from before 24 October still cite
 `artifacts/` paths directly; only unverified features cite them, and their files are
 listed as lost. Prose records per run are under [verification](#verification).
