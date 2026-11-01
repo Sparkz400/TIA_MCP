@@ -31,7 +31,8 @@ if (args.Length == 4 && args[0] == "--crash-client")
 }
 bool serve = args.Length == 3 && args[0] == "--serve" && args[1] == "--output";
 bool eventsOnly = args.Length==3 && args[0]=="--events-only" && args[1]=="--output";
-if (!serve && !eventsOnly && (args.Length != 2 || args[0] != "--output")) throw new ArgumentException("Use --output fresh-directory or --serve --output fresh-directory");
+bool methodsOnly = args.Length==3 && args[0]=="--methods-only" && args[1]=="--output";
+if (!serve && !eventsOnly && !methodsOnly && (args.Length != 2 || args[0] != "--output")) throw new ArgumentException("Use --output fresh-directory or --serve --output fresh-directory");
 string output = Path.GetFullPath(args[^1]);
 if (Directory.Exists(output)) throw new IOException("Output must be fresh.");
 Directory.CreateDirectory(output);
@@ -89,11 +90,14 @@ try
         passed = true;
     }
     else if(eventsOnly) {await EventChecks.Run(server,output,Check);passed=true;}
+    else if(methodsOnly) {await MethodConditionChecks.Run(server,output,Check);passed=true;}
     else
     {
         SubscriptionInputChecks.Run(Check);
         await EventChecks.Run(server,output,Check);
         Save("event-server-audit",server.Audit.ToArray());server.Audit.Clear();
+        await MethodConditionChecks.Run(server,output,Check);
+        Save("method-condition-server-audit",server.Audit.ToArray());server.Audit.Clear();
         var reconnectServer=await Start("reconnect");
         await ReconnectChecks.Run(reconnectServer,output,Check);
         Save("reconnect-server-audit",reconnectServer.Audit.ToArray());

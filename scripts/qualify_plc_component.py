@@ -28,6 +28,8 @@ from component_window_lifetime import ComponentLifetime
 from component_window_recovery import read_inputs as parent_recovery_inputs, run_recovery as run_parent_recovery
 
 FIXTURES = ROOT / "fixtures/libraries/component-qualification"
+# The unrelated peer FC always comes from the fixture's own FBD caller source, whatever caller a case selects.
+FIXTURE_CALLER = json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))["caller"]
 KIND = "library_component_qualification"
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "qualification_component_window")
 
@@ -86,13 +88,14 @@ def drive_component(call, initial, review, retain):
     raise RuntimeError("Component exceeded its bounded state sequence.")
 
 
-def terminal_network(xml, language):
+def terminal_network(xml, language, index=-1):
+    """The selected native network (the last by default) and the object IDs that follow it."""
     document = safe_xml(xml)
     nodes = list(document.iter())
     units = [node for node in nodes if node.tag == "SW.Blocks.CompileUnit"
              and node.findtext("AttributeList/ProgrammingLanguage") == language]
-    require(bool(units), "Independent caller has no native " + language + " network.")
-    unit = units[-1]
+    require(bool(units) and -len(units) <= index < len(units), "Independent caller has no such native " + language + " network.")
+    unit = units[index]
     descendants = set(unit.iter())
     following = [node for node in nodes[nodes.index(unit) + 1:] if node not in descendants and node.get("ID")]
     return unit.get("ID"), [{"kind": node.tag, "id": node.get("ID")} for node in following]
@@ -120,15 +123,18 @@ def verify_dependency_graph(versions, manifest):
 
 
 def verify_component_call(xml, manifest):
-    """Independent native CallInfo/instance/tag/EN wiring oracle, not planner output."""
+    """Independent native CallInfo/instance/tag/EN wiring oracle, not planner output. FBD enables the call with a Boolean
+    true constant, LAD with the power rail; a multi-instance is the caller's own static member, not a global DB."""
+    lad = manifest["language"] == "LAD"
+    multi = manifest.get("multiInstance")
     document = safe_xml(xml)
     local = lambda node: node.tag.rsplit("}", 1)[-1]
     calls = [node for node in document.iter() if local(node) == "CallInfo" and node.get("Name") == manifest["root"]]
     require(len(calls) == 1 and calls[0].get("BlockType") == "FB", "Expected exactly one FB component call.")
     info = calls[0]
     instances = [node for node in info if local(node) == "Instance"]
-    require(len(instances) == 1 and instances[0].get("Scope") == "GlobalVariable"
-            and [n.get("Name") for n in instances[0].iter() if local(n) == "Component"] == [manifest["instance"]],
+    require(len(instances) == 1 and instances[0].get("Scope") == ("LocalVariable" if multi else "GlobalVariable")
+            and [n.get("Name") for n in instances[0].iter() if local(n) == "Component"] == [multi or manifest["instance"]],
             "Native instance identity differs from independent specification.")
     require([(p.get("Name"), p.get("Section"), p.get("Type")) for p in info if local(p) == "Parameter"]
             == [(s["parameter"], s["direction"], s["dataType"]) for s in manifest["signals"]], "Native call interface differs.")
@@ -149,6 +155,7 @@ def verify_component_call(xml, manifest):
                 require(len(matches) == 1, "Unexpected/ambiguous native mapped tag.")
                 name = matches[0]["parameter"]
             else:
+                require(not lad, "A LAD component network has no operand besides the mapped tags.")
                 constants = {local(n): n.text for n in part.iter() if local(n) in {"ConstantType", "ConstantValue"}}
                 require(part.get("Scope") == "LiteralConstant" and constants.get("ConstantType") == "Bool"
                         and (constants.get("ConstantValue") or "").lower() == "true" and len(constants) == 2,
@@ -156,18 +163,20 @@ def verify_component_call(xml, manifest):
                 name = "enable"
         require(name not in ids.values() and part.get("UId") not in ids, "Duplicate native component part.")
         ids[part.get("UId")] = name
-    require(set(ids.values()) == {"call", "enable", "Enable", "Active"}, "Component part inventory differs.")
+    require(set(ids.values()) == {"call", "Enable", "Active"} | (set() if lad else {"enable"}), "Component part inventory differs.")
     observed = []
     for wire in next(node for node in net if local(node) == "Wires"):
         ends = []
         for end in wire:
             if local(end) == "OpenCon":
                 ends.append(("open", "value"))
+            elif local(end) == "Powerrail" and lad:
+                ends.append(("rail", "out"))
             else:
                 require(local(end) in {"IdentCon", "NameCon"} and end.get("UId") in ids, "Unresolved component connector.")
                 ends.append((ids[end.get("UId")], end.get("Name", "value")))
         observed.append(tuple(sorted(ends)))
-    wanted = [(('enable', 'value'), ('call', 'en')), (('Enable', 'value'), ('call', 'Enable')),
+    wanted = [(('rail', 'out') if lad else ('enable', 'value'), ('call', 'en')), (('Enable', 'value'), ('call', 'Enable')),
               (('Active', 'value'), ('call', 'Active')), (('call', 'eno'), ('open', 'value'))]
     # ENO may be omitted entirely by the qualified profile; no other open ports allowed.
     normalized = sorted(tuple(sorted(pair)) for pair in wanted)
@@ -279,7 +288,8 @@ def verify_standalone_caller(xml, manifest):
     require(len(list(blocks[0].iter("SW.Blocks.CompileUnit"))) == 1, "Standalone caller must contain exactly one network.")
 
 
-def verify_preserved_installation(before, after, caller, added):
+def verify_preserved_installation(before, after, caller, added, added_member=None, after_network=None):
+    """after_network: index of the original network the new one must directly follow (negative from the end); None accepts any."""
     require(set(after["objects"]) - set(before["objects"]) == set(added)
             and not set(before["objects"]) - set(after["objects"]), "Installed object inventory differs from exact fixture additions.")
     reduced = {"objects": {k: v for k, v in after["objects"].items() if k in before["objects"]}}
@@ -350,10 +360,26 @@ def verify_preserved_installation(before, after, caller, added):
                     return False
                 node.setAttribute("ID", format(int(value, 16) - count, "X"))
         unit.parentNode.removeChild(unit)
+        if added_member:
+            # A multi-instance is one new direct Static member of the caller FB's interface; it carries no IDs.
+            members = [m for m in candidate.getElementsByTagName("Member") if m.getAttribute("Name") == added_member
+                       and m.parentNode.tagName == "Section" and m.parentNode.getAttribute("Name") == "Static"
+                       and m.parentNode.parentNode.parentNode.tagName == "Interface"]
+            if len(members) != 1:
+                return False
+            section, space = members[0].parentNode, members[0].previousSibling
+            if space is not None and space.nodeType == Node.TEXT_NODE and not space.data.strip():
+                section.removeChild(space)
+            section.removeChild(members[0])
+            # A Static section that held only the new member was an empty element before it.
+            if all(n.nodeType == Node.TEXT_NODE and not n.data.strip() for n in section.childNodes):
+                for n in list(section.childNodes):
+                    section.removeChild(n)
         return native_payload(candidate.toxml()) == expected
 
     # Two candidates can restore only when they are equal up to that shift.
-    require(any(restores(index) for index in range(new_count)),
+    candidates = range(new_count) if after_network is None else [after_network % old_count + 1]
+    require(any(restores(index) for index in candidates),
             "Caller content outside the inserted network changed beyond the accepted following-ID shift.")
 
 
@@ -590,13 +616,14 @@ class ComponentRun:
         verify_dependency_graph(self.query(library, query="dependencies", **released[self.manifest["root"]]), self.manifest)
         # An independently authored peer proves complete preservation; the caller
         # selected for installation is deliberately absent before the first import.
-        peer_source = (self.native / "documents" / (self.manifest["caller"] + ".s7dcl")).read_text(encoding="utf-8-sig")
-        peer_source = peer_source.replace(self.manifest["caller"], self.manifest["unrelatedCaller"])
+        peer_source = (self.native / "documents" / (FIXTURE_CALLER + ".s7dcl")).read_text(encoding="utf-8-sig")
+        peer_source = peer_source.replace(FIXTURE_CALLER, self.manifest["unrelatedCaller"])
         self.apply("source_upsert", {"language": "SIMATIC_SD", "source": peer_source,
             "expectedBlockNames": [self.manifest["unrelatedCaller"]]})
         existing = self.manifest["callerMode"] == "existing"
-        if existing:
-            caller_source = (self.native / "documents" / (self.manifest["caller"] + ".s7dcl")).read_text(encoding="utf-8-sig")
+        source = self.manifest.get("callerSource", self.manifest["caller"] + ".s7dcl")
+        if existing and source:
+            caller_source = (self.native / "documents" / source).read_text(encoding="utf-8-sig")
             self.apply("source_upsert", {"language": "SIMATIC_SD", "source": caller_source, "expectedBlockNames": [self.manifest["caller"]]})
         inventory = complete_inventory(self.call)
         plc = inventory["plcPath"]
@@ -617,7 +644,8 @@ class ComponentRun:
         caller = plc + "/blocks/" + self.manifest["caller"]
         if self.manifest["callerMode"] == "existing":
             require(select(baseline["inventory"]["blocks"], self.manifest["caller"], plc)["path"] == caller, "Existing caller must be in the initial checkpoint.")
-            network, following = terminal_network(Path(baseline["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"), self.manifest["language"])
+            network, following = terminal_network(Path(baseline["objects"]["block:" + caller]["file"]).read_text(encoding="utf-8-sig"),
+                                                   self.manifest["language"], self.manifest.get("insertNetworkIndex", -1))
             self.report["callerInitialState"] = {"mode": "existing", "path": caller, "exists": True, "calledFromOb": False,
                 "insertAfterNetworkId": network, "followingObjectIds": following}
             return caller, {"mode": "existing", "blockPath": caller, "insertAfterNetworkId": network}, network
@@ -654,7 +682,8 @@ class ComponentRun:
         verify_pinned_source_oracle(source_bytes, oracle_bytes, root_version, self.manifest)
         self.report["sourceContentEvidenceAttempt"]["verified"] = True
         self.report["explicitSourceAttributesVerified"] = True; self.report["sourceContentPolicyVerified"] = True; self.persist()
-        require(plan["steps"][0]["prepareArguments"]["payload"]["selection"] == payload["selection"], "Planned root pin differs.")
+        # A reused FB has no import step; its exact installed versions are proven by the planner and the readback.
+        require(plan["fb"]["reused"] or plan["steps"][0]["prepareArguments"]["payload"]["selection"] == payload["selection"], "Planned root pin differs.")
         return plan
 
     def consumer(self, archive, released):

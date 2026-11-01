@@ -61,6 +61,11 @@ public sealed partial class TiaTools
         string? projectName = null, int maxItems = 500)
         => Call("plc_compare", new { projectName, plcPath, targetPlcPath, libraryId, maxItems = Limit(maxItems) }, cancellationToken);
 
+    [McpServerTool(Name = "project_upgrade", Destructive = false, OpenWorld = false)]
+    [Description("Upgrade an exact V14-V20 project file (.ap14-.ap20, V15.1 .ap15_1) or archive (.zap14-.zap20) with its required SHA-256 to V21, in an empty worker-owned TIA instance started with tia_start. The source is never opened or written: the project's whole folder, or the archive, is copied into a new unique directory under the host's upgrades artifacts and only that copy is upgraded (OpenWithUpgrade, RetrieveWithUpgrade). The source is hashed before and after. V13 and older, V21 and newer are refused before any native call (ProjectVersionUnsupported). Returns the source version, the upgraded project (left open), TIA's conversion logs with their success marker and error and warning counts, and sourceUnchanged. Nothing is compiled or saved beyond what TIA's upgrade does; read the compile state with project_inventory. Protected (UMAC) projects are not supported.")]
+    public Task<CallToolResult> ProjectUpgrade(string path, string expectedSha256, CancellationToken cancellationToken)
+        => Call("project_upgrade", new { path, expectedSha256, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "upgrades") }, cancellationToken);
+
     [McpServerTool(Name = "project_retrieve", Destructive = false, OpenWorld = false)]
     [Description("Retrieve an exact .zap21 archive with a required SHA-256 into a new unique directory in an empty worker-owned TIA instance. Supports explicit checkpoint recovery after a restart. Never overwrites an existing project.")]
     public Task<CallToolResult> ProjectRetrieve(string archivePath, string expectedSha256, CancellationToken cancellationToken)
@@ -97,7 +102,7 @@ public sealed partial class TiaTools
         => Call("block_interface", new { blockName, blockPath, projectName, plcPath, scopePath, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "hardware_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect configured hardware attributes, addresses, exposed channels, subnet memberships, native I/O-controller/connector associations and port interconnections with exact hardware owners or explicit unresolved coverage, plus GSD identities. Bounded offline observations; no physical wiring inference, network scan or PLC connection.")]
+    [Description("Inspect configured hardware attributes, addresses, exposed channels, subnet memberships, native I/O-controller/connector associations, port interconnections and MRP instances (domain, role, ring ports) with exact hardware owners or explicit unresolved coverage, plus GSD identities. Bounded offline observations; no physical wiring inference, network scan or PLC connection.")]
     public Task<CallToolResult> HardwareInspect(CancellationToken cancellationToken, string? hardwarePath = null, string? projectName = null, int maxItems = 500)
         => Call("hardware_inspect", new { hardwarePath, projectName, maxItems = Limit(maxItems) }, cancellationToken);
 
@@ -166,7 +171,7 @@ public sealed partial class TiaTools
         => Call("fixture_sources", new { language, blockName, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "fixtures") }, cancellationToken);
 
     [McpServerTool(Name = "change_prepare", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved (change_restore it, or start a new instance). Source/XML must explicitly describe intended objects. Does not change the project; writes preview artifacts.")]
+    [Description("Prepare an offline engineering change: kind and payload, exact project/PLC targets, preview, artifact hashes and conflict checks. Returns changeId/previewHash for change_apply and the project's unsaved state (isModified). Refuses with RecoveryRequired while another change on the same project in this TIA process is unresolved (change_restore it, or start a new instance). Source/XML must explicitly describe intended objects. Kind hmi_text_list_import takes {schemaVersion:1, target, expectedContentHash, recordId, outputId?}: the Host reopens that hmi_text_list_author/generate_set record and refuses content V21's import would change. Does not change the project; writes preview artifacts.")]
     public async Task<CallToolResult> ChangePrepare(string kind, JsonElement payload, CancellationToken cancellationToken, string? projectName = null, string? plcPath = null, string? scopePath = null)
     {
         object request;
@@ -182,11 +187,28 @@ public sealed partial class TiaTools
             try { request = new DbSnapshotWorkflowStore(options.ArtifactsDirectory).LoadPayload(payload); }
             catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidDbSnapshot", error.Message)); }
+        // The worker cannot read Host VCI records, so the reviewed three-way row and its exact package bytes are bound here.
+        if (kind == "vci_conflict_resolve")
+            try
+            {
+                if (options.GitExecutable is null) throw new BridgeException("GitNotConfigured", "Start the Host with --git-executable to read the reviewed VCI comparison.");
+                request = new TiaMcp.Core.VersionControl.VciWorkspaceStore(options.ArtifactsDirectory, options.GitExecutable, options.LibraryLimits).ConflictResolutionPayload(payload);
+            }
+            catch (Exception error) when (error is BridgeException or IOException or JsonException or InvalidOperationException or UnauthorizedAccessException)
+            { return Failure(error as BridgeException ?? new BridgeException("VciWorkflowFailed", "The reviewed VCI comparison could not be read.")); }
+        // The worker cannot read review records; the Host reopens the text-list record and hands over the exact candidate pair.
+        if (kind == "hmi_text_list_import")
+            try { request = new HmiComponentWorkflowStore(options.ArtifactsDirectory).TextListImportPayload(payload); }
+            catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or JsonException or InvalidOperationException)
+            { return Failure(error as BridgeException ?? new BridgeException("HmiTextListCandidateUnavailable", error.Message)); }
         // The worker cannot read the upload store; only exact public DER of the committed upload is handed over.
         if (kind == "certificate_import")
             try { request = TiaMcp.Core.Security.PublicCertificateReview.ImportPayload(payload, new ArtifactUploadStore(options.ArtifactsDirectory).ResolveCommitted); }
             catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException)
             { return Failure(error as BridgeException ?? new BridgeException("InvalidCertificateImport", "The certificate upload could not be read.")); }
+        // Only the launch option widens safety_fparameter_set beyond the qualified allowlist; no client argument can.
+        if (kind == "safety_fparameter_set" && options.SafetyFParameterDiscovery)
+            return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes"), fParameterDiscovery = true }, cancellationToken);
         return await Call("change_prepare", new { kind, payload = request, projectName, plcPath, scopePath, artifactDirectory = Path.Combine(options.ArtifactsDirectory, "changes") }, cancellationToken);
     }
 
@@ -229,9 +251,9 @@ public sealed partial class TiaTools
         => Call("web_inspect", new { projectName, hardwarePath, maxItems = Limit(maxItems) }, cancellationToken);
 
     [McpServerTool(Name = "vci_workspace_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
-    [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state and supported file formats. Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, export or synchronization.")]
+    [Description("Inspect the open project's native VCI workspace groups and workspaces: root path, language, library policy and mapped objects with native compare/child mapping state, supported file formats and contentSha256 (SHA-256 of the object's SimaticML export without document info; the native-side hash vci_conflict_resolve rechecks). Bounded by maxItems with explicit truncation. No workspace creation, mapping edit, workspace export or synchronization.")]
     public Task<CallToolResult> VciWorkspaceInspect(CancellationToken cancellationToken, string? projectName = null, int maxItems = 500)
-        => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems) }, cancellationToken);
+        => Call("vci_workspace_inspect", new { projectName, maxItems = Limit(maxItems), artifactDirectory = ExportDirectory }, cancellationToken);
 
     [McpServerTool(Name = "safety_validation_inspect", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Inspect one safety PLC like safety_inspect, plus Failsafe_* F-parameters of the CPU and its F-I/O modules (F-source/F-destination address, F-monitoring time, F-parameter signature) and Safety Validation Assistant activation tests, groups, safety functions, conditions, validity checks and recorded test states. exportArtifacts writes activation-test SimaticML and XLSX reports and the safety printout PDF to the export directory with SHA-256. The result is accepted by safety_evidence_review. Does not log in, execute activation tests, reset results, change F-parameters or approve the safety program.")]

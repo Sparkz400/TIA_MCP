@@ -35,6 +35,18 @@ public sealed record GitOperationBinding(string Operation, string RepositoryRoot
         new("fork", Root(before.RepositoryRoot), Root(control), Hash(executableSha256), SnapshotSha256: before.Sha256,
             Branch: GitSafety.Branch(branch), TargetCommit: before.HeadCommit);
 
+    // Remote operations bind the configured remote as Destination (a path or URL, never credentials); not admitted by BuildPlan.
+    public static GitOperationBinding Push(GitWorkspaceSnapshot before, string control, string executableSha256, string remote,
+        string branch, string commit, string? expectedRemoteCommit) =>
+        new("push", Root(before.RepositoryRoot), Root(control), Hash(executableSha256), SnapshotSha256: before.Sha256,
+            Branch: GitSafety.Branch(branch), TargetCommit: GitSafety.ObjectId(commit),
+            ExpectedReferenceCommit: expectedRemoteCommit is null ? null : GitSafety.ObjectId(expectedRemoteCommit), Destination: remote);
+
+    public static GitOperationBinding Fetch(GitWorkspaceSnapshot before, string control, string executableSha256, string remote,
+        string branch, string remoteCommit) =>
+        new("fetch", Root(before.RepositoryRoot), Root(control), Hash(executableSha256), SnapshotSha256: before.Sha256,
+            Branch: GitSafety.Branch(branch), TargetCommit: GitSafety.ObjectId(remoteCommit), ExpectedReferenceCommit: before.HeadCommit, Destination: remote);
+
     /// <summary>The caller retains canonical binding bytes, project/package provenance and real resource checkpoints.</summary>
     public EngineeringOperationPlan BuildPlan(NativeTargetObservation target, EngineeringArtifactReference bindingArtifact,
         IReadOnlyList<EngineeringArtifactReference> inputs, IReadOnlyList<string> requiredProbes,

@@ -143,6 +143,7 @@ internal static partial class Program
             ("Provisioning checkpoint refuses unsaved state and existing destinations", SimulationCheckpointTests.SavedStateAndCollisions),
             ("Provisioning checkpoint and durable receipt precede runtime continuation", SimulationCheckpointTests.ArchiveAndDurableReceiptPrecedeContinuation),
             ("Card move retries retain deadlines and never replay other operations", SimulationCardMoveRetryTests.BoundsAndNoNativeReplay),
+            ("Access-denied card moves record attempt timing, HRESULT and holder queries", SimulationCardMoveRetryTests.AccessDeniedRowsCarryTimingHResultAndHolderQueries),
             ("An open file below the card refuses its move and the probe names the holder", SimulationCardLockHoldersTests.OpenFileBelowCardRefusesMoveAndIsNamed),
             ("Discovery retains nonempty snapshots and requires repeated absence", SimulationDiscoveryWaitTests.TransientEntriesAndStableAbsence),
             ("Discovery never accepts persistent devices or late empty snapshots", SimulationDiscoveryWaitTests.PersistentDevicesAndLateSnapshots),
@@ -268,6 +269,7 @@ internal static partial class Program
             ("Unsupported array paths and bounds remain explicit", OfflineEvidenceTests.InterfaceArrayPathsStayExplicitWhenUnresolved),
             ("Interface normalization obeys traversal bounds without expanding arrays", OfflineEvidenceTests.InterfaceNormalizationIsBounded),
             ("Native symbolic matching preserves nested and instance boundaries", OfflineEvidenceTests.NativeSymbolsKeepNestedAndInstanceBoundaries),
+            ("Worker translation admission ledgers stay provisional until the default-mode packet", TranslationAdmissionLedgerTests.ProvisionalAndFinalRestrictedLedgers),
             ("Deletion policies and empty group checks fail closed", DependencyRulesTests.DeletionPolicyAndEmptyGroupsFailClosed),
             ("Dependency token scans preserve unresolved evidence", DependencyRulesTests.NativeDependencyTokensAreConservative),
             ("Dependency exclusion preserves same-name declarations in other owners", DependencyRulesTests.SelectedDeclarationExclusionPreservesOtherOwners),
@@ -334,7 +336,13 @@ internal static partial class Program
             ("Recovery preflight rejects invalid project components and relative roots", EngineeringPathsTests.InvalidPathsRejected),
             ("Archive staging preflight enforces the native 143-character boundary", EngineeringPathsTests.ArchiveStagingBoundaryIsPure),
             ("Archive staging preflight rejects invalid paths", EngineeringPathsTests.ArchivePathsRejectInvalidComponents),
-            ("Recovery archives retain unique short names within the native path limit", EngineeringPathsTests.RecoveryArchiveUsesShortName)
+            ("Recovery archives retain unique short names within the native path limit", EngineeringPathsTests.RecoveryArchiveUsesShortName),
+            ("Project upgrade accepts V14-V20 projects and archives and refuses V13 and older and V21 and newer before any read", ProjectUpgradeRulesTests.VersionsAndRefusals),
+            ("Project upgrade copies stay inside the owned destination, outside the source folder and within the native path limit", ProjectUpgradeRulesTests.LayoutStaysOwnedAndBounded),
+            ("Project upgrade summarizes the conversion log's project success marker and message counts", ProjectUpgradeRulesTests.ConversionLogSummary),
+            ("Project upgrade reads the real version and project name from the project marker, not the file name", ProjectUpgradeRulesTests.MarkerDeclaresTheRealVersion),
+            ("Project upgrade refuses a project folder holding another project or archive", ProjectUpgradeRulesTests.FolderHoldsOneProject),
+            ("Project upgrade evidence collection records its own failure and never replaces TIA's outcome", ProjectUpgradeRulesTests.EvidenceNeverReplacesTheOutcome)
         ];
         if (typedGraphicalOnly) tests = tests.Where(test => test.Name.StartsWith("Typed ", StringComparison.Ordinal)).ToArray();
         if (bridgeOnly) tests = tests.Where(test => test.Name.StartsWith("Bridge ", StringComparison.Ordinal)).ToArray();

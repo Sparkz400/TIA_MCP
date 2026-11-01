@@ -21,9 +21,11 @@ public sealed partial class VciWorkspaceStore
     private static readonly GitRunnerLimits Limits = new(MaxFiles, 64L << 20, MaxFileBytes);
     private readonly string root, records, controls, executable;
     private readonly ArtifactUploadStore uploads;
+    private readonly GitRemote? remote;
 
-    public VciWorkspaceStore(string artifactsDirectory, string gitExecutable, PackageIntakeLimits? uploadLimits = null)
+    public VciWorkspaceStore(string artifactsDirectory, string gitExecutable, PackageIntakeLimits? uploadLimits = null, GitRemote? remote = null)
     {
+        this.remote = remote;
         executable = GitSafety.PathRoot(gitExecutable, false);
         if (!File.Exists(executable)) throw new BridgeException("GitExecutableUnavailable", "Configure one installed Git executable on the Host.");
         root = Path.GetFullPath(Path.Combine(artifactsDirectory, "vci-workspaces"));
@@ -78,16 +80,7 @@ public sealed partial class VciWorkspaceStore
         }
         else
         {
-            var parent = Revision(parentRevisionRef);
-            var reader = Runner();
-            var before = await reader.InspectAsync(parent.Repository, token);
-            Require(before.Sha256 == parent.Value.SnapshotSha256, "PreviewStale", "Parent repository differs from its retained committed revision.");
-            var branches = await reader.BranchesAsync(parent.Repository, token);
-            CopyTree(parent.Repository, repository, token);
-            Require((await reader.InspectAsync(parent.Repository, token)).Sha256 == before.Sha256,
-                "PreviewStale", "Parent repository changed during copying.");
-            Require(branches.SequenceEqual(await reader.BranchesAsync(parent.Repository, token)) &&
-                branches.SequenceEqual(await reader.BranchesAsync(repository, token)), "PreviewStale", "Parent branch inventory changed during copying.");
+            var before = await CopyRevision(parentRevisionRef, repository, token);
             if (branchName is not null && GitSafety.Branch(branchName) != before.HeadReference)
             {
                 var journal = new Journal(Path.Combine(entry.Path, "fork-journal")); var fork = Runner(journal);
@@ -126,6 +119,22 @@ public sealed partial class VciWorkspaceStore
             artifacts.ToArray(), snapshot.HeadReference);
         WriteNew(Path.Combine(entry.Path, "review.json"), review);
         return Reopen(Reference("preview", entry.Id, Path.Combine(entry.Path, "review.json")));
+    }
+
+    // A new candidate repository is a verified copy of a committed or fetched parent; the parent never changes.
+    private async Task<GitWorkspaceSnapshot> CopyRevision(string parentRevisionRef, string repository, CancellationToken token)
+    {
+        var parent = Committed(parentRevisionRef);
+        var reader = Runner();
+        var before = await reader.InspectAsync(parent.Repository, token);
+        Require(before.Sha256 == parent.SnapshotSha256, "PreviewStale", "Parent repository differs from its retained committed revision.");
+        var branches = await reader.BranchesAsync(parent.Repository, token);
+        CopyTree(parent.Repository, repository, token);
+        Require((await reader.InspectAsync(parent.Repository, token)).Sha256 == before.Sha256,
+            "PreviewStale", "Parent repository changed during copying.");
+        Require(branches.SequenceEqual(await reader.BranchesAsync(parent.Repository, token)) &&
+            branches.SequenceEqual(await reader.BranchesAsync(repository, token)), "PreviewStale", "Parent branch inventory changed during copying.");
+        return before;
     }
 
     public async Task<object> CommitAsync(string previewRef, string reviewedPlanSha256, CancellationToken token = default)
@@ -167,6 +176,7 @@ public sealed partial class VciWorkspaceStore
     {
         var parsed = Parse(recordRef);
         if (parsed.Kind is "manifest" or "comparison") return ReopenPackages(recordRef, parsed.Kind);
+        if (parsed.Kind is "fetch" or "push") return ReopenRemote(recordRef, parsed.Kind);
         if (parsed.Kind == "export")
         {
             var export = Read<VciGitExport>(recordRef, "export");
@@ -202,7 +212,7 @@ public sealed partial class VciWorkspaceStore
         var reader = Runner(); var after = await reader.InspectAsync(preview.Repository, token);
         Require(reader.ExecutableSha256 == preview.Value.ExecutableSha256 && after.HeadCommit == callback.CandidateCommit &&
             after.HeadTree == callback.CandidateTree && after.Status.Length == 0, "PreviewStale", "Repository or executable differs from the verified callback.");
-        string? parent = preview.Value.ParentRef is null ? null : Revision(preview.Value.ParentRef).Value.Result.Commit;
+        string? parent = preview.Value.ParentRef is null ? null : Committed(preview.Value.ParentRef).Commit;
         var result = new GitCommitResult(callback.OperationId, preview.Repository, callback.CandidateCommit, callback.CandidateTree,
             parent, preview.Value.PlanSha256, reader.ExecutableSha256, await reader.GetVersionAsync(token));
         WriteNew(receiptPath, new VciGitRevision(previewRef, result, after.Sha256, callback.Sha256));
@@ -213,12 +223,12 @@ public sealed partial class VciWorkspaceStore
     {
         using var gate = Lock();
         Require(count is > 0 and <= 50, "VciInputLimit", "History accepts 1..50 commits.");
-        var revision = Revision(revisionRef); var runner = Runner();
-        Require((await runner.InspectAsync(revision.Repository, token)).Sha256 == revision.Value.SnapshotSha256,
+        var revision = Committed(revisionRef); var runner = Runner();
+        Require((await runner.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
             "PreviewStale", "Revision repository changed.");
         var history = await runner.HistoryAsync(revision.Repository, count, token);
-        Require(history.StartsWith(revision.Value.Result.Commit + "\0", StringComparison.Ordinal) &&
-            (await runner.InspectAsync(revision.Repository, token)).Sha256 == revision.Value.SnapshotSha256,
+        Require(history.StartsWith(revision.Commit + "\0", StringComparison.Ordinal) &&
+            (await runner.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
             "PreviewStale", "History no longer belongs to the selected immutable revision.");
         Require(Encoding.UTF8.GetByteCount(history) <= 65536, "VciOutputLimit", "History exceeds 64 KiB; request fewer commits.");
         return new { revisionRef, nativeQualified = false, maximumCommits = count, history,
@@ -232,14 +242,14 @@ public sealed partial class VciWorkspaceStore
         Require(offset >= 0 && count is > 0 and <= 50, "VciInputLimit", "List 1..50 branch refs per page.");
         Require(offset == 0 || expectedInventorySha256 is not null, "VciInputLimit", "Subsequent pages require the first page's inventorySha256.");
         if (expectedInventorySha256 is not null) VciGuard.Hash(expectedInventorySha256);
-        var revision = Revision(revisionRef); var reader = Runner();
-        Require((await reader.InspectAsync(revision.Repository, token)).Sha256 == revision.Value.SnapshotSha256,
+        var revision = Committed(revisionRef); var reader = Runner();
+        Require((await reader.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
             "PreviewStale", "Revision repository changed.");
         var branches = await reader.BranchesAsync(revision.Repository, token);
         string hash = GitWorkspaceSnapshot.Digest(branches);
         Require((expectedInventorySha256 is null || expectedInventorySha256 == hash) &&
             hash == GitWorkspaceSnapshot.Digest(await reader.BranchesAsync(revision.Repository, token)) &&
-            (await reader.InspectAsync(revision.Repository, token)).Sha256 == revision.Value.SnapshotSha256,
+            (await reader.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
             "PreviewStale", "Branch inventory changed; restart from the first page.");
         Require(offset <= branches.Count, "VciInputLimit", "Branch offset exceeds the current inventory.");
         var rows = branches.Skip(offset).Take(count).ToArray();
@@ -253,15 +263,15 @@ public sealed partial class VciWorkspaceStore
     public async Task<object> MaterializeAsync(string revisionRef, CancellationToken token = default)
     {
         using var gate = Lock();
-        var revision = Revision(revisionRef); var entry = NewEntry();
+        var revision = Committed(revisionRef); var entry = NewEntry();
         WriteNew(Path.Combine(entry.Path, "intent.json"), new { kind = "export", revisionRef });
         var journal = new Journal(Path.Combine(entry.Path, "export-journal")); var runner = Runner(journal);
         var before = await runner.InspectAsync(revision.Repository, token);
-        Require(before.Sha256 == revision.Value.SnapshotSha256, "PreviewStale", "Revision repository changed.");
+        Require(before.Sha256 == revision.SnapshotSha256, "PreviewStale", "Revision repository changed.");
         string destination = Path.Combine(entry.Path, "files");
-        journal.Bind(GitOperationBinding.Materialize(before, runner.ControlDirectory, runner.ExecutableSha256, revision.Value.Result.Commit, destination));
-        var result = await runner.MaterializeAsync(revision.Repository, revision.Value.Result.Commit, destination, token);
-        var reviewedFiles = Preview(revision.Value.PreviewRef).Value.Files;
+        journal.Bind(GitOperationBinding.Materialize(before, runner.ControlDirectory, runner.ExecutableSha256, revision.Commit, destination));
+        var result = await runner.MaterializeAsync(revision.Repository, revision.Commit, destination, token);
+        var reviewedFiles = revision.Files;
         Require(result.Files.OrderBy(f => f.RelativePath, StringComparer.Ordinal).Select(f => (f.RelativePath, f.Sha256, f.Bytes))
             .SequenceEqual(reviewedFiles.OrderBy(f => f.RelativePath, StringComparer.Ordinal).Select(f => (f.RelativePath, f.Sha256, f.Bytes))),
             "VciIntegrityFailure", "Exported revision bytes differ from the reviewed file manifest.");
@@ -296,6 +306,7 @@ public sealed partial class VciWorkspaceStore
         }
         var artifacts = parsed.Kind is "manifest" or "comparison" ? PackageArtifacts(recordRef, parsed.Kind)
             : parsed.Kind == "export" ? Read<VciGitExport>(recordRef, "export").Value.Artifacts
+            : parsed.Kind == "fetch" ? Fetched(recordRef).Value.Artifacts : parsed.Kind == "push" ? Pushed(recordRef).Artifacts
             : Preview(parsed.Kind == "revision" ? Revision(recordRef).Value.PreviewRef : recordRef).Value.Artifacts;
         var artifact = artifacts.SingleOrDefault(a => a.Name == name);
         Require(artifact is not null, "VciArtifactMissing", "Use an artifact name returned by this record.");
@@ -304,12 +315,29 @@ public sealed partial class VciWorkspaceStore
 
     public object ReadFile(string recordRef, string relativePath, long offset = 0, int count = 65536)
     {
-        var parsed = Parse(recordRef);
-        Require(parsed.Kind is "preview" or "revision", "VciInvalidReference", "Use a preview or committed revision.");
-        var preview = Preview(parsed.Kind == "revision" ? Revision(recordRef).Value.PreviewRef : recordRef);
-        var file = preview.Value.Files.SingleOrDefault(f => f.RelativePath == relativePath);
+        var source = Source(recordRef);
+        var file = source.Files.SingleOrDefault(f => f.RelativePath == relativePath);
         Require(file is not null, "VciArtifactMissing", "Use an exact retained file path from files.json.");
-        return Chunk(PackageStorage.Under(preview.Repository, file.RelativePath), file.Sha256, file.Bytes, offset, count);
+        return Chunk(PackageStorage.Under(source.Repository, file.RelativePath), file.Sha256, file.Bytes, offset, count);
+    }
+
+    // Raw files of a preview, committed revision or fetched remote revision.
+    private (GitFileEvidence[] Files, string Repository) Source(string reference)
+    {
+        var kind = Parse(reference).Kind;
+        Require(kind is "preview" or "revision" or "fetch", "VciInvalidReference", "Use a preview, committed revision or fetched revision.");
+        if (kind == "preview") { var preview = Preview(reference); return (preview.Value.Files, preview.Repository); }
+        var committed = Committed(reference); return (committed.Files, committed.Repository);
+    }
+
+    // A committed or fetched revision: an immutable commit whose clean repository is retained exactly.
+    private (string Commit, string SnapshotSha256, string Repository, GitFileEvidence[] Files) Committed(string reference)
+    {
+        var kind = Parse(reference).Kind;
+        Require(kind is "revision" or "fetch", "VciInvalidReference", "Use a committed or fetched revision.");
+        if (kind == "fetch") { var fetched = Fetched(reference); return (fetched.Value.Commit, fetched.Value.SnapshotSha256, fetched.Repository, fetched.Value.Files); }
+        var revision = Revision(reference);
+        return (revision.Value.Result.Commit, revision.Value.SnapshotSha256, revision.Repository, Preview(revision.Value.PreviewRef).Value.Files);
     }
 
     public object List(int offset = 0, int count = 20)
@@ -327,10 +355,13 @@ public sealed partial class VciWorkspaceStore
                 string? kind = File.Exists(Path.Combine(directory, "comparison-receipt.json")) ? "comparison" :
                     File.Exists(Path.Combine(directory, "manifest-receipt.json")) ? "manifest" :
                     File.Exists(Path.Combine(directory, "export.json")) ? "export" :
+                    File.Exists(Path.Combine(directory, "fetch.json")) ? "fetch" : File.Exists(Path.Combine(directory, "push.json")) ? "push" :
                     File.Exists(Path.Combine(directory, "commit.json")) ? "revision" : File.Exists(Path.Combine(directory, "review.json")) ? "preview" : null;
                 if (kind is not null) { reference = Reference(kind, id, Path.Combine(directory, Receipt(kind))); _ = Reopen(reference); state = kind == "preview" ? "prepared" : "complete"; }
                 if (kind == "preview" && HasCommitIntent(directory)) state = "outcomeUnknown";
-                if (kind is null && Directory.Exists(Path.Combine(directory, "fork-journal"))) state = "outcomeUnknown";
+                // A dispatched remote operation without its receipt may have changed the remote; refusals before dispatch stay incomplete.
+                if (kind is null && (Directory.Exists(Path.Combine(directory, "fork-journal")) ||
+                    File.Exists(Path.Combine(directory, "push-journal", "0001.json")) || File.Exists(Path.Combine(directory, "fetch-journal", "0001.json")))) state = "outcomeUnknown";
             }
             catch (Exception e) when (e is BridgeException or IOException or JsonException or UnauthorizedAccessException) { state = "integrity-failed"; }
             return new { id, recordRef = reference, state };
@@ -347,17 +378,21 @@ public sealed partial class VciWorkspaceStore
             ? ["diff.txt", "files.json", "fork-journal/intent.json", "fork-journal/0001.json", "fork-journal/0002.json"] : ["diff.txt", "files.json"];
         VerifyArtifacts(entry.Directory, entry.Value.Artifacts, expectedArtifacts);
         string repository = Path.Combine(entry.Directory, "repository");
+        VerifyWorkingFiles(repository, entry.Value.Files);
+        return (entry.Value, entry.Directory, repository);
+    }
+    private static void VerifyWorkingFiles(string repository, GitFileEvidence[] files)
+    {
         var actual = TreeFiles(repository, MaxTreeBytes).Select(p => Path.GetRelativePath(repository, p).Replace('\\', '/'))
             .Where(p => !p.StartsWith(".git/", StringComparison.Ordinal)).Order(StringComparer.Ordinal).ToArray();
-        Require(actual.SequenceEqual(entry.Value.Files.Select(f => f.RelativePath).Order(StringComparer.Ordinal)),
+        Require(actual.SequenceEqual(files.Select(f => f.RelativePath).Order(StringComparer.Ordinal)),
             "VciIntegrityFailure", "Working-file inventory differs from the retained review.");
-        foreach (var file in entry.Value.Files)
+        foreach (var file in files)
         {
             GitSafety.RelativePath(file.RelativePath); string path = PackageStorage.Under(repository, file.RelativePath);
             Require(new FileInfo(path).Length == file.Bytes && PackageStorage.FileHash(path) == file.Sha256,
                 "VciIntegrityFailure", "Retained working bytes changed.");
         }
-        return (entry.Value, entry.Directory, Path.Combine(entry.Directory, "repository"));
     }
     private (VciGitRevision Value, string Directory, string Repository) Revision(string reference)
     {
@@ -381,9 +416,9 @@ public sealed partial class VciWorkspaceStore
     }
     private static (string Kind, string Id, string Hash) Parse(string reference)
     {
-        Require(reference is { Length: >= 108 and <= 112 }, "VciInvalidReference", "Use a bounded Host-issued VCI reference.");
+        Require(reference is { Length: >= 106 and <= 112 }, "VciInvalidReference", "Use a bounded Host-issued VCI reference.");
         var parts = reference?.Split(':');
-        Require(parts is { Length: 4 } && parts[0] == "vci" && parts[1] is "preview" or "revision" or "export" or "manifest" or "comparison",
+        Require(parts is { Length: 4 } && parts[0] == "vci" && parts[1] is "preview" or "revision" or "export" or "manifest" or "comparison" or "fetch" or "push",
             "VciInvalidReference", "Use the exact Host-issued VCI reference.");
         string hash = PackageStorage.Hash(parts[3]);
         Require(parts[3] == hash, "VciInvalidReference", "VCI references use canonical lowercase digests.");
@@ -392,7 +427,8 @@ public sealed partial class VciWorkspaceStore
     private string DirectoryFor(string id) => PackageStorage.Under(records, id);
     private static bool HasCommitIntent(string directory) => File.Exists(Path.Combine(directory, "commit-intent.json")) || Directory.Exists(Path.Combine(directory, "commit-journal"));
     private static string Receipt(string kind) => kind switch
-    { "preview" => "review.json", "revision" => "commit.json", "manifest" => "manifest-receipt.json", "comparison" => "comparison-receipt.json", _ => "export.json" };
+    { "preview" => "review.json", "revision" => "commit.json", "manifest" => "manifest-receipt.json", "comparison" => "comparison-receipt.json",
+      "fetch" => "fetch.json", "push" => "push.json", _ => "export.json" };
     private static string Reference(string kind, string id, string path) => "vci:" + kind + ":" + id + ":" + PackageStorage.FileHash(path);
     private FileStream Lock() => PackageStorage.Lock(PackageStorage.Under(root, "store.lock"));
     private (string Id, string Path) NewEntry()
@@ -489,15 +525,16 @@ public sealed partial class VciWorkspaceStore
         private sealed record Callback(int Sequence, string? PreviousSha256, GitOperationRecord Record);
         internal sealed record Status(int Count, string Sha256, string Phase, string OperationId, string? CandidateCommit, string? CandidateTree);
         private GitOperationBinding? binding; private GitOperationRecord? latest; private string? previous; private int sequence;
-        public static Status? Read(string directory, VciGitReview review, string repository)
+        public static Status? Read(string directory, VciGitReview review, string repository) => Read(directory, "commit", repository, intent =>
+            intent.PlanSha256 == review.PlanSha256 && intent.ExecutableSha256 == review.ExecutableSha256 && intent.SnapshotSha256 == review.SnapshotSha256 &&
+            (review.HeadReference is null || intent.Branch == review.HeadReference));
+        public static Status? Read(string directory, string operation, string repository, Func<GitOperationBinding, bool> expected)
         {
             PackageStorage.EnsureNoLinks(directory);
             if (!Directory.Exists(directory)) return null;
             var intent = JsonSerializer.Deserialize<GitOperationBinding>(ReadBytes(Path.Combine(directory, "intent.json")), BridgeProtocol.Json);
-            Require(intent is not null && intent.Operation == "commit" && intent.RepositoryRoot == repository &&
-                intent.PlanSha256 == review.PlanSha256 && intent.ExecutableSha256 == review.ExecutableSha256 && intent.SnapshotSha256 == review.SnapshotSha256 &&
-                (review.HeadReference is null || intent.Branch == review.HeadReference),
-                "VciIntegrityFailure", "Commit journal intent differs from review.");
+            Require(intent is not null && intent.Operation == operation && intent.RepositoryRoot == repository && expected(intent),
+                "VciIntegrityFailure", "Journal intent differs from the retained record.");
             var paths = Directory.EnumerateFiles(directory).Where(p => Path.GetFileName(p) != "intent.json").Order(StringComparer.Ordinal).Take(6).ToArray();
             Require(paths.Length <= 5, "VciIntegrityFailure", "Unexpected callback count.");
             string? priorHash = null; GitOperationRecord? previousRecord = null; int count = 0;
@@ -505,9 +542,9 @@ public sealed partial class VciWorkspaceStore
             {
                 var bytes = ReadBytes(path); var row = JsonSerializer.Deserialize<Callback>(bytes, BridgeProtocol.Json);
                 Require(row is not null && row.Sequence == ++count && Path.GetFileName(path) == count.ToString("D4") + ".json" &&
-                    row.PreviousSha256 == priorHash && row.Record.BindingSha256 == intent.Sha256 && row.Record.Operation == "commit" &&
+                    row.PreviousSha256 == priorHash && row.Record.BindingSha256 == intent.Sha256 && row.Record.Operation == operation &&
                     row.Record.RepositoryRoot == repository && (previousRecord is null || row.Record.OperationId == previousRecord.OperationId) &&
-                    Allowed("commit", previousRecord?.Phase, row.Record.Phase), "VciIntegrityFailure", "Commit callback sequence or hash chain changed.");
+                    Allowed(operation, previousRecord?.Phase, row.Record.Phase), "VciIntegrityFailure", "Callback sequence or hash chain changed.");
                 priorHash = GitSafety.Hash(bytes); previousRecord = row.Record;
             }
             return previousRecord is null ? null : new(count, priorHash!, previousRecord.Phase, previousRecord.OperationId,

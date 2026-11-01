@@ -1,0 +1,75 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.rerun.20261031",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-10-31T17:34:21+00:00",
+  "source": {
+    "commit": "0130116ed4f25e5791e4e588d82dadc3a5db98d3",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Candidate combined-apply shapes (scripts/qualify_library_integrate_apply.py --candidates at 0130116e, build 0130116e frozen at artifacts/w3c6, --artifacts artifacts/ic3r, no subst drive) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. ladStandalone (new LAD FC, power rail), ladExisting (existing LAD FC after its last network; following IDs 8->D, 9->E), fbCaller (existing FBD FB TiaMcpComponentHost, renumbered to FB30 so the component keeps FB2, new global instance DB; 8->D, 9->E), earlierPlacement (existing two-network FBD FC after its first network; seven following IDs including the second network shifted by 5) and reuse (after a verified standalone install, a second new FBD FC with TiaMcpComponentGate_2 reusing the installed FB and UDT: one typed step, no second import, the version-comment-only differences recorded as ignoredDifferences with both values, the typed step's own archive as the checkpoint) each installed through change_apply: preview candidateFeatures exactly [ladCaller], [fbCaller], [earlierPlacement] or [reusedComponent], coordinator installation_verified with one initial project checkpoint in the short step workspace changes/c/<8 hex>, an independent export/inventory diff showing exactly the planned additions, the native caller insertion proof, the independent call/instance/tag oracle, the project library holding exactly the released versions, a fresh reopen equal to the installed state, a 0-error compile, and change_restore of the initial checkpoint into a new location in a fresh owned Portal equal to the baseline after retrieval and after reopen (for reuse: the first installation). multiInstance (after a verified install, a multi-instance in TiaMcpComponentHost reusing the FB) ended at its recorded boundary before any dispatch: the typed route's multi-instance profiles refuse the component FB's structured UDT static (InstanceCreationProfileUnavailable, coordinator preparation_failed, both steps undispatched, project unchanged).",
+  "limitations": [
+    "multiInstance is not installed: no captured multi-instance profile covers an FB with a structured (UDT) static; it needs a captured profile or a scalar component fixture.",
+    "Candidate shapes ran on a --component-qualification Host in owned scratch; combinations of these features (for example LAD with an earlier placement) were not exercised.",
+    "Reuse accepted version-comment-only differences: the source global library versions had an empty en-US comment, the installed versions their de-DE release comment; the component readback proved the installed content against the pinned source exports.",
+    "Software units, OB insertion, reused instance DBs, partial dependency reuse and DB/UDT-tag member bindings stay plan-only. No runtime execution."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "644734c53eb85a3a533aba468a017268907a15b781101c9594dd3914320af90d"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "c7c3becb4cffb6c9ea4e2e2b9b18c695585090d1649eee056146b5eec4808a31"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "4a80521f94e65dddd1cd1be72c7652bb190135db03c6502dbde11a927f7f16f4",
+      "bytes": 12563512,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:ladStandalone",
+        "candidate:ladExisting",
+        "candidate:fbCaller",
+        "candidate:earlierPlacement",
+        "candidate:reuse",
+        "candidate:multiInstance"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

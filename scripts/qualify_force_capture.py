@@ -21,6 +21,8 @@ import uuid
 import psutil
 from block_test_process import OwnedTiaProcessWatcher, _WindowsProcessApi
 from smoke_mcp import Client
+from retained_native_lifecycle import (FILE_STORAGE_SERVER, FILE_STORAGE_TERMINAL_SECONDS,
+                                       terminal_deadline_seconds as _deadline)
 from qualify_worker_startup_exact import identity
 from qualify_translation_category_probe import (StoreExclusiveWindow, WindowsFiles, safe_path,
     verify_recovery_gate, require, resource_key, overlaps)
@@ -441,15 +443,8 @@ class Processes:
         return value
 
 
-# Measured on this PC on 24 October 2026: in 16 headless runs the FileStorage server
-# exited 300.0-301.7 s after the terminal wait began (a fixed idle shutdown). It gets
-# that measured time plus a 60 s margin; every other owned process keeps the caller's deadline.
-FILE_STORAGE_SERVER = "Siemens.Automation.ObjectFrame.FileStorage.Server.exe"
-FILE_STORAGE_TERMINAL_SECONDS = 360
-
-
 def terminal_deadline_seconds(entry, default_seconds):
-    return max(default_seconds, FILE_STORAGE_TERMINAL_SECONDS) if entry["identity"]["name"] == FILE_STORAGE_SERVER else default_seconds
+    return _deadline(entry["identity"]["name"], default_seconds)
 
 
 class HostSession:

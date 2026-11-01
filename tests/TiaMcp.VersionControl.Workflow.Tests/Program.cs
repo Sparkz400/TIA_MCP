@@ -187,4 +187,5 @@ await Reject("VciIntegrityFailure", () => Task.FromResult(store.Reopen(namedRef)
 File.WriteAllBytes(forkReceipt, forkBytes);
 Check(Text(Json(store.Reopen(namedRef)), "headReference") == "refs/heads/review/offline", "fork callbacks are hash-bound downloadable retained artifacts");
 checks += await PackageChecks.Run(root, args[0], revision, secondRevision);
+checks += await RemoteChecks.Run(root, args[0]);
 Console.WriteLine($"{checks} VCI workflow checks passed; actual local Git, no Siemens products or native qualification.");

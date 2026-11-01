@@ -441,6 +441,7 @@ TextListGenerationTests.Run(root);
 NumericTextListGenerationTests.Run(root);
 CoordinatedTextListTests.Run(root);
 TextListSetEvolutionTests.Run(root);
+TextListImportPayloadTests.Run(root, repository);
 var unifiedSource = reviews.Read(destinationId); var unifiedModel = unifiedSource["model"]!.DeepClone().AsObject();
 foreach (var node in unifiedModel["nodes"]!.AsArray().OfType<JsonObject>())
 {

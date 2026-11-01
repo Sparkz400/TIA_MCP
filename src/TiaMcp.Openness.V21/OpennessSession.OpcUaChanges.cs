@@ -289,7 +289,7 @@ namespace TiaMcp.Openness.V21
                 if (setting.Attribute == null || !item.GetAttributeInfos().Any(i => i.Name == setting.Attribute && (i.AccessMode & EngineeringAttributeAccessMode.Write) != 0))
                     throw new BridgeException("UnsupportedCapability", setting.Field == "guestAccess"
                         ? "V21 models OPC UA guest access as the UMAC anonymous user holding the OPCUAServerAccess device right, which this kind and umac_role_set never change; nothing was written."
-                        : setting.Field + " has no writable native " + (setting.Attribute ?? "attribute") + " on this CPU; port and automatic certificate acceptance exist only while the server is on. Nothing was written.");
+                        : setting.Field + " has no writable native " + (setting.Attribute ?? "attribute") + " on this CPU; port, automatic certificate acceptance and alarms and conditions exist only while the server is on. Nothing was written.");
                 object current = item.GetAttribute(setting.Attribute);
                 string refusal = OpcUaServerSettings.Refusal(setting.Field, OpcUaPayloadValue(requested["expected"]), OpcUaPayloadValue(requested["value"]), current);
                 if (refusal == "InvalidRequest") throw new BridgeException(refusal, setting.Field + " needs { expected, value }: booleans, a port 1..65535, or a license name of " + string.Join(", ", OpcUaServerSettings.Licenses) + ".");
@@ -304,6 +304,7 @@ namespace TiaMcp.Openness.V21
             var warnings = (JArray)preview["warnings"];
             warnings.Add("Offline project settings only: the CPU's OPC UA server changes once this configuration is downloaded. Clients, certificates and endpoint reachability are not checked.");
             if (payload["runtimeLicense"] != null) warnings.Add("runtimeLicense records the purchased OPC UA runtime license in the project; it does not verify or activate an entitlement.");
+            if (payload["alarmsAndConditions"] != null) warnings.Add("alarmsAndConditions switches the server's Alarms and Conditions on or off; conditions also need central alarm management in the PLC, and message acknowledgment by OPC UA clients is a separate option this kind never sets.");
         }
 
         private void ApplyOpcUaServerSettings(EngineeringChange change)

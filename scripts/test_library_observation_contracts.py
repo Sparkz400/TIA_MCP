@@ -24,6 +24,19 @@ class LibraryObservationContracts(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.validate(value, kind)
 
+    def test_reuse_preview_records_both_version_comments(self):
+        from jsonschema import Draft202012Validator, ValidationError
+        schema = json.loads((validation.ROOT / "contracts/library-component-preview.v1.schema.json").read_bytes())["properties"]["integrationPlan"]["properties"]["reuse"]
+        difference = {"description": "Version comment", "status": "ObjectsDifferent", "reason": "comment only",
+                      "sourceValue": {"en-US": "Fixture"}, "installedValue": {"de-DE": "Fixture"}}
+        reuse = {"versions": [{"typeName": "Gate", "typeGuid": "a", "versionGuid": "b", "ignoredDifferences": [difference]}],
+                 "instanceDbPath": None, "duplicatesCreated": False}
+        Draft202012Validator(schema).validate(reuse)
+        for change in (lambda d: d.pop("installedValue"), lambda d: d.update(description="Author"), lambda d: d.update(extra=1)):
+            bad = copy.deepcopy(reuse); change(bad["versions"][0]["ignoredDifferences"][0])
+            with self.subTest(bad=bad), self.assertRaises(ValidationError):
+                Draft202012Validator(schema).validate(bad)
+
     def test_original_bytes_pin_and_no_qualification(self):
         for kind in ("identity", "lock"):
             raw = (FIXTURE / (kind + ".json")).read_bytes()

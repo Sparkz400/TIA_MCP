@@ -1,0 +1,22 @@
+#Version: 2.0
+TextListContainers:
+  TextList:
+    ResourceListType: TextList
+    ResourceLists:
+      "QualificationStates":
+        RangeType: Decimal
+        Entries:
+          "StateOff":
+            Type: SingleValue
+            Value: -2147483648
+            FromValue: -2147483648
+            ToValue: -2147483648
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Off"
+          "StateReady":
+            Type: SingleValue
+            Value: 2147483647
+            FromValue: 2147483647
+            ToValue: 2147483647
+            IsDefaultEntry: false
+            Text: "QualificationText.Text_Ready"

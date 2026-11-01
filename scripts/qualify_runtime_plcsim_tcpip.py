@@ -20,6 +20,12 @@ concurrent UA and web acquisitions share, and retired at the end.
 --mode ua-write-loss | web-write-loss: a --runtime-qualification Host exits (74) after sending a write; a new Host
   reports the session unknown and refuses the retry; an explicit read through a fresh session, confirmed by the PLCSIM
   API, decides the outcome.
+--mode ua-services: the scratch also holds a user-program server method (FB ServerMethod with OPC_UA_ServerMethodPre/Post
+  V1.1, instance ServerMethod_DB) and a Program_Alarm (FB AlarmGate on RealServer.AlarmTrigger), with Alarms and Conditions
+  on the OPC UA server. runtime_ua_call finds the method by browse, calls it (the PLCSIM API counts the calls) and is
+  refused for a standard server method, a wrong argument count and a missing acknowledgement; the method's own Bad result
+  is returned. runtime_ua_conditions with ConditionRefresh observes the alarm after a PLCSIM write raises it and after it
+  falls. runtime_ua_history_probe records the server's HistoryRead boundary.
 
 PLCSIM's network mode, adapters and IP addresses are operator settings and are never changed. verify_runtime_plcsim_tcpip
 checks the retained run; verification.json is written only when it passes.
@@ -68,6 +74,8 @@ NON_RETAIN
       Marker : DInt := 4711;
       Cycles : DInt;
       UaValue : Int;
+      MethodCalls : DInt;
+      AlarmTrigger : Bool;
    END_VAR
 
 BEGIN
@@ -81,9 +89,77 @@ VERSION : 0.1
 BEGIN
     "DiagGate_DB"();
     "RealServer".Cycles := "RealServer".Cycles + 1;
-END_ORGANIZATION_BLOCK
+%sEND_ORGANIZATION_BLOCK
 
 '''
+# ua-services only. The server method follows the V21 help's OPC_UA_ServerMethodPre/Post V1.1 example (both instructions
+# called every cycle); OutInt := InInt + 1, OutBool := NOT InBool, and InInt 32767 is the method's own BadInvalidArgument.
+SERVER_METHOD = '''FUNCTION_BLOCK "ServerMethod"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR DB_SPECIFIC
+      UAMethod_InParameters : Struct
+         InInt : Int;
+         InBool : Bool;
+      END_STRUCT;
+      UAMethod_OutParameters : Struct
+         OutInt : Int;
+         OutBool : Bool;
+      END_STRUCT;
+   END_VAR
+   VAR
+      OPC_UA_ServerMethodPre_Instance {InstructionName := 'OPC_UA_ServerMethodPre'; LibVersion := '1.1'} : OPC_UA_ServerMethodPre;
+      DONE_PRE : Bool;
+      BUSY_PRE : Bool;
+      ERROR_PRE : Bool;
+      STATUS_PRE : DWord;
+      UAMethod_Called : Bool;
+      OPC_UA_ServerMethodPost_Instance {InstructionName := 'OPC_UA_ServerMethodPost'; LibVersion := '1.1'} : OPC_UA_ServerMethodPost;
+      UAMethod_Result : DWord;
+      UAMethod_Finished : Bool;
+      DONE_POST : Bool;
+      BUSY_POST : Bool;
+      ERROR_POST : Bool;
+      STATUS_POST : DWord;
+   END_VAR
+
+BEGIN
+\t#OPC_UA_ServerMethodPre_Instance(Done => #DONE_PRE, Busy => #BUSY_PRE, Error => #ERROR_PRE, Status => #STATUS_PRE,
+\t                                 UAMethod_Called => #UAMethod_Called, UAMethod_InParameters := #UAMethod_InParameters);
+\tIF #UAMethod_Called AND NOT #ERROR_PRE THEN
+\t    IF #UAMethod_InParameters.InInt = 32767 THEN
+\t        #UAMethod_Result := DW#16#80AB0000;
+\t    ELSE
+\t        #UAMethod_OutParameters.OutInt := #UAMethod_InParameters.InInt + 1;
+\t        #UAMethod_OutParameters.OutBool := NOT #UAMethod_InParameters.InBool;
+\t        #UAMethod_Result := 0;
+\t        "RealServer".MethodCalls := "RealServer".MethodCalls + 1;
+\t    END_IF;
+\t    #UAMethod_Finished := TRUE;
+\tEND_IF;
+\t#OPC_UA_ServerMethodPost_Instance(UAMethod_Result := #UAMethod_Result, UAMethod_Finished := #UAMethod_Finished, Done => #DONE_POST,
+\t                                  Busy => #BUSY_POST, Error => #ERROR_POST, Status => #STATUS_POST, UAMethod_OutParameters := #UAMethod_OutParameters);
+\tIF #DONE_POST OR #ERROR_POST THEN
+\t    #UAMethod_Finished := FALSE;
+\t    #UAMethod_Result := 0;
+\tEND_IF;
+END_FUNCTION_BLOCK
+
+'''
+# The Program_Alarm form that compiled in local.alarm_imports.20261028; its alarm text and class stay TIA's defaults.
+ALARM_GATE = '''FUNCTION_BLOCK "AlarmGate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR
+      Overtemperature : Program_Alarm;
+   END_VAR
+
+BEGIN
+\t#Overtemperature(SIG := "RealServer".AlarmTrigger);
+END_FUNCTION_BLOCK
+
+'''
+SERVICES_MAIN = '    "ServerMethod_DB"();\n    "AlarmGate_DB"();\n'
 HYPOTHESES = [
     {"id": "follows", "statement": "Active is true whenever Enable is true.",
      "prediction": {"when": [{"signalId": "enable", "op": "eq", "value": True}], "expect": [{"signalId": "active", "op": "eq", "value": True}]}},
@@ -95,11 +171,15 @@ UNITS = {"enable": "1", "active": "1"}
 RIGHTS = ("OPCUAServerAccess", "WebReadTags", "WebWriteTags", "WebAllowDiagnostics", "WebChangeOperatingMode")
 ENABLE = {"serverEnabled": {"expected": False, "value": True}, "runtimeLicense": {"expected": "NoLicense", "value": "SimaticOpcUaS71500Small"}}
 AUTO_ACCEPT = {"autoAcceptClientCertificates": {"expected": False, "value": True}}
+ALARMS_AND_CONDITIONS = {"alarmsAndConditions": {"expected": False, "value": True}}
+SERVER = {"namespaceUri": "http://opcfoundation.org/UA/", "identifierType": "numeric", "identifier": "2253"}
+GET_MONITORED_ITEMS = {"namespaceUri": "http://opcfoundation.org/UA/", "identifierType": "numeric", "identifier": "11492"}
 UA_NS = "http://opcfoundation.org/UA/"
 OBJECTS = {"namespaceUri": UA_NS, "identifierType": "numeric", "identifier": "85"}
 START_TIME = {"namespaceUri": UA_NS, "identifierType": "numeric", "identifier": "2257"}
 # member: (owning DB, PLCSIM API type); the UA nodes and web symbols name the same tags.
 SIGNALS = {"Marker": ("RealServer", "int32"), "Cycles": ("RealServer", "int32"), "UaValue": ("RealServer", "int16"),
+           "MethodCalls": ("RealServer", "int32"), "AlarmTrigger": ("RealServer", "bool"),
            "Enable": ("DiagGate_DB", "bool"), "Active": ("DiagGate_DB", "bool")}
 ENTROPY = b"TiaMcp.V21.ScratchRuntimeUser.v1"
 LIMITATIONS = [
@@ -108,7 +188,8 @@ LIMITATIONS = [
     "The OPC UA and web login is the scratch's generated runtime user (UMAC, password from its CurrentUser DPAPI file into a run-owned vault); guest access, "
     "project users made by an operator and UMC are not exercised.",
     "Power-on needs the provisioned protection credential, provisioned with first-use TLS trust under the owned-empty-CPU policy.",
-    "Scalar DInt, Int and Bool tags only; arrays, structures, events and methods are not exercised.",
+    "Scalar DInt, Int and Bool tags only; arrays and structures are not exercised. ua-services adds one user-program server method with "
+    "Int/Bool arguments and one Program_Alarm with TIA's default text and class; Acknowledge, AddComment and history access are not product routes.",
 ]
 
 
@@ -128,8 +209,8 @@ def unprotect(path):
         ctypes.windll.kernel32.LocalFree(ctypes.cast(output.pbData, ctypes.c_void_p))
 
 
-def ua_node(member=None):
-    return {"namespaceUri": oracle.SIEMENS_NS, "identifierType": "string", "identifier": '"RealServer"' + ('."%s"' % member if member else "")}
+def ua_node(member=None, block="RealServer"):
+    return {"namespaceUri": oracle.SIEMENS_NS, "identifierType": "string", "identifier": '"%s"' % block + ('."%s"' % member if member else "")}
 
 
 def symbol(member):
@@ -311,7 +392,12 @@ def setup(r):
     change(r, "source_upsert", {"language": "SCL", "source": FB, "expectedBlockNames": ["DiagGate"]})
     change(r, "instance_db_create", {"name": "DiagGate_DB", "instanceOfName": "DiagGate"})
     change(r, "source_upsert", {"language": "SCL", "source": DB, "expectedBlockNames": ["RealServer"]})
-    change(r, "source_upsert", {"language": "SCL", "source": MAIN, "expectedBlockNames": ["Main"]})
+    services = r.args.mode == "ua-services"
+    if services:
+        for block, source in (("ServerMethod", SERVER_METHOD), ("AlarmGate", ALARM_GATE)):
+            change(r, "source_upsert", {"language": "SCL", "source": source, "expectedBlockNames": [block]})
+            change(r, "instance_db_create", {"name": block + "_DB", "instanceOfName": block})
+    change(r, "source_upsert", {"language": "SCL", "source": MAIN % (SERVICES_MAIN if services else ""), "expectedBlockNames": ["Main"]})
 
     umac = r.stage("access_inspect", lambda: t("access_inspect", {"maxItems": 2000}))["projectUmac"]
     roles, scopes = [n for n in umac["roleNames"].values() if n.startswith("TiaMcpRuntime_")], umac["deviceRightScopes"]
@@ -322,7 +408,10 @@ def setup(r):
     # V21 turns the system pages on with the server (29 October 2026); activation alone fails its readback, so both are named.
     change(r, "webserver_page_set", {"webServerActive": {"expected": False, "value": True}, "systemWebPages": {"expected": False, "value": True}})
     change(r, "opcua_server_settings_set", ENABLE)
-    change(r, "opcua_server_settings_set", AUTO_ACCEPT)
+    change(r, "opcua_server_settings_set", {**AUTO_ACCEPT, **(ALARMS_AND_CONDITIONS if services else {})})
+    if services:  # A&C needs central alarm management in the PLC: record the CPU's alarm attributes, never change them.
+        r.report["cpuAlarmAttributes"] = r.stage("CPU alarm attributes", lambda: {a["name"]: a.get("value") for a in t("hardware_inspect", {
+            "hardwarePath": r.cpu, "maxItems": 2000})["items"][0]["attributes"] if "alarm" in a["name"].lower()})
 
     def application_uri():
         settings = t("opcua_engineering_inspect", {"plcPath": r.plc, "maxItems": 2000})["serverSettings"]
@@ -330,7 +419,8 @@ def setup(r):
         require(len(server) == 1, "Expected one OPC UA sub-item: %s" % server)
         rows = t("hardware_inspect", {"hardwarePath": server[0], "maxItems": 2000})["items"]
         values = {a["name"]: a.get("value") for a in rows[0]["attributes"]}
-        require(values.get("OpcUaServer") is True and values.get("OpcUaAutoAcceptAllClientCertificates") is True and values.get("OpcUaPort") == 4840,
+        require(values.get("OpcUaServer") is True and values.get("OpcUaAutoAcceptAllClientCertificates") is True and values.get("OpcUaPort") == 4840
+                and (not services or values.get("OpcUaAlarmsAndConditionsEnable") is True),
                 "The OPC UA server settings differ: %s" % {k: v for k, v in values.items() if k.startswith("OpcUa")})
         return values["OpcUaApplicationUri"]
     r.app_uri = r.stage("OPC UA application URI", application_uri)
@@ -731,6 +821,82 @@ def write_loss(r, channel):
     r.stage("close the deciding session", lambda: r.tool("runtime_%s_disconnect" % channel, {"attemptId": fresh_session})["state"])
 
 
+def plc_methods(r, ua, limit=300):
+    """Every Method the PLC namespace exposes below Objects, by a bounded walk over its Object nodes: runtime_ua_call admits any of
+    them, so the run shows whether system methods sit beside the user program's."""
+    queue, seen, found, browsed = [OBJECTS], set(), [], 0
+    while queue and browsed < limit:
+        parent = queue.pop(0)
+        browsed += 1
+        for ref in r.tool("runtime_ua_browse", {"attemptId": ua, "node": parent})["references"]:
+            node = ref.get("node")
+            key = json.dumps(node, sort_keys=True)
+            if not node or node.get("namespaceUri") != oracle.SIEMENS_NS or key in seen:
+                continue
+            seen.add(key)
+            if ref.get("nodeClass") == "Method":
+                found.append({"parent": parent, "method": node, "browseName": ref.get("browseName")})
+            elif ref.get("nodeClass") == "Object":
+                queue.append(node)
+    return {"methods": found, "browsed": browsed, "complete": not queue}
+
+
+def services(r):
+    """Server-method Call, Alarms and Conditions and the HistoryRead boundary on the owned instance, through one UA session."""
+    t = r.tool
+    bind(r)
+    credentials(r)
+    ua = connect(r, "ua", "runtime_ua_connect", ua_selection(r))
+    r.stage(oracle.EVENT_MODEL, lambda: t("runtime_ua_browse", {"attemptId": ua, "node": SERVER})["references"])
+    r.report["plcMethods"] = r.stage(oracle.METHOD_SET, lambda: plc_methods(r, ua))
+
+    def discover():
+        references = t("runtime_ua_browse", {"attemptId": ua, "node": ua_node(block="ServerMethod_DB")})["references"]
+        found = [x["node"] for x in references if x.get("nodeClass") == "Method" and x.get("node")]
+        require(len(found) == 1, "ServerMethod_DB exposes no single server method: %s" % references)
+        return found[0]
+    target = {"attemptId": ua, "bindingSha256": r.binding, "objectNode": ua_node(block="ServerMethod_DB"), "methodNode": r.stage(oracle.METHOD_BROWSE, discover),
+              "acknowledgeCall": True}
+
+    def inputs(number, flag):
+        return [{"encoding": "decimalInteger", "value": str(number)}, {"encoding": "boolean", "value": flag}]
+    before = compare(r, "ua", oracle.CALLS[0], ua, "MethodCalls")["plcsimRead"]["value"]
+    refused(r, oracle.CALL_UNACKNOWLEDGED, "runtime_ua_call", {**target, "inputs": inputs(41, True), "acknowledgeCall": False}, "RuntimeAcknowledgementRequired")
+    for label, arguments in ((oracle.CALL_STANDARD, {**target, "objectNode": SERVER, "methodNode": GET_MONITORED_ITEMS, "inputs": inputs(1, True)[:1]}),
+                             (oracle.CALL_ARGUMENTS, {**target, "inputs": inputs(41, True)[:1]})):
+        result = r.stage(label, lambda a=arguments: t("runtime_ua_call", a))
+        require(result["state"] == "refused" and result["dispatched"] is False and result["refusal"] == oracle.CALL_REFUSALS[label], "%s was not refused: %s" % (label, result))
+    called = r.stage(oracle.UA_CALL, lambda: t("runtime_ua_call", {**target, "inputs": inputs(41, True)}))
+    require(called["state"] == "called" and [(o.get("encoding"), o.get("value")) for o in called["outputs"]] == [("decimalInteger", "42"), ("boolean", False)],
+            "The server method did not answer 42 and false: %s" % called)
+    settle(r, "MethodCalls", before + 1)
+    compare(r, "ua", oracle.CALLS[1], ua, "MethodCalls")
+    failed = r.stage(oracle.CALL_FAILED, lambda: t("runtime_ua_call", {**target, "inputs": inputs(32767, False)}))
+    require(failed["state"] == "methodFailed" and failed["statusCode"] == oracle.METHOD_BAD, "The method's own Bad result was not returned: %s" % failed)
+    compare(r, "ua", oracle.CALLS[2], ua, "MethodCalls")
+
+    def snapshot(label):
+        result = r.stage(label, lambda: t("runtime_ua_conditions", {"attemptId": ua, "windowMilliseconds": 4000, "maximumEvents": 128}))
+        require(result["refresh"]["startObserved"] and result["refresh"]["endObserved"], "%s lacks the ConditionRefresh boundaries" % label)
+        return {json.dumps(e["conditionId"], sort_keys=True) for e in result["events"] if e["kind"] == "condition" and e.get("activeState") is True}
+
+    def trigger(value):
+        r.stage("sim_write AlarmTrigger %s" % value, lambda: t("sim_write", {"instanceId": r.instance["id"], "writes": [
+            {"symbol": r.symbols["AlarmTrigger"], "type": "bool", "value": value}]}))
+        settle(r, "AlarmTrigger", value)
+    idle = snapshot(oracle.CONDITIONS[0])
+    trigger(True)
+    raised = snapshot(oracle.CONDITIONS[1]) - idle
+    trigger(False)
+    fallen = snapshot(oracle.CONDITIONS[2])
+    # PLCSIM may not raise A&C conditions at all; that stays a recorded observation, never a product failure.
+    r.report["alarmCondition"] = {"raised": len(raised) == 1, "conditionIds": sorted(raised), "activeAfterFall": sorted(raised & fallen)}
+    require(len(raised) <= 1, "The trigger raised several conditions: %s" % sorted(raised))
+    # Last before the disconnect: an unexpected HistoryRead fault ends the session, so the other evidence comes first.
+    r.stage(oracle.HISTORY, lambda: t("runtime_ua_history_probe", {"attemptId": ua, "node": ua_node("Marker")}))
+    require(r.stage("runtime_ua_disconnect", lambda: t("runtime_ua_disconnect", {"attemptId": ua}))["state"] == "closed", "The UA session did not close")
+
+
 def release(r):
     """Stop, switch off and release the owned instance from the current Host (a new one adopts it when none is open)."""
     if getattr(r, "instance", None) is None:
@@ -749,7 +915,7 @@ def release(r):
 
 
 MODES = {"normal": normal, "host-loss-capture": host_loss_capture, "server-restart": server_restart,
-         "ua-write-loss": lambda r: write_loss(r, "ua"), "web-write-loss": lambda r: write_loss(r, "web")}
+         "ua-write-loss": lambda r: write_loss(r, "ua"), "web-write-loss": lambda r: write_loss(r, "web"), "ua-services": services}
 
 
 def body(r):

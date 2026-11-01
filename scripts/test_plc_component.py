@@ -461,6 +461,77 @@ class ComponentFixtureTests(unittest.TestCase):
             for label, data in (('wrong shift', insert(shift=1)), ('unshifted ID', insert(keep_first=True))):
                 with self.subTest(label=label), self.assertRaises(RuntimeError):
                     verify_preserved_installation(before, snapshot(label.replace(' ', '-'), data), '/caller', [])
+            # Pinned to the selected network: the new one must follow exactly that network.
+            verify_preserved_installation(before, snapshot('pinned', accepted), '/caller', [], after_network=0)
+            verify_preserved_installation(before, snapshot('pinned-last', accepted), '/caller', [], after_network=-1)
+
+    def call_from(self, name, spec):
+        """A retained native typed call export, renamed to the fixture's semantics."""
+        doc = ET.fromstring((ROOT / "fixtures/typed-graphical/native" / name).read_text(encoding="utf-8-sig"))
+        names = {"TiaMcp_EnableGate_DB": spec["instance"], "Enable": "ComponentEnable", "Active": "ComponentActive", "Child": spec.get("multiInstance") or "Child"}
+        for node in doc.iter():
+            local = node.tag.rsplit("}", 1)[-1]
+            if local == "CallInfo": node.set("Name", spec["root"])
+            if local == "Access" and node.get("Scope") == "LocalVariable": node.set("Scope", "GlobalVariable")
+            if local == "Component": node.set("Name", names.get(node.get("Name"), node.get("Name")))
+        return ET.tostring(doc, encoding="unicode")
+
+    def test_lad_call_is_enabled_by_the_power_rail(self):
+        lad = dict(self.spec, language="LAD")
+        verify_component_call(self.call_from("Tgp_FB_global_LAD.xml", lad), lad)
+        with self.assertRaisesRegex(RuntimeError, "inventory differs|wiring differs"):
+            verify_component_call(self.call_from("Tgp_FB_global_LAD.xml", lad), self.spec)
+        with self.assertRaisesRegex(RuntimeError, "no operand besides"):
+            verify_component_call(self.native_call(), lad)
+
+    def test_multi_instance_call_uses_the_callers_static_member(self):
+        multi = dict(self.spec, multiInstance="Gate")
+        verify_component_call(self.call_from("Tgp_FB_multi_FBD.xml", multi), multi)
+        with self.assertRaisesRegex(RuntimeError, "instance identity"):
+            verify_component_call(self.call_from("Tgp_FB_multi_FBD.xml", multi), self.spec)
+        with self.assertRaisesRegex(RuntimeError, "instance identity"):
+            verify_component_call(self.native_call(), multi)
+
+    def test_selected_network_index(self):
+        xml = ('<Document><SW.Blocks.FC ID="0"><ObjectList><SW.Blocks.CompileUnit ID="1"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>'
+               '<SW.Blocks.CompileUnit ID="2"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FC></Document>')
+        self.assertEqual(("1", [{"kind": "SW.Blocks.CompileUnit", "id": "2"}]), terminal_network(xml, "FBD", 0))
+        self.assertEqual("2", terminal_network(xml, "FBD")[0])
+        with self.assertRaisesRegex(RuntimeError, "no such native"):
+            terminal_network(xml, "FBD", 2)
+
+    def test_multi_instance_preservation_accepts_only_the_announced_static_member(self):
+        import hashlib
+        head = '<Document><SW.Blocks.FB ID="0"><AttributeList><Interface><Sections xmlns="urn:i"><Section Name="Static"%s</Section></Sections></Interface><Name>Host</Name></AttributeList><ObjectList>'
+        before = (head % '>').replace('></Section>', ' />') + '<SW.Blocks.CompileUnit ID="1" /><MultilingualText ID="2" /></ObjectList></SW.Blocks.FB></Document>'
+        after = (head % '>\n  <Member Name="Gate" Datatype="&quot;G&quot;" />\n') + '<SW.Blocks.CompileUnit ID="1" /><SW.Blocks.CompileUnit ID="2" /><MultilingualText ID="3" /></ObjectList></SW.Blocks.FB></Document>'
+        with tempfile.TemporaryDirectory() as temporary:
+            def snap(name, text):
+                path = Path(temporary) / (name + ".xml"); data = text.encode("utf-8"); path.write_bytes(data)
+                return {"objects": {"block:/caller": {"path": "/caller", "file": str(path), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(), "payloadSha256": name}}}
+            old, new = snap("before", before), snap("after", after)
+            verify_preserved_installation(old, new, "/caller", [], "Gate")
+            for label, member in (("unannounced", None), ("other name", "Other")):
+                with self.subTest(label=label), self.assertRaises(RuntimeError):
+                    verify_preserved_installation(old, new, "/caller", [], member)
+
+    def test_pinned_placement_rejects_an_insertion_after_another_network(self):
+        import hashlib
+        unit = '<SW.Blocks.CompileUnit ID="%s" />'
+        before = '<Document><SW.Blocks.FC ID="0"><AttributeList><Name>C</Name></AttributeList><ObjectList>' + unit % 1 + unit % 2 + '</ObjectList></SW.Blocks.FC></Document>'
+        # A third, identical network after the second: it equals an insertion after the first only up to which one is new.
+        after = before.replace(unit % 2, unit % 2 + unit % 3)
+        with tempfile.TemporaryDirectory() as temporary:
+            def snap(name, text):
+                path = Path(temporary) / (name + ".xml"); data = text.encode("utf-8"); path.write_bytes(data)
+                return {"objects": {"block:/caller": {"path": "/caller", "file": str(path), "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(), "payloadSha256": name}}}
+            old, new = snap("before", before), snap("after", after)
+            verify_preserved_installation(old, new, "/caller", [], after_network=1)
+            verify_preserved_installation(old, new, "/caller", [])
+            different = before.replace(unit % 2, unit % 2 + '<SW.Blocks.CompileUnit ID="3" Kind="new" />')
+            verify_preserved_installation(old, snap("different", different), "/caller", [], after_network=-1)
+            with self.assertRaisesRegex(RuntimeError, "accepted following-ID shift"):
+                verify_preserved_installation(old, snap("different-first", different), "/caller", [], after_network=0)
 
     def test_full_caller_preservation_rejects_unrelated_changes(self):
         with tempfile.TemporaryDirectory() as temporary:

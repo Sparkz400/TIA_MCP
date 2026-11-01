@@ -50,6 +50,7 @@ namespace TiaMcp.Openness.V21
                     case "scratch_create": AdmissionReconcileScratch(check); break;
                     case "project_retrieve": AdmissionReconcileRetrieve(check, observationSha256); break;
                     case "project_copy": AdmissionReconcileCopy(check); break;
+                    case "project_upgrade": AdmissionReconcileUpgrade(check, observationSha256); break;
                     case "library_open": AdmissionReconcileLibraryOpen(check, observationSha256); break;
                 }
             }
@@ -198,6 +199,23 @@ namespace TiaMcp.Openness.V21
                 check.Prove(archive, "verifiedApplied", "The copy archive retrieves to the unchanged source (fresh fingerprints are equal).");
             else if (!((JArray)archive["reasons"]).Any()) check.Hold(archive, "The copy archive is partial or differs from the unchanged source.");
             check.Destination(destination, () => reference, "The destination is a copy of the unchanged source (fresh fingerprints are equal).");
+        }
+
+        private void AdmissionReconcileUpgrade(AdmissionReconcileCheck check, string observationSha256)
+        {
+            JObject source = check.Row("readUpgradeSource"), destination = check.Row("createNewDestination");
+            if (source == null || destination == null) return;
+            string path = source.Value<string>("path"), root = destination.Value<string>("path");
+            string hash = File.Exists(path) ? ChangeFileHash(path) : Directory.Exists(path) ? LibraryDirectoryHash(path) : null;
+            if (hash != null && SharedMutationHash(new JObject { ["sourceSha256"] = hash, ["upgradeDestination"] = root }) == observationSha256)
+                check.Prove(source, "unchanged", "The upgrade source hash recomputes the admitted observation exactly.");
+            else check.Hold(source, "The upgrade source is missing or changed.");
+            string receiptPath = Path.Combine(root, "upgrade-receipt.json");
+            var receipt = File.Exists(receiptPath) && new FileInfo(receiptPath).Length < 4 * 1024 * 1024 ? JObject.Parse(File.ReadAllText(receiptPath)) : null;
+            check.Evidence(destination, "receipt", new JObject { ["state"] = receipt?["state"], ["project"] = receipt?["project"]?.DeepClone() });
+            // Only a completed receipt naming the one V21 project in the destination proves it; a copy without it is partial.
+            check.Destination(destination, null, "The destination holds the one V21 project its completed upgrade receipt names.",
+                project => receipt?.Value<string>("state") == "upgraded" && SameSimulationPath(project.Path?.FullName, receipt["project"]?.Value<string>("path")));
         }
 
         private void AdmissionReconcileLibraryOpen(AdmissionReconcileCheck check, string observationSha256)

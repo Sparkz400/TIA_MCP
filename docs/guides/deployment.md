@@ -64,6 +64,8 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--timeout-seconds <n>` | `120` (launcher: `300`) | Deadline of one native worker call; 5 to 900. Simulator waits must end 5 s before it ([simulation](simulation.md#operations)) | `-TimeoutSeconds` |
 | `--toolsets <groups>` | All tools | Comma-separated [tool groups](../reference/mcp-surface.md#tool-groups---toolsets), or `all`; once | `-Toolsets` |
 | `--git-executable <exe>` | None; VCI Git tools refuse with `GitNotConfigured` | Absolute path of an installed Git | `-GitExecutable` |
+| `--git-remote <repo>` | None; `vci_push` and `vci_fetch` refuse with `GitRemoteNotConfigured` | The one [Git remote](../reference/vci-host-workflow.md#remote-delivery): an absolute path or `file:///` URL of a bare repository; requires `--git-executable`; once | None |
+| `--git-allow-network-remote` | Off | Lets `--git-remote` be a credential-free `https://` URL; no credentials, user names or other transports | None |
 | `--ua-client-identity <name>` | None | `default` or a 32-character lowercase hex name of a [protected OPC UA client identity](../reference/opcua-runtime.md#protected-persistent-client-identity); once | `-UaClientIdentity` |
 | `--diagnose` | Off | Prints worker information and TIA discovery as JSON, then exits; no MCP server | `-Diagnose` (`Start-TiaMcp.ps1` only) |
 | `--no-native-workers` | Off; always on in the portable package | Native calls return `NativeWorkersDisabled` without starting a worker | None |
@@ -73,7 +75,7 @@ Every MCP client connection owns separate workers and session state. Do not poin
 | `--disable-library-integrate-apply` | Off | Turns combined apply off: `change_apply` refuses every PLC `library_integrate` recipe with `PlcIntegrationNotQualified`; not with `--enable-library-integrate-apply` | None |
 | `--library-limits-file <json>` | Built-in limits | Library package intake limits, a JSON object of at most 64 KiB ([storage policy](library-management.md#storage-policy-and-errors)) | None |
 
-Neither launcher script passes `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply` or `--library-limits-file`; `Start-TiaMcp.ps1` adds `--no-native-workers` only automatically for offline bundles. The generated configuration runs `Start-TiaMcp.ps1`, so extra `args` do not reach the Host either. To use these options, point the MCP client at `TiaMcp.Host.exe` directly, with an explicit `--artifacts` directory.
+Neither launcher script passes `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--library-limits-file`, `--git-remote` or `--git-allow-network-remote`; `Start-TiaMcp.ps1` adds `--no-native-workers` only automatically for offline bundles. The generated configuration runs `Start-TiaMcp.ps1`, so extra `args` do not reach the Host either. To use these options, point the MCP client at `TiaMcp.Host.exe` directly, with an explicit `--artifacts` directory.
 
 Qualification-only options register gated test tools and interruption points for the native runners. They stay out of the normal feature advertisement, are refused together with `--no-native-workers`, and are not for production use:
 
@@ -85,6 +87,8 @@ Qualification-only options register gated test tools and interruption points for
 | `--testsuite-scope-probe` | Its own sequential Host |
 | `--testsuite-qualification` | Its own sequential Host; only in builds with the `TESTSUITE_QUALIFICATION` constant |
 | `--translation-qualification` | Its own sequential Host |
+| `--safety-fparameter-discovery` | Only in Host and worker builds with `-p:SafetyFParameterDiscovery=true` (never packaged); `safety_fparameter_set` also writes declared-writable F-parameters outside the [qualified allowlist](engineering-workflows.md#f-parameter-allowlist), for `scripts/probe_safety_fparameters.py` |
+| `--hmi-text-list-qualification <profile>` | Its own sequential Host; `unified-comfort` or `unified-pc`. The worker admits change kind `hmi_text_list_import` for that profile only in a project it created or retrieved itself; production admits only profiles whose native qualification passed |
 
 As the first argument, `--credential-store` and `--ua-identity-store` run the [protected credential](../reference/protected-credentials.md) and OPC UA identity commands instead of the server. `--session-relay-server` and `--session-relay-client` are internal to `Start-TiaMcp.ps1 -InteractiveSession`.
 

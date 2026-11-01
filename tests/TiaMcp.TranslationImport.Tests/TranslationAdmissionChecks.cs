@@ -4,7 +4,7 @@ using static TiaMcp.Translations.TranslationJson;
 
 internal static class TranslationAdmissionChecks
 {
-    internal static void Register(Action<string, Func<Task>> test, Func<Fixture> fixture)
+    internal static void Register(Action<string, Func<Task>> test, Func<Fixture> fixture, Func<string[], string[], Fixture> restricted)
     {
         static void Refuse(string code, Action action)
         { try { action(); } catch (BridgeException e) when (e.Code == code) { return; } throw new Exception("Expected " + code); }
@@ -15,7 +15,9 @@ internal static class TranslationAdmissionChecks
             var context = new TranslationImportContext(f.Root, op, f.CandidateRef, f.CandidateReceipt, candidate.Candidate.WorkbookSha256, f.Scope);
             var key = TranslationProductionAdmission.Describe(context, new(new('1', 64), new('2', 64), f.Target.AdapterSha256, new('3', 64)));
             string package = new('4', 64);
-            var proofs = TranslationProductionAdmission.NativeCases.Select(name => new TranslationAdmissionProof(name, HashJson(key), package, new('5', 64), "native"))
+            // The default-mode packet of a final restricted ledger has its own receipt ('7').
+            var proofs = TranslationProductionAdmission.NativeCasesFor(key.Contract).Select(name => new TranslationAdmissionProof(name, HashJson(key), package,
+                    new(TranslationProductionAdmission.DefaultModeCases.Contains(name) ? '7' : '5', 64), "native"))
                 .Concat(TranslationProductionAdmission.PortableCases.Select(name => new TranslationAdmissionProof(name, HashJson(key), package, new('6', 64), "portable"))).ToArray();
             return (key, new("synthetic-checker-only-never-registered", key, package, proofs));
         }
@@ -27,6 +29,28 @@ internal static class TranslationAdmissionChecks
             if (TranslationProductionImportAdapter.QualifiedProfiles.Length != 0) throw new Exception("Synthetic proof enabled production");
             return Task.CompletedTask;
         });
+        test("restricted one-PLC block-comment scope has its own contract and complete ledger", () => {
+            var (key, profile) = Key(restricted(["plc:Fixture"], ["BlockCommentCategoryData"]));
+            if (key.Contract != TranslationProductionAdmission.RestrictedContract || profile.Proofs.Length != 25 || key.Rows.Length != 2)
+                throw new Exception("Restricted key differs");
+            TranslationProductionAdmission.RequireComplete(profile, key);
+            // Without the default-mode interruption packet the ledger is only provisional.
+            var provisional = profile with { Proofs = profile.Proofs.Where(proof => !TranslationProductionAdmission.DefaultModeCases.Contains(proof.Case)).ToArray() };
+            TranslationProductionAdmission.RequireComplete(provisional, key, provisional: true);
+            Refuse("TranslationAdmissionIncomplete", () => TranslationProductionAdmission.RequireComplete(provisional, key));
+            Refuse("TranslationAdmissionIncomplete", () => TranslationProductionAdmission.RequireComplete(profile with { Proofs = profile.Proofs.Select(proof =>
+                TranslationProductionAdmission.DefaultModeCases.Contains(proof.Case) ? proof with { EvidenceSha256 = new('5', 64) } : proof).ToArray() }, key));
+            // The whole-project ledger lacks the restricted category controls; the key cannot be relabelled either.
+            Refuse("TranslationAdmissionIncomplete", () => TranslationProductionAdmission.RequireComplete(
+                profile with { Proofs = profile.Proofs.Where(proof => proof.Case != "restricted-category-filter").ToArray() }, key));
+            Refuse("TranslationAdmissionMismatch", () => TranslationProductionAdmission.RequireComplete(profile, key with { Contract = TranslationProductionAdmission.Contract }));
+            return Task.CompletedTask;
+        });
+        foreach (var (name, objects, categories) in new[] { ("two PLCs", new[] { "plc:A", "plc:B" }, new[] { "BlockCommentCategoryData" }),
+            ("another category", ["plc:Fixture"], ["BlockCommentCategoryData", "HwcnCommentTextCategoryData"]), ("a block selection", ["Main"], ["BlockCommentCategoryData"]) })
+            test("restricted admission refuses " + name, () => {
+                Refuse("TranslationAdmissionScopeUnqualified", () => Key(restricted(objects, categories))); return Task.CompletedTask;
+            });
         var changes = new Dictionary<string, Func<TranslationAdmissionKey, TranslationAdmissionKey>> {
             ["host and dependencies"] = key => key with { Binaries = key.Binaries with { HostPackageSha256 = new('a', 64) } },
             ["translation assembly"] = key => key with { Binaries = key.Binaries with { TranslationAssemblySha256 = new('a', 64) } },

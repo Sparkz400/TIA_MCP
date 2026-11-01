@@ -145,6 +145,19 @@ class RetainedTests(unittest.TestCase):
             self.assertFalse(proof["completed"])
             self.assertTrue(row["proof"]["completed"] and row["proof"]["deadlineOrCancellationObserved"])
 
+    def test_only_the_file_storage_server_gets_its_longer_terminal_deadline(self):
+        self.assertEqual(life.terminal_deadline_seconds(life.FILE_STORAGE_SERVER, 45), life.FILE_STORAGE_TERMINAL_SECONDS)
+        self.assertEqual(life.terminal_deadline_seconds(life.FILE_STORAGE_SERVER, 600), 600)
+        self.assertEqual(life.terminal_deadline_seconds("Siemens.Automation.Portal.exe", 45), 45)
+        for name, expected in ((life.FILE_STORAGE_SERVER, 360), ("Siemens.Automation.Portal.exe", 45)):
+            tree = life.RetainedNativeTree.__new__(life.RetainedNativeTree); tree.mutex = life.threading.RLock()
+            tree.directory = Path("unused"); row = {"identity": {"pid": 1, "name": name}, "role": "native", "proof": None, "watcher": SimpleNamespace(evidence={"originalFileTimeTicks": 1})}
+            with (patch.object(tree, "await_capture_complete"), patch.object(life, "emit"),
+                  patch.object(life, "wait_retained_terminal") as wait):
+                wait.side_effect = lambda *_, publish, **__: publish({"completed": True})
+                tree._close_record_once(row, 45)
+            self.assertEqual(wait.call_args.kwargs["timeout_seconds"], expected, name)
+
     def test_terminal_host_without_worker_keeps_eof_and_handles_held_through_cancellation(self):
         with tempfile.TemporaryDirectory() as temp:
             folder = Path(temp).resolve(); processes, watchers, make, host, worker, hp, wp, factory, binder = self.fixture(folder)

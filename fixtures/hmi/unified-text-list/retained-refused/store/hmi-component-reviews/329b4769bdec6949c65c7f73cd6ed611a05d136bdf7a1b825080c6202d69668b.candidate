@@ -1,0 +1,37 @@
+#Version: 2.0
+TextLibraries:
+  "ProbeTextsTexts":
+    Type: Text
+    Languages:
+      - "en-US"
+      - "de-DE"
+    DefaultLanguage: "en-US"
+    Entries:
+      "Quote":
+        Text:
+          - "\"quoted\" \\ backslash"
+          - "\"quoted\" \\ backslash DE"
+      "Whitespace":
+        Text:
+          - "tab\u0009here\u000d\u000aCRLF and\u000aLF"
+          - "tab\u0009here\u000d\u000aCRLF and\u000aLF DE"
+      "Unicode":
+        Text:
+          - "Über 日本語 😀"
+          - "Über 日本語 😀 DE"
+      "Empty":
+        Text:
+          - ""
+          - ""
+      "Yaml":
+        Text:
+          - "---\u000a!tag &anchor #hash: colon"
+          - "---\u000a!tag &anchor #hash: colon DE"
+      "Nul":
+        Text:
+          - "a\u0000b"
+          - "a\u0000b DE"
+      "Separators":
+        Text:
+          - "x\u0085y\u2028z\u2029"
+          - "x\u0085y\u2028z\u2029 DE"

@@ -18,17 +18,19 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
 {
     private string Root => options.ArtifactsDirectory;
     private TranslationImportWorkflow Runner => new(Root);
-    private TranslationWorkerAdapter Adapter(string projectPath, string plcPath, string? sourceCulture = null, string? targetCulture = null, string[]? plcPaths = null) =>
+    private TranslationWorkerAdapter Adapter(string projectPath, string plcPath, string? sourceCulture = null, string? targetCulture = null, string[]? plcPaths = null,
+        string[]? categoryIds = null) =>
         new(bridge, Root, projectPath, plcPath, (context, action) => {
             if (!context.Operation.Plan.Target.ProjectFilePath.StartsWith(Path.GetFullPath(Root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
                 throw new BridgeException("ProjectIsolationRequired", "Qualification requires the newly owned fixture beneath this run root.");
-        }, sourceCulture ?? "de-DE", targetCulture ?? "en-GB", plcPaths);
+        }, sourceCulture ?? "de-DE", targetCulture ?? "en-GB", plcPaths, categoryIds);
     private TranslationWorkerAdapter Adapter(string id)
     {
         var op = Runner.Status(id); var selector = JsonNode.Parse(File.ReadAllText(Path.Combine(Root, "translation-qualification", id + ".json")))!;
         if (selector["planSha256"]!.GetValue<string>() != op.PlanSha256) throw new BridgeException("IdentityMismatch", "Qualification selector changed.");
         return Adapter(op.Plan.Target.ProjectFilePath, selector["plcPath"]!.GetValue<string>(), selector["sourceCulture"]?.GetValue<string>(),
-            selector["targetCulture"]?.GetValue<string>(), selector["plcPaths"]?.AsArray().Select(p => p!.GetValue<string>()).ToArray());
+            selector["targetCulture"]?.GetValue<string>(), selector["plcPaths"]?.AsArray().Select(p => p!.GetValue<string>()).ToArray(),
+            selector["categoryIds"]?.AsArray().Select(p => p!.GetValue<string>()).ToArray());
     }
     [McpServerTool(Name = "qualification_translation_fixture", Destructive = true, OpenWorld = false)]
     [Description("Explicit qualification runtime only: seed and reopen the exact newly owned bilingual scratch.")]
@@ -41,23 +43,24 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         bridge.CallAsync("translation_categories", new { projectPath, plcPath, artifactDirectory = Root }, cancellationToken);
 
     [McpServerTool(Name = "qualification_translation_capture", Destructive = false, OpenWorld = false)]
-    [Description("Explicit qualification runtime only: complete live bilingual text and peer capture for one active culture pair (default de-DE/en-GB) and every named PLC owner.")]
+    [Description("Explicit qualification runtime only: complete live bilingual text and peer capture for one active culture pair (default de-DE/en-GB) and every named PLC owner. Optional categoryIds export those categories for the named PLCs and keep exactly their rows; excludedRows lists every other native row.")]
     public async Task<object> Capture(string projectPath, string plcPath, CancellationToken cancellationToken,
-        string? sourceCulture = null, string? targetCulture = null, string[]? plcPaths = null)
+        string? sourceCulture = null, string? targetCulture = null, string[]? plcPaths = null, string[]? categoryIds = null)
     {
-        var (observation, profile) = await Adapter(projectPath, plcPath, sourceCulture, targetCulture, plcPaths).Capture(cancellationToken);
+        var (observation, profile) = await Adapter(projectPath, plcPath, sourceCulture, targetCulture, plcPaths, categoryIds).Capture(cancellationToken);
         var workbook = TranslationWorkbook.Open(observation.Workbook, profile, observation.Target.Reference, Sha256(observation.Workbook));
-        return new { observation.Target, profile, rows = profile.Rows.Select(r => new { r.NativeKey, r.Category,
+        var excluded = observation.Peers.SingleOrDefault(p => p.Identity == TranslationWorkerAdapter.ExcludedRowsPeer);
+        return new { observation.Target, observation.Scope, profile, rows = profile.Rows.Select(r => new { r.NativeKey, r.Category,
             source = workbook.ReadText(r.SourceCell), target = workbook.ReadText(r.Targets.Single().Location) }).ToArray(),
-            nativeImportExecuted = false };
+            excludedRows = excluded is null ? null : JsonNode.Parse(new TranslationImportArtifacts(Root).ReadBytes(excluded.Evidence)), nativeImportExecuted = false };
     }
     [McpServerTool(Name = "qualification_translation_prepare", Destructive = false, OpenWorld = false)]
-    [Description("Explicit qualification runtime only: bind fresh capture to an explicit no-op or single edit and exact durable review. updateSourceLanguage=true edits the source cell under the separately approved source-text mode; otherwise the target cell.")]
+    [Description("Explicit qualification runtime only: bind fresh capture to an explicit no-op or single edit and exact durable review. updateSourceLanguage=true edits the source cell under the separately approved source-text mode; otherwise the target cell. Optional categoryIds bind the Host-filtered restricted capture; only one PLC's BlockCommentCategoryData has an admission contract.")]
     public async Task<object> Prepare(string projectPath, string plcPath, string idempotencyKey,
         string? nativeKey = null, string? replacement = null, string? sourceCulture = null, string? targetCulture = null,
-        string[]? plcPaths = null, bool updateSourceLanguage = false, CancellationToken cancellationToken = default)
+        string[]? plcPaths = null, bool updateSourceLanguage = false, string[]? categoryIds = null, CancellationToken cancellationToken = default)
     {
-        var (observation, profile) = await Adapter(projectPath, plcPath, sourceCulture, targetCulture, plcPaths).Capture(cancellationToken);
+        var (observation, profile) = await Adapter(projectPath, plcPath, sourceCulture, targetCulture, plcPaths, categoryIds).Capture(cancellationToken);
         var workflow = new TranslationWorkflowStore(Root); var uploads = new ArtifactUploadStore(Root, options.LibraryLimits);
         var capture = workflow.Capture(uploads.Upload(observation.Workbook, "original.xlsx"), uploads.Upload(TranslationWorkerAdapter.JsonBytes(profile), "profile.json"),
             uploads.Upload(TranslationWorkerAdapter.JsonBytes(observation.Target.Reference), "project.json"));
@@ -79,11 +82,11 @@ public sealed class TranslationQualificationTools(IBridgeClient bridge, HostOpti
         var operation = Runner.Prepare(candidate["recordRef"]!.GetValue<string>(), candidate["recordSha256"]!.GetValue<string>(), observation, idempotencyKey);
         string folder = Path.Combine(Root, "translation-qualification"); Directory.CreateDirectory(folder);
         using (var file = new FileStream(Path.Combine(folder, operation.Id + ".json"), FileMode.CreateNew, FileAccess.Write, FileShare.Read))
-        { file.Write(TranslationWorkerAdapter.JsonBytes(new { plcPath, operation.PlanSha256, sourceCulture, targetCulture, plcPaths })); file.Flush(true); }
+        { file.Write(TranslationWorkerAdapter.JsonBytes(new { plcPath, operation.PlanSha256, sourceCulture, targetCulture, plcPaths, categoryIds })); file.Flush(true); }
         var binaries = new TranslationProductionRegistry(AppContext.BaseDirectory, options.WorkerPath, TranslationNativeTools.ApiDirectory(options)).Binaries();
         var binding = new TranslationImportArtifacts(Root).Read<TranslationImportBinding>(operation.Plan.Inputs[0]);
         TranslationAdmissionKey? admissionKey = null; string? admissionRefusal = null;
-        // Generalized cultures, owners and source mode are qualification evidence only; no production key exists for them.
+        // Generalized cultures, owners, other category selections and source mode have no production key; one PLC's block comments has its own contract.
         try { admissionKey = TranslationProductionAdmission.Describe(new(Root, operation, binding.CandidateRef, binding.CandidateReceiptSha256,
             binding.Candidate.Sha256, binding.Baseline.Scope), binaries); }
         catch (BridgeException error) when (error.Code == "TranslationAdmissionScopeUnqualified") { admissionRefusal = error.Message; }

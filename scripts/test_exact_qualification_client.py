@@ -44,6 +44,11 @@ class Checks(unittest.TestCase):
         client=self.client()
         with patch.object(module.Client,'request',return_value={'content':[{'type':'text','text':'{"processId":19}'}]}):client.request('tools/call',{'name':'tia_start'})
         self.assertEqual(client.exact_tree.calls,['intent',('accepted',19)])
+    def test_schema_prefetch_without_params_reaches_the_host(self):
+        # smoke_mcp.Client.request fetches tools/list (no params) before the first tools/call.
+        client=self.client()
+        with patch.object(module.Client,'request',return_value={'tools':[]}) as request:client.request('tools/list')
+        request.assert_called_once_with('tools/list',None);self.assertEqual(client.exact_tree.calls,[])
     def test_initialization_is_not_native_start_acceptance(self):
         client=self.client()
         with patch.object(module.Client,'request',return_value={}):client.request('initialize',{})

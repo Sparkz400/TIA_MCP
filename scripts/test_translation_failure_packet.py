@@ -132,5 +132,31 @@ class FailurePacketChecks(unittest.TestCase):
                 with self.assertRaises(ValueError): verifier.verify(root)
                 with self.assertRaises(ValueError): admission_verifier.verify(root)
 
+    def test_source_drift_of_a_restricted_packet_compares_the_admitted_category_rows(self):
+        """The raw native export of a restricted packet also holds the excluded rows (31 October tr09)."""
+        main = ('xl/worksheets/sheet1.xml', '<BlockCommentCategoryData>', 'Main', 'K1', '', 'Prueftext Main {0}', 'Verification text Main {0}')
+        hardware = ('xl/worksheets/sheet1.xml', '<HwcnCommentTextCategoryData>', '', 'H', '', '', '')
+        drifted = (*main[:-2], 'Qualification source drift Main {0}', main[-1])
+        for scope, exported, accepted in ((['plc:/PLC'], {'K1': drifted, 'H': hardware}, True),
+                                          (['whole-project:legacy-bilingual'], {'K1': drifted, 'H': hardware}, False)):
+            with self.subTest(scope=scope), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / 'translation-native' / 'sourceDrift-1').mkdir(parents=True); (root / 'translation-native' / 'observe-1').mkdir()
+                (root / 'translation-native' / 'observe-1' / 'all.xlsx').write_bytes(b'export')
+                checkpoint = {'relativePath': 'translation-import/blobs/' + 'c' * 64, 'sha256': 'c' * 64}
+                (root / 'translation-native' / 'sourceDrift-1' / 'source-drift-intent.json').write_text(json.dumps({'operationId': 'op', 'planSha256': 'p' * 64,
+                    'before': 'Prueftext Main {0}', 'after': 'Qualification source drift Main {0}', 'automaticReplay': False, 'checkpoint': checkpoint}), encoding='utf-8')
+                oracle = admission_verifier.Oracle.__new__(admission_verifier.Oracle); oracle.root = root
+                oracle.binding = lambda operation: {'baseline': {'scope': {'objectSelections': scope, 'categoryIds': ['BlockCommentCategoryData']}}}
+                oracle.parsed = lambda artifact: {'code': 'StaleWorkbook'}
+                final = {'planSha256': 'p' * 64, 'checkpoints': [checkpoint], 'evidence': [{'gate': 'failure', 'artifact': {}}]}
+                original = admission_verifier.workbook
+                admission_verifier.workbook = lambda data: dict(exported)
+                try:
+                    if accepted: oracle.source_drift({'id': 'op'}, final, {'K1': main}, 'K1')
+                    else:
+                        with self.assertRaisesRegex(ValueError, 'source-only drift'): oracle.source_drift({'id': 'op'}, final, {'K1': main}, 'K1')
+                finally: admission_verifier.workbook = original
+
 
 if __name__ == '__main__': unittest.main()

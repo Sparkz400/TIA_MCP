@@ -159,12 +159,16 @@ public sealed partial class HmiComponentWorkflowStore(string artifactsRoot)
         report["files"] = rows;
     }
     private JsonObject Reference(string hash, string extension) => new() { ["path"] = "hmi-component-reviews/" + hash + extension, ["sha256"] = hash };
+    // Test seam: invoked before each durable artifact publication, so a test can abandon the Host at exactly that boundary.
+    internal Action<string, string>? BeforePublish { get; set; }
     private JsonObject Publish(byte[] bytes, string extension, int limit)
     {
         if (bytes.Length > limit) throw new BridgeException("ArtifactCapacity", "HMI component review artifact exceeds its byte bound.");
+        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes));
+        BeforePublish?.Invoke(extension, hash);
         PackageStorage.EnsureNoLinks(Root); Directory.CreateDirectory(Root);
         using var gate = PackageStorage.Lock(Path.Combine(Root, ".write.lock"));
-        string hash = Convert.ToHexStringLower(SHA256.HashData(bytes)); var artifact = Reference(hash, extension);
+        var artifact = Reference(hash, extension);
         string path = PackageStorage.Under(Root, hash + extension);
         if (!File.Exists(path))
         {

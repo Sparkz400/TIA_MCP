@@ -173,9 +173,14 @@ class Oracle:
         # The second live export itself must prove the changed source, not merely
         # a callback flag or a claimed StaleWorkbook error.
         expected = dict(before); expected[key] = (*before[key][:-2], intent['after'], before[key][-1])
+        # A restricted packet's raw native export also holds the excluded rows; compare its admitted-category rows,
+        # which is exactly what the Host filter keeps (the decoded tuple has no row number).
+        scope = self.binding(trial['id'])['baseline']['scope']
+        labels = None if scope['objectSelections'] == ['whole-project:legacy-bilingual'] else {'<' + c + '>' for c in scope['categoryIds']}
         changed = []
         for path in self.root.glob('translation-native/observe-*/all.xlsx'):
-            if workbook(path.read_bytes()) == expected: changed.append(path)
+            rows = workbook(path.read_bytes())
+            if {k: v for k, v in rows.items() if labels is None or v[1] in labels} == expected: changed.append(path)
         require(len(changed) == 1, 'Actual source-only drift export missing or repeated')
         failures = [self.parsed(e['artifact']) for e in final['evidence'] if e['gate'] == 'failure' or e['gate'].startswith('interruption.')]
         require(any(f.get('code') in STALE_CODES for f in failures), 'Source drift did not retain exact stale refusal')

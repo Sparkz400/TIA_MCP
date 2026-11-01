@@ -932,6 +932,22 @@
                     "minLength": 1,
                     "maxLength": 4096,
                     "pattern": "\\S"
+                  },
+                  "ignoredDifferences": {
+                    "type": "array",
+                    "maxItems": 16,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["description", "status", "reason", "sourceValue", "installedValue"],
+                      "properties": {
+                        "description": {"const": "Version comment"},
+                        "status": {"const": "ObjectsDifferent"},
+                        "reason": {"type": "string", "minLength": 1},
+                        "sourceValue": {"type": "object", "additionalProperties": {"type": ["string", "null"]}},
+                        "installedValue": {"type": "object", "additionalProperties": {"type": ["string", "null"]}}
+                      }
+                    }
                   }
                 }
               }

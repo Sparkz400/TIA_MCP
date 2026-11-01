@@ -23,6 +23,15 @@ namespace TiaMcp.Openness.V21
             }
         }
 
+        // Kinds whose apply compiles every device of the project, hardware and software, instead of one selected PLC.
+        // project_simulation_enable is a project-wide setting that changes how every PLC compiles, so it compiles them all.
+        private static readonly string[] DeviceCompiledKinds = { "cax_import", "network_configure", "network_io_assign", "drive_parameter_set", "drive_telegram_set",
+            "safety_fparameter_set", "safety_import_xml", "webserver_page_set", "umac_role_set", "opcua_server_settings_set", "project_simulation_enable", "network_mrp_set" };
+
+        internal static bool CompilesEveryDevice(string kind) =>
+            kind.StartsWith("hardware_", StringComparison.Ordinal) || kind.StartsWith("connection_", StringComparison.Ordinal) ||
+            kind.StartsWith("certificate_", StringComparison.Ordinal) || Array.IndexOf(DeviceCompiledKinds, kind) >= 0;
+
         /// <summary>Dispatch only when the targets equal the reviewed preview, in order.</summary>
         internal static bool SameTargets(IEnumerable<string> reviewed, IEnumerable<string> current) =>
             reviewed != null && current != null && reviewed.SequenceEqual(current, StringComparer.Ordinal);

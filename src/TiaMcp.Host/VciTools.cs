@@ -21,7 +21,7 @@ public sealed class VciTools(HostOptions options)
         Run(s => Task.FromResult(s.ComparePackages(baselineRef, projectRef, workspaceRef, expectedHashes)));
 
     [McpServerTool(Name = "vci_prepare", ReadOnly = false, Destructive = false, OpenWorld = false)]
-    [Description("Prepare an offline local Git revision from 1..1000 explicitly selected files and committed uploads, at most 16 MiB/file and 64 MiB raw tree. Null uploadRef with delete=false creates an empty file; delete=true removes an exact parent file. Optional parentRevisionRef must be a Host-issued committed revision. Each candidate owns a separate repository. Optional branchName names the initial branch or creates/selects a new unused branch at the exact parent commit; omission inherits the parent branch (main for a new repository). Existing different branches are never reset or switched into. Retains raw bytes, tracked Git diff and file manifest; new files are reviewed through file reads. Returns planSha256 for explicit commit review. No native export/import, remote Git or user repository paths.")]
+    [Description("Prepare an offline local Git revision from 1..1000 explicitly selected files and committed uploads, at most 16 MiB/file and 64 MiB raw tree. Null uploadRef with delete=false creates an empty file; delete=true removes an exact parent file. Optional parentRevisionRef must be a Host-issued committed or fetched revision. Each candidate owns a separate repository. Optional branchName names the initial branch or creates/selects a new unused branch at the exact parent commit; omission inherits the parent branch (main for a new repository). Existing different branches are never reset or switched into. Retains raw bytes, tracked Git diff and file manifest; new files are reviewed through file reads. Returns planSha256 for explicit commit review. No native export/import or user repository paths; remote delivery uses vci_push and vci_fetch.")]
     public Task<CallToolResult> Prepare(VciUploadFile[] files, GitAuthor author, string message, string? parentRevisionRef = null, string? branchName = null,
         CancellationToken cancellationToken = default) => Run(s => s.PrepareAsync(files, author, message, parentRevisionRef, cancellationToken, branchName));
 
@@ -54,6 +54,16 @@ public sealed class VciTools(HostOptions options)
     public Task<CallToolResult> Materialize(string revisionRef, CancellationToken cancellationToken = default) =>
         Run(s => s.MaterializeAsync(revisionRef, cancellationToken));
 
+    [McpServerTool(Name = "vci_push", ReadOnly = false, Destructive = false, OpenWorld = true)]
+    [Description("Push the exact commit of a Host-issued committed or fetched revision to branchName on the one Host-configured remote (--git-remote; a local bare repository unless --git-allow-network-remote allows credential-free https). Compare-and-swap: the remote branch must equal expectedRemoteCommit (omit when it must not exist yet) and the commit must descend from it; there is no forced update. Reads the remote branch back. Refuses a local remote that is not a minimal bare repository (the core-only config allowlist, no hooks, alternates or other indirection), checked again right before dispatch. A dispatched push without its receipt stays outcomeUnknown; inspect the remote before repeating. No credentials, caller URLs or native engineering.")]
+    public Task<CallToolResult> Push(string revisionRef, string branchName, string? expectedRemoteCommit = null, CancellationToken cancellationToken = default) =>
+        Run(s => s.PushAsync(revisionRef, branchName, expectedRemoteCommit, cancellationToken));
+
+    [McpServerTool(Name = "vci_fetch", ReadOnly = false, Destructive = false, OpenWorld = true)]
+    [Description("Fetch branchName from the one Host-configured remote into a new fetched-revision record. With parentRevisionRef (a committed or fetched revision checked out on the same branch name) the copied repository fast-forwards to the remote commit and refuses divergent remote history; without it a new repository takes the remote commit. Optional expectedRemoteCommit pins the reviewed remote commit. A local remote must pass the same minimal bare-repository check as vci_push. The remote tree must hold only regular files without .gitattributes/.gitmodules; working files read back as the exact remote blobs. The record serves as parentRevisionRef, history, branches, materialize, file read and package capture source. Prior records never change; no native engineering.")]
+    public Task<CallToolResult> Fetch(string branchName, string? parentRevisionRef = null, string? expectedRemoteCommit = null, CancellationToken cancellationToken = default) =>
+        Run(s => s.FetchAsync(branchName, parentRevisionRef, expectedRemoteCommit, cancellationToken));
+
     [McpServerTool(Name = "vci_list", ReadOnly = true, Destructive = false, OpenWorld = false)]
     [Description("Discover 1..50 retained local VCI records, including incomplete, damaged or outcome-unknown candidates. Store limit 128 records and 2 GiB with bounded reserved headroom. Discovery offsets are sorted by record ID; relist after concurrent additions. Does not resume or replay Git writes.")]
     public Task<CallToolResult> List(int offset = 0, int count = 20) => Run(s => Task.FromResult(s.List(offset, count)));
@@ -73,7 +83,7 @@ public sealed class VciTools(HostOptions options)
         try
         {
             if (options.GitExecutable is null) throw new BridgeException("GitNotConfigured", "Start the Host with --git-executable and an absolute installed Git path.");
-            return Format(await action(new VciWorkspaceStore(options.ArtifactsDirectory, options.GitExecutable, options.LibraryLimits)), false);
+            return Format(await action(new VciWorkspaceStore(options.ArtifactsDirectory, options.GitExecutable, options.LibraryLimits, options.GitRemote)), false);
         }
         catch (Exception error) when (error is BridgeException or IOException or UnauthorizedAccessException or ArgumentException or JsonException or InvalidOperationException)
         {

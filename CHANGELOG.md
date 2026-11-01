@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.86`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.88`.
 
 ### Added
 
@@ -38,6 +38,49 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   Unified and Classic HMI read and authoring routes.
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
 - **Explorer:** technology, software-unit, library and port providers.
+- **Project upgrade:** `project_upgrade` upgrades a V14–V20 project folder (`.ap14`–`.ap20`,
+  `.ap15_1`) or archive (`.zap14`–`.zap20`) to V21 on an owned copy; the source is never opened,
+  its hash is checked before and after, and V13 and older are refused before any native call
+  (`local.project_upgrade.20261031`).
+- **OPC UA client:** `runtime_ua_call` calls a method component of an object in the PLC namespace
+  (on an S7-1500, a user-program server method) on an owned PLCSIM instance behind the
+  `runtime_ua_write` gate, never retried; `runtime_ua_conditions` takes an Alarms and Conditions
+  snapshot with ConditionRefresh; `runtime_ua_history_probe` records the server's `HistoryRead`
+  answer, which the product refuses (`UaHistoryReadUnsupported`); `opcua_server_settings_set` takes
+  `alarmsAndConditions` (`local.runtime.plcsim-ua-services.20261031`).
+- **Unified text-list import:** change kind `hmi_text_list_import` imports a retained
+  `hmi_text_list_author` or `hmi_text_list_generate_set` candidate into a Unified Comfort or Unified
+  PC HMI through `change_prepare`, `change_apply` and `change_restore`. The Host refuses content V21
+  would change, also for older records; apply checkpoints, compiles, imports and requires the
+  candidate lists to read back exactly and the other lists, the rest of the HMI and the compiler
+  errors and warnings to stay unchanged before it saves (`local.hmi.text-list-import.route.20261031`).
+- **VCI remote delivery:** `vci_push` publishes a committed or fetched revision to the one remote set
+  by `--git-remote`, with compare-and-swap and no forced update; `vci_fetch` fast-forwards a revision
+  to the remote branch after validating its tree; change kind `vci_conflict_resolve` resolves a
+  two-sided VCI conflict from a reviewed three-way comparison (take native, remote or a reviewed
+  merged document) with checkpoint, compile and exact readback (`local.vci_git.20261031`,
+  `local.hostonly.vci.git.20261031`). `vci_workspace_inspect` reports each mapped object's
+  `contentSha256`.
+- **Hardware topology:** change kinds `network_mrp_set` (media redundancy role and MRP domain of a
+  PROFINET interface, shown by `hardware_inspect` `network.mrp`) and `hardware_shared_device_access`
+  (an IO-device module's access: one PLC of the station's I/O systems, or `OutsideOfProject` with an
+  optional `externalIoControllers` count); `network_io_assign` takes `sharedDevice` with `sharedSubmodules`, and
+  `hardware_replace` takes `acceptAddressChange` with `acknowledgedTags`
+  (`local.hardware_changes.topology.20261101`, `local.hardware_changes.topology_restores.20261101`).
+- **Capability profiles:** 13 module capability profiles in
+  `contracts/hardware-catalog-profiles.v1.json`, linked from `hardware_catalog_search` and checked by
+  attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
+  (45 cells on three CPUs) that `to_create` admits or refuses by (`local.technology.version_profiles.20261031`).
+- **Restricted translation profile:** qualification captures accept `categoryIds`, and the Host
+  keeps exactly the requested categories of V21's leaking category export by row identity; a
+  one-PLC `BlockCommentCategoryData` admission contract becomes final only after
+  `build_translation_admission.py --finalize` adds the default-mode interruption packet
+  (`local.translation.restricted.qualification.20261031`, `local.translation.restricted.native.20261031`).
+- **PLC component shapes:** combined `library_integrate` apply also installs a LAD FC caller, an FB
+  caller, an earlier placement in an existing FBD FC and reuse of an installed FB, each as an exact
+  single-feature shape (`local.library_integrate.candidate_shapes.rerun.20261031`); combinations
+  stay plan-only. `library_instantiate` sets an explicit `namespace` on a master copy of a block or
+  PLC data type (`local.library_units.namespace.rerun.20261031`).
 
 ### Changed
 
@@ -50,6 +93,28 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - `plc_station_upload` can trust an owned PLCSIM instance's TLS (`trustOwnedSimulationCertificate`,
   off by default); `safety_import_xml` compiles every device; the device compile lists devices
   without a compile service as not compiled instead of refusing.
+- New Host options `--git-remote <repo>` (the one bare remote of `vci_push`/`vci_fetch`; needs
+  `--git-executable`) and `--git-allow-network-remote` (lets it be a credential-free `https://` URL);
+  the qualification-only `--hmi-text-list-qualification <profile>` and, in builds made with
+  `-p:SafetyFParameterDiscovery=true` only, `--safety-fparameter-discovery`
+  ([Host options](docs/guides/deployment.md#host-options)).
+- `safety_fparameter_set` writes only the F-parameters of the allowlist derived from a discovery run
+  (77 over seven ET 200SP and ET 200MP F-module types, `local.safety.fparameter_discovery.20261031`);
+  any other name is refused with `UnsupportedAttribute` and the module type, and written
+  F-parameters join configured-hardware preservation.
+- `tag_create`, `tag_set` (`LogicalAddress`) and `tag_table_import_xml` refuse an absolute input or
+  output address in an F-I/O range at prepare with `SafetyBoundary` and write nothing; before, a tag
+  created there became a safety tag and was refused only after the create.
+- Combined `library_integrate` apply refuses before any claim when a block number the import would
+  take is already used (`ComponentBlockNumberOccupied`) or a step checkpoint or recovery path would
+  exceed TIA's 143 characters (`ComponentPathTooLong`); its steps run in a short workspace
+  `changes/c/<8 hex>`, and a reused FB may differ from its source only in the version comment, which
+  the preview records.
+- `to_create` checks the CPU, type and version against the technology version profiles: a recorded
+  refusal refuses with its native text (`TechnologyVersionRefused`), and an unprofiled pair needs
+  `unprofiledAcknowledged` (`TechnologyVersionUnprofiled` otherwise).
+- The Unified HMI preservation capture also covers the complete text-list export, and OPC UA sessions
+  also check that namespace 0 is the OPC UA namespace.
 
 ### Fixed
 
@@ -75,15 +140,30 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     on a store with an `.archive` folder); a clock step back no longer fails a dispatch.
   - Release tooling: blocked rows need a disposition, verified features cannot rest on lost raw
     reports only, the Explorer relationship checks run in CI, and a 1.x release tag is gated.
+- Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
+  - `project_simulation_enable` compiles every device: in a project with more than one PLC it
+    refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the
+    post-apply fingerprint failed (`local.project_simulation.multi_plc.20261101`).
+  - Combined apply of a verified shape no longer imports and saves the component FB before failing
+    at typed preparation when the captured profile's FB number is taken in the target, which left the
+    change `recovery_required`; it is refused before any claim.
+  - Runner and diagnostics fixes: `ExactClient` runners accept the `tools/list` prefetch without
+    params again (broken since `28d50f91`); `qualify_plcsim_signals.py` takes the discovery baseline
+    before `sim_create`; card-move rows carry their UTC time; the retained-tree runners give the
+    FileStorage helper its 360 s exit deadline.
 
 ### Known limitations
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 437 of 469 catalog features are verified; 108 release-matrix cells are open
+- 451 of 479 catalog features are verified; 108 release-matrix cells are open and 12 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
 - V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
-  through Openness, an OPC UA reference-namespace import crashes TIA, and V21 refuses the CPU protection
-  level while UMAC runtime access is enabled (its password has a credential route).
+  through Openness, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
+  level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
+  server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
+  file, and the offline memory-card download cannot load a safety program into PLCSIM.
+- `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
+  Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built
   on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures.

@@ -189,6 +189,9 @@ internal static class IntegerTextListConversionTests
             ("USInt", "SInt", 0, 127), ("Int", "UInt", 0, 32767), ("UInt", "Int", 0, 32767),
             ("DInt", "UDInt", 0, 2147483647), ("UDInt", "DInt", 0, 2147483647),
             ("DInt", "UDInt", 2147483647, 2147483647), ("UDInt", "DInt", 0, 0) };
+        string lossUpload = Input(ConvertRequest(Seed("Int", -5, 5), "DInt"));
+        PublishInterruptionSweep.Run("set-conversion", root, ".text-set.json", 6, s => s.GenerateTextListSet(lossUpload), (ok, label) => Check(ok, label));
+        Release();
         JsonObject? chain = null;
         foreach (var test in matrix)
         {

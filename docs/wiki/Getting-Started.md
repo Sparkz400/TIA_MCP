@@ -23,13 +23,17 @@ Requirements:
 - Windows with **TIA Portal V21** and **Openness**, configured for your user ([Openness registration](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/openness-application-registration.md))
 - **PLCSIM Advanced V8** with a usable license and a supported CPU/firmware, for simulation.
   The default Softbus mode needs no network setup and covers simulation, download, online compare and upload.
-  - Only the runtime OPC UA and web tools against PLCSIM need TCP/IP: set PLCSIM *Online Access* to the
-    PLCSIM Virtual Ethernet Adapter with a static address, and create the instance with
-    `communicationInterface: "TCPIP"` at `sim_create` ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md#loading-an-engineering-program)).
+  - Only the runtime OPC UA and web tools against PLCSIM (including OPC UA method calls and alarm snapshots) need
+    TCP/IP: set PLCSIM *Online Access* to the PLCSIM Virtual Ethernet Adapter with a static address, and create the
+    instance with `communicationInterface: "TCPIP"` at `sim_create` ([simulation](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/simulation.md#loading-an-engineering-program)).
     Runtime writes and RUN/STOP also need Windows to route the instance's address through that adapter, so give
-    it an address in the instance's subnet ([owned PLCSIM writes](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-runtime-sessions.md#owned-plcsim-writes-and-runstop)).
+    it an address in the instance's subnet and no default gateway ([owned PLCSIM writes](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/physical-runtime-sessions.md#owned-plcsim-writes-and-runstop)).
+    An adapter that took a DHCP lease from your network reaches that network; set the static address first.
     Never bridge the PLCSIM virtual switch or adapter to a plant network adapter: the route check cannot detect a
     physical PLC behind such a bridge
+  - The mode is machine-wide: while PLCSIM is in TCP/IP mode, Softbus instances refuse power-on, RUN and writes
+    (`SoftbusRequired`), and the discovery before `sim_create` needs Softbus, so switch *Online Access* back to
+    Softbus for the other simulation work
 - .NET 10 SDK and .NET Framework 4.8 reference assemblies
 - PowerShell 7, Python 3.13 and Node.js 24 for the development checks
 
@@ -47,7 +51,9 @@ Combined library install: on every Host, `change_apply` installs a prepared PLC 
 
 Optional TIA Add-In: `./scripts/Publish-AddIn.ps1` builds the companion with the installed Siemens Publisher and writes an enrollment file. Install the package in TIA yourself, then start the Host with `--addin-handoff --addin-enrollment <file>`. Steps and limits are in [Add-In companion](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/addin-selections.md#native-companion-build-publish-and-enroll); one native selection handoff is verified (`local.addin.companion.20261029`).
 
-The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply` or `--library-limits-file`; start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options).
+External Git delivery (`vci_push`, `vci_fetch`) needs `--git-executable` and one `--git-remote <bare repository>`, a local path or `file:///` URL; `--git-allow-network-remote` also admits a credential-free `https://` remote. See [remote delivery](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/reference/vci-host-workflow.md#remote-delivery).
+
+The launcher scripts do not pass `--addin-handoff`, `--addin-enrollment`, `--enable-library-integrate-apply`, `--disable-library-integrate-apply`, `--library-limits-file`, `--git-remote` or `--git-allow-network-remote`; start the Host directly for those. `Start-TiaMcp.ps1` adds `--no-native-workers` itself, but only for offline bundles. Every option, its default and its range is listed under [Host options](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/guides/deployment.md#host-options). Qualification-only options such as `--hmi-text-list-qualification` and `--safety-fparameter-discovery` exist for the native qualification runners, not for normal use.
 
 Vendor libraries can have additional CPU, tag-table and product requirements.
 Check the [PAL/DMC intake and prerequisite review](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/vendor-intake-review-20261025.md)

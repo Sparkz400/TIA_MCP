@@ -1,9 +1,10 @@
 # Offline local Git document revisions
 
-The normal Host exposes twelve `vci_*` tools without Siemens products. They retain
+The normal Host exposes fourteen `vci_*` tools without Siemens products. They retain
 uploaded document bytes in separate Host-owned Git repositories, review and commit
-selected changes, preserve parent history and export an exact old revision. This
-is the local Git part of D01. [Package manifests and three-way comparison](vci-package-workflow.md)
+selected changes, preserve parent history, export an exact old revision and
+[push to and fetch from one configured remote](#remote-delivery). This
+is the Git part of D01. [Package manifests and three-way comparison](vci-package-workflow.md)
 are also available from explicit supplied mapping evidence. Native VCI workspace
 mappings, export/import into TIA and engineering qualification remain separate obligations in the [execution queue](../history/offline-execution-20261016.md).
 
@@ -17,8 +18,8 @@ Configure one installed Git executable at Host startup:
 ```
 
 Without `--git-executable`, VCI calls return `GitNotConfigured`; other offline tools
-remain available. MCP callers cannot choose an executable, shell command, remote,
-existing repository or arbitrary destination. The existing
+remain available. MCP callers cannot choose an executable, shell command, remote URL,
+existing repository or arbitrary destination; the one remote is a Host option. The existing
 [restricted Git runner](vci-git-runner.md) pins the executable and rejects hooks,
 config includes, aliases, remotes, attributes, submodules, links and unsupported
 repository state. All returned native qualification flags remain false.
@@ -28,7 +29,7 @@ repository state. All returned native qualification flags remain false.
 1. Upload nonempty raw files through `artifact_upload_begin`, chunk transfer and
    `artifact_upload_commit`. Retain each resulting `upload:<id>` handle.
 2. Call `vci_prepare` with an explicit author, message and selected files. Omitting
-   `parentRevisionRef` starts a new repository. Supplying a completed revision makes
+   `parentRevisionRef` starts a new repository. Supplying a completed or fetched revision makes
    an independent candidate with the same Git history. No original revision changes.
    Optional `branchName` selects the initial branch in a new repository, or creates
    and selects a new unused branch at the exact parent commit in its private copy.
@@ -116,9 +117,10 @@ the Git runner retains its own index and branch safeguards.
   descendants. Global store capacity includes failed candidates and retained controls.
 - History accepts 1–50 commits and at most 64 KiB of text. Read/download pages are
   bounded to 64 KiB. Discovery lists at most 50 rows; relist after concurrent additions.
-- Normal commit success is local Git evidence. Native package eligibility, VCI
-  mapping, directed synchronization, native semantic validation, native project
-  recovery, remote publication, larger measured scale and release acceptance remain open.
+- Normal commit success is local Git evidence. Native package eligibility, native
+  semantic validation, native project recovery, network remotes, larger measured
+  scale and release acceptance remain open; mapping and synchronization are the
+  [prepared VCI kinds](vci-package-workflow.md#native-workspace-changes).
 
 The [JSON contract](../../contracts/vci-workspace.v1.schema.json) defines the input
 and output shapes. [Validation record](../verification/vci-host-workflow-20261016.md).
@@ -141,6 +143,60 @@ inspect retained files before disposal. There is no automatic fork replay or
 repair. Machine power-loss durability is not qualified.
 
 This delivers named initial/child branches and descendant commits. It does not
-provide standalone ref reset/delete/rename/merge tools, remote tracking or
-publication, or native VCI synchronization. Those broader D01 obligations remain
-open. [Executed checks](../verification/vci-branches-20261016.md).
+provide standalone ref reset/delete/rename/merge tools or remote-tracking refs;
+remote delivery is the next section. [Executed checks](../verification/vci-branches-20261016.md).
+
+## Remote delivery
+
+`vci_push` and `vci_fetch` exchange revisions with the one remote the Host is
+started with:
+
+```json
+"args": ["--git-executable", "C:\\Program Files\\Git\\cmd\\git.exe", "--git-remote", "D:\\Repos\\plc-workspace.git"]
+```
+
+`--git-remote` takes an absolute path or `file:///` URL of a bare repository.
+A non-local remote needs `--git-allow-network-remote` and must be a
+credential-free `https://` URL; user names, passwords, queries, SSH and every
+other transport are refused at startup, and no credential helper or prompt is
+ever used, so a remote that needs authentication fails. Each call runs the
+pinned executable with the same cleared environment and fixed configuration,
+literal arguments and only the remote's own protocol enabled. Because the
+remote's receive-pack runs its own hooks and configuration, a local remote must
+be a minimal bare repository: the same `[core]`-only configuration allowlist the
+runner applies to its own repositories (no includes, `hooksPath`,
+`alternateRefsCommand` or any other key; `GitUnsupportedConfiguration`), no
+active hooks (`GitExecutableCustomizationRefused`) and no alternates, grafts,
+loose or packed replace refs, or `.git` entry, which Git's local lookup would
+enter before the configured directory (`GitUnsupportedRepository`), and no
+junction or symbolic link anywhere below it, such as at `refs/heads` or
+`objects/pack` (`GitUnsafePath`; at most 100,000 entries are walked). It is
+checked when the remote branch is read and again immediately before dispatch; a
+writer of the remote after that check is outside the Host's control. Only
+drive-letter paths are accepted: UNC and device spellings (`\\server\share`,
+`//server/share`, `\\?\`, `\??\`) are refused. Without `--git-remote` both tools
+return `GitRemoteNotConfigured`.
+
+- `vci_push` publishes the exact commit of a committed or fetched revision to
+  `branchName`. The remote branch must equal `expectedRemoteCommit` (omit it
+  when the branch must not exist yet) and the commit must descend from it;
+  otherwise `GitReferenceConflict` or `GitNotFastForward` refuse before
+  dispatch. The update uses a lease on the expected value and is read back;
+  nothing is ever forced. The `vci:push:` record binds revision, remote, branch,
+  commit and the verified callback.
+- `vci_fetch` creates a `vci:fetch:` record. With `parentRevisionRef` (checked
+  out on the same branch name) it copies the parent repository and
+  fast-forwards that branch to the remote commit; divergent remote history
+  refuses with `GitNotFastForward`. Without a parent it starts a new repository.
+  Optional `expectedRemoteCommit` pins the commit you reviewed (`PreviewStale`
+  if the remote moved). The remote tree must hold only regular files without
+  `.gitattributes` or `.gitmodules`; every working file must read back as its
+  exact blob. The fetched record is a revision: use it as `parentRevisionRef`,
+  for history, branches, materialization, file reads and package capture.
+
+A push or fetch that was dispatched but has no receipt is listed as
+`outcomeUnknown` and never replayed; inspect the remote before pushing again
+and fetch into a new record. Prior records never change. The
+[conflict workflow](vci-package-workflow.md#two-sided-conflict-resolution) uses
+these tools to bring a remote change into a native workspace and to publish its
+resolution. Verified against a local bare remote: `local.hostonly.vci.git.20261031` (Host-only) and `local.vci_git.20261031` (native round trip). Network remotes are not qualified. [Record](../verification/vci-external-git-20261031.md).

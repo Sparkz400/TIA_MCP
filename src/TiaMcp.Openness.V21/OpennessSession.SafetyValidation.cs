@@ -30,7 +30,7 @@ namespace TiaMcp.Openness.V21
             foreach (var entry in DeviceItems(plc.Project, lookup))
             {
                 bool fIo;
-                try { fIo = entry.Item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress"); }
+                try { fIo = IsFIo(entry.Item); }
                 catch (Exception) { warnings.Add(new JObject { ["path"] = entry.Path, ["message"] = "Native attribute metadata could not be captured." }); continue; }
                 if (!fIo) continue;
                 var source = FailsafeValue(entry.Item, "Failsafe_FSourceAddress");
@@ -101,16 +101,61 @@ namespace TiaMcp.Openness.V21
             return result;
         }
 
-        // The reviewed F-I/O write subset: V21 Openness documents both as read/write F-I/O F-parameters. F-source addresses (set by
-        // the CPU's central F-source address), F-parameter signatures, SIL/CRC/version and F-I/O DB assignment stay read-only here.
-        private static readonly HashSet<string> FParameterWriteAttributes = new HashSet<string>(new[] { "Failsafe_FDestinationAddress", "Failsafe_FMonitoringtime" }, StringComparer.Ordinal);
-        // A property: partial-class static initializer order across files is not guaranteed.
-        private static HashSet<string> HardwareFParameterPreservedAttributes => new HashSet<string>(HardwareWriteAttributes.Concat(FParameterWriteAttributes), StringComparer.Ordinal);
+        // Preserved on every device item by safety_fparameter_set besides the written names: both are documented read/write
+        // F-I/O F-parameters. A property: partial-class static initializer order across files is not guaranteed.
+        private static HashSet<string> HardwareFParameterPreservedAttributes => new HashSet<string>(HardwareWriteAttributes.Concat(new[] { "Failsafe_FDestinationAddress", "Failsafe_FMonitoringtime" }), StringComparer.Ordinal);
+
+        // The written F-parameter names of a safety_fparameter_set payload, which preservation also captures on every device item.
+        private static IEnumerable<string> FParameterNames(EngineeringChange change) => change.Kind != "safety_fparameter_set" ? Enumerable.Empty<string>()
+            : (change.Payload["parameters"] as JArray ?? new JArray()).OfType<JObject>().Select(row => row["name"]?.Type == JTokenType.String ? row.Value<string>("name") : null)
+                .Where(name => !FParameterAllowlistRules.Denied(name)).ToArray();
+
+        // An F-I/O exposes Failsafe_FDestinationAddress, as safety_validation_inspect and safety_fparameter_set select them.
+        private static bool IsFIo(DeviceItem item) => item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress");
+
+        // Address ranges of every F-I/O subtree whose addresses the PLC owns or may own (no or an unresolved controller counts),
+        // for tag_create. Metadata that cannot be read leaves an item out; the created tag's IsSafety readback stays the backstop.
+        private static List<(string IoType, int StartByte, int LengthBits, string Path)> FIoAddressRanges(PlcSelection plc)
+        {
+            var budget = new ScanBudget(50000);
+            var hardware = DeviceItems(plc.Project, budget).ToArray();
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "F-I/O lookup is incomplete; a tag on an I/O address cannot be checked against F-I/O address ranges.");
+            var ranges = new List<(string IoType, int StartByte, int LengthBits, string Path)>();
+            foreach (var fIo in hardware.Where(entry => { try { return IsFIo(entry.Item); } catch (Exception) { return false; } }))
+                foreach (var item in hardware.Where(entry => entry.Path == fIo.Path || entry.Path.StartsWith(fIo.Path + "/", StringComparison.Ordinal)))
+                    foreach (var address in item.Item.Addresses)
+                        if (!address.AddressControllers.Any() || address.AddressControllers.Any(controller => ControllerMatchesSelectedPlc(controller, plc.Software) != false))
+                            ranges.Add((address.IoType.ToString(), address.StartAddress, address.Length, fIo.Path));
+            return ranges;
+        }
+
+        // A tag on an F-I/O address becomes a safety tag; tag_create, tag_set and tag_table_import_xml refuse it before writing.
+        private static void RejectFIoAddresses(PlcSelection plc, IEnumerable<string> addresses)
+        {
+            var io = addresses.Where(address => TagAddressRules.Io(address) != null).ToArray();
+            if (io.Length == 0) return;
+            var ranges = FIoAddressRanges(plc);
+            foreach (var address in io)
+                if (TagAddressRules.FIoOverlap(address, ranges) is string fIo)
+                    throw new BridgeException("SafetyBoundary", "The address " + address + " lies in the address range of the F-I/O " + fIo +
+                        "; a tag there becomes a safety tag, which standard tag changes exclude. Nothing was written.", new JObject { ["logicalAddress"] = address, ["fIoPath"] = fIo });
+        }
+
+        // The catalog type of an F-I/O: its own, else its direct parent module's (an ET 200SP F-I/O item has none). Never a rack's.
+        private static string FIoModuleTypeIdentifier(DeviceItem item) =>
+            FParameterAllowlistRules.ModuleKey(item.TypeIdentifier, (item.Parent as DeviceItem)?.TypeIdentifier)
+                ?? throw new BridgeException("UnresolvedHardware", "Neither the F-I/O nor its direct parent has a module type identifier (order number with firmware, or GSD); no allowlist row applies.");
 
         // Prepare (write=false) returns the preview rows; apply (write=true) rechecks ownership, expected values and collisions, writes, then reads back.
         private JArray FParameterSet(EngineeringChange change, Project project, bool write)
         {
             var payload = change.Payload;
+            // Only a Host launched with --safety-fparameter-discovery sets this; it admits declared-writable parameters the allowlist lacks.
+#if SAFETY_FPARAMETER_DISCOVERY
+            bool discovery = change.Selector.Value<bool?>("fParameterDiscovery") == true;
+#else
+            const bool discovery = false; // a normal build never honours the key, whatever a reloaded journal holds
+#endif
             // An exact shape keeps anything else, such as a credential, out of the preview and journal.
             if (payload.Count != 2 || !(payload["parameters"] is JArray)) throw new BridgeException("InvalidRequest", "payload must contain exactly safetyAcknowledged and parameters.");
             RequireChangeBool(payload, "safetyAcknowledged");
@@ -126,7 +171,7 @@ namespace TiaMcp.Openness.V21
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "F-I/O lookup is incomplete.");
             // Every F-I/O not provably on another F-source; an unreadable F-source counts, so the collision check stays conservative.
-            var fIo = hardware.Where(entry => entry.Item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress")).Where(entry =>
+            var fIo = hardware.Where(entry => IsFIo(entry.Item)).Where(entry =>
                 { var source = FailsafeValue(entry.Item, "Failsafe_FSourceAddress"); return source?.Type != JTokenType.Integer || JToken.DeepEquals(source, central); }).ToArray();
             var targets = new List<(HardwareEntry Entry, string Name, object Value)>();
             var result = new JArray();
@@ -135,7 +180,7 @@ namespace TiaMcp.Openness.V21
                 var row = token as JObject;
                 if (row == null || row.Count != 4 || row["expected"] == null || row["value"] == null) throw new BridgeException("InvalidRequest", "Each F-parameter write needs exactly hardwarePath, name, expected and value.");
                 string path = ChangeText(row, "hardwarePath", 4096), name = ChangeText(row, "name", 128);
-                if (!FParameterWriteAttributes.Contains(name)) throw new BridgeException("UnsupportedAttribute", "F-parameter is outside the reviewed write subset (Failsafe_FDestinationAddress, Failsafe_FMonitoringtime): " + name);
+                if (FParameterAllowlistRules.Denied(name)) throw new BridgeException("UnsupportedAttribute", "F-source addresses, signatures, SIL/CRC/version, F-I/O DB assignment and non-F-parameters are never written: " + name);
                 if (targets.Any(target => target.Entry.Path == path && target.Name == name)) throw new BridgeException("InvalidRequest", "Duplicate F-parameter write: " + path + " " + name);
                 var entry = fIo.FirstOrDefault(item => item.Path == path) ?? throw new BridgeException("HardwareNotFound", "hardwarePath does not select an F-I/O device item on this safety PLC's F-source address: " + path);
                 if (!JToken.DeepEquals(FailsafeValue(entry.Item, "Failsafe_FSourceAddress"), central)) throw new BridgeException("UnresolvedSafetyOwnership", "The F-source address of the F-I/O is unreadable: " + path);
@@ -145,6 +190,12 @@ namespace TiaMcp.Openness.V21
                 var infos = entry.Item.GetAttributeInfos().Where(info => info.Name == name).Take(2).ToArray();
                 if (infos.Length != 1 || (infos[0].AccessMode & EngineeringAttributeAccessMode.Read) == 0 || (infos[0].AccessMode & EngineeringAttributeAccessMode.Write) == 0)
                     throw new BridgeException("AttributeNotWritable", "The F-I/O must declare " + name + " once as readable and writable: " + path);
+                string module = FIoModuleTypeIdentifier(entry.Item);
+                var qualification = FParameterAllowlistRules.Row(FParameterAllowlist.Value, module, name);
+                if (!FParameterAllowlistRules.Qualified(qualification) && !discovery)
+                    throw new BridgeException("UnsupportedAttribute", "F-parameter " + name + (qualification == null ? " is not in" : " is pending re-curation in") +
+                        " the qualified allowlist (safety-fparameter-allowlist.v1) for module type " + module + ": " + path,
+                        new JObject { ["hardwarePath"] = path, ["name"] = name, ["moduleTypeIdentifier"] = module, ["allowlistRow"] = qualification });
                 object before = entry.Item.GetAttribute(name) ?? throw new BridgeException("AttributeTypeUnknown", "F-parameter has no native value: " + name);
                 if (!JToken.DeepEquals(ChangeScalar(before), row["expected"]))
                     throw new BridgeException(write ? "PreviewStale" : "ExpectedValueMismatch", "The current value of " + name + " differs from expected; nothing was written.",
@@ -155,6 +206,7 @@ namespace TiaMcp.Openness.V21
                 row["value"] = ChangeScalar(value);
                 targets.Add((entry, name, value));
                 result.Add(new JObject { ["hardwarePath"] = path, ["name"] = name, ["type"] = before.GetType().FullName, ["before"] = ChangeScalar(before), ["after"] = row["value"].DeepClone(),
+                    ["moduleTypeIdentifier"] = module, ["qualification"] = FParameterAllowlistRules.Qualified(qualification) ? qualification : new JObject { ["discovery"] = true, ["allowlistRow"] = qualification },
                     ["fParameterSignatures"] = FParameterSignatures(entry.Item) });
             }
             foreach (var target in targets.Where(target => target.Name == "Failsafe_FDestinationAddress"))

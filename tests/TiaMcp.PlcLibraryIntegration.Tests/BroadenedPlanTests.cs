@@ -32,11 +32,11 @@ internal static class BroadenedPlanTests
             Equal(2, ((JArray)p["steps"]).Count); Equal(null, p["steps"][1]["planOnly"]); Compile(p, f.Caller);
         });
 
-        test("multi-instance plan creates a static member in the FB caller and is plan-only", () => {
+        test("multi-instance plan creates a static member in the FB caller with no planOnly step", () => {
             var f = Multi(); var p = f.Build(); var typed = Typed(p); TypedGraphicalPayload.Validate(typed);
             Equal("createMulti", typed["instances"][0].Value<string>("kind")); Equal("Motor1", typed["instances"][0].Value<string>("name"));
             Equal("\"Motor\"", p["multiInstance"].Value<string>("dataType")); Equal(null, p["instanceDb"]);
-            Equal("ComponentMultiInstanceUnqualified", Codes(p["steps"][1])); Equal(null, p["steps"][0]["planOnly"]);
+            Equal(null, p["steps"][1]["planOnly"]); Equal(null, p["steps"][0]["planOnly"]);
         });
         test("multi-instance needs an FB caller", () => Reject("UnsupportedIntegrationCaller", Multi(), f => { f.Caller.Root.Element("SW.Blocks.FB").Name = "SW.Blocks.FC"; f.Inventory["objects"][0]["kind"] = "FC"; }));
         test("existing caller member is not adopted as a multi-instance", () => Reject("DeclarationCollision", Multi(), f => f.Payload["integration"]["multiInstance"]["name"] = "existing"));
@@ -57,9 +57,9 @@ internal static class BroadenedPlanTests
             Equal(1, ((JArray)p["steps"]).Count); Equal(1, p["steps"][0].Value<int>("order")); Equal("graphical_typed_edit", p["steps"][0].Value<string>("kind"));
             Equal("existingGlobal", typed["instances"][0].Value<string>("kind")); Equal("/plc/blocks/Motor_1", typed["instances"][0].Value<string>("blockPath"));
             Equal(true, p["instanceDb"].Value<bool>("reused")); Equal("/plc/blocks/Motor_1", p["reuse"].Value<string>("instanceDbPath")); Equal(true, p["fb"].Value<bool>("reused"));
-            Equal("ComponentRecoveryAnchorUnavailable", Codes(p["steps"][0]));
+            Equal("ComponentInstanceReuseUnqualified", Codes(p["steps"][0]));
         });
-        test("reused FB with a new instance DB keeps createGlobal", () => { var p = ReusedRoot().Build(); Equal("createGlobal", Typed(p)["instances"][0].Value<string>("kind")); Equal(2, p["instanceDb"].Value<int>("provisionalNumber")); });
+        test("reused FB with a new instance DB keeps createGlobal in one typed step", () => { var p = ReusedRoot().Build(); Equal("createGlobal", Typed(p)["instances"][0].Value<string>("kind")); Equal(2, p["instanceDb"].Value<int>("provisionalNumber")); Equal(1, ((JArray)p["steps"]).Count); Equal(null, p["steps"][0]["planOnly"]); });
         test("instance DB with unproven users is not reused", () => Reject("InstanceUseUnproven", ReusedRoot(), f => InstanceDb(f, null)));
         test("instance DB already used elsewhere is not reused", () => Reject("InstanceAlreadyUsed", ReusedRoot(), f => InstanceDb(f, new JArray("/plc/blocks/Other"))));
         test("same-name DB of another FB is not reused", () => Reject("LibraryConflict", ReusedRoot(), f => { InstanceDb(f, new JArray()); f.Inventory["objects"].Last["instanceOfName"] = "Other"; }));
@@ -97,35 +97,125 @@ internal static class BroadenedPlanTests
         });
 
         // Production combined apply (on every Host since 29 October 2026) admits only the natively verified shapes.
-        static string Refusal(Fixture f) => PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller);
+        static string Refusal(Fixture f, bool candidates = false) => PlcComponentQualificationGate.CombinedApplyRefusal(new JObject { ["payload"] = f.Payload, ["integrationPlan"] = f.Build() }, f.Caller, candidates);
+        static string Features(Fixture f) => string.Join(",", PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller).Properties().Select(p => p.Name));
         static Fixture Titled(string networks, int title) { var f = new Fixture(); f.Caller = XDocument.Parse("<Document><SW.Blocks.FC ID=\"0\"><AttributeList><Name>Main</Name><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList><ObjectList>" + networks + "<MultilingualText ID=\"" + title + "\" CompositionName=\"Title\" /></ObjectList></SW.Blocks.FC></Document>"); f.Payload["integration"]["caller"]["insertAfterNetworkId"] = "1"; return f; }
         static Fixture Ob() { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.OB"; f.Inventory["objects"][0]["kind"] = "OB"; return f; }
         test("combined apply admits the verified existing FBD FC caller", () => Equal(null, Refusal(new Fixture())));
         test("combined apply admits the verified standalone FBD FC", () => { var f = new Fixture(); f.Standalone("FBD"); Equal(null, Refusal(f)); });
         const string Unit1 = "<SW.Blocks.CompileUnit ID=\"1\"><AttributeList><ProgrammingLanguage>FBD</ProgrammingLanguage></AttributeList></SW.Blocks.CompileUnit>";
         test("combined apply admits insertion after the last network with shifted title IDs", () => Equal(null, Refusal(Titled(Unit1, 2))));
-        test("combined apply refuses insertion before another network", () => Equal(true, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3)).StartsWith("Only insertion after", StringComparison.Ordinal)));
+        test("combined apply admits the verified insertion before another network", () => Equal(null, Refusal(Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3))));
         test("combined apply refuses OB insertion by name", () => Equal(true, Refusal(Ob()).StartsWith("OB insertion is refused", StringComparison.Ordinal)));
+        Func<Fixture> ladExisting = () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
+        Func<Fixture> fbCaller = () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; };
+        Func<Fixture> ladFb = () => { var f = fbCaller(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
+        Func<Fixture> ladEarlier = () => { var f = Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; };
+        // Passed natively on 31 October (local.library_integrate.candidate_shapes.rerun.20261031): each exact single-feature shape runs in production.
         foreach (var (name, shape) in new (string, Func<Fixture>)[] {
-            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }),
-            ("existing LAD FC", () => { var f = new Fixture(); f.Caller.Descendants("ProgrammingLanguage").ToList().ForEach(e => e.Value = "LAD"); f.Inventory["objects"][0]["language"] = "LAD"; return f; }),
-            ("FB caller", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Name = "SW.Blocks.FB"; f.Inventory["objects"][0]["kind"] = "FB"; return f; }),
-            ("multi-instance", Multi), ("software unit", Unit), ("DB-member binding", DbMember), ("UDT tag member", TagMember), ("reused FB", ReusedRoot),
+            ("standalone LAD FC", () => { var f = new Fixture(); f.Standalone("LAD"); return f; }), ("existing LAD FC", ladExisting), ("FB caller", fbCaller),
+            ("reused FB", ReusedRoot), ("insertion before another network", () => Titled(Unit1 + Unit1.Replace("\"1\"", "\"2\""), 3)) })
+        {
+            test("combined apply admits the verified " + name + " in production", () => { Equal(null, Refusal(shape())); Equal("", Features(shape())); });
+        }
+        // Candidate shapes: each has a builder but no native evidence, so only a qualification Host's owned scratch admits it.
+        foreach (var (name, shape, features) in new (string, Func<Fixture>, string)[] {
+            ("multi-instance", Multi, "fbCaller,multiInstance"), ("LAD FB caller", ladFb, "ladCaller,fbCaller"), ("LAD FC with an earlier placement", ladEarlier, "ladCaller,earlierPlacement") })
+        {
+            test("combined apply refuses candidate " + name + " in production", () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
+            test("qualification Host admits candidate " + name, () => { Equal(null, Refusal(shape(), true)); Equal(features, Features(shape())); });
+        }
+        foreach (var (name, shape) in new (string, Func<Fixture>)[] {
+            ("software unit", Unit), ("DB-member binding", DbMember), ("UDT tag member", TagMember),
+            ("reused instance DB", () => { var f = ReusedRoot(); InstanceDb(f, new JArray()); return f; }),
             ("reused dependency", () => { var f = new Fixture(); f.AddDependency(); Add(f, "MotorState", "/plc/types/MotorState", "UDT"); Prove(f, 1); return f; }),
-            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }) })
-            test("combined apply refuses " + name, () => { if (Refusal(shape()) == null) throw new Exception("Unverified shape admitted."); });
+            ("planner blocker", () => { var f = new Fixture(); f.Caller.Root.Element("SW.Blocks.FC").Element("ObjectList").Add(new XElement("MultilingualText", new XAttribute("ID", "9"))); return f; }),
+            ("OB caller", Ob) })
+            test("combined apply refuses " + name + " even on a qualification Host", () => { if (Refusal(shape(), true) == null) throw new Exception("Shape without a builder admitted."); });
+        // A shape opens as its exact feature combination; verified single features never open their combinations.
+        test("verified shapes open exact feature combinations only", () => {
+            JObject Unverified(Fixture f, params string[] shapes) => PlcComponentQualificationGate.UnverifiedFeatures(f.Build(), f.Payload, f.Caller, shapes);
+            Equal(0, Unverified(ladExisting(), "ladCaller").Count); Equal(1, Unverified(ladExisting(), "fbCaller").Count);
+            Equal("fbCaller+multiInstance", PlcComponentQualificationGate.ShapeKey(Unverified(Multi())));
+            Equal(2, Unverified(Multi(), "fbCaller", "multiInstance").Count); Equal(0, Unverified(Multi(), "fbCaller+multiInstance").Count);
+            Equal(2, Unverified(Multi(), "multiInstance+fbCaller").Count);
+        });
+        test("verified shapes have no candidate features", () => { Equal("", Features(new Fixture())); var f = new Fixture(); f.Standalone("FBD"); Equal("", Features(f)); Equal("", Features(Titled(Unit1, 2))); });
+        test("candidate refusals name the first unverified feature, else the unverified combination", () => {
+            Equal("Only new global instance DBs are verified; multi-instances stay plan-only.", Refusal(Multi()));
+            Equal("The combination fbCaller+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladFb()));
+            Equal("The combination earlierPlacement+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladEarlier()));
+        });
         test("combined apply refuses PLC/HMI recipes and missing plans", () => {
             var f = new Fixture(); var preview = new JObject { ["payload"] = f.Payload.DeepClone(), ["integrationPlan"] = f.Build() };
             preview["payload"]["action"] = PlcHmiIntegrationPlanner.InstallAction;
             Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(preview, f.Caller) == null); Equal(false, PlcComponentQualificationGate.CombinedApplyRefusal(new JObject(), null) == null);
         });
-        test("combined apply names each coordinator step", () => Equal("apply_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("graphical_prepared")));
+        test("combined apply names each coordinator step", () => {
+            Equal("apply_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("graphical_prepared"));
+            Equal("prepare_library_instantiate", PlcComponentQualificationGate.CombinedApplyStep("created")); Equal("prepare_graphical_typed_edit", PlcComponentQualificationGate.CombinedApplyStep("created", true));
+        });
         // Decided before the claim, so step 1 never imports and saves a component that step 2 must refuse (30 October review).
         test("combined apply admits only de-DE-only projects before the claim", () => {
             Equal(null, PlcComponentQualificationGate.CombinedApplyLanguageRefusal(["de-DE"], "de-DE", "de-DE"));
             foreach (var (active, reference, editing) in new[] { (new[] { "de-DE", "en-US" }, "de-DE", "de-DE"), (new[] { "en-US" }, "en-US", "en-US"),
                          (new[] { "de-DE" }, "de-DE", "en-US"), (Array.Empty<string>(), null, null), (null, "de-DE", "de-DE") })
                 Equal(true, PlcComponentQualificationGate.CombinedApplyLanguageRefusal(active, reference, editing)?.StartsWith("Only de-DE-only projects", StringComparison.Ordinal));
+        });
+        // 31 October native finding: the FB caller fixture took FB2, the component FB imported as FB3, and the captured profile
+        // refused after the import was saved. An occupied number is now refused before the claim.
+        XDocument Version(string kind, string name, string number) => XDocument.Parse("<Document><SW.Blocks.CodeBlockLibraryTypeVersion ID=\"0\"><ObjectList><SW.Blocks." + kind +
+            " ID=\"1\" CompositionName=\"ContentObject\"><AttributeList><Name>" + name + "</Name>" + (number == null ? "" : "<Number>" + number + "</Number>") + "</AttributeList></SW.Blocks." + kind + "></ObjectList></SW.Blocks.CodeBlockLibraryTypeVersion></Document>");
+        var udt = XDocument.Parse("<Document><SW.Types.PlcTypeLibraryTypeVersion ID=\"0\"><ObjectList><SW.Types.PlcStruct ID=\"1\"><AttributeList><Name>State</Name></AttributeList></SW.Types.PlcStruct></ObjectList></SW.Types.PlcTypeLibraryTypeVersion></Document>");
+        JObject Block(string kind, int number, string path) => new JObject { ["kind"] = kind, ["number"] = number, ["path"] = path };
+        test("combined apply refuses an import whose block number is occupied, naming the block", () => {
+            var refusal = PlcComponentQualificationGate.CombinedApplyNumberRefusal([udt, Version("FB", "Gate", "2")], [Block("OB", 2, "/plc/blocks/Main2"), Block("FC", 2, "/plc/blocks/Peer"), Block("FB", 2, "/plc/blocks/Host")], "Gate", 2);
+            Equal("ComponentBlockNumberOccupied", refusal.Value<string>("code")); Equal("/plc/blocks/Host", refusal.Value<string>("conflictingBlock"));
+            Equal(true, refusal.Value<string>("message").Contains("FB2 is already used by /plc/blocks/Host") && refusal.Value<string>("message").Contains("captured instance profile"));
+            Equal(null, PlcComponentQualificationGate.CombinedApplyNumberRefusal([udt, Version("FB", "Gate", "2")], [Block("FB", 1, "/plc/blocks/Other"), Block("FC", 2, "/plc/blocks/Peer"), Block("DB", 2, "/plc/blocks/Data")], "Gate", 2));
+            Equal("ComponentBlockNumberOccupied", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FC", "Helper", "7")], [Block("FC", 7, "/plc/blocks/X")]).Value<string>("code"));
+        });
+        test("combined apply refuses an FB the captured profile binds to another number, or without a number", () => {
+            Equal("CapturedStorageProfileUnavailable", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "5")], [], "Gate", 2).Value<string>("code"));
+            Equal(null, PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Other", "5")], [], "Gate", 2));
+            Equal("ComponentBlockNumberUnknown", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", null)], [], "Gate", 2).Value<string>("code"));
+            // Without a captured context the profile's FB name binds no number, and an occupied number names no profile.
+            Equal(null, PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "5")], [], "Gate", null));
+            var occupied = PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "5")], [Block("FB", 5, "/plc/blocks/Host")], "Gate", null);
+            Equal("ComponentBlockNumberOccupied", occupied.Value<string>("code")); Equal(false, occupied.Value<string>("message").Contains("captured instance profile"));
+        });
+        // Why the refusal runs only before the claim: after a combined apply the installed FB occupies its own number.
+        test("an installed component's own FB number would be refused, so only unclaimed changes are checked", () =>
+            Equal("/plc/blocks/Gate", PlcComponentQualificationGate.CombinedApplyNumberRefusal([Version("FB", "Gate", "2")], [Block("FB", 2, "/plc/blocks/Gate")], "Gate", 2).Value<string>("conflictingBlock")));
+        // 31 October native finding: the nested layout put the import archive at 164 characters under a 51-character root; now 121.
+        test("combined apply steps live in a short workspace whose archive path fits TIA's limit for a normal Host root", () => {
+            string id = "lib-05d85a3573b8471db3ded20b4118bb2b", root51 = @"D:\Entwicklung\TIA_MCP-public\artifacts\ic1\ie6fdb2";
+            string workspace = PlcComponentQualificationGate.CombinedApplyWorkspace(Path.Combine(root51, "changes", "change-" + id), id);
+            Equal(Path.Combine(root51, "changes", "c", "05d85a35"), workspace); Equal(121, PlcComponentQualificationGate.CombinedApplyArchivePathLength(workspace));
+            string root60 = @"C:\Users\someone\AppData\Local\TiaMcp\artifacts\run-00000001"; Equal(60, root60.Length);
+            var fits = PlcComponentQualificationGate.CombinedApplyWorkspace(Path.Combine(root60, "changes", "change-" + id), id);
+            const string scratch = "TiaMcpScratch_20261031_150445_6d8af7f2";
+            Equal(130, PlcComponentQualificationGate.CombinedApplyArchivePathLength(fits)); Equal(null, PlcComponentQualificationGate.CombinedApplyPathRefusal(Path.Combine(root60, "changes", "change-" + id), id, scratch));
+            string root80 = root60 + new string('x', 20);
+            var refusal = PlcComponentQualificationGate.CombinedApplyPathRefusal(Path.Combine(root80, "changes", "change-" + id), id, scratch);
+            Equal("ComponentPathTooLong", refusal.Value<string>("code")); Equal(150, refusal.Value<int>("length")); Equal(150, refusal.Value<int>("archivePathLength"));
+            Equal(true, refusal.Value<string>("message").StartsWith("The step checkpoint archive path would be 150 characters", StringComparison.Ordinal));
+        });
+        // change_restore retrieves into <changes>/lr_<10 hex>/<project>; a long project name binds before the step archive does.
+        test("combined apply refuses a recovery directory over TIA's limit before the claim", () => {
+            string id = "lib-05d85a3573b8471db3ded20b4118bb2b", root73 = @"C:\Users\someone\AppData\Local\TiaMcp\artifacts\run-00000001" + new string('y', 13);
+            string plan = Path.Combine(root73, "changes", "change-" + id);
+            Equal(143, PlcComponentQualificationGate.CombinedApplyArchivePathLength(PlcComponentQualificationGate.CombinedApplyWorkspace(plan, id)));
+            Equal(134, PlcComponentQualificationGate.CombinedApplyRecoveryPathLength(plan, "TiaMcpScratch_20261031_150445_6d8af7f2"));
+            Equal(null, PlcComponentQualificationGate.CombinedApplyPathRefusal(plan, id, "TiaMcpScratch_20261031_150445_6d8af7f2"));
+            var refusal = PlcComponentQualificationGate.CombinedApplyPathRefusal(plan, id, new string('P', 48));
+            Equal("ComponentPathTooLong", refusal.Value<string>("code")); Equal(144, refusal.Value<int>("recoveryPathLength")); Equal(144, refusal.Value<int>("length"));
+            Equal(true, refusal.Value<string>("message").StartsWith("The recovered project directory of change_restore would be 144 characters", StringComparison.Ordinal));
+        });
+        test("reuse records an ignored version-comment difference in the plan", () => {
+            var f = ReusedRoot(); f.Inventory["reusedVersions"][0]["ignoredDifferences"] = new JArray(new JObject { ["description"] = "Version comment", ["status"] = "ObjectsDifferent" });
+            var p = f.Build(); Equal("Version comment", p["reuse"]["versions"][0]["ignoredDifferences"][0].Value<string>("description"));
+            Equal(0, ((JArray)ReusedRoot().Build()["reuse"]["versions"][0]["ignoredDifferences"]).Count);
         });
         test("combined apply needs an instance profile covering the planned FB before the claim", () => {
             var callee = new Fixture().Fb; callee.Root.Element("SW.Blocks.FB").Element("AttributeList").Add(new XElement("MemoryLayout", "Optimized"));

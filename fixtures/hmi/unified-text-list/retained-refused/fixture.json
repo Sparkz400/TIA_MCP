@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "retained-refused-text-lists.v1",
+  "producer": "Actual Host stores of runs artifacts/q/tl2 (commit 52d440a) and artifacts/q/tl3 (commit 6886526), published before hmi_text_list_author refused content V21 changes (commit 47491ab). Synthetic qualification content.",
+  "records": [
+    {
+      "recordId": "05503222e610d1ad1aa1d70f865bed8004d7bd592ff388714404869f19839f81",
+      "run": "artifacts/q/tl2",
+      "expectedCode": "HmiTextListValueOutOfRange",
+      "lists": [
+        "EntryTypes",
+        "Int32Bounds",
+        "BeyondInt32",
+        "BoolDefault",
+        "BitDefault"
+      ]
+    },
+    {
+      "recordId": "0af9783b52b7aabda541894882d8544ce27a6d09f49b94e368fdd0a0e262769b",
+      "run": "artifacts/q/tl2",
+      "expectedCode": "HmiTextListNameUnsupported",
+      "lists": [
+        "Plain_Name1",
+        "Name with space",
+        "Umlaut_Ä",
+        "Unicode_日本語",
+        "Dot.Name",
+        "Colon:Name",
+        "Hash#Name",
+        "Quote\"Name",
+        "Bracket[Name]",
+        "Dash-Name"
+      ]
+    },
+    {
+      "recordId": "44b37aae8eae6a4b7991a1fd366f56e717fa3ef8d101008e30be3a83ec875eb6",
+      "run": "artifacts/q/tl2",
+      "expectedCode": "HmiTextListTextUnsupported",
+      "lists": [
+        "TextChars",
+        "NulText",
+        "SeparatorText"
+      ]
+    },
+    {
+      "recordId": "02cfd8c2736811541d95d2af906772f39456b555b6efc037c1db15a86b8e4566",
+      "run": "artifacts/q/tl3",
+      "expectedCode": "HmiTextListDefaultEntryValue",
+      "lists": [
+        "Unicode 日本語 quoted-name",
+        "Bool",
+        "BitNumber"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "hmi-component-reviews/05503222e610d1ad1aa1d70f865bed8004d7bd592ff388714404869f19839f81.author.json",
+      "bytes": 1298,
+      "sha256": "05503222e610d1ad1aa1d70f865bed8004d7bd592ff388714404869f19839f81"
+    },
+    {
+      "path": "hmi-component-reviews/af0eda759717ec59bfd81020091315aca322af790c21a6989457c285d77eae92.author-input",
+      "bytes": 1785,
+      "sha256": "af0eda759717ec59bfd81020091315aca322af790c21a6989457c285d77eae92"
+    },
+    {
+      "path": "hmi-component-reviews/1ecd51f2e7c98dc8b42644f853d1480d5038a02369ed0805d71ff484ae89ea04.candidate",
+      "bytes": 2557,
+      "sha256": "1ecd51f2e7c98dc8b42644f853d1480d5038a02369ed0805d71ff484ae89ea04"
+    },
+    {
+      "path": "hmi-component-reviews/9d6173a0b7d1eca3b9aeb920940408a7dfd73b273a152c4411582fedea3089e9.candidate",
+      "bytes": 223,
+      "sha256": "9d6173a0b7d1eca3b9aeb920940408a7dfd73b273a152c4411582fedea3089e9"
+    },
+    {
+      "path": "hmi-component-reviews/0af9783b52b7aabda541894882d8544ce27a6d09f49b94e368fdd0a0e262769b.author.json",
+      "bytes": 1297,
+      "sha256": "0af9783b52b7aabda541894882d8544ce27a6d09f49b94e368fdd0a0e262769b"
+    },
+    {
+      "path": "hmi-component-reviews/6cf690edc608d70628d5145d4ce9015d5697a5a25852a5c8766bc945adb94c8a.author-input",
+      "bytes": 1929,
+      "sha256": "6cf690edc608d70628d5145d4ce9015d5697a5a25852a5c8766bc945adb94c8a"
+    },
+    {
+      "path": "hmi-component-reviews/a16493721d0bb066b5da277ac314ba473ec3b9facb8bba45c69c5aed138614a8.candidate",
+      "bytes": 2638,
+      "sha256": "a16493721d0bb066b5da277ac314ba473ec3b9facb8bba45c69c5aed138614a8"
+    },
+    {
+      "path": "hmi-component-reviews/ef94ba074deebb132b471d509378691d093f1a433d474e6d65e60355e8d65339.candidate",
+      "bytes": 220,
+      "sha256": "ef94ba074deebb132b471d509378691d093f1a433d474e6d65e60355e8d65339"
+    },
+    {
+      "path": "hmi-component-reviews/44b37aae8eae6a4b7991a1fd366f56e717fa3ef8d101008e30be3a83ec875eb6.author.json",
+      "bytes": 1296,
+      "sha256": "44b37aae8eae6a4b7991a1fd366f56e717fa3ef8d101008e30be3a83ec875eb6"
+    },
+    {
+      "path": "hmi-component-reviews/c60ee62298339efbf757ca8e8f92a85168a60acc00549432f6a3c876c427bd36.author-input",
+      "bytes": 1850,
+      "sha256": "c60ee62298339efbf757ca8e8f92a85168a60acc00549432f6a3c876c427bd36"
+    },
+    {
+      "path": "hmi-component-reviews/37c67e6908c16c1334159dd9bfac32a18a521b61b3857d735116db84ea4440a4.candidate",
+      "bytes": 1663,
+      "sha256": "37c67e6908c16c1334159dd9bfac32a18a521b61b3857d735116db84ea4440a4"
+    },
+    {
+      "path": "hmi-component-reviews/329b4769bdec6949c65c7f73cd6ed611a05d136bdf7a1b825080c6202d69668b.candidate",
+      "bytes": 888,
+      "sha256": "329b4769bdec6949c65c7f73cd6ed611a05d136bdf7a1b825080c6202d69668b"
+    },
+    {
+      "path": "hmi-component-reviews/02cfd8c2736811541d95d2af906772f39456b555b6efc037c1db15a86b8e4566.author.json",
+      "bytes": 1320,
+      "sha256": "02cfd8c2736811541d95d2af906772f39456b555b6efc037c1db15a86b8e4566"
+    },
+    {
+      "path": "hmi-component-reviews/03004e9f14ece6b928c81363ffe633a0f1a0a9880b6fb1afc45d6aa18f976266.author-input",
+      "bytes": 1420,
+      "sha256": "03004e9f14ece6b928c81363ffe633a0f1a0a9880b6fb1afc45d6aa18f976266"
+    },
+    {
+      "path": "hmi-component-reviews/6d39f6662ff4ab1ac417b5b703fb9440b37cf8d79a9d397ab87d94bef7edbafb.candidate",
+      "bytes": 1647,
+      "sha256": "6d39f6662ff4ab1ac417b5b703fb9440b37cf8d79a9d397ab87d94bef7edbafb"
+    },
+    {
+      "path": "hmi-component-reviews/f9c482ef5977166f1cd9d2d56d016d7e7c27adf6dd9deaf2ce6a6cca0ac8fa87.candidate",
+      "bytes": 396,
+      "sha256": "f9c482ef5977166f1cd9d2d56d016d7e7c27adf6dd9deaf2ce6a6cca0ac8fa87"
+    }
+  ]
+}

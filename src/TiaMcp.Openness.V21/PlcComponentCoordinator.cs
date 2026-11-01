@@ -86,10 +86,10 @@ namespace TiaMcp.Openness.V21
                 if (state == "installation_verified") return record;
                 if (record.Value<string>("sessionToken") != _operations.SessionToken) Fail("ComponentFreshSessionRequired", "Prepared native handles expired. Reconcile dispatched outcomes read-only and retain the initial checkpoint; automatic continuation in a new session is unavailable.");
                 if (state == "dispatching_library" || state == "dispatching_graphical" || state == "outcome_unknown") Fail("ComponentOutcomeUnknown", "A dispatched operation must be reconciled, never replayed.");
-                if (state == "created") return Prepare(record, "library", 0);
+                if (state == "created") return Reused(record) ? Prepare(record, "graphical") : Prepare(record, "library");
                 if (state == "library_prepared") return Apply(record, "library", approvedStepPreviewHash);
                 if (state == "library_applied") return Verify(record, false);
-                if (state == "import_verified") return Prepare(record, "graphical", 1);
+                if (state == "import_verified") return Prepare(record, "graphical");
                 if (state == "graphical_prepared") return Apply(record, "graphical", approvedStepPreviewHash);
                 if (state == "graphical_applied") return Verify(record, true);
                 Fail("ComponentRecoveryRequired", "The coordinator stopped at " + state + ". Inspect its durable evidence and initial checkpoint. It cannot repeat failed stages.");
@@ -97,7 +97,11 @@ namespace TiaMcp.Openness.V21
             }
         }
 
-        private JObject Prepare(JObject record, string step, int index)
+        // A reused FB has no import step: its one typed step is index 0 and its own checkpoint anchors recovery.
+        private static bool Reused(JObject record) => record["contract"]["plan"]["fb"]?.Value<bool?>("reused") == true;
+        private static int StepIndex(JObject record, string step) => step == "library" ? 0 : ((JArray)record["contract"]["plan"]["steps"]).Count - 1;
+
+        private JObject Prepare(JObject record, string step)
         {
             try
             {
@@ -111,7 +115,7 @@ namespace TiaMcp.Openness.V21
                     ValidateImportEvidence(record, latest); ValidateOriginalCaller(record, latest);
                     record["preTypedEvidence"] = latest.DeepClone();
                 }
-                var arguments = (JObject)record["contract"]["plan"]["steps"][index]["prepareArguments"].DeepClone();
+                var arguments = (JObject)record["contract"]["plan"]["steps"][StepIndex(record, step)]["prepareArguments"].DeepClone();
                 var prepared = _operations.Prepare(arguments);
                 ValidatePrepared(record, step, prepared);
                 record[step]["prepared"] = prepared.DeepClone(); record[step]["prepareArguments"] = arguments;
@@ -120,7 +124,8 @@ namespace TiaMcp.Openness.V21
             }
             catch (Exception error)
             {
-                record["state"] = step == "library" ? "preparation_failed" : "recovery_required";
+                // Before the first dispatch nothing changed, so a failed preparation needs no recovery.
+                record["state"] = record["library"]["dispatch"] == null ? "preparation_failed" : "recovery_required";
                 record["failure"] = Failure(error); Write(record, step + "_prepare_failed"); throw;
             }
         }
@@ -168,6 +173,7 @@ namespace TiaMcp.Openness.V21
                 Write(record, step + "_status_observed");
                 ValidateReceiptIdentity(prepared, observed);
                 if (step == "library") CaptureInitialCheckpoint(record, observed, false);
+                else if (Reused(record)) CaptureTypedCheckpoint(record, observed["journal"] as JObject ?? observed, false);
                 string nativeState = (observed.Value<string>("state") ?? observed["journal"]?.Value<string>("state"));
                 if (nativeState == "applied")
                 {
@@ -196,11 +202,21 @@ namespace TiaMcp.Openness.V21
                 ValidateImportEvidence(record, evidence);
                 if (installed)
                 {
-                    var effect = ((JArray)record["graphical"]["prepared"]["preview"]["effects"]).Single(e => e.Value<string>("action") == "createInstanceDB");
-                    var instance = evidence["instance"] as JObject;
-                    if (instance == null || instance.Value<string>("path") != effect.Value<string>("path") || instance.Value<int?>("number") != effect.Value<int?>("number") || instance.Value<string>("instanceOfName") != effect.Value<string>("instanceOfName") || evidence.Value<bool?>("callerMatchesPrepared") != true || evidence.Value<bool?>("instanceMatchesPrepared") != true)
-                        Fail("ComponentReadbackMismatch", "Caller or exact instance identity/content differs from the freshly prepared typed result.");
-                    RequireHash(evidence.Value<string>("callerSha256")); RequireHash(instance.Value<string>("contentSha256"));
+                    if (contract["plan"]["multiInstance"] is JObject multi)
+                    {
+                        var member = evidence["multiInstance"] as JObject;
+                        if (member == null || member.Value<string>("callerPath") != multi.Value<string>("callerPath") || member.Value<string>("name") != multi.Value<string>("name") || member.Value<string>("dataType") != multi.Value<string>("dataType") || evidence.Value<bool?>("callerMatchesPrepared") != true || evidence["instance"] != null)
+                            Fail("ComponentReadbackMismatch", "Caller or its exact new multi-instance member differs from the freshly prepared typed result.");
+                    }
+                    else
+                    {
+                        var effect = ((JArray)record["graphical"]["prepared"]["preview"]["effects"]).Single(e => e.Value<string>("action") == "createInstanceDB");
+                        var instance = evidence["instance"] as JObject;
+                        if (instance == null || instance.Value<string>("path") != effect.Value<string>("path") || instance.Value<int?>("number") != effect.Value<int?>("number") || instance.Value<string>("instanceOfName") != effect.Value<string>("instanceOfName") || evidence.Value<bool?>("callerMatchesPrepared") != true || evidence.Value<bool?>("instanceMatchesPrepared") != true)
+                            Fail("ComponentReadbackMismatch", "Caller or exact instance identity/content differs from the freshly prepared typed result.");
+                        RequireHash(instance.Value<string>("contentSha256"));
+                    }
+                    RequireHash(evidence.Value<string>("callerSha256"));
                     if (PlcLibraryIntegrationPlanner.CreatesStandaloneCaller((JObject)contract["payload"]) &&
                         (evidence.Value<bool?>("callerExists") != true || evidence.Value<string>("callerPath") != PlcLibraryIntegrationPlanner.CallerPath((JObject)contract["payload"]) ||
                          evidence["caller"]?.Value<string>("kind") != "FC" || evidence["caller"]?.Value<string>("language") != contract["payload"]["integration"]["caller"].Value<string>("language")))
@@ -235,6 +251,13 @@ namespace TiaMcp.Openness.V21
                     Fail("ComponentReadbackMismatch", "Strict dependency raw content differs; no content policy applies.");
             }
             if (!JToken.DeepEquals(evidence["mappings"], contract["plan"]["mappings"])) Fail("ComponentReadbackMismatch", "Mapped native tag paths, names, types or addresses changed.");
+            // The root FB has exactly one use, the planned block, and keeps the block number of its first readback.
+            var fb = (JObject)contract["plan"]["fb"]; var root = actual.Single(v => v.Value<string>("typeGuid") == expected.Single(p => p.Value<string>("typeName") == fb.Value<string>("name")).Value<string>("typeGuid"));
+            if (!(root["objectPaths"] is JArray rootPaths) || rootPaths.Count != 1 || (string)rootPaths[0] != fb.Value<string>("path") ||
+                evidence["fb"]?.Value<string>("path") != fb.Value<string>("path") || evidence["fb"]?["number"]?.Type != JTokenType.Integer)
+                Fail("ComponentReadbackMismatch", "The root FB must have exactly one native use, the planned block " + fb.Value<string>("path") + ".");
+            if (record["fbNumber"] != null && record.Value<int>("fbNumber") != evidence["fb"].Value<int>("number")) Fail("ComponentReadbackMismatch", "The root FB's block number changed between readbacks.");
+            record["fbNumber"] = evidence["fb"].Value<int>("number");
         }
 
         private static void ValidateOriginalCaller(JObject record, JObject evidence)
@@ -256,15 +279,21 @@ namespace TiaMcp.Openness.V21
             RequireHash(prepared.Value<string>("previewHash"));
             var preview = prepared["preview"] as JObject;
             if (preview == null || LibraryJournalStore.Hash(preview.ToString(Formatting.None)) != prepared.Value<string>("previewHash")) Fail("ComponentPreparationMismatch", "Prepared preview hash does not bind the returned preview.");
-            int index = step == "library" ? 0 : 1; var arguments = record["contract"]["plan"]["steps"][index]["prepareArguments"];
+            var arguments = record["contract"]["plan"]["steps"][StepIndex(record, step)]["prepareArguments"];
             if (preview.Value<string>("kind") != arguments.Value<string>("kind") || !JToken.DeepEquals(preview["payload"], arguments["payload"])) Fail("ComponentPreparationMismatch", "Preparation changed the exact reviewed step kind or payload.");
             string path = preview.Value<string>("projectPath") ?? preview["project"]?.Value<string>("path");
             if (path != record["contract"].Value<string>("projectPath")) Fail("ComponentPreparationMismatch", "Prepared step belongs to a different project.");
             if (step == "graphical")
             {
-                var effects = preview["effects"] as JArray;
-                var instances = effects?.Where(e => e.Value<string>("action") == "createInstanceDB").ToArray();
-                if (instances == null || instances.Length != 1 || instances[0].Value<string>("name") != record["contract"]["plan"]["instanceDb"].Value<string>("name") || instances[0].Value<string>("path") != record["contract"]["plan"]["instanceDb"].Value<string>("path") || instances[0].Value<int?>("number") == null || instances[0].Value<int?>("number") < 1 || instances[0].Value<int?>("number") > 65535)
+                var effects = preview["effects"] as JArray ?? new JArray();
+                var instances = effects.Where(e => e.Value<string>("action") == "createInstanceDB").ToArray();
+                var members = effects.Where(e => e.Value<string>("action") == "createMultiInstance").ToArray();
+                if (record["contract"]["plan"]["multiInstance"] is JObject multi)
+                {
+                    if (instances.Length != 0 || members.Length != 1 || members[0].Value<string>("callerPath") != multi.Value<string>("callerPath") || members[0].Value<string>("member") != multi.Value<string>("name") || members[0].Value<string>("dataType") != multi.Value<string>("dataType"))
+                        Fail("ComponentPreparationMismatch", "Fresh typed preparation must create exactly the reviewed multi-instance in the caller FB and no instance DB.");
+                }
+                else if (members.Length != 0 || instances.Length != 1 || instances[0].Value<string>("name") != record["contract"]["plan"]["instanceDb"].Value<string>("name") || instances[0].Value<string>("path") != record["contract"]["plan"]["instanceDb"].Value<string>("path") || instances[0].Value<int?>("number") == null || instances[0].Value<int?>("number") < 1 || instances[0].Value<int?>("number") > 65535)
                     Fail("ComponentPreparationMismatch", "Fresh typed preparation must create exactly the reviewed instance DB; its native number is separately reviewed in this preview.");
                 var payload = (JObject)record["contract"]["payload"];
                 if (PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload))
@@ -298,6 +327,7 @@ namespace TiaMcp.Openness.V21
                 var qualification = journal["typedQualification"];
                 if (qualification?.Value<bool?>("engineeringVerified") != true || qualification.Value<bool?>("preservationVerified") != true || qualification.Value<bool?>("saved") != true)
                     Fail("ComponentReadbackMismatch", "Typed step lacks compiler, preservation, instance-readback or save evidence.");
+                if (Reused(record)) CaptureTypedCheckpoint(record, journal);
             }
         }
 
@@ -335,6 +365,26 @@ namespace TiaMcp.Openness.V21
                 ["instructions"] = "Preserve current projects and all journals. Use the first library change's existing change_restore in a new empty owned Portal; never substitute the later typed checkpoint, close user projects, or replay uncertain mutations. Verify fresh-reopen native content independently." };
         }
 
+        // A reused FB's only step is the typed edit, so the archive it takes before its mutation is the initial checkpoint.
+        private static void CaptureTypedCheckpoint(JObject record, JObject journal, bool required = true)
+        {
+            string path = journal.Value<string>("recoveryArchive"), hash = journal.Value<string>("recoveryArchiveSha256");
+            if (path == null && !required) return;
+            var stages = (journal["stages"] as JArray ?? new JArray()).Select(s => (string)s).ToList();
+            int archive = stages.IndexOf("recovery_archive_created"), mutation = stages.IndexOf("mutation_applied");
+            if (archive < 0 || mutation >= 0 && mutation <= archive || required && mutation < 0) Fail("ComponentCheckpointOrderInvalid", "The typed receipt must record its project archive before its mutation.");
+            RequireHash(hash);
+            if (!Path.IsPathRooted(path ?? "") || !File.Exists(path) || FileHash(path) != hash) Fail("ComponentCheckpointInvalid", "The typed step's checkpoint is missing or its bytes changed.");
+            var prepared = record["graphical"]["prepared"];
+            var checkpoint = new JObject { ["kind"] = "project", ["originalPath"] = record["contract"]["projectPath"].DeepClone(), ["archivePath"] = path, ["sha256"] = hash,
+                ["changeId"] = prepared["changeId"].DeepClone(), ["previewHash"] = prepared["previewHash"].DeepClone() };
+            if (record["initialCheckpoint"] != null && !JToken.DeepEquals(checkpoint, record["initialCheckpoint"])) Fail("ComponentCheckpointInvalid", "The initial checkpoint cannot be replaced.");
+            record["initialCheckpoint"] = checkpoint;
+            record["recovery"] = new JObject { ["initialTypedChangeId"] = checkpoint["changeId"].DeepClone(), ["initialPreviewHash"] = checkpoint["previewHash"].DeepClone(),
+                ["archivePath"] = path, ["archiveSha256"] = hash, ["requiresEmptyOwnedPortal"] = true, ["retrievesToNewLocation"] = true, ["automaticRecovery"] = false,
+                ["instructions"] = "Preserve current projects and all journals. The reused FB was not imported, so the typed step's own pre-mutation archive is the initial checkpoint; retrieve it into a new location in an empty owned Portal and never replay uncertain mutations." };
+        }
+
         private static JObject ValidateContract(JObject prepared)
         {
             var preview = prepared?["preview"] as JObject; var plan = preview?["integrationPlan"] as JObject;
@@ -342,20 +392,109 @@ namespace TiaMcp.Openness.V21
                 Fail("InvalidComponentContract", "Coordinator requires the exact hashed plan-only prepared library integration response.");
             if (plan["blockers"] is not JArray blockers || blockers.Count != 0) Fail("ComponentPlanBlocked", "Resolve every planner blocker before preparing a qualification sequence.");
             if (plan["steps"] is JArray proposed && proposed.Any(s => s.Value<bool?>("planOnly") != null)) Fail("ComponentPlanBlocked", "The plan has planOnly steps (see planOnlyReasons); the coordinator cannot dispatch or read them back.");
-            if (plan["steps"] is not JArray steps || steps.Count != 2 || steps[0].Value<string>("kind") != "library_instantiate" || steps[1].Value<string>("kind") != "graphical_typed_edit") Fail("InvalidComponentContract", "Exactly the existing library import and fresh typed edit are allowed.");
+            string[] kinds = plan["fb"]?.Value<bool?>("reused") == true ? new[] { "graphical_typed_edit" } : new[] { "library_instantiate", "graphical_typed_edit" };
+            if (plan["steps"] is not JArray steps || !steps.Select(s => s.Value<string>("kind")).SequenceEqual(kinds)) Fail("InvalidComponentContract", "Exactly the existing library import and fresh typed edit are allowed; a fully reused FB has the typed edit only.");
             if (!Path.IsPathRooted(preview.Value<string>("projectPath") ?? "")) Fail("InvalidComponentContract", "An exact native target project path is required.");
             PlcLibraryIntegrationPlanner.ValidatePayload((JObject)preview["payload"]);
             var payload = (JObject)preview["payload"];
             if (PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload))
             {
                 if (plan["caller"]?.Value<bool?>("initiallyAbsent") != true || plan["caller"]?.Value<string>("blockPath") != PlcLibraryIntegrationPlanner.CallerPath(payload) || plan["callerArtifact"] != null ||
-                    plan["steps"][1]["prepareArguments"]["payload"]["model"]?.Value<string>("operation") != "createBlock")
+                    // The typed edit is the last step: the second one, or the only one for a reused FB.
+                    ((JArray)plan["steps"]).Last["prepareArguments"]["payload"]["model"]?.Value<string>("operation") != "createBlock")
                     Fail("InvalidComponentContract", "Standalone caller contract requires exact initial absence and typed creation.");
             }
             else RequireHash(plan["callerArtifact"]?.Value<string>("sha256"));
             foreach (JObject version in (JArray)plan["versions"]) PlcComponentContentContract.ValidatePin(version);
             return new JObject { ["planChangeId"] = prepared["changeId"].DeepClone(), ["planPreviewHash"] = prepared["previewHash"].DeepClone(), ["projectPath"] = preview["projectPath"].DeepClone(), ["payload"] = preview["payload"].DeepClone(), ["plan"] = plan.DeepClone() };
         }
+
+        /// <summary>Admission reconciliation of a production combined apply's step workspace, worker-owned scratch of its steps. The walk
+        /// never follows a reparse point and admits only entries the combined apply writes; every coordinator journal must verify its own
+        /// hash, and every checkpoint archive must be recorded with its hash by the step journal beside it, so the steps' own records
+        /// account for what was written. "unchanged", "verifiedApplied" or null (held, basis is why).</summary>
+        internal static string ReconcileWorkspace(string workspace, JObject evidence, out string basis)
+        {
+            FileAttributes attributes;
+            // GetAttributes reads the entry itself: a junction or symbolic link is reported, not followed.
+            try { attributes = File.GetAttributes(workspace); }
+            catch (Exception error) when (error is FileNotFoundException || error is DirectoryNotFoundException)
+            { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
+            if ((attributes & FileAttributes.ReparsePoint) != 0) { basis = "The step workspace " + workspace + " is a reparse point; its content may live elsewhere."; return null; }
+            if ((attributes & FileAttributes.Directory) == 0) { basis = "The step workspace path is a file."; return null; }
+            var journals = new System.Collections.Generic.List<string>(); var archives = new System.Collections.Generic.List<string>(); int count = 0;
+            var pending = new System.Collections.Generic.Stack<Tuple<DirectoryInfo, string>>();
+            pending.Push(Tuple.Create(new DirectoryInfo(workspace), "root"));
+            while (pending.Count > 0)
+            {
+                var next = pending.Pop();
+                foreach (var entry in next.Item1.EnumerateFileSystemInfos())
+                {
+                    if (++count > 20000) { basis = "The step workspace holds more than 20000 entries."; return null; }
+                    if ((entry.Attributes & FileAttributes.ReparsePoint) != 0) { basis = "Workspace entry " + entry.FullName + " is a reparse point; its content may live elsewhere."; return null; }
+                    string role = WorkspaceEntry(next.Item2, entry);
+                    if (role == null) { basis = "Workspace entry " + entry.FullName + " is not one the combined apply writes."; return null; }
+                    if (entry is DirectoryInfo directory) pending.Push(Tuple.Create(directory, role));
+                    else if (role == "journal") journals.Add(entry.FullName);
+                    else if (role == "archive") archives.Add(entry.FullName);
+                }
+            }
+            if (count == 0) { basis = "The step workspace was never written; no component step ran."; return "unchanged"; }
+            var states = new JArray(); evidence["coordinatorStates"] = states;
+            foreach (string journal in journals)
+            {
+                try { states.Add(ReadChecked(journal).Value<string>("state")); }
+                catch (Exception error) when (error is PlcComponentException || error is IOException || error is JsonException)
+                { basis = "Coordinator journal " + journal + " is unreadable or its hash differs: " + error.Message; return null; }
+            }
+            var recordedArchives = new JArray(); evidence["checkpointArchives"] = recordedArchives;
+            foreach (string archive in archives)
+            {
+                string directory = Path.GetDirectoryName(archive), name = Path.GetFileName(directory), path = Path.Combine(directory, "journal.json"), hash = FileHash(archive);
+                bool recorded = false;
+                try
+                {
+                    if (name.StartsWith("change-lib-", StringComparison.Ordinal))
+                        recorded = (LibraryJournalStore.Read(path, name.Substring("change-".Length))["checkpoints"] as JArray ?? new JArray()).OfType<JObject>()
+                            .Any(c => SamePath(c.Value<string>("archivePath"), archive) && c.Value<string>("sha256") == hash);
+                    else if (File.Exists(path) && new FileInfo(path).Length <= 8 * 1024 * 1024)
+                    {
+                        var step = JObject.Parse(File.ReadAllText(path));
+                        recorded = "change-" + step.Value<string>("changeId") == name && SamePath(step.Value<string>("recoveryArchive"), archive) && step.Value<string>("recoveryArchiveSha256") == hash;
+                    }
+                }
+                catch (Exception error) when (error is IOException || error is InvalidDataException || error is JsonException) { recorded = false; }
+                if (!recorded) { basis = "Checkpoint archive " + archive + " is missing from, or differs from, its step journal."; return null; }
+                recordedArchives.Add(new JObject { ["path"] = archive, ["sha256"] = hash });
+            }
+            basis = "Worker-owned step scratch of the combined apply: only its own entries, every coordinator journal verifies its hash and every checkpoint archive is recorded with its hash by its step journal.";
+            return "verifiedApplied";
+        }
+
+        // The role of an entry the combined apply writes in its workspace, or null. The root holds the coordinator, its project lock,
+        // the import step's idempotency claim, the two step directories and the readback captures (layout of the 31 October run).
+        private static string WorkspaceEntry(string parent, FileSystemInfo entry)
+        {
+            string name = entry.Name; bool directory = entry is DirectoryInfo;
+            Func<string, bool> match = pattern => System.Text.RegularExpressions.Regex.IsMatch(name, pattern);
+            switch (parent)
+            {
+                case "root":
+                    if (directory) return match(@"\Acomponent-[0-9a-f]{32}\z") ? "coordinator" : match(@"\Achange-lib-[0-9a-f]{32}\z") ? "libraryStep"
+                        : match(@"\Achange-[0-9a-f]{32}\z") ? "typedStep" : name == "captures" ? "captures" : null;
+                    return match(@"\Acomponent-project-[0-9a-f]{64}\.lock\z") || match(@"\Alibrary-key-[0-9a-f]{64}\.claim\z") ? "file" : null;
+                case "coordinator": return !directory && name == "component-journal.json" ? "journal" : null;
+                case "captures": return directory && match(@"\Acomponent-read-[0-9a-f]{32}\z") ? "capture" : null;
+                case "capture": return !directory && match(@"\A[A-Za-z0-9_-]+\.xml\z") ? "file" : null;
+                case "libraryStep": case "typedStep":
+                    if (directory) return null;
+                    if (name == "before.zap21") return "archive";
+                    return name == "journal.json" || match(@"\A[A-Za-z0-9_-]+\.xml\z") || parent == "libraryStep" && name == "library-lock.v1.json" ? "file" : null;
+                default: return null;
+            }
+        }
+        private static bool SamePath(string left, string right) =>
+            !string.IsNullOrEmpty(left) && Path.IsPathRooted(left) && string.Equals(Path.GetFullPath(left), Path.GetFullPath(right), StringComparison.OrdinalIgnoreCase);
 
         private IDisposable Lock()
         {

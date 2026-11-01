@@ -30,7 +30,9 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("TranslationAdmissionInvalid", "Bounded unique installed admission entries required.");
             foreach (JObject entry in entries)
             {
-                TranslationAdmissionFields(entry, "id", "projectPath", "plcPath", "profile", "evidence");
+                bool provisional = entry["qualification"] != null;
+                TranslationAdmissionFields(entry, provisional ? new[] { "id", "projectPath", "plcPath", "profile", "evidence", "qualification" }
+                    : new[] { "id", "projectPath", "plcPath", "profile", "evidence" });
                 var profile = entry["profile"] as JObject;
                 TranslationAdmissionFields(profile, "id", "key", "sourcePackageSha256", "proofs");
                 var key = profile["key"] as JObject;
@@ -38,14 +40,16 @@ namespace TiaMcp.Openness.V21
                     "profileSha256", "scope", "baselineContentSha256", "candidateContentSha256", "rows", "peers");
                 var binaries = key["binaries"] as JObject;
                 TranslationAdmissionFields(binaries, "hostPackageSha256", "translationAssemblySha256", "workerSha256", "siemensApiSha256");
-                if (binaries.Value<string>("workerSha256") != ChangeFileHash(typeof(OpennessSession).Assembly.Location) ||
-                    key.Value<string>("contract") != "translation.whole-project-de-DE-en-GB-main-ob1.exact.v1" || key.Value<int>("tiaVersion") != 21 ||
+                if (binaries.Value<string>("workerSha256") != ChangeFileHash(typeof(OpennessSession).Assembly.Location) || key.Value<int>("tiaVersion") != 21 ||
                     profile.Value<string>("id") != entry.Value<string>("id"))
                     throw new BridgeException("TranslationAdmissionMismatch", "Installed worker/profile identity changed.");
+                if (provisional) TranslationAdmissionFields(entry["qualification"] as JObject, "hostDirectory", "workerDirectory");
                 var proofs = profile["proofs"] as JArray; var evidence = entry["evidence"] as JArray;
-                if (proofs == null || proofs.Count != 20 || evidence == null || evidence.Count == 0 || evidence.Count > 128)
+                if (proofs == null || proofs.Any(proof => !(proof is JObject)) || evidence == null || evidence.Count == 0 || evidence.Count > 128)
                     throw new BridgeException("TranslationAdmissionIncomplete", "Complete reviewed native and portable proof ledger required.");
                 foreach (JObject proof in proofs) TranslationAdmissionFields(proof, "case", "keySha256", "sourcePackageSha256", "evidenceSha256", "mode");
+                // Contract, provisional deployment binding and proof ledger (TranslationAdmissionLedger.cs, unit-tested).
+                TranslationAdmissionLedger.Check(entry, AppDomain.CurrentDomain.BaseDirectory);
                 foreach (JObject file in evidence)
                 {
                     TranslationAdmissionFields(file, "path", "sha256");

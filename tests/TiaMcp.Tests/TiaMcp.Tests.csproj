@@ -40,6 +40,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringFingerprintRules.cs" Link="EngineeringFingerprintRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/UmacRoleRules.cs" Link="UmacRoleRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/EngineeringPaths.cs" Link="EngineeringPaths.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/ProjectUpgradeRules.cs" Link="ProjectUpgradeRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/OpennessSession.SimulationCheckpoint.cs" Link="OpennessSession.SimulationCheckpoint.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/SimulationOnlineLogin.cs" Link="SimulationOnlineLogin.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/SimulationTlsPin.cs" Link="SimulationTlsPin.cs" />
@@ -52,5 +53,6 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelProviders.cs" Link="ProjectModelProviders.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelRelationshipProviders.cs" Link="ProjectModelRelationshipProviders.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ProjectModelTypedPreview.cs" Link="ProjectModelTypedPreview.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TranslationAdmissionLedger.cs" Link="TranslationAdmissionLedger.cs" />
   </ItemGroup>
 </Project>

@@ -322,8 +322,31 @@ Test("actual managed process loss at flushed dispatch intent survives restart", 
     True(runner.MarkInterrupted(id, op.Revision).State == "outcomeUnknown");
 });
 
+// The fixture scope is restricted (plc:Fixture, BlockCommentCategoryData); "categories" drift admits only another category.
+async Task RejectOutOfScope(Func<Task> action)
+{
+    try { await action(); }
+    catch (BridgeException error) when (error.Code == "TranslationScopeMismatch" && error.Message.Contains("admitted restricted categories")) { return; }
+    throw new Exception("Expected the restricted-category refusal");
+}
+foreach (int observation in new[] { 1, 3 })
+Test($"restricted scope refuses an out-of-scope apply observation {observation} and keeps ownership", async () => {
+    var f = New(); var op = f.Prepare(); f.Adapter.Alter = (n, value) => n == observation ? f.Drift(value, "categories") : value;
+    await RejectOutOfScope(() => f.Apply(op));
+    True(f.Runner.Status(op.Id).State == (observation == 1 ? "outcomeUnknown" : "recoveryRequired") && f.Adapter.Imports == (observation == 1 ? 0 : 1) &&
+        f.Adapter.Saves == 0 && new EngineeringOperationStore(f.Root).Pending().Count == 1);
+});
+Test("restricted scope refuses an out-of-scope recovered copy and keeps both reservations", async () => {
+    var f = New(); var op = await f.Apply(f.Prepare()); var recovery = await f.Runner.Recover(op.Id, op.PlanSha256, op.Revision, f.RecoveryPath, f.Adapter);
+    f.Adapter.Fault = "recovery-scope";
+    await RejectOutOfScope(() => f.Runner.Reconcile(op.Id, op.PlanSha256, recovery.Revision, f.Adapter));
+    True(f.Runner.Status(op.Id).State == "recoveryIntent" && f.Adapter.Restores == 1 && new EngineeringOperationStore(f.Root).Pending().Count == 1);
+});
+RestrictedCaptureChecks.Register(Test, output);
+
 if (admissionOnly) tests.Clear();
-TranslationAdmissionChecks.Register(Test, () => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true));
+TranslationAdmissionChecks.Register(Test, () => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true),
+    (objects, categories) => new Fixture(Path.Combine(output, Guid.NewGuid().ToString("N")), exactAdmission: true, exactObjects: objects, exactCategories: categories));
 TranslationRegistryChecks.Register(Test, output);
 ProjectTextExportChecks.Register(Test, output);
 var results = new JsonArray(); int failed = 0;
@@ -350,10 +373,11 @@ internal sealed class Fixture
     internal byte[] Original { get; }
     internal string CandidateRef { get; }
     internal string CandidateReceipt { get; }
-    internal Fixture(string root, bool edit = true, string? shape = null, string? adapterHash = null, bool exactAdmission = false)
+    internal Fixture(string root, bool edit = true, string? shape = null, string? adapterHash = null, bool exactAdmission = false,
+        string[]? exactObjects = null, string[]? exactCategories = null)
     {
         Root = root; Directory.CreateDirectory(root);
-        if (exactAdmission) Scope = new("de-DE", "en-GB", ["de-DE", "en-GB"], ["whole-project:legacy-bilingual"], ["BlockCommentCategoryData"]);
+        if (exactAdmission) Scope = new("de-DE", "en-GB", ["de-DE", "en-GB"], exactObjects ?? ["whole-project:legacy-bilingual"], exactCategories ?? ["BlockCommentCategoryData"]);
         var nativeArtifacts = new TranslationImportArtifacts(root);
         var nativePeers = new[] { ("all-other-project-content", "Synthetic complete unaffected export"), ("untouched:nl-NL", "Synthetic original Dutch text") };
         Peers = nativePeers.Select(p => { var evidence = nativeArtifacts.RetainBytes(Encoding.UTF8.GetBytes(p.Item2)); return new TranslationImportPeer(p.Item1, evidence.Sha256, evidence); }).ToArray();
@@ -487,6 +511,7 @@ internal sealed class FakeAdapter(Fixture fixture) : ITranslationImportAdapter, 
                 Snapshot = fixture.Target.Reference.Snapshot with { ObservationId = freshReopen ? "restored-fresh" : "restored" } } };
         var value = fixture.Observation(Fault == "recovery-content" ? Current : fixture.Original, target);
         if (Fault == "recovery-peer") value = fixture.Drift(value, "peers");
+        if (Fault == "recovery-scope") value = fixture.Drift(value, "categories");
         return Task.FromResult(new TranslationRecoveryReadback(value, null));
     }
     public Task<byte[]> Close(CancellationToken token) { Closes++; return Task.FromResult(Step("cleanup")); }

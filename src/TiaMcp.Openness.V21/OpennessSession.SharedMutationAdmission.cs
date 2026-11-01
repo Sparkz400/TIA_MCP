@@ -21,10 +21,13 @@ namespace TiaMcp.Openness.V21
 
         private static bool IsSharedMutation(string operation) => operation == "change_apply" || operation == "change_restore" ||
             operation == "simulation_download" || operation == "simulation_provision_scratch_credential" || operation == "library_open" ||
-            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step" || operation == "plc_station_upload";
+            operation == "scratch_create" || operation == "project_retrieve" || operation == "project_copy" || operation == "project_upgrade" || operation == "watch_fixture_seed" || operation == "watch_authoring_source_negative" || operation == "component_window_step" || operation == "plc_station_upload";
 
         private JObject SharedMutationBegin(JObject args)
         {
+            // An unsupported project version is refused before any native call, attachment and the exclusive-access lease included.
+            if (args.Value<string>("operation") == "project_upgrade" && args["arguments"] is JObject upgrade)
+                ProjectUpgradeRules.SourceVersion(upgrade.Value<string>("path"), upgrade.Value<string>("expectedSha256"), out _);
             EnsureAttached();
             if (_sharedMutationLease != null || _watchLease != null) throw new BridgeException("ResourceBusy", "A native mutation already owns exclusive access.");
             string operation = ChangeText(args, "operation", 64);
@@ -75,6 +78,7 @@ namespace TiaMcp.Openness.V21
                 case "scratch_create": return ScratchCreate(arguments);
                 case "project_retrieve": return ProjectRetrieve(arguments);
                 case "project_copy": return ProjectCopy(arguments);
+                case "project_upgrade": return ProjectUpgrade(arguments);
                 case "plc_station_upload": return PlcStationUpload(arguments);
                 case "watch_fixture_seed": return WatchFixtureSeed(arguments);
                 case "watch_authoring_source_negative": return WatchAuthoringSourceNegative(arguments);
@@ -192,6 +196,8 @@ namespace TiaMcp.Openness.V21
                     {
                         if (!_libraryChanges.TryGetValue(id, out var change)) throw new BridgeException("OutcomeUnknown", "Prepared native library handles do not survive restart; inspect the legacy journal.");
                         add("workspace", change.Directory, "legacyJournalCheckpointOutput");
+                        if (change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload))
+                            add("workspace", PlcComponentQualificationGate.CombinedApplyWorkspace(change.Directory, change.Id), "combinedApplyStepWorkspace");
                         if (ChangeText(args, "previewHash", 64) != change.PreviewHash) throw new BridgeException("PreviewMismatch", "Preview hash differs.");
                         string key = ChangeText(args, "idempotencyKey", 128);
                         bool returnedApply = change.IdempotencyKey == key && change.State == "applied";
@@ -285,6 +291,15 @@ namespace TiaMcp.Openness.V21
                 add("project", source.Path.FullName, "archiveSavedSourceUnchanged"); observation["source"] = ProjectInfo(source);
                 absent("workspace", "copyArchive", SharedMutationPlannedDestination("projectCopyArchive", () => Path.Combine(root, EngineeringPaths.NewRecoveryArchiveName(root))));
                 absent("project", "copyDestination", SharedMutationPlannedDestination("projectCopy", () => EngineeringPaths.NewRecoveryDirectory(root, source.Name)));
+            }
+            else if (operation == "project_upgrade")
+            {
+                if (!_ownsPortal || _portal.Projects.Count != 0) throw new BridgeException("ProjectIsolationRequired", "Project upgrade requires this worker's empty Portal.");
+                var source = ProjectUpgradeSource(args); string destination = ProjectUpgradeDestination(args);
+                ProjectUpgradeRules.Plan(destination, source.Path, source.Archive, source.Name);
+                add(source.Archive ? "workspace" : "project", source.Archive ? source.Path : source.Folder, "readUpgradeSource");
+                observation["sourceSha256"] = source.SourceSha256;
+                absent("project", "upgradeDestination", destination);
             }
             else if (operation == "plc_station_upload")
             {

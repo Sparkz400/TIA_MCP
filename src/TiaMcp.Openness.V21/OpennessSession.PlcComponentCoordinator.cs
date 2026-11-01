@@ -38,7 +38,8 @@ namespace TiaMcp.Openness.V21
             private readonly string _changes, _workspace;
             private readonly bool _production;
             internal NativePlcComponentOperations(OpennessSession session, LibraryChange plan, string workspace, bool production)
-            { _session = session; _plan = plan; _workspace = workspace; _changes = Path.Combine(workspace, "changes"); _production = production; }
+            // Production keeps its steps directly in its short workspace so their archive paths stay within TIA's 143 characters.
+            { _session = session; _plan = plan; _workspace = workspace; _changes = production ? workspace : Path.Combine(workspace, "changes"); _production = production; }
             public string SessionToken => _session._libraryGeneration;
 
             public JObject Prepare(JObject arguments)
@@ -51,8 +52,9 @@ namespace TiaMcp.Openness.V21
                     if (_session.LibraryChangeFingerprint(_plan) != _plan.Preview.Value<string>("fingerprint")) throw new BridgeException("PreviewStale", "Source or target changed after the component plan; no native mutation was dispatched.");
                     return _session.LibraryChangePrepare(arguments, (JArray)_plan.Preview["integrationPlan"]["versions"]);
                 }
-                // The natively captured storage profile applies only to a plan whose installed FB/UDT content equals the captured one.
-                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _session.CapturedStorageContext(_plan, _production));
+                // The natively captured storage profile applies only to a plan whose installed FB/UDT content equals the captured one,
+                // and it is a global instance DB; a multi-instance takes the typed route's own multi-instance profiles.
+                if (kind == "graphical_typed_edit") return _session.ChangePrepare(arguments, _plan.Preview["integrationPlan"]["multiInstance"] != null ? null : _session.CapturedStorageContext(_plan, _production));
                 throw new BridgeException("UnsupportedComponentStep", "Coordinator can prepare only library_instantiate and graphical_typed_edit.");
             }
 
@@ -156,6 +158,8 @@ namespace TiaMcp.Openness.V21
                                 ["CreationDate"] = CaptureSetting(() => fb.CreationDate) };
                         }
                     }
+                    var rootFb = blocks.Where(b => b.Path == contract["plan"]["fb"].Value<string>("path")).ToArray();
+                    if (rootFb.Length == 1) result["fb"] = new JObject { ["path"] = rootFb[0].Path, ["number"] = rootFb[0].Item.Number };
                     var mappings = new JArray(); result["mappings"] = mappings;
                     foreach (JObject mapping in (JArray)contract["plan"]["mappings"])
                     {
@@ -187,13 +191,18 @@ namespace TiaMcp.Openness.V21
                     {
                         var prepared = typedPreparation["preview"];
                         CompareArtifact((JObject)prepared["typed"]["nativeArtifact"], callerFile);
+                        var multi = contract["plan"]["multiInstance"] as JObject;
                         if (!standalone)
                         {
                             var original = (JObject)contract["plan"]["callerArtifact"];
                             result["callerInsertion"] = PlcComponentCallerInsertion.Verify(
                                 EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(original, original.Value<string>("sha256"))),
-                                EngineeringSources.ReadXml(File.ReadAllText(callerFile)), payload["integration"]["caller"].Value<string>("insertAfterNetworkId"));
+                                EngineeringSources.ReadXml(File.ReadAllText(callerFile)), payload["integration"]["caller"].Value<string>("insertAfterNetworkId"), multi?.Value<string>("name"));
                         }
+                        // The whole caller, new multi-instance member included, already equals the prepared typed artifact above.
+                        if (multi != null) result["multiInstance"] = new JObject { ["callerPath"] = callerPath, ["name"] = multi.Value<string>("name"), ["dataType"] = result["callerInsertion"]["addedStaticMember"]["dataType"].DeepClone() };
+                        else
+                        {
                         var effects = ((JArray)prepared["effects"]).Where(e => e.Value<string>("action") == "createInstanceDB").ToArray();
                         if (effects.Length != 1) throw new BridgeException("ComponentReadbackMismatch", "Expected exactly one prepared instance creation.");
                         var effect = effects[0];
@@ -203,7 +212,9 @@ namespace TiaMcp.Openness.V21
                         string instanceFile = Path.Combine(directory, "instance.xml"); instance.Export(new FileInfo(instanceFile), ExportOptions.WithDefaults, DocumentInfoOptions.None);
                         CompareArtifact((JObject)effect["artifact"], instanceFile);
                         result["instance"] = new JObject { ["path"] = instances[0].Path, ["number"] = instance.Number, ["instanceOfName"] = instance.InstanceOfName, ["contentSha256"] = ChangeFileHash(instanceFile), ["artifact"] = ChangeArtifact(instanceFile) };
-                        result["callerMatchesPrepared"] = true; result["instanceMatchesPrepared"] = true;
+                        result["instanceMatchesPrepared"] = true;
+                        }
+                        result["callerMatchesPrepared"] = true;
                     }
                     }
                     result["scopeComplete"] = true;

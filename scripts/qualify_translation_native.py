@@ -96,6 +96,8 @@ class Run:
         self.entry = entries[0]
         self.save('admission', {'kind': 'translation-native-default-mode', 'profileId': args.profile_id, 'registry': ref(registry),
                                 'projectPath': self.entry['projectPath'], 'plcPath': self.entry['plcPath'], 'packages': self.packages,
+                                # A restricted entry's captures, plans and interruptions all run on its Host-filtered category scope.
+                                'contract': self.entry['profile']['key']['contract'], 'scope': self.entry['profile']['key']['scope'],
                                 'runner': ref(Path(__file__)), 'qualificationMode': False, 'automaticReplay': False})
 
     def save(self, name, value):

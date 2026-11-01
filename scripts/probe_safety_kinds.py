@@ -111,9 +111,31 @@ def body(h):
         h.report["summary"] = {p["name"]: p["outcome"] for p in h.report.get("probes", [])}
 
 
-def topology(h, scope):
+def plug_first(h, rack, entries, name, slot, scope):
+    """Plug the first catalog entry the rack accepts at slot as name; returns it, or None when every entry is IncompatibleHardware."""
+    for module in entries:
+        plug = {"hardwarePath": rack, "typeIdentifier": module["typeIdentifier"], "name": name, "positionNumber": slot}
+        proposed = h.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": "hardware_plug", "payload": plug, **scope}})
+        if not proposed.get("isError"):
+            h.apply_prepared("hardware_plug", proposed["structuredContent"])
+            return module
+        require(error_of(proposed).get("code") == "IncompatibleHardware", "Unexpected %s preparation failure: %s" % (name, error_of(proposed)))
+    return None
+
+
+def plug_extra(h, rack, extra, scope):
+    """Further F-modules (search, type name, article prefix, name, slot) on rack; each plugged entry or skip reason lands in h.report["fModules"]."""
+    for search, type_name, article, name, slot in extra:
+        entries = [e for e in h.tool("hardware_catalog_search", {"filter": search, "maxItems": 500})["entries"]
+                   if type_name in (e.get("typeName") or "") and article in (e.get("articleNumber") or "")]
+        plugged = plug_first(h, rack, sorted(entries, key=version_key, reverse=True), name, slot, scope)
+        h.report.setdefault("fModules", {})[name] = plugged or {"skipped": "notInCatalog" if not entries else "IncompatibleHardware"}
+
+
+def topology(h, scope, extra=(), server_slot=4):
     """qualify_remote_io's route (local.remote-io.full-route.20261024) with the F-CPU as IO controller: an ET 200SP station with
-    up to two F-DI modules. Returns the F-DI names that were plugged, by hardware path."""
+    up to two F-DI modules, then the extra modules (plug_extra) with the server module at server_slot. Returns the plugged
+    module names by hardware path."""
     head = h.report["interfaceModule"] = catalog(h, "IM 155-6 PN ST", "PN ST", "6ES7 155-6")[0]
     require(head["typeIdentifier"] == "OrderNumber:6ES7 155-6AU02-0BN0/V6.4", "The generated-server contract requires the captured IM 155-6AU02 V6.4 profile.")
     change(h, "hardware_add", {"typeIdentifier": head["typeIdentifier"], "deviceName": REMOTE, "itemName": HEAD}, scope, compile=False)
@@ -141,23 +163,20 @@ def topology(h, scope):
         "LocationIdentifier": "", "Name": server, "PlantDesignation": ""}}}, scope)
     companion = next(e["expectedNativeCompanion"] for e in prepared["preview"]["effects"] if "expectedNativeCompanion" in e)
     # The generated server occupies slot 1, where no input module plugs; qualify_remote_io moves it to slot 4 the same way.
-    change(h, "hardware_move", server_relocation(verified_manifest(assigned, "configured-hardware-preservation"), companion), scope)
-    for module in catalog(h, "F-DI 8x24VDC HF", "F-DI 8x24VDC HF", "6ES7 136-6"):
-        plug = {"hardwarePath": rails[0]["path"], "typeIdentifier": module["typeIdentifier"], "name": FDI, "positionNumber": 1}
-        proposed = h.client.request("tools/call", {"name": "change_prepare", "arguments": {"kind": "hardware_plug", "payload": plug, **scope}})
-        if not proposed.get("isError"):
-            h.apply_prepared("hardware_plug", proposed["structuredContent"])
-            h.report["fModule"] = module
-            break
-        require(error_of(proposed).get("code") == "IncompatibleHardware", "Unexpected F-DI preparation failure: %s" % error_of(proposed))
-    require("fModule" in h.report, "No catalog-selected F-DI module plugs into the ET 200SP station.")
+    change(h, "hardware_move", {**server_relocation(verified_manifest(assigned, "configured-hardware-preservation"), companion), "positionNumber": server_slot}, scope)
+    module = plug_first(h, rails[0]["path"], catalog(h, "F-DI 8x24VDC HF", "F-DI 8x24VDC HF", "6ES7 136-6"), FDI, 1, scope)
+    require(module, "No catalog-selected F-DI module plugs into the ET 200SP station.")
+    h.report["fModule"] = module
+    plug = {"hardwarePath": rails[0]["path"], "typeIdentifier": module["typeIdentifier"], "name": FDI, "positionNumber": 1}
 
     def second():
         outcome = attempt(h, "hardware_plug", {**plug, "name": FDI2, "positionNumber": 2}, scope)
         require(outcome["prepared"], "The second F-DI was refused: %s" % outcome.get("error"))
         return outcome
     probe(h, "plug a second F-DI for the duplicate-address refusal", second)
-    return {r["name"]: r["path"] for r in h.tool("project_inventory", {"maxItems": 2000})["hardware"] if r["name"] in (FDI, FDI2)}
+    plug_extra(h, rails[0]["path"], extra, scope)
+    names = {FDI, FDI2, *(row[3] for row in extra)}
+    return {r["name"]: r["path"] for r in h.tool("project_inventory", {"maxItems": 2000})["hardware"] if r["name"] in names}
 
 
 def fparameters(h, plc, scope):

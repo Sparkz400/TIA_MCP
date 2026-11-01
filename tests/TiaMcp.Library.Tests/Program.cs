@@ -500,12 +500,44 @@ Test("CLI native disabling preserves normal defaults and refuses qualification m
     Equal(true, File.Exists(Path.Combine(Path.GetDirectoryName(HostOptions.Parse([]).ArtifactsDirectory)!, "TiaMcp.slnx")));
     Equal(true, HostOptions.Parse([]).WorkerPath.EndsWith(Path.Combine("src", "TiaMcp.Openness.V21", "bin", "Debug", "net48", "TiaMcp.Openness.V21.exe")));
     Equal(true, HostOptions.Parse(["--no-native-workers", "--worker", Path.Combine(work, "worker.exe")]).NoNativeWorkers);
+    // F-parameter discovery exists only in -p:SafetyFParameterDiscovery=true builds; this (and every packaged) build refuses it.
+    Equal(false, HostOptions.Parse([]).SafetyFParameterDiscovery);
+    try { HostOptions.Parse(["--safety-fparameter-discovery"]); throw new Exception("A normal build accepted --safety-fparameter-discovery"); }
+    catch (ArgumentException) { }
     foreach (var flag in new[] { "--diagnose", "--component-qualification", "--testsuite-scope-probe", "--translation-qualification" })
     {
         Equal(false, HostOptions.Parse([flag]).NoNativeWorkers);
         try { HostOptions.Parse([flag, "--no-native-workers"]); }
         catch (ArgumentException error) when (error.Message.Contains("Native diagnosis and qualification cannot run")) { continue; }
         throw new Exception("Native-disabled CLI accepted " + flag);
+    }
+    // The text-list import qualification admits one named profile on its own native Host.
+    Equal("unified-pc", HostOptions.Parse(["--hmi-text-list-qualification", "unified-pc"]).HmiTextListQualificationProfile);
+    Equal(null, HostOptions.Parse([]).HmiTextListQualificationProfile);
+    foreach (var refused in new[] { new[] { "--hmi-text-list-qualification", "unified-comfort", "--no-native-workers" }, new[] { "--hmi-text-list-qualification", "classic-comfort" },
+        new[] { "--hmi-text-list-qualification", "unified-pc", "--translation-qualification" }, new[] { "--hmi-text-list-qualification", "unified-pc", "--component-qualification" },
+        new[] { "--hmi-text-list-qualification", "unified-pc", "--hmi-text-list-qualification", "unified-pc" } })
+    {
+        try { HostOptions.Parse(refused); }
+        catch (ArgumentException) { continue; }
+        throw new Exception("CLI accepted " + string.Join(" ", refused));
+    }
+});
+Test("CLI Git remote is local by default and needs an explicit option for credential-free https", work =>
+{
+    string git = Path.Combine(work, "git.exe"), bare = Path.Combine(work, "remote.git");
+    Equal(null, HostOptions.Parse([]).GitRemote);
+    Equal(bare, HostOptions.Parse(["--git-executable", git, "--git-remote", bare]).GitRemote!.Location);
+    Equal("https", HostOptions.Parse(["--git-executable", git, "--git-remote", "https://example.invalid/r.git", "--git-allow-network-remote"]).GitRemote!.Protocol);
+    foreach (var (arguments, message) in new (string[], string)[] {
+        (["--git-executable", git, "--git-remote", "https://example.invalid/r.git"], "--git-allow-network-remote"),
+        (["--git-executable", git, "--git-remote", "https://user:secret@example.invalid/r.git", "--git-allow-network-remote"], "credentials"),
+        (["--git-remote", bare], "requires --git-executable"), (["--git-allow-network-remote"], "requires --git-remote"),
+        (["--git-executable", git, "--git-remote", bare, "--git-remote", bare], "given once") })
+    {
+        try { HostOptions.Parse(arguments); }
+        catch (ArgumentException error) when (error.Message.Contains(message)) { continue; }
+        throw new Exception("Git remote options accepted " + string.Join(' ', arguments));
     }
 });
 Test("CLI toolsets select named groups and refuse unknown, empty or repeated values", work =>

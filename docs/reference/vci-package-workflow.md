@@ -46,8 +46,10 @@ reads the open project's native VCI tree without changing it: system/user worksp
 groups, each workspace's root path, language and library policy (global library
 path, delete-unused-type-versions flag), and every mapped object with its native
 ancestor identity, directory, file name, format, `CompareState`,
-`IndividualObjectCompareDetails`, child `MappingState` and the formats
-`GetSupportedFileFormats` offers for it. Groups, workspaces, mappings and formats
+`IndividualObjectCompareDetails`, child `MappingState`, the formats
+`GetSupportedFileFormats` offers for it and `contentSha256`, the SHA-256 of the
+object's SimaticML export without document info (null with a warning when V21
+refuses the export; not covered by the read-contract evidence). Groups, workspaces, mappings and formats
 share the `maxItems` budget; `completeness.truncated` and per-item `warnings` are
 explicit. Use the result to write reviewed mapping evidence; it is an observation,
 not a manifest, and its states do not establish preservation or import support.
@@ -60,7 +62,7 @@ is verified (`local.read_contracts.20261028`).
 
 ## Native workspace changes
 
-Five kinds run through `change_prepare` / `change_apply` with the usual
+Six kinds run through `change_prepare` / `change_apply` with the usual
 checkpoint, idempotency key and journal; payloads are in the
 [kind table](../guides/engineering-workflows.md):
 
@@ -71,6 +73,7 @@ checkpoint, idempotency key and journal; payloads are in the
 | `vci_mapping_add` | `Workspace.ExportObject` or `Workspace.ConnectObject` |
 | `vci_mapping_remove` | `MappedObject.Delete()` |
 | `vci_synchronize` | `MappedObject.Synchronize(SynchronizationMode)` |
+| `vci_conflict_resolve` | `MappedObject.Synchronize(SynchronizationMode)` after a [reviewed resolution](#two-sided-conflict-resolution) |
 
 Workspace and group paths are the ones `vci_workspace_inspect` returns; objects
 are one exact block, PLC data type, tag table or technology object by
@@ -106,9 +109,66 @@ undocumented status initialization. Package completeness (for example SIMATIC
 SD `.s7res` companions) is not checked. The directory is passed to V21 as the
 absolute path below the root, because the
 [15 October probe](vci-native-profiles-20261015.md) saw the native route reject
-a relative `DirectoryInfo`. All five kinds are verified: workspace create/delete by
+a relative `DirectoryInfo`. The first five kinds are verified: workspace create/delete by
 `local.access.qualify.rerun.20261028`, mapping add/remove and synchronize by
 `local.vci_mappings.20261028` (export mode, one workspace in the root group).
+`vci_conflict_resolve` is verified by `local.vci_git.20261031` (take=remote, native and merged on one SCL FC, with reopen and checkpoint restore).
+
+## Two-sided conflict resolution
+
+A two-sided conflict arises when the project object and the package that a Git
+checkout wrote into the workspace both changed since they last agreed; the
+mapping then reports `ProjectObjectChanged` and `WorkspaceFileChanged`, and
+`vci_synchronize` refuses it as `VciConflict`. `vci_conflict_resolve` applies
+one explicit, reviewed resolution instead:
+
+1. Fetch the remote branch with [`vci_fetch`](vci-host-workflow.md#remote-delivery)
+   and check its package files out into the workspace root (for example from
+   `vci_file_read`). Revisions mirror the workspace root, so a package path in
+   Git is its path below the root.
+2. Capture three manifests and compare them with `vci_package_compare`: the
+   baseline (the revision both sides last shared), the project side (the native
+   change) and the workspace side (the fetched remote revision). The mapping
+   evidence's `workspaceId` is the `vci_workspace_inspect` workspace path, and
+   each side's `object.contentSha256` is the mapped object's inspected
+   `contentSha256` at that point. V21 has no project-neutral VCI export, so the
+   native side is the base package files with the object's changed
+   `contentSha256`.
+3. Prepare `vci_conflict_resolve` with `comparisonRef`, `packageId`, `objectPath`,
+   `workspacePath` and `take`:
+   - `native` keeps the project: `Synchronize(ProjectToWorkspace)` overwrites the
+     remote package files (backed up first; the remote side stays in Git).
+   - `remote` takes the fetched document: `Synchronize(WorkspaceToProject)`.
+   - `merged` writes a reviewed document from `mergedRecordRef` (a preview,
+     committed or fetched revision holding every package file), then
+     `Synchronize(WorkspaceToProject)`.
+4. Commit the resulting package on top of the fetched revision with
+   `vci_prepare` / `vci_commit` (for `merged`, commit the same preview) and
+   publish it with `vci_push`, with the fetched commit as `expectedRemoteCommit`.
+
+The Host binds the request at preparation. It reloads the comparison and its
+whole input chain, accepts only a `divergentChange` row (`VciResolutionUnsupported`
+otherwise: one-sided changes use `vci_synchronize`, and additions, deletions,
+identity, ownership, stale or incomplete rows stay refused), requires the
+comparison's workspace to be `workspacePath` and the reviewed package object to
+be `objectPath` (`VciResolutionMismatch`), the same file layout on both sides
+and a native-side `object.contentSha256`, and hands the worker that hash, the
+remote package hashes and, for `remote` and `merged`, the exact bytes to write
+(at most 16 files and 4 MiB). Callers never supply hashes or bytes.
+
+The worker requires `WorkspaceFileChanged` (`VciResolutionNotNeeded` before the
+checkout), the workspace package to be exactly the reviewed remote side, and a
+fresh export of the live object to hash to the reviewed native side, so an
+object edited after the comparison is never overwritten or exported unreviewed
+(`VciResolutionStale` for both; the preview reports the live hash).
+`ProjectObjectChanged` may also be set. `remote` and
+`merged` require `compile=true`, keep the direct-mutation guards and overwrite
+the project's own unsynchronized changes to the object, with the checkpoint as
+the way back. The mapping must read back `Equal`, and for `remote` and `merged`
+the package must equal the written bytes; the root inventory, backups and
+fingerprint rules above apply unchanged. A change applies once; a repeated
+`change_apply` under another idempotency key refuses with `RecoveryRequired` from the shared mutation admission (the same key returns the recorded outcome without running again), and an interrupted apply is
+held for manual reconciliation.
 
 ## Conflict and preservation rules
 
@@ -122,7 +182,8 @@ a relative `DirectoryInfo`. All five kinds are verified: workspace create/delete
   file manifests for those. An empty package report is not whole-project equality.
 - One-sided changes, identical two-sided changes, divergent edits, divergent
   additions and delete-versus-change cases remain distinct. No automatic merge
-  or conflict resolution is performed.
+  or conflict resolution is performed; a `divergentChange` row is resolved only
+  by an explicit [`vci_conflict_resolve`](#two-sided-conflict-resolution) change.
 - Original upload release does not invalidate retained mapping bytes. Reopening
   or downloading a report verifies its artifacts and reconstructs the full input
   chain from the pinned mappings and retained source bytes. A changed input fails
@@ -145,6 +206,7 @@ available in the complete report artifact.
 This delivery exposes the existing portable comparison model. The native mapping
 lifecycle is verified as described under [native workspace changes](#native-workspace-changes);
 connect mode, native companion/language preservation and library policies remain unexecuted.
-Host branch operations, remote publishing and larger measured performance also
-remain separate work; this increment does not complete all of D01 or the release.
+Remote delivery and two-sided resolution are verified against a local bare
+remote ([external Git record](../verification/vci-external-git-20261031.md)); network remotes and larger
+measured performance remains separate work, and this does not complete all of D01 or the release.
 See [verification](../verification/vci-package-workflow-20261016.md).

@@ -1,0 +1,241 @@
+#Version: 2.0
+
+TextListContainers:
+  DeviceTextList:
+    ResourceListType: TextList
+    ResourceLists:
+      QualificationStates:
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_0
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_1
+      EntryTypes:
+        Entries:
+          Text_list_entry_0:
+            Type: To
+            Value: -1
+            ToValue: -1
+            Text: MyTextLibrary.Text_2
+          Text_list_entry_1:
+            Type: Range
+            ToValue: 10
+            Text: MyTextLibrary.Text_3
+          Text_list_entry_2:
+            Type: From
+            Value: 11
+            FromValue: 11
+            Text: MyTextLibrary.Text_4
+      Int32Bounds:
+        Entries:
+          Text_list_entry_0:
+            Value: -2147483648
+            FromValue: -2147483648
+            ToValue: -2147483648
+            Text: MyTextLibrary.Text_5
+          Text_list_entry_1:
+            Value: 2147483647
+            FromValue: 2147483647
+            ToValue: 2147483647
+            Text: MyTextLibrary.Text_6
+      DefaultZero:
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_7
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_8
+      BoolNoDefault:
+        RangeType: Bool
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_9
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_10
+      BitDefault:
+        RangeType: BitNumber
+        Entries:
+          Text_list_entry_0:
+            IsDefaultEntry: True
+            Text: MyTextLibrary.Text_11
+          Text_list_entry_1:
+            Value: 31
+            FromValue: 31
+            ToValue: 31
+            Text: MyTextLibrary.Text_12
+      TextChars:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_13
+          Text_list_entry_1:
+            Value: 1
+            FromValue: 1
+            ToValue: 1
+            Text: MyTextLibrary.Text_14
+          Text_list_entry_2:
+            Value: 2
+            FromValue: 2
+            ToValue: 2
+            Text: MyTextLibrary.Text_15
+          Text_list_entry_3:
+            Value: 3
+            FromValue: 3
+            ToValue: 3
+            Text: MyTextLibrary.Text_16
+          Text_list_entry_4:
+            Value: 4
+            FromValue: 4
+            ToValue: 4
+            Text: MyTextLibrary.Text_17
+          Text_list_entry_5:
+            Value: 5
+            FromValue: 5
+            ToValue: 5
+            Text: MyTextLibrary.Text_18
+          Text_list_entry_6:
+            Value: 6
+            FromValue: 6
+            ToValue: 6
+            Text: MyTextLibrary.Text_19
+      Format_00AD:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_20
+      Format_200B:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_21
+      Format_200D:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_22
+      Format_FEFF:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_23
+      Format_202E:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_24
+      Format_2060:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_25
+      Plain_Name1:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_26
+      Name with space:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_27
+      Umlaut_Ä:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_28
+      Unicode_日本語:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_29
+      Имя Ελληνικά:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_30
+      اسم שם 이름:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_31
+      Digits 0123 ٣:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_32
+      NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_33
+      MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_34
+      P!Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_35
+      P&Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_36
+      P'Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_37
+      P(Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_38
+      P)Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_39
+      P+Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_40
+      P,Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_41
+      P-Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_42
+      P;Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_43
+      P<Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_44
+      P=Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_45
+      P>Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_46
+      P@Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_47
+      P\Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_48
+      P^Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_49
+      P{Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_50
+      P|Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_51
+      P}Name:
+        Entries:
+          Text_list_entry_0:
+            Text: MyTextLibrary.Text_52

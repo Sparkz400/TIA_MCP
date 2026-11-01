@@ -248,4 +248,12 @@ class RecoveryGateTests(unittest.TestCase):
             self.assertEqual(coordinator.main(), 1); client.assert_not_called()
 
 
+class SourceControlTests(unittest.TestCase):
+    def test_main_records_follow_either_ui_language_and_stay_inside_main(self):
+        rows = {key: {"viewPath": "Fixture\\PLC\\" + path} for key, path in [("de", "Programmbausteine\\Main\\Remanence"),
+                ("en", "Program blocks\\Main\\Block comment"), ("other", "Program blocks\\TiaMcp_IsEnabled\\Block comment"),
+                ("foreign", "Other\\PLC\\Program blocks\\Main\\Block comment"), ("hardware", "")]}
+        self.assertEqual(set(coordinator.main_records(rows, "Fixture", "PLC")), {"de", "en"})
+
+
 if __name__ == "__main__": unittest.main()

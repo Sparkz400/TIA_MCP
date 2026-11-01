@@ -253,3 +253,4 @@ File.WriteAllText(Path.Combine(root,"mcp-fixture.json"),JsonSerializer.Serialize
 File.WriteAllText(Path.Combine(root,"verification.json"),JsonSerializer.Serialize(new{completed=true,nativeExecuted=false,count=checks.Count,checks},BridgeProtocol.Json));
 Console.WriteLine($"PASS technology profiles: {checks.Count} checks; synthetic supplied observations only.");
 EncoderTests.Run(root, review, packet);
+VersionProfileTests.Run();

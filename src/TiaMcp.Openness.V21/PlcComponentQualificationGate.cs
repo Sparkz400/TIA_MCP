@@ -40,23 +40,53 @@ namespace TiaMcp.Openness.V21
                 throw new PlcComponentException("InvalidRequest", "An explicit caller idempotencyKey is required for the review request.");
         }
 
-        // Production combined apply (on by default since 29 October 2026) runs only the shapes the component route
-        // verified natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
-        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport)
+        // Production combined apply (on by default since 29 October 2026) runs the shapes the component route verified
+        // natively: fresh FB/dependency import, a new global instance DB and a new FBD FC or an existing one after its last network.
+        // Each further feature below has a builder. A plan's exact feature combination (ShapeKey) runs in production only once
+        // that combination has its own native evidence and is listed in VerifiedShapes; a verified feature does not open its
+        // untested combinations. Until then only a qualification Host (--component-qualification) runs it, on its own owned
+        // scratch (candidates=true).
+        // Passed natively on 31 October (local.library_integrate.candidate_shapes.rerun.20261031): a new or existing LAD FC caller, an
+        // existing FBD FB caller, an existing FBD FC after an earlier network, and reuse of the installed FB with a new FBD FC caller.
+        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "ladCaller", "reusedComponent" };
+        internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
             if (payload == null || caller == null || PlcHmiIntegrationPlanner.IsRecipe(payload)) return "Only a prepared PLC component plan is eligible; HMI targets and PLC/HMI recipes stay plan-only.";
             if (caller.Value<bool?>("obCallAdded") != false || caller.Value<string>("kind") == "OB") return "OB insertion is refused; add the OB call as its own reviewed change.";
-            if (caller.Value<string>("kind") != "FC" || caller.Value<string>("language") != "FBD")
-                return "Only a new or existing FBD FC caller is verified; " + caller.Value<string>("language") + " " + caller.Value<string>("kind") + " callers stay plan-only.";
-            if (plan["fb"]?.Value<bool?>("reused") != false || (plan["reuse"]?["versions"] as JArray)?.Count != 0 || plan["instanceDb"] == null || plan["instanceDb"].Value<bool?>("reused") == true)
-                return "Only a fresh FB/dependency import with a new global instance DB is verified; reuse and multi-instances stay plan-only.";
+            if (!(caller.Value<string>("kind") is "FC" or "FB") || !(caller.Value<string>("language") is "FBD" or "LAD"))
+                return "Only LAD/FBD FC and FB callers have a combined apply builder.";
+            bool reused = plan["fb"]?.Value<bool?>("reused") == true;
+            if ((plan["reuse"]?["versions"] as JArray)?.Count != (reused ? ((JArray)plan["versions"]).Count : 0) || plan["instanceDb"]?.Value<bool?>("reused") == true)
+                return "Only a fresh FB/dependency import or the complete installed FB, each with new instance storage, has a builder; partial dependency reuse and reused instance DBs stay plan-only.";
             if (!(plan["blockers"] is JArray blockers) || blockers.Count != 0 || !(plan["steps"] is JArray steps) || steps.Any(s => s["planOnly"] != null))
                 return "Resolve every planner blocker and planOnly step first.";
+            var unverified = candidates ? new JObject() : UnverifiedFeatures(plan, payload, callerExport);
+            if (unverified.Count == 0) return null;
+            return (string)unverified.Properties().FirstOrDefault(p => !VerifiedShapes.Contains(p.Name, StringComparer.Ordinal))?.Value
+                ?? "The combination " + ShapeKey(unverified) + " of separately verified features has no native evidence; it stays plan-only.";
+        }
+
+        // The plan's features beyond the first verified shape, each with its refusal, when their exact combination is not verified.
+        internal static JObject UnverifiedFeatures(JObject plan, JObject payload, XDocument callerExport, System.Collections.Generic.IEnumerable<string> verifiedShapes = null)
+        {
+            var features = Features(plan, payload, callerExport);
+            return (verifiedShapes ?? VerifiedShapes).Contains(ShapeKey(features), StringComparer.Ordinal) ? new JObject() : features;
+        }
+        internal static string ShapeKey(JObject features) => string.Join("+", features.Properties().Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal));
+
+        private static JObject Features(JObject plan, JObject payload, XDocument callerExport)
+        {
+            var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
+            var features = new JObject();
+            if (language == "LAD") features["ladCaller"] = "A LAD caller is verified only as a new or existing FC on its own; a LAD " + kind + " caller with further features stays plan-only.";
+            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB; a " + language + " FB caller with further features stays plan-only.";
+            if (plan["multiInstance"] != null) features["multiInstance"] = "Only new global instance DBs are verified; multi-instances stay plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB; reuse with further features stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
-                return "Only insertion after the existing caller's last network is verified; earlier placements stay plan-only.";
-            return null;
+                features["earlierPlacement"] = "An earlier placement is verified only in an existing FBD FC on its own; an earlier placement with further features stays plan-only.";
+            return features;
         }
         // Step 1 imports and saves before step 2 creates the instance DB, so what step 2 needs from the target is decided
         // before the claim. The verified runs were de-DE only; another active language changes the installed FB/UDT exports.
@@ -74,8 +104,56 @@ namespace TiaMcp.Openness.V21
             return "No instance creation profile covers the FB, so the instance DB step would fail after the import: " +
                 (last?.Message ?? "no instance template exists for this CPU and route.");
         }
-        internal static string CombinedApplyStep(string state) =>
-            state == "created" ? "prepare_library_instantiate" : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
+        // The combined apply's steps live in a short workspace beside the plan's change directory, not nested inside it: TIA
+        // refuses an archive whose path (the step's change directory plus "\before") exceeds 143 characters.
+        internal const int TiaArchivePathLimit = 143;
+        internal static string CombinedApplyWorkspace(string planDirectory, string planId) =>
+            System.IO.Path.Combine(System.IO.Path.GetDirectoryName(planDirectory), "c", planId.Substring(planId.Length - 32, 8));
+        // The import step's directory change-lib-<32 hex> is the longest; the typed step's change-<32 hex> is shorter.
+        internal static int CombinedApplyArchivePathLength(string workspace) => System.IO.Path.Combine(workspace, "change-lib-" + new string('0', 32), "before").Length;
+        // change_restore retrieves the checkpoint into <changes>/lr_<10 hex>/<project> (SharedMutationLibraryRecoveryDirectory);
+        // TIA limits that project directory to 143 characters as well.
+        internal static int CombinedApplyRecoveryPathLength(string planDirectory, string projectName) =>
+            System.IO.Path.Combine(System.IO.Path.GetDirectoryName(planDirectory), "lr_" + new string('0', 10), projectName).Length;
+        internal static JObject CombinedApplyPathRefusal(string planDirectory, string planId, string projectName)
+        {
+            int archive = CombinedApplyArchivePathLength(CombinedApplyWorkspace(planDirectory, planId)), recovery = CombinedApplyRecoveryPathLength(planDirectory, projectName);
+            int length = Math.Max(archive, recovery);
+            return length <= TiaArchivePathLimit ? null : new JObject { ["code"] = "ComponentPathTooLong", ["length"] = length, ["limit"] = TiaArchivePathLimit,
+                ["archivePathLength"] = archive, ["recoveryPathLength"] = recovery,
+                ["message"] = (archive >= recovery ? "The step checkpoint archive path" : "The recovered project directory of change_restore") + " would be " + length +
+                    " characters, over TIA's " + TiaArchivePathLimit + "; start the Host with an artifact root at least " + (length - TiaArchivePathLimit) + " characters shorter." };
+        }
+
+        // CreateFrom keeps a library block's number only while it is free; an occupied number renumbers the imported block, and a
+        // captured instance profile compares the reference FB export with its number, so the typed step would fail after the import is saved.
+        internal static JObject CombinedApplyNumberRefusal(System.Collections.Generic.IEnumerable<XDocument> imported, System.Collections.Generic.IEnumerable<JObject> target,
+            string capturedFbName = null, int? capturedFbNumber = null)
+        {
+            foreach (var document in imported)
+            {
+                var block = document.Descendants().FirstOrDefault(e => e.Name.LocalName == "SW.Blocks.FB" || e.Name.LocalName == "SW.Blocks.FC");
+                if (block == null) continue; // PLC data types have no block number
+                string kind = block.Name.LocalName.Substring("SW.Blocks.".Length), name = (string)block.Element("AttributeList")?.Element("Name");
+                if (!int.TryParse((string)block.Element("AttributeList")?.Element("Number"), System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number))
+                    return Refusal("ComponentBlockNumberUnknown", kind + " " + name + " exports no block number, so the number its import takes cannot be checked before the claim.");
+                if (kind == "FB" && name == capturedFbName && capturedFbNumber != null && number != capturedFbNumber)
+                    return Refusal("CapturedStorageProfileUnavailable", "The captured instance profile binds " + name + " as FB" + capturedFbNumber + ", but the library version exports FB" + number + ".");
+                var used = target.FirstOrDefault(t => t.Value<string>("kind") == kind && t.Value<int?>("number") == number);
+                if (used != null)
+                {
+                    var refusal = Refusal("ComponentBlockNumberOccupied", kind + number + " is already used by " + used.Value<string>("path") + ". Importing " + name +
+                        " would renumber it" + (name == capturedFbName && capturedFbNumber != null ? ", which the captured instance profile does not cover" : "") + "; free or renumber that block first.");
+                    refusal["conflictingBlock"] = used.Value<string>("path"); refusal["number"] = number; refusal["kind"] = kind; refusal["importedBlock"] = name;
+                    return refusal;
+                }
+            }
+            return null;
+        }
+        private static JObject Refusal(string code, string message) => new JObject { ["code"] = code, ["message"] = message };
+
+        internal static string CombinedApplyStep(string state, bool reusedFb = false) =>
+            state == "created" ? (reusedFb ? "prepare_graphical_typed_edit" : "prepare_library_instantiate") : state == "library_prepared" ? "apply_library_instantiate" : state == "library_applied" ? "verify_import_readback" :
             state == "import_verified" ? "prepare_graphical_typed_edit" : state == "graphical_prepared" ? "apply_graphical_typed_edit" : state == "graphical_applied" ? "verify_installation_readback" : state;
     }
 }

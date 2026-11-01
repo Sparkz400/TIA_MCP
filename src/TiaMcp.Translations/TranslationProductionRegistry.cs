@@ -10,8 +10,11 @@ using static TiaMcp.Translations.TranslationJson;
 namespace TiaMcp.Translations;
 
 internal sealed record TranslationAdmissionFile(string Path, string Sha256);
+// Present only on a provisional restricted entry: the qualification deployment that runs its default-mode packet.
+internal sealed record TranslationAdmissionDeployment(string HostDirectory, string WorkerDirectory);
 internal sealed record TranslationAdmissionEntry(string Id, string ProjectPath, string PlcPath,
-    TranslationAdmissionProfile Profile, TranslationAdmissionFile[] Evidence);
+    TranslationAdmissionProfile Profile, TranslationAdmissionFile[] Evidence,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] TranslationAdmissionDeployment? Qualification = null);
 internal sealed record TranslationAdmissionRegistryDocument(int Version, TranslationAdmissionEntry[] Entries);
 
 /// <summary>
@@ -55,7 +58,17 @@ internal sealed class TranslationProductionRegistry(string installationDirectory
             EngineeringResourceKey.ForPath("project", selected.ProjectPath) == selected.Profile.Key.ProjectResourceKey &&
             !string.IsNullOrWhiteSpace(selected.PlcPath) && selected.PlcPath.Length <= 8192 && !selected.PlcPath.Any(char.IsControl),
             "TranslationAdmissionInvalid", "Installed selector differs from its exact project instance key.");
-        TranslationProductionAdmission.RequireComplete(selected.Profile, selected.Profile.Key);
+        // A provisional restricted entry lacks the default-mode interruption packet. It is valid only inside the exact
+        // qualification deployment that runs that packet; every other installation refuses it until it is finalized.
+        Require(selected.Qualification is null || selected.Profile.Key.Contract == TranslationProductionAdmission.RestrictedContract &&
+            SameDirectory(selected.Qualification.HostDirectory, installation) &&
+            SameDirectory(selected.Qualification.WorkerDirectory, System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(workerPath))!),
+            "TranslationAdmissionProvisional", "A provisional restricted admission is valid only in its qualification deployment; finalize it with the default-mode interruption packet.");
+        TranslationProductionAdmission.RequireComplete(selected.Profile, selected.Profile.Key, selected.Qualification is not null);
+        // A restricted key names its one PLC; the installed selector must be that PLC.
+        Require(selected.Profile.Key.Scope.ObjectSelections is ["whole-project:legacy-bilingual"] ||
+            selected.Profile.Key.Scope.ObjectSelections.SequenceEqual(["plc:" + selected.PlcPath]),
+            "TranslationAdmissionInvalid", "Installed selector differs from its exact project instance key.");
         Require(HashJson(selected.Profile.Key.Binaries) == HashJson(Binaries()), "TranslationAdmissionMismatch", "Installed admission pins different executable dependencies or Siemens API.");
         Require(selected.Evidence is { Length: > 0 and <= 128 } && selected.Evidence.All(file => file is not null) &&
             selected.Evidence.Select(file => file.Path).Distinct(StringComparer.Ordinal).Count() == selected.Evidence.Length &&
@@ -78,7 +91,7 @@ internal sealed class TranslationProductionRegistry(string installationDirectory
         var entry = Resolve(id);
         Require(EngineeringResourceKey.ForPath("project", context.Operation.Plan.Target.ProjectFilePath) == entry.Profile.Key.ProjectResourceKey,
             "TranslationAdmissionMismatch", "Operation belongs to another exact project instance.");
-        TranslationProductionAdmission.RequireComplete(entry.Profile, TranslationProductionAdmission.Describe(context, Binaries()));
+        TranslationProductionAdmission.RequireComplete(entry.Profile, TranslationProductionAdmission.Describe(context, Binaries()), entry.Qualification is not null);
     }
 
     internal TranslationAdmissionBinaries Binaries()
@@ -124,6 +137,8 @@ internal sealed class TranslationProductionRegistry(string installationDirectory
             }
         }
     }
+    private static bool SameDirectory(string? path, string directory) => path is not null && System.IO.Path.IsPathFullyQualified(path) &&
+        string.Equals(System.IO.Path.GetFullPath(path).TrimEnd('\\', '/'), System.IO.Path.GetFullPath(directory).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase);
     private static void UniqueProperties(JsonElement element)
     {
         if (element.ValueKind == JsonValueKind.Object)

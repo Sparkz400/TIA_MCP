@@ -1,0 +1,15 @@
+{
+  "description": "Curated summaries of 31 October 2026 that the catalog does not cite: both runs have a failed outcome, and a verified feature may cite only passed records. They are described, not cited, in docs/verification/component-candidate-shapes-20261031.md.",
+  "retiredFromCatalog": [],
+  "records": [],
+  "summariesNeverCataloged": [
+    {
+      "id": "local.library_integrate.candidate_shapes.20261031",
+      "reason": "Failed outcome: run 1 stopped every case at TIA's 143-character archive path and three run-2 cases failed. Not cited; a clean rerun replaces it."
+    },
+    {
+      "id": "local.library_units.namespace.20261031",
+      "reason": "Failed outcome: both runs stopped at the OB-rooted NAMESPACE caller source. Not cited; a clean rerun replaces it."
+    }
+  ]
+}
