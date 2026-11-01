@@ -26899,7 +26899,7 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Requires a qualification Host (--hmi-change-qualification classic-comfort) with a project its own worker retrieved or created, holding only Classic Comfort HMIs whose capture shows only the standing export note, and a worker-owned TIA instance for change_restore."
+          "Requires a qualification Host (--hmi-change-qualification classic-comfort) with a project its own worker retrieved or created, holding only Classic HMIs, the target a Classic Comfort one, whose capture shows only the standing export note, and a worker-owned TIA instance for change_restore."
         ]
       },
       "prerequisites": [

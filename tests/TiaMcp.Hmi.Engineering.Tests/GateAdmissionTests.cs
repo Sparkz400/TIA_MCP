@@ -80,6 +80,11 @@ static class GateAdmissionTests
             Assert(HmiEngineeringRules.Gate("classic", "classic-comfort", "scalar_property_set").Value<string>("reason").Contains("hmi_classic_import"), "Classic BackColor");
             Assert(HmiEngineeringRules.Gate("classic", "classic-comfort", "classic_xml_import").Value<string>("reason").Contains("hmi_classic_import"), "Classic import");
             Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "external_tag_create").Value<string>("reason").Contains("hmi_external_tag_create"), "Unified external tag");
+            string scalarReason = HmiEngineeringRules.Gate("classic", "classic-basic", "scalar_property_set").Value<string>("reason");
+            string importReason = HmiEngineeringRules.Gate("classic", "classic-basic", "classic_xml_import").Value<string>("reason");
+            Assert(scalarReason.Contains("only on classic-comfort") && !scalarReason.Contains("screen or tag table"), "the Classic scalar names its profile scope");
+            Assert(importReason.Contains("only on classic-comfort and only for a screen or tag table"), "the Classic import names its profile and type scope");
+            Assert(HmiEngineeringRules.Gate("unified", "unified-pc", "external_tag_create").Value<string>("reason").Contains("only on unified-comfort or unified-pc"), "the Unified kind names its profiles");
             foreach (var (family, operation) in new[] { ("unified", "scalar_property_set"), ("unified", "classic_xml_import"), ("unified", "tag_create"), ("classic", "external_tag_create"), ("unified", "screen_create") })
                 Assert(!HmiEngineeringRules.Gate(family, "x", operation).Value<string>("reason").Contains("Change kind"), "no kind for " + family + " " + operation);
         });

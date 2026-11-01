@@ -246,8 +246,9 @@ namespace TiaMcp.Model
                     : classicScalar
                         ? "Classic screen export is documented. Exact BackColor property readback, full export/dependency coverage, unrelated-content preservation, compile, save/reopen and recovered-project equality have not passed for this exact device/runtime profile."
                         : "Classic has no typed screen-item or primitive tag Create route in the inspected V21 assembly; a family-specific preserving XML creation/binding adapter and its dependency closure remain required.";
-            string kind = Kinds.FirstOrDefault(k => k.Value.Family == family && k.Value.Operations.Contains(operation, StringComparer.Ordinal)).Key;
-            if (kind != null) reason += " Change kind " + kind + " admits this operation under its own qualification gate; hmi_engineering never does.";
+            var carrier = Kinds.FirstOrDefault(k => k.Value.Family == family && k.Value.Operations.Contains(operation, StringComparer.Ordinal));
+            if (carrier.Key != null) reason += " Change kind " + carrier.Key + " admits this operation only on " + string.Join(" or ", carrier.Value.QualificationProfiles)
+                + (operation == "classic_xml_import" ? " and only for a screen or tag table" : "") + ", under its own qualification gate; hmi_engineering never does.";
             return new JObject { ["family"] = family, ["targetProfile"] = profile ?? "unknown", ["operation"] = operation,
                 ["apiAvailability"] = body ? "available" : family == "unified" ? "unavailable" : "partial",
                 ["bridgeImplementation"] = body ? "guarded_body" : "unavailable",

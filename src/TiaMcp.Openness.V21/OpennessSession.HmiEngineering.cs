@@ -62,7 +62,9 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("StaleRevision", "HMI native content changed since inspection; prepare from a fresh complete content capture.", change.HmiEvidence);
             return new JObject { ["effects"] = new JArray(effect), ["warnings"] = new JArray("Native compile does not qualify HMI runtime behavior."),
                 ["hmiEvidence"] = change.HmiEvidence.DeepClone(), ["compileRequired"] = true, ["saveRequired"] = true,
-                ["preservationPolicy"] = "hmi-family-specific-exact-v1; no PLC normalization; Classic export-time DocumentInfo.Created only" };
+                ["preservationPolicy"] = operation == "classic_xml_import"
+                    ? "hmi-family-specific-exact-v1; the target's readback ignores DocumentInfo, export-local IDs (HmiPreservationRules) and formatting; every other export Classic export-time DocumentInfo.Created only"
+                    : "hmi-family-specific-exact-v1; no PLC normalization; Classic export-time DocumentInfo.Created only" };
         }
 
         private static void RequireHmiEngineeringGate(JObject gate, JObject evidence)
