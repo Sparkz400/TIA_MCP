@@ -117,7 +117,8 @@ def body(h):
     start = h.report["fdiInputStart"] = input_start(rows, modules[FDI])
     safety = h.stage("safety_inspect of the F-PLC", lambda: h.tool("safety_inspect", {"plcPath": plc, "maxItems": 2000}))
     h.report["safetyProgram"] = {k: safety.get(k) for k in ("isPasswordSet", "isLoggedOn")}
-    h.apply("project_simulation_enable", {"enabled": True})
+    # Its apply compiles one PLC; the scratch has two, so the F-PLC is named (sl1 refused AmbiguousTarget without it).
+    change(h, "project_simulation_enable", {"enabled": True}, {"plcPath": plc})
     tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]
     default = [t for t in tables if any(c.get("kind") == "system" for c in t.get("constants", []))]
     require(len(default) == 1, "Expected one default tag table: %s" % [t["name"] for t in tables])
