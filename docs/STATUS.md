@@ -5,9 +5,9 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.88`: 479 features, 451 verified, 28 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 129 shipped, 322 limited, 19 unqualified, 7 unavailable on V21, 2 deferred |
-| Matrix cells | 2,055 bound, **108 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Feature catalog | `0.4.89`: 479 features, 453 verified, 26 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 129 shipped, 324 limited, 17 unqualified, 7 unavailable on V21, 2 deferred |
+| Matrix cells | 2,064 bound, **99 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
@@ -19,8 +19,7 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 names every row with an open cell.
 
 - **External prerequisites:** an operator at the desktop for the last Test Suite session
-  (TS-Q01), the Explorer roundtrip in VS Code, compilable Classic and Unified HMI fixtures and
-  the installation of the exported I-device GSD (one desk session; the runners are merged); the VMware guest, a V20 library input, RT
+  (TS-Q01); the VMware guest, a V20 library input, RT
   Professional and other HMI targets, a physical PLC (B05), optional products and licenses such
   as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
@@ -68,7 +67,9 @@ restricted translation profile, four more combined-apply shapes, technology vers
 profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
 recorded V21 boundaries. Later on 1 November: the `project_upgrade` interruption cases passed natively
-(16/16) and combined apply gained a multi-instance shape. On
+(16/16) and combined apply gained a multi-instance shape. In a desk session the Explorer roundtrip passed
+in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an
+operator-installed I-device GSD in the hardware runner (catalog 0.4.89). On
 [31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed
 offline, among them simulator ownership on every write, a PLCSIM route check for runtime writes and
 stores that no longer block on a missing old path; the changed native paths await a native recheck. On

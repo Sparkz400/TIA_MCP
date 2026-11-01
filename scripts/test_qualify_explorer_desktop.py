@@ -52,6 +52,7 @@ class DesktopRoundtripTests(unittest.TestCase):
         self.assertEqual("Visual Studio Code", found["clientInfo"]["name"])
         order = found["order"]
         self.assertTrue(order["capture"] < order["sent"] < order["details"] < order["detach"] < order["reused"])
+        self.assertEqual("ModelInvalidated", q.review(roundtrip(reused=error("ModelInvalidated")))["staleCode"])
 
     def test_view_details_before_the_send_do_not_count_as_the_agents_call(self):
         records = roundtrip(details_ref={**REF, "nodeId": "n8"})
@@ -67,6 +68,16 @@ class DesktopRoundtripTests(unittest.TestCase):
     def test_unnegotiated_session_fails(self):
         records = roundtrip()
         records[0]["message"]["params"]["capabilities"] = {}
+        with self.assertRaisesRegex(AssertionError, "negotiated"):
+            q.review(records)
+
+    def test_stateless_discover_negotiates_through_meta(self):
+        records = roundtrip()
+        records[0]["message"].update(method="server/discover", params={"_meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientInfo": {"name": "copilot-cli", "version": "1"},
+            "io.modelcontextprotocol/clientCapabilities": {"extensions": {"io.modelcontextprotocol/ui": {"mimeTypes": [q.MIME]}}}}})
+        self.assertEqual("copilot-cli", q.review(records)["clientInfo"]["name"])
+        records[0]["message"]["params"]["_meta"]["io.modelcontextprotocol/clientCapabilities"] = {}
         with self.assertRaisesRegex(AssertionError, "negotiated"):
             q.review(records)
 

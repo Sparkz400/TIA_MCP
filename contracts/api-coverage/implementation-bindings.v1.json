@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f8d8e4d733f667017996e11b22b21b85553dba66ce1e0080d0f6b0b7033f8232",
-      "bytes": 1567880
+      "sha256": "653877c25bc663d6f4fe19caa2a1950f88e64a7c44b415d6c40f13de167ae80d",
+      "bytes": 1573764
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2402,8 +2402,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/HardwareEngineeringRules.cs",
-      "sha256": "6ee97bf444cd66288503ad83184775d799f28eb7ced35c2cde5510ec471121a8",
-      "bytes": 57784
+      "sha256": "1339375192987dc583f0b6319f1f9c9ac2eb08e557f3ef20bd7115fd5dcfe892",
+      "bytes": 58386
     },
     {
       "path": "src/TiaMcp.Openness.V21/HmiAssemblyIdentityRules.cs",
@@ -101421,6 +101421,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.families.20261029.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.gsd.20261101",
+          "profileSha256": "ad58c5a64782606cca7299e0213a71eefd55929d7b6e3d90e45ad3822e58bd0d",
+          "artifacts": [
+            "evidence/local.hardware_changes.gsd.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -102250,7 +102257,15 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.compile.20261101",
+          "profileSha256": "784880b57481ccc381b978001427915ef1d10b1113002b36d998a7498fd0cad5",
+          "artifacts": [
+            "evidence/local.hmi.compile.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -104275,6 +104290,13 @@
           "profileSha256": "9a8b8c403424f49043a68f919217167c94ca99af6a0dd5f3af7262dda8563703",
           "artifacts": [
             "evidence/local.hardware_changes.topology_restores.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hardware_changes.gsd.20261101",
+          "profileSha256": "ad58c5a64782606cca7299e0213a71eefd55929d7b6e3d90e45ad3822e58bd0d",
+          "artifacts": [
+            "evidence/local.hardware_changes.gsd.20261101.json"
           ]
         }
       ],
@@ -111606,6 +111628,13 @@
           "artifacts": [
             "evidence/local.hardware_changes.topology_restores.20261101.json"
           ]
+        },
+        {
+          "id": "local.hardware_changes.gsd.20261101",
+          "profileSha256": "ad58c5a64782606cca7299e0213a71eefd55929d7b6e3d90e45ad3822e58bd0d",
+          "artifacts": [
+            "evidence/local.hardware_changes.gsd.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -111727,7 +111756,29 @@
       "sourceDependencies": [],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.hmi.bridge.rerun.20261029",
+          "profileSha256": "1253b6d80b70ba490ec2dc05f2fb706d492b763d4fd6fc5e0baa38077b599886",
+          "artifacts": [
+            "evidence/local.hmi.bridge.rerun.20261029.json"
+          ]
+        },
+        {
+          "id": "local.hmi.text-list-import.route.20261031",
+          "profileSha256": "1703763e3884981210993ef96ce37d05068d1a158446be7aa9551dc3942094b1",
+          "artifacts": [
+            "evidence/local.hmi.text-list-import.route.20261031.json"
+          ]
+        },
+        {
+          "id": "local.hmi.compile.20261101",
+          "profileSha256": "784880b57481ccc381b978001427915ef1d10b1113002b36d998a7498fd0cad5",
+          "artifacts": [
+            "evidence/local.hmi.compile.20261101.json"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -114314,6 +114365,13 @@
           "artifacts": [
             "evidence/local.explorer.e1.20261028.json"
           ]
+        },
+        {
+          "id": "local.explorer.desktop.20261101",
+          "profileSha256": "5f3629347fe82089437ff00ce1011d905c7b81fd593b07ddde7aaba4cf556e51",
+          "artifacts": [
+            "evidence/local.explorer.desktop.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -114400,6 +114458,13 @@
           "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d",
           "artifacts": [
             "evidence/local.explorer.e1.20261028.json"
+          ]
+        },
+        {
+          "id": "local.explorer.desktop.20261101",
+          "profileSha256": "5f3629347fe82089437ff00ce1011d905c7b81fd593b07ddde7aaba4cf556e51",
+          "artifacts": [
+            "evidence/local.explorer.desktop.20261101.json"
           ]
         }
       ],
@@ -127445,6 +127510,11 @@
       "sha256": "704301f8540e621ba94d85abf6cb31ac2b1a94e04e0230aa42e6e1f4d7f828ea"
     },
     {
+      "path": "evidence/local.explorer.desktop.20261101.json",
+      "state": "observed",
+      "sha256": "63144362567a6cd0b0839e93c7f621592baa83937137dadf2915bd4ffe93a817"
+    },
+    {
       "path": "evidence/local.explorer.e1.20261028.json",
       "state": "observed",
       "sha256": "a9280c5ae8e3357838c5428c61b7448e3018302db0e27f8dcbd8eebf3a763ef4"
@@ -127500,6 +127570,11 @@
       "sha256": "b30600658a303e425604a9771f01c34a9df2c2752855a95cd6af513fc1e7dc42"
     },
     {
+      "path": "evidence/local.hardware_changes.gsd.20261101.json",
+      "state": "observed",
+      "sha256": "36dd87796a953dddae8489dacc3c1007487bc6b7ff0c4a142f8e3b004908a6b2"
+    },
+    {
       "path": "evidence/local.hardware_changes.topology.20261101.json",
       "state": "observed",
       "sha256": "a1a66d59723b589388ccf541383effe07130b1960f8abf8df508b0c093f8d69a"
@@ -127513,6 +127588,11 @@
       "path": "evidence/local.hmi.bridge.rerun.20261029.json",
       "state": "observed",
       "sha256": "4a682db29aa6102a3a16b03c490d69811d01eb6a1303f4da4aaee86bedec3d9c"
+    },
+    {
+      "path": "evidence/local.hmi.compile.20261101.json",
+      "state": "observed",
+      "sha256": "f3c05f163438e7df08e7d1c88d224f23b3cdef41c18903d7d489fa4b38681575"
     },
     {
       "path": "evidence/local.hmi.text-list-import.20261029.json",
@@ -128412,6 +128492,10 @@
       "profileSha256": "f9ef19dfc4c2f2c4064fd439d2b73e20e62f55b52c363c5ccb95a2ad60784525"
     },
     {
+      "id": "local.explorer.desktop.20261101",
+      "profileSha256": "5f3629347fe82089437ff00ce1011d905c7b81fd593b07ddde7aaba4cf556e51"
+    },
+    {
       "id": "local.explorer.e1.20261028",
       "profileSha256": "38b7b396c7b1cde5ab816d0a4c38ea198d6ae7cb9fe7228cdd9ba92c089fed2d"
     },
@@ -128456,6 +128540,10 @@
       "profileSha256": "ae9869cbea297112ef85922bf1d8434b12ee889b207513064a24b2bc9012eb63"
     },
     {
+      "id": "local.hardware_changes.gsd.20261101",
+      "profileSha256": "ad58c5a64782606cca7299e0213a71eefd55929d7b6e3d90e45ad3822e58bd0d"
+    },
+    {
       "id": "local.hardware_changes.topology.20261101",
       "profileSha256": "78c27d5645f5cd75ddadec20463d4fb31b388c6d3f2c3e7b810fc4884bb3c343"
     },
@@ -128466,6 +128554,10 @@
     {
       "id": "local.hmi.bridge.rerun.20261029",
       "profileSha256": "1253b6d80b70ba490ec2dc05f2fb706d492b763d4fd6fc5e0baa38077b599886"
+    },
+    {
+      "id": "local.hmi.compile.20261101",
+      "profileSha256": "784880b57481ccc381b978001427915ef1d10b1113002b36d998a7498fd0cad5"
     },
     {
       "id": "local.hmi.text-list-import.20261029",

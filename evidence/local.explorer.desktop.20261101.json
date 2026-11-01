@@ -1,0 +1,54 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.explorer.desktop.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T09:33:12+00:00",
+  "source": {
+    "commit": "4b2a3c05763c39892e4d2f8ad3e02006a11e4908",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "VS Code 1.144.0 (Copilot agent, MCP 2026-07-28 server/discover) as the MCP Apps desktop host of the Host with --toolsets core,explorer on an owned scratch project: Explorer resource read and render, an exact six-field block selection verified and answered by project_model_details with the identical reference, the reference refused with SessionMismatch after tia_detach, an independent block_read equal to the details, and the artifact fallback (structured capture and offline HTML) for a client without MCP Apps.",
+  "limitations": [
+    "One product (VS Code 1.144.0) on one Windows desk. Rendering, no network request from the view and the stale state are operator-confirmed with screenshots. VS Code reloads the view when it scrolls back into sight and drops its selection, so the reference was reused from chat after tia_detach; the reloaded view showed ModelInvalidated. SSH/VM transport stays open (B07)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e5ccef943e6e7f3ebee783521bdb2f032b0750fc471db3382b12edca5e1f62f3"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "94ff16d4307a01734df21451022b7204fc414899d8cd090148b6d7e19c06f4bf"
+    }
+  ],
+  "runs": [
+    {
+      "report": "verification.json",
+      "sha256": "b7d4a1725683b60a5ff2bd907a908ebd8ad663b4a0a538058fd037469b6ec5de",
+      "bytes": 29211,
+      "completed": true,
+      "steps": [
+        "desktop transcript: negotiation, exact selection roundtrip, refusal after detach",
+        "an unnegotiated client sees no app UI",
+        "independent block_read equals the details the product received",
+        "artifact fallback: structured capture and an offline HTML viewer without MCP Apps"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "project_model_capture",
+        "project_model_export",
+        "project_open",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

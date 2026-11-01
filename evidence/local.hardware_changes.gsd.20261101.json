@@ -1,0 +1,113 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hardware_changes.gsd.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T09:59:14+00:00",
+  "source": {
+    "commit": "1110c3e6a055df20652d79bb92e277e1a5c194a5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hardware_changes.py --slice gsd on an owned scratch with a second CPU 1511-1 PN V4.1 on HwNet and an ET 200MP station that creates the IO system HwPeerIo. The project's own exported I-device GSD (GSDML V2.45, designation TiaMcpIDevice, two transfer areas), installed by an operator in TIA, is the one catalog entry found; hardware_add adds it, network_configure puts its node on HwNet without an address (the GSD reads IpProtocolSelection OtherPath), and network_io_assign assigns it to HwPeerIo with compile and save: both transfer areas take start addresses owned by the assigning PLC, everything else stays exact, the assignment restores once from its checkpoint and applies again. 52/52 steps.",
+  "limitations": [
+    "One GSD device, the project's own I-device export; no modules plugged into it, no shared-device access, no other GSD vendors or device families.",
+    "V21 Openness has no GSD installation API: an operator installs the GSD in TIA before the run; without it the runner records gsdNotInstalled."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b172a27b4ff3aa261d0a74fa38ea3dd0c5f3054e9aee0dd4bd3ab580ed9525b7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "2e846900dc0a2aaccc60d9dd38831e03335079a045f310161cefd5e639fcd2df"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "edc0c5a89d7f4a13fb0e2f660ea818a2b674f8241fd3925b73e4776a575d5a3b",
+      "bytes": 520626,
+      "completed": true,
+      "steps": [
+        "start owned TIA hardware changes",
+        "create owned scratch hardware changes",
+        "snapshot baseline",
+        "search the catalog for the installed I-device GSD",
+        "prepare add CPU HwPeer",
+        "apply hardware_add",
+        "change_status add CPU HwPeer",
+        "snapshot add CPU HwPeer",
+        "verify add CPU HwPeer",
+        "prepare put HwPeerCpu on HwNet",
+        "apply network_configure",
+        "change_status put HwPeerCpu on HwNet",
+        "snapshot put HwPeerCpu on HwNet",
+        "verify put HwPeerCpu on HwNet",
+        "prepare add ET 200MP station HwMp",
+        "apply hardware_add",
+        "change_status add ET 200MP station HwMp",
+        "snapshot add ET 200MP station HwMp",
+        "verify add ET 200MP station HwMp",
+        "prepare put HwMp on HwNet",
+        "apply network_configure",
+        "change_status put HwMp on HwNet",
+        "snapshot put HwMp on HwNet",
+        "verify put HwMp on HwNet",
+        "prepare assign HwMp to HwPeerCpu",
+        "apply network_io_assign",
+        "change_status assign HwMp to HwPeerCpu",
+        "snapshot assign HwMp to HwPeerCpu",
+        "verify assign HwMp to HwPeerCpu",
+        "prepare add GSD device HwGsd",
+        "apply hardware_add",
+        "change_status add GSD device HwGsd",
+        "snapshot add GSD device HwGsd",
+        "verify add GSD device HwGsd",
+        "prepare put HwGsd on HwNet",
+        "apply network_configure",
+        "change_status put HwGsd on HwNet",
+        "snapshot put HwGsd on HwNet",
+        "verify put HwGsd on HwNet",
+        "prepare assign HwGsd to HwPeerCpu, restored",
+        "apply network_io_assign",
+        "change_status assign HwGsd to HwPeerCpu, restored",
+        "snapshot assign HwGsd to HwPeerCpu, restored",
+        "verify assign HwGsd to HwPeerCpu, restored",
+        "restore assign HwGsd to HwPeerCpu, restored",
+        "snapshot restored assign HwGsd to HwPeerCpu, restored",
+        "restored assign HwGsd to HwPeerCpu, restored equals the pre-change state",
+        "prepare assign HwGsd to HwPeerCpu",
+        "apply network_io_assign",
+        "change_status assign HwGsd to HwPeerCpu",
+        "snapshot assign HwGsd to HwPeerCpu",
+        "verify assign HwGsd to HwPeerCpu"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "device_inventory",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}

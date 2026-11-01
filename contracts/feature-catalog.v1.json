@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.88",
+  "catalogVersion": "0.4.89",
   "targetTiaVersions": [
     21
   ],
@@ -686,6 +686,57 @@
       "limitations": [
         "One small fixture with one subnet, one IO system and one IO device; no multi-subnet, shared-device, redundant or IE/PB-coupler topologies. Configured associations only, never cables, ports or physical topology.",
         "No technology objects or software-unit relations existed in the fixture, so the technologyConnections and softwareUnitRelations providers remain natively unqualified; watch-table and populated external-source captures were not compared against an independent oracle."
+      ]
+    },
+    {
+      "id": "local.explorer.desktop.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4b2a3c05763c39892e4d2f8ad3e02006a11e4908",
+        "passedScope": "scripts/qualify_explorer_desktop.py with Debug builds of 8627274d (src unchanged at 4b2a3c0). VS Code 1.144.0 (Copilot agent, MCP 2026-07-28 server/discover) as the MCP Apps desktop host of the Host with --toolsets core,explorer on an owned scratch project: Explorer resource read and render, an exact six-field block selection verified and answered by project_model_details with the identical reference, the reference refused with SessionMismatch after tia_detach, an independent block_read in a fresh owned TIA equal to the details, and the artifact fallback (structured capture and offline HTML) for a client without MCP Apps. 4/4 steps."
+      },
+      "artifacts": [
+        "evidence/local.explorer.desktop.20261101.json"
+      ],
+      "limitations": [
+        "One product (VS Code 1.144.0) on one Windows desk; rendering, no network request from the view and the stale state are operator-confirmed with screenshots.",
+        "VS Code reloads the view when it scrolls back into sight and drops its selection, so the reference was reused from chat after tia_detach; the reloaded view showed ModelInvalidated. SSH/VM transport stays open (B07)."
+      ]
+    },
+    {
+      "id": "local.hmi.compile.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4b2a3c05763c39892e4d2f8ad3e02006a11e4908",
+        "passedScope": "scripts/qualify_engineering_gaps.py --hmi-fixture with Debug builds of 8627274d (src unchanged at 4b2a3c0) on two desk-configured HmiSeeder fixtures: a TP700 Comfort pair (start screen set in the editor) and an MTP700 Unified Comfort pair (encrypted-transfer password typed in the editor), two HMI targets each, retrieved into owned projects. Every target compiles through change_prepare/change_apply with zero errors and zero warnings, hmi_inspect is unchanged, a fresh Host reopens the saved project and compiles again, and the last compile restores from its checkpoint with hmi_inspect equal in the recovered copy. Refusals: an extra payload field and compile=false (InvalidRequest), a missing target (HmiTargetNotFound). 31/31 steps per fixture."
+      },
+      "artifacts": [
+        "evidence/local.hmi.compile.20261101.json"
+      ],
+      "limitations": [
+        "Only desk-configured fixtures compile: HMI targets created through Openness have no start screen (Classic) or transfer password (Unified).",
+        "Other devices, WinCC RT Advanced, Basic, Unified PC and RT Professional are not qualified."
+      ]
+    },
+    {
+      "id": "local.hardware_changes.gsd.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "1110c3e6a055df20652d79bb92e277e1a5c194a5",
+        "passedScope": "scripts/qualify_hardware_changes.py --slice gsd with Debug builds of 533cf8c4 (src unchanged at 1110c3e) on an owned scratch with a second CPU 1511-1 PN V4.1 on HwNet and an ET 200MP station that creates the IO system HwPeerIo. The project's own exported I-device GSD (GSDML V2.45, designation TiaMcpIDevice, two transfer areas), installed by an operator in TIA, is the one catalog entry found; hardware_add adds it, network_configure puts its node on HwNet without an address (the GSD reads IpProtocolSelection OtherPath), and network_io_assign assigns it to HwPeerIo with compile and save: both transfer areas take start addresses owned by the assigning PLC, everything else stays exact, and the assignment restores once from its checkpoint and applies again. 52/52 steps."
+      },
+      "artifacts": [
+        "evidence/local.hardware_changes.gsd.20261101.json"
+      ],
+      "limitations": [
+        "One GSD device, the project's own I-device export; no modules plugged into it, no shared-device access, no other GSD vendors or device families.",
+        "V21 Openness has no GSD installation API: an operator installs the GSD in TIA before the run; without it the runner records gsdNotInstalled."
       ]
     },
     {
@@ -7611,7 +7662,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. A CPU 1214C DC/DC/DC V4.7 with configureScratchSecurity and an ET 200MP IM 155-5 PN ST V4.1 head (applied without compile until its IO assignment, because an unassigned IO device fails the device compile) passed the same gates (local.hardware_changes.families.20261029); HMI, drive and GSD devices are not exercised.",
+          "Natively qualified in an owned scratch CPU 1511-1 PN V4.1 with a second CPU on one subnet (local.hardware_changes.20261028): a CPU 1511-1 PN added with configureScratchSecurity, everything outside the new device unchanged; case-insensitive duplicate names and identifiers missing from the catalog refused; fresh-Portal reopen and checkpoint restore. A CPU 1214C DC/DC/DC V4.7 with configureScratchSecurity and an ET 200MP IM 155-5 PN ST V4.1 head (applied without compile until its IO assignment, because an unassigned IO device fails the device compile) passed the same gates (local.hardware_changes.families.20261029); An installed I-device GSD was added the same way and compiled with its IO assignment (local.hardware_changes.gsd.20261101; no reopen); HMI and drive devices are not exercised.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
@@ -7622,7 +7673,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.20261028",
-          "local.hardware_changes.families.20261029"
+          "local.hardware_changes.families.20261029",
+          "local.hardware_changes.gsd.20261101"
         ]
       },
       "availability": {
@@ -8827,7 +8879,7 @@
         "limitations": [
           "The aggregate distributed-I/O workflow is a sequence of reviewed changes, each with its own preview, checkpoint, device compile and preservation: add IO devices (hardware_add), connect nodes (network_configure), assign controllers (network_io_assign, with the explicit generated ET 200SP server contract), plug and move modules, share an IO device between PLCs of one project (network_io_assign sharedDevice) or hand modules to a controller outside the project (hardware_shared_device_access), link ports and configure media redundancy (network_mrp_set). There is no single-call topology import.",
           "The single-controller ET 200SP route (local.remote-io.full-route.rerun.20261028) and two controllers with S7-1200 and ET 200MP families (local.hardware_changes.families.20261029) are qualified; local.hardware_changes.topology.20261101 adds ET 200SP on the second CPU, a shared device in one project, a module outside the project and an MRP ring, in one project with four devices on one subnet.",
-          "I-devices under a higher-level controller, drive devices, arbitrary module families and runtime behaviour are not covered. GSD devices are not exercised: V21 Openness has no GSD installation API, and local.hardware_changes.topology.20261101 recorded gsdNotInstalled. Once an operator installs the project's own exported I-device GSD in TIA, the hardware runner adds, assigns and compiles it.",
+          "I-devices under a higher-level controller, drive devices, arbitrary module families and runtime behaviour are not covered. GSD devices: V21 Openness has no GSD installation API, so an operator installed the project's own exported I-device GSD in TIA; adding it, putting it on the subnet and assigning it to the second CPU's IO system with compile passed, with checkpoint restore (local.hardware_changes.gsd.20261101). Other GSD devices are not exercised.",
           "The topology run applied and persisted the shared device, the module outside the project and the MRP domain; local.hardware_changes.topology_restores.20261101 restored the shared-device assignment, OutsideOfProject, the createDomain manager and the IM 155-5 PN ST client."
         ]
       },
@@ -8835,7 +8887,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.hardware_changes.topology.20261101",
-          "local.hardware_changes.topology_restores.20261101"
+          "local.hardware_changes.topology_restores.20261101",
+          "local.hardware_changes.gsd.20261101"
         ]
       },
       "availability": {
@@ -9044,14 +9097,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0) and change.hmi_compile (one HMI target per change; not yet natively qualified: only a desk-configured fixture compiles, docs/reference/hmi-fixture-preparation.md). Each feature's own limitations bound its claim.",
+          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0) and change.hmi_compile (one HMI target per change, on desk-configured TP700 Comfort and MTP700 Unified Comfort fixtures). Each feature's own limitations bound its claim.",
           "Not delivered: HMI content writes (change.hmi_engineering stays behind the closed HMI preservation gate), WinCC RT Professional, Classic PLC declaration mapping and visual or runtime acceptance. See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.bridge.rerun.20261029",
+          "local.hmi.text-list-import.route.20261031",
+          "local.hmi.compile.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -12508,7 +12565,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.explorer.native-providers.20261026",
-          "local.explorer.e1.20261028"
+          "local.explorer.e1.20261028",
+          "local.explorer.desktop.20261101"
         ]
       },
       "availability": {
@@ -12845,7 +12903,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.explorer.e1.20261028"
+          "local.explorer.e1.20261028",
+          "local.explorer.desktop.20261101"
         ]
       },
       "availability": {
@@ -13977,7 +14036,8 @@
           "Hardware preservation manifests now require unique nonempty string paths and object rows before comparison; malformed rows cannot be filtered away. This guard has portable linked-source regression evidence only; the changed native worker still needs SDK build and native qualification.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "Project-wide device compilation now uses exact device-path-v1 identities with complete service preflight and post-compile scope checks; changed native routes require SDK and product qualification. Independent device-inventory qualification is implemented for safety scratch and encoder hardware only.",
-          "The ET 200SP IM 155-6 PN ST V6.4 also passed on the second CPU's existing IO system with the generated server module (local.hardware_changes.topology.20261101), and its BusAdapter ports take SharedDeviceAccessType PLC with the head's items."
+          "The ET 200SP IM 155-6 PN ST V6.4 also passed on the second CPU's existing IO system with the generated server module (local.hardware_changes.topology.20261101), and its BusAdapter ports take SharedDeviceAccessType PLC with the head's items.",
+          "An installed I-device GSD (two transfer areas, start -1 and no owner until assigned) joined the second CPU's IO system with compile and save, each transfer area taking a start address owned by that PLC, and restored from its checkpoint (local.hardware_changes.gsd.20261101). Only a range without a start and owner may take one, and only from the assigned PLC."
         ]
       },
       "qualification": {
@@ -13987,7 +14047,8 @@
           "local.remote-io.lifecycle.rerun.20261028",
           "local.hardware_changes.families.20261029",
           "local.hardware_changes.topology.20261101",
-          "local.hardware_changes.topology_restores.20261101"
+          "local.hardware_changes.topology_restores.20261101",
+          "local.hardware_changes.gsd.20261101"
         ]
       },
       "availability": {
@@ -22044,14 +22105,16 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the installed API only; not natively qualified.",
+          "Natively qualified on desk-configured HmiSeeder fixtures in TIA Portal V21 (local.hmi.compile.20261101): a TP700 Comfort pair (start screen set in the editor) and an MTP700 Unified Comfort pair (encrypted-transfer password typed in the editor), two HMI targets each. Every target compiles with zero errors and zero warnings, hmi_inspect is unchanged, a fresh Host reopens the saved project and compiles again, and the last compile restores from its checkpoint. Refusals: an extra payload field and compile=false (InvalidRequest), a missing target (HmiTargetNotFound). Other devices, WinCC RT Advanced, Basic, Unified PC and projects not configured this way are not qualified.",
           "Payload target {family, hmiPath} from library_query hmi_targets; compile=true. Saves the project and creates a checkpoint before compiler dispatch; no other mutation runs. Runtime is not verified.",
-          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile is not qualified."
+          "Native observation (local.engineering_gaps.20261029): a TP700 Comfort and an MTP700 Unified Basic created by hardware_add are compiled on their exact targets, and TIA's errors (no start screen; the Unified panel also lacks its runtime password) return as CompileFailed and restore from the checkpoint. No compilable HMI target can be made through the public routes (screen creation stays behind the closed HMI preservation gate), so a successful compile needs a fixture configured in the editor (docs/reference/hmi-fixture-preparation.md)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.hmi.compile.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",

@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.88`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.89`.
 
 ### Added
 
@@ -37,7 +37,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **HMI:** Unified text-list authoring and generation whose candidates import exactly through V21;
   Unified and Classic HMI read and authoring routes.
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
-- **Explorer:** technology, software-unit, library and port providers.
+- **Explorer:** technology, software-unit, library and port providers. The desktop roundtrip passed in
+  VS Code 1.144.0 through MCP Apps: an exact selection answered by `project_model_details`, refusal
+  after `tia_detach` and the artifact fallback (`local.explorer.desktop.20261101`).
+- **HMI compile:** `change.hmi_compile` compiles fixtures an operator configured in the editor (start
+  screen, Unified transfer password): TP700 Comfort and MTP700 Unified Comfort, two targets each, with
+  zero errors and warnings, a fresh-Host reopen and checkpoint restore (`local.hmi.compile.20261101`).
 - **Project upgrade:** `project_upgrade` upgrades a V14–V20 project folder (`.ap14`–`.ap20`,
   `.ap15_1`) or archive (`.zap14`–`.zap20`) to V21 on an owned copy; the source is never opened,
   its hash is checked before and after, and V13 and older are refused before any native call
@@ -87,8 +92,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   a caller FB with dependents (its own instance DB, embedding parents) is refused at
   `mutation_begin` with `DependencyProfileUnavailable` before any admission record
   (`local.library_integrate.candidate_shapes.dependents.rerun.20261101`).
-- **GSD:** the I-device GSD export reran (`local.gsd_transfer_areas.20261101`); the GSDML is staged
-  for an operator install, and the hardware runner has `--slice gsd` for the device step afterwards.
+- **GSD:** the I-device GSD export reran (`local.gsd_transfer_areas.20261101`). With the GSDML
+  installed by an operator, the hardware runner's `--slice gsd` adds the device, puts it on the subnet and
+  assigns it with compile and checkpoint restore (`local.hardware_changes.gsd.20261101`).
 
 ### Changed
 
@@ -160,10 +166,15 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   - Combined apply of a verified shape no longer imports and saves the component FB before failing
     at typed preparation when the captured profile's FB number is taken in the target, which left the
     change `recovery_required`; it is refused before any claim.
-  - Runner and diagnostics fixes: `ExactClient` runners accept the `tools/list` prefetch without
-    params again (broken since `28d50f91`); `qualify_plcsim_signals.py` takes the discovery baseline
-    before `sim_create`; card-move rows carry their UTC time; the retained-tree runners give the
-    FileStorage helper its 360 s exit deadline.
+  - `network_io_assign` accepts the start address the assigned PLC gives a range that had none (an
+    I-device GSD's transfer areas); it refused the assignment with `MutationVerificationFailed`.
+  - Runner and diagnostics fixes: the Explorer desktop gate reads the MCP 2026-07-28
+    `server/discover` handshake and accepts `ModelInvalidated` after `tia_detach`; the GSD slice puts the
+    device on the subnet without an address (its GSD sets `IpProtocolSelection` `OtherPath`);
+    `ExactClient` runners accept the `tools/list` prefetch without params again (broken since
+    `28d50f91`); `qualify_plcsim_signals.py` takes the discovery baseline before `sim_create`; card-move
+    rows carry their UTC time; the retained-tree runners give the FileStorage helper its 360 s exit
+    deadline.
 
 ### Known limitations
 

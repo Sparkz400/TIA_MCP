@@ -1,0 +1,150 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.compile.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T09:45:11+00:00",
+  "source": {
+    "commit": "4b2a3c05763c39892e4d2f8ad3e02006a11e4908",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_engineering_gaps.py --hmi-fixture on two desk-configured HmiSeeder fixtures in TIA Portal V21: a TP700 Comfort pair (start screen set in the editor) and an MTP700 Unified Comfort pair (encrypted-transfer password typed in the editor), two HMI targets each, retrieved into owned projects. Every target compiles through change_prepare/change_apply with zero errors and zero warnings, hmi_inspect is unchanged, a fresh Host reopens the saved project and compiles again, and the last compile restores from its checkpoint with hmi_inspect equal in the recovered copy. Refusals: an extra payload field and compile=false (InvalidRequest), a missing target (HmiTargetNotFound). 31/31 steps per fixture.",
+  "limitations": [
+    "Only desk-configured fixtures compile: HMI targets created through Openness have no start screen (Classic) or transfer password (Unified), which V21 offers no public API to set.",
+    "Other devices, WinCC RT Advanced, Basic, Unified PC and RT Professional are not qualified."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "e5ccef943e6e7f3ebee783521bdb2f032b0750fc471db3382b12edca5e1f62f3"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "94ff16d4307a01734df21451022b7204fc414899d8cd090148b6d7e19c06f4bf"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "5a96e31969e0ecc7c7e40aa07071dcd6a8a1cf8f287edc79e6ffc9d62eb2cd0c",
+      "bytes": 159176,
+      "completed": true,
+      "steps": [
+        "start owned TIA hmi fixture",
+        "retrieve the configured HMI fixture",
+        "discover HMI targets",
+        "refuse hmi_compile with an extra payload field",
+        "refuse hmi_compile without compile=true",
+        "prepare hmi_compile",
+        "capture hmi_inspect of every target",
+        "refuse hmi_compile of a missing classic target",
+        "prepare hmi_compile",
+        "hmi_compile classic HMI_RT_1",
+        "change_status of the HMI_RT_1 compile",
+        "refuse hmi_compile of a missing classic target",
+        "prepare hmi_compile",
+        "hmi_compile classic HMI_RT_2",
+        "change_status of the HMI_RT_2 compile",
+        "hmi_inspect unchanged by the compiles",
+        "close the compiled session",
+        "start a fresh Host",
+        "start owned TIA reopen",
+        "reopen the saved fixture",
+        "reopened hmi_inspect equals the compiled fixture",
+        "refuse hmi_compile of a missing classic target",
+        "prepare hmi_compile",
+        "hmi_compile classic HMI_RT_1",
+        "change_status of the HMI_RT_1 compile",
+        "refuse hmi_compile of a missing classic target",
+        "prepare hmi_compile",
+        "hmi_compile classic HMI_RT_2",
+        "change_status of the HMI_RT_2 compile",
+        "restore hmi_compile from its checkpoint",
+        "recovered copy hmi_inspect equals the compiled fixture"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hmi_inspect",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    },
+    {
+      "report": "qualification.json",
+      "sha256": "ee20aebbe79e4fcc8e751be4108c2cb7a7e617b75b05a0a54e5cbbf9501d8c51",
+      "bytes": 136740,
+      "completed": true,
+      "steps": [
+        "start owned TIA hmi fixture",
+        "retrieve the configured HMI fixture",
+        "discover HMI targets",
+        "refuse hmi_compile with an extra payload field",
+        "refuse hmi_compile without compile=true",
+        "prepare hmi_compile",
+        "capture hmi_inspect of every target",
+        "refuse hmi_compile of a missing unified target",
+        "prepare hmi_compile",
+        "hmi_compile unified HMI_RT_1",
+        "change_status of the HMI_RT_1 compile",
+        "refuse hmi_compile of a missing unified target",
+        "prepare hmi_compile",
+        "hmi_compile unified HMI_RT_2",
+        "change_status of the HMI_RT_2 compile",
+        "hmi_inspect unchanged by the compiles",
+        "close the compiled session",
+        "start a fresh Host",
+        "start owned TIA reopen",
+        "reopen the saved fixture",
+        "reopened hmi_inspect equals the compiled fixture",
+        "refuse hmi_compile of a missing unified target",
+        "prepare hmi_compile",
+        "hmi_compile unified HMI_RT_1",
+        "change_status of the HMI_RT_1 compile",
+        "refuse hmi_compile of a missing unified target",
+        "prepare hmi_compile",
+        "hmi_compile unified HMI_RT_2",
+        "change_status of the HMI_RT_2 compile",
+        "restore hmi_compile from its checkpoint",
+        "recovered copy hmi_inspect equals the compiled fixture"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hmi_inspect",
+        "library_query",
+        "project_inventory",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

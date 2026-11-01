@@ -93,6 +93,8 @@ is restored from its checkpoint and the recovered copy compared once more.
 Every inspected page and row must name the project of that step (retrieved,
 reopened, recovered), and empty screens or an empty Unified model refuse.
 Session-bound identity fields and Classic export hashes are not compared.
+On 1 November it passed 31/31 steps on a TP700 Comfort and an MTP700 Unified Comfort fixture
+(`local.hmi.compile.20261101`).
 
 ```powershell
 python -u -B scripts/qualify_engineering_gaps.py --run-native --host <frozen TiaMcp.Host.exe> --worker <frozen TiaMcp.Openness.V21.exe> --artifacts D:/Entwicklung/TIA_MCP-public/artifacts/hc --hmi-fixture <preparation>/native/configured.zap21

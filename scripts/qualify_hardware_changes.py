@@ -311,12 +311,14 @@ def plug(run, name, slot, station=SCRATCH, module=MODULE, changed=()):
               added=under(item[3:], constant(run, station, station.prefix + name)), changed=changed, rows={item: {"typeIdentifier": module, "positionNumber": slot}})
 
 
-def node(run, device, interface, address, deferred=False):
-    """One more interface on HwNet with its own address; device_inventory shows the address on the device, its head and the interface rows."""
+def node(run, device, interface, address=None, deferred=False):
+    """One more interface on HwNet, with its own address when given; device_inventory shows the address on the device, its head and the
+    interface rows."""
     path = run.path(device, "items", *interface)
     name = run.current["view"]["hw:" + path]["network"]["nodes"][0]["name"]  # "X1" on S7-1500, "X1 : PN(LAN)" on S7-1200, "IE1" on IM 155-5.
-    rows = [run.path(device), run.path(device, "items", interface[0]), path]
-    run.apply("put %s on HwNet" % device, "network_configure", {"hardwarePath": path, "nodeName": name, "subnetName": "HwNet", "attributes": {"Address": address}},
+    rows = [run.path(device), run.path(device, "items", interface[0]), path] if address else []
+    extra = {"attributes": {"Address": address}} if address else {}
+    run.apply("put %s on HwNet" % device, "network_configure", {"hardwarePath": path, "nodeName": name, "subnetName": "HwNet", **extra},
               changed=["hw:" + path] + ["inv:" + row for row in rows], deferred=deferred)
 
 
@@ -583,15 +585,19 @@ def gsd_device(run, rows=None, restore=False):
               {"effects": [{"createDevice": device, "typeIdentifier": identifier}]}, added=under(run.path(device)), deferred=True)
     prefix = run.path(device, "items", "")
     interface = next(key[3 + len(prefix):] for key, row in sorted(run.current["view"].items()) if key.startswith("hw:" + prefix) and (row.get("network") or {}).get("ioConnectors"))
-    node(run, device, tuple(interface.split("/")), "192.168.0.6", deferred=True)  # ("HwGsdHead", "items", "PROFINET%20interface"), as MP.interface.
+    # ("HwGsdHead", "items", "Interface"). The I-device GSD reads IpProtocolSelection OtherPath (its own CPU project sets the address),
+    # so its node has no Address attribute.
+    node(run, device, tuple(interface.split("/")), deferred=True)
     path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
+    # Unlike the ET 200MP head, the GSD's ports keep their state on assignment (discovery hg4).
+    items = lambda applied, state: [key for key in head_items(run, device, head)(applied, state) if "/items/Port%20" not in key]
     def assign(restored):
         return run.apply("assign %s to HwPeerCpu%s" % (device, ", restored" if restored else ""), "network_io_assign", payload,
                          {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
                          shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
-                         changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated, restore=restored, boundary=True)
+                         changed=lambda applied, state: items(applied, state) + ["hw:" + controller], added=generated, restore=restored, boundary=True)
     if restore:
         run.b0 = run.current
         assign(True)
