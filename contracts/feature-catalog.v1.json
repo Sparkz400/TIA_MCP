@@ -3858,6 +3858,22 @@
         "The repo's online PLCSIM route is gated by a successful memory card, which V21 refuses for an F-CPU, so V21's online download of a safety program (its SafetyProgram download configuration 'Load safety program to device', selection ConsistentDownload) was not reached; the policy would refuse that safety confirmation anyway.",
         "No safety acceptance, login, password or confirmation; the scratch user's fail-safe access exists in the owned scratch only."
       ]
+    },
+    {
+      "id": "local.library_units.namespace.dependency.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "c54d0be1174777c376ce5d35c5ff1ba4a7bd4c32",
+        "passedScope": "scripts/qualify_library_units.py --run-native at c54d0be1 (build c54d0be1 frozen at artifacts/w4nd, --artifacts artifacts/lu4, 117/117 steps): the namespace sequence of local.library_units.namespace.rerun.20261031 plus an FB type instantiated with an explicit namespace together with the UDT it needs, which library_instantiate creates in the same change: the preview lists both as created, the FB carries the namespace and the UDT keeps its type's (empty) namespace, compile 0 errors, both read back through software_inspect, equal after a fresh reopen, and the change's checkpoint restored into a new TIA removes both."
+      },
+      "artifacts": [
+        "evidence/local.library_units.namespace.dependency.20261101.json"
+      ],
+      "limitations": [
+        "One FB/UDT pair in one software unit of one S7-1500; a dependency with its own namespace and nested dependency chains are not exercised."
+      ]
     }
   ],
   "features": [
@@ -11501,7 +11517,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 project with a second CPU and an owned user global library (local.library_preservation.20261028): exact independent PLC and library snapshot diffs around each change, stale-identity and wrong-previewHash refusals, fresh reopen and checkpoint restore of one change of this kind.",
-          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029), for a UDT root reused as the namespaced FB's dependency and for a master copy of an FC (instanceNamespace.masterCopies); a later PLC-wide library_update_project keeps every namespaced path (local.library_units.namespace.rerun.20261031). A dependency created alongside a namespaced root keeps its type namespace; unexercised.",
+          "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029), for a UDT root reused as the namespaced FB's dependency and for a master copy of an FC (instanceNamespace.masterCopies); a later PLC-wide library_update_project keeps every namespaced path (local.library_units.namespace.rerun.20261031). A dependency created alongside a namespaced root keeps its type namespace: a UDT created with a namespaced FB stays in the root namespace and compiles (local.library_units.namespace.dependency.20261101); a dependency with its own type namespace and nested dependency chains are not exercised.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -11529,7 +11545,8 @@
           "local.library_protected.rerun.20261029",
           "local.library_scopes.rerun.20261029",
           "local.library_units.namespace.20261029",
-          "local.library_units.namespace.rerun.20261031"
+          "local.library_units.namespace.rerun.20261031",
+          "local.library_units.namespace.dependency.20261101"
         ]
       },
       "availability": {
@@ -11596,7 +11613,8 @@
           "local.library_scopes.rerun.20261029",
           "local.library_scopes.forced.20261029",
           "local.library_units.namespace.20261029",
-          "local.library_units.namespace.rerun.20261031"
+          "local.library_units.namespace.rerun.20261031",
+          "local.library_units.namespace.dependency.20261101"
         ]
       },
       "availability": {

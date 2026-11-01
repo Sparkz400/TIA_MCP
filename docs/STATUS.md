@@ -5,7 +5,7 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.92`: 481 features, 455 verified, 26 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Feature catalog | `0.4.93`: 481 features, 455 verified, 26 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
 | Release matrix rows | 129 shipped, 326 limited, 17 unqualified, 7 unavailable on V21, 2 deferred |
 | Matrix cells | 2,078 bound, **99 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
 | Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92` |

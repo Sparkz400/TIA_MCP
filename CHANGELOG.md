@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.92`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.93`.
 
 ### Added
 
@@ -96,7 +96,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   caller, an earlier placement in an existing FBD FC and reuse of an installed FB, each as an exact
   single-feature shape (`local.library_integrate.candidate_shapes.rerun.20261031`); combinations
   stay plan-only. `library_instantiate` sets an explicit `namespace` on a master copy of a block or
-  PLC data type (`local.library_units.namespace.rerun.20261031`). An FB caller with a multi-instance
+  PLC data type (`local.library_units.namespace.rerun.20261031`); a UDT that the instantiation of a
+  namespaced FB creates alongside it keeps its type's empty namespace and compiles
+  (`local.library_units.namespace.dependency.20261101`). An FB caller with a multi-instance
   and a reused component also verifies (`local.library_integrate.candidate_shapes.multi.20261101`);
   a caller FB with dependents (its own instance DB, embedding parents) is refused at
   `mutation_begin` with `DependencyProfileUnavailable` before any admission record

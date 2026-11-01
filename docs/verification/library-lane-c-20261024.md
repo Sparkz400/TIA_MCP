@@ -101,6 +101,24 @@ After the user's elevated Openness grant, `scripts/native/LibraryUnitSeeder` see
 
 `local.library_dependencies.20261025` repeats the dependency run on this build to confirm same-scope reuse is unaffected.
 
+**Explicit namespaces (29 October to 1 November).** `library_instantiate` takes `namespace` for a software-unit
+`scopePath` and sets it on the selected roots. It passed on an FB root (`local.library_units.namespace.20261029`), and on
+31 October on a namespaced UDT reused by a namespaced FB, a namespaced master copy and a PLC-wide update that keeps the
+namespaced paths (`local.library_units.namespace.rerun.20261031`,
+[record](component-candidate-shapes-20261031.md#library-instance-namespaces)). On 1 November `qualify_library_units.py`
+at c54d0be1 (build frozen at `artifacts/w4nd`, 117/117 steps,
+[`local.library_units.namespace.dependency.20261101`](../../evidence/local.library_units.namespace.dependency.20261101.json))
+added a dependency created alongside a namespaced root: an FB instantiated with the namespace while the unit held no
+instance of its UDT.
+
+- The preview lists the FB and the UDT as created and nothing as reused.
+- The namespace goes on the FB only. Created dependencies keep their type namespace, so the UDT stays in the root
+  namespace. The project compiles with 0 errors.
+- `software_inspect` reads the FB under `/namespaces/TiaMcp_LibUnit/` and the UDT without a namespace, each with one
+  exact use, and a fresh reopen shows the same. The change's checkpoint restored into a new TIA holds neither.
+
+Not exercised: a dependency with its own type namespace and nested dependency chains.
+
 ## Release behavior on PLCSIM — 26 October 2026
 
 `local.library_releases.20261026` (`qualify_library_release_changes.py` at bc974fc, build da24990 frozen at `D:\lrc\b9`, raw

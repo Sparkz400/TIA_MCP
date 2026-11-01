@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.92",
-    "catalogSha256": "f793c57b3546aa9d5641cda929f5259cb207ea24259e16b9dcef0a6fd75ecc01",
+    "catalogSha256": "16d5fd553e02a27395ad530833fdae8779270514d14402f27cd963f944c2d1dc",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "46737ea7e7ac38dc63c0f4e775924db19fffde58bddc165b6f6773af3a0ce3ed"
   },
@@ -8111,7 +8111,8 @@
         "local.library_protected.rerun.20261029",
         "local.library_scopes.rerun.20261029",
         "local.library_units.namespace.20261029",
-        "local.library_units.namespace.rerun.20261031"
+        "local.library_units.namespace.rerun.20261031",
+        "local.library_units.namespace.dependency.20261101"
       ],
       "cells": [
         {
@@ -8131,7 +8132,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8151,7 +8153,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8171,7 +8174,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8191,7 +8195,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8211,7 +8216,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8231,7 +8237,8 @@
             "local.library_protected.rerun.20261029",
             "local.library_scopes.rerun.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         }
       ]
@@ -8263,7 +8270,8 @@
         "local.library_scopes.rerun.20261029",
         "local.library_scopes.forced.20261029",
         "local.library_units.namespace.20261029",
-        "local.library_units.namespace.rerun.20261031"
+        "local.library_units.namespace.rerun.20261031",
+        "local.library_units.namespace.dependency.20261101"
       ],
       "cells": [
         {
@@ -8281,7 +8289,8 @@
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8299,7 +8308,8 @@
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8317,7 +8327,8 @@
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8335,7 +8346,8 @@
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8353,7 +8365,8 @@
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         },
         {
@@ -8371,7 +8384,8 @@
             "local.library_scopes.rerun.20261029",
             "local.library_scopes.forced.20261029",
             "local.library_units.namespace.20261029",
-            "local.library_units.namespace.rerun.20261031"
+            "local.library_units.namespace.rerun.20261031",
+            "local.library_units.namespace.dependency.20261101"
           ]
         }
       ]
@@ -27242,6 +27256,21 @@
         {
           "path": "evidence/local.library_units.namespace.20261029.json",
           "sha256": "bd573e39b84a401821d52df2a033a864299401fe56a729153e0ff140dc2b48f4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_units.namespace.dependency.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "c54d0be1174777c376ce5d35c5ff1ba4a7bd4c32",
+      "retained": [
+        {
+          "path": "evidence/local.library_units.namespace.dependency.20261101.json",
+          "sha256": "2d951d552a16c68d9fbddd6358efe032809eeea29e4f05de94eb782801bb1131"
         }
       ],
       "notRetained": []
