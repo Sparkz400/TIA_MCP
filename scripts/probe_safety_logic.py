@@ -104,7 +104,11 @@ def boundary(h, stage, error):
 
 
 def body(h):
-    h.owned_scratch("safety logic")
+    standard = h.owned_scratch("safety logic")
+    # The setting makes every PLC's blocks inconsistent until compiled, and its apply compiles one PLC: enabled while the scratch
+    # still has only its standard PLC (sl1 refused AmbiguousTarget, sl2 FingerprintUnavailable on the uncompiled other PLC). The
+    # F-CPU added next is compiled by hardware_add's device compile.
+    change(h, "project_simulation_enable", {"enabled": True}, {"plcPath": standard})
     fcpu = h.report["fCpu"] = catalog(h, "1511F-1 PN", "1511F-1 PN", "6ES7 ")[0]
     _, added = change(h, "hardware_add", {"typeIdentifier": fcpu["typeIdentifier"], "deviceName": STATION, "itemName": "TiaMcpFPlc",
                                           "configureScratchSecurity": True, "failsafeRuntimeAccess": True}, {})
@@ -117,8 +121,6 @@ def body(h):
     start = h.report["fdiInputStart"] = input_start(rows, modules[FDI])
     safety = h.stage("safety_inspect of the F-PLC", lambda: h.tool("safety_inspect", {"plcPath": plc, "maxItems": 2000}))
     h.report["safetyProgram"] = {k: safety.get(k) for k in ("isPasswordSet", "isLoggedOn")}
-    # Its apply compiles one PLC; the scratch has two, so the F-PLC is named (sl1 refused AmbiguousTarget without it).
-    change(h, "project_simulation_enable", {"enabled": True}, {"plcPath": plc})
     tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]
     default = [t for t in tables if any(c.get("kind") == "system" for c in t.get("constants", []))]
     require(len(default) == 1, "Expected one default tag table: %s" % [t["name"] for t in tables])
