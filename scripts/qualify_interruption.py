@@ -110,7 +110,7 @@ TEXT_LIST_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "imp"
 _WRITING = lambda j: j.get("state") == "applying" and "hmi_native_write_started" in stages(j) and "mutation_applied" not in stages(j)
 GATE_POINTS = {"ckpt": POINTS["ckpt"], "mut": (_COMPILING, "worker"), "wrt": (_WRITING, "worker"), "comp": POINTS["comp"], "save": POINTS["save"],
                "hckp": (POINTS["ckpt"][0], "host"), "hwrt": (_WRITING, "host"), "hsav": (POINTS["save"][0], "host")}
-GATE_PROFILES = {"ci": ("classic-comfort",), "et": ("unified-comfort", "unified-pc"), "sc": ("unified-comfort", "unified-pc"),
+GATE_PROFILES = {"ci": ("classic-comfort", "classic-rt-advanced", "classic-basic"), "et": ("unified-comfort", "unified-pc"), "sc": ("unified-comfort", "unified-pc"),
                  "dy": ("unified-comfort", "unified-pc"), "eh": ("unified-comfort", "unified-pc")}  # The --hmi-fixture-profile each prefix runs on.
 
 
@@ -930,8 +930,8 @@ def main():
     parser.add_argument("--report", type=pathlib.Path, required=True)
     parser.add_argument("--hmi-fixture", type=pathlib.Path,
                         help="tl-*: an HmiSeeder textlist-fixture checkpoint.zap21; ci-*/et-*: a configured.zap21 (scripts/prepare_hmi_fixture_ui.py) or, "
-                             "for unified-pc, the seeded HmiSeeder baseline (artifacts/q/hps/unified-pc/baseline.zap21)")
-    parser.add_argument("--hmi-fixture-profile", choices=("classic-comfort", "unified-comfort", "unified-pc"), default="unified-comfort")
+                             "for unified-pc, classic-rt-advanced and classic-basic, the seeded HmiSeeder baseline (artifacts/q/hps/<profile>/baseline.zap21)")
+    parser.add_argument("--hmi-fixture-profile", choices=("classic-comfort", "classic-rt-advanced", "classic-basic", "unified-comfort", "unified-pc"), default="unified-comfort")
     args = parser.parse_args()
     global HMI_FIXTURE, HMI_FIXTURE_PROFILE
     HMI_FIXTURE = args.hmi_fixture.resolve(strict=True) if args.hmi_fixture else None

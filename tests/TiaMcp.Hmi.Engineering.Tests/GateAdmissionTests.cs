@@ -4,6 +4,7 @@ using TiaMcp.Model;
 // Change kinds hmi_classic_import, hmi_external_tag_create and hmi_screen_create: production admission, standing capture notes and the compile rule they share with the text list.
 static class GateAdmissionTests
 {
+    static readonly string[] ClassicQualifying = { "classic-rt-advanced", "classic-basic" };
     static readonly string[] AllProfiles = { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
     static readonly string[] Kinds = { "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create" };
     // Kinds with no production profile before their native qualification, and their operations.
@@ -46,14 +47,23 @@ static class GateAdmissionTests
         check("A qualification profile changes no admission and opens nothing beyond the qualified scope", () => {
             foreach (string kind in Kinds.Where(k => !Unqualified.ContainsKey(k)))
                 foreach (string profile in AllProfiles)
-                    foreach (string qualification in new[] { profile, "classic-comfort", "unified-pc" })
+                    foreach (string qualification in new[] { profile, "classic-comfort", "unified-pc" }.Where(q => !(kind == "hmi_classic_import" && q == profile && ClassicQualifying.Contains(profile))))
                         foreach (string operation in HmiEngineeringRules.Operations)
                             foreach (string type in new[] { Screen, TagTable, null })
                                 Assert(Open(kind, profile, operation, type, qualification) == Qualified(kind, profile, operation, type), "with qualification " + qualification + ": " + kind + " " + profile + " " + operation);
             Assert(HmiEngineeringRules.KindGate("hmi_classic_import", "classic", "classic-comfort", "classic_xml_import", Screen, "classic-comfort").Value<string>("admission") == "production", "a qualification Host does not change a qualified profile's admission");
-            foreach (string profile in new[] { "classic-rt-advanced", "classic-basic", "classic-rt-professional" })
-                Assert(HmiEngineeringRules.KindGate("hmi_classic_import", "classic", profile, "classic_xml_import", Screen, profile).Value<string>("reason").Contains("passed native qualification on classic-comfort only"), "unqualified Classic profile " + profile);
-            Assert(HmiEngineeringRules.QualificationProfiles.OrderBy(p => p, StringComparer.Ordinal).SequenceEqual(new[] { "classic-comfort", "unified-comfort", "unified-pc" }), "flag profiles");
+            Assert(HmiEngineeringRules.KindGate("hmi_classic_import", "classic", "classic-rt-professional", "classic_xml_import", Screen, "classic-rt-professional").Value<string>("reason").Contains("passed native qualification on classic-comfort only"), "RT Professional");
+            foreach (string profile in ClassicQualifying)
+                foreach (string operation in HmiEngineeringRules.Operations)
+                    foreach (string type in new[] { Screen, TagTable, null })
+                    {
+                        // Seeded RT Advanced and Basic baselines: a qualification Host of that profile admits the Classic scope, production does not.
+                        var gate = HmiEngineeringRules.KindGate("hmi_classic_import", "classic", profile, operation, type, profile);
+                        bool scope = operation == "scalar_property_set" || operation == "classic_xml_import" && (type == Screen || type == TagTable);
+                        Assert(gate.Value<bool>("available") == scope && gate.Value<string>("admission") == (scope ? "qualification" : null) && gate.Value<string>("nativeQualification") == "unverified", "qualifying Classic " + profile + ": " + gate);
+                        Assert(!HmiEngineeringRules.KindGate("hmi_classic_import", "classic", profile, operation, type).Value<bool>("available"), "no production admission yet: " + profile);
+                    }
+            Assert(HmiEngineeringRules.QualificationProfiles.OrderBy(p => p, StringComparer.Ordinal).SequenceEqual(new[] { "classic-basic", "classic-comfort", "classic-rt-advanced", "unified-comfort", "unified-pc" }), "flag profiles");
         });
         check("An unqualified kind opens only on a qualification Host, for its own Unified profile and operations", () => {
             foreach (var (kind, operations) in Unqualified.Select(p => (p.Key, p.Value)))

@@ -56,7 +56,8 @@ class FakeHost:
         for index, name in enumerate(route.HMIS, 1):
             hmi = "/devices/HmiDevice_%s/items/%s/hmi/%s" % ("AB"[index - 1], name, name)
             if self.family == "classic":
-                exports = {hmi + ROLES[s][2]: screen(s) for s in ROLES}
+                # The seeder authors no popup on KTP700 Basic PN.
+                exports = {hmi + ROLES[s][2]: screen(s) for s in ROLES if not (self.profile == "classic-basic" and s == "Popup_1")}
                 exports[hmi + "/tagTables/QualificationTags"] = TABLE.format(created="x")
                 world[hmi] = {"exports": exports, "plc": None}
             else:
@@ -91,7 +92,7 @@ class FakeHost:
         exports = self.world()[hmi]["exports"]
         if section == "screens":
             return [dict(self.row(hmi, path, "hmiScreen", name), screenRole=ROLES[name][0], properties={"BackColor": route.root_attribute(exports[path], "BackColor")})
-                    for name in ROLES for path in [hmi + ROLES[name][2]]]
+                    for name in ROLES for path in [hmi + ROLES[name][2]] if path in exports]
         if section == "items":
             return [self.row(hmi, screen_path + "/items/Rectangle", "hmiScreenItem", "Rectangle", properties={"BackColor": "128, 128, 128"})]
         if section == "tags":
@@ -328,7 +329,7 @@ class FakeClient:
         host = self.host
         # The three profiles are production-admitted for the 1 November kinds; a qualification Host does not change that.
         # hmi_screen_create has no production profile yet: only a qualification Host of the fixture's profile admits it.
-        admission = "qualification" if kind in ("hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create") else "production"
+        admission = route.admission(kind, host.profile)
         code = host.check(kind, payload, admission == "production" or self.admitted == host.profile)
         gate = {"available": code is None, "admission": admission if code is None else None, "targetProfile": host.profile, "reasonCode": code}
         if code:
@@ -410,20 +411,20 @@ class GateRouteRunTests(unittest.TestCase):
             "archive": {"path": str(archive), "sha256": hashlib.sha256(b"configured").hexdigest()}}}), encoding="utf-8")
         return archive
 
-    def seeded(self, sha=None, completed=True):
-        archive = self.root / "hps" / "unified-pc" / "baseline.zap21"
+    def seeded(self, sha=None, completed=True, profile="unified-pc"):
+        archive = self.root / "hps" / profile / "baseline.zap21"
         archive.parent.mkdir(parents=True, exist_ok=True)
         archive.write_bytes(b"seeded")
         report = self.root / "hps" / "native-report.json"
-        report.write_text(json.dumps({"completed": completed, "fixtureMode": "positive", "profiles": [{"profile": "unified-pc", "archiveRetrievalVerified": True,
+        report.write_text(json.dumps({"completed": completed, "fixtureMode": "positive", "profiles": [{"profile": profile, "archiveRetrievalVerified": True,
             "connectionFixture": {"links": [{"isValid": True}]}, "archive": {"path": str(archive), "sha256": sha or hashlib.sha256(b"seeded").hexdigest()}}]}), encoding="utf-8")
         return report
 
     def run_route(self, profile, family, kind=None, **fake):
         host = FakeHost(self.root, family, profile, **fake)
         arguments = types.SimpleNamespace(profile=profile, base=self.root, fixture=None, seeded_report=None, kind=kind)
-        if profile == "unified-pc":
-            arguments.seeded_report = self.seeded()
+        if profile in route.SEEDED:
+            arguments.seeded_report = self.seeded(profile=profile)
         else:
             arguments.fixture = self.configured(profile)
         with mock.patch("builtins.print"):
@@ -437,6 +438,17 @@ class GateRouteRunTests(unittest.TestCase):
         self.assertEqual(6, sum(c.startswith("Applied with every stage") for c in report["checks"]))
         self.assertEqual(6, len(report["replays"]))
         self.assertIn("A production Host admits the kind with admission production", report["checks"])
+
+    def test_classic_route_runs_on_the_seeded_rt_advanced_and_basic_baselines(self):
+        for profile, refusals in (("classic-rt-advanced", 11), ("classic-basic", 10)):
+            with self.subTest(profile=profile):
+                shutil.rmtree(self.root / "hps", ignore_errors=True)
+                report = self.run_route(profile, "classic", errors=1)
+                self.assertEqual([], report["failures"])
+                self.assertEqual("seeded", report["fixture"]["mode"])
+                self.assertEqual(refusals, sum(c.startswith("Refused before any write") for c in report["checks"]))
+                self.assertEqual(6, sum(c.startswith("Gate admits this kind and profile (qualification)") for c in report["checks"]))
+                self.assertIn("A production Host refuses the kind before its production admission", report["checks"])
 
     def test_unified_routes_pass_on_configured_and_seeded_fixtures(self):
         for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):

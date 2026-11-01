@@ -2,7 +2,7 @@
 hmi_dynamization_create and hmi_event_handler_create, the HMI writes that pass the closed preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
 
 One profile per run, on a qualification Host (--hmi-change-qualification <profile>) in a copy its own worker retrieves. Since the
-three profiles passed (1 November 2026) the gate admits them in production, also on that Host (ADMISSION):
+three profiles passed (1 November 2026) the gate admits them in production, also on that Host (PRODUCTION):
 - classic-comfort (hmi_classic_import) and unified-comfort (hmi_external_tag_create) retrieve the desk-configured fixture
   (--fixture <configured.zap21> of scripts/prepare_hmi_fixture_ui.py, checked by qualify_engineering_gaps.prepared_archive);
 - hmi_screen_create (--kind) runs on the same Unified fixtures: a new screen sized like Overview_A on HMI_RT_1, an IOField on it
@@ -11,6 +11,9 @@ three profiles passed (1 November 2026) the gate admits them in production, also
   binds ProcessValue to a PLC tag, a global DB member and an internal tag; readback includes the hmi_references chain;
 - hmi_event_handler_create (--kind) adds a script handler to a screen, a rectangle and a button (setup, hmi_screen_create); the
   event type is the object's own (learned from the refusal of an undocumented one), the script text is never executed;
+- classic-rt-advanced and classic-basic have no configured fixture either (the R4 rule, 1 November 2026): their seeded
+  baselines (artifacts/q/hps) keep the compile error of their unset start screen, which the compile rule requires unchanged;
+  KTP700 Basic PN has no popup (its import terminated the Portal, run h2/s1);
 - unified-pc has no configured fixture yet (ruling R4): --seeded-report names the HmiSeeder qualify report
   (artifacts/q/hps/native-report.json) whose positive baseline (two HMIs, two PLCs, integrated connections, LinkedSignal and
   LinkedDbValue) is retrieved as that report recorded it. Its two encrypted-transfer password errors stay; the kind's compile
@@ -46,8 +49,10 @@ from qualify_engineering_gaps import differences, hmi_snapshot, prepared_archive
 from qualify_hmi import inspect_all
 from qualify_reliability import ReliabilityClient, decoded, require
 
-PROFILES = {"classic-comfort": ("classic", "hmi_classic_import"), "unified-comfort": ("unified", "hmi_external_tag_create"),
+PROFILES = {"classic-comfort": ("classic", "hmi_classic_import"), "classic-rt-advanced": ("classic", "hmi_classic_import"),
+            "classic-basic": ("classic", "hmi_classic_import"), "unified-comfort": ("unified", "hmi_external_tag_create"),
             "unified-pc": ("unified", "hmi_external_tag_create")}  # Each profile's family and default --kind.
+SEEDED = ("classic-rt-advanced", "classic-basic", "unified-pc")  # Profiles without a configured fixture: their HmiSeeder baseline.
 HMIS = ("HMI_RT_1", "HMI_RT_2")
 # As journaled by a complete apply of either kind (OpennessSession.HmiEngineering.cs ApplyHmiEngineeringMutation and ChangeApply).
 APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created", "hmi_baseline_compiled", "hmi_native_write_started",
@@ -55,10 +60,13 @@ APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created", "hmi_ba
 PLC_KEYS = ("projectPath", "plcPath", "scopePath", "objectPath", "kind", "name", "namespace")  # The worker's plcTag allowlist.
 BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "SharedValueAdded", "QualificationExternal"
 SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "QualificationButton"
-# The admission the gate reports for each kind on its profiles: production since its native qualification passed (the qualifying
-# runs of local.hmi.*.route.20261101 saw "qualification"); "qualification" while a kind has no production profile.
-ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "qualification",
-             "hmi_dynamization_create": "qualification", "hmi_event_handler_create": "qualification"}
+# The profiles production admits per kind (HmiEngineeringRules Kinds); the gate reports "production" there and "qualification" on
+# a qualification Host elsewhere (the qualifying runs of local.hmi.*.route.20261101 saw "qualification").
+PRODUCTION = {"hmi_classic_import": ("classic-comfort",), "hmi_external_tag_create": ("unified-comfort", "unified-pc")}
+
+
+def admission(kind, profile):
+    return "production" if profile in PRODUCTION.get(kind, ()) else "qualification"
 
 
 def digest(raw):
@@ -72,7 +80,7 @@ def resolve_fixture(profile, fixture=None, seeded_report=None):
         found = prepared_archive(fixture)
         require(found["profile"] == profile, "The configured fixture was prepared for " + str(found["profile"]))
         return {"mode": "configured", **found}
-    require(profile == "unified-pc", "Only unified-pc has no configured fixture; use --fixture for " + profile)
+    require(profile in SEEDED, "Only %s have no configured fixture; use --fixture for %s" % (", ".join(SEEDED), profile))
     report_path = pathlib.Path(seeded_report).resolve(strict=True)
     raw = report_path.read_bytes()
     report = json.loads(raw.decode("utf-8-sig"))
@@ -225,12 +233,15 @@ def classic_import(row, xml):
 
 
 def classic_fixture(client, hmis):
-    """Per HMI: both regular screens, the template, popup and global elements, and the QualificationTags table."""
+    """Per HMI: both regular screens, the template, popup and global elements, and the QualificationTags table. Only a KTP700 Basic
+    PN fixture lacks the popup (the seeder skips it there); every other role must be present once."""
     fx = {}
     for name, device in hmis.items():
         screens = list(rows(client, device, "screens").values())
         regular = {r["name"]: r for r in screens if r.get("screenRole") == "regular"}
         roles = {role: [r for r in screens if r.get("screenRole") == role] for role in ("template", "popup", "globalElements")}
+        if not roles["popup"] and device.get("profile") == "classic-basic":
+            del roles["popup"]
         tables = {r["name"]: r for r in rows(client, device, "tags").values() if r["identity"]["kind"] == "hmiTagTable"}
         require({"Overview_A", "Overview_B"} <= set(regular) and all(len(found) == 1 for found in roles.values()) and "QualificationTags" in tables,
                 "%s lacks a fixture screen, template, popup, global elements or QualificationTags" % name)
@@ -249,7 +260,7 @@ def classic_refusals(client, hmis, fx):
                                                                "properties": {"Visible": True}}, "InvalidRequest"),
              ("a non-canonical color", kind, scalar(screen, "204,204,204"), "InvalidRequest")]
     cases += [("import of the " + label, kind, classic_import(rt1[role], export(client, device, rt1[role])), "HmiPreservationUnavailable")
-              for role, label in (("template", "screen template"), ("popup", "popup"), ("globalElements", "global elements"))]
+              for role, label in (("template", "screen template"), ("popup", "popup"), ("globalElements", "global elements")) if role in rt1]
     cases += [("another screen's document", kind, classic_import(screen, export(client, device, rt1["Overview_B"])), "XmlScopeMismatch"),
               ("another root type", kind, classic_import(screen, export(client, device, rt1["QualificationTags"])), "XmlScopeMismatch"),
               ("a DTD", kind, classic_import(screen, with_dtd(own)), "InvalidRequest"),
@@ -612,7 +623,7 @@ def handler_reopen(client, hmis, fx):
 
 # Kind: family, profiles, fixture, setup applies (label, kind, payload) before the reference, refusals before any write, applies
 # in order, and an unbound reopen probe of the production gate (client, hmis, fx).
-KINDS = {"hmi_classic_import": ("classic", ("classic-comfort",), classic_fixture, lambda fx: [], classic_refusals, classic_cases,
+KINDS = {"hmi_classic_import": ("classic", ("classic-comfort", "classic-rt-advanced", "classic-basic"), classic_fixture, lambda fx: [], classic_refusals, classic_cases,
                                 lambda client, hmis, fx: scalar(fx["HMI_RT_1"]["Overview_B"], ALTERNATE)),
          "hmi_external_tag_create": ("unified", ("unified-comfort", "unified-pc"), unified_fixture, lambda fx: [], unified_refusals, unified_cases,
                                      lambda client, hmis, fx: external(fx["HMI_RT_1"], "QualificationReopen", "root")),
@@ -744,9 +755,9 @@ def run(args, connect, watch=lambda pid: None):
                 path, section, request = case["absent"] if isinstance(case["absent"], tuple) else (case["absent"], "tags", {})
                 gate(path not in rows(client, device, section, **request), "Absent before the change: " + label)
             prepared = step("change_prepare " + label, prepare(client, kind, case["payload"]))
-            admission = prepared["preview"]["hmiEvidence"]["gate"]
-            gate(admission.get("available") is True and admission.get("admission") == ADMISSION[kind] and admission.get("targetProfile") == profile,
-                 "Gate admits this kind and profile (%s): %s" % (ADMISSION[kind], label), admission)
+            admitted = prepared["preview"]["hmiEvidence"]["gate"]
+            gate(admitted.get("available") is True and admitted.get("admission") == admission(kind, profile) and admitted.get("targetProfile") == profile,
+                 "Gate admits this kind and profile (%s): %s" % (admission(kind, profile), label), admitted)
             if index == 0:
                 for flags in ({"compile": False, "save": False}, {"compile": True, "save": False}):
                     refused = decoded(client.raw_tool("change_apply", apply_arguments(prepared, **flags))).get("error") or {}
@@ -827,12 +838,12 @@ def run(args, connect, watch=lambda pid: None):
         # Unbound, so an admitted prepare stops at StaleRevision after the gate; its details carry the gate. Before a kind has a
         # production profile the production Host refuses it at the gate (HmiPreservationUnavailable, admission null).
         error = refusal(fresh, kind, reopen_of(fresh, hmis, fixture_of(fresh, hmis)))
-        admission = (error.get("details") or {}).get("gate") or {}
-        production = ADMISSION[kind] == "production"
-        gate(error.get("code") == ("StaleRevision" if production else "HmiPreservationUnavailable") and admission.get("available") is production
-             and admission.get("admission") == ("production" if production else None),
+        admitted = (error.get("details") or {}).get("gate") or {}
+        production = admission(kind, profile) == "production"
+        gate(error.get("code") == ("StaleRevision" if production else "HmiPreservationUnavailable") and admitted.get("available") is production
+             and admitted.get("admission") == ("production" if production else None),
              "A production Host admits the kind with admission production" if production else "A production Host refuses the kind before its production admission",
-             {"code": error.get("code"), "gate": {k: admission.get(k) for k in ("available", "admission", "reasonCode")}})
+             {"code": error.get("code"), "gate": {k: admitted.get(k) for k in ("available", "admission", "reasonCode")}})
         fresh.tool("tia_detach")
     except Exception as error:
         gate(False, "Fresh reopen completed", repr(error))
@@ -853,7 +864,7 @@ def main(argv=None):
     parser.add_argument("--profile", choices=sorted(PROFILES), required=True)
     parser.add_argument("--kind", choices=sorted(KINDS), help="Change kind to qualify; default: the profile's (hmi_classic_import or hmi_external_tag_create)")
     parser.add_argument("--fixture", type=pathlib.Path, help="configured.zap21 of a completed scripts/prepare_hmi_fixture_ui.py run")
-    parser.add_argument("--seeded-report", type=pathlib.Path, help="unified-pc only: the HmiSeeder qualify native-report.json (artifacts/q/hps)")
+    parser.add_argument("--seeded-report", type=pathlib.Path, help="%s only: the HmiSeeder qualify native-report.json (artifacts/q/hps)" % ", ".join(SEEDED))
     args = parser.parse_args(argv)
     args.base = args.base.resolve()
     require(not args.base.exists(), "Fresh evidence directory required")
