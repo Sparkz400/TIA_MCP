@@ -110,6 +110,46 @@ class HardwareChangeTests(unittest.TestCase):
             self.assertIs(expected, q.shared_device(run))
         self.assertEqual([q.constant(run, q.SP, "HwSpHead~SpDi3")], calls[0])  # hw5: SpDi3's HwPeerCpu system constant goes.
 
+    def test_profile_gates_need_the_catalog_link_and_the_profile_refusal(self):
+        identifier = "OrderNumber:6ES7 131-6BF00-0BA0/V1.1"
+        for link, message, ok in ((q.PROFILE_LINK + identifier, "The capability profile of %s does not declare InformationText writable on the module." % identifier, True),
+                                  (None, "", False), (q.PROFILE_LINK + identifier, "The item declares no writable InformationText.", False)):
+            run = q.Run.__new__(q.Run)
+            run.base, filters, refused = "/projects/P/devices/", [], []
+            run.h = type("H", (), {"report": {}, "args": None, "stage": lambda self, name, operation: operation(),
+                                   "tool": lambda self, name, arguments: filters.append(arguments["filter"]) or {"entries": [{"typeIdentifier": identifier, "profile": link}, {"typeIdentifier": "x", "profile": None}]}})()
+            run.refuse = lambda kind, label, payload, code: refused.append((kind, payload, code)) or {"code": code, "message": message}
+            if ok:
+                q.profile_gates(run, identifier)
+                self.assertEqual(["6ES7 131-6BF00-0BA0"], filters)
+                self.assertEqual([("hardware_attributes", {"hardwarePath": "/projects/P/devices/HwSp/items/SpDi3", "attributes": {"InformationText": "HwText"}}, "AttributeNotWritable")], refused)
+            else:
+                with self.assertRaises(Exception):
+                    q.profile_gates(run, identifier)
+
+    def test_restore_slice_restores_each_topology_change_the_full_run_lacks(self):
+        calls, run = [], q.Run.__new__(q.Run)
+        run.base, run.current, run.coverage = "/projects/P/devices/", {"view": {}}, {}
+        run.h = type("H", (), {"report": {}, "args": None})()
+        run.expect = lambda ok, label, message, detail=None: calls.append(("expect", bool(ok)))
+        def record(name, result=None):
+            return lambda *args, **kwargs: calls.append((name, *[a for a in args[1:] if isinstance(a, str)], kwargs.get("restore", False))) or result
+        stubs = {"add_cpu": record("add_cpu"), "network": record("network"), "station": record("station"), "sp_station": record("sp_station", q.SP),
+                 "sp_modules": record("sp_modules", ("old", "new")), "plug": record("plug"), "profile_gates": record("profile_gates"),
+                 "shared_device": record("shared", True), "shared_access": record("access", True), "mrp": record("mrp", True)}
+        saved = {name: getattr(q, name) for name in stubs}
+        try:
+            for name, stub in stubs.items():
+                setattr(q, name, stub)
+            q.restore_slice(run)
+        finally:
+            for name, original in saved.items():
+                setattr(q, name, original)
+        manager, _, head = q.interfaces(run)
+        self.assertEqual([("shared", True), ("shared", False), ("access", "SpDi4", "OutsideOfProject", True), ("mrp", manager, "Manager", q.RING, True),
+                          ("mrp", manager, "Manager", q.RING, False), ("mrp", head, "Client", q.RING, True)], calls[calls.index(("profile_gates", "old", False)) + 1:-1])
+        self.assertEqual(("expect", False), calls[-1])  # The stubs mark no coverage, so the slice's coverage gate fails.
+
     def test_ring_opens_the_line_sets_roles_then_relinks_and_closes(self):
         closed, calls, _ = self.ring()
         self.assertTrue(closed)

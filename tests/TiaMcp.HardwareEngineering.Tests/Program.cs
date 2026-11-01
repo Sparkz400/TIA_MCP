@@ -350,20 +350,45 @@ const string controller2 = "/projects/P/devices/CPU2/items/Rack/items/CPU/items/
 JObject SystemRef2() => new JObject { ["state"] = "assigned", ["name"] = "Io2", ["number"] = 101, ["ownerHardwarePath"] = controller2, ["controllerIndex"] = 0, ["subnet"] = "PN" };
 void SharedBase(JArray rows)
 {
-    rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["owners"] = new JArray("/cpu1");
+    rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["owners"] = new JArray("/cpu1"); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1";
     var second = Row(controller2); second["network"] = new JObject { ["nodes"] = new JArray(), ["controllers"] = new JArray(new JObject { ["index"] = 0, ["system"] = SystemRef2() }), ["connectors"] = new JArray() }; rows.Add(second);
 }
+// A sharedDevice connection names the submodules that move to the new controller (sharedSubmodules); everything else stays exact.
 var shared = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 1, ["controllerHardwarePath"] = controller2, ["controllerIndex"] = 0, ["addressControllerOwnerPath"] = "/cpu2",
-    ["sharedDevice"] = true, ["sharedAddressControllerOwnerPaths"] = new JArray("/cpu1") };
+    ["sharedDevice"] = true, ["sharedAddressControllerOwnerPaths"] = new JArray("/cpu1"), ["sharedSubmodules"] = new JArray(module) };
 void SharedAssigned(JArray rows) => rows[3]["network"]["connectors"][1]["system"] = SystemRef2();
-Check("shared device adds a second controller", "network_io_assign", shared, SharedAssigned, true, SharedBase);
-Check("shared device may hand an address to the new controller", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, true, SharedBase);
-Check("shared device address owned by both rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu1", "/cpu2"); }, false, SharedBase);
-Check("shared device foreign owner rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu3"); }, false, SharedBase);
-Check("shared device changing the first connector rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[3]["network"]["connectors"][0]["system"] = new JObject { ["state"] = "notAssigned" }; }, false, SharedBase);
-Check("shared device without another assigned connector rejected", "network_io_assign", shared, SharedAssigned, false, rows => { SharedBase(rows); rows[3]["network"]["connectors"][0]["system"] = new JObject { ["state"] = "notAssigned" }; });
+void SharedMoved(JArray rows) { SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }
+Check("shared device adds a second controller with its submodule", "network_io_assign", shared, SharedMoved, true, SharedBase);
+Check("shared submodule that does not move rejected", "network_io_assign", shared, SharedAssigned, false, SharedBase);
+Check("shared submodule keeping its address owner rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, false, SharedBase);
+Check("shared submodule keeping its assignment target rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedBase);
+Check("shared submodule without a captured assignment target rejected", "network_io_assign", shared, rows => { SharedMoved(rows); }, false, rows => { SharedBase(rows); ((JObject)rows[1]["attributes"]).Remove("SharedDeviceAssignmentTarget"); });
+Check("shared device address owned by both rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu1", "/cpu2"); }, false, SharedBase);
+Check("shared device foreign owner rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu3"); }, false, SharedBase);
+Check("shared device changing the first connector rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[3]["network"]["connectors"][0]["system"] = new JObject { ["state"] = "notAssigned" }; }, false, SharedBase);
+Check("shared device without another assigned connector rejected", "network_io_assign", shared, SharedMoved, false, rows => { SharedBase(rows); rows[3]["network"]["connectors"][0]["system"] = new JObject { ["state"] = "notAssigned" }; });
 var sharedWithoutPeers = (JObject)shared.DeepClone(); sharedWithoutPeers.Remove("sharedAddressControllerOwnerPaths");
-Check("shared device without peer PLCs rejected", "network_io_assign", sharedWithoutPeers, SharedAssigned, false, SharedBase);
+Check("shared device without peer PLCs rejected", "network_io_assign", sharedWithoutPeers, SharedMoved, false, SharedBase);
+var sharedWithoutSubmodules = (JObject)shared.DeepClone(); sharedWithoutSubmodules.Remove("sharedSubmodules");
+Check("shared device without sharedSubmodules rejected", "network_io_assign", sharedWithoutSubmodules, SharedAssigned, false, SharedBase);
+// Rows outside the sharedSubmodules keep their owners and assignment targets; a subitem of a named item may follow it.
+void SharedOther(JArray rows)
+{
+    SharedBase(rows); var other = Row(station + "/items/DO", 3); other["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1";
+    other["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 2, ["lengthBits"] = 8, ["owners"] = new JArray("/cpu1") }); rows.Add(other);
+    var sub = Row(child, 1); sub["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1";
+    sub["addresses"] = new JArray(new JObject { ["ioType"] = "Diagnosis", ["startAddress"] = -1, ["lengthBits"] = 0, ["owners"] = new JArray() }); rows.Add(sub);
+}
+Check("shared submodule's subitem follows its target, diagnosis address exact", "network_io_assign", shared, rows => { SharedMoved(rows); rows[6]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, true, SharedOther);
+Check("subitem taking a third target rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[6]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu3"; }, false, SharedOther);
+Check("address owner change outside the sharedSubmodules rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[5]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedOther);
+Check("assignment target change outside the sharedSubmodules rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[5]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, false, SharedOther);
+Check("diagnosis address of a shared submodule taking an owner rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[6]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedOther);
+Check("address count change of a station item rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[5]["addresses"] = new JArray(); }, false, SharedOther);
+if (!HardwareEngineeringRules.CapturesSharedAccess("network_io_assign", shared) || HardwareEngineeringRules.CapturesSharedAccess("network_io_assign", assign) || HardwareEngineeringRules.CapturesSharedAccess("network_io_assign", null)
+    || !HardwareEngineeringRules.CapturesSharedAccess("hardware_shared_device_access", null) || HardwareEngineeringRules.CapturesSharedAccess("hardware_replace", shared))
+    throw new Exception("Shared-device attribute capture differs.");
+count++; Console.WriteLine("PASS shared-device attributes join the manifest for a sharedDevice assignment and hardware_shared_device_access only");
 var peersWithoutShared = (JObject)assign.DeepClone(); peersWithoutShared["sharedAddressControllerOwnerPaths"] = new JArray("/other");
 Check("peer PLCs without sharedDevice rejected", "network_io_assign", peersWithoutShared, Assigned, false);
 var sharedDisconnect = new JObject { ["hardwarePath"] = remote, ["connectorIndex"] = 1, ["disconnect"] = true, ["addressControllerOwnerPath"] = "/cpu2", ["sharedDevice"] = true, ["sharedAddressControllerOwnerPaths"] = new JArray("/cpu1") };
@@ -390,6 +415,15 @@ Check("MRP domain appearing without createDomain rejected", "network_mrp_set", m
 Check("MRP createDomain adding another domain rejected", "network_mrp_set", mrpCreate, rows => { rows[2]["mrp"] = Mrp("Manager", "Ring"); Domains(rows, "Other", "Ring", "mrpdomain-1"); }, false, rows => { MrpCaptured(rows); Domains(rows, "mrpdomain-1"); });
 Check("MRP createDomain of an existing name rejected", "network_mrp_set", mrpCreate, rows => rows[2]["mrp"] = Mrp("Manager", "Ring"), false, rows => { MrpCaptured(rows); Domains(rows, "Ring"); });
 Check("MRP createDomain without captured domains rejected", "network_mrp_set", mrpCreate, rows => rows[2]["mrp"] = Mrp("Manager", "Ring"), false, MrpCaptured);
+// A port link joins two ring ports or two other ports; a role that would make one end a ring port and not the other is refused.
+HardwareEngineeringRules.RequireRingLinks(new (string, bool, string, bool)[0]);
+HardwareEngineeringRules.RequireRingLinks(new[] { ("A/P1", true, "B/P2", true), ("A/P2", false, "C/P1", false) });
+count += 2;
+foreach (var (label, link) in new[] { ("a ring port linked to another port", ("A/P1", true, "B/P1", false)), ("leaving the ring while linked to a ring port", ("A/P1", false, "B/P1", true)) })
+{
+    try { HardwareEngineeringRules.RequireRingLinks(new[] { ("A/P2", true, "C/P2", true), link }); throw new Exception("Ring link accepted: " + label); }
+    catch (BridgeException error) when (error.Code == "NetworkPrerequisite" && error.Message.Contains("B/P1")) { count++; Console.WriteLine("PASS MRP role refused: " + label); }
+}
 // Shared-device access: the module takes the access, subitems may follow, ranges stay and owners stay among the station's I/O-system PLCs.
 var access = new JObject { ["hardwarePath"] = module, ["accessType"] = "OutsideOfProject", ["addressControllerOwnerPaths"] = new JArray("/cpu1") };
 void AccessBase(JArray rows) { WithChild(rows); rows[1]["attributes"]["SharedDeviceAccessType"] = "PLC"; rows[4]["attributes"]["SharedDeviceAccessType"] = "PLC"; rows[1]["addresses"][0]["owners"] = new JArray("/cpu1"); }
@@ -404,7 +438,7 @@ Check("shared access collateral rejected", "hardware_shared_device_access", acce
 // PLC assigns the module to one PLC of the station through SharedDeviceAssignmentTarget (with SharedDeviceAccessConfigured); V21 derives the access.
 var accessPlc = new JObject { ["hardwarePath"] = module, ["accessType"] = "PLC", ["assignmentTargetPath"] = "/cpu2", ["addressControllerOwnerPaths"] = new JArray("/cpu1", "/cpu2") };
 void Inputs(JArray rows, string access, bool configured, string target) { rows[1]["attributes"]["SharedDeviceAccessType"] = access; rows[1]["attributes"]["SharedDeviceAccessConfigured"] = configured; rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = target; }
-Check("shared access assigns the module to another PLC", "hardware_shared_device_access", accessPlc, rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, true,
+Check("shared access moving a module between two PLCs rejected", "hardware_shared_device_access", accessPlc, rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false,
     rows => { AccessBase(rows); Inputs(rows, "PLC", true, "/cpu1"); });
 Check("shared access to another target than requested rejected", "hardware_shared_device_access", accessPlc, rows => Inputs(rows, "PLC", true, "/cpu1"), false,
     rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); });
@@ -415,14 +449,18 @@ Check("shared access outside the project releases the addresses", "hardware_shar
 Check("shared access back to a PLC restores its addresses", "hardware_shared_device_access", accessPlc,
     rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 3, ["lengthBits"] = 8, ["owners"] = new JArray("/cpu2") }); }, true,
     rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); rows[1]["addresses"] = new JArray(); });
+void OutsideWithSub(JArray rows) { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); rows[1]["addresses"] = new JArray(); rows[4]["attributes"]["SharedDeviceAssignmentTarget"] = null; rows[4]["attributes"]["SharedDeviceAccessConfigured"] = false; }
+void BackToPlc(JArray rows) { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 3, ["lengthBits"] = 8, ["owners"] = new JArray("/cpu2") }); }
+Check("shared access subitem follows the requested target", "hardware_shared_device_access", accessPlc, rows => { BackToPlc(rows); rows[4]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; rows[4]["attributes"]["SharedDeviceAccessConfigured"] = true; }, true, OutsideWithSub);
+Check("shared access subitem taking another target rejected", "hardware_shared_device_access", accessPlc, rows => { BackToPlc(rows); rows[4]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1"; }, false, OutsideWithSub);
+Check("shared access subitem undeclaring an input rejected", "hardware_shared_device_access", accessPlc, rows => { BackToPlc(rows); ((JObject)rows[4]["attributes"]).Remove("SharedDeviceAccessConfigured"); }, false, OutsideWithSub);
 Check("restored addresses owned by another PLC rejected", "hardware_shared_device_access", accessPlc,
     rows => { Inputs(rows, "PLC", true, "/cpu2"); rows[1]["addresses"] = new JArray(new JObject { ["ioType"] = "Input", ["startAddress"] = 3, ["lengthBits"] = 8, ["owners"] = new JArray("/cpu1") }); }, false,
     rows => { AccessBase(rows); Inputs(rows, "OutsideOfProject", false, null); rows[1]["addresses"] = new JArray(); });
 // A shared submodule moving to the new PLC takes an address in that PLC's space (hw4); other items keep theirs.
-var sharedWithModule = (JObject)shared.DeepClone(); sharedWithModule["sharedSubmodules"] = new JArray(module);
-Check("shared submodule takes a new address of the new PLC", "network_io_assign", sharedWithModule, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["startAddress"] = 2; rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, true, SharedBase);
-Check("address move outside the shared submodules rejected", "network_io_assign", shared, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["startAddress"] = 2; rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedBase);
-Check("shared submodule resizing its address rejected", "network_io_assign", sharedWithModule, rows => { SharedAssigned(rows); rows[1]["addresses"][0]["lengthBits"] = 32; rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedBase);
+Check("shared submodule takes a new address of the new PLC", "network_io_assign", shared, rows => { SharedMoved(rows); rows[1]["addresses"][0]["startAddress"] = 2; }, true, SharedBase);
+Check("address move outside the shared submodules rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[5]["addresses"][0]["startAddress"] = 4; }, false, SharedOther);
+Check("shared submodule resizing its address rejected", "network_io_assign", shared, rows => { SharedMoved(rows); rows[1]["addresses"][0]["lengthBits"] = 32; }, false, SharedBase);
 // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change, and only then may it change.
 void AccessExternalBase(JArray rows) { AccessBase(rows); rows[3]["attributes"]["NumberOfExternalIoControllers"] = 0; }
 var accessExternal = (JObject)access.DeepClone(); accessExternal["externalIoControllers"] = 1; accessExternal["ioDeviceInterfacePath"] = remote;
@@ -493,6 +531,11 @@ foreach (var (type, path, channelSelector, name, proof) in new[] {
     ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "", (JObject)null, "Comment", "local.hardware_changes.20261028"), ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "", null, "Author", "local.hardware_changes.20261028"),
     ("OrderNumber:6ES7 521-1BH00-0AB0/V2.0", "", null, "Comment", "local.hardware_changes.20261028"),
     ("OrderNumber:6ES7 221-1BH30-0XB0/V1.0", "", null, "Comment", "local.hardware_changes.families.20261029"), ("OrderNumber:6ES7 221-1BH30-0XB0/V1.0", "", null, "Author", "local.hardware_changes.families.20261029"),
+    ("OrderNumber:6ES7 221-1BH32-0XB0/V2.0", "", null, "Comment", "local.hardware_changes.families.20261029"),
+    ("OrderNumber:6ES7 131-6BF00-0BA0/V1.1", "", null, "Comment", "local.hardware_changes.topology.20261101"), ("OrderNumber:6ES7 131-6BF00-0BA0/V1.1", "", null, "Author", "local.hardware_changes.topology.20261101"),
+    ("OrderNumber:6ES7 131-6BF00-0BA0/V1.1", "", null, "SharedDeviceAccessConfigured", "local.hardware_changes.topology.20261101"),
+    ("OrderNumber:6ES7 131-6BF00-0BA0/V1.1", "", null, "SharedDeviceAssignmentTarget", "local.hardware_changes.topology.20261101"),
+    ("OrderNumber:6ES7 131-6BF01-0BA0/V0.0", "", null, "Comment", "local.hardware_changes.topology.20261101"),
     ("OrderNumber:6ES7 511-1AL03-0AB0/V4.1", "items/PROFINET%20interface_1", null, "InterfaceOperatingMode", "local.gsd_transfer_areas.20261028"),
     ("OrderNumber:6ES7 521-1BH00-0AB0/V1.0", "items/{module}", digital0, "HardwareInterruptRisingEdgeActive", "local.plcsim_gaps.ob40.20261030") })
 {

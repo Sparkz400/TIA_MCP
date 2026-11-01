@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "1e92abc7a3f50aa2a9b56cc3e4020c90078b08d9db38dbd49202ef2bdfdcd1f4",
+    "catalogSha256": "b8d789a0adc0b1ff205e7cbd4f1ad0f4bf0bd85a7d70db498ce2720779f764d2",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -15,16 +15,16 @@
     "features": 471,
     "support": {
       "deferred": 6,
-      "limited": 314,
+      "limited": 310,
       "shipped": 127,
       "unavailable_target": 5,
-      "unqualified": 19
+      "unqualified": 23
     },
     "cells": {
       "blocked": 31,
-      "bound": 2013,
+      "bound": 1995,
       "deferred": 18,
-      "open": 108
+      "open": 126
     },
     "openCellsByOwner": {
       "D06": {
@@ -57,7 +57,7 @@
       },
       "X10": {
         "role": "Hardware and remote IO",
-        "open": 6
+        "open": 24
       }
     }
   },
@@ -5187,7 +5187,7 @@
         "hardware_catalog_search"
       ],
       "changeKind": null,
-      "support": "limited",
+      "support": "unqualified",
       "owners": [
         "X10"
       ],
@@ -5197,24 +5197,18 @@
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-completeness",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-evidence",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },
@@ -5229,7 +5223,7 @@
         "hardware_inspect"
       ],
       "changeKind": null,
-      "support": "limited",
+      "support": "unqualified",
       "owners": [
         "X10"
       ],
@@ -5239,24 +5233,18 @@
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-completeness",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-evidence",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },
@@ -11262,7 +11250,7 @@
         "change_restore"
       ],
       "changeKind": "hardware_shared_device_access",
-      "support": "limited",
+      "support": "unqualified",
       "owners": [
         "X10"
       ],
@@ -11272,45 +11260,33 @@
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-preserve",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-preview",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-native",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-recovery",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-evidence",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },
@@ -11531,7 +11507,7 @@
         "change_restore"
       ],
       "changeKind": "network_mrp_set",
-      "support": "limited",
+      "support": "unqualified",
       "owners": [
         "X10"
       ],
@@ -11541,45 +11517,33 @@
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-preserve",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-preview",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-native",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-recovery",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         },
         {
           "gate": "AC-evidence",
-          "status": "bound",
-          "evidenceIds": [
-            "local.hardware_changes.topology.20261101"
-          ]
+          "status": "open",
+          "evidenceIds": []
         }
       ]
     },

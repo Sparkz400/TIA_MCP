@@ -195,26 +195,36 @@ constants; that kind has no transfer-area preservation check. The interface's
 
 ## Shared devices
 
-V21 Openness exposes a shared device in two ways, and the bridge reviews both; both are natively qualified with the
-[hardware runner](../../scripts/qualify_hardware_changes.py) (`local.hardware_changes.topology.20261101`,
-[record](../verification/hardware-topology-20261031.md)), except the `sharedDevice` disconnect.
+V21 Openness exposes a shared device in two ways, and the bridge reviews both. The
+[hardware runner](../../scripts/qualify_hardware_changes.py) applied both natively and persisted them across a reopen
+(`local.hardware_changes.topology.20261101`, [record](../verification/hardware-topology-20261031.md)); the checkpoint restores of
+the shared assignment and of `OutsideOfProject`, the preservation rules below and the `sharedDevice` disconnect are not yet
+natively exercised.
 
 - **Several PLCs of one project.** An IO-device interface has several `IoConnector`s (four on the IM 155-6 PN ST V6.4).
   `network_io_assign` with `sharedDevice: true` connects a further, unassigned connector to another PLC's I/O system while
   the other connectors stay assigned; one connector per PLC. The bridge records the PLC items of the other assigned
-  connectors as `sharedAddressControllerOwnerPaths` (refused when supplied without `sharedDevice`, overwritten with it). Preservation lets each station
-  address have at most one owner among those PLCs and the selected one; the other connectors must stay exact.
+  connectors as `sharedAddressControllerOwnerPaths` (refused when supplied without `sharedDevice`, overwritten with it).
   A connection also names `sharedSubmodules` (1 to 64 exact items of the station) whose `SharedDeviceAssignmentTarget` becomes
   the selected PLC item in the same change: V21 compiles a further IO controller only with a submodule of its own ("Connected PLCs
-  must have at least one assigned submodule as a shared device"). `disconnect: true` with `sharedDevice` removes one PLC again. Without `sharedDevice`, a further assigned connector is
+  must have at least one assigned submodule as a shared device"). Each must own I/O addresses itself or through a subitem, not be
+  assigned to the selected PLC yet, and declare the target writable natively and in its capability profile; the preview lists
+  each target before and after. Preservation adds every item's shared-device attributes: inside those subtrees every I/O address
+  ends owned by exactly the selected PLC with its I/O type and length (its start moves into that PLC's address space) and a
+  target may only become the selected PLC; each named item must move its target and at least one address; every other row,
+  owners and targets included, stays exact. `disconnect: true` with `sharedDevice` removes one PLC again (each station address
+  then has at most one owner among the remaining PLCs). Without `sharedDevice`, a further assigned connector is
   `UnsupportedCapability`; the generated server contract (`expectedServerModule`) belongs to the first assignment only.
 - **Per-module access.** V21 keeps `SharedDeviceAccessType` (`Unknown`, `OutsideOfProject`, `PLC`) read-only and derives it
   from `SharedDeviceAccessConfigured` and the device item in `SharedDeviceAssignmentTarget`, both writable on every item of an
   IO device. `hardware_shared_device_access` takes `accessType` `PLC` with `assignmentTargetPath` (the PLC item of one of the
   station's I/O systems) or `OutsideOfProject` (clears `SharedDeviceAccessConfigured`), on one module or submodule of an
-  assigned IO device. Stations holding PLC software are refused. The bridge records the PLC items of the
-  station's I/O systems as `addressControllerOwnerPaths`; the module and its subitems may take the requested access, every
-  address range stays and may keep at most one owner among those PLCs. Optional `externalIoControllers` (1 to 32, with
+  assigned IO device. Stations holding PLC software are refused, and so is a direct move from one PLC of the station to
+  another (`UnsupportedCapability`; set `OutsideOfProject` first). The bridge records the PLC items of the
+  station's I/O systems as `addressControllerOwnerPaths`; the module and its subitems may take the requested access (each
+  input either unchanged or the value the access gives). Address ranges keep their I/O type, start and length with at most one
+  owner among those PLCs, except that `OutsideOfProject` releases the subtree's addresses and `PLC` brings them back owned by
+  the target. Optional `externalIoControllers` (1 to 32, with
   `OutsideOfProject`) also sets `NumberOfExternalIoControllers` of the station's one assigned interface in the same change, which
   TIA may require once a module is accessed outside the project; with it, a module already outside the project may change only
   that count. The other project and module copies (`SharedDeviceCopyOfModule`) are not configured.
@@ -237,9 +247,13 @@ domain whose `DomainParticipants` include the interface. V21 offers no participa
 `RingPort1`/`RingPort2` are read-only in V21 and stay the TIA defaults (Port_1 and Port_2). The ring itself is the port
 topology: set the roles first, then close the ring with `hardware_port_connect`; a ring without one manager fails the device
 compile. V21 compiles a ring role only while each of the interface's ports links to another ring port ("Ring port ... is
-connected to port ..., which is not a ring port"), so set the roles while the members' ports are unlinked or linked to each other. Preservation adds every interface's MRP instances (name, domain, role, ring ports) and its subnet's MRP domain names to
+connected to port ..., which is not a ring port"), so set the roles while the members' ports are unlinked or linked to each other;
+prepare refuses a role that would leave a linked port pair with one ring port and one other port (`NetworkPrerequisite`; a partner
+port is a ring port when it declares `RingPort` true). Preservation adds every interface's MRP instances (name, domain, role, ring ports) and its subnet's MRP domain names to
 the manifest; only the selected instance's role and domain may change, and only `createDomain` adds its domain name. MRP domain attributes (`IsDefault`, `ManagerOutsideOfProjectActive`), domain
-deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed.
+deletion, MRP interconnection and MRPD are not reviewed, and no MRP telegram is observed. The topology run applied and
+persisted the domain and all three roles; it restored the second CPU's join and `ManagerAuto` but not the `createDomain` manager
+or the IM 155-5 PN ST client, and the port-link refusal is not natively exercised, so `change.network_mrp_set` stays unverified.
 
 ## Address-changing replacement
 
@@ -265,7 +279,9 @@ instance name. An `OrderNumber:` identifier names its firmware; a versionless `S
 equals it. A write to such a type whose firmware matches none of its profiles, or cannot be read, is refused
 (`AttributeNotWritable`) rather than left unchecked. The hardware runner writes
 `profiles.json` for every type its native run creates, merging every snapshot that shows a type (an attribute declared only in
-some states still enters); a curated run fills the contract, which holds none until then.
+some states still enters); a curated run fills the contract. It holds the 13 profiles of
+`local.hardware_changes.topology.20261101`, whose own worker still bundled an empty contract: the profile refusal and the
+`hardware_catalog_search` link below are not yet natively exercised.
 
 `hardware_catalog_search` names an entry's profile in `profile` (`contracts/hardware-catalog-profiles.v1.json#<typeIdentifier>`,
 else null). When the nearest item at or above the written one has a profile, `hardware_attributes`,
@@ -279,7 +295,11 @@ the file in TIA; `hardware_add` then takes its `GSD:` type identifier and the ot
 hardware runner: export the I-device GSD with `scripts/qualify_gsd_export.py` (designation `TiaMcpIDevice`; the run's
 `hardware_gsd_export` artifact holds the GSDML file), then in TIA Portal open Options > Manage general station description
 files (GSD), select that folder and install it. The runner then adds the device, assigns it to the second CPU and compiles; without
-it the run records `gsdNotInstalled`.
+it the run records `gsdNotInstalled`, as `local.hardware_changes.topology.20261101` did: the GSD step is not exercised.
+
+`scripts/qualify_hardware_changes.py --slice restores` is the short native run that closes these gaps: on a build that bundles
+the contract, the catalog search must name a profile and a write the profile does not declare must be refused by it, and the
+shared assignment, `OutsideOfProject`, the `createDomain` manager and the IM 155-5 PN ST client are each applied and restored.
 
 ## Preservation manifest identity checks
 

@@ -67,7 +67,7 @@ the device compile. Without the installed file it records `gsdNotInstalled` and 
 
 One owned TIA Portal V21 instance and one owned scratch project, built and run from a frozen `git archive` copy; nothing
 touched a user project, a PLC or PLCSIM. Every applied kind persisted across a fresh owned Portal reopen, and every new
-kind was applied, refused and restored:
+kind was applied, refused and restored at least once, though not in every mode (see the review below):
 
 - **ET 200SP on the second CPU:** the IM 155-6 PN ST V6.4 joined HwPeerIo with its generated server module (moved to slot 4).
   `SpDi3` at slot 1 holds the light BaseUnit and raises the update time to 2 ms; the family modules at slots 2 and 3
@@ -85,6 +85,33 @@ kind was applied, refused and restored:
 - **Profiles:** 13 module capability profiles are now in `contracts/hardware-catalog-profiles.v1.json`.
 
 The run used three discovery passes in this slot (hw3 to hw5, below). The `sharedDevice` disconnect is not exercised.
+
+### Review: narrowed claims and the restore slice
+
+The review of `aa87e82b..1584d389` found the catalog claims wider than the run:
+
+- The qualified worker bundled `"profiles": []`; the contract was filled only after the run. No profile refusal and no
+  `hardware_catalog_search` profile link ran natively.
+- No checkpoint restore covers the shared-device assignment, `OutsideOfProject`, the `createDomain` manager or the IM 155-5 PN ST
+  client.
+
+`hardware.catalog_profiles`, `hardware.distributed_io`, `change.network_mrp_set` and `change.hardware_shared_device_access` are
+therefore unverified again; `change.network_io_assign` keeps its earlier evidence, and its `sharedDevice` mode is described as
+applied and persisted only. The same review tightened the worker:
+
+- A `sharedDevice` assignment now captures every item's shared-device attributes. Inside the `sharedSubmodules` subtrees every
+  I/O address must end owned by exactly the new PLC, and each named item must move its target and an address. Every other row
+  stays exact. The named items must own I/O addresses, must not yet be assigned to that PLC, and pass the profile check.
+- `hardware_shared_device_access` refuses a direct PLC-to-PLC move, and the subtree's inputs may take only the values the access
+  gives.
+- `network_mrp_set` refuses a role that would link a ring port to a non-ring port (`NetworkPrerequisite`).
+
+`scripts/qualify_hardware_changes.py --slice restores` is the short native run that restores the claims. It runs on a build
+that bundles the contract and covers:
+
+- the second CPU with the ET 200MP and ET 200SP stations and three DI 8x24VDC ST;
+- the catalog search naming the plugged module's profile, and a profile refusal of `InformationText`;
+- apply and restore of the shared assignment, `OutsideOfProject`, the `createDomain` manager and the IM 155-5 PN ST client.
 
 ## Discovery passes (not evidence)
 

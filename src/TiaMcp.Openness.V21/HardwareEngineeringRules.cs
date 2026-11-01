@@ -29,6 +29,20 @@ namespace TiaMcp.Openness.V21
         // MRP instances (domain, role, ring ports) join the manifest only for the kind that changes them.
         internal static bool CapturesMrp(string kind) => kind == "network_mrp_set";
 
+        // The shared-device attributes join the manifest for the kinds that change them: a sharedDevice assignment (its sharedSubmodules'
+        // SharedDeviceAssignmentTarget) and hardware_shared_device_access. A plain assignment sets them on the whole station, unreviewed.
+        internal static bool CapturesSharedAccess(string kind, JObject payload) =>
+            kind == "hardware_shared_device_access" || kind == "network_io_assign" && payload?.Value<bool?>("sharedDevice") == true;
+
+        // V21 compiles a ring role only while each port link joins two ring ports or two other ports ("Ring port ... is connected to
+        // port ..., which is not a ring port", discovery hw3): one link per row, with whether each end is a ring port after the change.
+        internal static void RequireRingLinks(IEnumerable<(string Port, bool Ring, string Partner, bool PartnerRing)> links)
+        {
+            foreach (var link in links.Where(link => link.Ring != link.PartnerRing))
+                throw new BridgeException("NetworkPrerequisite", link.Port + (link.Ring ? " would be a ring port" : " would leave the ring") + " while linked to " + link.Partner +
+                    (link.PartnerRing ? ", a ring port" : ", which is not a ring port") + "; V21 fails such a link at the device compile. Disconnect it first (hardware_port_disconnect).");
+        }
+
         // V21 SharedDeviceAccessType values a change may request (Unknown is the native unassigned state).
         internal static readonly string[] SharedDeviceAccessTypes = { "PLC", "OutsideOfProject" };
 
@@ -309,26 +323,46 @@ namespace TiaMcp.Openness.V21
                     if (!JToken.DeepEquals(current, actual)) Fail("Connector does not reference the exact selected controller's I/O system.");
                 }
                 connector["system"] = actual.DeepClone();
-                // Native address ownership follows the assigned controller. It is
-                // the only allowed address change, and only on this remote station.
+                // Native address ownership follows the assigned controller. It is the only allowed address change, and only on this
+                // remote station; a sharedDevice connection moves only its sharedSubmodules subtrees to the selected PLC.
+                string selectedOwner = payload.Value<string>("addressControllerOwnerPath");
+                bool moving = shared && !disconnect;
+                if (moving && sharedItems.Length == 0) Fail("A sharedDevice connection names its sharedSubmodules.");
+                var moved = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal) &&
                     before.OfType<JObject>().Any(original => original.Value<string>("path") == row.Value<string>("path"))))
                 {
                     var actualRow = Target(after, row.Value<string>("path"));
-                    var addresses = (JArray)row["addresses"];
+                    var addresses = (JArray)row["addresses"]; var seen = actualRow["addresses"] as JArray;
+                    if (seen?.Count != addresses.Count) Fail("A remote-station item's address ranges changed in number.");
+                    string named = moving ? sharedItems.FirstOrDefault(item => InTree(row, item)) : null;
                     for (int i = 0; i < addresses.Count; i++)
                     {
                         var previousOwners = (JArray)addresses[i]["owners"];
                         if (previousOwners.Count > 1 || previousOwners.Any(owner => !ownersBefore.Contains(owner.Value<string>()))) Fail("Prechange remote-station address ownership is shared, foreign or unresolved.");
-                        var owners = (JArray)actualRow["addresses"][i]["owners"];
+                        var owners = (JArray)seen[i]["owners"];
+                        if (moving)
+                        {
+                            // Rows outside the sharedSubmodules subtrees and diagnostic (zero-length) addresses stay exact.
+                            if (named == null || addresses[i].Value<long>("lengthBits") == 0) continue;
+                            if (owners.Count != 1 || owners[0].Value<string>() != selectedOwner || !JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) || !JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
+                                Fail("A shared submodule's I/O address must end owned by exactly the selected PLC, with its I/O type and length.");
+                            if (!JToken.DeepEquals(previousOwners, owners)) moved.Add(named);
+                            // It takes a start address in that PLC's address space (discovery hw4).
+                            addresses[i] = seen[i].DeepClone();
+                            continue;
+                        }
                         if (owners.Count > 1 || owners.Any(owner => !ownersAfter.Contains(owner.Value<string>()))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
                         addresses[i]["owners"] = owners.DeepClone();
-                        // A shared submodule that moves to the selected PLC takes a start address in that PLC's address space (discovery hw4).
-                        if (shared && !disconnect && sharedItems.Any(item => InTree(row, item)) && owners.Count == 1 && owners[0].Value<string>() == payload.Value<string>("addressControllerOwnerPath")
-                            && JToken.DeepEquals(addresses[i]["ioType"], actualRow["addresses"][i]["ioType"]) && JToken.DeepEquals(addresses[i]["lengthBits"], actualRow["addresses"][i]["lengthBits"]))
-                            addresses[i]["startAddress"] = actualRow["addresses"][i]["startAddress"].DeepClone();
                     }
+                    // A named item takes the selected PLC as its assignment target; its subitems keep theirs or follow it.
+                    var was = row["attributes"]?["SharedDeviceAssignmentTarget"]; var becomes = actualRow["attributes"]?["SharedDeviceAssignmentTarget"];
+                    bool takes = named != null && was != null && becomes?.Type == JTokenType.String && becomes.Value<string>() == selectedOwner;
+                    if (takes) row["attributes"]["SharedDeviceAssignmentTarget"] = becomes.DeepClone();
+                    if (row.Value<string>("path") == named && (!takes || JToken.DeepEquals(was, becomes))) Fail("A sharedSubmodules item does not move its assignment target to the selected PLC: " + named);
                 }
+                foreach (string item in moving ? sharedItems : new string[0])
+                    if (!moved.Contains(item)) Fail("A sharedSubmodules item moves no I/O address to the selected PLC: " + item);
             }
             else if (kind == "network_configure")
             {
@@ -420,6 +454,8 @@ namespace TiaMcp.Openness.V21
                 var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
                 if (Target(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
                 if (access == "PLC" && Target(after, path)["attributes"]?.Value<string>("SharedDeviceAssignmentTarget") != payload.Value<string>("assignmentTargetPath")) Fail("The selected item does not read back the requested assignment target.");
+                // A direct PLC-to-PLC move is not covered (its start addresses would move unreviewed); prepare refuses it as well.
+                if (access == "PLC" && selected["attributes"]?.Value<string>("SharedDeviceAccessType") == "PLC") Fail("A module moves between two PLCs of the station only through OutsideOfProject.");
                 // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
                 if (payload["externalIoControllers"] != null)
                 {
@@ -432,9 +468,15 @@ namespace TiaMcp.Openness.V21
                     string was = row["attributes"]?.Value<string>("SharedDeviceAccessType"), becomes = now["attributes"]?.Value<string>("SharedDeviceAccessType");
                     if (becomes != was && becomes != access) Fail("A subitem took a SharedDeviceAccessType other than the requested one.");
                     if (becomes != null) row["attributes"]["SharedDeviceAccessType"] = becomes;
-                    // The writable inputs V21 derives the access from may follow in the subtree.
+                    // The writable inputs V21 derives the access from may follow in the subtree, only to the values the requested access gives.
                     foreach (string name in new[] { "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" })
-                        if (now["attributes"]?[name] != null) row["attributes"][name] = now["attributes"][name].DeepClone(); else (row["attributes"] as JObject)?.Remove(name);
+                    {
+                        JToken old = row["attributes"]?[name], value = now["attributes"]?[name];
+                        JToken wanted = name == "SharedDeviceAccessConfigured" ? new JValue(access == "PLC") : access == "PLC" ? new JValue(payload.Value<string>("assignmentTargetPath")) : JValue.CreateNull();
+                        if (old == null && value == null) continue;
+                        if (value == null || !JToken.DeepEquals(value, old) && !JToken.DeepEquals(value, wanted)) Fail("A subitem's " + name + " differs from both its value before and the one the requested access gives.");
+                        row["attributes"][name] = value.DeepClone();
+                    }
                     var addresses = (JArray)row["addresses"]; var observed = now["addresses"] as JArray ?? new JArray();
                     // OutsideOfProject releases the subtree's addresses from this project; PLC gives them back, owned by the target (discovery hw4).
                     if (observed.Count != addresses.Count)

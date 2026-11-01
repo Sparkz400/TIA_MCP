@@ -29,6 +29,10 @@ acknowledgedTags).
 
 --discover runs the same sequence but records every unexpected state difference, preview and refusal under discovered
 instead of failing: a key-discovery pass that fixes the expectations, never evidence.
+
+--slice restores runs a short sequence instead: the two stations on the second CPU, the capability-profile gates (the catalog
+search names a profile; a write the profile does not declare is refused) and a checkpoint restore of each topology change the
+full run applied without one (the shared-device assignment, OutsideOfProject, the createDomain manager, the IM 155-5 client).
 """
 from __future__ import annotations
 
@@ -103,6 +107,15 @@ LIMITATIONS = [
     "hardware_delete removes the last DI module of each rack (an S7-1500 rack with a gap fails compile); CPUs, HMIs and built-in items are refused by design.",
     "Engineering only; nothing is downloaded and no physical topology is observed.",
 ]
+SLICE_LIMITATIONS = [
+    "--slice restores: one owned scratch CPU 1511-1 PN V4.1, an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on one subnet with one ET 200MP IM 155-5 PN ST V4.1 "
+    "and one ET 200SP IM 155-6 PN ST V6.4 station assigned to it, three catalog-selected DI 8x24VDC ST in the ET 200SP rack; no S7-1200, no port links, no reopen.",
+    "Capability profiles: the worker's bundled contract; one hardware_catalog_search entry naming its profile and one refused undeclared write (InformationText).",
+    "Checkpoint restores of the shared-device assignment (SpDi3 to the scratch CPU), SpDi4 OutsideOfProject with one external IO controller, the MRP manager "
+    "creating domain HwRing and the IM 155-5 PN ST joining it as client; the members' ports stay unlinked, so no ring is closed.",
+    "Engineering only; nothing is downloaded and no physical topology is observed.",
+]
+PROFILE_LINK = "contracts/hardware-catalog-profiles.v1.json#"  # hardware_catalog_search's profile reference: the contract path, #, the typeIdentifier.
 
 
 def hardware(inspect):
@@ -390,7 +403,7 @@ def sp_modules(run, station_):
     return older, newer
 
 
-def shared_device(run):
+def shared_device(run, restore=False):
     """The ET 200SP interface's connector 1 joins a new IO system of the scratch CPU while connector 0 stays with HwPeerCpu, and SpDi3
     is assigned to the scratch CPU in the same change: V21 compiles a further controller only with a submodule of its own (hw3).
     True when applied."""
@@ -399,12 +412,14 @@ def shared_device(run):
                "sharedSubmodules": [run.path(SP.device, "items", "SpDi3")]}
     generated = lambda applied, state: [key for key in state if key.startswith((constant(run, SCRATCH, SP.prefix), constant(run, SCRATCH, "Local~" + SHARED_IO)))]
     submodule = run.path(SP.device, "items", "SpDi3", "items", "SpDi3")
-    return run.apply("share %s with ScratchPLC" % SP.device, "network_io_assign", payload,
-                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True}]},
+    return run.apply("share %s with ScratchPLC%s" % (SP.device, ", restored" if restore else ""), "network_io_assign", payload,
+                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": None, "afterIoSystem": SHARED_IO, "disconnect": False, "sharedDevice": True,
+                                   "sharedSubmodules": [{"hardwarePath": payload["sharedSubmodules"][0], "assignmentTargetBefore": run.path("HwPeer", "items", "HwPeerCpu"),
+                                                         "assignmentTargetAfter": run.path("ScratchStation", "items", "ScratchPLC")}]}]},
                      shown={**payload, "addressControllerOwnerPath": run.path("ScratchStation", "items", "ScratchPLC"), "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
                      # SpDi3's submodule takes the scratch CPU's address space (its start moves, hw4) and its HwPeerCpu system constant goes (hw5).
                      plc=scratch_plc(run), changed=["hw:" + device, "hw:" + controller, "hw:" + submodule], removed=[constant(run, SP, SP.prefix + "SpDi3")],
-                     added=generated, boundary=True) is not None
+                     added=generated, restore=restore, boundary=True) is not None
 
 
 def shared_access(run, name, access, shared, external=None, target=None, restore=False):
@@ -766,6 +781,48 @@ def profiles(run):
     run.h.stage("capture module capability profiles", capture)
 
 
+def profile_gates(run, identifier):
+    """With the bundled capability profiles: hardware_catalog_search names the profile of SpDi3's type, and a write that profile does
+    not declare (InformationText on the module) is refused by the profile, before any native check."""
+    def search():
+        entries = run.h.tool("hardware_catalog_search", {"filter": identifier.split(":", 1)[1].split("/", 1)[0], "maxItems": 500})["entries"]
+        row = next((e for e in entries if e["typeIdentifier"] == identifier), None)
+        require(row and row.get("profile") == PROFILE_LINK + identifier, "hardware_catalog_search does not name the profile of %s: %s" % (identifier, row))
+        return {"profile": row["profile"], "unprofiled": sum(1 for e in entries if e.get("profile") is None)}
+    run.h.stage("hardware_catalog_search names the capability profile of " + identifier, search)
+    error = run.refuse("hardware_attributes", "a write the module's capability profile does not declare",
+                       {"hardwarePath": run.path(SP.device, "items", "SpDi3"), "attributes": {"InformationText": "HwText"}}, "AttributeNotWritable")
+    run.expect("capability profile of " + identifier in (error.get("message") or ""), "profiles", "The refusal does not come from the capability profile: %s" % error.get("message"))
+
+
+def restore_slice(run):
+    """--slice restores: the ET 200MP and ET 200SP stations on the second CPU with SpDi3, SpDi and SpDi4, the two profile gates, then a
+    checkpoint restore of each change local.hardware_changes.topology.20261101 applied without one: the shared-device assignment, SpDi4
+    OutsideOfProject, the createDomain manager and the IM 155-5 PN ST client (the members' ports stay unlinked)."""
+    add_cpu(run, "add CPU HwPeer", "HwPeer")
+    network(run)
+    station(run)
+    sp = sp_station(run)
+    older, _ = sp_modules(run, sp)
+    plug(run, "SpDi3", 1, sp, older, changed=["hw:" + run.path(SP.device, "items", *SP.interface)])
+    plug(run, "SpDi", 2, sp, older)
+    plug(run, "SpDi4", 3, sp, older)
+    profile_gates(run, older)
+    run.b0 = run.current
+    shared_device(run, restore=True)
+    shared_device(run)
+    run.b0 = run.current
+    shared_access(run, "SpDi4", "OutsideOfProject", True, external=1, restore=True)
+    manager, _, head = interfaces(run)
+    run.b0 = run.current
+    mrp(run, manager, "Manager", RING, create=True, restore=True)
+    mrp(run, manager, "Manager", RING, create=True)
+    run.b0 = run.current
+    mrp(run, head, "Client", RING, restore=True)
+    missing = [kind for kind in ("network_io_assign", "hardware_shared_device_access", "network_mrp_set") if not run.coverage.get(kind, {}).get("restored")]
+    run.expect(not missing and run.coverage.get("hardware_attributes", {}).get("refused"), "coverage", "Slice kinds without a restore or the profile refusal: %s" % missing)
+
+
 def body(h):
     run = Run(h)
     h.owned_scratch("hardware changes")
@@ -773,6 +830,9 @@ def body(h):
     run.project, run.base = status["path"], "/projects/%s/devices/" % status["name"]
     run.plc = scratch_plc(run)  # The PLC compiled by tag_create.
     run.current = run.snap("baseline")
+    if getattr(getattr(h, "args", None), "slice", None) == "restores":
+        restore_slice(run)
+        return
     phase_a(run)
     reopen(run)
     phase_b(run)
@@ -789,7 +849,9 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--discover", action="store_true", help="Record unexpected state differences, previews and refusals instead of failing (not evidence).")
+    parser.add_argument("--slice", choices=("restores",), help="restores: only the profile gates and the topology restores the full run lacks.")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "hw_", "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"
-            + (" (key discovery, not evidence)" if args.discover else ""), LIMITATIONS, []).run(body)
+    title = ("X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations" if args.slice else
+             "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring")
+    Harness(args, "hw_", title + (" (key discovery, not evidence)" if args.discover else ""), SLICE_LIMITATIONS if args.slice else LIMITATIONS, []).run(body)

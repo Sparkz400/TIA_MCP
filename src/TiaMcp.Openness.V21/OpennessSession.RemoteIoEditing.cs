@@ -144,7 +144,7 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("MutationVerificationFailed", "The channel's hardware interrupt OB readback differs from the request.");
         }
 
-        private IoConnector PrepareIoAssignment(EngineeringChange change, Project project, JObject preview, out IoController controller)
+        private IoConnector PrepareIoAssignment(EngineeringChange change, Project project, JObject preview, out IoController controller, out HardwareEntry[] sharedItems)
         {
             var payload = change.Payload;
             var item = ChangeHardware(project, payload);
@@ -174,7 +174,7 @@ namespace TiaMcp.Openness.V21
             var allowed = new[] { plc.Software }.Concat(peers.Select(peer => (PlcSoftware)peer.Item.GetService<SoftwareContainer>().Software)).ToArray();
             if (allowed.Skip(1).Any(software => software.Equals(plc.Software))) throw new BridgeException("InvalidRequest", "The selected PLC already controls this IO device through another connector of the interface.");
             if (shared) payload["sharedAddressControllerOwnerPaths"] = new JArray(peers.Select(peer => peer.Path).Distinct().OrderBy(path => path, StringComparer.Ordinal));
-            SharedSubmodules(project, payload, station, shared && !disconnect);
+            sharedItems = SharedSubmodules(project, payload, station, shared && !disconnect, hardware);
             foreach (var peer in hardware.Where(row => row.Path.StartsWith(station + "/items/", StringComparison.Ordinal)))
             {
                 var peerNetwork = peer.Item.GetService<NetworkInterface>();
@@ -215,7 +215,8 @@ namespace TiaMcp.Openness.V21
             if (preview != null) ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["connectorIndex"] = index, ["beforeIoSystem"] = connector.ConnectedToIoSystem?.Name,
                 ["controllerHardwarePath"] = payload["controllerHardwarePath"]?.DeepClone(), ["controllerIndex"] = payload["controllerIndex"]?.DeepClone(),
                 ["afterIoSystem"] = controller?.IoSystem?.Name ?? payload.Value<string>("createIoSystemName"), ["disconnect"] = disconnect, ["sharedDevice"] = shared,
-                ["sharedSubmodules"] = payload["sharedSubmodules"]?.DeepClone() });
+                ["sharedSubmodules"] = sharedItems.Length == 0 ? null : new JArray(sharedItems.Select(entry => new JObject { ["hardwarePath"] = entry.Path,
+                    ["assignmentTargetBefore"] = SharedTargetPath(entry.Item, hardware), ["assignmentTargetAfter"] = payload["addressControllerOwnerPath"].DeepClone() })) });
             ValidateExpectedServerModule(change, project, item, preview);
             return connector;
         }
@@ -246,29 +247,35 @@ namespace TiaMcp.Openness.V21
 
         // V21 compiles a further IO controller of a shared device only with at least one submodule assigned to it ("Connected PLCs must
         // have at least one assigned submodule as a shared device", discovery hw3), so a sharedDevice connection names 1 to 64 items of
-        // the station (sharedSubmodules) whose SharedDeviceAssignmentTarget becomes the selected PLC item in the same change.
-        private DeviceItem[] SharedSubmodules(Project project, JObject payload, string station, bool required)
+        // the station (sharedSubmodules) whose SharedDeviceAssignmentTarget becomes the selected PLC item in the same change. Each must own
+        // I/O addresses (itself or through a subitem) and not be assigned to that PLC yet.
+        private HardwareEntry[] SharedSubmodules(Project project, JObject payload, string station, bool required, HardwareEntry[] hardware)
         {
             var list = payload["sharedSubmodules"];
             if (!required)
             {
                 if (list != null) throw new BridgeException("InvalidRequest", "sharedSubmodules applies only to a sharedDevice connection.");
-                return new DeviceItem[0];
+                return new HardwareEntry[0];
             }
             if (!(list is JArray paths) || paths.Count == 0 || paths.Count > 64 || paths.Any(path => path.Type != JTokenType.String) || paths.Select(path => path.Value<string>()).Distinct(StringComparer.Ordinal).Count() != paths.Count)
                 throw new BridgeException("InvalidRequest", "A sharedDevice connection needs sharedSubmodules: 1 to 64 distinct exact hardware paths of the station's items to assign to the selected PLC.");
+            string owner = payload.Value<string>("addressControllerOwnerPath");
             return paths.Select(path =>
             {
                 if (!path.Value<string>().StartsWith(station + "/items/", StringComparison.Ordinal)) throw new BridgeException("InvalidRequest", "Every sharedSubmodules path must belong to the selected IO device's station.");
-                var item = ChangeHardware(project, new JObject { ["hardwarePath"] = path.DeepClone() }).Item;
-                if (!Writable(item, SharedTarget)) throw new BridgeException("AttributeNotWritable", "A sharedSubmodules item declares no readable and writable " + SharedTarget + ".");
-                return item;
+                var entry = ChangeHardware(project, new JObject { ["hardwarePath"] = path.DeepClone() });
+                if (!Writable(entry.Item, SharedTarget)) throw new BridgeException("AttributeNotWritable", "A sharedSubmodules item declares no readable and writable " + SharedTarget + ".");
+                HardwareEngineeringRules.RequireProfileWritable(ItemProfile(entry.Item, out string profilePath), profilePath, null, new[] { SharedTarget });
+                if (!hardware.Any(row => (row.Path == entry.Path || row.Path.StartsWith(entry.Path + "/", StringComparison.Ordinal)) && row.Item.Addresses.Any(address => address.Length > 0)))
+                    throw new BridgeException("InvalidRequest", "A sharedSubmodules item must own I/O addresses itself or through a subitem: " + entry.Path);
+                if (SharedTargetPath(entry.Item, hardware) == owner) throw new BridgeException("InvalidRequest", "A sharedSubmodules item is already assigned to the selected PLC: " + entry.Path);
+                return entry;
             }).ToArray();
         }
 
         private void ApplyIoAssignment(EngineeringChange change, Project project)
         {
-            var connector = PrepareIoAssignment(change, project, null, out var controller);
+            var connector = PrepareIoAssignment(change, project, null, out var controller, out var sharedItems);
             var previous = connector.ConnectedToIoSystem;
             if (change.Payload.Value<bool?>("disconnect") == true)
             {
@@ -282,14 +289,12 @@ namespace TiaMcp.Openness.V21
                 connector.ConnectToIoSystem(system);
                 if (!Equals(connector.ConnectedToIoSystem, system) || !system.ConnectedIoDevices.Any(candidate => Equals(candidate, connector)))
                     throw new BridgeException("MutationVerificationFailed", "Native forward/reverse I/O-system readback differs from the selected association.");
-                if (change.Payload["sharedSubmodules"] != null)
+                if (sharedItems.Length != 0)
                 {
-                    var plc = SelectPlc(change.Selector);
-                    var budget = new ScanBudget(50000);
-                    var cpu = PlcItems(DeviceItems(project, budget).ToArray()).Single(entry => Equals(entry.Item.GetService<SoftwareContainer>().Software, plc.Software)).Item;
-                    string station = change.Payload.Value<string>("hardwarePath");
-                    foreach (var item in SharedSubmodules(project, change.Payload, station.Substring(0, station.IndexOf("/items/", StringComparison.Ordinal)), true))
+                    var cpu = ChangeHardware(project, new JObject { ["hardwarePath"] = change.Payload["addressControllerOwnerPath"].DeepClone() }).Item;
+                    foreach (var entry in sharedItems)
                     {
+                        var item = ChangeHardware(project, new JObject { ["hardwarePath"] = entry.Path }).Item;
                         item.SetAttribute(SharedTarget, cpu);
                         if (!Equals(item.GetAttribute(SharedTarget), cpu)) throw new BridgeException("MutationVerificationFailed", "A shared submodule does not read back the selected PLC as its assignment target.");
                     }
@@ -299,11 +304,12 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("MutationVerificationFailed", "The previous I/O system still contains the moved or disconnected connector.");
         }
 
-        private JArray CaptureHardwareEngineering(Project project, string kind = null)
+        private JArray CaptureHardwareEngineering(Project project, string kind = null, JObject payload = null)
         {
             bool cpuMemoryBytes = kind == "hardware_cpu_memory_bytes", ports = HardwareEngineeringRules.CapturesPorts(kind), mrp = HardwareEngineeringRules.CapturesMrp(kind);
             var attributeAllowlist = cpuMemoryBytes ? HardwareCpuMemoryPreservedAttributes : kind == "hardware_cpu_parameters" ? HardwareCpuParameterPreservedAttributes : kind == "safety_fparameter_set" ? HardwareFParameterPreservedAttributes
-                : kind == "hardware_shared_device_access" ? new HashSet<string>(HardwareWriteAttributes.Concat(SharedAccessAttributes).Concat(ExternalControllerAttributes), StringComparer.Ordinal) : HardwareWriteAttributes;
+                : kind == "hardware_shared_device_access" ? new HashSet<string>(HardwareWriteAttributes.Concat(SharedAccessAttributes).Concat(ExternalControllerAttributes), StringComparer.Ordinal)
+                : HardwareEngineeringRules.CapturesSharedAccess(kind, payload) ? new HashSet<string>(HardwareWriteAttributes.Concat(SharedAccessAttributes), StringComparer.Ordinal) : HardwareWriteAttributes;
             var budget = new ScanBudget(50000);
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Complete hardware preservation capture exceeds 50000 items.");
@@ -368,7 +374,7 @@ namespace TiaMcp.Openness.V21
         private void PrepareHardwarePreservation(EngineeringChange change, Project project, JObject preview)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind);
+            change.HardwareBeforeManifest = CaptureHardwareEngineering(project, change.Kind, change.Payload);
             string path = Path.Combine(change.Directory, "hardware-before.json");
             File.WriteAllText(path, change.HardwareBeforeManifest.ToString(Formatting.Indented));
             change.Backups.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
@@ -378,6 +384,7 @@ namespace TiaMcp.Openness.V21
             if (HardwareEngineeringRules.CapturesPorts(change.Kind)) preview["preservation"]["covered"] += " Port interconnections (native ConnectedPorts) are included.";
             if (HardwareEngineeringRules.CapturesMrp(change.Kind)) preview["preservation"]["covered"] += " Every interface's MRP instances (domain, MediaRedundancyRole, ring ports) and its subnet's MRP domain names are included.";
             if (change.Kind == "hardware_shared_device_access") preview["preservation"]["covered"] += " SharedDeviceAccessType, SharedDeviceAccessConfigured, SharedDeviceAssignmentTarget and NumberOfExternalIoControllers of every device item are included.";
+            else if (HardwareEngineeringRules.CapturesSharedAccess(change.Kind, change.Payload)) preview["preservation"]["covered"] += " SharedDeviceAccessType, SharedDeviceAccessConfigured and SharedDeviceAssignmentTarget of every device item are included.";
             if (change.Kind == "safety_fparameter_set") preview["preservation"]["covered"] += " Failsafe_FDestinationAddress and Failsafe_FMonitoringtime of every device item are included.";
             if (change.Kind == "hardware_replace") preview["inventoryBefore"] = HardwareEngineeringRules.ReplaceInventory(change.HardwareBeforeManifest, change.Payload.Value<string>("hardwarePath"));
         }
@@ -385,7 +392,7 @@ namespace TiaMcp.Openness.V21
         private void VerifyHardwarePreservation(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var after = CaptureHardwareEngineering(project, change.Kind);
+            var after = CaptureHardwareEngineering(project, change.Kind, change.Payload);
             string path = Path.Combine(change.Directory, "hardware-after.json");
             File.WriteAllText(path, after.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-preservation", ["artifact"] = ChangeArtifact(path) });
@@ -406,7 +413,7 @@ namespace TiaMcp.Openness.V21
         private void VerifyHardwareRecovery(EngineeringChange change, Project project)
         {
             if (!HardwareEngineeringRules.Applies(change.Kind)) return;
-            var restored = CaptureHardwareEngineering(project, change.Kind);
+            var restored = CaptureHardwareEngineering(project, change.Kind, change.Payload);
             string path = Path.Combine(change.Directory, "hardware-restored.json");
             File.WriteAllText(path, restored.ToString(Formatting.Indented));
             change.Readbacks.Add(new JObject { ["role"] = "configured-hardware-recovery", ["artifact"] = ChangeArtifact(path) });

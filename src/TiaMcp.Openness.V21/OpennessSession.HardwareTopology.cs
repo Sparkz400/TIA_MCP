@@ -186,6 +186,18 @@ namespace TiaMcp.Openness.V21
                 ["ringPorts"] = new JArray(new[] { instance.RingPort1, instance.RingPort2 }.Select(ring => ring == null ? JValue.CreateNull() : port(ring))) }));
         }
 
+        // A port's device and item names for messages, such as HwPeer/HwPeerCpu/PROFINET interface_1/Port_1.
+        private static string PortName(NetworkPort port)
+        {
+            var names = new System.Collections.Generic.List<string>();
+            for (IEngineeringInstance cursor = port.OwnedBy; cursor != null && names.Count < 16; cursor = cursor.Parent)
+            {
+                if (cursor is DeviceItem item) names.Insert(0, item.Name);
+                else if (cursor is Device device) { names.Insert(0, device.Name); break; }
+            }
+            return string.Join("/", names);
+        }
+
         // The MRP domain names of the subnet an interface's one connected node joins, null without one.
         private static JObject MrpDomainNames(NetworkInterface network)
         {
@@ -222,12 +234,18 @@ namespace TiaMcp.Openness.V21
             string before = changes[0].Value<string>("before"), domainBefore = current?.Name;
             if (before == role && (name == null || Equals(current, domain)))
                 throw new BridgeException("InvalidRequest", "The requested MRP role and domain are unchanged.");
+            // After the change the interface's ports (an instance's RingPort1/RingPort2) are ring ports unless the role is NotInRing; a
+            // linked partner port is one when it declares RingPort true.
+            var ringPorts = target is MrpInstance ring ? new[] { ring.RingPort1, ring.RingPort2 } : network.Ports.ToArray();
+            HardwareEngineeringRules.RequireRingLinks(network.Ports.SelectMany(port => port.ConnectedPorts.Select(partner => (Port: PortName(port), Ring: role != "NotInRing" && ringPorts.Contains(port),
+                Partner: PortName(partner), PartnerRing: partner.OwnedBy is DeviceItem other && Declares(other, "RingPort") && Equals(other.GetAttribute("RingPort"), true)))));
             if (preview != null)
             {
                 ((JArray)preview["effects"]).Add(new JObject { ["hardwarePath"] = item.Path, ["mrpInstance"] = (target as MrpInstance)?.Name, ["roleBefore"] = before, ["roleAfter"] = role,
                     ["domainBefore"] = domainBefore, ["domainAfter"] = name ?? domainBefore, ["createDomain"] = create });
                 preview["attributeChanges"] = changes;
-                ((JArray)preview["warnings"]).Add("Ring ports stay as configured; close or open the ring with hardware_port_connect and hardware_port_disconnect. A closed ring needs exactly one manager in its domain or the device compile fails.");
+                ((JArray)preview["warnings"]).Add("Ring ports stay as configured; close or open the ring with hardware_port_connect and hardware_port_disconnect. A closed ring needs exactly one manager in its domain or the device compile fails. " +
+                    "Every link of the interface's ports must join two ring ports or two other ports; a role that would break this is refused (NetworkPrerequisite).");
             }
             return target;
         }
@@ -261,6 +279,10 @@ namespace TiaMcp.Openness.V21
             return declared.Length == 1 && (declared[0].AccessMode & EngineeringAttributeAccessMode.Read) != 0 && (declared[0].AccessMode & EngineeringAttributeAccessMode.Write) != 0;
         }
 
+        // The hardware path of an item's SharedDeviceAssignmentTarget; null without one.
+        private static string SharedTargetPath(DeviceItem item, HardwareEntry[] hardware) =>
+            Declares(item, SharedTarget) && item.GetAttribute(SharedTarget) is DeviceItem target ? hardware.FirstOrDefault(entry => Equals(entry.Item, target))?.Path : null;
+
         // One module or submodule of an IO device: PLC assigns it to the PLC item assignmentTargetPath (one of the station's I/O-system
         // PLCs); OutsideOfProject clears SharedDeviceAccessConfigured, leaving it to an IO controller outside this project. The payload
         // records the station's I/O-system PLC items, the only permitted address owners afterwards. With OutsideOfProject, optional
@@ -293,14 +315,20 @@ namespace TiaMcp.Openness.V21
                 if (!Writable(item.Item, name)) throw new BridgeException("AttributeNotWritable", "The item declares no readable and writable " + name + "; V21 keeps SharedDeviceAccessType itself read-only.");
             HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, names);
             string before = item.Item.GetAttribute("SharedDeviceAccessType")?.ToString();
-            var current = item.Item.GetAttribute(SharedTarget) as DeviceItem;
-            string currentTarget = current == null ? null : hardware.FirstOrDefault(entry => Equals(entry.Item, current))?.Path;
+            string currentTarget = SharedTargetPath(item.Item, hardware);
             // With externalIoControllers a module already outside the project may change only its station's external controller count.
             bool accessUnchanged = before == access && (access != "PLC" || currentTarget == targetPath);
             if (accessUnchanged && external == null) throw new BridgeException("InvalidRequest", "The item already has the requested shared-device access.");
+            // Not exercised natively, and its start addresses would move unreviewed.
+            if (access == "PLC" && before == "PLC") throw new BridgeException("UnsupportedCapability", "A direct move between two PLCs of the station is not covered: set the module OutsideOfProject first, then PLC with the new target.");
             var changes = new JArray(new JObject { ["name"] = "SharedDeviceAccessType", ["type"] = "Siemens.Engineering.HW.SharedDeviceAccessType", ["before"] = before, ["after"] = access, ["derived"] = true });
-            if (access == "PLC") changes.Add(new JObject { ["name"] = SharedTarget, ["type"] = typeof(DeviceItem).FullName, ["before"] = currentTarget, ["after"] = targetPath });
-            else changes.Add(new JObject { ["name"] = SharedConfigured, ["type"] = typeof(bool).FullName, ["before"] = ChangeScalar(item.Item.GetAttribute(SharedConfigured)), ["after"] = false });
+            var configured = ChangeScalar(item.Item.GetAttribute(SharedConfigured));
+            if (access == "PLC")
+            {
+                if (!(configured.Type == JTokenType.Boolean && configured.Value<bool>())) changes.Add(new JObject { ["name"] = SharedConfigured, ["type"] = typeof(bool).FullName, ["before"] = configured, ["after"] = true });
+                changes.Add(new JObject { ["name"] = SharedTarget, ["type"] = typeof(DeviceItem).FullName, ["before"] = currentTarget, ["after"] = targetPath });
+            }
+            else changes.Add(new JObject { ["name"] = SharedConfigured, ["type"] = typeof(bool).FullName, ["before"] = configured, ["after"] = false });
             ioDevice = null;
             if (external != null)
             {
