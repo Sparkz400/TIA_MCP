@@ -1,6 +1,7 @@
 """Qualify library consumption in a software unit with a namespace preset, the one-instance-per-device rule, the unit-aware
 cleanup refusal and an explicit namespace on a library instance: on an FB root, on a UDT dependency that the namespaced FB then
-reuses, on a master copy, and kept by a later reachable library update of the namespaced FB."""
+reuses, on a master copy, kept by a later reachable library update of the namespaced FB, and on an FB root whose UDT is created
+alongside it (the UDT keeps its type's empty namespace)."""
 from __future__ import annotations
 
 import argparse
@@ -14,6 +15,8 @@ FB, UDT, UNIT = "TiaMcpLibraryGate", "TiaMcpLibraryState", "TiaMcp_LibUnit"
 # An FB that depends on its UDT, and a plain FC for a master copy.
 DEPENDENT_FB, DEPENDENCY = "TiaMcpComponentGate", "TiaMcpComponentState"
 MASTER_FC = "TiaMcpUnitMasterFc"
+# A copy of the dependent FB and its UDT under other names, so the target holds neither when the FB is instantiated.
+CREATED_FB, CREATED_UDT = "TiaMcpUnitCreatedGate", "TiaMcpUnitCreatedState"
 MASTER_SOURCE = 'FUNCTION "' + MASTER_FC + """" : Void
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -79,6 +82,24 @@ def namespaced(software, unit, names):
     return paths
 
 
+def created_alongside(software, unit):
+    """Paths of the namespaced FB and of the UDT created alongside it: the FB in the unit's namespace, the UDT in none."""
+    rows = [x for key in ("blocks", "types") for x in software[key] if x["path"].rsplit("/", 1)[-1] in (CREATED_FB, CREATED_UDT)]
+    paths = {x["path"].rsplit("/", 1)[-1]: x["path"] for x in rows if x.get("scopePath") == unit}
+    require(len(rows) == 2 and len(paths) == 2, "Expected the FB and the UDT created alongside exactly once, in the unit: %s" % rows)
+    require("/namespaces/" + UNIT + "/" in paths[CREATED_FB] and "/namespaces/" not in paths[CREATED_UDT], "Namespaces differ: %s" % paths)
+    return paths
+
+
+def alongside_documents(folder):
+    """The component FB and UDT documents, byte for byte except for the two names."""
+    folder.mkdir()
+    for old, new, extension in ((DEPENDENT_FB, CREATED_FB, ".scl"), (DEPENDENCY, CREATED_UDT, ".udt")):
+        data = (ROOT / "fixtures/libraries/component-qualification" / (old + extension)).read_bytes()
+        (folder / (new + extension)).write_bytes(data.replace(DEPENDENT_FB.encode(), CREATED_FB.encode()).replace(DEPENDENCY.encode(), CREATED_UDT.encode()))
+    return folder
+
+
 def body(h):
     documents = h.directory / "documents"
     shutil.copytree(ROOT / "fixtures/libraries/type-lifecycle", documents)
@@ -104,6 +125,12 @@ def body(h):
     software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
     h.apply("library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": global_library, "target": {"plcPath": plc},
             "object": {"kind": "block", "objectPath": next(x["path"] for x in software["blocks"] if x["path"].rsplit("/", 1)[-1] == MASTER_FC)}})
+    # A second dependent FB with its UDT, for the UDT created alongside the namespaced FB.
+    alongside_folder = alongside_documents(h.directory / "alongside-documents")
+    created_dependency = h.release(library, h.create_type(library, alongside_folder, CREATED_UDT, "types", plc), "1.0.0")
+    created_root = h.release(library, h.create_type(library, alongside_folder, CREATED_FB, "blocks", plc), "1.0.0")
+    h.apply("library_publish", h.selected(library, [created_dependency], destinationLibraryId=global_library))
+    h.apply("library_publish", h.selected(library, [created_root], destinationLibraryId=global_library))
     generation_one = h.archive(global_library)
     second = h.release(library, h.edit_source(library, plc, fb, FB, change), "1.1.0")
     h.apply("library_set_default", h.selected(library, [second]))
@@ -222,19 +249,36 @@ def body(h):
     h.stage("FB at exactly 1.1.0", lambda: h.verify_use(consumer, second, 1))
     h.stage("the updated FB keeps namespace %s" % UNIT, lambda: require(placement() == h.report["placement"], "The update moved the FB or UDT") or True)
     h.stage("the dependent FB, its UDT and the master-copy FC keep namespace %s" % UNIT, others_unmoved)
+
+    # A dependency created alongside a namespaced root: the target holds no UDT of the second pair, so the FB's
+    # instantiation creates it. The namespace goes on the selected FB only; the UDT keeps its type's empty namespace, the
+    # root namespace against which V21 resolves unqualified names. This follows the PLC-wide update, whose cleanup guard
+    # would otherwise need an OB that reaches the new FB.
+    alongside = h.prepare("library_instantiate", h.selected(source, [created_root], target=in_unit, namespace=UNIT))
+    h.stage("the namespaced FB creates its UDT alongside", lambda: require(
+        alongside["preview"].get("reusedDependencies") == [] and alongside["preview"].get("createdNames") == [CREATED_FB, CREATED_UDT]
+        and (alongside["preview"].get("instanceNamespace") or {}).get("objects") == [{"typeName": CREATED_FB, "typeNamespace": ""}],
+        "Preview does not create the UDT alongside the namespaced FB: %s" % alongside["preview"]) or alongside["preview"]["createdNames"])
+    applied_alongside = h.apply_prepared("library_instantiate", alongside)
+    h.stage("the FB and the UDT created alongside compile without errors", lambda: require(
+        applied_alongside["journal"]["compile"]["errorCount"] == 0, "Compile differs: %s" % applied_alongside["journal"]["compile"]) or 0)
+    h.report["alongsidePlacement"] = h.stage("FB in namespace %s and the UDT created alongside without, both in the unit" % UNIT,
+        lambda: created_alongside(h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}), unit))
+    h.stage("the FB and the UDT created alongside used once each",
+            lambda: h.verify_use(consumer, created_root, 1) and h.verify_use(consumer, created_dependency, 1))
     h.tool("library_close", {"libraryId": source})
     project_path = h.tool("tia_session_status")["projects"][0]["path"]
     h.stage("close consumer session", lambda: h.tool("tia_detach"))
 
     # The namespaced instantiation's checkpoint restores the project as it was before the FB.
     h.owned_portal("restore")
-    def restore():
-        restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
+    def restore(change):
+        restored = h.tool("change_restore", {"changeId": change["changeId"], "previewHash": change["previewHash"]})
         rows = restored["resources"]
         require(restored["state"] == "restored_to_new_locations" and [r["kind"] for r in rows] == ["project"] and rows[0]["state"] == "completed",
                 "Checkpoint recovery differs: %s" % restored)
         return restored
-    h.stage("restore the namespaced instantiation's checkpoint", restore)
+    h.stage("restore the namespaced instantiation's checkpoint", lambda: restore(prepared))
     def restored_state():
         software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
         names = sorted(x["path"].rsplit("/", 1)[-1] for key in ("blocks", "types") for x in software[key] if x["path"].rsplit("/", 1)[-1] in (FB, UDT))
@@ -247,6 +291,25 @@ def body(h):
     h.stage("reopen consumer", lambda: h.reopen_project(project_path))
     h.stage("reopened: namespaced FB at 1.1.0 and UDT intact", lambda: h.verify_use(h.project_library(), second, 1) and placement())
     h.stage("reopened: the dependent FB, its UDT and the master-copy FC in namespace %s" % UNIT, others_unmoved)
+    def reopened_alongside():
+        require(created_alongside(h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000}), unit) == h.report["alongsidePlacement"],
+                "The FB or the UDT created alongside moved")
+        library = h.project_library()
+        return h.verify_use(library, created_root, 1) and h.verify_use(library, created_dependency, 1)
+    h.stage("reopened: the FB in namespace %s and the UDT created alongside without" % UNIT, reopened_alongside)
+    h.stage("close reopen session", lambda: h.tool("tia_detach"))
+
+    # The created-alongside instantiation's checkpoint restores the updated project without that FB and UDT.
+    h.owned_portal("restore alongside")
+    h.stage("restore the created-alongside instantiation's checkpoint", lambda: restore(alongside))
+    def restored_before_alongside():
+        software = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})
+        names = [x["path"].rsplit("/", 1)[-1] for key in ("blocks", "types") for x in software[key]]
+        require(CREATED_FB not in names and CREATED_UDT not in names, "The restored project still holds the FB or UDT created alongside: %s" % names)
+        require(placement() == h.report["placement"], "The restored FB or UDT moved")
+        others_unmoved()
+        return h.verify_use(h.project_library(), second, 1)
+    h.stage("restored: no FB or UDT created alongside, the namespaced objects in place and the FB at 1.1.0", restored_before_alongside)
 
 
 if __name__ == "__main__":
@@ -262,5 +325,5 @@ if __name__ == "__main__":
     Harness(args, "un_", "V21 library consumption in a software unit with a namespace preset beside the PLC root", [
         "One software unit without unit relations; unit-to-root calls are not exercised, so unit uses are conservatively unreachable.",
         "The unit is created by scripts/native/LibraryUnitSeeder (a registered fixture tool), not by an MCP route.",
-        "The explicit namespace is exercised on two FB roots, a UDT root that the second FB then reuses, and one master-copy FC; a dependency created alongside a namespaced root keeps its type namespace, unexercised.",
+        "The explicit namespace is exercised on three FB roots, a UDT root that the second FB then reuses, and one master-copy FC; the UDT created alongside the third FB keeps its type's empty namespace.",
         "No runtime execution."], [args.unit_seeder]).run(body)
