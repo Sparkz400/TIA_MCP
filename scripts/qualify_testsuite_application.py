@@ -11,6 +11,10 @@ per Host session, like TS-Q01:
   fail      the failing case is an assertion failure (recoveryRequired), then checkpoint recovery and reconciliation
   afterRun  the passing case with an injected lost Run reply (outcomeUnknown), then recovery and reconciliation
   released  the instance is released between prepare and execute; observation refuses before checkpoint or Run
+  jobPass   the passing case reviewed again through testsuite_application_plan_prepare and queued by testsuite_style_job_prepare
+            (a repeated key returns the same job; a wrong hash and a key bound to another review refuse), then that job is
+            dispatched through qualification_testsuite_execute
+  jobFail   the failing case queued the same way, dispatched, then checkpoint recovery and reconciliation
 
 Nothing outside the worker-created scratch and the instances this run creates is touched. Every instance is released.
 """
@@ -32,6 +36,39 @@ LIMITATIONS = [
     "execution acceptance is the returned Run itself.",
     "The simulator ticket expires 15 minutes after sim_create, so download, prepare and execute run back to back.",
 ]
+
+
+def queue_job(h, prepared, ticket, refuse):
+    """Review the prepared fixture case again through the public plan tool and queue it with testsuite_style_job_prepare."""
+    reviewed = json.loads((h.directory / prepared["review"]["relativePath"]).read_text(encoding="utf-8"))
+    manifest = reviewed["runs"][0]["run"]["definitions"][0]
+
+    def plan(runs):
+        return h.tool("testsuite_application_plan_prepare", {"request": {
+            "target": reviewed["runs"][0]["operation"]["target"], "executionProfile": PROFILE, "executionMode": "externallyManaged",
+            "simulatorTicket": ticket, "wholeGroup": False,
+            "definitions": [{"manifest": manifest, "originalArtifact": prepared["observation"]["definition"]["originalArtifact"]}],
+            "runs": [{"selectedDefinitionIds": [manifest["id"]], "excludedDefinitionIds": []}] * runs}})["review"]
+
+    review = h.stage("testsuite_application_plan_prepare", lambda: plan(1))
+    key = h.directory.name + "-queued"
+    arguments = {"relativePath": review["relativePath"], "sha256": review["sha256"], "reviewedSha256": review["sha256"], "idempotencyKey": key}
+    refuse("a wrong reviewed hash", "testsuite_style_job_prepare", {**arguments, "reviewedSha256": "0" * 64}, ["ReviewMismatch"])
+    queued = h.stage("testsuite_style_job_prepare", lambda: h.tool("testsuite_style_job_prepare", arguments))
+    again = h.stage("testsuite_style_job_prepare (repeated key)", lambda: h.tool("testsuite_style_job_prepare", arguments))
+    require(again["job"] == queued["job"] and [o["id"] for o in again["operations"]] == [o["id"] for o in queued["operations"]],
+            "A repeated key must return the same job and operations")
+    other = plan(2)
+    refuse("the key bound to another review", "testsuite_style_job_prepare",
+           {"relativePath": other["relativePath"], "sha256": other["sha256"], "reviewedSha256": other["sha256"], "idempotencyKey": key}, ["IdempotencyConflict"])
+    status = h.tool("testsuite_style_job_status", {"jobId": queued["job"]["id"]})
+    require(status["job"] == queued["job"] and len(status["operations"]) == 1 and status["operations"][0]["state"] == "prepared"
+            and status["operations"][0]["revision"] == 0 and status["job"]["id"] != prepared["status"]["job"]["id"],
+            "The queued job must be a separate prepared job at revision 0")
+    h.report["queuedJob"] = {"jobId": queued["job"]["id"], "review": review, "qualificationReview": prepared["review"],
+                             "sameReviewAsQualification": review["sha256"] == prepared["review"]["sha256"],
+                             "qualificationJobId": prepared["status"]["job"]["id"]}
+    return queued["job"]["id"], queued["job"]["reviewSha256"], queued["operations"][0]["id"], status
 
 
 def body(h, case):
@@ -88,7 +125,7 @@ def body(h, case):
         require(running["instance"]["operatingState"] == "Run", "The instance did not enter RUN")
         h.report["instance"] = {"id": instance["id"], "name": instance["name"]}
 
-        prepare = {"projectPath": project, "fixture": "applicationFail" if case == "fail" else "applicationPass",
+        prepare = {"projectPath": project, "fixture": "applicationFail" if case in ("fail", "jobFail") else "applicationPass",
                    "idempotencyKey": h.directory.name + "-" + case, "simulatorTicket": created["downloadTicket"]}
         if case == "pass":
             tampered = created["downloadTicket"][:-8] + ("A" * 8 if not created["downloadTicket"].endswith("A" * 8) else "B" * 8)
@@ -103,6 +140,9 @@ def body(h, case):
         op = status["operations"][0]["id"]
         require(prepared["observation"]["executionProfile"] == PROFILE and prepared["observation"]["nativeExecuted"] is False, "Prepare must not execute")
         h.report["prepare"] = {"jobId": job, "review": prepared["review"], "definition": prepared["observation"]["definition"]["name"]}
+
+        if case in ("jobPass", "jobFail"):
+            job, review, op, status = queue_job(h, prepared, created["downloadTicket"], refuse)
 
         def action(current):
             return {"jobId": job, "reviewedSha256": review, "operationId": op,
@@ -145,7 +185,8 @@ def body(h, case):
             h.stage("qualification_testsuite_execute", lambda: h.tool("qualification_testsuite_execute", execute))
         status = h.tool("testsuite_style_job_status", {"jobId": job})
         current = status["operations"][0]["state"]
-        expected = {"pass": "succeeded", "fail": "recoveryRequired", "afterRun": "outcomeUnknown"}[case]
+        expected = {"pass": "succeeded", "jobPass": "succeeded", "fail": "recoveryRequired", "jobFail": "recoveryRequired",
+                    "afterRun": "outcomeUnknown"}[case]
         require(current == expected, "Expected %s, observed %s" % (expected, current))
         results = h.stage("testsuite_style_job_results", lambda: h.tool("testsuite_style_job_results", {"jobId": job, "operationId": op}))
         if results.get("raw"):
@@ -153,8 +194,8 @@ def body(h, case):
         if case != "afterRun":
             classification = results["result"]["classification"]
             h.report["classification"] = classification
-            require(classification == ("passed" if case == "pass" else "assertionFailure"), "Classification mismatch: " + classification)
-        if case in ("fail", "afterRun"):
+            require(classification == ("passed" if case in ("pass", "jobPass") else "assertionFailure"), "Classification mismatch: " + classification)
+        if case in ("fail", "jobFail", "afterRun"):
             recovered = h.stage("qualification_testsuite_recover", lambda: h.tool("qualification_testsuite_recover",
                                 {**action(status), "recoveryLocation": str(h.directory / "rc")}))
             reconciled = h.stage("qualification_testsuite_reconcile", lambda: h.tool("qualification_testsuite_reconcile", action(recovered)))
@@ -173,7 +214,7 @@ if __name__ == "__main__":
     parser.add_argument("--worker", type=Path, required=True)
     parser.add_argument("--sim-worker", type=Path, required=True)
     parser.add_argument("--artifacts", type=Path, required=True)
-    parser.add_argument("--case", choices=["pass", "fail", "afterRun", "released"], required=True)
+    parser.add_argument("--case", choices=["pass", "fail", "afterRun", "released", "jobPass", "jobFail"], required=True)
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
