@@ -26,6 +26,7 @@ namespace TiaMcp.Openness.V21
                 bool translationQualification = false;
                 bool libraryIntegrateApply = false;
                 string hmiTextListQualification = null;
+                string hmiChangeQualification = null;
                 string apiDirectory = InstalledApiDirectory();
                 string simulatorApiDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "Siemens", "PLCSIMADV", "API", "8.0");
                 string discoveryProbe = null;
@@ -59,15 +60,17 @@ namespace TiaMcp.Openness.V21
                     else if (args[i] == "--enable-library-integrate-apply") libraryIntegrateApply = true;
                     else if (args[i] == "--hmi-text-list-qualification" && i + 1 < args.Length && hmiTextListQualification == null &&
                         Array.IndexOf(TiaMcp.Model.HmiTextListImportRules.QualificationProfiles, args[i + 1]) >= 0) hmiTextListQualification = args[++i];
+                    else if (args[i] == "--hmi-change-qualification" && i + 1 < args.Length && hmiChangeQualification == null &&
+                        Array.IndexOf(TiaMcp.Model.HmiEngineeringRules.QualificationProfiles, args[i + 1]) >= 0) hmiChangeQualification = args[++i];
 #if TESTSUITE_QUALIFICATION
                     else if (args[i] == "--testsuite-qualification") testSuiteQualification = true;
 #endif
                     else throw new ArgumentException("Usage: TiaMcp.Openness.V21.exe --pipe NAME [--api-dir DIR]");
                 }
-                if (placeholderIdentityProbe != null && (discoveryProbe != null || pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || hmiTextListQualification != null))
+                if (placeholderIdentityProbe != null && (discoveryProbe != null || pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || hmiTextListQualification != null || hmiChangeQualification != null))
                     throw new ArgumentException("The placeholder identity probe runs alone.");
                 if (string.IsNullOrWhiteSpace(pipe) && discoveryProbe == null && placeholderIdentityProbe == null) throw new ArgumentException("--pipe is required.");
-                if (discoveryProbe != null && (pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || hmiTextListQualification != null))
+                if (discoveryProbe != null && (pipe != null || componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || hmiTextListQualification != null || hmiChangeQualification != null))
                     throw new ArgumentException("Discovery probes cannot be combined with a pipe or another qualification mode.");
                 apiDirectory = Path.GetFullPath(apiDirectory);
                 string basePath = Path.Combine(apiDirectory, "Siemens.Engineering.Base.dll");
@@ -82,7 +85,8 @@ namespace TiaMcp.Openness.V21
                 if (testSuiteQualification && (componentQualification || testSuiteScopeProbe)) throw new ArgumentException("Separate qualification modes required.");
                 if (translationQualification && (componentQualification || testSuiteScopeProbe || testSuiteQualification)) throw new ArgumentException("Separate qualification modes required.");
                 if (hmiTextListQualification != null && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification)) throw new ArgumentException("Separate qualification modes required.");
-                return Run(pipe, apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply, hmiTextListQualification);
+                if (hmiChangeQualification != null && (componentQualification || testSuiteScopeProbe || testSuiteQualification || translationQualification || hmiTextListQualification != null)) throw new ArgumentException("Separate qualification modes required.");
+                return Run(pipe, apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply, hmiTextListQualification, hmiChangeQualification);
             }
             catch (Exception exception)
             {
@@ -124,14 +128,14 @@ namespace TiaMcp.Openness.V21
 
         // Keep JIT loading of Siemens-dependent code after installing the resolver.
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static int Run(string pipeName, string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply, string hmiTextListQualification)
+        private static int Run(string pipeName, string apiDirectory, bool componentQualification, bool testSuiteScopeProbe, bool testSuiteQualification, bool translationQualification, bool libraryIntegrateApply, string hmiTextListQualification, string hmiChangeQualification)
         {
             using (var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.None))
             {
                 pipe.Connect(30000);
                 using (var reader = new StreamReader(pipe, new UTF8Encoding(false, true), false, 4096, true))
                 using (var writer = new TiaMcp.Transport.WorkerPipeWriter(pipe))
-            using (var session = new OpennessSession(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply) { HmiTextListQualificationProfile = hmiTextListQualification })
+            using (var session = new OpennessSession(apiDirectory, componentQualification, testSuiteScopeProbe, testSuiteQualification, translationQualification, libraryIntegrateApply) { HmiTextListQualificationProfile = hmiTextListQualification, HmiChangeQualificationProfile = hmiChangeQualification })
                 {
                     while (true)
                     {
