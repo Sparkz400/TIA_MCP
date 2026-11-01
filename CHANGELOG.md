@@ -134,6 +134,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   from this PLC; V21 has no block move API. The release matrix counts an unavailable API with an
   unsupported or blocked target as `unavailable_target`.
 - `SimulationTargetMismatch` tells an owned instance with no successful card that it has none.
+- `drive_observe` no longer drops a drive object whose `DriveObjectNumber` Startdrive cannot read (a
+  G120C PN V4.7): such a drive's objects are addressed by their container position
+  (`driveObjectIndex`, `driveId` `DO@<index>`) with a warning. `drive_parameter_set` and
+  `drive_telegram_set` take exactly one of `driveObjectNumber` or `driveObjectIndex`, refuse the
+  other with `DriveObjectHandleMismatch`, and add the drive object's identity to the change fingerprint.
 - The Unified HMI preservation capture also covers the complete text-list export, and OPC UA sessions
   also check that namespace 0 is the OPC UA namespace.
 
@@ -208,7 +213,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - 451 of 479 catalog features are verified; 108 release-matrix cells are open and 6 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
 - V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
-  through Openness, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
+  through Openness (its drive objects are addressed by position), an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
   file, and a safety program cannot be loaded into PLCSIM (the offline memory-card download is

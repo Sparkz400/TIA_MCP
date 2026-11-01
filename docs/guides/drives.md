@@ -21,15 +21,22 @@ item that exposes a `DriveObjectContainer`. It changes nothing.
 
 Each `drives[].driveObjects[]` row has the `driveObjectNumber` and a `snapshot`
 in the exact v2 snapshot format of the
-[supplied drive review](../reference/drive-profile-review.md):
+[supplied drive review](../reference/drive-profile-review.md). Startdrive cannot
+read the number of some drives (a G120C PN V4.7 answers "Drive object number could
+not be retrieved"). On a drive where any number cannot be read, every row reports
+`driveObjectNumber: null` and `driveObjectIndex`, its zero-based position in the
+drive's `DriveObjects`, and a warning names the native error; one drive never mixes
+the two handles.
 
-- `identity`: `driveId` is the local handle `DO<driveObjectNumber>`; order number
+- `identity`: `driveId` is the local handle `DO<driveObjectNumber>`, or
+  `DO@<driveObjectIndex>` on a drive addressed by index; order number
   and firmware come from the hosting hardware item's attributes; family and
   parameter set are null with a reason.
 - `parameters`: name, number, arrayIndex, unit, value and metadata (parameter
   text, array length, min/max, enum labels) from `DriveObject.Parameters`.
   Values are `scalar` (CLR type and invariant text), `reference` for a BICO
-  source (`DO<n>` and the exact source name) or `unavailable` with a reason.
+  source (`DO<n>` and the exact source name; the owner stays null with a reason when
+  its number cannot be read) or `unavailable` with a reason.
   `access` is always `unknown`: Openness does not expose per-parameter write access.
 - `telegrams`: type, number, input/output size in bytes and the telegram's
   `Address` ranges (start byte, length in bits). PLC ownership is not resolved.
@@ -60,6 +67,12 @@ offline project:
     { "name": "p1082[0]", "expected": { "kind": "scalar", "type": "System.Single", "text": "1500" }, "value": 1800 } ] }
 ```
 
+- Name the drive object by exactly one handle, the one `drive_observe` reports:
+  `driveObjectNumber`, or `driveObjectIndex` on a drive addressed by index. The
+  other handle refuses with `DriveObjectHandleMismatch`. Prepare and apply resolve
+  the object again; its identity (hardware path, drive object count, order number,
+  firmware, parameter count) is part of the change fingerprint, so apply refuses
+  with `StaleRevision` when it changed. `drive_telegram_set` takes the same handle.
 - `expected` is the value object exactly as `drive_observe` reported it. Prepare
   and apply refuse any difference before the first write.
 - `value` is a JSON scalar converted to the parameter's current CLR type; enums by name.
