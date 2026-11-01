@@ -193,7 +193,11 @@ namespace TiaMcp.Openness.V21
                 Directory.CreateDirectory(exported);
                 table.Tags.Export(new DirectoryInfo(exported));
                 foreach (string path in Directory.GetFiles(exported, "*", SearchOption.AllDirectories))
-                    AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + path.Substring(exported.Length + 1).Replace('\\', '/'), path, artifacts);
+                {
+                    string relative = path.Substring(exported.Length + 1).Replace('\\', '/');
+                    if (HmiPreservationRules.IsExportHelperFile(relative)) continue;
+                    AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + relative, path, artifacts);
+                }
             }
             missing.Add(HmiPreservationRules.UnifiedTagTableExportNote);
             // The complete paired text-list export; it re-exports byte-identically (local.hmi.text-list-import.20261029).

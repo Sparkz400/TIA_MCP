@@ -26,6 +26,10 @@ namespace TiaMcp.Model
                 return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value))).Replace("-", "").ToLowerInvariant();
         }
 
+        // TIA's Unified export helper keeps its process ID and port in the export folder while it runs (route run hr5): process
+        // metadata that a capture finds only when it races the helper. Exactly these two names; anything else stays content.
+        internal static bool IsExportHelperFile(string relative) => relative == ".ile/ItLikeEs.pid" || relative == ".ile/ItLikeEs.port";
+
         // XDocument.ToString drops the XML declaration that TIA's exports carry and RequireExactDocument compares (route run hr1).
         internal static void WriteXml(XDocument document, string path) => document.Save(path, SaveOptions.DisableFormatting);
 

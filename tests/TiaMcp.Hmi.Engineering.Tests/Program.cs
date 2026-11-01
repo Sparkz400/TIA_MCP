@@ -259,6 +259,11 @@ Check("Classic scalar patch selects export-local owner, preserving duplicate mem
     Reject(() => HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "1", "BackColor", "204, 204, 204", "128, 128, 128"));
     Reject(() => HmiPreservationRules.PatchClassicScalar(before, "Hmi.Screen.Screen", "0", "BackColor", "Stale", "128, 128, 128"));
 });
+Check("Only the Unified export helper's two process files are left out of a capture", () => {
+    Assert(HmiPreservationRules.IsExportHelperFile(".ile/ItLikeEs.pid") && HmiPreservationRules.IsExportHelperFile(".ile/ItLikeEs.port"));
+    foreach (string other in new[] { ".ile/other.pid", "ItLikeEs.pid", ".ile/ItLikeEs.pid.bak", "Default tag table.hmi.yml", ".ILE/ItLikeEs.pid" })
+        Assert(!HmiPreservationRules.IsExportHelperFile(other));
+});
 Check("A prepared Classic document keeps the native XML declaration through its file", () => {
     var native = HmiPreservationRules.ReadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" + xml);
     var expected = HmiPreservationRules.PatchClassicScalar(native, "Hmi.Screen.Screen", "0", "BackColor", "204, 204, 204", "128, 128, 128");
