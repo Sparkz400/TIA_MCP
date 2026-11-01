@@ -398,6 +398,18 @@ var sharedDisconnect = new JObject { ["hardwarePath"] = remote, ["connectorIndex
 void SharedOwned(JArray rows) { SharedBase(rows); SharedAssigned(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }
 Check("shared disconnect releases the second controller", "network_io_assign", sharedDisconnect, rows => { rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }; rows[1]["addresses"][0]["owners"] = new JArray(); }, true, SharedOwned);
 Check("shared disconnect keeping its owner rejected", "network_io_assign", sharedDisconnect, rows => rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }, false, SharedOwned);
+// V21 fails the compile of a submodule left assigned to the leaving PLC (rd1), so a shared disconnect names the leaving PLC's items
+// (sharedSubmodules) and they go to the one remaining PLC: owner and assignment target, with a start in its address space.
+var sharedGiveBack = (JObject)sharedDisconnect.DeepClone(); sharedGiveBack["sharedSubmodules"] = new JArray(module);
+void SharedHeld(JArray rows) { SharedOwned(rows); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }
+void GivenBack(JArray rows) { rows[3]["network"]["connectors"][1]["system"] = new JObject { ["state"] = "notAssigned" }; rows[1]["addresses"][0]["owners"] = new JArray("/cpu1"); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu1"; }
+Check("shared disconnect gives its submodule to the remaining PLC", "network_io_assign", sharedGiveBack, GivenBack, true, SharedHeld);
+Check("given-back submodule takes a start of the remaining PLC", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["startAddress"] = 6; }, true, SharedHeld);
+Check("given-back submodule keeping the leaving target rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["attributes"]["SharedDeviceAssignmentTarget"] = "/cpu2"; }, false, SharedHeld);
+Check("given-back address left with the leaving PLC rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["owners"] = new JArray("/cpu2"); }, false, SharedHeld);
+Check("given-back address resized rejected", "network_io_assign", sharedGiveBack, rows => { GivenBack(rows); rows[1]["addresses"][0]["lengthBits"] = 8; }, false, SharedHeld);
+var giveBackTwoPeers = (JObject)sharedGiveBack.DeepClone(); giveBackTwoPeers["sharedAddressControllerOwnerPaths"] = new JArray("/cpu1", "/cpu3");
+Check("shared disconnect with two remaining PLCs rejected", "network_io_assign", giveBackTwoPeers, GivenBack, false, SharedHeld);
 // MRP: the selected interface's one instance takes the requested role and domain; its name, ring ports and every other interface stay.
 JArray Mrp(string role, string domain, string ring = "/P1") => new JArray(new JObject { ["name"] = "MRP1", ["domain"] = domain, ["role"] = role, ["ringPorts"] = new JArray(ring, "/P2") });
 void MrpCaptured(JArray rows) { rows[2]["mrp"] = Mrp("NotInRing", "mrpdomain-1"); rows[3]["mrp"] = Mrp("NotInRing", "mrpdomain-1"); }
@@ -521,6 +533,19 @@ if (!HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:F/D") || HardwareEng
     || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, "OrderNumber:6ES7 131-6BF00-0BA0/V1.1"))
     throw new Exception("Catalog profile links differ.");
 count++; Console.WriteLine("PASS catalog entries name their type's profiles, versionless ones without a firmware");
+// The bundled I-device GSD head profile (captured in rd1) is selected only by its FirmwareVersion and declares Comment, not InformationText.
+const string gsdHead = "GSD:GSDML-V2.45-SIEMENS-TIAMCPIDEVICE-20261101.XML/DAP/DAP1";
+var gsdProfile = HardwareEngineeringRules.Profile(gsdHead, "V4.1");
+if (gsdProfile == null || HardwareEngineeringRules.Profile(gsdHead, null) != null || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, gsdHead))
+    throw new Exception("The bundled GSD head profile is not keyed by its firmware.");
+HardwareEngineeringRules.RequireProfileWritable(gsdProfile, "", null, new[] { "Comment" });
+foreach (var (label, check) in new (string, Action)[] { ("an undeclared head attribute", () => HardwareEngineeringRules.RequireProfileWritable(gsdProfile, "", null, new[] { "InformationText" })),
+    ("another firmware of the GSD head", () => HardwareEngineeringRules.RequireVersionlessMatch(HardwareEngineeringRules.BundledProfileList, gsdHead, "V4.0")) })
+{
+    try { check(); throw new Exception("Bundled GSD profile accepted " + label); }
+    catch (BridgeException error) when (error.Code == "AttributeNotWritable") { count++; Console.WriteLine("PASS bundled GSD profile refuses " + label); }
+}
+count++;
 foreach (var (label, firmware) in new[] { ("another firmware", "V2.0"), ("another firmware format", "1.0"), ("an unreadable firmware", (string)null) })
 {
     try { HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", firmware); throw new Exception("Versionless profile mismatch accepted: " + label); }

@@ -935,15 +935,22 @@ def shared_refusal(run):
 
 
 def shared_disconnect(run):
-    """The ET 200SP interface's connector 1 leaves the scratch CPU's IO system (sharedDevice disconnect), applied and restored.
+    """The ET 200SP interface's connector 1 leaves the scratch CPU's IO system (sharedDevice disconnect) and gives SpDi3 back to
+    HwPeerCpu in the same change: V21 fails the compile of a submodule left assigned to the leaving PLC (rd1). Applied and restored.
     True when applied."""
-    device, owner = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC")
-    payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True}
+    device, owner, peer = run.path(SP.device, "items", *SP.interface), run.path("ScratchStation", "items", "ScratchPLC"), run.path("HwPeer", "items", "HwPeerCpu")
+    module = run.path(SP.device, "items", "SpDi3")
+    payload = {"hardwarePath": device, "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}
     run.b0 = run.current
+    # The inverse of the shared assignment's constants: the scratch CPU's station constants go, SpDi3's returns to HwPeerCpu; the
+    # emptied IO system HwScratchIo stays with its constant.
+    gone = [key for key in run.current["view"] if key.startswith(constant(run, SCRATCH, SP.prefix))]
     return run.apply("disconnect %s's shared connector, restored" % SP.device, "network_io_assign", payload,
-                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True}]},
-                     shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": [run.path("HwPeer", "items", "HwPeerCpu")]},
-                     plc=scratch_plc(run), changed=["hw:" + device], restore=True, boundary=True) is not None
+                     {"effects": [{"hardwarePath": device, "connectorIndex": 1, "beforeIoSystem": SHARED_IO, "afterIoSystem": None, "disconnect": True, "sharedDevice": True,
+                                   "sharedSubmodules": [{"hardwarePath": module, "assignmentTargetBefore": owner, "assignmentTargetAfter": peer}]}]},
+                     shown={**payload, "addressControllerOwnerPath": owner, "sharedAddressControllerOwnerPaths": [peer]}, plc=scratch_plc(run),
+                     changed=["hw:" + device, "hw:" + module + "/items/SpDi3"], removed=gone, added=[constant(run, SP, SP.prefix + "SpDi3")],
+                     restore=True, boundary=True) is not None
 
 
 def link_refusals(run):

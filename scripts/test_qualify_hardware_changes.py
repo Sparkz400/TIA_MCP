@@ -444,13 +444,20 @@ class HardwareChangeTests(unittest.TestCase):
 
     def test_shared_disconnect_names_the_shared_connector_and_both_owners(self):
         run, calls = q.Run.__new__(q.Run), []
-        run.base, run.current = "/projects/P/devices/", {"view": {"k": 1}}
+        run.base = "/projects/P/devices/"
+        proxy = q.constant(run, q.SCRATCH, "HwSpHead~Proxy")
+        run.current = {"view": {proxy: 1, q.constant(run, q.SCRATCH, "Local~" + q.SHARED_IO): 1}}
         run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: calls.append((payload, preview, shown, plc, expected)) or {"changeId": "c"}
         self.assertTrue(q.shared_disconnect(run))
         payload, preview, shown, plc, expected = calls[0]
-        self.assertEqual({"hardwarePath": run.path("HwSp", "items", *q.SP.interface), "connectorIndex": 1, "disconnect": True, "sharedDevice": True}, payload)
-        self.assertEqual([run.path("HwPeer", "items", "HwPeerCpu")], shown["sharedAddressControllerOwnerPaths"])
+        module, peer = run.path("HwSp", "items", "SpDi3"), run.path("HwPeer", "items", "HwPeerCpu")
+        # SpDi3, assigned to the leaving scratch CPU, goes back to HwPeerCpu in the same change (rd1: else the compile fails).
+        self.assertEqual({"hardwarePath": run.path("HwSp", "items", *q.SP.interface), "connectorIndex": 1, "disconnect": True, "sharedDevice": True, "sharedSubmodules": [module]}, payload)
+        self.assertEqual([{"hardwarePath": module, "assignmentTargetBefore": run.path("ScratchStation", "items", "ScratchPLC"), "assignmentTargetAfter": peer}],
+                         preview["effects"][0]["sharedSubmodules"])
+        self.assertEqual([peer], shown["sharedAddressControllerOwnerPaths"])
         self.assertEqual((q.scratch_plc(run), True, True), (plc, expected["restore"], expected["boundary"]))
+        self.assertEqual(([proxy], [q.constant(run, q.SP, "HwSpHead~SpDi3")]), (expected["removed"], expected["added"]))  # The IO system's constant stays.
         self.assertIs(run.b0, run.current)
 
     def test_second_project_stations_must_be_complementary(self):
