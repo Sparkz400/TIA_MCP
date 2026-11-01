@@ -5,9 +5,10 @@ project_compile with save then compiles the PLC station and lists the drive unde
 no device compile service), and drive_observe runs again. Startdrive cannot read DriveObject.DriveObjectNumber of this
 drive (28 October and 1 November 2026), so drive_observe addresses its drive objects by driveObjectIndex; the runner uses
 whichever handle drive_observe reports. When the drive objects read, drive_parameter_set and drive_telegram_set each
-apply with checkpoint, device compile (drive listed as not compiled) and save, are read back through drive_observe,
+apply with checkpoint, device compile (drive listed as not compiled) and save, are confirmed by change_status, are
+read back through drive_observe,
 refuse typed (including the other handle) and are restored from their checkpoints. Whatever V21 refuses is recorded
-under boundaries with its exact error.
+under boundaries with its exact error. The run passes only if the owned TIA process exits after detach and Host close.
 """
 from __future__ import annotations
 
@@ -51,6 +52,13 @@ def drive_receipt(applied):
     return {"targets": [t["targetPath"] for t in receipt["targets"]], "notCompiled": skipped}
 
 
+def applied_status(h, prepared, applied):
+    """change_status reports the applied change with the stages of its apply result."""
+    status = h.tool("change_status", {"changeId": prepared["changeId"]})
+    require(status["state"] == "applied" and status["stages"] == applied["stages"], "change_status differs from the apply result: %s" % status)
+    return {"state": status["state"], "stages": status["stages"]}
+
+
 def handle(drive_object):
     """The one handle drive_observe reports: driveObjectIndex on a drive whose numbers cannot be read, else driveObjectNumber."""
     key = "driveObjectIndex" if "driveObjectIndex" in drive_object else "driveObjectNumber"
@@ -85,6 +93,7 @@ def add_drive(h):
 
 def body(h):
     h.owned_scratch("drives")
+    h.watch_owned_tia()  # run() then requires the owned TIA to exit after detach (on 1 November it outlived the run)
     boundaries = h.report["boundaries"] = {}
     add_drive(h)
     h.report["unsavedObserve"] = h.stage("drive_observe of the new unsaved drive", lambda: observe(h))
@@ -136,6 +145,7 @@ def parameters(h, path, ref, boundaries):
         h.refuse("refuse the save parameter p971", kind, {**payload, "parameters": [{"name": protected[0]["name"], "expected": protected[0]["value"], "value": 1}]}, "SafetyBoundary")
     applied = h.apply_prepared(kind, prepared)
     h.report["parameterCompile"] = h.stage("drive_parameter_set compile lists the drive as not compiled", lambda: drive_receipt(applied))
+    h.report["parameterStatus"] = h.stage("change_status reports the applied parameter change", lambda: applied_status(h, prepared, applied))
     after = h.stage("read back the parameter", lambda: next(p for p in parameter_rows(h, path, ref, [row["number"]]) if p["name"] == name)["value"])
     require(after["text"] == str(value), "Parameter readback %s differs from %s" % (after, value))
     def restore():
@@ -168,6 +178,7 @@ def telegrams(h, path, ref, boundaries):
     h.refuse("refuse stale expected telegrams", kind, {**payload, "expectedTelegrams": []}, "ExpectedValueMismatch")
     applied = h.apply_prepared(kind, prepared)
     h.report["telegramCompile"] = h.stage("drive_telegram_set compile lists the drive as not compiled", lambda: drive_receipt(applied))
+    h.report["telegramStatus"] = h.stage("change_status reports the applied telegram change", lambda: applied_status(h, prepared, applied))
     after = h.stage("read back the main telegram", lambda: telegram_rows(h, path, ref))
     require([t["number"] for t in after if t["type"] == "MainTelegram"] == [target], "Main telegram readback: %s" % after)
     def restore():
