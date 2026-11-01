@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "9212d92fde652d44b28cfdbb030f608b38d9187343eba6a0b83c6dde767c485d",
-      "bytes": 1444084
+      "sha256": "92767e316597e532b669ad7b64349b0a8fac1d11f71155354c0a3bf578f71fb5",
+      "bytes": 1446429
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -99843,6 +99843,13 @@
           "artifacts": [
             "evidence/local.project_simulation.20261028.json"
           ]
+        },
+        {
+          "id": "local.project_simulation.multi_plc.20261101",
+          "profileSha256": "da6c623a910a35cffb64ecd24c93299d6fc64f425724128e9f44cd256da70b43",
+          "artifacts": [
+            "evidence/local.project_simulation.multi_plc.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -121488,6 +121495,11 @@
       "sha256": "150e77d708ab5169d92140947885c1ad74a6f3ce3441e8339b29045c212d670e"
     },
     {
+      "path": "evidence/local.project_simulation.multi_plc.20261101.json",
+      "state": "observed",
+      "sha256": "26e3407e637c57eac2736eb4c5f689ca8fb2b450c9d28e359b4cb8e0d22819c0"
+    },
+    {
       "path": "evidence/local.read_contracts.20261028.json",
       "state": "observed",
       "sha256": "3841523a6aaeb22f6c4ad144112317f97d982bcd3818e9b377bd2bf743fcb399"
@@ -122253,6 +122265,10 @@
     {
       "id": "local.project_simulation.20261028",
       "profileSha256": "9392162d71a5f082674567325f6d2585ca5fc05529a2c25b0115669a4a52ca2e"
+    },
+    {
+      "id": "local.project_simulation.multi_plc.20261101",
+      "profileSha256": "da6c623a910a35cffb64ecd24c93299d6fc64f425724128e9f44cd256da70b43"
     },
     {
       "id": "local.read_contracts.20261028",

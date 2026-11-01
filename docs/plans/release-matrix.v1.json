@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "9212d92fde652d44b28cfdbb030f608b38d9187343eba6a0b83c6dde767c485d",
+    "catalogSha256": "92767e316597e532b669ad7b64349b0a8fac1d11f71155354c0a3bf578f71fb5",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -4740,49 +4740,56 @@
         "L03"
       ],
       "evidenceIds": [
-        "local.project_simulation.20261028"
+        "local.project_simulation.20261028",
+        "local.project_simulation.multi_plc.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.project_simulation.20261028"
+            "local.project_simulation.20261028",
+            "local.project_simulation.multi_plc.20261101"
           ]
         }
       ]
@@ -26251,6 +26258,21 @@
         {
           "path": "evidence/local.project_simulation.20261028.json",
           "sha256": "150e77d708ab5169d92140947885c1ad74a6f3ce3441e8339b29045c212d670e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.project_simulation.multi_plc.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "d681ece1653cec0e41a1880d9bc9883b90491c10",
+      "retained": [
+        {
+          "path": "evidence/local.project_simulation.multi_plc.20261101.json",
+          "sha256": "26e3407e637c57eac2736eb4c5f689ca8fb2b450c9d28e359b4cb8e0d22819c0"
         }
       ],
       "notRetained": []

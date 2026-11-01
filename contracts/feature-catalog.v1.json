@@ -3266,6 +3266,23 @@
         "safety_fparameter_set writes Failsafe_FDestinationAddress here; the other 76 allowlisted F-parameters rest on local.safety.fparameter_discovery.20261031 (discovery Host).",
         "No F-logic behavior, acceptance, login, password or download; a printout or signature read does not validate or approve a safety program."
       ]
+    },
+    {
+      "id": "local.project_simulation.multi_plc.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d681ece1653cec0e41a1880d9bc9883b90491c10",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of d681ece1 (artifacts/w2bs4, git archive), 24/24 steps, in an owned scratch holding the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) with an ET 200SP station and two F-DI 8x24VDC HF. project_simulation_enable with no plcPath applied in this two-PLC project with checkpoint, a compile of every device (ScratchStation, TiaMcpFStation, TiaMcpRemoteIo; zero errors, device-path-v1 receipt) and save, where the one-PLC compile of earlier builds refused AmbiguousTarget (sl1) or left the other PLC inconsistent so the fingerprint refused (sl2). Then safety_inspect (no safety password, not logged on), two standard tags and a safety_import_xml of Main_Safety_RTG1 with two F-FBD networks: V21 refused the import natively ('The element Address has an invalid scope GlobalVariable', the probe's own XML for the absolute F-DI input) and the change was restored from its checkpoint. PLCSIM was not reached."
+      },
+      "artifacts": [
+        "evidence/local.project_simulation.multi_plc.20261101.json"
+      ],
+      "limitations": [
+        "Covers project_simulation_enable in a project with two PLCs (enable only) and the restore of a natively refused safety import; no F-logic behavior, PLCSIM download or F-I/O injection.",
+        "The scratch user's fail-safe access exists in the owned scratch only; no safety login, password, acceptance or download."
+      ]
     }
   ],
   "features": [
@@ -7813,7 +7830,7 @@
         "status": "partial",
         "limitations": [
           "Natively qualified in an owned scratch project (local.project_simulation.20261028): IsSimulationDuringBlockCompilationEnabled switched on and off with checkpoint, compile and save, read back through a fresh preparation (no read tool exposes it), fresh-Portal reopen and checkpoint restore; a payload without the explicit flag is refused.",
-          "Apply compiles every device of the project (the device compile of safety_import_xml), because the setting leaves every PLC's blocks to recompile; with only one PLC compiled, a project with two PLCs refused AmbiguousTarget without plcPath and FingerprintUnavailable with it (scripts/probe_safety_logic.py runs sl1 and sl2, 1 November 2026). A plcPath is accepted but no longer narrows the compile.",
+          "Apply compiles every device of the project (the device compile of safety_import_xml), because the setting leaves every PLC's blocks to recompile; with only one PLC compiled, a project with two PLCs refused AmbiguousTarget without plcPath and FingerprintUnavailable with it (probe_safety_logic.py runs sl1 and sl2, 1 November 2026). A plcPath is accepted but no longer narrows the compile. Natively verified without plcPath in a two-PLC project (standard and F-CPU, three devices compiled with zero errors; local.project_simulation.multi_plc.20261101).",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification."
         ]
@@ -7821,7 +7838,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.project_simulation.20261028"
+          "local.project_simulation.20261028",
+          "local.project_simulation.multi_plc.20261101"
         ]
       },
       "availability": {
@@ -8412,7 +8430,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py probes changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8 (import, device compile, simulation_download, RUN, F-DI input through sim_area_write, the F-logic's outputs read back) and records a V8 or V21 refusal as the boundary; its native run is pending."
+          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py probes changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8 (import, device compile, simulation_download, RUN, F-DI input through sim_area_write, the F-logic's outputs read back) and records a V8 or V21 refusal as the boundary. Its native runs of 1 November 2026 did not reach PLCSIM: a generic tag on the F-DI's input address becomes a safety tag that tag_create refuses (SafetyBoundary), and V21 refused the probe's absolute-address F-FBD access ('The element Address has an invalid scope GlobalVariable', local.project_simulation.multi_plc.20261101). Behavior, F-CPU simulation and F-I/O injection remain unqualified."
         ]
       },
       "qualification": {

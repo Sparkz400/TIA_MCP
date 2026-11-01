@@ -1,0 +1,90 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.project_simulation.multi_plc.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T01:40:03+00:00",
+  "source": {
+    "commit": "d681ece1653cec0e41a1880d9bc9883b90491c10",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/probe_safety_logic.py on a frozen Debug build of d681ece1 (artifacts/w2bs4, git archive), 24/24 steps, in an owned scratch holding the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) with an ET 200SP station and two F-DI 8x24VDC HF. project_simulation_enable with no plcPath applied in this two-PLC project with checkpoint, a compile of every device (ScratchStation, TiaMcpFStation, TiaMcpRemoteIo; zero errors, device-path-v1 receipt) and save, where the one-PLC compile of earlier builds refused AmbiguousTarget (sl1) or left the other PLC inconsistent so the fingerprint refused (sl2). Then safety_inspect (no safety password, not logged on), two standard tags and a safety_import_xml of Main_Safety_RTG1 with two F-FBD networks: V21 refused the import natively ('The element Address has an invalid scope GlobalVariable', the probe's own XML for the absolute F-DI input) and the change was restored from its checkpoint. PLCSIM was not reached.",
+  "limitations": [
+    "Covers project_simulation_enable in a project with two PLCs (enable only) and the restore of a natively refused safety import; no F-logic behavior, PLCSIM download or F-I/O injection.",
+    "The scratch user's fail-safe access exists in the owned scratch only; no safety login, password, acceptance or download."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b7ee1c393dd459b2264d2313e4a9b81e370d3dddfdbdc80740c7d4ffcc378bf0"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "59721f3d9965caba58771dd2c6d6755a4ae309b1cf80b2ba98992c228a84e658"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "193f1b364b307bfe61c0221021d7042702a9487dd7a6f2d53537a7784018e161"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "c5812b91c2daccc1fac40842c0bb53c097b53650b400bd107d02aa8980d4afdd",
+      "bytes": 799456,
+      "completed": true,
+      "steps": [
+        "start owned TIA safety logic",
+        "create owned scratch safety logic",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_move",
+        "apply hardware_move",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "safety_inspect of the F-PLC",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "safety_import_xml of the changed F-logic"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "safety_inspect",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}
