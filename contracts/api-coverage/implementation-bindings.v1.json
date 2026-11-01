@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8ff1f473bcdf8c02c1c6dc41094842d11c801c01709e49c1d1fa2e03070ea79d",
-      "bytes": 1609461
+      "sha256": "164a1939aa325066b21995e3847543d0aec0b24e55cd5f4072da4f770795172e",
+      "bytes": 1615406
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -118595,6 +118595,14 @@
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
           ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -118673,6 +118681,14 @@
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
           ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -118714,6 +118730,14 @@
           "artifacts": [
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
+          ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
           ]
         }
       ],
@@ -118808,6 +118832,14 @@
           "artifacts": [
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
+          ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
           ]
         }
       ],
@@ -126159,7 +126191,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126181,7 +126222,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126288,7 +126338,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126315,7 +126374,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126337,7 +126405,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126374,7 +126451,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126397,7 +126483,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126523,7 +126618,16 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -130196,6 +130300,11 @@
       "sha256": "660dcb066bf79657004b3377444db85813facb755e4a587c88a034bd90d55329"
     },
     {
+      "path": "docs/verification/testsuite-style-q01-20261101.md",
+      "state": "observed",
+      "sha256": "e55080015b9388106ebf3368c406f7578a8705c5c52d441ba835f00c9121d4e2"
+    },
+    {
       "path": "evidence/local.access.qualify.20261029.json",
       "state": "observed",
       "sha256": "a7d7c0e33554445937f602f1a8f9fa4070a38cbd58114514bfb541de2d4d9601"
@@ -130984,6 +131093,11 @@
       "path": "evidence/local.testsuite.scope-probe.20261028.json",
       "state": "observed",
       "sha256": "67b9ac17c1a2193567a14aa6d29d8db2155e881293f013723ab438b38d29fc14"
+    },
+    {
+      "path": "evidence/local.testsuite.style-q01.20261101.json",
+      "state": "observed",
+      "sha256": "424a86424ece9926c16e9a8fb3a2d5aa854dd49e6716573dffc49bfedf47c01f"
     },
     {
       "path": "evidence/local.translation.native.20261028.json",
@@ -131873,6 +131987,10 @@
     {
       "id": "local.testsuite.scope-probe.20261028",
       "profileSha256": "fc96bbe5ab2bd3e9a1be79c0cef2f04526fee906ed79e604c48a28f19dcc02b4"
+    },
+    {
+      "id": "local.testsuite.style-q01.20261101",
+      "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9"
     },
     {
       "id": "local.translation.native.20261028",

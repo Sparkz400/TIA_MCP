@@ -1,0 +1,218 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.testsuite.style-q01.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T17:16:04+00:00",
+  "source": {
+    "commit": "0ed68e8515e6f4ccae2a47fafcf09fdcdb18c5b5",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_testsuite_native.py --case <case> on a frozen Debug build of da5485d9 (artifacts/tq9, git archive, TestSuiteQualification=true, Host --testsuite-qualification), 1 November 2026 16:43-17:08 UTC, six cases with one owned TIA Portal V21 Update 3 (English UI, Test Suite Advanced V21) and one worker-created scratch CPU 1511-1 PN V4.1 each. qualification_testsuite_prepare imports the packaged single-rule style fixture (TiaMcp_Q01_Clean or TiaMcp_Q01_Violating, CodeBlock (FB,FC,OB), enabled), sets its scope on the program blocks, compiles, saves and prepares a durable style job; qualification_testsuite_execute runs one RuleSetExecutor.Run with checkpoint archive, compile, preservation, fresh reopen and cleanup. Scope and license are operator observations: at every ui-* challenge the operator at the desk supplied screenshots of the native style-guide scope editor and, at prepare, of the Automation License Manager key check (Test Suite Advanced 21.0, 1 OK, 0 defective), accepted by StyleUiEvidence.Validate. clean: succeeded, classification passed. violating: assertionFailure, recoveryRequired, qualification_testsuite_recover into a new folder and qualification_testsuite_reconcile verifiedRestored. stop: two reviewed runs; testsuite_style_job_stop_request after the first leaves [succeeded, stopped]. beforeRun and afterRun: injected worker response loss before and after the Run; testsuite_style_job_status reports outcomeUnknown and no result, nothing is replayed, recover and reconcile verifiedRestored. afterRestore (root ar): violating fixture with the restore reply lost; the operation stays outcomeUnknown and reconcile verifiedRestored. Every case: Host exit 0, worker exit verified, preexisting TIA processes unchanged. Not part of this record: root afterRestore, refused by the worker at tia_create_scratch with ProjectPathTooLong (its 12-character folder name put the planned scratch path over the native limit) before any native change; Host, worker and TIA exited cleanly.",
+  "limitations": [
+    "One packaged single-rule style fixture (CodeBlock (FB,FC,OB)) per Run in a worker-created scratch CPU 1511-1 PN V4.1 under the English UI; other rules, rule sets, scopes, CPUs and UI languages stay unqualified. Production admission stays closed: testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified. testsuite_style_plan_prepare, testsuite_style_job_prepare and testsuite_style_job_mark_interrupted were not called; qualification_testsuite_prepare builds the review and job through the same TestSuiteStyleJobs core.",
+    "Scope and license rest on operator observations: V21 Update 3 has no rule-set scope read route. For clean/prepare the screenshot showed neither the object selector nor the enabled state; the operator confirmed both in chat. Later screenshots show the rule table (CodeBlock (FB,FC,OB), Enabled). Screenshots pasted as WebP were re-encoded to PNG with unchanged pixels for the validator (PNG/JPEG only); the originals are kept beside each challenge folder as <challenge>-<purpose>-original.webp. The violating/reconcile-recovered screenshot has no title bar; its open project path (violating/h/recovered) was confirmed from the TIA process's window title (read-only, no Openness attach). Later screenshots include the title bar.",
+    "Interruption is injected worker response loss at beforeRun, afterRun and afterRestore; the worker and TIA stay alive. No worker, Portal or Host process loss was exercised for style jobs."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "faa6bcf9de70d8b09c91d3e8f4e6240bbae4895a7d38a944ed160f391dcb3d3e"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "465233cec4cee0b6a968acc09478c6869461c845a49d8d032fce311dea618761"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "3f08e9b31b5ec3ab92d7339d38cffa29f6d784a5efd9c1178822f8c9029b53bb",
+      "bytes": 147702,
+      "completed": true,
+      "steps": [
+        "tia_discover",
+        "tia_start",
+        "tia_create_scratch",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsPassed": [
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "testsuite_style_job_results",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "report.json",
+      "sha256": "24a8dc11bb6d13e22151ab3bb2b0e936197491a118421404653d0926f36181e4",
+      "bytes": 192516,
+      "completed": true,
+      "steps": [
+        "tia_discover",
+        "tia_start",
+        "tia_create_scratch",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "qualification_testsuite_reconcile",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsPassed": [
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "qualification_testsuite_recover",
+        "testsuite_style_job_results",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "report.json",
+      "sha256": "f037b63aa751a7dd8a4180dc277734bcfacb5d89ee43594562a905c98b5443a7",
+      "bytes": 197877,
+      "completed": true,
+      "steps": [
+        "tia_discover",
+        "tia_start",
+        "tia_create_scratch",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "testsuite_style_job_stop_request",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsPassed": [
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "testsuite_style_job_results",
+        "testsuite_style_job_stop_request",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "report.json",
+      "sha256": "1adf1144a988d3f1be828a535dcf1a8d9edd4f0da5359f65da248df9e43919b2",
+      "bytes": 167252,
+      "completed": true,
+      "steps": [
+        "tia_discover",
+        "tia_start",
+        "tia_create_scratch",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_status",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "qualification_testsuite_reconcile",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsPassed": [
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "qualification_testsuite_recover",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_execute"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "b36d069fcc686f6b5a91cc3241a9a684162b32c8b31bbf1d25d346abb615230e",
+      "bytes": 167136,
+      "completed": true,
+      "steps": [
+        "tia_discover",
+        "tia_start",
+        "tia_create_scratch",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_status",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "qualification_testsuite_reconcile",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsPassed": [
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "qualification_testsuite_recover",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_execute"
+      ]
+    },
+    {
+      "report": "report.json",
+      "sha256": "373e63c77ae9bc9a041bfab63dc449833d86c5a4b96f9d7a8b13e7196e21031f",
+      "bytes": 193062,
+      "completed": true,
+      "steps": [
+        "tia_discover",
+        "tia_start",
+        "tia_create_scratch",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_execute",
+        "testsuite_style_job_results",
+        "qualification_testsuite_recover",
+        "testsuite_style_job_status",
+        "qualification_testsuite_reconcile",
+        "tia_detach",
+        "tia_discover"
+      ],
+      "toolsPassed": [
+        "qualification_testsuite_execute",
+        "qualification_testsuite_prepare",
+        "qualification_testsuite_reconcile",
+        "testsuite_style_job_results",
+        "testsuite_style_job_status",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_discover",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "qualification_testsuite_recover"
+      ]
+    }
+  ]
+}

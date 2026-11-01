@@ -89,7 +89,7 @@ the CPU's web certificate being trusted in the Windows store, a setting the user
 
 | # | SDK or workflow | Version on this PC | Public and documented | Beyond TIA MCP | Feasibility | Owner | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 22 | Test Suite Openness | Uninstall "Test Suite Advanced V21.0 + Upd1"; `API/Siemens.Engineering.TestSuite.dll` 21.0.0.0 | Yes: `HELP/TestSuiteOLH_enUS.zip` and the assembly XML (application, system and style-guide namespaces) | Style-guide jobs need one more desk session (TS-Q01, scheduled by the maintainer); system tests have no execution route yet | Feasible now (application tests implemented and verified) | D06 | [application tests](../verification/testsuite-application-20261030.md); [Test Suite native](../verification/testsuite-native-20261028.md) |
+| 22 | Test Suite Openness | Uninstall "Test Suite Advanced V21.0 + Upd1"; `API/Siemens.Engineering.TestSuite.dll` 21.0.0.0 | Yes: `HELP/TestSuiteOLH_enUS.zip` and the assembly XML (application, system and style-guide namespaces) | Style-guide jobs ran in the TS-Q01 qualification mode on 1 November; production style execution is a V21 boundary (no scope re-check at execution time), and system tests have no execution route yet | Feasible now (application tests implemented and verified) | D06 | [application tests](../verification/testsuite-application-20261030.md); [Test Suite native](../verification/testsuite-native-20261028.md); [TS-Q01](../verification/testsuite-style-q01-20261101.md) |
 | 23 | Startdrive Openness | Uninstall "SINAMICS Startdrive ... V21.0 + Upd1"; `API/Siemens.Engineering.Startdrive.dll` 2100.100.3900.1 | Yes: `HELP/SdrOpennessenUS.zip` | Drive parameters, telegrams, online drive objects | Offline drive kinds verified on a G120C PN, whose drive object is addressed by container index because Startdrive cannot read its `DriveObjectNumber` (D10, `local.drives.index-status.20261101`); online drive access needs a physical drive (B05) | D10 | [drives guide](../guides/drives.md); [record](../verification/drives-index-20261101.md); [TODO](../TODO.md#deferred-rows) |
 | 24 | TIA Add-In API, selection companion | `API/Siemens.Engineering.AddIn.Base.dll`, `.Step7.dll` 2100.0.121.1; `Siemens.Engineering.AddIn.Publisher.exe` | Yes: assembly XML | Nothing for project-tree selections | Feasible, implemented (verified, `local.addin.companion.20261029`) | X04 | `src/TiaMcp.AddIn.V21/`; catalog `addin_companion` |
 | 25 | Add-In safety compile workflow | `API/Siemens.Engineering.AddIn.Safety.dll` 2100.0.121.1 | Yes: assembly XML, `SafetyCompileWorkflowAddIn`, `SafetyCompileContext` | A hook that runs when the operator compiles the safety program; the companion refuses workflow hooks today | Feasible now (qualification needs an operator at the desk) | X04, D14 | `API/Siemens.Engineering.AddIn.Safety.xml`; catalog `addin_companion` limitations |
@@ -142,8 +142,8 @@ so a foreign or released instance is refused before any API call.
    safety compile result and collective signature to the enrolled Host as evidence, never
    changing the compile. Qualify in a desk session: the operator compiles an F-CPU of an owned
    scratch, and the Host record matches `safety_inspect`.
-7. **Row 22, Test Suite residuals.** Nothing to build for X13: the style jobs need TS-Q01, which
-   the maintainer schedules, and system tests need an execution route under D06.
+7. **Row 22, Test Suite residuals.** Nothing to build for X13: TS-Q01 ran on 1 November and production
+   style execution is a V21 boundary; `testsuite_style_job_prepare` needs one TS-Q02 run, and system tests need an execution route under D06.
 
 ## Open points for the maintainer
 

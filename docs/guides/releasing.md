@@ -32,8 +32,8 @@ TIA MCP stays pre-1.0 until the [TODO](../TODO.md) is closed; until then every r
    workflows, then a read-only `build` job builds the offline bundle with
    `scripts/Package.ps1 -Offline`, verifies it with `scripts/Verify-TiaMcpBundle.ps1 -Strict`,
    refuses a tag that differs from the bundle's `productVersion` or a CHANGELOG without its
-   section, and, from 1.0 on, refuses unless the release ledger says `releaseReady` and the
-   matrix has no open or deferred cell (`scripts/release_matrix.py --release-gate`). It uploads
+   section, and, from 1.0 on, refuses unless the release ledger says `releaseReady`, every release obligation in it is
+   accepted and the matrix has no open or deferred cell (`scripts/release_matrix.py --release-gate`). It uploads
    the ZIP, its `.zip.sha256`, the manifest and the notes as a workflow artifact. A separate
    `draft` job, the only one with a write token, checks the ZIP against its hash, expands it and
    runs `Verify-TiaMcpBundle.ps1 -Strict` on the expanded ZIP, then creates a draft release

@@ -40,6 +40,9 @@ def run(path):
                  for c in receipt.get("toolCalls", [])]
              or [{"name": st["tool"], "isError": st["isError"]}
                  for st in report.get("steps", []) if isinstance(st, dict) and "tool" in st and "isError" in st]
+             # The TS-Q01 runner (qualify_testsuite_native.py) keeps each call as {name, wire: raw tools/call result}.
+             or [{"name": st["name"], "isError": st["wire"].get("isError") is True}
+                 for st in report.get("steps", []) if isinstance(st, dict) and "name" in st and isinstance(st.get("wire"), dict)]
              # Owned-session runners keep each lifetime's audited calls as {tool, status}.
              or [{"name": call["tool"], "isError": call.get("status") != "passed"}
                  for session in report.get("sessions", []) if isinstance(session, dict) for call in session.get("calls", [])])
