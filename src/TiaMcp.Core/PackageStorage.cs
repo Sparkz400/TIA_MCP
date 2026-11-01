@@ -93,8 +93,9 @@ internal static class PackageStorage
         }
     }
 
+    // Revision 0 of an operation, admission or component window (a dispatch intent) is published by this rename: write-through.
     internal static void PublishDirectory(string staging, string destination) =>
-        PublishDirectory(staging, destination, Directory.Move, Thread.Sleep);
+        PublishDirectory(staging, destination, (source, target) => MoveDurably(source, target), Thread.Sleep);
 
     internal static void PublishDirectory(string staging, string destination, Action<string, string> move, Action<int> delay)
     {
@@ -129,13 +130,14 @@ internal static class PackageStorage
     internal static void PublishFile(string temporary, string destination) =>
         PublishFile(temporary, destination, (source, target) => File.Move(source, target, true), Thread.Sleep);
 
-    // For revision and callback journals. MOVEFILE_WRITE_THROUGH: the rename is on disk when this returns, so a record counted as
-    // committed (a dispatch intent) survives a power loss; File.Move can leave the new directory entry in the cache.
+    // For revision and callback journals, files or directories on one volume. MOVEFILE_WRITE_THROUGH: the rename is on disk when this
+    // returns, so a record counted as committed (a dispatch intent) survives a power loss; File.Move can leave it in the cache.
     internal static void MoveDurably(string source, string destination, bool replace = false)
     {
-        if (!OperatingSystem.IsWindows()) { File.Move(source, destination, replace); return; }
+        if (!OperatingSystem.IsWindows())
+        { if (Directory.Exists(source)) Directory.Move(source, destination); else File.Move(source, destination, replace); return; }
         if (!MoveFileEx(@"\\?\" + Path.GetFullPath(source), @"\\?\" + Path.GetFullPath(destination), (replace ? 1u : 0u) | 8u))
-            throw new IOException("The file could not be renamed.", Marshal.GetHRForLastWin32Error());
+            throw new IOException("The path could not be renamed.", Marshal.GetHRForLastWin32Error());
     }
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, EntryPoint = "MoveFileExW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

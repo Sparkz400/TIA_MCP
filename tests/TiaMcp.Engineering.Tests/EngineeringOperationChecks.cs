@@ -217,6 +217,14 @@ internal static class EngineeringOperationChecks
         catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
         PackageStorage.MoveDurably(temporary,revision,replace:true);
         if(File.ReadAllText(revision)!="second" || File.Exists(temporary)) throw new Exception("A durable replace must publish the new bytes");
+        // Revision 0 is a whole staged directory: it renames the same way and never lands on an existing record.
+        string staged=Path.Combine(directory,".preparing-record"),record=Path.Combine(directory,"record");
+        Directory.CreateDirectory(staged);File.WriteAllText(Path.Combine(staged,"000000.json"),"intent");
+        PackageStorage.MoveDurably(staged,record);
+        if(Directory.Exists(staged) || File.ReadAllText(Path.Combine(record,"000000.json"))!="intent") throw new Exception("A durable directory rename must publish the staged record");
+        Directory.CreateDirectory(staged);
+        try { PackageStorage.MoveDurably(staged,record); throw new Exception("A durable directory rename must not replace a published record"); }
+        catch(IOException error) when(error.HResult==unchecked((int)0x800700B7)) { }
         Console.WriteLine("PASS long resource paths: existing file, case alias, absent descendant, refused device namespaces and durable renames");
     }
 

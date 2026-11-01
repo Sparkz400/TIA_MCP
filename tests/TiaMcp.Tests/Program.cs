@@ -134,6 +134,7 @@ internal static partial class Program
             ("Technology supported scalar values round-trip and invalid inputs refuse", TechnologyParameterTests.ScalarRoundtrip),
             ("Null technology values require a unique explicit supported type", TechnologyParameterTests.ExplicitNullType),
             ("Journal directory publication tolerates an actual Windows handle", JournalDirectoryPublicationTests.ActualWindowsHandle),
+            ("Journal directory publication is write-through by default and still waits out a held handle", JournalDirectoryPublicationTests.DefaultIsDurableAndRetried),
             ("Journal publication bounds retries and never overwrites or replays", JournalDirectoryPublicationTests.BoundsAndNoOverwrite),
             ("Card moves tolerate transient locks and reconcile without replay", SimulationCardMoveRetryTests.TransientLockAndReconciliation),
             ("Owned PLCSIM routes answer only the offered project-user login, once", SimulationOnlineLoginTests.OnlyTheOfferedProjectUserLoginOnce),
