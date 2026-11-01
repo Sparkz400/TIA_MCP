@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 from qualify_translation_category_probe import StoreExclusiveWindow, resource_key, overlaps, safe_path
-from verify_watch_workflow import canonical_sha
+from verify_watch_workflow import canonical_matches
 
 
 def require(value, message):
@@ -32,7 +32,7 @@ def scan_component_reservations(root, keys, owner=None):
         for revision, path in enumerate(files):
             require(path.name == f"{revision:08d}.json" and path.stat().st_size <= 2 * 1024 * 1024, "Invalid component journal sequence")
             record = json.loads(path.read_text(encoding="utf-8"))
-            require(record["id"] == directory.name and record["revision"] == revision and record["previousSha256"] == (None if prior is None else canonical_sha(prior)), "Component hash chain differs")
+            require(record["id"] == directory.name and record["revision"] == revision and (record["previousSha256"] is None if prior is None else canonical_matches(record["previousSha256"], prior)), "Component hash chain differs")
             require(record["state"] in {"active", "outcomeUnknown", "released", "recoveryReconciled"}, "Unknown component lifetime state")
             resources = sorted(set(resource_key(r["kind"], r["path"]) for r in record["manifest"]["resources"]))
             require(resources == record["resourceKeys"], "Component resource keys differ")

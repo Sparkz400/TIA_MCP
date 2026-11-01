@@ -102,7 +102,7 @@ def review(root, outer, operation, name, new):
     plan, before, edit = record['plan'], proposal['before'], proposal['edit']
     require(record['state'] == 'prepared' and record['revision'] == 0 and record['previousSha256'] is None
             and plan['operation'] == 'watchLifecycle', 'Initial lifecycle operation required')
-    require(base.canonical_sha(plan) == record['planSha256'], 'Plan digest mismatch')
+    require(base.canonical_matches(record['planSha256'], plan), 'Plan digest mismatch')
     require(plan['target'] == before['observation'], 'Plan target mismatch')
     require(base.load(base.artifact(root, outer['reviewArtifact'])) == proposal, 'Retained review mismatch')
     for entry in plan['inputs']:

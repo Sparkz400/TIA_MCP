@@ -269,4 +269,32 @@ class WatchWorkflowOracleTests(unittest.TestCase):
         self.assertEqual("Force table", force.findtext("AttributeList/Name")); self.assertIsNone(force.find("ObjectList"))
 
 
+class CanonicalFormTests(unittest.TestCase):
+    """The Python RFC 8785 form reproduces every shared vector of the journal contract (strings, integers, literals)."""
+
+    def test_rfc8785_matches_the_shared_vectors(self):
+        vectors = json.loads((Path(__file__).resolve().parents[1] / "fixtures/canonical-json/vectors.v1.json").read_text(encoding="utf-8"))["cases"]
+        def plain(value):
+            return not isinstance(value, float) and all(plain(v) for v in (value.values() if isinstance(value, dict) else value if isinstance(value, list) else []))
+        checked = 0
+        for case in vectors:
+            if "input" not in case or "canonical" not in case:
+                continue
+            try:
+                value = json.loads(case["input"])
+            except ValueError:
+                continue
+            if plain(value):
+                self.assertEqual(case["canonical"], oracle.rfc8785(value), case["name"])
+                checked += 1
+        self.assertGreaterEqual(checked, 8)
+
+    def test_a_stored_hash_matches_in_either_form_only(self):
+        value = {"recordedAt": "2026-11-01T22:00:00+00:00", "path": "D:/Prüfung<1>", "n": 3}
+        rfc = oracle.sha(oracle.rfc8785(value).encode("utf-8"))
+        self.assertNotEqual(rfc, oracle.canonical_sha(value))
+        self.assertTrue(oracle.canonical_matches(rfc, value) and oracle.canonical_matches(oracle.canonical_sha(value), value))
+        self.assertFalse(oracle.canonical_matches("0" * 64, value) or oracle.canonical_matches(None, value))
+
+
 if __name__ == "__main__": unittest.main()
