@@ -69,6 +69,16 @@ class CurateEvidenceTests(unittest.TestCase):
             summary = run(path)
         self.assertEqual((["change_apply"], ["change_apply"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_run_reads_tool_outcomes_from_wire_steps(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "report.json")
+            path.write_text(json.dumps({"completed": True, "steps": [
+                {"name": "tia_start", "wire": {"structuredContent": {}}},
+                {"name": "qualification_testsuite_execute", "wire": {"isError": True}}]}), encoding="utf-8")
+            summary = run(path)
+        self.assertEqual(["tia_start", "qualification_testsuite_execute"], summary["steps"])
+        self.assertEqual((["tia_start"], ["qualification_testsuite_execute"]), (summary["toolsPassed"], summary["toolsRejected"]))
+
     def test_run_reads_host_lifetime_receipts_and_checks(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "verification.json")
