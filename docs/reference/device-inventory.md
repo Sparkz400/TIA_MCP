@@ -4,8 +4,10 @@
 device or device item, including built-in interfaces and submodules.
 `device_inventory_export` exports the entire captured scope to CSV or XLSX.
 `device_online_browse` and `device_identify` use a separate, read-only Siemens
-Web API route for actual identification. Physical CPU and remote-I/O
-qualification remains **unverified**; see the
+Web API route for actual identification. Both online tools passed on an owned
+PLCSIM Advanced V8 CPU 1511-1 PN V4.1 on 1 November
+([record](../verification/device-inventory-online-20261101.md)). Physical CPU and
+remote-I/O qualification remains **unverified**; see the
 [verification record](../verification/device-inventory-20261016.md).
 
 ## Offline capture and paging
@@ -60,7 +62,7 @@ defines the fields, `read_diagnostics` permission, and unavailable-I&M errors.
 
 | Family / route | Status |
 | --- | --- |
-| S7-1500 / S7-1500V Standard/T/F and S7-1200 G2 advertising the required methods | Implemented; protocol fixtures tested; hardware unverified |
+| S7-1500 / S7-1500V Standard/T/F and S7-1200 G2 advertising the required methods | Implemented; protocol fixtures tested; PLCSIM Advanced V8 CPU 1511-1 PN V4.1 qualified (`local.device_inventory.online.20261101`); hardware unverified |
 | ET 200 and other attached I/O exposed by a compatible controller | Controller-mediated I&M0 at explicit hardware IDs; individual support and hardware unverified |
 | Festo CPX-AP-I in the observed project | Offline capture verified; direct Festo adapter not implemented; routed I&M applicability unverified |
 | Older S7-1200, S7-300/400, unsupported S7-1500 firmware, R/H, other direct vendor interfaces | No qualified adapter in this change; never fabricate actual identities |
@@ -94,7 +96,13 @@ snapshot. [Offline regression evidence](../verification/inventory-response-20261
 Limits: 10 seconds per complete response,
 60 seconds per identification request, 256 KiB per response.
 
-TLS certificate validation remains enabled; redirects/proxies are disabled.
+TLS certificate validation remains enabled, without a pin; redirects/proxies are disabled.
+The controller's web certificate must chain to a root that Windows trusts for the
+Host's user. For a self-signed PLCSIM or scratch certificate this is an operator
+step: import that instance's certificate into `Cert:\CurrentUser\Root` for the run
+(`Import-Certificate -FilePath <file> -CertStoreLocation Cert:\CurrentUser\Root`) and
+remove it afterwards (`Remove-Item Cert:\CurrentUser\Root\<thumbprint>`). Each new
+provisioning makes a new certificate. The tools never change certificate stores.
 For authenticated targets, establish an authorized Web API session externally.
 A host environment variable named `TIA_INVENTORY_<target>` can hold a JSON record
 with `endpoint` and `token`; pass only its name in `sessionEnvironmentVariable`.
@@ -147,4 +155,7 @@ Include matching data, a firmware mismatch, unavailable I&M, denied permissions,
 disconnected modules and duplicate names. Expand coverage only after per-target
 checks pass. `scripts/qualify_device_inventory.py` proves offline native
 collection and export and owns only its MCP processes, not the open TIA UI.
-No current record claims that the physical online comparison passed.
+No current record claims that the physical online comparison passed. On PLCSIM,
+`qualify_runtime_plcsim_tcpip.py --mode device-inventory` compares both tools with
+its own pinned `Modules.Browse` and I&M0 reads; there the PROFINET interface and
+ports answer the CPU's own I&M0, and the station node carries the CPU's name.

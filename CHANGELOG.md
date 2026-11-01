@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.93`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.94`.
 
 ### Added
 
@@ -34,6 +34,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `plc_online_compare` and `plc_station_upload`, runtime OPC UA and Web API against PLCSIM over
   TCP/IP, and read-only live monitoring of watch and force tables (`watch_table_monitor`).
 - **Test Suite:** application test runs on an owned PLCSIM instance (TS-Q02 qualification mode).
+- **Online device identification:** `device_online_browse` and `device_identify` are qualified on an
+  owned PLCSIM instance over TCP/IP: they equal pinned `Modules.Browse` and I&M0 reads of the CPU, its
+  PROFINET interface and both ports. The operator trusts the instance's web certificate for the run, and
+  the session token comes from an `Api.Login` passed as a `TIA_INVENTORY_<target>` record
+  (`local.device_inventory.online.20261101`).
 - **HMI:** Unified text-list authoring and generation whose candidates import exactly through V21;
   Unified and Classic HMI read and authoring routes.
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
@@ -202,6 +207,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     change `recovery_required`; it is refused before any claim.
   - `network_io_assign` accepts the start address the assigned PLC gives a range that had none (an
     I-device GSD's transfer areas); it refused the assignment with `MutationVerificationFailed`.
+  - `device_online_browse` and `device_identify` send a sized HTTP/1.1 body with plain
+    `application/json`, as the runtime Web API client does; PLCSIM answered their chunked
+    `application/json; charset=utf-8` request with HTTP 500.
   - Runner and diagnostics fixes: the Explorer desktop gate reads the MCP 2026-07-28
     `server/discover` handshake and accepts `ModelInvalidated` after `tia_detach`; the GSD slice puts the
     device on the subnet without an address (its GSD sets `IpProtocolSelection` `OtherPath`);

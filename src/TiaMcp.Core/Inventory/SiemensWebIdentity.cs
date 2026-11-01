@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace TiaMcp.Core.Inventory;
@@ -108,11 +107,14 @@ public sealed class SiemensWebIdentity : IDisposable
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(10));
         var requestCancellation = timeout.Token;
-        using var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
+        // A sized HTTP/1.1 body with plain application/json, as WebRuntimeClient sends: PLCSIM's web server answered JsonContent's
+        // chunked "application/json; charset=utf-8" request with HTTP 500 (X10 run x10q).
+        using var request = new HttpRequestMessage(HttpMethod.Post, endpoint) { Version = HttpVersion.Version11, VersionPolicy = HttpVersionPolicy.RequestVersionExact };
         if (!string.IsNullOrEmpty(token)) request.Headers.Add("X-Auth-Token", token);
         var body = new Dictionary<string, object> { ["jsonrpc"] = "2.0", ["id"] = id, ["method"] = method };
         if (parameters != null) body["params"] = parameters;
-        request.Content = JsonContent.Create(body);
+        request.Content = new ByteArrayContent(JsonSerializer.SerializeToUtf8Bytes(body));
+        request.Content.Headers.ContentType = new("application/json");
         try
         {
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, requestCancellation);

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.92",
+  "catalogVersion": "0.4.96",
   "targetTiaVersions": [
     21
   ],
@@ -3172,6 +3172,27 @@
         "One user-program server method with Int/Bool scalar arguments; methods of custom server interfaces or companion namespaces, structured or array arguments and a lost Call response on the real server were not exercised (the lost-response path is the shared session path qualified by ua-write-loss and tested offline).",
         "One Program_Alarm with TIA's default text and alarm class (no acknowledgement required: AckedState true) beside a CPU system-diagnostics condition present throughout; acknowledgeable alarms, Acknowledge, AddComment and shelving were not exercised, and SourceName is null on this server.",
         "HistoryRead is a recorded S7-1500 boundary, not a supported service; the probe returns no values."
+      ]
+    },
+    {
+      "id": "local.device_inventory.online.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "a6f763700833f5e298aa520f81bc8358bbeb1377",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py --mode device-inventory (run rs_ad8a41e4 in artifacts/x10s) at a6f76370 with Host, Openness and simulator workers built at b4f4785d (frozen at artifacts/x10c), 58/58 steps, on an owned PLCSIM Advanced V8 TCP/IP instance of a fresh owned scratch CPU 1511-1 PN V4.1 at 192.168.0.1 (web server and system pages on, the generated runtime user granted read_diagnostics). The operator trusted the instance's self-signed web certificate in Cert:\\CurrentUser\\Root; the runner only checked the store. Modules.Browse without a session answered Permission denied, so the runtime user logged in over a connection pinned to that certificate and the token reached a fresh Host only as a TIA_INVENTORY_<target> record (sessionEnvironmentVariable); that Host reopened the saved scratch for its device_inventory snapshot (9 rows). device_online_browse walked the station node (hwid 32), the CPU (49), its PROFINET interface (64), both ports (65, 66) and the virtual communication interface (135); device_identify read I&M0 of the CPU, the interface and both ports, bound by exact names to the snapshot rows (the CPU row to the cpu-subtype node). Every node field, hardware ID and I&M0 field (order number, serial number, hardware and software revision) equals the runner's own pinned Modules.Browse and Modules.ReadIdentificationMaintenance reads; the CPU's configured MLFB and firmware match its I&M0. No token in any retained file; the session was logged out, every Host and worker has an exit proof and the instance was released. The independent oracle scripts/verify_runtime_plcsim_tcpip.py found no issue."
+      },
+      "artifacts": [
+        "evidence/local.device_inventory.online.20261101.json"
+      ],
+      "limitations": [
+        "One PLCSIM CPU 1511-1 PN without modules; physical PLCs, ET 200 stations and other families are not exercised.",
+        "The tools keep Windows TLS validation without a pin, so the operator trusts the instance's self-signed web certificate for the run; a pinned route is not offered.",
+        "Rows bind by exact unique names; PLCSIM gives the station node the CPU's name, and the CPU row binds to the cpu-subtype node.",
+        "On PLCSIM the PROFINET interface and its ports answer the CPU's own I&M0; module-level I&M0 of separate hardware is not shown."
       ]
     },
     {
@@ -16697,13 +16718,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 TCP/IP instance of a scratch CPU 1511-1 PN V4.1 (local.device_inventory.online.20261101): the walk of the station, CPU, PROFINET interface, ports and virtual interface equals pinned Modules.Browse reads node by node.",
+          "TLS keeps Windows certificate validation without a pin: the controller's web certificate must chain to a root trusted for the Host's user, which the operator sets up (for a self-signed PLCSIM certificate, Cert:\\CurrentUser\\Root for the run).",
+          "Modules.Browse needs a session with read_diagnostics: the token of an externally established Api.Login reaches the tool only as a TIA_INVENTORY_<target> Host environment record named by sessionEnvironmentVariable; the tool never logs in or out.",
           "See docs/reference/device-inventory.md for capture bounds, unavailable fields and conditional interface coverage.",
           "Physical hardware comparison with TIA Online and diagnostics is pending; no universal device-family support claim."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.device_inventory.online.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16738,13 +16764,18 @@
       "implementation": {
         "status": "partial",
         "limitations": [
+          "Natively qualified on one owned PLCSIM Advanced V8 TCP/IP instance of a scratch CPU 1511-1 PN V4.1 (local.device_inventory.online.20261101): I&M0 of the CPU, its PROFINET interface and both ports, bound to a device_inventory snapshot, equals pinned Modules.ReadIdentificationMaintenance reads field by field; on PLCSIM the interface and ports answer the CPU's own I&M0.",
+          "TLS keeps Windows certificate validation without a pin: the controller's web certificate must chain to a root trusted for the Host's user, which the operator sets up (for a self-signed PLCSIM certificate, Cert:\\CurrentUser\\Root for the run).",
+          "The I&M0 read needs a session with read_diagnostics: the token of an externally established Api.Login reaches the tool only as a TIA_INVENTORY_<target> Host environment record named by sessionEnvironmentVariable; the tool never logs in or out. The snapshot must be one of the same Host.",
           "See docs/reference/device-inventory.md for capture bounds, unavailable fields and conditional interface coverage.",
           "Physical hardware comparison with TIA Online and diagnostics is pending; no universal device-family support claim."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.device_inventory.online.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
