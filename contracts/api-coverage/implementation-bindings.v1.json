@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "16d5fd553e02a27395ad530833fdae8779270514d14402f27cd963f944c2d1dc",
-      "bytes": 1594525
+      "sha256": "735e09415a6dc242c58bb42e060e3ef715b4713bfcdf428ea1a22d6d9337a44d",
+      "bytes": 1596098
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -120853,6 +120853,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -123142,6 +123149,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -123365,6 +123379,13 @@
           "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47",
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
+          ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
           ]
         }
       ],
@@ -123726,6 +123747,13 @@
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
           ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -123929,6 +123957,13 @@
           "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47",
           "artifacts": [
             "evidence/local.runtime.plcsim-tcpip.20261029.json"
+          ]
+        },
+        {
+          "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+          "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441",
+          "artifacts": [
+            "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
           ]
         }
       ],
@@ -130760,6 +130795,11 @@
       "sha256": "1e07b43e2efd5a4cac3c520dd652c1b419d382853ee8ac506a71e9c94632449c"
     },
     {
+      "path": "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json",
+      "state": "observed",
+      "sha256": "97f4a1963ce37719139324aa91099ccb9b53f08ba5c9378c717cbe9dd3263db2"
+    },
+    {
       "path": "evidence/local.runtime.plcsim-ua-services.20261031.json",
       "state": "observed",
       "sha256": "fada8ebdec9415ffe67f6c3683f4236294a8769851d888aaf112a1cdb45687f4"
@@ -131652,6 +131692,10 @@
     {
       "id": "local.runtime.plcsim-tcpip.20261029",
       "profileSha256": "6cb2091a2062c6c0362202b15bd7004aa370b8aa708817e93117e3db88f29a47"
+    },
+    {
+      "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+      "profileSha256": "d47e11160233073eee85508c796cc658343305890f5c039b3e1bd0f4e58c0441"
     },
     {
       "id": "local.runtime.plcsim-ua-services.20261031",

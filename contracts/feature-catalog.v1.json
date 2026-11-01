@@ -3139,6 +3139,23 @@
       ]
     },
     {
+      "id": "local.runtime.plcsim-tcpip.route-gate.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "10d6294f",
+        "passedScope": "scripts/qualify_runtime_plcsim_tcpip.py --mode normal with Debug builds of 10d6294f on an owned PLCSIM Advanced V8 TCP/IP instance (scratch CPU 1511-1 PN at 192.168.0.1): runtime_ua_write, runtime_web_write and runtime_web_operating_mode (RUN to STOP and back) pass with sessions connected through the PLCSIM Virtual Ethernet Adapter (connect-time route gate), their stale-precondition refusals hold, UA subscriptions with the default three keep-alives run to their duration although the server revises the publishing interval to 1000 ms, and a Web API capture stopped mid-run leaves its session usable for the following RUN/STOP; independent oracle without issues. 95/95 steps."
+      },
+      "artifacts": [
+        "evidence/local.runtime.plcsim-tcpip.route-gate.20261101.json"
+      ],
+      "limitations": [
+        "The refusal of a session opened through another network card is covered offline only; this PC has no second route to the CPU address.",
+        "One PLCSIM instance and CPU; physical PLCs stay out of scope."
+      ]
+    },
+    {
       "id": "local.runtime.plcsim-ua-services.20261031",
       "status": "passed",
       "profile": {
@@ -22619,7 +22636,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -22664,7 +22682,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -22890,7 +22909,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -24636,7 +24656,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
@@ -25128,7 +25149,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.plcsim-tcpip.20261029"
+          "local.runtime.plcsim-tcpip.20261029",
+          "local.runtime.plcsim-tcpip.route-gate.20261101"
         ]
       },
       "availability": {
