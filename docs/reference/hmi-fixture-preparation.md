@@ -1,7 +1,7 @@
 # Prepare exact HMI prerequisite fixtures
 
 `scripts/prepare_hmi_fixture_ui.py --prepare-only` validates original fixture,
-archive, helper and recovery references and writes a new `preparation.json`.
+archive and helper references and writes a new `preparation.json`.
 It starts no process, acquires no native/store ownership and grants no admission.
 It preserves the original reports and explicitly leaves HMI compile, fresh
 reopen, bridge recovery and native qualification false.
@@ -9,17 +9,15 @@ reopen, bridge recovery and native qualification false.
 Supported preparation profiles are `classic-comfort`, `unified-comfort` and
 `unified-pc`. The source must contain exactly one selected positive owned
 fixture with independently observed archive retrieval, distinct HMI owners and
-an unchanged archive. An existing recovery report must record successful
-checkpoint recovery, recovered fresh reopen and nonempty successful session
-cleanup. This is a recovery foundation; PLC recovery evidence does not establish
-HMI archive recovery or preservation.
+an unchanged archive. A PLC recovery report is no longer required (1 November
+2026): it never established HMI archive recovery or preservation, and no current
+runner writes one.
 
 ```powershell
 python -B scripts/prepare_hmi_fixture_ui.py --prepare-only `
   --profile classic-comfort `
   --helper <exact-built-HmiSeeder.exe> `
   --source-report <original-native-report.json> `
-  --recovery-report <original-recovery-report.json> `
   --output <new-preparation-directory>
 ```
 
@@ -73,9 +71,32 @@ commands refuse.
 
 The Python harness tests file-only packet behavior and post-launch cleanup
 failures without starting TIA. `TiaMcp.HmiRepairAdmission.Tests` links the exact
-native admission helper into portable tests, including failed recovery,
-missing cleanup, changed archives, unsupported profiles and unheld windows.
+native admission helper into portable tests, including changed archives,
+unsupported profiles, unreviewed owners and unheld windows.
 Neither test suite establishes successful native fixture configuration.
+
+## Compile the configured fixture through `hmi_compile`
+
+`scripts/qualify_engineering_gaps.py --hmi-fixture <configured.zap21>` qualifies
+the production `hmi_compile` change kind on a completed preparation's archive.
+In an owned TIA it retrieves the archive with `project_retrieve`, checks the
+refusals (an extra payload field, `compile=false`, a missing target) and the
+preview scope, then compiles every HMI target through `change_prepare` and
+`change_apply`: each must report `compiled`, zero errors and zero warnings in a
+complete diagnostic tree, and `change_status` reads it back. `hmi_inspect`
+(every section, each screen's items, the Unified typed model) must be unchanged
+by the compiles. After `tia_detach` a fresh Host reopens the saved project, finds
+the same `hmi_inspect` content and compiles every target again; the last compile
+is restored from its checkpoint and the recovered copy compared once more.
+Session-bound identity fields and Classic export hashes are not compared.
+
+```powershell
+python -u -B scripts/qualify_engineering_gaps.py --run-native --host <frozen TiaMcp.Host.exe> --worker <frozen TiaMcp.Openness.V21.exe> --artifacts D:/Entwicklung/TIA_MCP-public/artifacts/hc --hmi-fixture <preparation>/native/configured.zap21
+```
+
+`project_retrieve` refuses a destination over 80 characters, so the run
+directory (`<artifacts>/eh_<8 hex>`) must stay within 56; the runner checks this
+before starting TIA.
 
 ## Verify the configured saved state and archive
 

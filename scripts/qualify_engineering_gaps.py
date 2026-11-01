@@ -5,14 +5,21 @@ change.hmi_compile) and the tag-table lifecycle (change.tag_table_create, change
 Every change runs through change_prepare/change_apply with checkpoint, compile and save; typed refusals come first and
 change no block, type or tag table. A fresh Portal reopens the saved project and finds the same tables, program and CPU
 parameters. One change of each family is restored from its checkpoint into a new directory.
+
+--hmi-fixture <configured.zap21> instead qualifies change.hmi_compile on a desk-configured HmiSeeder fixture
+(scripts/prepare_hmi_fixture_ui.py): its archive is retrieved into an owned project, every HMI target compiles with zero
+errors and warnings and leaves hmi_inspect unchanged, a fresh Host reopens the saved project and compiles it again, and the
+last compile is restored from its checkpoint.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 from pathlib import Path
 import time
 
 from library_native_harness import Harness, require
+from qualify_hmi import SECTIONS, inspect_all
 
 # Reviewed parameter -> candidate new values on the scratch CPU 1511-1 PN, tried in order; the names are
 # HardwareEngineeringRules.CpuParameterAttributes. V21 rejects StartupActionAfterPowerOn = 2 in its setter (29 October 2026),
@@ -33,6 +40,14 @@ LIMITATIONS = [
     "Compilation is checked by zero errors and complete diagnostics; it does not establish machine behavior.",
     "Tag tables: PLC-root scope only; software-unit scopes and user groups are not exercised.",
 ]
+FIXTURE_LIMITATIONS = [
+    "One HmiSeeder fixture per run and every HMI target in it, changed only by the reviewed desk prerequisite: an existing start screen (Classic) or the encrypted-transfer password and confirmation (Unified); other devices and content are not qualified.",
+    "A clean compile is zero errors, zero warnings and a complete diagnostic tree; it does not establish runtime or visual behavior.",
+    "hmi_inspect equality covers connections, tags, screens with their items, alarms, scripts, resources and, for Unified, the typed model, without session-bound identity fields and Classic export hashes (the parsed export content is compared); getter gaps reported as coverage stay gaps.",
+]
+# Session- or observation-bound hmi_inspect fields: identities name the open project copy and session, and a Classic
+# screen export's hash belongs to that export (its parsed items stay compared).
+VOLATILE = {"projectPath", "projectCopyId", "sessionGeneration", "exportSha256", "remainingBudget"}
 
 
 def cpu_values(h, path):
@@ -258,7 +273,8 @@ def hmi_compile(h, hmi):
         outcome = h.client.request("tools/call", {"name": "change_apply", "arguments": h.apply_args(prepared)})
         content = outcome.get("structuredContent") or {}
         if not outcome.get("isError"):
-            return {"outcome": "compiled", "compilation": compiled(content, [hmi["compileScope"]])}
+            return {"outcome": "compiled", "compilation": compiled(content, [hmi["compileScope"]]), "stages": content["stages"],
+                    "changeId": prepared["changeId"], "previewHash": prepared["previewHash"]}
         error = content.get("error") or {}
         details = error.get("details") or {}
         compilation = details.get("compile") or details.get("compilation") or {}
@@ -268,7 +284,120 @@ def hmi_compile(h, hmi):
         recovered = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
         require(recovered["state"] == "restored", "The failed HMI compile was not restored")
         return {"outcome": "compileErrorsReported", "errors": errors, "restoredStages": recovered["stages"]}
-    return h.stage("hmi_compile " + hmi["family"], run)
+    return h.stage("hmi_compile " + hmi["family"] + " " + hmi["name"], run)
+
+
+def clean(result):
+    """A fixture compile passes only compiled and saved, with zero errors and warnings in a complete diagnostic tree."""
+    compilation = result.get("compilation") or {}
+    targets = compilation.get("targets") or []
+    require(result.get("outcome") == "compiled" and "changed_project_saved" in result.get("stages", ())
+            and compilation.get("errorCount") == 0 and compilation.get("warningCount") == 0 and targets
+            and all(t.get("errorCount") == 0 and t.get("warningCount") == 0 and t.get("messagesTruncated") is False
+                    and all(m.get("state") not in ("Error", "Warning") for m in t.get("messages", [])) for t in targets),
+            "The HMI fixture did not compile cleanly: %s" % result)
+    return result
+
+
+def stable(value):
+    if isinstance(value, dict):
+        return {key: stable(item) for key, item in value.items() if key not in VOLATILE}
+    if isinstance(value, list):
+        return [stable(item) for item in value]
+    return value
+
+
+def hmi_snapshot(h, hmi):
+    """Every hmi_inspect section of one target: coverage status and stable rows keyed by exact object path."""
+    target = {"family": hmi["family"], "hmiPath": hmi["hmiPath"]}
+    snapshot = {}
+    def collect(label, request):
+        page = inspect_all(h.client, {**request, "target": target})
+        status = page["lastPage"]["coverage"]["status"]
+        require(status != "truncated", "hmi_inspect %s is truncated" % label)
+        snapshot[label] = {"coverage": status, "rows": {row["identity"]["objectPath"]: stable(row) for row in page["items"]}}
+        return page["items"]
+    for section in SECTIONS + (("model",) if hmi["family"] == "unified" else ()):
+        rows = collect(section, {"section": section})
+        if section == "screens":
+            for screen in rows:
+                collect("items " + screen["identity"]["objectPath"], {"section": "items", "screenPath": screen["identity"]["objectPath"]})
+    return snapshot
+
+
+def counts(snapshots):
+    return {path: {label: len(section["rows"]) for label, section in snapshot.items()} for path, snapshot in snapshots.items()}
+
+
+def differences(before, after):
+    """Sections, and object paths within them, whose coverage or stable rows differ."""
+    found = []
+    for label in sorted(set(before) | set(after)):
+        old, new = before.get(label), after.get(label)
+        if old is None or new is None or old["coverage"] != new["coverage"]:
+            found.append(label)
+            continue
+        found += [label + " " + path for path in sorted(set(old["rows"]) | set(new["rows"])) if old["rows"].get(path) != new["rows"].get(path)]
+    return found
+
+
+def unchanged(h, targets, before):
+    found = {t["hmiPath"]: differences(before[t["hmiPath"]], hmi_snapshot(h, t)) for t in targets}
+    require(not any(found.values()), "hmi_inspect differs: %s" % {path: rows[:20] for path, rows in found.items() if rows})
+    return counts(before)
+
+
+def compile_clean(h, hmi):
+    """hmi_compile of one fixture target, which must pass cleanly; change_status reads the applied change back."""
+    result = clean(hmi_compile(h, hmi))
+    def status():
+        state = h.tool("change_status", {"changeId": result["changeId"]})["state"]
+        require(state == "applied", "change_status reports " + str(state))
+        return state
+    h.stage("change_status of the " + hmi["name"] + " compile", status)
+    h.report.setdefault("hmiCompile", {}).setdefault(hmi["hmiPath"], []).append(result)
+    return result
+
+
+def retrieve_fits(directory):
+    """project_retrieve refuses a destination over 80 characters (<run>/recovery/r_<12 hex>); that limit binds first."""
+    return len(str(Path(directory) / "recovery" / ("r_" + "0" * 12))) <= 80
+
+
+def fixture_body(archive):
+    def body(h):
+        require(retrieve_fits(h.directory), "Choose a shorter --artifacts path (for example artifacts/hc)")
+        expected = hashlib.sha256(archive.read_bytes()).hexdigest()
+        h.owned_portal("hmi fixture")
+        retrieved = h.stage("retrieve the configured HMI fixture", lambda: h.tool("project_retrieve", {"archivePath": str(archive), "expectedSha256": expected}))
+        project_path = retrieved["project"]["path"]
+        targets = h.stage("discover HMI targets", lambda: h.tool("library_query", {"request": {"action": "hmi_targets"}})["targets"])
+        require(targets and len({t["family"] for t in targets}) == 1, "Expected the fixture's HMI targets of one family: %s" % targets)
+        h.report["fixture"] = {"archive": {"path": str(archive), "sha256": expected}, "projectPath": project_path, "targets": targets}
+        first = {"family": targets[0]["family"], "hmiPath": targets[0]["hmiPath"]}
+        h.refuse("refuse hmi_compile with an extra payload field", "hmi_compile", {"target": first, "x": 1}, "InvalidRequest")
+        def no_flag():
+            prepared = h.prepare("hmi_compile", {"target": first})
+            error = h.call_error("change_apply", {**h.apply_args(prepared), "compile": False, "save": False})
+            require(error.get("code") == "InvalidRequest", "compile=false was not refused: %s" % error)
+            return error
+        h.stage("refuse hmi_compile without compile=true", no_flag)
+        before = {}
+        def capture():
+            before.update({t["hmiPath"]: hmi_snapshot(h, t) for t in targets})
+            return counts(before)
+        h.stage("capture hmi_inspect of every target", capture)
+        for hmi in targets:
+            compile_clean(h, hmi)
+        h.stage("hmi_inspect unchanged by the compiles", lambda: unchanged(h, targets, before))
+        h.stage("close the compiled session", lambda: h.tool("tia_detach"))
+        h.stage("start a fresh Host", h.connect)
+        h.owned_portal("reopen")
+        h.stage("reopen the saved fixture", lambda: h.reopen_project(project_path))
+        h.stage("reopened hmi_inspect equals the compiled fixture", lambda: unchanged(h, targets, before))
+        last = [compile_clean(h, hmi) for hmi in targets][-1]
+        restore(h, last, "hmi_compile", lambda: unchanged(h, targets, before))
+    return body
 
 
 if __name__ == "__main__":
@@ -278,6 +407,12 @@ if __name__ == "__main__":
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
+    parser.add_argument("--hmi-fixture", type=Path, help="configured.zap21 from prepare_hmi_fixture_ui.py: qualify hmi_compile on it instead")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "eg_", "Engineering gaps: CPU parameters, compile-only kinds and tag-table lifecycle in an owned scratch", LIMITATIONS, []).run(body)
+    if args.hmi_fixture:
+        fixture = args.hmi_fixture.resolve(strict=True)
+        Harness(args, "eh_", "hmi_compile on a configured HmiSeeder fixture: clean compile, fresh-Host reopen and checkpoint restore",
+                FIXTURE_LIMITATIONS, [fixture], scratch=False).run(fixture_body(fixture))
+    else:
+        Harness(args, "eg_", "Engineering gaps: CPU parameters, compile-only kinds and tag-table lifecycle in an owned scratch", LIMITATIONS, []).run(body)

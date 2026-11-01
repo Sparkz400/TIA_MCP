@@ -41,9 +41,6 @@ internal static class AdmissionChecks
             ["automaticReplay"] = false, ["runtimeAllowed"] = false, ["helperSha256"] = Program.Hash(Helper),
             ["archive"] = Reference(archive), ["sourceReport"] = Write(Path.Combine(folder, "source.json"), source),
             ["review"] = Write(Path.Combine(folder, "review.json"), review), ["storeWindowIntent"] = Write(Path.Combine(folder, "window.json"), window),
-            ["recoveryGate"] = Write(Path.Combine(folder, "gate.json"), new JObject { ["pureTestOnly"] = true, ["completed"] = true,
-                ["preservation"] = new JObject { ["checkpointRecovery"] = true, ["recoveredFreshReopen"] = true },
-                ["sessions"] = new JArray(new JObject { ["cleanup"] = new JObject { ["completed"] = true } }) }),
             ["outputDirectory"] = output, ["artifactRoot"] = folder };
     }
     private static void Check(string name, Action<JObject> mutate, bool reject = true)
@@ -73,11 +70,7 @@ internal static class AdmissionChecks
         Check("source-incomplete", a => ChangeReference(a, "sourceReport", s => s["completed"] = false));
         Check("unknown-profile", a => ChangeReference(a, "sourceReport", s => s["profiles"][0]["profile"] = "unknown-classic"));
         Check("archive-retrieval-unverified", a => ChangeReference(a, "sourceReport", s => s["profiles"][0]["archiveRetrievalVerified"] = false));
-        Check("recovery-incomplete", a => ChangeReference(a, "recoveryGate", r => r["completed"] = false));
-        Check("recovery-checkpoint-failed", a => ChangeReference(a, "recoveryGate", r => r["preservation"]["checkpointRecovery"] = false));
-        Check("recovery-reopen-failed", a => ChangeReference(a, "recoveryGate", r => r["preservation"]["recoveredFreshReopen"] = false));
-        Check("recovery-cleanup-failed", a => ChangeReference(a, "recoveryGate", r => r["sessions"][0]["cleanup"]["completed"] = false));
-        Check("recovery-cleanup-empty", a => ChangeReference(a, "recoveryGate", r => r["sessions"] = new JArray()));
+        Check("missing-retrieval-gate", a => a.Remove("checkpointRetrievalGatePassed"));
         Check("negative-fixture", a => ChangeReference(a, "sourceReport", s => s["profiles"][0]["deliberateInvalidReferences"] = true));
         Check("unreviewed-owner", a => ChangeReference(a, "review", r => r["owners"] = new JArray("A", "C")));
         Check("security-disable-denied", a => ChangeReference(a, "review", r => r["disableSecurityAllowed"] = true));

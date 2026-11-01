@@ -46,14 +46,24 @@ class Harness:
             self.report["toolCalls"] = self.client.tool_calls
         (self.directory / "qualification.json").write_text(json.dumps(self.report, indent=2), encoding="utf-8")
 
+    def connect(self):
+        """Start the Host. A later call closes the current Host first (a fresh-Host stage); its calls stay in toolCalls."""
+        calls = []
+        if self.client is not None:
+            receipt = self.client.close()
+            calls = receipt.pop("toolCalls")
+            self.report.setdefault("closedHosts", []).append(receipt)
+        self.client = Client(self.args.host.resolve(), self.args.timeout, ["--worker", str(self.args.worker.resolve()),
+                             "--artifacts", str(self.directory), "--sim-worker", str(getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe"),
+                             *getattr(self.args, "host_args", ())])
+        self.client.tool_calls = calls
+        self.client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {},
+                            "clientInfo": {"name": "native-library-qualification", "version": "1"}})
+        self.client.notify("notifications/initialized")
+
     def run(self, body):
         try:
-            self.client = Client(self.args.host.resolve(), self.args.timeout, ["--worker", str(self.args.worker.resolve()),
-                                 "--artifacts", str(self.directory), "--sim-worker", str(getattr(self.args, "sim_worker", None) or self.directory / "sim-not-used.exe"),
-                                 *getattr(self.args, "host_args", ())])
-            self.client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {},
-                                "clientInfo": {"name": "native-library-qualification", "version": "1"}})
-            self.client.notify("notifications/initialized")
+            self.connect()
             body(self)
             self.report["completed"] = True
         except Exception as error:

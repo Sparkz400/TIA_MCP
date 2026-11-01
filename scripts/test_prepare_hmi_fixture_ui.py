@@ -27,36 +27,49 @@ class PreparationPacketTests(unittest.TestCase):
         self.helper = self.root / 'helper.exe'
         self.helper.write_bytes(b'file-only helper hash')
         self.source = self.root / 'source.json'
-        self.recovery = self.root / 'recovery.json'
         self.source_data = dict(completed=True, profiles=[dict(profile='classic-comfort',
             fixtureMode='positive', deliberateInvalidReferences=False, archiveRetrievalVerified=True,
             projectPath=str(self.root / 'TiaMcpHmi_test.ap21'), archive=runner.reference(self.archive),
             nativeBefore=[dict(name='HmiA'), dict(name='HmiB')])])
-        self.recovery_data = dict(completed=True,
-            preservation=dict(checkpointRecovery=True, recoveredFreshReopen=True),
-            sessions=[dict(cleanup=dict(completed=True))])
+        # No --recovery-report: a PLC recovery report never qualified HMI recovery and no runner writes one.
         self.args = SimpleNamespace(helper=self.helper, source_report=self.source,
-            recovery_report=self.recovery, output=self.root / 'prepared', profile='classic-comfort',
+            output=self.root / 'prepared', profile='classic-comfort',
             prepare_only=True, known_store=[])
         self.save()
 
     def save(self):
         self.source.write_text(json.dumps(self.source_data), encoding='utf-8')
-        self.recovery.write_text(json.dumps(self.recovery_data), encoding='utf-8')
 
     def test_preparation_retains_exact_inputs_without_native_or_locks(self):
-        original = {p: p.read_bytes() for p in [self.archive, self.helper, self.source, self.recovery]}
+        original = {p: p.read_bytes() for p in [self.archive, self.helper, self.source]}
         with patch.object(runner, 'StoreExclusiveWindow') as window, patch.object(runner, 'execute_helper') as execute:
             self.assertEqual(runner.run(self.args), 0)
         window.assert_not_called()
         execute.assert_not_called()
         packet = runner.read(self.args.output / 'preparation.json')
         self.assertEqual(packet['inputs']['archive'], runner.reference(self.archive))
+        self.assertEqual(set(packet['inputs']), {'helper', 'sourceReport', 'archive'})
         self.assertEqual(packet['owners'], ['HmiA', 'HmiB'])
         self.assertFalse(packet['admissionGranted'])
         self.assertFalse(packet['bridgeRecoveryQualified'])
         self.assertFalse((self.args.output / 'admission.json').exists())
         for path, data in original.items(): self.assertEqual(path.read_bytes(), data)
+
+    def test_native_admission_keeps_every_gate_but_the_recovery_report(self):
+        self.args.prepare_only = False
+        class Window:
+            def __init__(window, roots, *args, **kwargs): window.root = roots[0]
+            def __enter__(window): (window.root / 'window-intent.json').write_text('{}', encoding='utf-8')
+            def __exit__(window, *error): return False
+        with patch.object(runner, 'StoreExclusiveWindow', Window), \
+                patch.object(runner, 'execute_helper', side_effect=RuntimeError('no native helper in tests')):
+            self.assertEqual(runner.run(self.args), 1)
+        admission = runner.read(self.args.output / 'admission.json')
+        self.assertNotIn('recoveryGate', admission)
+        self.assertTrue(admission['ownedFixture'] and admission['sequentialNativeAdmission'] and admission['checkpointRetrievalGatePassed'])
+        self.assertFalse(admission['automaticReplay'] or admission['runtimeAllowed'])
+        self.assertEqual(admission['archive'], runner.reference(self.archive))
+        self.assertEqual(runner.read(self.args.output / 'result.json')['failure']['message'], 'no native helper in tests')
 
     def test_unified_preparation_selects_only_transfer_prerequisite(self):
         self.args.profile = 'unified-comfort'
@@ -73,21 +86,10 @@ class PreparationPacketTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Exactly one'): runner.run(self.args)
         self.assertFalse(self.args.output.exists())
 
-    def test_empty_cleanup_cannot_prove_recovery(self):
-        self.recovery_data['sessions'] = []
-        self.save()
-        with self.assertRaisesRegex(ValueError, 'Recovery foundation'): runner.run(self.args)
-        self.assertFalse(self.args.output.exists())
-
     def test_changed_archive_refuses_before_output(self):
         self.archive.write_bytes(b'changed')
         with self.assertRaisesRegex(ValueError, 'Original archive changed'): runner.run(self.args)
         self.assertFalse(self.args.output.exists())
-
-    def test_failed_reopen_refuses_even_with_completed_summary(self):
-        self.recovery_data['preservation']['recoveredFreshReopen'] = False
-        self.save()
-        with self.assertRaisesRegex(ValueError, 'Recovery foundation'): runner.run(self.args)
 
     def test_unrelated_project_name_refuses(self):
         self.source_data['profiles'][0]['projectPath'] = str(self.root / 'customer.ap21')
