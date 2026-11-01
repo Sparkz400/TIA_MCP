@@ -344,13 +344,16 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
         var login = entry.Status.Login;
         try
         {
-            Consume(Vault(login),login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ =>
+            // Only the credential's state is checked under the vault lock; the session's requests run after it is released,
+            // so a slow PLC cannot hold other vault users (block protection) past their bounded wait.
+            Vault(login).Use(login.Credential, Binding(login.Endpoint, login.PeerCertificateSha256, login.User, login.Mode), _ => { });
+            if (Failure(() =>
             {
                 entry.Client.VerifySessionAsync(login.User,login.Mode,cancellationToken).GetAwaiter().GetResult();
                 var status = entry.Status with { Profile = entry.Client.Profile };
                 Save(status); entry.Status = status;
                 action();
-            });
+            }) is { } failure) throw Error(failure);
         }
         catch (Exception error) when (entry.Client.SessionUnusable)
         {
@@ -361,22 +364,23 @@ public sealed class PhysicalRuntimeSessions : IAsyncDisposable
     private static void Consume(CredentialVault vault,CredentialReference reference,CredentialBinding binding,Action<byte[]> action)
     {
         string? failure=null;
-        vault.Use(reference,binding,bytes =>
-        {
-            try { action(bytes); }
-            catch (Exception error)
-            {
-                // Only fixed codes escape the vault consumer; never retain its exception or message.
-                failure = error is BridgeException e && e.Code is
-                    "RuntimePermissionDenied" or "RuntimeSymbolMetadataChanged" or "RuntimeResponseInvalid" or "RuntimeResponseLimit" or
-                    "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
-                    "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
-                    "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
-                    or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
-                    ? e.Code : "RuntimeOperationFailed";
-            }
-        });
+        vault.Use(reference,binding,bytes => failure = Failure(() => action(bytes)));
         if (failure is not null) throw Error(failure);
+    }
+    // Only fixed codes escape a session request; never retain its exception or message.
+    private static string? Failure(Action action)
+    {
+        try { action(); return null; }
+        catch (Exception error)
+        {
+            return error is BridgeException e && e.Code is
+                "RuntimePermissionDenied" or "RuntimeSymbolMetadataChanged" or "RuntimeResponseInvalid" or "RuntimeResponseLimit" or
+                "RuntimeAuthenticationDenied" or "RuntimeTransportFailure" or "RuntimeTimeout" or "RuntimeCancelled" or
+                "RuntimeTlsUnverified" or "RuntimeHttpFailure" or "RuntimeSessionExpired" or "RuntimeBrowseFailed" or
+                "RuntimeDiscoveryFailed" or "RuntimeRequestLimit" or "RuntimeLoginResponseInvalid" or "RuntimeProviderRejected" or "RuntimeSecretEchoRejected"
+                or "RuntimeProfileInvalid" or "RuntimeSessionIdentityMismatch"
+                ? e.Code : "RuntimeOperationFailed";
+        }
     }
     private static CredentialVault Vault(RuntimeLoginSelection login) => CredentialVault.Existing(CredentialVault.UserRoot(login.VaultName));
     private static void ValidatePassword(byte[] bytes)
