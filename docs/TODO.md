@@ -138,7 +138,7 @@ One box per obligation group of the [release ledger](plans/release-obligations-2
   - **Combined apply:** a crash between the library journal's temporary write and its move leaves `journal.json.<guid>.tmp` in the step workspace, and reconcile then holds the admission (fail-safe, manual cleanup).
   - **Text-list Host-loss sweep:** the sweep ignores `*.tmp` files when it compares stores, so a temporary file leaked on a successful path would stay hidden.
   - **VCI:** `vci_workspace_inspect`'s per-mapping `contentSha256` is exercised by `local.vci_git.20261031` but not covered by its read evidence `local.read_contracts.20261028`; a remote over 100,000 entries is refused until it is repacked.
-- [ ] **Contract freeze:** a public compatibility policy for the tool surface: which tool names, input/output schemas and error codes 1.0 freezes, and how they may change afterwards.
+- [ ] **Contract freeze:** a public compatibility policy for the tool surface: which tool names, input/output schemas and error codes 1.0 freezes, and how they may change afterwards. A [draft policy](plans/contract-freeze-policy.md) (1 November) waits on the maintainer's 13 open decisions.
 - [ ] **Release candidate:** re-run the required regression on the frozen candidate and publish upgrade, recovery and rollback instructions ([1.0 checklist](history/1.0-release-checklist-20261013.md)).
 - [ ] **Explorer performance evidence:** warm/cold timings, memory and payload sizes next to the existing 1k/10k/50k tree and 500-node graph measurements ([1.0 checklist](history/1.0-release-checklist-20261013.md)).
 - [ ] **Vendor inputs:** re-obtain the PAL/DMC ZIPs (no longer on this PC) for the DMC FB compilation, real vendor byte volumes and the three [lost records](#lost-evidence).
