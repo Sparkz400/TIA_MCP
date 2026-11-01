@@ -68,8 +68,9 @@ class FakeHost:
                 tags[table + "/tags/SharedValue"] = {"kind": "hmiTag", "name": "SharedValue", "properties": {"Connection": "", "PlcTag": "", "DataType": "Int", "AccessMode": "SymbolicAccess"}}
                 world[hmi] = {"plc": plc, "tags": tags, "connections": {hmi + "/connections/HMI_Connection_1": {"kind": "hmiConnection", "name": "HMI_Connection_1", "properties": {"Partner": "PLC_" + "AB"[index - 1]}}},
                               "screens": {hmi + "/screens/" + s: {"kind": "hmiScreen", "name": s, "properties": {"Width": 800, "Height": 480}} for s in ("Overview_A", "Overview_B")},
-                              "items": {hmi + "/screens/Overview_A/items/RepeatedItem": {"kind": "hmiScreenItem", "name": "RepeatedItem", "screen": hmi + "/screens/Overview_A",
-                                        "nativeType": "Siemens.Engineering.HmiUnified.UI.Shapes.HmiRectangle", "properties": {"Left": 30, "Top": 40, "Width": 120, "Height": 60}}},
+                              "items": {hmi + "/screens/%s/items/RepeatedItem" % s: {"kind": "hmiScreenItem", "name": "RepeatedItem", "screen": hmi + "/screens/" + s,
+                                        "nativeType": "Siemens.Engineering.HmiUnified.UI.Shapes.HmiRectangle", "properties": {"Left": 30, "Top": 40, "Width": 120, "Height": 60}}
+                                        for s in ("Overview_A", "Overview_B")},
                               "model": {path: {"kind": row["kind"], "name": row["name"], "properties": dict(row["properties"])} for path, row in tags.items()}}
         return world
 
@@ -115,7 +116,9 @@ class FakeHost:
             if exported:
                 artifacts.append(self.export(hmi, exported))
         else:
-            items = [dict(self.row(hmi, path, row["kind"], row["name"], row["properties"]), **{k: row[k] for k in ("nativeType", "dynamizations") if k in row})
+            exact = request.get("objectPath") if section == "screens" else None
+            items = [dict(self.row(hmi, path, row["kind"], row["name"], row["properties"]), **{k: row[k] for k in ("nativeType", "dynamizations") if k in row},
+                          **({"eventHandlers": row.get("eventHandlers", [])} if section == "items" or path == exact else {}))
                      for path, row in self.world()[hmi].get(section, {}).items() if section != "items" or row["screen"] == request.get("screenPath")]
         if request.get("objectPath") and section != "items":
             items = [r for r in items if r["identity"]["objectPath"] == request["objectPath"]]
@@ -152,7 +155,8 @@ class FakeHost:
         hmi, path = target["hmiPath"], target["objectPath"]
         if kind != "hmi_engineering":
             family, operations = {"hmi_classic_import": ("classic", {"classic_xml_import", "scalar_property_set"}), "hmi_external_tag_create": ("unified", {"external_tag_create"}),
-                                  "hmi_screen_create": ("unified", {"screen_create", "item_create"}), "hmi_dynamization_create": ("unified", {"dynamization_set"})}[kind]
+                                  "hmi_screen_create": ("unified", {"screen_create", "item_create"}), "hmi_dynamization_create": ("unified", {"dynamization_set"}),
+                                  "hmi_event_handler_create": ("unified", {"event_handler_set"})}[kind]
             if target["family"] != family or operation not in operations:
                 return "InvalidRequest"
         if operation == "screen_create":
@@ -163,6 +167,16 @@ class FakeHost:
                 return "HmiNameConflict"
             if not any(r["properties"] == payload["properties"] for r in screens):
                 return "DependencyUnresolved"
+        if operation == "event_handler_set":
+            script, event = payload["script"], payload["eventType"]
+            if event == "None" or not script.strip() or len(script) > 16384 or any(ord(c) < 32 and c not in "\t\r\n" for c in script):
+                return "InvalidRequest"
+            owner = self.world()[hmi]["screens"].get(path) or self.world()[hmi]["items"][path]
+            allowed = ["Loaded", "Cleared"] if owner["kind"] == "hmiScreen" else ["Down", "Up", "Tapped"]
+            if event not in allowed:
+                raise Refused("InvalidRequest", {"eventType": event, "allowed": allowed})
+            if any(h["properties"]["EventType"] == event for h in owner.get("eventHandlers", [])):
+                return "HmiNameConflict"
         if operation == "dynamization_set":
             binding, item = payload["bindings"][0], self.world()[hmi]["items"][path]
             tag = self.world()[hmi]["tags"].get(binding["tagIdentity"]["objectPath"]) if binding["tagIdentity"]["hmiPath"] == hmi else None
@@ -238,6 +252,11 @@ class FakeHost:
             world[hmi]["items"][created] = {"kind": "hmiScreenItem", "name": payload["name"], "screen": path, "properties": properties,
                                             "nativeType": "Siemens.Engineering.HmiUnified.UI.Widgets." + payload["itemType"]}
             world[hmi]["model"][created] = {"kind": "hmiModelNode", "name": payload["name"], "properties": dict(properties)}
+        elif operation == "event_handler_set":
+            owner = world[hmi]["screens"].get(path) or world[hmi]["items"][path]
+            owner.setdefault("eventHandlers", []).append({"properties": {"EventType": payload["eventType"]}, "script": {
+                "scriptCode": payload["script"], "scriptCodeSha256": hashlib.sha256(payload["script"].encode("utf-8")).hexdigest(), "scriptsExecuted": False}})
+            world[hmi]["model"][path + "/eventHandlers/" + payload["eventType"]] = {"kind": "hmiModelNode", "name": payload["eventType"], "properties": {}}
         elif operation == "dynamization_set":
             binding = payload["bindings"][0]
             tag = binding["tagIdentity"]["objectPath"].rsplit("/", 1)[1]
@@ -309,7 +328,7 @@ class FakeClient:
         host = self.host
         # The three profiles are production-admitted for the 1 November kinds; a qualification Host does not change that.
         # hmi_screen_create has no production profile yet: only a qualification Host of the fixture's profile admits it.
-        admission = "qualification" if kind in ("hmi_screen_create", "hmi_dynamization_create") else "production"
+        admission = "qualification" if kind in ("hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create") else "production"
         code = host.check(kind, payload, admission == "production" or self.admitted == host.profile)
         gate = {"available": code is None, "admission": admission if code is None else None, "targetProfile": host.profile, "reasonCode": code}
         if code:
@@ -476,6 +495,27 @@ class GateRouteRunTests(unittest.TestCase):
                         row["properties"]["Bound"] = True
         failures = self.run_route("unified-comfort", "unified", kind="hmi_dynamization_create", leak=leak)["failures"]
         self.assertTrue(any("unchanged outside the intended delta: ProcessValue of HmiIOField QualificationField on HMI_RT_1" in f for f in failures), failures)
+
+    def test_handler_route_adds_scripts_to_a_screen_a_rectangle_and_a_button(self):
+        for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):
+            with self.subTest(profile=profile):
+                shutil.rmtree(self.root / "hps", ignore_errors=True)
+                shutil.rmtree(self.root / "prep", ignore_errors=True)
+                report = self.run_route(profile, "unified", kind="hmi_event_handler_create", errors=errors)
+                self.assertEqual([], report["failures"])
+                self.assertEqual(1, sum(c.startswith("Setup applied") for c in report["checks"]))
+                self.assertEqual(8, sum(c.startswith("Refused before any write") for c in report["checks"]))
+                self.assertEqual(["Loaded handler of screen Overview_A on HMI_RT_1", "Tapped handler of item RepeatedItem on HMI_RT_1", "Tapped handler of item QualificationButton on HMI_RT_2"],
+                                 [r["label"] for r in report["replays"]])
+
+    def test_a_handler_that_changes_its_script_fails_the_readback(self):
+        def leak(world):
+            for hmi in world:
+                for owner in list(world[hmi]["screens"].values()) + list(world[hmi]["items"].values()):
+                    for handler in owner.get("eventHandlers", []):
+                        handler["script"]["scriptCode"] = handler["script"]["scriptCode"].strip()
+        failures = self.run_route("unified-comfort", "unified", kind="hmi_event_handler_create", leak=leak)["failures"]
+        self.assertTrue(any(f.startswith("Independent readback of the target: Loaded handler of screen Overview_A") for f in failures), failures)
 
     def test_a_screen_row_change_outside_the_created_item_fails(self):
         def leak(world):

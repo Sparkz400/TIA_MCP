@@ -1,5 +1,5 @@
-"""Native qualification of change kinds hmi_classic_import, hmi_external_tag_create, hmi_screen_create and
-hmi_dynamization_create, the HMI writes that pass the closed preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
+"""Native qualification of change kinds hmi_classic_import, hmi_external_tag_create, hmi_screen_create,
+hmi_dynamization_create and hmi_event_handler_create, the HMI writes that pass the closed preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
 
 One profile per run, on a qualification Host (--hmi-change-qualification <profile>) in a copy its own worker retrieves. Since the
 three profiles passed (1 November 2026) the gate admits them in production, also on that Host (ADMISSION):
@@ -9,6 +9,8 @@ three profiles passed (1 November 2026) the gate admits them in production, also
   and a button on HMI_RT_2's Overview_B;
 - hmi_dynamization_create (--kind) first creates the items it binds through hmi_screen_create (setup, before the reference), then
   binds ProcessValue to a PLC tag, a global DB member and an internal tag; readback includes the hmi_references chain;
+- hmi_event_handler_create (--kind) adds a script handler to a screen, a rectangle and a button (setup, hmi_screen_create); the
+  event type is the object's own (learned from the refusal of an undocumented one), the script text is never executed;
 - unified-pc has no configured fixture yet (ruling R4): --seeded-report names the HmiSeeder qualify report
   (artifacts/q/hps/native-report.json) whose positive baseline (two HMIs, two PLCs, integrated connections, LinkedSignal and
   LinkedDbValue) is retrieved as that report recorded it. Its two encrypted-transfer password errors stay; the kind's compile
@@ -56,7 +58,7 @@ SCREEN, FIELD, BUTTON = "QualificationScreen", "QualificationField", "Qualificat
 # The admission the gate reports for each kind on its profiles: production since its native qualification passed (the qualifying
 # runs of local.hmi.*.route.20261101 saw "qualification"); "qualification" while a kind has no production profile.
 ADMISSION = {"hmi_classic_import": "production", "hmi_external_tag_create": "production", "hmi_screen_create": "qualification",
-             "hmi_dynamization_create": "qualification"}
+             "hmi_dynamization_create": "qualification", "hmi_event_handler_create": "qualification"}
 
 
 def digest(raw):
@@ -523,6 +525,91 @@ def binding_reopen(client, hmis, fx):
     return binding_payload(bound_item(client, hmis, fx, "HMI_RT_2", "Overview_B", "QualificationGauge"), fx["HMI_RT_2"]["tags"]["SharedValue"])
 
 
+# --- Unified event handlers (hmi_event_handler_create) ------------------------------------------------------------------------
+
+# Untrusted script text, stored verbatim and never executed, evaluated or syntax-checked (HmiEngineeringRules.MaxScriptLength).
+SCRIPT = "// TIA MCP qualification: stored verbatim, never executed.\nHMIRuntime.Trace('qualification');\n"
+PREFERRED_EVENTS = ("Loaded", "Tapped", "Activated", "Up")
+UNDOCUMENTED_EVENT = "QualificationUndocumented"
+
+
+def handler_payload(owner, event, script=SCRIPT):
+    return {"schemaVersion": 1, "operation": "event_handler_set", "target": owner["identity"], "eventType": event, "script": script}
+
+
+def event_types(client, owner):
+    """The object's own event types, from the worker's refusal of an undocumented one (HmiEventHandler lists them)."""
+    error = refusal(client, "hmi_event_handler_create", handler_payload(owner, UNDOCUMENTED_EVENT))
+    allowed = (error.get("details") or {}).get("allowed")
+    require(error.get("code") == "InvalidRequest" and isinstance(allowed, list) and allowed, "No event types for %s: %s" % (owner["identity"]["objectPath"], error))
+    return allowed
+
+
+def event_type(client, owner):
+    allowed = event_types(client, owner)
+    return next((e for e in PREFERRED_EVENTS if e in allowed), allowed[0])
+
+
+def handler_owners(client, hmis, fx):
+    """The screen HMI_RT_1/Overview_A, the seeded rectangle on HMI_RT_1/Overview_B and the setup button on HMI_RT_2/Overview_B."""
+    overview_b = fx["HMI_RT_1"]["screens"]["Overview_B"]["identity"]["objectPath"]
+    rectangle = rows(client, hmis["HMI_RT_1"], "items", screenPath=overview_b).get(overview_b + "/items/RepeatedItem")
+    require(rectangle is not None, "HMI_RT_1 Overview_B lacks RepeatedItem")
+    return [("HMI_RT_1", "screen", fx["HMI_RT_1"]["screens"]["Overview_A"]), ("HMI_RT_1", "item", rectangle),
+            ("HMI_RT_2", "item", bound_item(client, hmis, fx, "HMI_RT_2", "Overview_B", BUTTON))]
+
+
+def handler_setup(fx):
+    return [("HmiButton %s on HMI_RT_2 Overview_B" % BUTTON, "hmi_screen_create",
+             item_payload(fx["HMI_RT_2"]["screens"]["Overview_B"], BUTTON, "HmiButton", {"left": 20, "top": 160, "width": 160, "height": 50}))]
+
+
+def handler_refusals(client, hmis, fx):
+    kind = "hmi_event_handler_create"
+    screen = fx["HMI_RT_1"]["screens"]["Overview_A"]
+    event = event_type(client, screen)
+    return [("the same handler payload as hmi_engineering", "hmi_engineering", handler_payload(screen, event), "HmiPreservationUnavailable"),
+            ("an operation outside the kind (screen_create)", kind, screen_payload(fx["HMI_RT_1"], SCREEN), "InvalidRequest"),
+            ("an event type the screen does not document", kind, handler_payload(screen, UNDOCUMENTED_EVENT), "InvalidRequest"),
+            ("event type None", kind, handler_payload(screen, "None"), "InvalidRequest"),
+            ("a blank script", kind, handler_payload(screen, event, "   "), "InvalidRequest"),
+            ("a script over 16384 characters", kind, handler_payload(screen, event, "/" * 16385), "InvalidRequest"),
+            ("a script with a control character", kind, handler_payload(screen, event, "// bell \u0007"), "InvalidRequest"),
+            ("a Classic family target", kind, handler_payload({"identity": {**screen["identity"], "family": "classic"}}, event), "InvalidRequest")]
+
+
+def handler_cases(fx):
+    """One handler each on a screen, a seeded rectangle and a setup button; readback reads the owner's handler and its script."""
+    def handled(index):
+        def build(client, hmis):
+            hmi, role, owner = handler_owners(client, hmis, fx)[index]
+            event, path = event_type(client, owner), owner["identity"]["objectPath"]
+
+            def verify(client):
+                if role == "screen":
+                    row = rows(client, hmis[hmi], "screens", objectPath=path).get(path) or {}
+                else:
+                    screen_path = path.rsplit("/items/", 1)[0]
+                    row = rows(client, hmis[hmi], "items", screenPath=screen_path).get(path) or {}
+                found = [h for h in row.get("eventHandlers") or [] if (h.get("properties") or {}).get("EventType") == event]
+                script = (found[0].get("script") or {}) if len(found) == 1 else {}
+                observed = {"handlers": len(found), "scriptCode": script.get("scriptCode"), "sha256": script.get("scriptCodeSha256"), "executed": script.get("scriptsExecuted")}
+                expected = {"handlers": 1, "scriptCode": SCRIPT, "sha256": digest(SCRIPT.encode("utf-8")), "executed": False}
+                return observed == expected, None if observed == expected else {"expected": expected, "observed": observed}
+            case = {"label": "%s handler of %s %s on %s" % (event, role, owner["name"], hmi), "hmi": hmi, "payload": handler_payload(owner, event),
+                    "roots": [path + "/eventHandlers/" + event], "verify": verify}
+            if role == "item":
+                case["fields"] = {path: "eventHandlers"}
+            return case
+        return build
+    return [handled(index) for index in range(3)]
+
+
+def handler_reopen(client, hmis, fx):
+    screen = fx["HMI_RT_2"]["screens"]["Overview_A"]
+    return handler_payload(screen, event_type(client, screen))
+
+
 # Kind: family, profiles, fixture, setup applies (label, kind, payload) before the reference, refusals before any write, applies
 # in order, and an unbound reopen probe of the production gate (client, hmis, fx).
 KINDS = {"hmi_classic_import": ("classic", ("classic-comfort",), classic_fixture, lambda fx: [], classic_refusals, classic_cases,
@@ -531,7 +618,8 @@ KINDS = {"hmi_classic_import": ("classic", ("classic-comfort",), classic_fixture
                                      lambda client, hmis, fx: external(fx["HMI_RT_1"], "QualificationReopen", "root")),
          "hmi_screen_create": ("unified", ("unified-comfort", "unified-pc"), screen_fixture, lambda fx: [], screen_refusals, screen_cases,
                                lambda client, hmis, fx: screen_payload(fx["HMI_RT_1"], "QualificationReopen")),
-         "hmi_dynamization_create": ("unified", ("unified-comfort", "unified-pc"), binding_fixture, binding_setup, binding_refusals, binding_cases, binding_reopen)}
+         "hmi_dynamization_create": ("unified", ("unified-comfort", "unified-pc"), binding_fixture, binding_setup, binding_refusals, binding_cases, binding_reopen),
+         "hmi_event_handler_create": ("unified", ("unified-comfort", "unified-pc"), screen_fixture, handler_setup, handler_refusals, handler_cases, handler_reopen)}
 
 
 # --- Change calls ------------------------------------------------------------------------------------------------------------

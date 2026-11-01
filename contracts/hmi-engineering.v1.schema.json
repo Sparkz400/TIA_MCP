@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://tia-mcp.local/contracts/hmi-engineering.v1.schema.json",
   "title": "Prepared HMI engineering payload",
-  "description": "Payload of change_prepare kind hmi_engineering, and of kinds hmi_classic_import (operations classic_xml_import and scalar_property_set on Classic), hmi_external_tag_create (operation external_tag_create on Unified), hmi_screen_create (operations screen_create and item_create on Unified) and hmi_dynamization_create (operation dynamization_set on Unified). All writes use existing change_apply/change_status/change_restore. Available native setters do not qualify a target; server-side exact-profile preservation and acceptance gates remain authoritative.",
+  "description": "Payload of change_prepare kind hmi_engineering, and of kinds hmi_classic_import (operations classic_xml_import and scalar_property_set on Classic), hmi_external_tag_create (operation external_tag_create on Unified), hmi_screen_create (operations screen_create and item_create on Unified), hmi_dynamization_create (operation dynamization_set on Unified) and hmi_event_handler_create (operation event_handler_set on Unified). All writes use existing change_apply/change_status/change_restore. Available native setters do not qualify a target; server-side exact-profile preservation and acceptance gates remain authoritative.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "operation", "target", "expectedContentHash"],

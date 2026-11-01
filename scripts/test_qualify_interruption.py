@@ -108,9 +108,9 @@ class InterruptionMatrixTests(unittest.TestCase):
 
     def test_gate_scenarios_run_on_the_change_qualification_host(self):
         self.assertEqual(["--hmi-change-qualification", "unified-comfort"], q.gate_host_arguments())
-        self.assertEqual({"ci": "hmi_classic_import", "et": "hmi_external_tag_create", "sc": "hmi_screen_create", "dy": "hmi_dynamization_create"}, {p: q.KINDS[p][0] for p in q.GATE_PROFILES})
+        self.assertEqual({"ci": "hmi_classic_import", "et": "hmi_external_tag_create", "sc": "hmi_screen_create", "dy": "hmi_dynamization_create", "eh": "hmi_event_handler_create"}, {p: q.KINDS[p][0] for p in q.GATE_PROFILES})
         self.assertTrue(all(q.reconciliation_class(q.KINDS[p][0]) == "target" for p in q.GATE_PROFILES))
-        self.assertEqual({prefix + "-" + p for prefix in ("ci", "et", "sc", "dy") for p in q.GATE_POINTS}, {n for n in q.KIND_SCENARIOS if n[:2] in q.GATE_PROFILES})
+        self.assertEqual({prefix + "-" + p for prefix in ("ci", "et", "sc", "dy", "eh") for p in q.GATE_POINTS}, {n for n in q.KIND_SCENARIOS if n[:2] in q.GATE_PROFILES})
 
     def test_expected_outcomes(self):
         for kind in ("source_upsert", "hardware_plug", "to_create", "tag_set"):
@@ -127,7 +127,7 @@ class InterruptionMatrixTests(unittest.TestCase):
         for point in ("hckp", "himp", "hred", "hsav"):
             self.assertEqual({"released": False, "effectPersisted": True}, q.expected_outcome("hmi_text_list_import", point))
         # The gate kinds are target kinds too: a killed baseline compile or native write releases the unchanged project.
-        for kind in ("hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create"):
+        for kind in ("hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hmi_dynamization_create", "hmi_event_handler_create"):
             self.assertEqual({"released": False, "effectPersisted": False}, q.expected_outcome(kind, "ckpt"))
             for point in ("mut", "wrt", "comp"):
                 self.assertEqual({"released": True, "project": "unchanged", "effectPersisted": False}, q.expected_outcome(kind, point))
@@ -136,7 +136,7 @@ class InterruptionMatrixTests(unittest.TestCase):
 
     def test_scenario_names_stay_short(self):
         # The reconciliation retrieve root (base/scenario/ar_<12>) must stay within the worker's 70-character limit.
-        self.assertEqual(57, len(q.KIND_SCENARIOS))
+        self.assertEqual(65, len(q.KIND_SCENARIOS))
         self.assertTrue(all(len(name) <= 7 for name in q.KIND_SCENARIOS))
         self.assertFalse(set(q.KIND_SCENARIOS) & set(q.SCENARIOS))
         self.assertEqual(16, len(q.UPGRADE_SCENARIOS))
