@@ -3355,6 +3355,25 @@
       ]
     },
     {
+      "id": "local.project_upgrade.interruption.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "61f75b839532c790d7727ff5d3f14dfe1b2d3fb7",
+        "passedScope": "scripts/qualify_interruption.py on a Debug build of 61f75b8 frozen with git archive, 16 of 16 cases, each in its own owned Portal on an owned copy of TinyMySQLClient_V15.ap15 (project folder, OpenWithUpgrade, pf-*) or TinyMySQLClient_V14_1.zap14 (archive, RetrieveWithUpgrade, pa-*), reconciled once by engineering_admission_reconcile from a fresh Host. Worker and owned TIA terminated at the first dispatchIntent (int: destination never created) -> released, source and destination unchanged; at receipt copying (cpy) and upgrading (upg, inside the native upgrade) -> held with the partial owned copy; at the first .ap21 at the observed layout while the receipt is upgrading (prj) -> held without the project being opened. Host stopped after the durable dispatch intent and before dispatch (hint, host.project_upgrade.beforeDispatch) -> released unchanged. Host killed at receipt copying (hcpy) and upgrading (hupg), and Host stopped after the native upgrade returned but before recording it (hret, host.project_upgrade) -> the worker finished, released with the destination verifiedApplied, and the reconciled V21 project (TinyMySQLClient_V15_V21, TinyMySQLClient_V14_V21) opened in the same fresh session with its pinned inventory (17 hardware items, 1 PLC, 7 blocks, 0 inconsistent). Every case: source copy fingerprint unchanged and proven unchanged by the reconciler, exactly one project_upgrade admission and at most one destination (no replay), destination unchanged by reconciliation, each held admission keeps its source reserved (a second project_upgrade is refused ResourceBusy). Originals byte-identical before and after; copies removed; no run file names a folder above an original."
+      },
+      "artifacts": [
+        "evidence/local.project_upgrade.interruption.20261101.json"
+      ],
+      "limitations": [
+        "Interruption is process termination of the worker with its owned TIA, or Host loss by kill or a qualification Host point, once per case; power loss, disk faults and remote transport are not exercised.",
+        "Two small public examples (a V15 project folder and a V14 SP1 archive). Boundaries are observed through the durable upgrade receipt and admission store; the copy of these examples takes milliseconds, so each case records the durable state it hit (all 16 hit their intended state).",
+        "A partial copy or unfinished upgrade stays held; releasing it needs someone to remove the owned destination and reconcile again, which is not exercised.",
+        "Reconciliation trusts the worker-written upgrade receipt once it is bound to the recomputed source hash and the observed layout; a receipt edited inside the owned artifacts tree after the interruption is trusted."
+      ]
+    },
+    {
       "id": "local.technology.version_profiles.20261031",
       "status": "passed",
       "profile": {
@@ -4058,14 +4077,15 @@
           "Accepts .ap14-.ap20 project files (V15.1: .ap15_1) and .zap14-.zap20 archives with their SHA-256. V13 and older, V21 and newer are refused by file name before any file read or native call (ProjectVersionUnsupported); after the hash check the release declared by the project marker (ProjectCompatibilityVersion; in an archive, its one top-level project file) must match, so a renamed older project is refused before the upgrade. A project folder holding another project or archive is refused; a locked source file is SourceLocked.",
           "The source is never opened or written: the project file's whole folder (at most 20000 files and 4 GiB) is copied under its own name, or the archive (at most 1 GiB) byte for byte, into a new owned directory under the host's upgrades artifacts, and only that copy is upgraded. The source hash (the archive bytes, or a sorted manifest of every file in the folder) is checked before and after the copy and after the upgrade (sourceUnchanged). The upgraded project must be where V21 saves it: <destination>/<folder>_V21/<folder>_V21.ap21 for a project folder, <destination>/w/<project>_V21/<project>_V21.ap21 for an archive (UpgradeVerificationFailed otherwise).",
           "Nothing is compiled or saved beyond what TIA's upgrade does. The upgraded project stays open with its isModified flag reported; TIA's ConversionLog_*_to_21 files are returned with their project success marker and error and warning counts; collecting that evidence never replaces TIA's outcome (evidenceFailure). Block consistency (the compile state) is read with project_inventory.",
-          "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile (source hash unchanged; destination absent, empty or holding the one V21 project its completed upgrade receipt names).",
-          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Protected (UMAC) projects, V15.1 and V17-V20 sources, locked sources and interrupted upgrades (reconciliation) are not exercised natively."
+          "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile: the source hash must be unchanged and the destination absent, empty or holding the one V21 project at the observed location that its completed upgrade receipt names (bound to the recomputed source hash). A partial copy or an unfinished upgrade stays held, with the source reserved, and is never opened.",
+          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Interruption and reconciliation are qualified (local.project_upgrade.interruption.20261101): worker loss after dispatch intent, during the copy, during the native upgrade and after the upgraded .ap21 exists, and Host loss before dispatch, during the copy and the upgrade and after the native reply, for the V15 folder and the V14 SP1 archive, each reconciled once without replay. Protected (UMAC) projects, V15.1 and V17-V20 sources and locked sources are not exercised natively."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.project_upgrade.20261031"
+          "local.project_upgrade.20261031",
+          "local.project_upgrade.interruption.20261101"
         ]
       },
       "availability": {

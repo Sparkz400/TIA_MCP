@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "f0f5f2c8b51311901d7b9a4f3bb2818008e1487caefec269cb2c64390078b137",
-      "bytes": 1539696
+      "sha256": "e74bb0e61b03b24605426f20029a4bf41f94ce38cec0caa78437319c596b8204",
+      "bytes": 1543269
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -115401,6 +115401,13 @@
           "artifacts": [
             "evidence/local.project_upgrade.20261031.json"
           ]
+        },
+        {
+          "id": "local.project_upgrade.interruption.20261101",
+          "profileSha256": "dfa0a9d03a73c08eef11a360a6cf6db3bf4d12c1a0a7713f508abc16cd6a6cb9",
+          "artifacts": [
+            "evidence/local.project_upgrade.interruption.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -127733,6 +127740,11 @@
       "sha256": "91086c812c8d2b528fb8fd8b242e594a9a6d10a2e30ad6fa0ef66a2038c1d11c"
     },
     {
+      "path": "evidence/local.project_upgrade.interruption.20261101.json",
+      "state": "observed",
+      "sha256": "6bb8d86d82539041efa52ef8891e41b093cc17496fda55f7a2530d2d1022d4e9"
+    },
+    {
       "path": "evidence/local.read_contracts.20261028.json",
       "state": "observed",
       "sha256": "3841523a6aaeb22f6c4ad144112317f97d982bcd3818e9b377bd2bf743fcb399"
@@ -128558,6 +128570,10 @@
     {
       "id": "local.project_upgrade.20261031",
       "profileSha256": "63596019b1b19bb2ec27d6928eafc40b76190fa271d605e08ddf4b66f40c0264"
+    },
+    {
+      "id": "local.project_upgrade.interruption.20261101",
+      "profileSha256": "dfa0a9d03a73c08eef11a360a6cf6db3bf4d12c1a0a7713f508abc16cd6a6cb9"
     },
     {
       "id": "local.read_contracts.20261028",

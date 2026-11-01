@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.87",
-    "catalogSha256": "f0f5f2c8b51311901d7b9a4f3bb2818008e1487caefec269cb2c64390078b137",
+    "catalogSha256": "e74bb0e61b03b24605426f20029a4bf41f94ce38cec0caa78437319c596b8204",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -496,28 +496,32 @@
         "X01"
       ],
       "evidenceIds": [
-        "local.project_upgrade.20261031"
+        "local.project_upgrade.20261031",
+        "local.project_upgrade.interruption.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.project_upgrade.20261031"
+            "local.project_upgrade.20261031",
+            "local.project_upgrade.interruption.20261101"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.project_upgrade.20261031"
+            "local.project_upgrade.20261031",
+            "local.project_upgrade.interruption.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.project_upgrade.20261031"
+            "local.project_upgrade.20261031",
+            "local.project_upgrade.interruption.20261101"
           ]
         }
       ]
@@ -27182,6 +27186,21 @@
         {
           "path": "evidence/local.project_upgrade.20261031.json",
           "sha256": "91086c812c8d2b528fb8fd8b242e594a9a6d10a2e30ad6fa0ef66a2038c1d11c"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.project_upgrade.interruption.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "61f75b839532c790d7727ff5d3f14dfe1b2d3fb7",
+      "retained": [
+        {
+          "path": "evidence/local.project_upgrade.interruption.20261101.json",
+          "sha256": "6bb8d86d82539041efa52ef8891e41b093cc17496fda55f7a2530d2d1022d4e9"
         }
       ],
       "notRetained": []
