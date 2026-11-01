@@ -172,7 +172,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   [shared vectors](fixtures/canonical-json/vectors.v1.json) that both runtimes' tests reproduce byte for
   byte; integer literals beyond 2^53 keep their exact digits, and a lone surrogate is refused
   (`InvalidRequest`). Numbers now hash by value (`1.0` as `1`, `1e3` as `1000`), and both runtimes
-  read number literals with one exact conversion (the worker's .NET Framework parser misrounds some);
+  read number literals with one exact conversion (the worker's .NET Framework parser misrounds some and never sees them);
   review diffs still report `1` to `1.0`. Non-ASCII text and `+ < > & '` stay literal. **Upgrade:**
   journals, records, captures, completed reviews, approvals and candidates, Test Suite jobs, VCI
   manifests and revisions, capture plans and saved reviews written by earlier builds keep verifying in

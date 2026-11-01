@@ -1132,8 +1132,8 @@
     },
     {
       "path": "src/TiaMcp.Core/Engineering/CanonicalJson.cs",
-      "sha256": "dffd41ce6388d33736b4ecaf0851bfb565488fd63e55c97a774756f3fab13d2e",
-      "bytes": 9084
+      "sha256": "68256b19e357becfe143b31b50b11982d5cf0a31ab855a7c1f6d1fe3e52cffd2",
+      "bytes": 9699
     },
     {
       "path": "src/TiaMcp.Core/Engineering/CanonicalJsonText.cs",
@@ -1187,8 +1187,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
-      "sha256": "4f54f971dbc961969412da23e22024081e7dd216452d74b87bfbf7afa86a0b5f",
-      "bytes": 38292
+      "sha256": "b9564939116cb175b850256151c5c47a287b99659114f42762017ee09510c971",
+      "bytes": 39188
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringExternalEvidence.cs",
@@ -2342,8 +2342,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/CanonicalJson.cs",
-      "sha256": "026e3ec5bf706bfd106cbd24953c6460e6f54caf872b5e8661cbfd71c2401da0",
-      "bytes": 5479
+      "sha256": "c3b5dd456de11fa5bf1f0c9609c2a01ff6d118ed102107e9a0bda3250ef53fd6",
+      "bytes": 7295
     },
     {
       "path": "src/TiaMcp.Openness.V21/CapabilityRules.cs",
@@ -5731,8 +5731,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -8191,8 +8191,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
@@ -10460,8 +10460,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -17428,8 +17428,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -18615,8 +18615,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
@@ -21001,8 +21001,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
@@ -21980,8 +21980,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -24563,8 +24563,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
@@ -33214,8 +33214,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
@@ -38305,8 +38305,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
@@ -43368,8 +43368,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -44902,8 +44902,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -54814,8 +54814,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Read",
-          "line": 375,
-          "endLine": 376,
+          "line": 389,
+          "endLine": 390,
           "sha256": "990f96c4524931e44efbc536a28388d0124a51d2e2858051675c8a375a53566a"
         },
         {
@@ -72838,8 +72838,8 @@
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
           "name": "Compare",
-          "line": 278,
-          "endLine": 284,
+          "line": 279,
+          "endLine": 285,
           "sha256": "f25a14a87a6868e0647e4f15cddb836900b4685a072206ed8609935480cbf4bc"
         },
         {
