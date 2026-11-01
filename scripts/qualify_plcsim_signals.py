@@ -233,6 +233,8 @@ def body(h):
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MAIN_SOURCE, "expectedBlockNames": ["Main"]})
 
     creation = uuid.uuid4().hex
+    # Before registration: the Runtime Manager publishes one all-zero Softbus placeholder, which provisioning excludes only against this baseline.
+    h.stage("discovery baseline", lambda: h.tool("simulation_discovery_baseline", {}))
     created = h.stage("sim_create", lambda: h.tool("sim_create", {"cpuType": "CPU1511", "creationId": creation}))
     lab.instance = verify_owned_instance(created["instance"])
     released, foreign, failed = False, {}, True
