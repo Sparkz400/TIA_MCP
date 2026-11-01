@@ -12,14 +12,19 @@ public sealed partial class TranslationWorkflowStore
 {
     // Trusted library seam only. The ten offline MCP tools neither call this nor
     // accept native observations. Approval still comes only from the durable review.
-    internal TranslationImportCandidate NativeCandidate(string candidateRef, string exactReceiptSha256)
+    // An admitted import reads its candidate in the form it was written with; a new import binds the current form.
+    internal TranslationImportCandidate NativeCandidate(string candidateRef, string exactReceiptSha256) =>
+        CanonicalJson.Compatible(() => NativeCandidateExact(candidateRef, exactReceiptSha256));
+    internal TranslationImportCandidate PendingNativeCandidate(string candidateRef, string exactReceiptSha256) =>
+        CanonicalJson.Current(() => NativeCandidateExact(candidateRef, exactReceiptSha256), PreparedBefore);
+    private TranslationImportCandidate NativeCandidateExact(string candidateRef, string exactReceiptSha256)
     {
         using var gate = retained.Lock();
         var candidate = RequireKind(retained.Load(candidateRef), "candidate");
         Require(candidate.RecordSha256 == exactReceiptSha256, "ReviewApprovalMismatch", "Bind the exact completed candidate receipt.");
         var review = RequireKind(retained.Load(Text(candidate.Metadata, "reviewRef")), "review");
         var approval = RequireKind(retained.Load(TranslationRetention.Reference("approval", review.Id)), "approval");
-        var (baseline, batch, _) = VerifiedReview(review);
+        var (baseline, batch, _) = VerifiedReviewExact(review);
         Require(Text(candidate.Metadata, "approvalSha256") == approval.RecordSha256 &&
             Text(approval.Metadata, "reviewRef") == TranslationRetention.Reference(review) &&
             Text(approval.Metadata, "reviewSha256") == Text(review.Metadata, "reviewSha256"),

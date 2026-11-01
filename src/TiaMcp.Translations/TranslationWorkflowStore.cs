@@ -157,9 +157,10 @@ public sealed partial class TranslationWorkflowStore
             "ExplicitTranslationApprovalRequired", "Caller must explicitly approve every change in this exact complete review and identify the reviewer.");
         var review = RequireKind(retained.Load(reviewRef), "review");
         Require(Text(review.Metadata, "reviewSha256") == exactReviewSha256, "ReviewApprovalMismatch", "Approval must name the exact unapproved review digest shown to the caller.");
-        var (workbook, batch, report) = VerifiedReview(review);
+        bool replay = retained.Exists("approval", review.Id);
+        var (workbook, batch, report) = replay ? VerifiedReview(review) : PendingReview(review);
         Require(BlockingIssues(report) == 0, "TranslationReviewBlocked", "Resolve review errors in a new review before approval.");
-        if (retained.Exists("approval", review.Id))
+        if (replay)
         {
             var existing = retained.Load(Reference("approval", review.Id));
             Require(Text(existing.Metadata, "reviewer") == reviewer && Text(existing.Metadata, "reviewSha256") == exactReviewSha256,
@@ -188,16 +189,11 @@ public sealed partial class TranslationWorkflowStore
         var approval = retained.Load(Reference("approval", review.Id));
         Require(approval.RecordSha256 == approvalSha256 && Text(approval.Metadata, "reviewRef") == reviewRef &&
             Text(approval.Metadata, "reviewSha256") == exactReviewSha256, "ReviewApprovalMismatch", "Candidate request does not match this review's retained approval.");
-        var (workbook, batch, _) = VerifiedReview(review);
-        // This Host-generated file has already passed its immutable receipt hash.
-        // Reviewer annotations can exceed the external 16 MiB input budget.
-        var approved = System.Text.Json.JsonSerializer.Deserialize<TranslationProposalBatch>(retained.Read(approval, "approved-proposals.json"), TranslationJson.Options)!;
-        var expected = batch with { Edits = batch.Edits.Select(e => e with { Approved = true, Reviewer = Text(approval.Metadata, "reviewer") }).ToArray() };
-        Require(HashJson(approved) == HashJson(expected), "TranslationIntegrityFailure", "Approved edits differ from the caller-approved proposals.");
-        var candidate = TranslationReview.BuildCandidate(workbook, workbook, approved.Edits, Text(approval.Metadata, "approvedReviewSha256"), approved.Options);
-        Require(HashJson(candidate.Manifest["review"]) == HashJson(ReadObject(approval, "approved-review.json")),
-            "TranslationIntegrityFailure", "Retained approved review differs from recomputed candidate review.");
-        if (retained.Exists("candidate", review.Id)) return Summary(retained.Load(Reference("candidate", review.Id)));
+        // A completed candidate replays in the form it was written with; a new one needs the current form.
+        bool replay = retained.Exists("candidate", review.Id);
+        var (workbook, candidate) = replay ? CanonicalJson.Compatible(() => ApprovedCandidate(review, approval))
+            : CanonicalJson.Current(() => ApprovedCandidate(review, approval), PreparedBefore);
+        if (replay) return Summary(retained.Load(Reference("candidate", review.Id)));
         var manifest = candidate.Manifest;
         var handoff = NativeHandoff(workbook, review, approval, manifest);
         var record = retained.Publish("candidate", review.Id, new JsonObject
@@ -211,6 +207,20 @@ public sealed partial class TranslationWorkflowStore
             ["candidate.xlsx"] = candidate.Bytes, ["candidate-manifest.json"] = JsonBytes(manifest), ["native-handoff.json"] = JsonBytes(handoff)
         }, approval);
         return Summary(record);
+    }
+
+    private (TranslationWorkbook Workbook, TranslationCandidate Candidate) ApprovedCandidate(TranslationRecord review, TranslationRecord approval)
+    {
+        var (workbook, batch, _) = VerifiedReviewExact(review);
+        // This Host-generated file has already passed its immutable receipt hash.
+        // Reviewer annotations can exceed the external 16 MiB input budget.
+        var approved = System.Text.Json.JsonSerializer.Deserialize<TranslationProposalBatch>(retained.Read(approval, "approved-proposals.json"), TranslationJson.Options)!;
+        var expected = batch with { Edits = batch.Edits.Select(e => e with { Approved = true, Reviewer = Text(approval.Metadata, "reviewer") }).ToArray() };
+        Require(HashJson(approved) == HashJson(expected), "TranslationIntegrityFailure", "Approved edits differ from the caller-approved proposals.");
+        var candidate = TranslationReview.BuildCandidate(workbook, workbook, approved.Edits, Text(approval.Metadata, "approvedReviewSha256"), approved.Options);
+        Require(HashJson(candidate.Manifest["review"]) == HashJson(ReadObject(approval, "approved-review.json")),
+            "TranslationIntegrityFailure", "Retained approved review differs from recomputed candidate review.");
+        return (workbook, candidate);
     }
 
     public JsonObject Reconcile(string baselineCaptureRef, string editedWorkbookArtifactRef, string currentCaptureRef)
@@ -286,9 +296,13 @@ public sealed partial class TranslationWorkflowStore
         { return new JsonObject { ["recordRef"] = Reference(kind, id), ["state"] = "incomplete", ["nativeImportAllowed"] = false }; }
     }
 
-    // An approval binds the review hash, so a review prepared before RFC 8785 is prepared again.
+    // A review retained before RFC 8785 stays readable, and completed steps replay, in the form it was written with.
     private (TranslationWorkbook Workbook, TranslationProposalBatch Batch, JsonObject Report) VerifiedReview(TranslationRecord review) =>
-        CanonicalJson.Current(() => VerifiedReviewExact(review), "This translation review was prepared before RFC 8785 canonical hashing (1 November 2026); prepare a new review from its capture.");
+        CanonicalJson.Compatible(() => VerifiedReviewExact(review));
+    // A new approval, candidate or import binds the review hash, so a review prepared before RFC 8785 is prepared again.
+    private const string PreparedBefore = "This translation review was prepared before RFC 8785 canonical hashing (1 November 2026); prepare a new review from its capture.";
+    private (TranslationWorkbook Workbook, TranslationProposalBatch Batch, JsonObject Report) PendingReview(TranslationRecord review) =>
+        CanonicalJson.Current(() => VerifiedReviewExact(review), PreparedBefore);
     private (TranslationWorkbook Workbook, TranslationProposalBatch Batch, JsonObject Report) VerifiedReviewExact(TranslationRecord review)
     {
         var capture = RequireKind(retained.Load(Text(review.Metadata, "captureRef")), "capture");
@@ -301,14 +315,14 @@ public sealed partial class TranslationWorkflowStore
         return (workbook, batch, report);
     }
 
-    // A capture is a native observation; one retained before RFC 8785 verifies in the form it was written with.
-    private TranslationWorkbook OpenCapture(TranslationRecord record) => CanonicalJson.Compatible(() => OpenCaptureExact(record));
-    private TranslationWorkbook OpenCaptureExact(TranslationRecord record)
+    // The stored profile and project hashes verify in either form (a capture retained before RFC 8785 keeps
+    // working); the workbook's own hashes are then derived in the current form, like those of every new workbook.
+    private TranslationWorkbook OpenCapture(TranslationRecord record)
     {
         var profile = Parse<WorkbookProfile>(Encoding.UTF8.GetString(retained.Read(record, "profile.json")));
         var project = Parse<EngineeringObjectReference>(Encoding.UTF8.GetString(retained.Read(record, "project.json")));
         var workbook = TranslationWorkbook.Open(retained.Read(record, "original.xlsx"), profile, project, Text(record.Metadata, "workbookSha256"));
-        Require(workbook.ProfileSha256 == Text(record.Metadata, "profileSha256") && HashJson(project) == Text(record.Metadata, "projectSha256"),
+        Require(CanonicalJson.Matches(Text(record.Metadata, "profileSha256"), Node(workbook.Mapping)) && CanonicalJson.Matches(Text(record.Metadata, "projectSha256"), Node(project)),
             "TranslationIntegrityFailure", "Capture profile or project observation differs.");
         CheckMappedTextBudget(workbook);
         return workbook;

@@ -15,9 +15,10 @@ public static class TranslationInspection
         Require(pageSize is > 0 and <= 1000, "TranslationPageLimit", "Page size must be between 1 and 1000.");
         string projectHash = HashJson(workbook.Project);
         int offset = cursor?.Offset ?? 0;
+        // A cursor may carry a capture's stored hashes, which one retained before RFC 8785 holds in the earlier form.
         if (cursor is not null)
-            Require(cursor.WorkbookSha256 == workbook.WorkbookSha256 && cursor.ProfileSha256 == workbook.ProfileSha256 &&
-                cursor.ProjectSha256 == projectHash, "StaleTranslationCursor", "Resume cursor belongs to a different capture, profile or project observation.");
+            Require(cursor.WorkbookSha256 == workbook.WorkbookSha256 && CanonicalJson.Matches(cursor.ProfileSha256, Node(workbook.Mapping)) &&
+                CanonicalJson.Matches(cursor.ProjectSha256, Node(workbook.Project)), "StaleTranslationCursor", "Resume cursor belongs to a different capture, profile or project observation.");
         Require(offset >= 0 && offset <= workbook.OrderedTargets.Length, "InvalidTranslationCursor", "Resume offset is outside the captured mapped targets.");
         var rows = new JsonArray();
         int end = offset + Math.Min(pageSize, workbook.OrderedTargets.Length - offset);

@@ -20,8 +20,25 @@ namespace TiaMcp.Openness.V21
             return output.ToString();
         }
 
-        internal static string Sha256(JToken token)
-        { using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(Serialize(token)))).Replace("-", "").ToLowerInvariant(); }
+        internal static string Sha256(JToken token) => Hex(Serialize(token));
+
+        // Workers before RFC 8785 (1 November 2026) hashed ordinal-sorted compact Newtonsoft JSON; values they
+        // stored (admission observations, reserved manifests, source snapshots) still verify against it.
+        internal static string LegacySha256(JToken token)
+        {
+            JToken Sort(JToken value)
+            {
+                if (value is JObject obj) return new JObject(obj.Properties().OrderBy(p => p.Name, StringComparer.Ordinal).Select(p => new JProperty(p.Name, Sort(p.Value))));
+                if (value is JArray array) return new JArray(array.Select(Sort));
+                return value.DeepClone();
+            }
+            return Hex(Sort(token).ToString(Formatting.None));
+        }
+
+        internal static bool Matches(string stored, JToken token) => stored != null && (stored == Sha256(token) || stored == LegacySha256(token));
+
+        private static string Hex(string text)
+        { using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-", "").ToLowerInvariant(); }
 
         private static void Write(StringBuilder output, JToken token, int depth)
         {
@@ -59,5 +76,26 @@ namespace TiaMcp.Openness.V21
         { if (!CanonicalJsonText.TryAppendString(output, value)) throw Invalid("Canonical JSON refuses a lone surrogate."); }
 
         private static BridgeException Invalid(string message) => new BridgeException("InvalidRequest", message);
+    }
+
+    // Reads one request line. .NET Framework's double.Parse misrounds some literals (2.2250738585072012e-308, long
+    // halfway mantissas), so each float is re-read exactly from its text, as the Host reads the same literal.
+    internal sealed class ExactNumberReader : JsonTextReader
+    {
+        private readonly string _line;
+        internal ExactNumberReader(string line) : base(new System.IO.StringReader(line)) { _line = line; }
+
+        public override bool Read()
+        {
+            bool read = base.Read();
+            if (read && TokenType == JsonToken.Float)
+            {
+                int end = LinePosition, start = end; // one line: the position just after the literal
+                while (start > 0 && "0123456789+-.eE".IndexOf(_line[start - 1]) >= 0) start--;
+                double? exact = CanonicalJsonText.ParseNumber(_line.Substring(start, end - start));
+                if (exact.HasValue) SetToken(JsonToken.Float, exact.Value, false);
+            }
+            return read;
+        }
     }
 }

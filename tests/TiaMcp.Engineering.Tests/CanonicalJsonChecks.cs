@@ -64,6 +64,26 @@ internal static class CanonicalJsonChecks
             passed++;
         }
 
+        // The exact literal reader both runtimes use agrees with .NET's correctly rounded double.Parse, including long
+        // mantissas near halfway points and subnormals, which .NET Framework's parser misrounds.
+        for (int i = 0; i < 3000; i++)
+        {
+            string literal = (random.Next(2) == 0 ? "-" : "") + random.Next(1, 10) + "." + string.Concat(Enumerable.Range(0, random.Next(1, 40)).Select(_ => random.Next(10))) + "e" + random.Next(-330, 310);
+            double expected = double.Parse(literal, CultureInfo.InvariantCulture);
+            double? parsed = CanonicalJsonText.ParseNumber(literal);
+            if (double.IsInfinity(expected) ? parsed is not null : BitConverter.DoubleToInt64Bits(parsed!.Value) != BitConverter.DoubleToInt64Bits(expected))
+                throw new Exception("Exact literal reading differs from .NET: " + literal);
+            passed++;
+        }
+        foreach (double value in samples)
+            Check(CanonicalJsonText.ParseNumber(CanonicalJsonText.Number(value)!) == value && CanonicalJsonText.ParseNumber(value.ToString("R", CultureInfo.InvariantCulture)) == value, "Number text reads back exactly");
+        Check(CanonicalJsonText.ParseNumber("1e400") is null && CanonicalJsonText.ParseNumber("2.4703282292062327e-324") == 0 &&
+            CanonicalJsonText.ParseNumber("2.2250738585072012e-308") == double.Parse("2.2250738585072014e-308", CultureInfo.InvariantCulture), "Range and rounding edges");
+
+        // Diffs keep exact number text even though hashes compare numbers by value.
+        Check(!CanonicalJson.ExactlyEqual(JsonNode.Parse("[1]")!, JsonNode.Parse("[1.0]")!) && CanonicalJson.ExactlyEqual(JsonNode.Parse("{\"a\":1}")!, JsonNode.Parse("{ \"a\" : 1 }")!),
+            "A changed observation of 1 to 1.0 is still a change");
+
         // Hashes stored before RFC 8785 still verify; new hashes differ only where the old form escaped or kept number text.
         var stored = new JsonObject { ["recordedAt"] = "2026-10-31T12:00:00+00:00", ["path"] = "D:\\Anlage\\Süd", ["n"] = 1 };
         string legacy = CanonicalJson.LegacySerialize(stored);
@@ -76,6 +96,11 @@ internal static class CanonicalJsonChecks
         Check(CanonicalJson.Compatible(Verify) == 1 && CanonicalJson.Sha256(stored) != legacyHash, "Retained state re-derives in its earlier form, then the current form resumes");
         Reject(() => CanonicalJson.Current(Verify, "prepare again"), CanonicalJson.FormChanged, "A pending review in the earlier form is refused with its own code");
         Reject(() => CanonicalJson.Compatible<int>(() => throw new BridgeException("ArtifactChanged", "Changed in both forms.")), "ArtifactChanged", "Changed content keeps its own refusal");
+        // A transient failure on content both forms write alike is never relabelled, even when the retry passes.
+        var plain = JsonNode.Parse("{\"a\":\"plain\",\"n\":[1,2]}")!; string plainHash = CanonicalJson.Sha256(plain); int calls = 0;
+        int Flaky() => ++calls == 1 ? throw new BridgeException("StoreBusy", "Transient.") : CanonicalJson.Sha256(plain) == plainHash ? 1 : 0;
+        Reject(() => CanonicalJson.Current(Flaky, "prepare again"), "StoreBusy", "A transient failure of a current-form review keeps its code");
+        calls = 0; Reject(() => CanonicalJson.Compatible(Flaky), "StoreBusy", "Compatible does not mask a transient failure as an earlier form");
         var ascii = JsonNode.Parse("{\"b\":[1,true,null],\"a\":\"plain\"}")!;
         Check(CanonicalJson.Sha256(ascii) == CanonicalJson.LegacySha256(ascii), "Plain ASCII content keeps its hash");
         Console.WriteLine($"PASS RFC 8785 canonical JSON: {passed} checks, {vectors["cases"]!.AsArray().Count} shared vectors; no native execution.");

@@ -87,6 +87,51 @@ namespace TiaMcp.Core.Engineering
             return belowFits ? below : aboveFits ? below + 1 : (BigInteger?)null;
         }
 
+        // The double nearest to a JSON number literal (ties to even), computed exactly: .NET Framework's double.Parse
+        // misrounds some literals (2.2250738585072012e-308, long halfway mantissas). Null beyond the double range.
+        public static double? ParseNumber(string literal)
+        {
+            int i = 0; bool negative = literal.Length > 0 && literal[0] == '-'; if (negative) i++;
+            var digits = new StringBuilder(); long exponent = 0;
+            for (; i < literal.Length && literal[i] >= '0' && literal[i] <= '9'; i++) digits.Append(literal[i]);
+            if (i < literal.Length && literal[i] == '.')
+                for (i++; i < literal.Length && literal[i] >= '0' && literal[i] <= '9'; i++) { digits.Append(literal[i]); exponent--; }
+            if (i < literal.Length && (literal[i] == 'e' || literal[i] == 'E'))
+            {
+                string text = literal.Substring(i + 1).TrimStart('+');
+                bool down = text.StartsWith("-", StringComparison.Ordinal); text = text.TrimStart('-').TrimStart('0');
+                long value = text.Length == 0 ? 0 : text.Length > 9 ? 1000000000 : long.Parse(text, CultureInfo.InvariantCulture);
+                exponent += down ? -value : value; i = literal.Length;
+            }
+            string significant = digits.ToString().TrimStart('0');
+            if (i != literal.Length || digits.Length == 0) throw new FormatException("Not a JSON number: " + literal);
+            if (significant.Length == 0 || significant.Length + exponent < -324) return negative ? -0.0 : 0.0;
+            if (significant.Length + exponent > 310) return null;
+            BigInteger numerator = BigInteger.Parse(significant, CultureInfo.InvariantCulture), denominator = BigInteger.One;
+            if (exponent >= 0) numerator *= Ten((int)exponent); else denominator = Ten((int)-exponent);
+            // value = numerator / denominator = q * 2^e with 2^52 <= q < 2^53, or a subnormal at e = -1074.
+            int e = (int)Math.Floor(BigInteger.Log(numerator, 2) - BigInteger.Log(denominator, 2)) - 52;
+            BigInteger q, remainder, scaled;
+            while (true)
+            {
+                if (e < -1074) e = -1074;
+                BigInteger n = e >= 0 ? numerator : numerator << -e; scaled = e >= 0 ? denominator << e : denominator;
+                q = BigInteger.DivRem(n, scaled, out remainder);
+                if (q >= Two53) { e++; continue; }
+                if (q < Two52 && e > -1074) { e--; continue; }
+                break;
+            }
+            int half = (remainder * 2).CompareTo(scaled);
+            if (half > 0 || half == 0 && !q.IsEven) q++;
+            if (q == Two53) { q = Two52; e++; }
+            if (e > 971) return null;
+            long bits = q < Two52 ? (long)q : (long)(e + 1075) << 52 | (long)(q - Two52);
+            double result = BitConverter.Int64BitsToDouble(bits);
+            return negative ? -result : result;
+        }
+
+        private static readonly BigInteger Two52 = BigInteger.One << 52, Two53 = BigInteger.One << 53;
+
         private static bool RoundsBack(BigInteger c, int q, BigInteger low, BigInteger high, int e, bool even)
         {
             int above = Compare(c, q, low, e - 2), below = Compare(c, q, high, e - 2);
