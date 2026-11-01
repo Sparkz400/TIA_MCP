@@ -1177,8 +1177,8 @@
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
-      "sha256": "1efcedc630333e5c58b9c709beb67be76c533ebf3ece890109cbebeee3c5c1a1",
-      "bytes": 31033
+      "sha256": "af4c7444edd3c6dc3552464fd5ece864cd5ec7878898c904aa3286c9f9688d2c",
+      "bytes": 31244
     },
     {
       "path": "src/TiaMcp.Core/EngineeringJobs/ComponentWindowEvidence.cs",
@@ -1327,8 +1327,8 @@
     },
     {
       "path": "src/TiaMcp.Core/JournalFileReplacement.cs",
-      "sha256": "f9ec12fe2c82649795e87f99e846efd56b162524517e433a96eeef83024bb1ae",
-      "bytes": 1673
+      "sha256": "18efc270744e71f5f89aa92561da133907395538876382890d1d501c9392fc88",
+      "bytes": 2457
     },
     {
       "path": "src/TiaMcp.Core/MultiuserReviewStore.cs",
@@ -1352,8 +1352,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PackageStorage.cs",
-      "sha256": "fa4d717d342aeb0f424c9e9120341cdc83ad99306db1ce9426c90cf260be9e05",
-      "bytes": 11997
+      "sha256": "7bdf59f8fa875262121a555e7da9182c27d1260add6eb10e8805e86ffc7680a6",
+      "bytes": 12254
     },
     {
       "path": "src/TiaMcp.Core/PackageStore.cs",
@@ -1687,8 +1687,8 @@
     },
     {
       "path": "src/TiaMcp.Core/VersionControl/VciWorkspaceStore.cs",
-      "sha256": "ea5b143a99497be3b56b6916c76431526d4a8432ca9035068246e6250425bdfc",
-      "bytes": 43422
+      "sha256": "3589f3832e1391cbbc6548d7e6d1b53ff6f6a04c26cdc7cb155bbea0b5bb6724",
+      "bytes": 43579
     },
     {
       "path": "src/TiaMcp.Core/WatchTables/WatchAuthoringProfile.cs",
@@ -2082,8 +2082,8 @@
     },
     {
       "path": "src/TiaMcp.Host/Security/CredentialVault.cs",
-      "sha256": "2235885c20922041dde3618c8fb32345485c5d4e4e32384cd354c2188863b91d",
-      "bytes": 18711
+      "sha256": "25d9b500c411465d4689a10ad9dc03c3f8c3b56d5ead66c6f5203bc01db17e64",
+      "bytes": 18861
     },
     {
       "path": "src/TiaMcp.Host/Security/UaClientIdentityCommand.cs",
@@ -3267,8 +3267,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationCreationJournal.cs",
-      "sha256": "11898076638f43662b42811bf5c926f3cb74e9525367d75fe4d116814d45b50c",
-      "bytes": 6953
+      "sha256": "c55df1583bb3a43b0555e2adeeb4ae3403b829419cdbf371c754552d4387da6e",
+      "bytes": 7105
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationPowerOnFailure.cs",
@@ -6712,8 +6712,8 @@
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
           "line": 357,
-          "endLine": 364,
-          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
+          "endLine": 365,
+          "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
@@ -17737,8 +17737,8 @@
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
           "line": 357,
-          "endLine": 364,
-          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
+          "endLine": 365,
+          "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
@@ -42321,8 +42321,8 @@
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
           "line": 357,
-          "endLine": 364,
-          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
+          "endLine": 365,
+          "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
@@ -43494,8 +43494,8 @@
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
           "line": 357,
-          "endLine": 364,
-          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
+          "endLine": 365,
+          "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
@@ -58006,8 +58006,8 @@
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
           "line": 357,
-          "endLine": 364,
-          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
+          "endLine": 365,
+          "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",
@@ -61370,8 +61370,8 @@
           "path": "src/TiaMcp.Core/EngineeringJobs/ComponentQualificationWindowStore.cs",
           "name": "Write",
           "line": 357,
-          "endLine": 364,
-          "sha256": "d1b3c9aa36672c31ffb3b95fe3603a3e118419e2d139043b33572ec2d5c0bca6"
+          "endLine": 365,
+          "sha256": "e0d0e82b48323f292c9ffb3f64bc19bb2081f3e8dfc8d9c01e262f4d17af2c23"
         },
         {
           "path": "src/TiaMcp.Core/EngineeringJobs/EngineeringMutationAdmissionStore.cs",

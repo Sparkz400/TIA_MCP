@@ -577,8 +577,9 @@ public sealed partial class VciWorkspaceStore
             Require(binding is not null && record.BindingSha256 == binding.Sha256 && record.RepositoryRoot == binding.RepositoryRoot &&
                 record.Operation == binding.Operation && (latest is null || record.OperationId == latest.OperationId), "VciJournalMismatch", "Callback differs from admitted local intent.");
             Require(Allowed(binding.Operation, latest?.Phase, record.Phase), "VciJournalSequence", "Invalid callback sequence.");
-            string path = Path.Combine(directory, (++sequence).ToString("D4") + ".json");
-            Publish(path, new { sequence, previousSha256 = previous, record }); previous = PackageStorage.FileHash(path); latest = record;
+            // The number advances only once its record is published, so a later outcomeUnknown takes the slot of a failed one.
+            string path = Path.Combine(directory, (sequence + 1).ToString("D4") + ".json");
+            Publish(path, new { sequence = sequence + 1, previousSha256 = previous, record }); sequence++; previous = PackageStorage.FileHash(path); latest = record;
             return Task.CompletedTask;
         }
     }
