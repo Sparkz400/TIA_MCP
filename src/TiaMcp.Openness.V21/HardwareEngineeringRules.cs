@@ -353,6 +353,10 @@ namespace TiaMcp.Openness.V21
                             continue;
                         }
                         if (owners.Count > 1 || owners.Any(owner => !ownersAfter.Contains(owner.Value<string>()))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
+                        // An unaddressed range (start -1, no owner; an I-device GSD's transfer areas) takes a start in the assigned PLC's address space.
+                        if (!disconnect && previousOwners.Count == 0 && addresses[i].Value<long?>("startAddress") == -1 && owners.Count == 1 && owners[0].Value<string>() == selectedOwner &&
+                            JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) && JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
+                            addresses[i]["startAddress"] = seen[i]["startAddress"].DeepClone();
                         addresses[i]["owners"] = owners.DeepClone();
                     }
                     // A named item takes the selected PLC as its assignment target; its subitems keep theirs or follow it.

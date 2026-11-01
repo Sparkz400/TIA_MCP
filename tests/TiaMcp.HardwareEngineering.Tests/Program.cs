@@ -143,6 +143,9 @@ Check("shared ownership rejected", "network_io_assign", assign, rows => { Assign
 Check("preexisting foreign ownership rejected", "network_io_assign", assign, Assigned, false, rows => rows[1]["addresses"][0]["owners"] = new JArray("/other"));
 Check("another assigned station interface rejected", "network_io_assign", assign, Assigned, false, rows => rows[0]["network"] = new JObject { ["connectors"] = new JArray(new JObject { ["index"] = 0, ["system"] = SystemRef() }) });
 Check("assignment address relocation rejected", "network_io_assign", assign, rows => { Assigned(rows); rows[1]["addresses"][0]["startAddress"] = 20; }, false);
+void Unaddressed(JArray rows) => rows[1]["addresses"][0]["startAddress"] = -1;
+Check("unaddressed range takes its start with the assigned PLC", "network_io_assign", assign, rows => { Assigned(rows); rows[1]["addresses"][0]["startAddress"] = 0; }, true, Unaddressed);
+Check("unaddressed range taking a start without an owner rejected", "network_io_assign", assign, rows => { rows[3]["network"]["connectors"][0]["system"] = SystemRef(); rows[1]["addresses"][0]["startAddress"] = 0; }, false, Unaddressed);
 var create = (JObject)assign.DeepClone(); create["createIoSystemName"] = "Io";
 Check("create exact controller system", "network_io_assign", create, rows => { Assigned(rows); rows[2]["network"]["controllers"][0]["system"] = SystemRef(); }, true,
     rows => rows[2]["network"]["controllers"][0]["system"] = new JObject { ["state"] = "notAssigned" });
