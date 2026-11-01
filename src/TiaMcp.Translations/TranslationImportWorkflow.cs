@@ -41,7 +41,7 @@ public sealed class TranslationImportWorkflow
     public EngineeringOperationRecord Prepare(string candidateRef, string candidateReceiptSha256,
         TranslationImportObservation observed, string idempotencyKey)
     {
-        var candidate = workflow.NativeCandidate(candidateRef, candidateReceiptSha256);
+        var candidate = workflow.PendingNativeCandidate(candidateRef, candidateReceiptSha256);
         ValidateCandidateShape(candidate);
         var baseline = RetainObservation(observed);
         VerifyReceipt(baseline);

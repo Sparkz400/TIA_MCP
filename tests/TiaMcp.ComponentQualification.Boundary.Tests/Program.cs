@@ -103,9 +103,13 @@ internal static class Program
                 string text = new string(units.Select(u => (char)(int)u).ToArray());
                 input = (string)vector["as"] == "key" ? new JObject { [text] = 1 } : (JToken)new JValue(text);
             }
-            else // Read as the worker reads requests (Program.cs), with a deeper bound so the depth cases reach the canonical limit.
-                using (var reader = new JsonTextReader(new StringReader((string)vector["input"])) { MaxDepth = 256, DateParseHandling = DateParseHandling.None })
+            else // Read with the worker's own request reader (Program.cs), with a deeper bound so the depth cases reach the canonical limit.
+                using (var reader = (JsonTextReader)Activator.CreateInstance(worker.GetType("TiaMcp.Openness.V21.ExactNumberReader", true),
+                    BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { (string)vector["input"] }, null))
+                {
+                    reader.MaxDepth = 256; reader.DateParseHandling = DateParseHandling.None;
                     input = JToken.ReadFrom(reader);
+                }
             try
             {
                 string text = (string)serialize.Invoke(null, new object[] { input }), digest = (string)sha256.Invoke(null, new object[] { input });
@@ -119,7 +123,19 @@ internal static class Program
             }
             passed++;
         }
-        Console.WriteLine("PASS worker RFC 8785 canonical JSON: " + passed + " shared vectors");
+        // Values an earlier worker stored (admission observations, reserved manifests, source snapshots) used ordinal-sorted
+        // compact Newtonsoft JSON, which escapes U+2028 and writes 1.0 for a double; they still verify.
+        var legacy = canonical.GetMethod("LegacySha256", BindingFlags.Static | BindingFlags.NonPublic);
+        var matches = canonical.GetMethod("Matches", BindingFlags.Static | BindingFlags.NonPublic);
+        string Digest(string text) { using (var sha = System.Security.Cryptography.SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(text))).Replace("-", "").ToLowerInvariant(); }
+        var observed = new JObject { ["b"] = 1.0, ["a"] = "\u2028" };
+        string earlier = Digest("{\"a\":\"\\u2028\",\"b\":1.0}"), current = Digest("{\"a\":\"\u2028\",\"b\":1}");
+        if ((string)legacy.Invoke(null, new object[] { observed }) != earlier || (string)sha256.Invoke(null, new object[] { observed }) != current ||
+            !(bool)matches.Invoke(null, new object[] { earlier, observed }) || !(bool)matches.Invoke(null, new object[] { current, observed }) ||
+            (bool)matches.Invoke(null, new object[] { Digest("{}"), observed }))
+            throw new Exception("Worker hashes stored before RFC 8785 must still verify, and only those.");
+        passed++;
+        Console.WriteLine("PASS worker RFC 8785 canonical JSON: " + (passed - 1) + " shared vectors and the earlier stored form");
         return passed;
     }
 }

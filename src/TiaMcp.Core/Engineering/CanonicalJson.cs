@@ -14,10 +14,22 @@ public static class CanonicalJson
 {
     /// <summary>Refusal for a pending review prepared before RFC 8785 (1 November 2026): prepare it again.</summary>
     public const string FormChanged = "CanonicalFormChanged";
-    // Set only while Compatible or Current re-derives a retained artifact the way an earlier build wrote it.
-    [ThreadStatic] private static bool legacy;
+    // Set only while Compatible or Current re-derives a retained artifact the way an earlier build wrote it;
+    // differed records whether that re-derivation serialized anything the two forms write differently.
+    [ThreadStatic] private static bool legacy, differed;
 
-    public static string Serialize(JsonNode node) => legacy ? LegacySerialize(node) : Rfc8785(node);
+    public static string Serialize(JsonNode node)
+    {
+        if (!legacy) return Rfc8785(node);
+        string earlier = LegacySerialize(node);
+        if (!differed)
+            try { differed = Rfc8785(node) != earlier; } catch (BridgeException) { differed = true; }
+        return earlier;
+    }
+
+    /// <summary>Exact JSON equality, number text included (<c>1</c> differs from <c>1.0</c>): for diffs that report
+    /// a changed observation, unlike a hash, which compares numbers by value.</summary>
+    public static bool ExactlyEqual(JsonNode a, JsonNode b) => LegacySerialize(a) == LegacySerialize(b);
 
     public static string Sha256(JsonNode node) => Hex(Serialize(node));
 
@@ -33,7 +45,8 @@ public static class CanonicalJson
 
     /// <summary>Reopens durable state (a job's review, a retained report or manifest, an admitted import) that
     /// re-derives its hashes or bytes. If that fails, it is re-derived once more in the pre-RFC 8785 form on this
-    /// thread, so state an earlier build wrote verifies exactly as written. If both fail, the first refusal stands.
+    /// thread, so state an earlier build wrote verifies exactly as written. The first refusal stands when both
+    /// fail, and also when the content serializes the same in both forms: then the form did not cause it.
     /// <paramref name="read"/> must only read.</summary>
     public static T Compatible<T>(Func<T> read)
     {
@@ -47,7 +60,8 @@ public static class CanonicalJson
     }
 
     /// <summary>Reopens a pending review whose approval must bind the current form. A review that verifies only in
-    /// the pre-RFC 8785 form is refused with <see cref="FormChanged"/> instead of its usual mismatch code.</summary>
+    /// the pre-RFC 8785 form, and only because its content serializes differently there, is refused with
+    /// <see cref="FormChanged"/>; any other failure keeps its own code.</summary>
     public static T Current<T>(Func<T> read, string message)
     {
         if (legacy) return read();
@@ -58,10 +72,10 @@ public static class CanonicalJson
 
     private static bool PassesLegacy<T>(Func<T> read, out T value)
     {
-        legacy = true;
-        try { value = read(); return true; }
+        legacy = true; differed = false;
+        try { value = read(); return differed; } // passing without any difference means the first failure was not the form
         catch (BridgeException) { value = default!; return false; }
-        finally { legacy = false; }
+        finally { legacy = false; differed = false; }
     }
 
     private static string Rfc8785(JsonNode node)
@@ -135,7 +149,9 @@ public static class CanonicalJson
     private static void Number(StringBuilder output, string text)
     {
         if (text.AsSpan().IndexOfAny('.', 'e', 'E') < 0) { output.Append(BigInteger.Parse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture)); return; }
-        output.Append(CanonicalJsonText.Number(double.Parse(text, NumberStyles.Float, CultureInfo.InvariantCulture)) ?? throw Invalid("Canonical JSON refuses a number outside the double range."));
+        // The worker reads the same literal with the same exact conversion (its runtime's double.Parse misrounds some).
+        double value = CanonicalJsonText.ParseNumber(text) ?? throw Invalid("Canonical JSON refuses a number outside the double range.");
+        output.Append(CanonicalJsonText.Number(value));
     }
 
     private static BridgeException Invalid(string message) => new("InvalidRequest", message);
