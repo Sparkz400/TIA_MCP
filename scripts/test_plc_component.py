@@ -7,7 +7,7 @@ import uuid
 from unittest import mock
 from pathlib import Path
 from xml.etree import ElementTree as ET
-from qualify_plc_component import (ComponentRun, FIXTURES, ROOT, drive_component, first_available_db_number, pin, review_step, terminal_network,
+from qualify_plc_component import (ComponentRun, FIXTURES, HASH_PROBE, ROOT, drive_component, first_available_db_number, pin, review_step, terminal_network,
     verify_component_call, verify_dependency_graph, verify_preserved_installation, verify_standalone_caller, verify_explicit_source_attributes, verify_pinned_source_oracle, recovery_inputs)
 
 
@@ -572,6 +572,20 @@ class ComponentDriverTests(unittest.TestCase):
         applies = [value for kind, value in events if kind == "change_apply"]
         self.assertEqual(["library_prepared-hash", "graphical_prepared-hash"], [r["previewHash"] for r in applies])
         self.assertTrue(all(r["checkpointSave"] and r["compile"] and r["save"] for r in applies))
+
+    def test_hash_probe_joins_every_advance_request_only(self):
+        states = iter(["library_applied", "import_verified", "graphical_prepared", "graphical_applied", "installation_verified"])
+        calls = []
+        def call(tool, args):
+            calls.append((tool, copy.deepcopy(args)))
+            return self.value(next(states))
+        drive_component(call, self.value("library_prepared"), lambda _: None, lambda *_: None, HASH_PROBE)
+        advances = [args["payload"] for tool, args in calls if tool == "change_prepare"]
+        self.assertEqual(3, len(advances))
+        self.assertTrue(all(p["action"] == "advance" and p["reviewWeight"] == 1e16 and p["reviewNote"] == HASH_PROBE["reviewNote"] for p in advances))
+        self.assertTrue(all("reviewNote" not in args for tool, args in calls if tool == "change_apply"))
+        self.assertIn('"reviewWeight": 1e+16', json.dumps(HASH_PROBE))
+        self.assertIn("\\u00fc", json.dumps(HASH_PROBE))
 
     def test_lost_response_never_replays_or_restores(self):
         calls = []

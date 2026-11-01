@@ -129,13 +129,13 @@ namespace TiaMcp.Openness.V21
             return ranges;
         }
 
-        // A tag table from a master copy brings addresses nothing can read before the create, so library_instantiate refuses one while the
-        // PLC owns, or may own, any F-I/O range.
+        // A tag table from a master copy (itself, or in a unit's master copy) brings addresses nothing can read before the create, so
+        // library_instantiate and software_unit_create_from refuse one while the PLC owns, or may own, any F-I/O range.
         private static void RejectFIoMasterCopy(PlcSelection plc, string masterCopy)
         {
             if (TagAddressRules.AnyFIo(FIoAddressRanges(plc)) is string fIo)
                 throw new BridgeException("SafetyBoundary", "The tag addresses of master copy " + masterCopy + " cannot be read before it is instantiated (V21 exposes only its content names), and the PLC " +
-                    "owns or may own the F-I/O " + fIo + "; a tag there would become a safety tag, which standard tag changes exclude. Nothing was written. Import the table with " +
+                    "owns or may own the F-I/O " + fIo + "; a tag there would become a safety tag, which standard tag changes exclude. Nothing was written. Import tag tables with " +
                     "tag_table_import_xml, which checks every address.", new JObject { ["masterCopy"] = masterCopy, ["fIoPath"] = fIo });
         }
 

@@ -1553,6 +1553,10 @@ namespace TiaMcp.Openness.V21
             foreach (var type in group.Types) yield return type;
             foreach (var child in group.Groups) foreach (var type in AllPlcTypes(child, depth + 1)) yield return type;
         }
+        // Every tag, user and system constant name of a software scope's tag tables: the names TIA keeps unique per scope.
+        private static string[] ScopeSymbolNames(PlcTagTableGroup group) => group == null ? new string[0] : AllTagTables(group)
+            .SelectMany(table => table.Tags.Select(tag => tag.Name).Concat(table.UserConstants.Select(constant => constant.Name)).Concat(table.SystemConstants.Select(constant => constant.Name))).ToArray();
+
         private static System.Collections.Generic.IEnumerable<PlcTagTable> AllTagTables(PlcTagTableGroup group, int depth = 0)
         {
             if (depth > 64) throw new BridgeException("TraversalLimit", "Tag table groups exceed nesting limit.");

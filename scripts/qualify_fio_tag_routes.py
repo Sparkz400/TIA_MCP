@@ -1,5 +1,6 @@
-"""Qualify the F-I/O tag-address refusals natively (1 November audit fix) on an owned scratch F-CPU: tag_create, tag_set,
-tag_table_import_xml, vci_synchronize WorkspaceToProject and library_instantiate of a tag-table master copy.
+"""Qualify the F-I/O tag-address refusals natively (1 November audit fixes) on an owned scratch F-CPU: tag_create, tag_set,
+tag_table_import_xml, vci_synchronize WorkspaceToProject, vci_conflict_resolve take=remote, library_instantiate of a tag-table
+master copy and software_unit_create_from of a unit master copy.
 
 Fixture: the scratch's standard CPU 1511-1 PN V4.1, which owns no F-I/O, and probe_safety_kinds' CPU 1511F-1 PN, added with
 configureScratchSecurity and failsafeRuntimeAccess (its generated scratch user holds Full access including fail-safe, which
@@ -12,31 +13,43 @@ Every refusal must come from change_prepare as SafetyBoundary naming the F-DI, a
 - tag_table_import_xml of a new table FioImport with one tag there; McTags with McProbe at %M60.0 imports into the standard PLC.
 - vci_synchronize WorkspaceToProject of FioTags, mapped by export in SimaticML to a workspace outside the project and the
   artifact store, after its package was edited from %M40.0 to %I<start>.0; edited to %M41.0, it applies.
+- vci_conflict_resolve take=remote of FioTags, a reviewed two-sided conflict: FioTags' package is committed and pushed to the
+  Host's --git-remote (a local bare repository), another engineer moves FioProbe onto %I<start>.0 in a clone and pushes,
+  FioProbe moves to %M42.0 in the project, and after vci_fetch, three vci_package_capture records, a vci_package_compare
+  divergentChange row and the checkout of the fetched package into the workspace, the resolution must refuse.
 - library_instantiate of a master copy of McTags into the F-PLC; into the standard PLC, after its own McProbe and McTags
   were deleted, it applies and McTags reads back with McProbe. (Renaming the table instead left McProbe in the PLC, and
-  TIA then created the master copy's tag as McProbe(1), run fr_eeb8be6f.)
+  TIA then created the master copy's tag as McProbe(1), run fr_eeb8be6f; qualify_master_copy_tag_collision.py covers it.)
+- software_unit_create_from of a master copy of the standard PLC's empty unit FioUnit into the F-PLC; into the standard PLC,
+  after FioUnit was deleted there, it applies.
 Last, a probe records whether a tag table mapped in each other VCI format still synchronizes project-ward after a
 bit-memory edit (the F-I/O rule reads the package as SimaticML).
 """
 from __future__ import annotations
 
 import argparse
+import json
+import os
 from pathlib import Path
+import subprocess
+from types import SimpleNamespace
 
 from library_native_harness import Harness, require
 from probe_safety_kinds import FDI, STATION, catalog, change, topology
 from probe_safety_logic import input_start
 from probe_wave_kinds import attempt, error_of, probe
-from qualify_access_changes import files_under
+from qualify_access_changes import files_under, upload
 from qualify_typed_resolution import tag_fixture
+from qualify_vci_mappings import commit, download, plain_git, prepare_files, push, sha
 from typed_graphical_transport import artifact_bytes
 
-FIO_TABLE, PROBE_TAG, MC_TABLE, MC_TAG, SD_TABLE = "FioTags", "FioProbe", "McTags", "McProbe", "SdTags"
+FIO_TABLE, PROBE_TAG, MC_TABLE, MC_TAG, SD_TABLE, UNIT = "FioTags", "FioProbe", "McTags", "McProbe", "SdTags", "FioUnit"
 WORKSPACE = "FioVci"
 LIMITATIONS = [
     "One owned scratch with a standard CPU 1511-1 PN V4.1 and a CPU 1511F-1 PN whose ET 200SP station carries two F-DI 8x24VDC HF; "
     "addresses in the first F-DI's input range only. F-output, ET 200MP and other F-module ranges are not exercised.",
-    "vci_conflict_resolve's project-ward route and block or SCL imports with absolute operands are not exercised.",
+    "vci_conflict_resolve runs take=remote only, against a local bare Git remote; take=merged and block or SCL imports with absolute operands are not exercised.",
+    "software_unit_create_from copies an empty unit (its default tag table only) within the project library; unit master copies holding tags are not exercised.",
     "The F-CPU's generated scratch user holds Full access including fail-safe (owned scratch only); no safety login, password or download.",
 ]
 
@@ -113,7 +126,10 @@ def body(h):
     h.stage("the standard PLC's imported " + MC_TABLE, lambda: has_tag(h, standard, MC_TABLE, [MC_TAG, "Bool", "%M60.0", False]))
 
     vci = vci_routes(h, plc, table, fio, f)
+    if vci:
+        conflict_route(h, plc, table, fio, f, vci)
     library_routes(h, plc, standard, s)
+    unit_routes(h, plc, standard, s)
     if vci:
         for fmt in (x for x in vci["formats"] if x != "SimaticML"):
             probe(h, "project-ward synchronization of a %s tag-table package" % fmt, lambda fmt=fmt: other_format(h, standard, empty, vci, fmt))
@@ -162,6 +178,80 @@ def library_routes(h, plc, standard, s):
     h.stage("the instantiated %s reads back on the standard PLC" % MC_TABLE, lambda: has_tag(h, standard, MC_TABLE, [MC_TAG, "Bool", "%M60.0", False]))
 
 
+def conflict_route(h, plc, table, fio, f, vci):
+    """vci_conflict_resolve take=remote of a reviewed two-sided conflict whose remote side moves FioProbe onto the F-DI input."""
+    root, workspace = Path(vci["root"]), vci["workspace"]
+    git = {"remote": str(h.directory / "git-remote.git"), "clone": str(h.directory / "git-other-engineer"), "pushes": []}
+    run = SimpleNamespace(h=h, git=git, git_exe=h.args.git_executable)
+    h.report["git"] = git
+    def mapping():
+        rows = [m for w in h.tool("vci_workspace_inspect")["workspaces"] if w["path"] == workspace for m in w["mappedObjects"]
+                if (m.get("object") or [{}])[-1].get("Name") == FIO_TABLE]
+        require(len(rows) == 1 and isinstance(rows[0].get("contentSha256"), str), "Expected one mapping of %s with a content hash: %s" % (FIO_TABLE, rows))
+        return rows[0]
+    files = {n: (root / n).read_bytes() for n in files_under(root) if n.split("/")[-1].startswith(FIO_TABLE + ".")}
+    base_content = mapping()["contentSha256"]
+    base = commit(run, "Baseline FioTags", prepare_files(run, "Baseline FioTags", files, branch="main"))
+    push(run, "baseline", base, None)
+    plain_git(run, h.directory, "clone", "--branch", "main", git["remote"], git["clone"])
+    h.stage("the other engineer moves %s onto %s" % (PROBE_TAG, fio), lambda: edit_package(git["clone"], FIO_TABLE, "%M41.0", fio))
+    plain_git(run, git["clone"], "commit", "-am", "Other engineer: FioProbe on the F-DI input")
+    plain_git(run, git["clone"], "push", "origin", "main")
+    head = plain_git(run, git["clone"], "rev-parse", "HEAD")
+    change(h, "tag_set", {"tagTablePath": table, "memberName": PROBE_TAG, "attributes": {"LogicalAddress": "%M42.0"}}, f)
+    native = mapping()["contentSha256"]
+    fetched = h.stage("vci_fetch the other engineer's commit", lambda: h.tool("vci_fetch", {"branchName": "main", "parentRevisionRef": base["recordRef"], "expectedRemoteCommit": head}))
+    require(fetched["commit"] == head, "The fetch did not reach the remote commit")
+    remote = {name: download(h, "vci_file_read", fetched["recordRef"], relativePath=name) for name in files}
+    def capture(label, source, content):
+        snapshot = {"observationId": "qualify-fio-routes:" + label, "sourceSha256": content, "tiaVersion": 21}
+        row = mapping()
+        evidence = {"schemaVersion": "vci-mapping-evidence.v1", "workspaceId": workspace, "snapshot": snapshot, "enumerationComplete": True, "packages": [{
+            "packageId": FIO_TABLE, "nativeStatus": row["compareState"],
+            "object": {"object": {"projectPath": h.tool("tia_session_status")["projects"][0]["path"], "plcPath": plc, "scopePath": None, "objectPath": table, "kind": "tagTable"},
+                       "snapshot": snapshot, "contentSha256": content},
+            "profile": {"profileId": "vci-tag-table", "family": "nativeDocument", "objectKind": "tagTable", "nativeFormat": "SimaticML",
+                        "evidenceSha256": sha(json.dumps(row, sort_keys=True).encode()), "evidenceOrigin": "nativeExport", "complete": True,
+                        "expectedFiles": [{"relativePath": name, "role": "document"} for name in sorted(files)]}}]}
+        reference = upload(h, "mapping.json", json.dumps(evidence).encode("utf-8"))
+        return h.stage("vci_package_capture " + label, lambda: h.tool("vci_package_capture", {"sourceRecordRef": source, "mappingUploadRef": reference}))
+    sides = [capture("baseline", base["recordRef"], base_content), capture("native", base["recordRef"], native), capture("remote", fetched["recordRef"], base_content)]
+    def compared():
+        result = h.tool("vci_package_compare", {"baselineRef": sides[0]["recordRef"], "projectRef": sides[1]["recordRef"], "workspaceRef": sides[2]["recordRef"],
+                        "expectedHashes": {"baseline": sides[0]["manifestSha256"], "project": sides[1]["manifestSha256"], "workspace": sides[2]["manifestSha256"]}})
+        rows = json.loads(download(h, "vci_artifact_read", result["recordRef"], name="comparison.json"))["rows"]
+        require(result["conflictCount"] == 1 and [r["state"] for r in rows] == ["divergentChange"], "The comparison does not report the two-sided conflict: %s" % rows)
+        return result
+    comparison = h.stage("vci_package_compare reports a divergentChange", compared)
+    def checkout():
+        for name, data in remote.items():
+            (root / name).write_bytes(data)
+        return sorted(remote)
+    h.report["vciConflictCheckout"] = h.stage("check the fetched package out into the workspace", checkout)
+    refuse(h, "a reviewed remote side with %s on the F-DI input" % PROBE_TAG, "vci_conflict_resolve",
+           {"workspacePath": workspace, "objectPath": table, "comparisonRef": comparison["recordRef"], "packageId": FIO_TABLE, "take": "remote"}, f, address=fio)
+
+
+def unit_routes(h, plc, standard, s):
+    """software_unit_create_from brings a unit's tag tables unread: refused while the PLC owns an F-I/O range, applied otherwise."""
+    unit = standard + "/units/" + UNIT
+    change(h, "software_unit_create", {"name": UNIT}, s)
+    library = h.project_library()
+    change(h, "library_create_master_copy", {"schemaVersion": 1, "destinationLibraryId": library, "target": {"plcPath": standard},
+                                             "object": {"kind": "softwareUnit", "objectPath": unit}}, {})
+    masters = [x for x in h.query(library)["items"] if x.get("kind") == "masterCopy" and x.get("name") == UNIT]
+    require(len(masters) == 1, "Expected one master copy %s: %s" % (UNIT, masters))
+    payload = {"libraryId": library, "masterCopyPath": masters[0]["masterCopyPath"], "name": UNIT}
+    refuse(h, "a unit master copy into the F-PLC", "software_unit_create_from", payload, {"plcPath": plc}, module=FDI[:-1])
+    change(h, "software_unit_delete", {"unitPath": unit, "dependencyPolicy": "rejectReferenced"}, s)
+    change(h, "software_unit_create_from", payload, s)
+    def created():
+        scopes = [x["path"] for x in h.tool("software_inspect", {"plcPath": standard, "maxItems": 2000}).get("softwareScopes", [])]
+        require(unit in scopes, "%s is not a scope of the standard PLC: %s" % (unit, scopes))
+        return scopes
+    h.stage("the created %s is a scope of the standard PLC" % UNIT, created)
+
+
 def other_format(h, standard, empty, vci, fmt):
     """A standard-PLC table mapped in fmt, edited %M44.0 -> %M45.0 and synchronized project-ward: applied or the exact refusal."""
     name = SD_TABLE + str(len(h.report.get("probes", [])))
@@ -181,8 +271,15 @@ if __name__ == "__main__":
     parser.add_argument("--worker", type=Path, required=True)
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=900)
+    parser.add_argument("--git-executable", type=Path, required=True, help="Installed Git for the Host's --git-executable and the other engineer's clone")
     parser.add_argument("--run-native", action="store_true")
     args = parser.parse_args()
     args.runner = __file__
-    Harness(args, "fr_", "F-I/O tag-address refusals of tag_create, tag_set, tag_table_import_xml, vci_synchronize and library_instantiate on an owned scratch F-CPU",
-            LIMITATIONS, []).run(body)
+    harness = Harness(args, "fr_", "F-I/O tag-address refusals of tag_create, tag_set, tag_table_import_xml, vci_synchronize, vci_conflict_resolve, "
+                      "library_instantiate and software_unit_create_from on an owned scratch F-CPU", LIMITATIONS, [])
+    remote = harness.directory / "git-remote.git"
+    # The Host's one configured remote: a new local bare repository owned by this run.
+    subprocess.run([str(args.git_executable), "init", "--bare", "--initial-branch=main", str(remote)], check=True, capture_output=True, timeout=60,
+                   env={**os.environ, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull})
+    args.host_args = ["--git-executable", str(args.git_executable.resolve()), "--git-remote", str(remote)]
+    harness.run(body)

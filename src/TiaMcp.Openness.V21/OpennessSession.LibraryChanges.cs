@@ -1124,9 +1124,19 @@ namespace TiaMcp.Openness.V21
                     {
                         LibraryJournal(change, "instantiate_master_" + master.Name, "dispatching");
                         string composition = payload.Value<string>("destinationComposition");
+                        var symbolsBefore = composition == "tagTables" ? ScopeSymbolNames(scope.Tags) : null;
                         object created = composition == "blocks" ? (object)scope.Blocks.Blocks.CreateFrom(master, MasterCopyMode.ThrowIfExists)
                             : composition == "tagTables" ? (object)scope.Tags.TagTables.CreateFrom(master, MasterCopyMode.ThrowIfExists)
                             : scope.Types.Types.CreateFrom(master, MasterCopyMode.ThrowIfExists);
+                        if (created is Siemens.Engineering.SW.Tags.PlcTagTable table)
+                        {
+                            // ThrowIfExists covers the table name only; a colliding tag is created renamed, which nothing references.
+                            var renamed = TagTableLifecycleRules.RenamedOnCollision(symbolsBefore, table.Tags.Select(tag => tag.Name).Concat(table.UserConstants.Select(constant => constant.Name)));
+                            if (renamed.Length != 0)
+                                throw new BridgeException("MutationVerificationFailed", "TIA created tags of master copy " + master.Name + " renamed (" + string.Join(", ", renamed) +
+                                    ") because the software scope already uses their names. Recover from the checkpoint; delete or rename the existing tags first.",
+                                    new JObject { ["masterCopy"] = master.Name, ["tagTable"] = table.Name, ["renamedTags"] = new JArray(renamed) });
+                        }
                         if (nameSpace != null)
                         {
                             if (created is PlcBlock masterBlock) masterBlock.Namespace = nameSpace; else ((PlcType)created).Namespace = nameSpace;

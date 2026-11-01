@@ -14,7 +14,9 @@ foreign instance for the ownership refusals and unregisters it at the end, also 
 Output tags are read-only to every symbolic writer: sim_write of SigOutWord (quoted and unquoted), a sim_write_signals batch
 with SigOutByte among a marker and a DB member, and a sim_test step writing SigOutByte refuse as InvalidRequest naming the
 output symbol; single sim_read calls show nothing written and sim_test leaves no report. A marker, a DB member and an
-input written by one sim_write still read back.
+input written by one sim_write still read back. The members of a structured output tag are output tags too: SigOutStruct, a
+PLC tag of the PLC data type SigOutUdt at %QB24 (members A and B, both Int, written by the program), imported with
+tag_table_import_xml; sim_write and sim_write_signals of "SigOutStruct".A refuse the same way and QB24..27 stay as they read.
 """
 from __future__ import annotations
 
@@ -27,6 +29,8 @@ import uuid
 
 from block_test_runtime import save_generated_scratch_project, verify_credential_provisioning, verify_download, verify_owned_instance
 from library_native_harness import Harness, require
+from qualify_typed_resolution import tag_fixture
+from typed_graphical_transport import artifact_bytes
 
 API_DIR = r"C:\Program Files (x86)\Common Files\Siemens\PLCSIMADV\API\8.0"
 DB = "SigDb"
@@ -41,6 +45,8 @@ TAGS = {"SigInByte": ("USInt", "%IB20", "uint8"), "SigInWord": ("Int", "%IW22", 
         "SigOutWord": ("Int", "%QW22", "int16"), "SigMarker": ("Int", "%MW30", "int16"), "SigMarkerCopy": ("Int", "%MW32", "int16"),
         "SigBit": ("Bool", "%M34.5", "bool")}
 EXTRA = {"Text": "string", "Arm": "bool", "Scans": "int32"}
+UDT, STRUCT_TAG, STRUCT_TABLE = "SigOutUdt", "SigOutStruct", "SigStructTags"
+UDT_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      A : Int;\n      B : Int;\n   END_STRUCT;\n\nEND_TYPE\n\n' % UDT
 DB_SOURCE = '''DATA_BLOCK "SigDb"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -66,6 +72,8 @@ BEGIN
     "SigOutByte" := "SigInByte";
     "SigOutWord" := "SigInWord" + 1;
     "SigMarkerCopy" := "SigMarker";
+    "SigOutStruct".A := "SigInWord";
+    "SigOutStruct".B := "SigMarker";
     "SigDb".Halt(IN := "SigDb".Arm, PT := T#2S);
     IF "SigDb".Halt.Q THEN
         STP();
@@ -114,7 +122,8 @@ CRITERIA = {
     "sim_read_signals": {"AC-identity": "Unselected instances refuse as SimulationNotSelected; string types as UnsupportedSignalType before any runtime call.",
                          "AC-runtime": "One ReadSignals call returns every primitive type equal to independent single sim_read reads; a missing symbol is a bad item with its runtime code.",
                          "AC-evidence": "This report."},
-    "sim_write": {"AC-identity": "An output tag, quoted or unquoted, refuses as InvalidRequest naming it, nothing written; a marker, a DB member and an input write and read back."},
+    "sim_write": {"AC-identity": "An output tag, quoted or unquoted, and a member of a structured output tag refuse as InvalidRequest naming them, nothing written; "
+                               "a marker, a DB member and an input write and read back."},
     "sim_test": {"AC-identity": "A step write to an output tag refuses the scenario as InvalidRequest before any write, and no report is saved."},
     "sim_write_signals": {"AC-identity": "A foreign (unowned) instance refuses as OwnedInstanceRequired; invalid batches and a batch with an output tag refuse before any write.",
                           "AC-runtime": "One WriteSignals call writes every primitive type including its range limits, read back by single sim_read calls.",
@@ -151,6 +160,9 @@ class Lab:
             found = [t for t in tags if t["symbol"].replace('"', "") == name]
             require(len(found) == 1, "PLCSIM tag %s is missing or ambiguous" % name)
             self.symbols[name], rows[name] = found[0]["symbol"], found[0]
+        # How PLCSIM lists the structured tag (the tag itself, its members or both) decides nothing here; it is recorded.
+        self.h.report["structTagList"] = [{k: t.get(k) for k in ("symbol", "dataType", "area", "offset", "bit")} for t in tags if t["symbol"].replace('"', "").startswith(STRUCT_TAG)]
+        require(self.h.report["structTagList"], "PLCSIM lists no entry of %s" % STRUCT_TAG)
         return {name: {k: row[k] for k in ("symbol", "dataType", "area", "offset", "bit")} for name, row in rows.items()}
 
     def signal(self, name, kind=None):
@@ -236,6 +248,7 @@ def body(h):
     require(len(default) == 1, "Expected one default tag table: %s" % [t["name"] for t in tables])
     for name, (kind, address, _) in TAGS.items():
         h.apply("tag_create", {"tagTablePath": default[0]["path"], "name": name, "dataTypeName": kind, "logicalAddress": address})
+    struct_tag(h, plc)
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": DB_SOURCE, "expectedBlockNames": [DB]})
     h.apply("source_upsert", {"scopePath": plc, "language": "SCL", "source": MAIN_SOURCE, "expectedBlockNames": ["Main"]})
 
@@ -293,6 +306,24 @@ def body(h):
             h.report["cleanupFailures"] = errors
             if not failed:
                 raise AssertionError("Cleanup failed: %s" % errors)
+
+
+def struct_tag(h, plc):
+    """SigOutStruct of the PLC data type SigOutUdt at %Q24.0, imported in a new table built from an independently exported empty one."""
+    h.apply("type_source_upsert", {"source": UDT_SOURCE, "expectedTypeNames": [UDT]})
+    h.apply("tag_table_create", {"tagTableName": STRUCT_TABLE + "Empty"})
+    path = [t["path"] for t in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"] if t["name"] == STRUCT_TABLE + "Empty"]
+    require(len(path) == 1, "Expected one empty template table: %s" % path)
+    empty = artifact_bytes(h.tool, h.tool("tag_table_read", {"tagTablePath": path[0]})["artifact"]).decode("utf-8-sig")
+    xml = tag_fixture(empty, STRUCT_TABLE, STRUCT_TAG, "%Q24.0")
+    require(xml.count("<DataTypeName>Bool</DataTypeName>") == 1, "Unexpected tag fixture: %s" % xml)
+    h.apply("tag_table_import_xml", {"xml": xml.replace("<DataTypeName>Bool</DataTypeName>", '<DataTypeName>"%s"</DataTypeName>' % UDT), "expectedTableNames": [STRUCT_TABLE]})
+    def imported():
+        rows = [g for t in h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"] if t["name"] == STRUCT_TABLE for g in t.get("tags", [])]
+        require(len(rows) == 1 and rows[0]["name"] == STRUCT_TAG and UDT in str(rows[0].get("dataType")) and "Q" in str(rows[0].get("logicalAddress")).upper(),
+                "The imported %s differs: %s" % (STRUCT_TAG, rows))
+        return rows[0]
+    h.report["structTag"] = h.stage("%s reads back as a %s output tag" % (STRUCT_TAG, UDT), imported)
 
 
 def signals(h, lab):
@@ -442,6 +473,23 @@ def outputs(h, lab):
         require(read == values, "sim_write of a marker, a DB member and an input did not read back: %s != %s" % (read, values))
         return read
     h.report["symbolicWritesStillWritable"] = h.stage("sim_write of a marker, a DB member and an input reads back", writable)
+    member = '"%s".A' % STRUCT_TAG
+    def member_refused(tool, writes):
+        def check():
+            before = lab.area("output", 24, 4)
+            error = h.call_error(tool, {"instanceId": instance, "writes": writes})
+            details = error.get("details") or {}
+            require(error.get("code") == "InvalidRequest" and str(details.get("symbol")).replace('"', "") == STRUCT_TAG + ".A" and details.get("area") == "Output",
+                    "Expected InvalidRequest naming %s, observed %s" % (member, error))
+            after = lab.area("output", 24, 4)
+            require(after == before, "The refused write changed QB24..27: %s -> %s" % (before, after))
+            return {"error": error, "outputBytes": after}
+        return check
+    h.report["structMemberRefusal"] = h.stage("refuse sim_write: the member %s of a structured output tag" % member,
+                                              member_refused("sim_write", [{"symbol": member, "type": "int16", "value": 777}]))
+    h.stage("refuse sim_write_signals: a batch with the member %s" % member,
+            member_refused("sim_write_signals", [{**lab.signal("SigMarker"), "value": 4322}, {"symbol": member, "type": "int16", "value": 777}]))
+    h.stage("the refused batch left SigMarker at 4321", lambda: require(lab.single("SigMarker") == {"SigMarker": 4321}, "SigMarker changed") or 4321)
 
 
 def states(result):

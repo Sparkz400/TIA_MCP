@@ -165,6 +165,8 @@ namespace TiaMcp.Openness.V21
                     bool renamed = scopes.Any(scope => scope.Unit != null && string.Equals(scope.Name, template, StringComparison.OrdinalIgnoreCase));
                     if (renamed && conflict == "refuse")
                         throw new BridgeException("ObjectExists", "The master copy's unit " + template + " already exists in the PLC; onNameConflict=rename inserts it with MasterCopyMode.Rename and then renames it to name.");
+                    // The unit's tag tables come along unread, as from a tag-table master copy.
+                    RejectFIoMasterCopy(plc, master.Name);
                     var source = new JObject { ["masterCopyPath"] = payload["masterCopyPath"], ["masterCopy"] = master.Name, ["creationDate"] = master.CreationDate.ToString("O"),
                         ["contents"] = new JArray(contents.Select(content => new JObject { ["name"] = content.ContentName, ["type"] = content.ContentType?.FullName })) };
                     var mode = renamed ? MasterCopyMode.Rename : MasterCopyMode.ThrowIfExists;
@@ -178,6 +180,8 @@ namespace TiaMcp.Openness.V21
                         .Concat(ScopeTypes(scope, scan).Select(type => Tuple.Create("type", type.Item.Name))).Concat(TagTables(scope.Tags, scope.Path + "/tags", scan).Select(table => Tuple.Create("tagTable", table.Item.Name)));
                     var existing = new HashSet<string>(scopes.SelectMany(scope => memberNames(scope, budget)).Select(member => member.Item2), StringComparer.Ordinal);
                     if (budget.Truncated) throw new BridgeException("TraversalLimit", "Member lookup before CreateFrom is incomplete.");
+                    // Every scope's symbols: whether TIA keeps a unit's tag names unique per unit or across the PLC is not established.
+                    var symbolsBefore = scopes.SelectMany(scope => ScopeSymbolNames(scope.Tags)).ToArray();
                     var before = provider.UnitGroup.Units.ToList();
                     var created = provider.UnitGroup.Units.CreateFrom(master, mode);
                     if (created == null || before.Contains(created)) throw new BridgeException("MutationVerificationFailed", "CreateFrom did not return a new software unit.");
@@ -192,6 +196,8 @@ namespace TiaMcp.Openness.V21
                     // block UnitFb -> UnitFb_1, Default tag table_3 -> _4), so TIA's "<existing>_<n>" names are reported; renamed blocks or types refuse.
                     var renamedMembers = mode == MasterCopyMode.Rename ? members.Where(member => existing.Contains(Regex.Replace(member.Item2, "_[0-9]+$", ""))
                         && !existing.Contains(member.Item2)).ToList() : new List<Tuple<string, string>>();
+                    // A colliding tag would be created as "<name>(<n>)" in either mode, as library_instantiate's are; renamed tags refuse like blocks.
+                    renamedMembers.AddRange(TagTableLifecycleRules.RenamedOnCollision(symbolsBefore, ScopeSymbolNames(after.Tags)).Select(tag => Tuple.Create("tag", tag)));
                     change.Readbacks.Add(new JObject { ["role"] = "createdUnitMembers", ["unitPath"] = after.Path,
                         ["members"] = new JArray(members.Select(member => new JObject { ["kind"] = member.Item1, ["name"] = member.Item2 })),
                         ["renamedByMasterCopyMode"] = new JArray(renamedMembers.Select(member => new JObject { ["kind"] = member.Item1, ["name"] = member.Item2 })) });
@@ -208,7 +214,7 @@ namespace TiaMcp.Openness.V21
             var renamed = change.Readbacks.Where(row => row.Value<string>("role") == "createdUnitMembers").SelectMany(row => row["renamedByMasterCopyMode"])
                 .Where(member => member.Value<string>("kind") != "tagTable").Select(member => member.Value<string>("name")).ToArray();
             if (renamed.Length != 0)
-                throw new BridgeException("MutationVerificationFailed", "MasterCopyMode.Rename renamed blocks or PLC data types of the copy (" + string.Join(", ", renamed)
+                throw new BridgeException("MutationVerificationFailed", "TIA renamed blocks, PLC data types or tags of the copy (" + string.Join(", ", renamed)
                     + "); callers would not reach them under their template names. Checkpoint recovery is required.");
         }
 
