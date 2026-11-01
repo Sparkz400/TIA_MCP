@@ -39,14 +39,15 @@ def authored_reference(path, unit):
         namespace = blocks[0].findtext("AttributeList/Namespace") or ""
         kind, payload, form = "block_import_xml", {"xml": text}, "native_xml_template_derivation"
     else:
-        require(path.suffix.lower() in {".scl", ".s7dcl"}, "Unsupported authored source format.")
-        names = re.findall(r'\b(?:FUNCTION_BLOCK|FUNCTION|DATA_BLOCK)\s+"([^\"]+)"', text)
+        require(path.suffix.lower() in {".scl", ".s7dcl", ".udt"}, "Unsupported authored source format.")
+        udt = path.suffix.lower() == ".udt"  # a PLC data type source, imported through type_source_upsert
+        names = re.findall(r'\bTYPE\s+"([^\"]+)"' if udt else r'\b(?:FUNCTION_BLOCK|FUNCTION|DATA_BLOCK)\s+"([^\"]+)"', text)
         namespaces = re.findall(r'^NAMESPACE\s+([A-Za-z0-9_.]+)', text, re.MULTILINE)
         # The standard route (no unit) admits only namespace-free sources; a unit route requires exactly one.
         require(len(namespaces) == (1 if unit else 0), "A unit source declares exactly one namespace; a standard source declares none.")
         namespace = namespaces[0] if unit else ""
-        form = "SCL" if path.suffix.lower() == ".scl" else "SIMATIC_SD"
-        kind, payload = "source_upsert", {"language": form, "source": text}
+        form = "UDT" if udt else "SCL" if path.suffix.lower() == ".scl" else "SIMATIC_SD"
+        kind, payload = ("type_source_upsert", {"source": text}) if udt else ("source_upsert", {"language": form, "source": text})
     require(names and all(names) and len(names) == len(set(names)), "Authored exact block names are missing or duplicated.")
     require(namespace == unit or unit and isinstance(namespace, str) and namespace.startswith(unit + "."), "Source namespace escapes the selected software scope.")
     return {"sourcePath": str(path.resolve()), "sha256": hashlib.sha256(text.encode()).hexdigest(),
@@ -73,6 +74,12 @@ def declare_changes(specifications, modify, observe):
                 "Tag tables are captured as additions only.")
 
 
+def type_namespace(path):
+    """Type rows carry no identity; ObjectIdentity.ObjectPath puts a namespace as /namespaces/<ns> directly before the name."""
+    _, found, namespace = path.rpartition("/")[0].rpartition("/namespaces/")
+    return namespace if found and "/" not in namespace else ""
+
+
 def verify_reference_additions(before, after, names, scope, namespace, modifies=(), observes=()):
     """Exactly the declared additions; only explicitly declared existing blocks of this scope may change."""
     old, new = before["objects"], after["objects"]
@@ -85,13 +92,18 @@ def verify_reference_additions(before, after, names, scope, namespace, modifies=
     # V21 marks an R_TRIG/F_TRIG instance DB know-how protected too (30 October): a declared one is added by identity only.
     expected = set(names) - set(modifies)
     added = [new[key] for key in set(new) - set(old) if new[key]["kind"] != "protectedSystemBlock" or "/systemGroups/" not in new[key]["path"]]
-    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable", "protectedSystemBlock") for row in added)
+    require(len(added) == len(expected) and all(row["kind"] in ("block", "tagTable", "type", "protectedSystemBlock") for row in added)
         and {row["name"] for row in added} == expected, "Reference capture did not add exactly the declared objects.")
-    blocks, tables = after["inventory"]["blocks"], after["inventory"].get("tagTables", [])
+    blocks, tables, types = after["inventory"]["blocks"], after["inventory"].get("tagTables", []), after["inventory"].get("types", [])
     for row in added + changed:
         if row["kind"] == "tagTable":
             match = [table for table in tables if table["path"] == row["path"]]
             require(len(match) == 1 and match[0]["scopePath"] == scope, "Reference tag table belongs to the wrong exact scope.")
+            continue
+        if row["kind"] == "type":
+            match = [item for item in types if item["path"] == row["path"]]
+            require(len(match) == 1 and match[0]["scopePath"] == scope and type_namespace(row["path"]) == namespace,
+                    "Reference type belongs to the wrong exact scope/namespace.")
             continue
         match = [block for block in blocks if block["path"] == row["path"]]
         require(len(match) == 1 and match[0]["scopePath"] == scope
@@ -156,11 +168,14 @@ def capture(args):
             report["fixtures"].append(entry)
             baseline = snapshot(session.invoke, folder / "before")
             require(not any(block["scopePath"] == scope and block["identity"]["namespace"] == entry["namespace"]
-                    and block["name"] in set(entry["names"]) - set(entry["modifies"]) for block in baseline["inventory"]["blocks"]),
+                    and block["name"] in set(entry["names"]) - set(entry["modifies"]) for block in baseline["inventory"]["blocks"])
+                    and not any(item["scopePath"] == scope and type_namespace(item["path"]) == entry["namespace"]
+                    and item["name"] in entry["names"] for item in baseline["inventory"].get("types", [])),
                     "New independent capture cannot overwrite an existing native reference.")
             require(all(any(block["scopePath"] == scope and block["identity"]["namespace"] == entry["namespace"] and block["name"] == name
                     for block in baseline["inventory"]["blocks"]) for name in entry["modifies"]), "A declared modification target does not exist.")
             target = ({"expectedTableNames": entry["names"]} if kind == "tag_table_import_xml"
+                      else {"expectedTypeNames": entry["names"]} if kind == "type_source_upsert"
                       else {"namespace": entry["namespace"], "expectedBlockNames": entry["names"]})
             if not args.unit:
                 target.pop("namespace", None)  # standard route: the PLC program scope, no namespace or scope path
@@ -187,7 +202,7 @@ def capture(args):
                 target = output / (row["name"] + (".xml" if row in additions else ".source-" + str(ordinal).zfill(2) + ".xml"))
                 require(not target.exists(), "Native export destination already exists.")
                 shutil.copyfile(row["file"], target)
-                rows = after["inventory"]["blocks" if row["kind"] == "block" else "tagTables"]
+                rows = after["inventory"][{"block": "blocks", "type": "types"}.get(row["kind"], "tagTables")]
                 identity = next(item for item in rows if item["path"] == row["path"])
                 entry["exports"].append({"name": row["name"], "kind": row["kind"], "changedExisting": row in changes,
                     "path": str(target), "sha256": hashlib.sha256(target.read_bytes()).hexdigest(), row["kind"]: identity})

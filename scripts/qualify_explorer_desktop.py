@@ -2,7 +2,8 @@
 
 prepare: an owned TIA creates a scratch (Main, TiaMcp_EnableGate, its instance DB, TiaMcp_IsEnabled) and closes. The run
 root then holds workspace/.vscode/mcp.json, which registers this script's `serve` as the stdio server, and the operator steps.
-serve: the product starts it. It starts the frozen Host and relays every stdio line unchanged, appending each one to
+serve: the product starts it. It starts the frozen Host with --toolsets core,explorer (VS Code offers a chat request at most
+128 tools; the full surface has about 300) and relays every stdio line unchanged, appending each one to
 transcript.jsonl; it never edits, drops or replays a message.
 verify: checks the transcript (MCP Apps negotiation and resource read, a verified selection followed by a
 project_model_details call with the identical six-field reference, and that reference refused after tia_detach), reads
@@ -10,7 +11,8 @@ the selected block with block_read in a fresh owned TIA, checks the artifact fal
 negotiate MCP Apps, and asks the operator what only the screen shows. Nothing in the project is changed.
 
 Operator steps (also written to <root>/operator-instructions.txt):
-1. Open the folder <root>/workspace in VS Code (or another MCP Apps product) and start the server "tia-mcp-desk".
+1. Open the folder <root>/workspace in VS Code (or another MCP Apps product), use agent mode in chat, and start the server
+   "tia-mcp-desk" (Command Palette: MCP: List Servers > tia-mcp-desk > Start Server; trust it when asked).
    Open the product's developer tools (VS Code: Help > Toggle Developer Tools) on the Network tab.
 2. In agent chat: "Call tia_start, then project_open with path <project>, then project_model_capture with
    lifetimeSeconds 900."
@@ -43,6 +45,9 @@ BLOCK_FIELDS = ("path", "name", "number", "kind", "programmingLanguage")
 QUESTIONS = (("rendered", "Did the Explorer render inside the product's chat after project_model_capture?"),
              ("noNetwork", "Did the developer tools show no network request from the Explorer view?"),
              ("staleShown", "After tia_detach, did the view show the stale or disconnected state for the reused selection?"))
+# VS Code offers a chat request at most 128 tools and the Host advertises about 300: the product gets the groups the roundtrip
+# calls (tia_*, project_open, block_read, project_model_*), about 65 tools. The verify clients keep the full surface.
+PRODUCT_TOOLSETS = "core,explorer"
 INSTRUCTIONS = __doc__[__doc__.index("Operator steps"):]
 
 
@@ -148,10 +153,14 @@ def offline_html(text):
     require(not remote, "The exported viewer references remote resources: %s" % remote[:5])
 
 
+def host_arguments(args, root, toolsets=None):
+    return ["--worker", str(args.worker.resolve()), "--artifacts", str(root / "h")] + (["--toolsets", toolsets] if toolsets else [])
+
+
 def host_client(args, root):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from smoke_mcp import Client
-    client = Client(args.host.resolve(), args.timeout, ["--worker", str(args.worker.resolve()), "--artifacts", str(root / "h")])
+    client = Client(args.host.resolve(), args.timeout, host_arguments(args, root))
     client.request("initialize", {"protocolVersion": "2025-11-25", "capabilities": {}, "clientInfo": {"name": "explorer-desktop-qualification", "version": "1"}})
     client.notify("notifications/initialized")
     return client
@@ -212,7 +221,7 @@ def serve(args):
     with lock:
         out.write(json.dumps({"t": now(), "session": session, "start": binaries(args)}) + "\n")
         out.flush()
-    host = subprocess.Popen([str(args.host.resolve()), "--worker", str(args.worker.resolve()), "--artifacts", str(root / "h")],
+    host = subprocess.Popen([str(args.host.resolve()), *host_arguments(args, root, PRODUCT_TOOLSETS)],
                             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     def pump():
         for line in sys.stdin.buffer:

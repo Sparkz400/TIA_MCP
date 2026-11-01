@@ -16,7 +16,8 @@ from typed_graphical_native_expectations import assert_existing_caller_insertion
 from qualify_typed_resolution import unqualified_outer_fixture, verify_untouched_caller, verify_tag_address_change
 from run_conformance import native_document, structural_xml
 from qualify_typed_tag_ambiguity import verify_native_setup
-from capture_typed_routes_owned import declare_changes, authored_reference, verify_reference_additions, require_clean_compile
+from capture_typed_routes_owned import declare_changes, authored_reference, verify_reference_additions, require_clean_compile, type_namespace
+from extract_typed_graphical_profiles import COMPONENT_TEMPLATES
 from prepare_crossunit_capture_archive import block_access, capture_command
 from qualify_typed_multi_dependency import verify_append
 from typed_graphical_runtime_preservation import RuntimePreservation, ObservedRuntimeBackend, file_inventory, inventory_difference
@@ -674,6 +675,62 @@ class RouteCapturePacketTests(unittest.TestCase):
         xml = (root / "fixtures/typed-graphical/native/instance-effects-iec-softwareUnit/after-caller.xml").read_text(encoding="utf-8-sig")
         self.assertEqual("Unpublished", block_access(xml))
         self.assertEqual("Published", block_access(xml.replace("<Access>Unpublished</Access>", "<Access>Published</Access>", 1)))
+
+    def test_component_storage_packet_parses_exactly_and_authors_every_template_block(self):
+        root = pathlib.Path(__file__).resolve().parents[1]
+        packet = json.loads((root / "fixtures/typed-graphical/route-capture-component-storage-packet.v1.json").read_bytes())
+        # Captured 1 November (local.typed.component-storage-capture.20261101); only the multi-instance template is deployed.
+        self.assertEqual("captured-builder-not-qualified", packet["status"])
+        self.assertTrue(packet["nativeReferenceQualification"])
+        self.assertFalse(packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        self.assertEqual(["standardMultiInstance", "unitGlobalInstance"], [row["id"] for row in packet["captured"] if row["status"] == "passed"])
+        templates = json.loads((root / "fixtures/typed-graphical/profiles.v1.json").read_bytes())
+        deployed = {t["id"] for collection in ("globalInstanceTemplates", "multiInstanceTemplates") for t in templates[collection] if "component-gate" in t["id"]}
+        self.assertEqual({"v21.fw41.component-gate.multi-instance.v1"}, deployed)
+        folded = set()
+        for capture in packet["captures"]:
+            self.assertEqual(capture["unit"], capture["command"][capture["command"].index("--unit") + 1])
+            kinds = []
+            for entry in capture["sources"]:
+                observed, kind, _ = authored_reference(root / entry["path"], capture["unit"])
+                for key in ("names", "namespace", "route", "authoredFormat"):
+                    self.assertEqual(entry[key], observed[key], entry["path"])
+                self.assertEqual(entry["sha256"], observed["fileSha256"], entry["path"])
+                kinds.append(kind)
+                folded |= {name.replace("TgpUnit_", "Tgp_") for name in entry["names"]}
+            # The UDT is admitted first: every later source declares it.
+            self.assertEqual(["type_source_upsert"] + ["source_upsert"] * (len(kinds) - 1), kinds)
+        for block, (_, reference, member) in COMPONENT_TEMPLATES.items():
+            self.assertLessEqual({block, reference}, folded)
+        host = (root / "fixtures/typed-graphical/sources/component-host-fbd.s7dcl").read_text(encoding="utf-8")
+        self.assertIn('Gate : "TiaMcpComponentGate";', host)
+        self.assertIn('State : "TiaMcp_UnitA.TiaMcpComponentState";', (root / "fixtures/typed-graphical/sources/route-Unit-component-gate.scl").read_text(encoding="utf-8"))
+        expected = packet["expectedTemplates"]
+        self.assertEqual({"multiInstanceTemplates": ["v21.fw41.component-gate.multi-instance.v1"]}, expected["deployedVerified"])
+        self.assertNotIn("deployedQualificationOnly", expected)
+        self.assertEqual({"globalInstanceTemplates": ["v21.fw41.softwareUnit.component-gate.global-instance.v1"]}, expected["stagedCandidateOnly"])
+        # The unit capture is only ever staged under artifacts/, never appended to the deployed catalog.
+        self.assertTrue(all("--stage-output" in step for step in packet["afterCapture"] if "csu" in step))
+
+    def test_type_sources_import_as_types_and_add_only_in_their_scope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = pathlib.Path(directory) / "state.udt"
+            source.write_text('TYPE "State"\nSTRUCT\n Active : Bool;\nEND_STRUCT;\nEND_TYPE', encoding="utf-8")
+            entry, kind, payload = authored_reference(source, "")
+            self.assertEqual((["State"], "UDT", "type_source_upsert", ["source"]), (entry["names"], entry["authoredFormat"], kind, list(payload)))
+            source.write_text('NAMESPACE U\nTYPE "State"\nSTRUCT\n Active : Bool;\nEND_STRUCT;\nEND_TYPE\nEND_NAMESPACE', encoding="utf-8")
+            with self.assertRaises(RuntimeError): authored_reference(source, "")
+            self.assertEqual(("softwareUnit", "U"), (authored_reference(source, "U")[0]["route"], authored_reference(source, "U")[0]["namespace"]))
+        path = "/plc/units/U/types/namespaces/U/State"
+        before = {"objects": {}}
+        after = {"objects": {"type:" + path: {"kind": "type", "name": "State", "path": path, "payloadSha256": "x"}},
+                 "inventory": {"blocks": [], "types": [{"path": path, "name": "State", "scopePath": "/plc/units/U"}]}}
+        added, changed = verify_reference_additions(before, after, ["State"], "/plc/units/U", "U")
+        self.assertEqual((["State"], []), ([row["name"] for row in added], changed))
+        for scope, namespace in (("/plc/units/V", "U"), ("/plc/units/U", ""), ("/plc/units/U", "U.Other")):
+            with self.subTest(scope=scope, namespace=namespace), self.assertRaises(RuntimeError):
+                verify_reference_additions(before, after, ["State"], scope, namespace)
+        self.assertEqual(("", "U.Inner"), (type_namespace("/plc/types/State"), type_namespace("/plc/units/U/types/namespaces/U.Inner/State")))
 
     def test_transitive_route_cases_embed_the_caller_in_its_own_namespace(self):
         root = pathlib.Path(__file__).resolve().parents[1]

@@ -169,9 +169,12 @@ namespace TiaMcp.Openness.V21
             {
                 var scope = LibraryPlcScope(change, out var plc); string cpu = TypedCpuIdentifier(plc);
                 var plan = (JObject)change.Preview["integrationPlan"];
-                // With a reused FB the typed preparation runs before any mutation, so it decides storage itself. After an import it
+                // With a reused FB the typed preparation runs before any mutation, so it decides storage itself; only a multi-instance
+                // caller's dependents are refused here, before admission, because no captured effect covers them. After an import it
                 // would fail only once the import is saved; a multi-instance profile needs the installed FB export, unknown before it.
-                if (plan["fb"].Value<bool>("reused")) return null;
+                if (plan["fb"].Value<bool>("reused"))
+                    return plan["multiInstance"] == null ? null
+                        : PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan["caller"].Value<string>("blockPath")));
                 if (plan["multiInstance"] != null) return NotQualified("A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.");
                 // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
                 var captured = CapturedStorageContext(change, true);
@@ -189,7 +192,7 @@ namespace TiaMcp.Openness.V21
                 var callee = EngineeringSources.ReadXml(PlcComponentContentContract.Artifact((JObject)root["artifact"], root.Value<string>("contentSha256")));
                 string catalog = TypedCatalogPath();
                 return NotQualified(PlcComponentQualificationGate.CombinedApplyInstanceRefusal(callee, plan["instanceDb"].Value<string>("name"),
-                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null)).Select(t => t.Value)));
+                    catalog == null ? Enumerable.Empty<System.Xml.Linq.XDocument>() : GlobalInstanceTemplates(catalog, cpu, TypedRoute(scope, null), TypedQualificationScratch(change.Project)).Select(t => t.Value)));
             }
             catch (BridgeException error) { return NotQualified(error.Message); }
             catch (PlcComponentException error) { return NotQualified(error.Message); }
@@ -224,7 +227,7 @@ namespace TiaMcp.Openness.V21
                 ["checkpoint"] = "The first step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
                 ["candidateFeatures"] = unverified,
                 ["qualification"] = unverified.Count != 0 ? "Candidate shape without native evidence, admitted only on this qualification Host's owned scratch."
-                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031)." };
+                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
             coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";

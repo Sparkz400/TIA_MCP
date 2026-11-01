@@ -1379,6 +1379,27 @@
       ]
     },
     {
+      "id": "local.gsd_transfer_areas.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "7efef756a7e51cf8b8f02524fe25ba6038e64dac",
+        "passedScope": "scripts/qualify_gsd_export.py on a frozen Debug build of 7efef756 (artifacts/gf1, git archive), 80/80 steps, in one owned scratch CPU 1511-1 PN V4.1 under TIA Portal V21: X1 put on subnet GsdNet; the PROFINET interface made an I-device with hardware_attributes (InterfaceOperatingMode 'IoController, IoDevice') without compile or save; hardware_transfer_area_create added the controller-device areas TiaMcpArea, TiaMcpSpare and TiaMcpTemp and hardware_transfer_area_delete removed TiaMcpTemp, each with asserted preview, checkpoint, device compile, configured-hardware preservation including every I-device interface's transfer areas, save and change_status; hardware_inspect, device_inventory and the PLC's program state differ in exactly the intended keys. hardware_gsd_export (designation TiaMcpIDevice) then wrote GSDML.xml (7823 bytes, SHA-256 a1adccde69bc8ffb546e7cfa7d1e5b3af2906216146c27c1852123a1bffa1561, GSDML schema V2.45, no graphics) from the only item reporting gsdExportAvailable and changed nothing. A fresh owned Portal reopen shows the identical state (except the compile-derived CalculatedBandwidthForCyclicIoData) and exports the byte-identical GSDML; from that state a create, a delete and the switch back to IoController are each restored from their checkpoints into copies equal to the reopened state, and the last copy exports the same GSDML. Typed refusals (HardwareNotFound, UnsupportedCapability, InvalidRequest, ObjectExists, ObjectNotFound) change nothing."
+      },
+      "artifacts": [
+        "evidence/local.gsd_transfer_areas.20261101.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 whose PROFINET interface is IO controller and I-device on a subnet without a higher-level IO controller; no shared device or controller assignment.",
+        "Controller-device (CD) transfer areas only, with the direction, lengths and local addresses TIA chooses; F-CD, PROFIsafe, shared-device and mapping-rule areas and direction or length edits are not exercised.",
+        "The I-device mode change applies without compile or save because V21 compiles a new I-device only with a transfer area; the next change's checkpoint saves it. Switching back to IoController with hardware_attributes removes the areas and their system constants.",
+        "The GSDML is Siemens output: checked as well-formed XML naming the designation, not installed in a TIA catalog or imported into another tool here. Engineering only; nothing is downloaded and no PROFINET communication is observed."
+      ]
+    },
+    {
       "id": "local.gsd_transfer_areas.20261028",
       "status": "passed",
       "profile": {
@@ -2088,6 +2109,73 @@
         "Candidate shapes ran on a --component-qualification Host in owned scratch; combinations of these features (for example LAD with an earlier placement) were not exercised.",
         "Reuse accepted version-comment-only differences: the source global library versions had an empty en-US comment, the installed versions their de-DE release comment; the component readback proved the installed content against the pinned source exports.",
         "Software units, OB insertion, reused instance DBs, partial dependency reuse and DB/UDT-tag member bindings stay plan-only. No runtime execution."
+      ]
+    },
+    {
+      "id": "local.typed.component-storage-capture.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "68eca319a1fa7bfcbd6e33de1914dea4527f2495",
+        "passedScope": "scripts/capture_typed_routes_owned.py, both captures of route-capture-component-storage-packet.v1.json (frozen 68eca319, artifacts/csm and artifacts/csu), each in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline. Standard route: the component UDT TiaMcpComponentState (type_source_upsert) and FB TiaMcpComponentGate from the component-qualification fixture sources, then the FBD FB Tgp_ComponentHost_FBD declaring the multi-instance Gate : \"TiaMcpComponentGate\". softwareUnit route (TiaMcp_UnitA): the same UDT and interface in the unit namespace as TgpUnit_ComponentGate with its instance DB. Every source compiled clean and saved, added exactly its declared objects in the selected scope and namespace, and the saved state matched a fresh-process reopen. The captured Gate member embeds the UDT static State with its nested Active member; the SCL-authored FB interface equals the library-installed component04-callee interface, and the unit DB members equal the unit FB members."
+      },
+      "artifacts": [
+        "evidence/local.typed.component-storage-capture.20261101.json"
+      ],
+      "limitations": [
+        "Native reference capture only. The standard multi-instance template v21.fw41.component-gate.multi-instance.v1 is the source of the multiInstance combined-apply shape; the unit instance template v21.fw41.softwareUnit.component-gate.global-instance.v1 is staged only (artifacts/csus) and has no qualification case.",
+        "No dependent instance-DB effect of a structured multi-instance member was captured: a caller FB with its own instance DB stays refused."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.multi.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "9febd4dfe1c38ccdbb04612c9703a22ef61a7ead",
+        "passedScope": "Combined-apply candidate cases (scripts/qualify_library_integrate_apply.py --candidates at 9febd4df, frozen artifacts/w4c, --artifacts artifacts/ic5) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch with the authored FB/UDT global library archive. ladStandalone, ladExisting, fbCaller, earlierPlacement and reuse installed again as in local.library_integrate.candidate_shapes.rerun.20261031. multiInstance: after a verified standalone install, a multi-instance Gate of the reused installed TiaMcpComponentGate in the existing FBD FB TiaMcpComponentHost (FB30, no instance DB) installed through change_apply: preview candidateFeatures exactly fbCaller, multiInstance and reusedComponent, one typed step whose multi-instance declaration came from the captured template v21.fw41.component-gate.multi-instance.v1 (local.typed.component-storage-capture.20261101, then qualificationOnly), coordinator installation_verified with the typed step's own archive as the single checkpoint, the native caller insertion proof with exactly one new Static member Gate and following IDs 8->D, 9->E, the call oracle on the LocalVariable instance, the project library holding exactly the released versions, a fresh reopen, a 0-error compile, and change_restore of that checkpoint into a new location in a fresh owned Portal equal to the first installation after retrieval and after reopen."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.multi.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+        "Qualifies only the exact shape fbCaller+multiInstance+reusedComponent with an FBD FB caller that has no instance DB and is not embedded elsewhere; no structured dependent-DB effect is captured, and a multi-instance after a fresh import stays refused before the claim."
+      ]
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.dependents.rerun.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "195f63a375a43e6ea382706c95de56580b23a377",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates at 195f63a3 (frozen artifacts/w4f, --artifacts artifacts/ic7) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: ladStandalone, ladExisting, fbCaller, earlierPlacement, reuse and multiInstance installed with every gate (exact candidateFeatures, installation_verified with one initial checkpoint, export/inventory diff, caller insertion proof, call oracle, library versions, reopen, 0-error compile, restore of the initial checkpoint). multiInstanceDependents: after a verified standalone install, TiaMcpComponentHost (FB30) got its own instance DB TiaMcpComponentHost_DB; the reused-FB multi-instance plan previewed combinedApply.eligible=false with refusalCode DependencyProfileUnavailable naming that DB in refusalDetails.dependents; change_apply was refused with DependencyProfileUnavailable and the message \"Combined apply refused before admission: ...\"; the Host's admission records were the same before and after; the plan stayed prepared without an idempotency claim; the scratch snapshot equalled the baseline."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.dependents.rerun.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+        "Covers a caller FB with its own global instance DB; an embedding parent FB falls under the same dependent closure but was not exercised natively."
+      ]
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "195f63a375a43e6ea382706c95de56580b23a377",
+        "passedScope": "scripts/qualify_library_integrate_apply.py without --candidates at 195f63a3 (frozen artifacts/w4f, --artifacts artifacts/ir2), owned de-DE-only CPU 1511-1 PN V4.1 scratch projects: the standalone FBD FC and existing FBD FC installs passed every gate (preview eligible, one change_apply, export/inventory diff of exactly the planned additions, project library versions, reopen, 0-error compile, restore of the initial checkpoint after retrieval and after reopen). Refusals with the former flag: an FBD OB caller (\"OB insertion is refused\") and an existing FBD FB caller with a multi-instance of a freshly imported FB (the multi-instance refusal) were refused with PlcIntegrationNotQualified and the message \"Combined apply refused before admission: ...\", the Host's admission records the same before and after each refused change_apply, each plan still prepared without an idempotency claim, and the project unchanged. A Host without the former flag reported combined apply, previewed the standalone FBD plan eligible and refused the FB multi-instance plan the same way."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.combined_apply.regression.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1."
       ]
     },
     {
@@ -3355,6 +3443,25 @@
       ]
     },
     {
+      "id": "local.project_upgrade.interruption.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "61f75b839532c790d7727ff5d3f14dfe1b2d3fb7",
+        "passedScope": "scripts/qualify_interruption.py on a Debug build of 61f75b8 frozen with git archive, 16 of 16 cases, each in its own owned Portal on an owned copy of TinyMySQLClient_V15.ap15 (project folder, OpenWithUpgrade, pf-*) or TinyMySQLClient_V14_1.zap14 (archive, RetrieveWithUpgrade, pa-*), reconciled once by engineering_admission_reconcile from a fresh Host. Worker and owned TIA terminated at the first dispatchIntent (int: destination never created) -> released, source and destination unchanged; at receipt copying (cpy) and upgrading (upg, inside the native upgrade) -> held with the partial owned copy; at the first .ap21 at the observed layout while the receipt is upgrading (prj) -> held without the project being opened. Host stopped after the durable dispatch intent and before dispatch (hint, host.project_upgrade.beforeDispatch) -> released unchanged. Host killed at receipt copying (hcpy) and upgrading (hupg), and Host stopped after the native upgrade returned but before recording it (hret, host.project_upgrade) -> the worker finished, released with the destination verifiedApplied, and the reconciled V21 project (TinyMySQLClient_V15_V21, TinyMySQLClient_V14_V21) opened in the same fresh session with its pinned inventory (17 hardware items, 1 PLC, 7 blocks, 0 inconsistent). Every case: source copy fingerprint unchanged and proven unchanged by the reconciler, exactly one project_upgrade admission and at most one destination (no replay), destination unchanged by reconciliation, each held admission keeps its source reserved (a second project_upgrade is refused ResourceBusy). Originals byte-identical before and after; copies removed; no run file names a folder above an original."
+      },
+      "artifacts": [
+        "evidence/local.project_upgrade.interruption.20261101.json"
+      ],
+      "limitations": [
+        "Interruption is process termination of the worker with its owned TIA, or Host loss by kill or a qualification Host point, once per case; power loss, disk faults and remote transport are not exercised.",
+        "Two small public examples (a V15 project folder and a V14 SP1 archive). Boundaries are observed through the durable upgrade receipt and admission store; the copy of these examples takes milliseconds, so each case records the durable state it hit (all 16 hit their intended state).",
+        "A partial copy or unfinished upgrade stays held; releasing it needs someone to remove the owned destination and reconcile again, which is not exercised.",
+        "Reconciliation trusts the worker-written upgrade receipt once it is bound to the recomputed source hash and the observed layout; a receipt edited inside the owned artifacts tree after the interruption is trusted."
+      ]
+    },
+    {
       "id": "local.technology.version_profiles.20261031",
       "status": "passed",
       "profile": {
@@ -3612,6 +3719,23 @@
         "A non-reproduction is not a fix: the cause of the single 23 October refusal stays unidentified; the diagnostics name the holder if it recurs.",
         "Runs used the signals runner, not the runtime batch that failed on 23 October; one PC and one PLCSIM Runtime Manager state; no physical PLC.",
         "Run p1 refused at discovery before any card move (Runtime Manager placeholder, no baseline) and is not counted."
+      ]
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "422875126abfb81069e0ca31cf1a78d92f2cbc33",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of 42287512 (artifacts/w2bs6, git archive), 26/26 steps, PLCSIM Advanced V8 on Softbus, same fixture as local.safety.logic_plcsim_boundary.20261101: a two-PLC owned scratch (standard CPU 1511-1 PN and CPU 1511F-1 PN with an ET 200SP F-DI), project_simulation_enable compiling all three devices, the changed Main_Safety_RTG1 imported, compiled with the safety program (zero errors) and saved, an owned CPU1511F PLCSIM instance. The offline memory card was refused again by V21 ('Load safety program to device'). The bounded follow-up, change_prepare simulation_download_online to the same owned instance (softwareScope all, reinitialize, allowStop), refused with SimulationTargetMismatch: the online route downloads only to an instance whose generated memory card came from this PLC, so for an F-CPU it cannot start. No safety prompt was answered; the owned instance was released (unregistered)."
+      },
+      "artifacts": [
+        "evidence/local.safety.logic_online_route.20261101.json"
+      ],
+      "limitations": [
+        "The repo's online PLCSIM route is gated by a successful memory card, which V21 refuses for an F-CPU, so V21's online download of a safety program (its SafetyProgram download configuration 'Load safety program to device', selection ConsistentDownload) was not reached; the policy would refuse that safety confirmation anyway.",
+        "No safety acceptance, login, password or confirmation; the scratch user's fail-safe access exists in the owned scratch only."
       ]
     }
   ],
@@ -4110,14 +4234,15 @@
           "Accepts .ap14-.ap20 project files (V15.1: .ap15_1) and .zap14-.zap20 archives with their SHA-256. V13 and older, V21 and newer are refused by file name before any file read or native call (ProjectVersionUnsupported); after the hash check the release declared by the project marker (ProjectCompatibilityVersion; in an archive, its one top-level project file) must match, so a renamed older project is refused before the upgrade. A project folder holding another project or archive is refused; a locked source file is SourceLocked.",
           "The source is never opened or written: the project file's whole folder (at most 20000 files and 4 GiB) is copied under its own name, or the archive (at most 1 GiB) byte for byte, into a new owned directory under the host's upgrades artifacts, and only that copy is upgraded. The source hash (the archive bytes, or a sorted manifest of every file in the folder) is checked before and after the copy and after the upgrade (sourceUnchanged). The upgraded project must be where V21 saves it: <destination>/<folder>_V21/<folder>_V21.ap21 for a project folder, <destination>/w/<project>_V21/<project>_V21.ap21 for an archive (UpgradeVerificationFailed otherwise).",
           "Nothing is compiled or saved beyond what TIA's upgrade does. The upgraded project stays open with its isModified flag reported; TIA's ConversionLog_*_to_21 files are returned with their project success marker and error and warning counts; collecting that evidence never replaces TIA's outcome (evidenceFailure). Block consistency (the compile state) is read with project_inventory.",
-          "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile (source hash unchanged; destination absent, empty or holding the one V21 project its completed upgrade receipt names).",
-          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Protected (UMAC) projects, V15.1 and V17-V20 sources, locked sources and interrupted upgrades (reconciliation) are not exercised natively."
+          "Runs through shared mutation admission: the source and the new destination are reserved. A structured failure is a returned outcome that keeps the owned copy for inspection; a lost reply is reconciled by engineering_admission_reconcile: the source hash must be unchanged and the destination absent, empty or holding the one V21 project at the observed location that its completed upgrade receipt names (bound to the recomputed source hash). A partial copy or an unfinished upgrade stays held, with the source reserved, and is never opened.",
+          "Natively qualified (local.project_upgrade.20261031): V14 SP1 archive, V15 and V16 project folders upgraded at the observed location with a successful conversion log and reopened in a fresh owned Portal with their pinned inventory; a V16 project with a TP700 Comfort 15.0.0.0 panel is refused by V21 (MissingProductsException) with its source unchanged; a V13 archive and the same archive renamed to .zap14 are refused before the upgrade. Interruption and reconciliation are qualified (local.project_upgrade.interruption.20261101): worker loss after dispatch intent, during the copy, during the native upgrade and after the upgraded .ap21 exists, and Host loss before dispatch, during the copy and the upgrade and after the native reply, for the V15 folder and the V14 SP1 archive, each reconciled once without replay. Protected (UMAC) projects, V15.1 and V17-V20 sources and locked sources are not exercised natively."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.project_upgrade.20261031"
+          "local.project_upgrade.20261031",
+          "local.project_upgrade.interruption.20261101"
         ]
       },
       "availability": {
@@ -4696,7 +4821,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.gsd_transfer_areas.20261028"
+          "local.gsd_transfer_areas.20261028",
+          "local.gsd_transfer_areas.20261101"
         ]
       },
       "availability": {
@@ -8405,15 +8531,16 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "unavailable",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "The public V21 Openness API has no member that moves a PLC block, type, tag table or group: the only move members are HW.HardwareObject.PlugMove and CanPlugMove (device items into another slot); PlcBlock.Parent and PlcBlockUserGroup.Parent are get-only, and every cross-group route (master copy, library type, SimaticML import, external source, documents) creates a new object (docs/verification/block-move-feasibility-20261031.md, offline metadata check of 31 October 2026)."
         ]
       },
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog feature; no bridge operation is exposed."
+          "No bridge operation is exposed. Recreation through block_read and the source_upsert change is a copy: it keeps neither instance DB links, cross-references nor creation data, so it is not offered as a move. Users move blocks in the TIA Portal editor. Closed as unavailable_target by maintainer disposition (31 October 2026, docs/plans/release-obligations-20261015.json).",
+          "Remaining confirmation (non-mutating, not run): target_capabilities on a block, type, tag table and software unit of an owned scratch must list no invocation named Move, Relocate, Reparent, Transfer, Cut or Paste (docs/verification/block-move-feasibility-20261031.md#remaining-check); a match reopens the row for the identity probe the record describes."
         ]
       },
       "qualification": {
@@ -8423,7 +8550,7 @@
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "No implemented adapter."
+          "V21 has no public move for PLC software objects (docs/verification/block-move-feasibility-20261031.md)."
         ]
       },
       "prerequisites": [
@@ -8825,28 +8952,29 @@
       "mcpTools": [],
       "changeKind": null,
       "api": {
-        "status": "unknown",
+        "status": "available",
         "reasons": [
-          "Vendor exposure and object-specific prerequisites require a documented adapter review."
+          "V21 DownloadProvider (offline Download(DirectoryInfo, ...) and online Download(IConfiguration, ...)) and the SafetyProgram download configuration (Siemens.Engineering.Safety.Download.Configurations.SafetyProgram, selection ConsistentDownload) exist; the offline route refuses an F-CPU and the confirmation is outside the policy."
         ]
       },
       "implementation": {
-        "status": "not_implemented",
+        "status": "partial",
         "limitations": [
-          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
-          "Boundary of the memory-card route for F-CPUs (docs/verification/safety-logic-plcsim-20261101.md); the online PLCSIM download route (change.simulation_download_online) is untested for an F-CPU."
+          "No product operation beyond change.safety_import_xml. The partial status covers only that changed-logic import (change.safety_import_xml); no route compiles, loads and runs it on a PLCSIM F-CPU. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
+          "No route loads a safety program into PLCSIM within the project's policy (docs/verification/safety-logic-plcsim-20261101.md): the online route (change.simulation_download_online) needs the owned instance's generated memory card and refused with SimulationTargetMismatch (local.safety.logic_online_route.20261101); behind that gate V21's SafetyProgram download configuration ('Load safety program to device', ConsistentDownload) would be raised next (per its API metadata; not reached natively) and is outside the project's policy, and the worker does not answer it. Closed as unavailable_target by maintainer disposition (1 November 2026, docs/plans/release-obligations-20261015.json)."
         ]
       },
       "qualification": {
         "status": "unverified",
         "evidenceIds": [
-          "local.safety.logic_plcsim_boundary.20261101"
+          "local.safety.logic_plcsim_boundary.20261101",
+          "local.safety.logic_online_route.20261101"
         ]
       },
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101); no other route is implemented."
+          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101), and the online route refuses at prepare without a successful card from this PLC (local.safety.logic_online_route.20261101); behind that gate V21's SafetyProgram download configuration ('Load safety program to device', ConsistentDownload) would be raised next (per its API metadata; not reached natively) and is outside the project's policy."
         ]
       },
       "prerequisites": [
@@ -8916,8 +9044,8 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Native bounded family adapters, exact v2 HMI identities, optional module diagnostics, project-model provider registration and evidence relationships are implemented.",
-          "Inspection, engineering, visual and runtime qualification remain separate. See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
+          "Delivered through hmi_inspect, hmi_references and hmi_capabilities (read-only inspection, relationships and module diagnostics on HmiSeeder fixtures for TP700 Comfort, WinCC RT Advanced, KTP700 Basic PN, MTP700 Unified Comfort and WinCC Unified PC RT), hmi_text_list_author, hmi_text_list_generate_set and change.hmi_text_list_import (Unified text lists on MTP700 Unified Comfort and WinCC Unified PC RT 21.0.1.0) and change.hmi_compile (one HMI target per change; not yet natively qualified: only a desk-configured fixture compiles, docs/reference/hmi-fixture-preparation.md). Each feature's own limitations bound its claim.",
+          "Not delivered: HMI content writes (change.hmi_engineering stays behind the closed HMI preservation gate), WinCC RT Professional, Classic PLC declaration mapping and visual or runtime acceptance. See the exact-profile evidence ledger; broad H0-H5 acceptance is not claimed.",
           "The 18 October shared HMI library-link repair captures one observed identifier pair, checks native service ownership and refuses unknown link state before Classic preserving import. Synthetic portable/Framework helper tests do not compile or qualify native callers, optional HMI loading, content preservation or runtime behavior. Historical evidence remains scoped to its original source."
         ]
       },
@@ -11381,7 +11509,7 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
+          "Natively qualified only for the PLC plc_component_plan route in the verified shapes of library.integrate_combined_apply (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101), which every Host applies since the maintainer decision of 29 October 2026; other shapes refuse with PlcIntegrationNotQualified. HMI faceplate_bind and PLC/HMI recipes are not qualified by it.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
@@ -11399,7 +11527,9 @@
         "evidenceIds": [
           "local.library_integrate.combined_apply.rerun.20261028",
           "local.library_integrate.candidate_shapes.rerun.20261031",
-          "local.library_integrate.combined_apply.regression.20261031"
+          "local.library_integrate.combined_apply.regression.20261031",
+          "local.library_integrate.combined_apply.regression.20261101",
+          "local.library_integrate.candidate_shapes.multi.20261101"
         ]
       },
       "availability": {
@@ -11441,11 +11571,11 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031).",
+          "Natively qualified as a production route on owned de-DE-only scratch projects with CPU 1511-1 PN (V21) for the captured FB/UDT component, a new or existing FBD FC caller and a new global instance DB (local.library_integrate.combined_apply.rerun.20261028, regression local.library_integrate.combined_apply.regression.20261031 after the short step workspace and the pre-claim refusals, and local.library_integrate.combined_apply.regression.20261101 after the pre-admission refusal). Since 31 October also, each as its own exact shape, a new or existing LAD FC caller, an existing FBD FB caller with a new global instance DB, an existing FBD FC after an earlier network, and reuse of the installed FB and UDT with a new FBD FC caller (local.library_integrate.candidate_shapes.rerun.20261031). Since 1 November also a multi-instance of the reused installed FB and UDT in an existing FBD FB caller without an instance DB, through the captured multi-instance template v21.fw41.component-gate.multi-instance.v1 (local.library_integrate.candidate_shapes.multi.20261101; capture local.typed.component-storage-capture.20261101).",
           "On by default (maintainer decision of 29 October 2026): every Host executes an eligible prepared PLC library_integrate plan in change_apply, and the preview states eligibility in combinedApply. --enable-library-integrate-apply is still accepted and changes nothing.",
-          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single-feature shapes ladCaller, fbCaller, earlierPlacement and reusedComponent are verified (PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; combinations of these features (for example a LAD FB caller or a LAD FC with an earlier placement), multi-instances, partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Combinations and multi-instances with a reused FB have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. A multi-instance of the captured component ends before any dispatch: the typed multi-instance profiles refuse its structured UDT static (InstanceCreationProfileUnavailable).",
-          "Before any claim it also refuses with its own code: ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
-          "The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
+          "Runs only the verified shapes: fresh FB/dependency import from a read-only global library source with its retained snapshot, a new global instance DB, a new FBD FC caller or an existing one inserting after its last network in the standard PLC scope, root scalar tag bindings, no planner blockers or planOnly steps. The single-feature shapes ladCaller, fbCaller, earlierPlacement and reusedComponent and the combination fbCaller+multiInstance+reusedComponent are verified (PlcComponentQualificationGate.VerifiedShapes). OB insertion is refused; combinations of these features (for example a LAD FB caller or a LAD FC with an earlier placement), other multi-instances (after a fresh import), partial dependency reuse, reused instance DBs, software units, HMI targets and PLC/HMI recipes stay plan-only and refuse with PlcIntegrationNotQualified, naming the first unverified feature or the unverified combination. Other combinations have builders without native evidence; only a --component-qualification Host runs them, in its owned scratch, and a shape opens in production only as its exact feature combination. Typed templates map a structured (UDT) member only onto a captured reference member with the identical nested declaration.",
+          "Before any claim it also refuses with its own code: DependencyProfileUnavailable (naming the dependents) when a multi-instance's caller FB has dependents (its instance DBs, embedding parents and their users, the typed route's dependent closure), because no captured dependent-DB effect covers the component's structured member; capturing that effect is not done (local.library_integrate.candidate_shapes.dependents.rerun.20261101). ComponentPathTooLong (with the computed length) when a step checkpoint archive path would exceed TIA's 143 characters; the steps live in a short workspace <Host artifact root>/changes/c/<8 hex>, so roots of up to 73 characters fit. ComponentBlockNumberOccupied (naming the conflicting block) when a block number the import would take is already used in the PLC, because the import would renumber the block; CapturedStorageProfileUnavailable when the captured instance profile binds the FB to another number.",
+          "Every combined-apply refusal is decided while the worker resolves the shared-mutation scope at mutation_begin, after the scope's own offline, PreviewStale and source checks (which keep their codes), so the Host writes no admission record and nothing becomes recovery_required (local.library_integrate.combined_apply.regression.20261101). The plan previewHash, library fingerprint and source hashes are rechecked under one admitted exclusive lease before the idempotency claim. Each step is freshly prepared, bound to the reviewed plan, applied with compile and save, and verified by readback (import identity/content, caller insertion and instance DB). Steps are not atomic.",
           "The import step's complete-project archive (for a reused FB, the typed step's own archive), taken before the first mutation, is the change's single recovery checkpoint. Any failure stops at that step, records failedStep and leaves recovery_required; change_restore on the change retrieves the checkpoint into a new location in an empty owned Portal and never replays a step. Automatic in-place rollback is not available.",
           "The new instance DB uses the natively captured storage profile when the installed FB/UDT content equals the captured component (de-DE only), otherwise the shipped typed instance templates; a callee neither covers refuses at fresh typed preparation with InstanceCreationProfileUnavailable.",
           "Before any claim, import or save, combined apply refuses (PlcIntegrationNotQualified) unless de-DE is the project's only active, reference and editing language and an instance creation profile covers the FB (captured storage profile with its CPU and loaded API files, or a shipped global instance template matched against the planned FB export); the preview reports combinedApply.eligible=false for such projects."
@@ -11456,7 +11586,11 @@
         "evidenceIds": [
           "local.library_integrate.combined_apply.rerun.20261028",
           "local.library_integrate.candidate_shapes.rerun.20261031",
-          "local.library_integrate.combined_apply.regression.20261031"
+          "local.library_integrate.combined_apply.regression.20261031",
+          "local.library_integrate.combined_apply.regression.20261101",
+          "local.typed.component-storage-capture.20261101",
+          "local.library_integrate.candidate_shapes.multi.20261101",
+          "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
         ]
       },
       "availability": {
@@ -13739,7 +13873,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.gsd_transfer_areas.20261028"
+          "local.gsd_transfer_areas.20261028",
+          "local.gsd_transfer_areas.20261101"
         ]
       },
       "availability": {
@@ -13791,7 +13926,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.gsd_transfer_areas.20261028"
+          "local.gsd_transfer_areas.20261028",
+          "local.gsd_transfer_areas.20261101"
         ]
       },
       "availability": {
@@ -20653,7 +20789,7 @@
           "Native outcomes: a code change downloads in RUN keeping actual values (TIA asks only ConsistentBlocksDownload); a layout change answers DataBlockReinitializationOrKeepActualValues with KeepActualValues or, with reinitialize and allowStop, StopPlcAndReinitialize and returns to RUN; plc_online_compare reports FolderContentsIdentical. change_restore recovers only the project into a new directory: the CPU keeps the downloaded program, and the recovered copy refuses further online downloads with SimulationTargetMismatch.",
           "After a download PLCSIM answers NotUpToDate until sim_tags refreshes its tag list. Softbus only, like plc_online_compare.",
           "Payload: downloadTicket of the owned instance (15 minutes from sim_create), softwareScope (all or changes), dataBlockValues (keepActualValues or reinitialize), explicit allowStop; optional runtimeCredentialMetadataPath (generated runtime-user login) and credentialMetadataPath (generated configuration password). Without a ticket it refuses with PhysicalPlcRefused.",
-          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC refuses with SimulationTargetMismatch.",
+          "Only the project and PLC that produced the instance's generated memory card, on the sole registered local Softbus instance with one addressable endpoint at its own address, already powered in STOP or RUN; another PLC, or an instance whose card was refused, failed or never generated, refuses with SimulationTargetMismatch.",
           "Compiles the PLC first and downloads nothing on a failed compile. Consistent blocks and alarm texts download consistently, online user data is kept, keep/reinitialize follows the option, a stop needs allowStop, a CPU found in RUN is restarted; every other configuration is refused. Software only, never a hardware download or a physical PLC.",
           "A CPU write: change_restore recovers only the project. Apply requires compile=false and save=false; an unresolved admission is held for manual reconciliation. Each download is recorded in the instance storage and reported by programEvidence."
         ]
@@ -24384,7 +24520,7 @@
         "status": "partial",
         "limitations": [
           "Same owned-PLCSIM gate as runtime_ua_write: the session endpoint must be a controller IPv4 address of a runtime_plcsim_bind binding, the simulator worker must still observe the same owned instance and Windows must route the address through the PLCSIM Virtual Ethernet Adapter (RuntimeTargetNotOwnedPlcsim / RuntimeTargetRouteUnverified before anything is sent). Requires acknowledgeCall and no running acquisition.",
-          "Only a method component of an object in the PLC namespace http://www.siemens.com/simatic-s7-opcua that browse finds (HasComponent, NodeClass Method); on an S7-1500 these are user-program server methods (OPC_UA_ServerMethodPre/Post), and the ua-services run records which methods the namespace exposes. Standard server methods (ConditionRefresh, Acknowledge, GetMonitoredItems), arbitrary NodeIds and a server without that namespace are refused (UaMethodNotServerMethod); the session check requires namespace index 0 to be the standard OPC UA namespace. Methods in custom server-interface or companion-specification namespaces are not reachable.",
+          "Only a method component of an object in the PLC namespace http://www.siemens.com/simatic-s7-opcua that browse finds (HasComponent, NodeClass Method); on an S7-1500 these are user-program server methods (OPC_UA_ServerMethodPre/Post). Standard server methods (ConditionRefresh, Acknowledge, GetMonitoredItems), arbitrary NodeIds and a server without that namespace are refused (UaMethodNotServerMethod); the session check requires namespace index 0 to be the standard OPC UA namespace. Methods in custom server-interface or companion-specification namespaces are not reachable.",
           "0..16 scalar inputs in runtime_ua_read encodings, checked against InputArguments in count and type before dispatch (Boolean, integers, Float/Double, String; DateTime, structures, arrays and enumerations refused); a non-executable method and duplicate or unreadable argument lists (UaMethodArgumentsUnreadable) are refused. Refusals keep the session.",
           "One Call service request; status code, per-input results and decoded outputs are returned. A lost response leaves the session remoteSessionUnknown and the call is never retried; no durable intent journal and no readback of the method's program effect.",
           "Qualified against the OPC UA server of an owned PLCSIM Advanced V8 CPU 1511-1 PN V4.1 (local.runtime.plcsim-ua-services.20261031): the PLC namespace below Objects exposes exactly the user program's \"ServerMethod_DB\".Method; (41, true) answered (42, false) with the PLCSIM call counter up by one, the method's own BadInvalidArgument returned as methodFailed, and a standard Server method, a wrong argument count and a missing acknowledgement were refused before dispatch. Lost responses are tested against the fixture server only."
@@ -24434,7 +24570,7 @@
           "One bounded snapshot per call: a temporary subscription with one event item on the Server object, ConditionRefresh, Publish for 500..5000 ms and at most 256 events, then DeleteSubscriptions, also after a failure or cancellation (cleanup failure marks the session remoteSessionUnknown); a Bad subscription status ends the window early and status changes are capped at 64. Nothing is retained; runtime_ua_subscription_start keeps event timelines with the standard BaseEventType fields only.",
           "Fields EventId, EventType, SourceName, Time, Message, Severity, ConditionId, Retain, ActiveState/Id and AckedState/Id; each event is classified refreshStart, refreshEnd, condition, overflow or event, and refresh boundaries, truncation and select-clause statuses stay explicit. No where clause, branches, comments, shelving or enabled-state fields.",
           "Read-only: one ConditionRefresh method call to the connected server, which re-sends condition events to this temporary subscription and writes no process data, so no owned target is needed. Acknowledge, Confirm, AddComment, enable/disable and shelving are not offered, and runtime_ua_call refuses the standard condition methods.",
-          "On an S7-1500 the server needs Alarms and Conditions enabled (opcua_server_settings_set alarmsAndConditions) and central alarm management in the PLC; whether PLCSIM Advanced raises conditions is decided by the ua-services run.",
+          "On an S7-1500 the server needs Alarms and Conditions enabled (opcua_server_settings_set alarmsAndConditions) and central alarm management in the PLC.",
           "Qualified against the OPC UA server of an owned PLCSIM Advanced V8 CPU 1511-1 PN V4.1 with Alarms and Conditions on (local.runtime.plcsim-ua-services.20261031): ConditionRefresh start/end in every snapshot, a Program_Alarm raised by a PLCSIM write appeared as one new active retained condition and was gone after the trigger fell; a CPU system-diagnostics condition was present throughout. That alarm used TIA's default class (AckedState true) and the server sends SourceName null; acknowledgeable alarms were not exercised."
         ]
       },

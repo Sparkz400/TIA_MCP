@@ -213,9 +213,16 @@ namespace TiaMcp.Openness.V21
             string receiptPath = Path.Combine(root, "upgrade-receipt.json");
             var receipt = File.Exists(receiptPath) && new FileInfo(receiptPath).Length < 4 * 1024 * 1024 ? JObject.Parse(File.ReadAllText(receiptPath)) : null;
             check.Evidence(destination, "receipt", new JObject { ["state"] = receipt?["state"], ["project"] = receipt?["project"]?.DeepClone() });
-            // Only a completed receipt naming the one V21 project in the destination proves it; a copy without it is partial.
-            check.Destination(destination, null, "The destination holds the one V21 project its completed upgrade receipt names.",
-                project => receipt?.Value<string>("state") == "upgraded" && SameSimulationPath(project.Path?.FullName, receipt["project"]?.Value<string>("path")));
+            // Only a completed receipt of this source naming the one V21 project at the observed layout proves it. A partial copy or an
+            // unfinished upgrade (receipt copying or upgrading) is held without opening its possibly half-written project in TIA.
+            string upgraded = ProjectUpgradeRules.ReceiptProject(receipt, root, path, source.Value<string>("kind") == "workspace", hash);
+            // Destination opens the one .ap21 it finds; anything but the receipt's project is held unopened.
+            var found = upgraded != null && Directory.Exists(root) ? Directory.GetFiles(root, "*.ap21", SearchOption.AllDirectories) : new string[0];
+            if (found.Length != 1 || !SameSimulationPath(found[0], upgraded)) upgraded = null;
+            string name = (receipt?["project"] as JObject)?.Value<string>("name");
+            check.Destination(destination, () => { check.Hold(destination, "No completed upgrade receipt of this source names the V21 project at the observed layout; a partial copy or unfinished upgrade is not opened."); return null; },
+                "The destination holds exactly the one V21 project at the observed layout that its completed upgrade receipt names.",
+                upgraded == null ? null : (Func<Project, bool>)(project => SameSimulationPath(project.Path?.FullName, upgraded) && project.Name == name));
         }
 
         private void AdmissionReconcileLibraryOpen(AdmissionReconcileCheck check, string observationSha256)

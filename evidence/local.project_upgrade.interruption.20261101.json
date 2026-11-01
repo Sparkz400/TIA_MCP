@@ -1,0 +1,54 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.project_upgrade.interruption.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T03:48:15+00:00",
+  "source": {
+    "commit": "61f75b839532c790d7727ff5d3f14dfe1b2d3fb7",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_interruption.py on a Debug build of 61f75b8 frozen with git archive, 16 of 16 cases, each in its own owned Portal on an owned copy of TinyMySQLClient_V15.ap15 (project folder, OpenWithUpgrade, pf-*) or TinyMySQLClient_V14_1.zap14 (archive, RetrieveWithUpgrade, pa-*), reconciled once by engineering_admission_reconcile from a fresh Host. Worker and owned TIA terminated at the first dispatchIntent (int: destination never created) -> released, source and destination unchanged; at receipt copying (cpy) and upgrading (upg, inside the native upgrade) -> held with the partial owned copy; at the first .ap21 at the observed layout while the receipt is upgrading (prj) -> held without the project being opened. Host stopped after the durable dispatch intent and before dispatch (hint, host.project_upgrade.beforeDispatch) -> released unchanged. Host killed at receipt copying (hcpy) and upgrading (hupg), and Host stopped after the native upgrade returned but before recording it (hret, host.project_upgrade) -> the worker finished, released with the destination verifiedApplied, and the reconciled V21 project (TinyMySQLClient_V15_V21, TinyMySQLClient_V14_V21) opened in the same fresh session with its pinned inventory (17 hardware items, 1 PLC, 7 blocks, 0 inconsistent). Every case: source copy fingerprint unchanged and proven unchanged by the reconciler, exactly one project_upgrade admission and at most one destination (no replay), destination unchanged by reconciliation, each held admission keeps its source reserved (a second project_upgrade is refused ResourceBusy). Originals byte-identical before and after; copies removed; no run file names a folder above an original.",
+  "limitations": [
+    "Interruption is process termination of the worker with its owned TIA, or Host loss by kill or a qualification Host point, once per case; power loss, disk faults and remote transport are not exercised.",
+    "Two small public examples (a V15 project folder and a V14 SP1 archive). Boundaries are observed through the durable upgrade receipt and admission store; the copy of these examples takes milliseconds, so each case records the durable state it hit (all 16 hit their intended state).",
+    "A partial copy or unfinished upgrade stays held; releasing it needs someone to remove the owned destination and reconcile again, which is not exercised.",
+    "Reconciliation trusts the worker-written upgrade receipt once it is bound to the recomputed source hash and the observed layout; a receipt edited inside the owned artifacts tree after the interruption is trusted."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d828a2dc0dcf903a32b26353b6344555cdbbb65d0725431540c9d5ee409c6460"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "9439e886fe0deeed690d9f9360d4c4788a0c413d8c9e142ed0cbc71e53a832b6"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "0fc65024c4838f54c4b60bfee439f5ef75bc10489aa02301162ce23b4e656777",
+      "bytes": 439594,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "project_inventory",
+        "project_open",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "project_upgrade"
+      ]
+    }
+  ]
+}

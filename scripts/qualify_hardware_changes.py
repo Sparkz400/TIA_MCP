@@ -33,6 +33,7 @@ instead of failing: a key-discovery pass that fixes the expectations, never evid
 --slice restores runs a short sequence instead: the two stations on the second CPU, the capability-profile gates (the catalog
 search names a profile; a write the profile does not declare is refused) and a checkpoint restore of each topology change the
 full run applied without one (the shared-device assignment, OutsideOfProject, the createDomain manager, the IM 155-5 client).
+--slice gsd runs only the installed I-device GSD device and what it needs (see gsd_slice).
 """
 from __future__ import annotations
 
@@ -114,6 +115,13 @@ SLICE_LIMITATIONS = [
     "Checkpoint restores of the shared-device assignment (SpDi3 to the scratch CPU), SpDi4 OutsideOfProject with one external IO controller, the MRP manager "
     "creating domain HwRing and the IM 155-5 PN ST joining it as client; the members' ports stay unlinked, so no ring is closed.",
     "Engineering only; nothing is downloaded and no physical topology is observed.",
+]
+GSD_SLICE_LIMITATIONS = [
+    "--slice gsd: one owned scratch CPU 1511-1 PN V4.1 and an added CPU 1511-1 PN V4.1 (configureScratchSecurity) on HwNet with an ET 200MP IM 155-5 PN ST V4.1 "
+    "station, whose assignment creates the IO system HwPeerIo; the scratch CPU stays off HwNet; no S7-1200, ET 200SP, port links or reopen.",
+    "GSD device: the I-device GSD that scripts/qualify_gsd_export.py exports (designation TiaMcpIDevice), installed by an operator in TIA (V21 Openness has no GSD "
+    "installation API); added and put on HwNet with checkpoint but without compile (an unassigned IO device fails the device compile), then assigned to HwPeerIo "
+    "with compile and save, that assignment restored once and applied again. No modules are plugged into the GSD device; nothing is downloaded.",
 ]
 PROFILE_LINK = "contracts/hardware-catalog-profiles.v1.json#"  # hardware_catalog_search's profile reference: the contract path, #, the typeIdentifier.
 
@@ -550,16 +558,22 @@ def address_change(run):
               added=lambda applied, state: [key for key in under(module)(applied, state) if key not in run.b0["view"]], check=mapped, restore=True, boundary=True)
 
 
-def gsd_device(run):
-    """The project's own exported I-device GSD (designation GSD_DESIGNATION), once an operator installed it in TIA: added as an IO
-    device, put on HwNet and assigned to HwPeerIo with compile. V21 Openness cannot install a GSD file, so without it the run records
-    gsdNotInstalled, which is not a failure."""
+def gsd_entries(run):
+    """The installed catalog entries of the project's own I-device GSD (designation GSD_DESIGNATION, a GSD: type), recorded as gsdCatalog."""
     def search():
         rows = [e for e in run.h.tool("hardware_catalog_search", {"filter": GSD_DESIGNATION, "maxItems": 500})["entries"] if (e.get("typeIdentifier") or "").startswith("GSD:")]
         run.h.report["gsdCatalog"] = rows
         return {"entries": len(rows)}
     run.h.stage("search the catalog for the installed I-device GSD", search)
-    rows = run.h.report["gsdCatalog"]
+    return run.h.report["gsdCatalog"]
+
+
+def gsd_device(run, rows=None, restore=False):
+    """The project's own exported I-device GSD, once an operator installed it in TIA: added as an IO device, put on HwNet and assigned
+    to HwPeerIo with compile. V21 Openness cannot install a GSD file, so without it the run records gsdNotInstalled, which is not a
+    failure. rows: the catalog entries already searched. restore: the assignment, which compiles and saves the deferred add and
+    subnet change, is restored once before it applies for good."""
+    rows = gsd_entries(run) if rows is None else rows
     if not rows:
         run.h.report["gsdNotInstalled"] = True
         return
@@ -573,15 +587,21 @@ def gsd_device(run):
     path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
-    run.apply("assign %s to HwPeerCpu" % device, "network_io_assign", payload,
-              {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
-              shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
-              changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated, boundary=True)
+    def assign(restored):
+        return run.apply("assign %s to HwPeerCpu%s" % (device, ", restored" if restored else ""), "network_io_assign", payload,
+                         {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
+                         shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
+                         changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated, restore=restored, boundary=True)
+    if restore:
+        run.b0 = run.current
+        assign(True)
+    assign(False)
     run.h.report["gsdDevice"] = {"typeIdentifier": identifier, "hardwarePath": path}
 
 
-def network(run):
-    for device, cpu, extra in (("HwPeer", "HwPeerCpu", {"attributes": {"Address": "192.168.0.2"}}), ("ScratchStation", "ScratchPLC", {})):
+def network(run, scratch=True):
+    """HwPeerCpu (readdressed; its change creates HwNet) and the scratch CPU on HwNet; scratch=False leaves the scratch CPU off it."""
+    for device, cpu, extra in (("HwPeer", "HwPeerCpu", {"attributes": {"Address": "192.168.0.2"}}), ("ScratchStation", "ScratchPLC", {}))[:2 if scratch else 1]:
         interface = run.path(device, "items", cpu, "items", "PROFINET%20interface_1")
         # device_inventory reports the node address on the device, CPU and interface rows, so only the readdressed peer changes there.
         rows = [run.path(device), run.path(device, "items", cpu), interface] if extra else []
@@ -825,6 +845,33 @@ def restore_slice(run):
     run.expect(not missing and run.coverage.get("hardware_attributes", {}).get("refused"), "coverage", "Slice kinds without a restore or the profile refusal: %s" % missing)
 
 
+def gsd_slice(run):
+    """--slice gsd: the GSD catalog search first; with an installed I-device GSD, only what gsd_device needs (the added CPU HwPeer on
+    HwNet and its IO system HwPeerIo, which the ET 200MP assignment creates), then the GSD device added and put on HwNet without
+    compile and its assignment, restored once and applied again. It qualifies only with exactly one installed GSD entry; without
+    one it records gsdNotInstalled and fails at once."""
+    rows = gsd_entries(run)
+    if not rows:
+        run.h.report["gsdNotInstalled"] = True
+    # Before any mutation: gsd_device would find a second entry only after the prerequisites.
+    run.expect(len(rows) == 1, "gsd", "The GSD slice needs exactly one installed I-device GSD entry (gsdNotInstalled: %s): %s" % (not rows, rows))
+    if rows:
+        add_cpu(run, "add CPU HwPeer", "HwPeer")
+        network(run, scratch=False)
+        station(run)
+        gsd_device(run, rows, restore=True)
+        run.expect(bool(run.coverage.get("network_io_assign", {}).get("restored")) and "gsdDevice" in run.h.report, "gsd",
+                   "The GSD slice qualifies only when the GSD device's assignment applied and restored.")
+
+
+def heading(args):
+    """The report title and limitations of the full run or the selected slice."""
+    title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
+             "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
+             None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
+    return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
+
+
 def body(h):
     run = Run(h)
     h.owned_scratch("hardware changes")
@@ -832,8 +879,9 @@ def body(h):
     run.project, run.base = status["path"], "/projects/%s/devices/" % status["name"]
     run.plc = scratch_plc(run)  # The PLC compiled by tag_create.
     run.current = run.snap("baseline")
-    if getattr(getattr(h, "args", None), "slice", None) == "restores":
-        restore_slice(run)
+    sliced = getattr(getattr(h, "args", None), "slice", None)
+    if sliced:
+        {"restores": restore_slice, "gsd": gsd_slice}[sliced](run)
         return
     phase_a(run)
     reopen(run)
@@ -851,9 +899,9 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--discover", action="store_true", help="Record unexpected state differences, previews and refusals instead of failing (not evidence).")
-    parser.add_argument("--slice", choices=("restores",), help="restores: only the profile gates and the topology restores the full run lacks.")
+    parser.add_argument("--slice", choices=("restores", "gsd"), help="restores: only the profile gates and the topology restores the full run lacks; "
+                        "gsd: only the installed I-device GSD device and what it needs.")
     args = parser.parse_args()
     args.runner = __file__
-    title = ("X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations" if args.slice else
-             "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring")
-    Harness(args, "hw_", title + (" (key discovery, not evidence)" if args.discover else ""), SLICE_LIMITATIONS if args.slice else LIMITATIONS, []).run(body)
+    title, limitations = heading(args)
+    Harness(args, "hw_", title, limitations, []).run(body)

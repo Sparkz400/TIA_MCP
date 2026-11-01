@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.dependents.rerun.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T06:00:05+00:00",
+  "source": {
+    "commit": "195f63a375a43e6ea382706c95de56580b23a377",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates at 195f63a3 (frozen artifacts/w4f, --artifacts artifacts/ic7) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: ladStandalone, ladExisting, fbCaller, earlierPlacement, reuse and multiInstance installed with every gate; multiInstanceDependents (TiaMcpComponentHost with its own instance DB, after a verified standalone install) previewed eligible=false with refusalCode DependencyProfileUnavailable naming that DB, change_apply was refused with DependencyProfileUnavailable and the message 'Combined apply refused before admission: ...', the Host's admission records were the same before and after, the plan stayed prepared without an idempotency claim, and the scratch snapshot equalled the baseline.",
+  "limitations": [
+    "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+    "Covers a caller FB with its own global instance DB; an embedding parent FB falls under the same dependent closure but was not exercised natively."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4bf625b2f8cde84edff5e50f14e7aeac334fc00a9a1728c6a155a1d90559d60f"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "974db1eebceffb22d5d385cc21de17cc632c6c5a7aa421cbb6b5bbbdae854c37"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "eda02fd7907117349ca0a7de7cdd5b4d72f80220add9c72a489b581b39ba4c8d",
+      "bytes": 15635088,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:ladStandalone",
+        "candidate:ladExisting",
+        "candidate:fbCaller",
+        "candidate:earlierPlacement",
+        "candidate:reuse",
+        "candidate:multiInstance",
+        "candidate:multiInstanceDependents"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_capabilities",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

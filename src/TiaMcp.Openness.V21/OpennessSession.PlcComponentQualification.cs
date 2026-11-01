@@ -70,6 +70,14 @@ namespace TiaMcp.Openness.V21
                 project != null && _scratchProject != null && project.Equals(_scratchProject), _portal?.Projects.Count ?? 0);
             EnsureProjectOffline(project);
         }
+        // Typed templates marked qualificationOnly serve only this --component-qualification worker's own component scratch.
+        private bool TypedQualificationScratch(Project project)
+        {
+            if (!_componentQualificationEnabled) return false;
+            try { RequireComponentScratch(project); return true; }
+            catch (PlcComponentException) { return false; }
+            catch (BridgeException) { return false; }
+        }
         private static JObject ComponentQualificationView(JObject record)
         {
             string state = record.Value<string>("state"), step = state == "library_prepared" ? "library" : state == "graphical_prepared" ? "graphical" : null;

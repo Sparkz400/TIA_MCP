@@ -48,7 +48,9 @@ namespace TiaMcp.Openness.V21
         // scratch (candidates=true).
         // Passed natively on 31 October (local.library_integrate.candidate_shapes.rerun.20261031): a new or existing LAD FC caller, an
         // existing FBD FB caller, an existing FBD FC after an earlier network, and reuse of the installed FB with a new FBD FC caller.
-        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "ladCaller", "reusedComponent" };
+        // Passed natively on 1 November (local.library_integrate.candidate_shapes.multi.20261101): a multi-instance of the reused
+        // installed FB in an existing FBD FB caller, through the captured template local.typed.component-storage-capture.20261101.
+        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "fbCaller+multiInstance+reusedComponent", "ladCaller", "reusedComponent" };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
@@ -80,9 +82,9 @@ namespace TiaMcp.Openness.V21
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
             if (language == "LAD") features["ladCaller"] = "A LAD caller is verified only as a new or existing FC on its own; a LAD " + kind + " caller with further features stays plan-only.";
-            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB; a " + language + " FB caller with further features stays plan-only.";
-            if (plan["multiInstance"] != null) features["multiInstance"] = "Only new global instance DBs are verified; multi-instances stay plan-only.";
-            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB; reuse with further features stays plan-only.";
+            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB, or with a multi-instance of the reused FB; a " + language + " FB caller with further features stays plan-only.";
+            if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB, or as a multi-instance in an existing FBD FB caller; reuse with further features stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
                 features["earlierPlacement"] = "An earlier placement is verified only in an existing FBD FC on its own; an earlier placement with further features stays plan-only.";
@@ -94,6 +96,17 @@ namespace TiaMcp.Openness.V21
             active?.Length == 1 && active[0] == "de-DE" && reference == "de-DE" && editing == "de-DE" ? null
                 : "Only de-DE-only projects are verified; this project has active languages " + string.Join(", ", active ?? new string[0]) +
                   " (reference " + reference + ", editing " + editing + ").";
+        // A multi-instance changes the caller FB's interface, so the typed step would also change each dependent the typed route
+        // finds (its instance DBs, embedding parents and their users). No captured dependent-DB effect covers the component's
+        // structured member, and the verified shape had no dependents, so such a plan is refused before admission and claim.
+        internal static JObject CombinedApplyDependentsRefusal(JObject plan, System.Collections.Generic.IEnumerable<string> dependents)
+        {
+            var paths = plan?["multiInstance"] == null ? new string[0] : dependents.OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            if (paths.Length == 0) return null;
+            return new JObject { ["code"] = "DependencyProfileUnavailable", ["dependents"] = new JArray(paths),
+                ["message"] = "The multi-instance caller " + plan["caller"]?.Value<string>("blockPath") + " has dependents (" + string.Join(", ", paths.Take(3)) +
+                    (paths.Length > 3 ? " and " + (paths.Length - 3) + " more" : "") + "); its instance DBs and embedding parents would need a captured dependent-DB effect for the new member, and none covers it." };
+        }
         // The template route of the instance DB step, decided on the planned FB export instead of after its import.
         internal static string CombinedApplyInstanceRefusal(XDocument callee, string instanceName, System.Collections.Generic.IEnumerable<XDocument> templates)
         {

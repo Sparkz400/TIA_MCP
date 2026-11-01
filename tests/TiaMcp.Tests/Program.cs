@@ -307,6 +307,8 @@ internal static partial class Program
             ("Typed replacement retains known native instruction and wire IDs", TypedGraphicalCorpusTests.ReplacementRetainsKnownNativeIds),
             ("Typed SUB/DIV read and replace TIA's Card-less import form", TypedGraphicalCorpusTests.NonExpandableMathReadsWithoutExportedCard),
             ("Typed global FB instances retain native storage defaults without guessing layouts", TypedGraphicalTests.GlobalInstanceTemplatesRetainObservedDefaults),
+            ("Typed structured members map only onto an identical captured member", TypedGraphicalTests.StructuredMembersMapOnlyOntoIdenticalCapturedMembers),
+            ("Typed qualification-only templates serve only the component qualification scratch", TypedGraphicalTests.QualificationOnlyTemplatesServeOnlyTheComponentScratch),
             ("Typed factories preserve every captured scalar creation and instance default", TypedGraphicalTests.CapturedCreationAndInstanceDefaultsRemainComplete),
             ("Typed captured branches preserve the complete native XML after replacement", TypedGraphicalCorpusTests.CapturedBranchRoundtripPreservesCompleteNativeXml),
             ("Typed inserted networks allocate native UIds within their own network", TypedGraphicalCorpusTests.NewNetworkIdsAreNativeScoped),
@@ -342,7 +344,8 @@ internal static partial class Program
             ("Project upgrade summarizes the conversion log's project success marker and message counts", ProjectUpgradeRulesTests.ConversionLogSummary),
             ("Project upgrade reads the real version and project name from the project marker, not the file name", ProjectUpgradeRulesTests.MarkerDeclaresTheRealVersion),
             ("Project upgrade refuses a project folder holding another project or archive", ProjectUpgradeRulesTests.FolderHoldsOneProject),
-            ("Project upgrade evidence collection records its own failure and never replaces TIA's outcome", ProjectUpgradeRulesTests.EvidenceNeverReplacesTheOutcome)
+            ("Project upgrade evidence collection records its own failure and never replaces TIA's outcome", ProjectUpgradeRulesTests.EvidenceNeverReplacesTheOutcome),
+            ("Project upgrade reconciliation trusts only a completed receipt of the admitted source at the observed layout", ProjectUpgradeRulesTests.ReceiptProvesOnlyACompletedUpgradeAtTheLayout)
         ];
         if (typedGraphicalOnly) tests = tests.Where(test => test.Name.StartsWith("Typed ", StringComparison.Ordinal)).ToArray();
         if (bridgeOnly) tests = tests.Where(test => test.Name.StartsWith("Bridge ", StringComparison.Ordinal)).ToArray();

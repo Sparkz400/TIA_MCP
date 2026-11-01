@@ -1,0 +1,26 @@
+{
+  "description": "Catalog evidence retired from contracts/feature-catalog.v1.json in catalog 0.4.88 (1 November 2026). local.library_integrate.candidate_shapes.dependents.20261101 ran at dc805b70, whose pre-admission refusal ran before the shared-mutation scope's own offline, PreviewStale and source checks and again at dispatch (review finding 1); 195f63a3 moved it after those checks, to mutation_begin only, and local.library_integrate.candidate_shapes.dependents.rerun.20261101 reran the same cases there. The passedScope is corrected to what was observed natively (review finding 2); otherwise kept verbatim.",
+  "retiredFromCatalog": "0.4.88",
+  "replacedBy": {
+    "local.library_integrate.candidate_shapes.dependents.20261101": "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
+  },
+  "records": [
+    {
+      "id": "local.library_integrate.candidate_shapes.dependents.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "dc805b70d0d081ccb39c32ec13e0b03edcc44144",
+        "passedScope": "scripts/qualify_library_integrate_apply.py --candidates at dc805b70 (frozen artifacts/w4d, --artifacts artifacts/ic6) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: ladStandalone, ladExisting, fbCaller, earlierPlacement, reuse and multiInstance installed again with every gate. multiInstanceDependents: after a verified standalone install, TiaMcpComponentHost (FB30) got its own instance DB TiaMcpComponentHost_DB; the reused-FB multi-instance plan previewed combinedApply.eligible=false with refusalCode DependencyProfileUnavailable naming that DB in refusalDetails.dependents, change_apply was refused with DependencyProfileUnavailable before admission (the Host's admission records were unchanged), the plan stayed prepared without an idempotency claim, and the scratch export/inventory snapshot equalled the baseline."
+      },
+      "artifacts": [
+        "evidence/local.library_integrate.candidate_shapes.dependents.20261101.json"
+      ],
+      "limitations": [
+        "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1.",
+        "Covers a caller FB with its own global instance DB; an embedding parent FB is covered by the same dependent closure but was not exercised natively."
+      ]
+    }
+  ]
+}

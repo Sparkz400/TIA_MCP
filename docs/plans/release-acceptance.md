@@ -46,11 +46,12 @@ the record changes the ledger, so regenerate the matrix afterwards
 The ledger's top-level `dispositions` holds the maintainer's decisions on rows that cannot close.
 Each entry names the feature, its obligations, the decision, its date, the boundary and the
 evidence. A dispositioned row is not a pass; it leaves the 1.0 count. The decision of
-29 October covers five `unavailable_target` rows (31 cells). Four rest on recorded V21
+29 October covers five `unavailable_target` rows (31 cells); `block.move` and
+`safety.logic_changes` joined on 1 November (seven rows, 37 cells). Four rest on recorded V21
 behavior; `change.hmi_engineering` rests on V21's missing `Screen.Export` plus the repository's
 preservation gate. The three block-protection kinds were blocked only for a missing repository
 route; the maintainer decided the same day to build it for 1.0, so they count as open work.
-The ten `deferred` rows have no disposition and stay 1.0 work
+The two `deferred` rows have no disposition and stay 1.0 work
 ([TODO](../TODO.md#deferred-rows)).
 
 ## Candidates on 29 October (catalog `0.4.76`)

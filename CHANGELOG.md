@@ -41,7 +41,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **Project upgrade:** `project_upgrade` upgrades a V14–V20 project folder (`.ap14`–`.ap20`,
   `.ap15_1`) or archive (`.zap14`–`.zap20`) to V21 on an owned copy; the source is never opened,
   its hash is checked before and after, and V13 and older are refused before any native call
-  (`local.project_upgrade.20261031`).
+  (`local.project_upgrade.20261031`). A half-written upgrade is held without being opened, and Host
+  loss after the native reply reconciles `verifiedApplied`
+  (`local.project_upgrade.interruption.20261101`, 16/16).
 - **OPC UA client:** `runtime_ua_call` calls a method component of an object in the PLC namespace
   (on an S7-1500, a user-program server method) on an owned PLCSIM instance behind the
   `runtime_ua_write` gate, never retried; `runtime_ua_conditions` takes an Alarms and Conditions
@@ -80,7 +82,13 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   caller, an earlier placement in an existing FBD FC and reuse of an installed FB, each as an exact
   single-feature shape (`local.library_integrate.candidate_shapes.rerun.20261031`); combinations
   stay plan-only. `library_instantiate` sets an explicit `namespace` on a master copy of a block or
-  PLC data type (`local.library_units.namespace.rerun.20261031`).
+  PLC data type (`local.library_units.namespace.rerun.20261031`). An FB caller with a multi-instance
+  and a reused component also verifies (`local.library_integrate.candidate_shapes.multi.20261101`);
+  a caller FB with dependents (its own instance DB, embedding parents) is refused at
+  `mutation_begin` with `DependencyProfileUnavailable` before any admission record
+  (`local.library_integrate.candidate_shapes.dependents.rerun.20261101`).
+- **GSD:** the I-device GSD export reran (`local.gsd_transfer_areas.20261101`); the GSDML is staged
+  for an operator install, and the hardware runner has `--slice gsd` for the device step afterwards.
 
 ### Changed
 
@@ -113,6 +121,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - `to_create` checks the CPU, type and version against the technology version profiles: a recorded
   refusal refuses with its native text (`TechnologyVersionRefused`), and an unprofiled pair needs
   `unprofiledAcknowledged` (`TechnologyVersionUnprofiled` otherwise).
+- `safety.logic_changes` and `block.move` are closed as `unavailable_target`: V21's offline
+  `DownloadProvider` refuses the PLCSIM card and the online route refuses at prepare without a card
+  from this PLC; V21 has no block move API. The release matrix counts an unavailable API with an
+  unsupported or blocked target as `unavailable_target`.
+- `SimulationTargetMismatch` tells an owned instance with no successful card that it has none.
 - The Unified HMI preservation capture also covers the complete text-list export, and OPC UA sessions
   also check that namespace 0 is the OPC UA namespace.
 
@@ -156,13 +169,14 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 451 of 479 catalog features are verified; 108 release-matrix cells are open and 12 deferred
+- 451 of 479 catalog features are verified; 108 release-matrix cells are open and 6 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
 - V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
   through Openness, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
-  file, and the offline memory-card download cannot load a safety program into PLCSIM.
+  file, and a safety program cannot be loaded into PLCSIM (the offline memory-card download is
+  refused; the online route needs a card from the PLC).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built

@@ -4,9 +4,9 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.88",
-    "catalogSha256": "779664bacba4bb025ece44a00b31d9c456b778399eb10d5d5973e6457fb25844",
+    "catalogSha256": "f8d8e4d733f667017996e11b22b21b85553dba66ce1e0080d0f6b0b7033f8232",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
+    "ledgerSha256": "d70c4096a59f2a65df1b618b39acd8e65a6d9d9cb58ac91ab3ec5d767f54c127"
   },
   "targetTiaVersions": [
     21
@@ -14,16 +14,16 @@
   "summary": {
     "features": 479,
     "support": {
-      "deferred": 4,
+      "deferred": 2,
       "limited": 322,
       "shipped": 129,
-      "unavailable_target": 5,
+      "unavailable_target": 7,
       "unqualified": 19
     },
     "cells": {
-      "blocked": 31,
+      "blocked": 37,
       "bound": 2055,
-      "deferred": 12,
+      "deferred": 6,
       "open": 108
     },
     "openCellsByOwner": {
@@ -496,28 +496,32 @@
         "X01"
       ],
       "evidenceIds": [
-        "local.project_upgrade.20261031"
+        "local.project_upgrade.20261031",
+        "local.project_upgrade.interruption.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.project_upgrade.20261031"
+            "local.project_upgrade.20261031",
+            "local.project_upgrade.interruption.20261101"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.project_upgrade.20261031"
+            "local.project_upgrade.20261031",
+            "local.project_upgrade.interruption.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.project_upgrade.20261031"
+            "local.project_upgrade.20261031",
+            "local.project_upgrade.interruption.20261101"
           ]
         }
       ]
@@ -1005,28 +1009,32 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.gsd_transfer_areas.20261028"
+        "local.gsd_transfer_areas.20261028",
+        "local.gsd_transfer_areas.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-completeness",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         }
       ]
@@ -5020,7 +5028,7 @@
       "domain": "language",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "unavailable_target",
       "owners": [
         "D07",
         "X11"
@@ -5429,12 +5437,13 @@
       "domain": "safety",
       "mcpTools": [],
       "changeKind": null,
-      "support": "deferred",
+      "support": "unavailable_target",
       "owners": [
         "D14"
       ],
       "evidenceIds": [
-        "local.safety.logic_plcsim_boundary.20261101"
+        "local.safety.logic_plcsim_boundary.20261101",
+        "local.safety.logic_online_route.20261101"
       ],
       "cells": [
         {
@@ -8358,7 +8367,9 @@
       "evidenceIds": [
         "local.library_integrate.combined_apply.rerun.20261028",
         "local.library_integrate.candidate_shapes.rerun.20261031",
-        "local.library_integrate.combined_apply.regression.20261031"
+        "local.library_integrate.combined_apply.regression.20261031",
+        "local.library_integrate.combined_apply.regression.20261101",
+        "local.library_integrate.candidate_shapes.multi.20261101"
       ],
       "cells": [
         {
@@ -8367,7 +8378,9 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8376,7 +8389,9 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8385,7 +8400,9 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8394,7 +8411,9 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8403,7 +8422,9 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8412,7 +8433,9 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         }
       ]
@@ -8435,7 +8458,11 @@
       "evidenceIds": [
         "local.library_integrate.combined_apply.rerun.20261028",
         "local.library_integrate.candidate_shapes.rerun.20261031",
-        "local.library_integrate.combined_apply.regression.20261031"
+        "local.library_integrate.combined_apply.regression.20261031",
+        "local.library_integrate.combined_apply.regression.20261101",
+        "local.typed.component-storage-capture.20261101",
+        "local.library_integrate.candidate_shapes.multi.20261101",
+        "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
       ],
       "cells": [
         {
@@ -8444,7 +8471,11 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
           ]
         },
         {
@@ -8453,7 +8484,11 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
           ]
         },
         {
@@ -8462,7 +8497,11 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
           ]
         },
         {
@@ -8471,7 +8510,11 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
           ]
         },
         {
@@ -8480,7 +8523,11 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
           ]
         },
         {
@@ -8489,7 +8536,11 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.combined_apply.regression.20261101",
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101",
+            "local.library_integrate.candidate_shapes.dependents.rerun.20261101"
           ]
         }
       ]
@@ -11488,49 +11539,56 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.gsd_transfer_areas.20261028"
+        "local.gsd_transfer_areas.20261028",
+        "local.gsd_transfer_areas.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         }
       ]
@@ -11550,49 +11608,56 @@
         "X10"
       ],
       "evidenceIds": [
-        "local.gsd_transfer_areas.20261028"
+        "local.gsd_transfer_areas.20261028",
+        "local.gsd_transfer_areas.20261101"
       ],
       "cells": [
         {
           "gate": "AC-identity",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-preserve",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-preview",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-native",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-recovery",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         },
         {
           "gate": "AC-evidence",
           "status": "bound",
           "evidenceIds": [
-            "local.gsd_transfer_areas.20261028"
+            "local.gsd_transfer_areas.20261028",
+            "local.gsd_transfer_areas.20261101"
           ]
         }
       ]
@@ -25930,6 +25995,23 @@
       "notRetained": []
     },
     {
+      "id": "local.gsd_transfer_areas.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1"
+      },
+      "sourceCommit": "7efef756a7e51cf8b8f02524fe25ba6038e64dac",
+      "retained": [
+        {
+          "path": "evidence/local.gsd_transfer_areas.20261101.json",
+          "sha256": "554703c5bc1cac8cafdfa63009e4055802095ef3e4cd2fc6f7f081491f95fba4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.hardware.20261024",
       "status": "passed",
       "profile": {
@@ -26625,6 +26707,36 @@
       "notRetained": []
     },
     {
+      "id": "local.library_integrate.candidate_shapes.dependents.rerun.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "195f63a375a43e6ea382706c95de56580b23a377",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.candidate_shapes.dependents.rerun.20261101.json",
+          "sha256": "0e6495dbde32f6112b836545efa699ffdc3f016709f3530d966a3e186aa2d782"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.multi.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "9febd4dfe1c38ccdbb04612c9703a22ef61a7ead",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.candidate_shapes.multi.20261101.json",
+          "sha256": "eb72b0c161721e83ab9cf46ab3a052f79e43bb0ad752eadddd05f89159774e18"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.library_integrate.candidate_shapes.rerun.20261031",
       "status": "passed",
       "profile": {
@@ -26650,6 +26762,21 @@
         {
           "path": "evidence/local.library_integrate.combined_apply.regression.20261031.json",
           "sha256": "8aa44c44b633c576c8b81b349cf72d803fd8a548c3b64ff582ef749a814652f1"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_integrate.combined_apply.regression.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "195f63a375a43e6ea382706c95de56580b23a377",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.combined_apply.regression.20261101.json",
+          "sha256": "372b93c08e5738e25830ddc9ad924e89a55af5496a57faf5b50311a84b86bb5b"
         }
       ],
       "notRetained": []
@@ -27220,6 +27347,21 @@
       "notRetained": []
     },
     {
+      "id": "local.project_upgrade.interruption.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "61f75b839532c790d7727ff5d3f14dfe1b2d3fb7",
+      "retained": [
+        {
+          "path": "evidence/local.project_upgrade.interruption.20261101.json",
+          "sha256": "6bb8d86d82539041efa52ef8891e41b093cc17496fda55f7a2530d2d1022d4e9"
+        }
+      ],
+      "notRetained": []
+    },
+    {
       "id": "local.provision.card_move.20261101",
       "status": "passed",
       "profile": {
@@ -27397,6 +27539,21 @@
         {
           "path": "evidence/local.safety.fparameter_discovery.20261031.json",
           "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety.logic_online_route.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "422875126abfb81069e0ca31cf1a78d92f2cbc33",
+      "retained": [
+        {
+          "path": "evidence/local.safety.logic_online_route.20261101.json",
+          "sha256": "607c356b5f4a5250b7559b8dbf27ac60e1780ffe28f90dc15f3de772b4e2e528"
         }
       ],
       "notRetained": []
@@ -27752,6 +27909,21 @@
         {
           "path": "evidence/local.translation.restricted.qualification.20261031.json",
           "sha256": "01ce8b8b8ee98089b5597301914a1798d5b8360eb4d686cf10f714efc960901d"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.typed.component-storage-capture.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "68eca319a1fa7bfcbd6e33de1914dea4527f2495",
+      "retained": [
+        {
+          "path": "evidence/local.typed.component-storage-capture.20261101.json",
+          "sha256": "f7588abae411e6076161427186cb1828ca9c68f6c2763703084c189ccf7edebd"
         }
       ],
       "notRetained": []

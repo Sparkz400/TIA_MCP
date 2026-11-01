@@ -94,6 +94,34 @@
       "boundary": "V21 and repository gate",
       "reason": "Behind the closed HMI preservation gate: V21 has no Screen.Export, so payloads without a public getter stay uncompared and no profile has passed every preservation, compile, persistence, recovery and visual gate.",
       "evidenceIds": []
+    },
+    {
+      "featureId": "safety.logic_changes",
+      "obligations": [
+        "D14"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-11-01",
+      "boundary": "V21 and project policy",
+      "reason": "The closure rests on two observed refusals: V21's offline DownloadProvider refuses to load the safety program onto a PLCSIM memory card ('Load safety program to device'), and the online route (change.simulation_download_online) refuses at prepare with SimulationTargetMismatch because the owned instance has no successful card from this PLC. Behind that gate V21's SafetyProgram download configuration ('Load safety program to device', ConsistentDownload) would be raised next (per its API metadata; not reached natively) and is outside the project's policy. Changed F-logic imports and compiles with the safety program, and PLCSIM V8 creates an owned CPU1511F instance, but no permitted route loads it.",
+      "evidenceIds": [
+        "local.safety.logic_plcsim_boundary.20261101",
+        "local.safety.logic_online_route.20261101"
+      ]
+    },
+    {
+      "featureId": "block.move",
+      "obligations": [
+        "D07",
+        "X11"
+      ],
+      "decision": "blocked; does not count toward 1.0 and is not a pass",
+      "decidedBy": "maintainer",
+      "date": "2026-10-31",
+      "boundary": "V21",
+      "reason": "The public V21 Openness API has no member that moves a PLC block, type, tag table or group: the only move members are HW.HardwareObject.PlugMove and CanPlugMove (device items into another slot); PlcBlock.Parent and PlcBlockUserGroup.Parent are get-only, and every cross-group route (master copy, library type, SimaticML import, external source, documents) creates a new object (docs/verification/block-move-feasibility-20261031.md, offline metadata check of 31 October 2026). Remaining confirmation (non-mutating, not run): target_capabilities on a block, type, tag table and software unit of an owned scratch must list no invocation named Move, Relocate, Reparent, Transfer, Cut or Paste (docs/verification/block-move-feasibility-20261031.md#remaining-check); a match reopens the row for the identity probe the record describes.",
+      "evidenceIds": []
     }
   ],
   "auditArtifact": "artifacts/release-audit-20261015/current-results.json",

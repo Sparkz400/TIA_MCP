@@ -7,6 +7,12 @@ owned TIA (native interruption) or the exact Host (transport loss). A fresh Host
 fresh owned TIA then call engineering_admission_reconcile once. The run checks that
 nothing was replayed (journal and dispatch count unchanged) and that the admission is
 either released with one disposition per resource or held with reasons.
+
+The pf-*/pa-* scenarios interrupt project_upgrade of an owned copy of TinyMySQLClient_V15.ap15 (OpenWithUpgrade) or
+TinyMySQLClient_V14_1.zap14 (RetrieveWithUpgrade) at each durable boundary (dispatch intent, copy, native upgrade, upgraded
+project before the reply) by worker loss, Host loss or a Host qualification point, and check the reconciliation the state
+left calls for: released with the source and an absent destination unchanged, released with the one V21 project
+verifiedApplied (pinned inventory read independently), or held with the source still reserved. Copies are removed afterwards.
 """
 import argparse
 import ctypes
@@ -16,11 +22,13 @@ import json
 import msvcrt
 import os
 import pathlib
+import queue
 import subprocess
 import time
 import uuid
 
 from qualify_hardware_families import FAMILIES, candidates
+from qualify_project_upgrade import EXAMPLES as UPGRADE_PINS, fingerprint, guarded, inventory_view, leaks, paths_fit, pinned, public, remove_copies, stage_input
 from qualify_reliability import ReliabilityClient, decoded, require, terminate_owned_test_worker
 from smoke_mcp import ROOT
 
@@ -188,6 +196,56 @@ KINDS = {"su": ("source_upsert", prepare_source, source_present, setup_scratch, 
          "tl": ("hmi_text_list_import", prepare_text_list, text_list_present, setup_text_list, TEXT_LIST_POINTS)}
 KIND_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix, row in KINDS.items() for point in row[4]}
 
+# project_upgrade (X01) of the two small public examples, each copied into its scenario's inputs as qualify_project_upgrade.py does.
+UPGRADE_SOURCES = {}  # --upgrade-source: example file name -> original, which is only hashed and copied
+UPGRADE_EXAMPLES = {"pf": "TinyMySQLClient_V15.ap15", "pa": "TinyMySQLClient_V14_1.zap14"}  # OpenWithUpgrade, RetrieveWithUpgrade
+
+
+def upgrade_receipt(root):
+    """State of the upgrade receipt under the scenario root; None before the worker wrote it."""
+    receipts = list((root / "upgrades").glob("u_*/upgrade-receipt.json"))
+    return (read_json(receipts[0]) or {}).get("state") if receipts else None
+
+
+def upgraded_projects(root):
+    """.ap21 files at the observed layout: <dest>/<folder>_V21/ for a project folder, <dest>/w/<name>_V21/ for an archive."""
+    return sorted((root / "upgrades").glob("u_*/*_V21/*.ap21")) + sorted((root / "upgrades").glob("u_*/w/*_V21/*.ap21"))
+
+
+def upgrade_state(root):
+    """The durable state an interrupted upgrade left: absent, unreceipted (a destination without receipt) or the receipt state."""
+    destinations = list((root / "upgrades").glob("u_*"))
+    require(len(destinations) <= 1, "More than one upgrade destination: the upgrade was dispatched again")
+    return "absent" if not destinations else upgrade_receipt(root) or "unreceipted"
+
+
+def upgrade_outcome(state):
+    """Exact reconciliation for the durable state; the source is proven unchanged in every state."""
+    if state == "absent":
+        return {"released": True, "destination": "unchanged"}
+    if state == "upgraded":
+        return {"released": True, "destination": "verifiedApplied"}
+    return {"released": False, "destination": None}  # A partial copy or an unfinished upgrade is held and never opened.
+
+
+def _receipt_is(state):
+    return lambda root: upgrade_receipt(root) == state
+
+
+# point: (trigger on the scenario root, interruption, durable states that count as that boundary). "worker" ends the worker and its
+# owned TIA; "host" kills the Host, whose worker finishes the upgrade; a host.* point is a --watch-qualification Host stopping itself.
+UPGRADE_POINTS = {
+    "int": (lambda root: bool(admissions(root, "project_upgrade")), "worker", {"absent", "unreceipted", "copying"}),
+    "cpy": (_receipt_is("copying"), "worker", {"copying", "upgrading"}),  # The copy of a small example takes milliseconds.
+    "upg": (_receipt_is("upgrading"), "worker", {"upgrading"}),
+    "prj": (lambda root: bool(upgraded_projects(root)), "worker", {"upgrading", "upgraded"}),
+    "hint": (None, "host.project_upgrade.beforeDispatch", {"absent"}),
+    "hcpy": (_receipt_is("copying"), "host", {"upgraded"}),
+    "hupg": (_receipt_is("upgrading"), "host", {"upgraded"}),
+    "hret": (None, "host.project_upgrade", {"upgraded"}),
+}
+UPGRADE_SCENARIOS = {f"{prefix}-{point}": (prefix, point) for prefix in UPGRADE_EXAMPLES for point in UPGRADE_POINTS}
+
 
 def alive(pid):
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -216,6 +274,17 @@ def wait_until(predicate, description, timeout, interval=0.02):
             return value
         time.sleep(interval)
     raise TimeoutError(description)
+
+
+def host_stopped(client, request):
+    """Whether the Host exited at its qualification point; an answer to the request instead (an error before the point) fails now."""
+    while True:
+        try:
+            line = client.lines.get_nowait()
+        except queue.Empty:
+            return client.process.poll() is not None
+        if line and json.loads(line).get("id") == request:
+            raise RuntimeError("The request was answered instead of stopping at the Host point: " + line[:500])
 
 
 def read_json(path):
@@ -301,7 +370,13 @@ class Scenario:
             if not tia_exited_alone:
                 terminate_owned_test_worker(tia_pid, TIA_EXE)
             return {"terminated": "worker", "workerPid": workers[0], "tiaPid": tia_pid, "tiaExitedWithWorker": tia_exited_alone}
-        client.kill_owned_host()
+        if mode == "point":
+            # A --watch-qualification Host stops itself (exit 74) at its admitted point; its worker and owned TIA then end alone.
+            wait_until(lambda: host_stopped(client, request), "The Host never stopped at its qualification point", 900, 0.5)
+            marker = read_json(self.root / "interruption-marker.json") or {}
+            require(client.process.returncode == 74 and marker.get("automaticReplay") is False, "The Host did not stop at its qualification point")
+        else:
+            client.kill_owned_host()
         worker_exited = True
         try:
             wait_until(lambda: not alive(workers[0]), "Worker did not exit after Host loss", 600, 0.5)
@@ -314,7 +389,7 @@ class Scenario:
         except TimeoutError:
             tia_exited = False
             terminate_owned_test_worker(tia_pid, TIA_EXE)
-        return {"terminated": "host", "workerPid": workers[0], "workerExitedAfterHostLoss": worker_exited,
+        return {"terminated": "hostPoint" if mode == "point" else "host", "workerPid": workers[0], "workerExitedAfterHostLoss": worker_exited,
                 "tiaPid": tia_pid, "tiaExitedWithWorker": tia_exited}
 
     def run_kind(self, prefix, point):
@@ -390,6 +465,69 @@ class Scenario:
             # After Host loss the worker finishes alone: the journal must end applied with every stage of a complete import.
             require(final.get("state") == "applied" and stages(final) == TEXT_LIST_APPLIED_STAGES,
                     f"The worker did not complete the text-list apply after Host loss: {final.get('state')} {stages(final)}")
+        self.report["passed"] = True
+        return self.report
+
+    def run_upgrade(self, prefix, point):
+        """Interrupt project_upgrade of one public example at one durable boundary, reconcile once from a fresh Host, then check
+        the exact outcome for the state it left, no replay, the unchanged source and an independent read of the result."""
+        name = UPGRADE_EXAMPLES[prefix]
+        trigger, mode, states = UPGRADE_POINTS[point]
+        self.report.update({"kind": "project_upgrade", "example": name, "point": point, "longestUpgradeDirectory": paths_fit(self.root, [name])})
+        copy = pathlib.Path(guarded(name, lambda: stage_input(self.root, UPGRADE_SOURCES[name])))
+        before, arguments = fingerprint(copy), {"path": str(copy), "expectedSha256": hashlib.sha256(copy.read_bytes()).hexdigest()}
+        observed = {}
+
+        def expect():
+            observed["state"], observed["projects"] = upgrade_state(self.root), [str(p) for p in upgraded_projects(self.root)]
+            return "released" if upgrade_outcome(observed["state"])["released"] else "held"
+
+        def verify(fresh, result):
+            """Independent reads in the reconciling session: the upgrade's pinned inventory, or a held source still reserved."""
+            if upgrade_outcome(observed["state"])["destination"] == "verifiedApplied":
+                require(len(observed["projects"]) == 1, "Expected exactly one upgraded project")
+                fresh.tool("project_open", {"path": observed["projects"][0]})
+                inventory = pinned(inventory_view(fresh.tool("project_inventory", {"maxItems": 2000})))
+                require(inventory == UPGRADE_PINS[name]["inventory"] and pathlib.Path(observed["projects"][0]).stem == UPGRADE_PINS[name]["project"],
+                        f"The reconciled upgrade is not the pinned project: {inventory}")
+                return {"upgradedProject": pathlib.Path(observed["projects"][0]).relative_to(self.root).as_posix(), "inventory": inventory}
+            if not result["released"]:
+                refused = decoded(fresh.raw_tool("project_upgrade", arguments)).get("error", {}).get("code")
+                require(refused == "ResourceBusy", f"A held upgrade must keep its source reserved, got {refused}")
+                return {"secondUpgrade": refused}
+            return {}
+
+        if mode.startswith("host."):
+            self.host_arguments = ["--component-qualification", "--watch-qualification", mode]
+        client = self.client()
+        self.host_arguments = []  # The reconciling Host is a normal one.
+        try:
+            client.initialize()
+            tia = self.start(client)
+            request = client.begin("tools/call", {"name": "project_upgrade", "arguments": arguments})
+            if trigger:
+                def reached():
+                    require(point == "prj" or upgrade_receipt(self.root) != "upgraded", "The upgrade ended before the interruption boundary")
+                    return trigger(self.root)
+                wait_until(reached, "project_upgrade never reached the interruption boundary", 600, 0.001)
+            reconciled = self.finish(client, request, tia, "project_upgrade", mode if mode in ("worker", "host") else "point", None, expect, verify=verify)
+        finally:
+            client.close()
+        self.report["passed"] = False  # finish() checked reconciliation only; the boundary and the oracle follow.
+        expected = self.report["expected"] = upgrade_outcome(observed["state"])
+        self.report["durableState"] = observed["state"]
+        rows = {r["effect"]: r["disposition"] for r in reconciled["dispositions"]}
+        require(observed["state"] in states, f"The interruption left {observed['state']}, not the {point} boundary {sorted(states)}")
+        require(rows == {"readUpgradeSource": "unchanged", "createNewDestination": expected["destination"]}, f"Unexpected dispositions {rows}")
+        destination_row = next(r for r in reconciled["dispositions"] if r["effect"] == "createNewDestination")
+        require(expected["released"] or "project" not in (destination_row["evidence"] or {}), "Reconciliation opened an unproven upgrade")
+        require(fingerprint(copy) == before, "The upgrade source changed")
+        require(len(admissions(self.root, "project_upgrade")) == 1, "Reconciliation or the held check dispatched another upgrade")
+        require(upgrade_state(self.root) == observed["state"] and [str(p) for p in upgraded_projects(self.root)] == observed["projects"],
+                "Reconciliation changed the upgrade destination")
+        if mode.startswith("host."):
+            response = (read_json(self.root / "interruption-marker.json") or {}).get("response")
+            require((response or {}).get("upgraded") is True if point == "hret" else response is None, "The Host did not stop at " + mode)
         self.report["passed"] = True
         return self.report
 
@@ -606,7 +744,9 @@ class Scenario:
         require(applied["state"] == "applied", "Fixture apply did not complete")
         return applied
 
-    def finish(self, client, request, tia, operation, mode, journal, expected, project=None):
+    def finish(self, client, request, tia, operation, mode, journal, expected, project=None, verify=None):
+        """expected: "released", "held", None (evidence decides) or a callable deciding it from the state the interruption left;
+        verify(fresh, result) reads independently in the reconciling session."""
         before = journal.read_bytes() if journal else None
         self.step("interrupt", {"journalAtInterrupt": read_json(journal) if journal else None, **self.interrupt(client, tia, mode, request)})
         if mode == "worker":
@@ -618,6 +758,8 @@ class Scenario:
         require(len(pending) == 1, f"Expected one unresolved {operation} admission, found {len(pending)}")
         admission = pending[0]
         self.step("unresolved admission", {"admissionId": admission["id"], "state": admission["state"], "resources": admission["scope"]["resources"]})
+        if callable(expected):
+            expected = self.step("expected from the interrupted state", expected())
         journal_after_interrupt = journal.read_bytes() if journal else None
         fresh = self.client()
         try:
@@ -625,6 +767,8 @@ class Scenario:
             self.step("fresh tia_start", fresh.tool("tia_start"))
             result = self.step("engineering_admission_reconcile", fresh.tool("engineering_admission_reconcile", {"admissionId": admission["id"]}))
             status = self.step("engineering_operation_status", fresh.tool("engineering_operation_status", {"operationId": admission["id"]}))
+            if verify:
+                self.step("independent read after reconcile", verify(fresh, result))
             fresh.tool("tia_detach")
         finally:
             fresh.close()
@@ -678,7 +822,9 @@ def main():
     parser.add_argument("--host", type=pathlib.Path, default=ROOT / "src/TiaMcp.Host/bin/Debug/net10.0-windows/TiaMcp.Host.exe")
     parser.add_argument("--worker", type=pathlib.Path, default=ROOT / "src/TiaMcp.Openness.V21/bin/Debug/net48/TiaMcp.Openness.V21.exe")
     parser.add_argument("--base", type=pathlib.Path, required=True, help="Short new artifact base; TIA limits project path length.")
-    parser.add_argument("--scenarios", nargs="*", choices=list(SCENARIOS) + list(KIND_SCENARIOS), default=[])
+    parser.add_argument("--scenarios", nargs="*", choices=list(SCENARIOS) + list(KIND_SCENARIOS) + list(UPGRADE_SCENARIOS), default=[])
+    parser.add_argument("--upgrade-source", type=pathlib.Path, action="append", default=[],
+                        help="An original public example for the pf-*/pa-* scenarios (TinyMySQLClient_V15.ap15, TinyMySQLClient_V14_1.zap14); only read and copied")
     parser.add_argument("--existing", nargs=2, action="append", default=[], metavar=("ARTIFACTS", "ADMISSION_ID"))
     parser.add_argument("--report", type=pathlib.Path, required=True)
     parser.add_argument("--hmi-fixture", type=pathlib.Path, help="HmiSeeder textlist-fixture checkpoint.zap21 for the tl-* scenarios")
@@ -688,22 +834,36 @@ def main():
     HMI_FIXTURE = args.hmi_fixture.resolve(strict=True) if args.hmi_fixture else None
     HMI_FIXTURE_PROFILE = args.hmi_fixture_profile
     host, worker = args.host.resolve(strict=True), args.worker.resolve(strict=True)
+    args.base = args.base.resolve()  # The Host resolves --artifacts against its own working directory; paths passed to it are absolute.
     args.base.mkdir(parents=True, exist_ok=False)
     report = {"schemaVersion": 1, "completed": False, "base": str(args.base), "hostSha256": hashlib.sha256(host.read_bytes()).hexdigest(),
               "workerSha256": hashlib.sha256(worker.read_bytes()).hexdigest(), "cases": []}
     def save():
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    # Each upgrade example is passed once and hashed before and after the run; only its name and fingerprint are recorded.
+    UPGRADE_SOURCES.update(public(args.upgrade_source, {UPGRADE_EXAMPLES[UPGRADE_SCENARIOS[n][0]] for n in args.scenarios if n in UPGRADE_SCENARIOS}))
+    originals = {name: guarded(name, lambda p=path: fingerprint(p)) for name, path in UPGRADE_SOURCES.items()}
+    if originals:
+        report["upgradeExamples"] = originals
     for name in args.scenarios:
         print("RUN " + name, flush=True)
         scenario = Scenario(name, host, worker, args.base)
         try:
             if name in KIND_SCENARIOS:
                 scenario.run_kind(*KIND_SCENARIOS[name])
+            elif name in UPGRADE_SCENARIOS:
+                scenario.run_upgrade(*UPGRADE_SCENARIOS[name])
             else:
                 scenario.run(*SCENARIOS[name])
         except Exception as error:
             scenario.report["failure"] = str(error)
+        if name in UPGRADE_SCENARIOS:
+            # The example copies carry the examples' own history (folders they were once upgraded in); only the report stays.
+            try:
+                scenario.report["remainingEntries"] = remove_copies(scenario.root)
+            except Exception as error:
+                scenario.report.update({"passed": False, "cleanupFailure": type(error).__name__})
         report["cases"].append(scenario.report)
         save()
         print(("PASS " if scenario.report["passed"] else "FAIL ") + name + " " + str(scenario.report.get("outcome") or scenario.report.get("failure", ""))[:500], flush=True)
@@ -714,6 +874,10 @@ def main():
         print(("PASS " if case["passed"] else "FAIL ") + case["scenario"] + " " + str(case.get("outcome") or case.get("failure", ""))[:500], flush=True)
     report["toolCalls"] = [call for case in report["cases"] for call in case["toolCalls"]]
     report["completed"] = all(case["passed"] for case in report["cases"])
+    if originals:
+        report["upgradeOriginalsUnchanged"] = all(guarded(n, lambda p=p: fingerprint(p)) == originals[n] for n, p in UPGRADE_SOURCES.items())
+        report["upgradeFilesNamingAnOriginalFolder"] = leaks(args.base, list(UPGRADE_SOURCES.values()))
+        report["completed"] = report["completed"] and report["upgradeOriginalsUnchanged"] and report["upgradeFilesNamingAnOriginalFolder"] == 0
     save()
     print("Report: " + str(args.report), flush=True)
     return 0 if report["completed"] else 1

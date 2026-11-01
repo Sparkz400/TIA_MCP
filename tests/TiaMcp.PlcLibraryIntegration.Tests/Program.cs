@@ -157,10 +157,33 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
     foreach (string check in new[] { "CombinedApplyLanguageRefusal(", "CombinedApplyInstanceRefusal(", "CapturedStorageContext(change, true)", "CombinedApplyNumberRefusal(", "CombinedApplyPathRefusal(" })
         if (integration.IndexOf(check, end, StringComparison.Ordinal) < 0) throw new Exception("Target check missing: " + check);
 });
+// A refused combined apply (a multi-instance caller with dependents included) is refused while the worker resolves the
+// shared-mutation scope (mutation_begin), so the Host writes no admission record; the dependents are the typed route's own closure.
+Test("combined-apply refusals precede the admission record, a stale preview still gets PreviewStale, and multi-instance dependents are refused", () => {
+    string admission = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs")).Replace("\r\n", "\n");
+    int resolve = admission.IndexOf("private JObject SharedMutationResolve()", StringComparison.Ordinal);
+    int library = admission.IndexOf("if (!_libraryChanges.TryGetValue(id, out var change))", resolve, StringComparison.Ordinal);
+    int end = admission.IndexOf("var change = GetEngineeringChange(args);", library, StringComparison.Ordinal);
+    // The scope's own refusals keep their codes: an online project, a stale preview and a changed source are refused first.
+    int offline = admission.IndexOf("EnsureProjectOffline(change.Project);", library, StringComparison.Ordinal);
+    int stale = admission.IndexOf("throw new BridgeException(\"PreviewStale\", \"Library resources changed since preview.\");", library, StringComparison.Ordinal);
+    int sources = admission.IndexOf("VerifyLibrarySources(change);", library, StringComparison.Ordinal);
+    // Only at mutation_begin (no scope yet): dispatch re-resolves the scope, and change_apply rechecks under the lease.
+    int refusal = admission.IndexOf("if (_sharedMutationScope == null && change.Kind == \"library_integrate\" && !IsHmiLibraryTarget(change.Payload) && _libraryIntegrateApplyEnabled\n                            && change.IdempotencyKey == null && PlcCombinedApplyRefusal(change) is JObject combinedRefusal)\n                            throw new BridgeException(combinedRefusal.Value<string>(\"code\")", library, StringComparison.Ordinal);
+    if (resolve < 0 || library < resolve || offline < library || stale < offline || sources < stale || refusal < sources || end < refusal)
+        throw new Exception("The combined-apply refusal must follow the scope's own offline, PreviewStale and source checks and run at mutation_begin only.");
+    if (admission.Split(new[] { "PlcCombinedApplyRefusal(change)" }, StringSplitOptions.None).Length != 2) throw new Exception("The admission scope evaluates the combined-apply refusal once.");
+    string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
+    if (integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan[\"caller\"].Value<string>(\"blockPath\")))", StringComparison.Ordinal) < 0)
+        throw new Exception("The reused-FB multi-instance target check must refuse the caller's dependents.");
+    string typed = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs"));
+    if (typed.IndexOf("foreach (string path in TypedDependentPaths(capture.Plc, capture.CallerPath))", StringComparison.Ordinal) < 0)
+        throw new Exception("The typed step and the pre-claim check must share one dependent closure.");
+});
 // Candidate shapes stay out of production: only the exact shapes with passed native evidence are verified, and candidates
 // are admitted only on a --component-qualification worker in its own single owned scratch. Change these pins only together with native evidence.
 Test("candidate shapes run only on a qualification Host's owned scratch, and only natively passed shapes are verified", () => {
-    Equal("earlierPlacement,fbCaller,ladCaller,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
+    Equal("earlierPlacement,fbCaller,fbCaller+multiInstance+reusedComponent,ladCaller,reusedComponent", string.Join(",", PlcComponentQualificationGate.VerifiedShapes));
     string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
     foreach (string pinned in new[] {
         "CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change))",
@@ -168,8 +191,9 @@ Test("candidate shapes run only on a qualification Host's owned scratch, and onl
         if (integration.Replace("\r\n", "\n").IndexOf(pinned, StringComparison.Ordinal) < 0) throw new Exception("Candidate admission changed: " + pinned);
     if (integration.Split(new[] { "PlcComponentCandidatesAdmitted(" }, StringSplitOptions.None).Length != 3) throw new Exception("Candidate admission must have exactly one use.");
     string gate = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs"));
-    if (gate.IndexOf("internal static readonly string[] VerifiedShapes = { \"earlierPlacement\", \"fbCaller\", \"ladCaller\", \"reusedComponent\" };", StringComparison.Ordinal) < 0 ||
-        gate.IndexOf("local.library_integrate.candidate_shapes.rerun.20261031", StringComparison.Ordinal) < 0)
+    if (gate.IndexOf("internal static readonly string[] VerifiedShapes = { \"earlierPlacement\", \"fbCaller\", \"fbCaller+multiInstance+reusedComponent\", \"ladCaller\", \"reusedComponent\" };", StringComparison.Ordinal) < 0 ||
+        gate.IndexOf("local.library_integrate.candidate_shapes.rerun.20261031", StringComparison.Ordinal) < 0 ||
+        gate.IndexOf("local.library_integrate.candidate_shapes.multi.20261101", StringComparison.Ordinal) < 0)
         throw new Exception("VerifiedShapes changes only together with its cited native evidence.");
     // A failed combined apply carries the coordinator's initial checkpoint, the typed one of a reused FB included, into the change journal.
     if (integration.IndexOf("if (record?[\"initialCheckpoint\"] is JObject checkpoint && ((JArray)change.Journal[\"checkpoints\"]).Count == 0) ((JArray)change.Journal[\"checkpoints\"]).Add(checkpoint.DeepClone());", StringComparison.Ordinal) < 0)
