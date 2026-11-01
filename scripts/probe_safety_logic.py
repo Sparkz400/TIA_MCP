@@ -103,12 +103,17 @@ def boundary(h, stage, error):
     h.report["outcome"] = "boundary"
 
 
+def simulation_compiled(compile, devices):
+    """project_simulation_enable's compile receipt must cover every device of the project, with no error: the setting changes
+    how every PLC compiles (sl1 refused AmbiguousTarget and sl2 FingerprintUnavailable while it compiled one PLC)."""
+    compiled = {target.get("targetPath") for target in compile.get("targets") or []}
+    require(compile.get("errorCount") == 0 and compile.get("targetIdentityPolicy") == "device-path-v1" and set(devices) <= compiled,
+            "project_simulation_enable did not compile every device without error: %s" % {k: compile.get(k) for k in ("errorCount", "requiredTargets")})
+    return sorted(compiled)
+
+
 def body(h):
     standard = h.owned_scratch("safety logic")
-    # The setting makes every PLC's blocks inconsistent until compiled, and its apply compiles one PLC: enabled while the scratch
-    # still has only its standard PLC (sl1 refused AmbiguousTarget, sl2 FingerprintUnavailable on the uncompiled other PLC). The
-    # F-CPU added next is compiled by hardware_add's device compile.
-    change(h, "project_simulation_enable", {"enabled": True}, {"plcPath": standard})
     fcpu = h.report["fCpu"] = catalog(h, "1511F-1 PN", "1511F-1 PN", "6ES7 ")[0]
     _, added = change(h, "hardware_add", {"typeIdentifier": fcpu["typeIdentifier"], "deviceName": STATION, "itemName": "TiaMcpFPlc",
                                           "configureScratchSecurity": True, "failsafeRuntimeAccess": True}, {})
@@ -119,6 +124,9 @@ def body(h):
     rows = [row for item in h.tool("project_inventory", {"maxItems": 2000})["hardware"] if item["path"].startswith(modules[FDI])
             for row in h.tool("hardware_inspect", {"hardwarePath": item["path"], "maxItems": 2000})["items"]]
     start = h.report["fdiInputStart"] = input_start(rows, modules[FDI])
+    # Enabled with both PLCs in the project and no plcPath: its apply must compile every device.
+    _, enabled = change(h, "project_simulation_enable", {"enabled": True}, {})
+    h.report["simulationCompile"] = simulation_compiled(enabled["compile"], [p.split("/items/", 1)[0] for p in (standard, plc)])
     safety = h.stage("safety_inspect of the F-PLC", lambda: h.tool("safety_inspect", {"plcPath": plc, "maxItems": 2000}))
     h.report["safetyProgram"] = {k: safety.get(k) for k in ("isPasswordSet", "isLoggedOn")}
     tables = h.tool("software_inspect", {"plcPath": plc, "maxItems": 2000})["tagTables"]

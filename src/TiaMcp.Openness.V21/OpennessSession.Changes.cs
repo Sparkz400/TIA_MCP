@@ -1187,7 +1187,7 @@ namespace TiaMcp.Openness.V21
         {
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
             if (IsCompileOnlyKind(change.Kind) && change.Kind != "plc_compile") return CompileOnly(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
+            if (CompileOnlyRules.CompilesEveryDevice(change.Kind) || PlcAlarmProjectKinds.Contains(change.Kind))
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {

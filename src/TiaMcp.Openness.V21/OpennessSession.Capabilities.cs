@@ -58,7 +58,7 @@ namespace TiaMcp.Openness.V21
                 AddTargetFeature(features, "hardware_catalog_search", directApi, "implemented", "Installed catalog content and optional products determine catalog results.");
                 AddTargetFeature(features, "change.hardware_add", directApi, "partial", "An exact installed catalog identifier and valid device configuration are required.");
                 var simulation = ProbeCapabilityService<PlcSimulationSettingsProvider>(project, "project", probes);
-                AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; no simulator is started.");
+                AddTargetFeature(features, "change.project_simulation_enable", simulation, "implemented", "Prepared project checkpoint and explicit apply are required; apply compiles every device of the project, because the setting changes how every PLC compiles, so a project with several PLCs needs no plcPath. No simulator is started.");
                 AddTargetFeature(features, "project_properties", directApi, "partial", "Bounded project metadata, history, languages and text categories; not natively qualified.");
                 AddTargetFeature(features, "change.project_attributes_set", directApi, "partial", "Author, Copyright, Family and Version only when native attribute info permits read/write; Comment is multilingual and excluded. Not natively qualified.");
                 AddTargetFeature(features, "change.project_languages_set", directApi, "partial", "Adds/removes active languages and sets reference/editing language; removing the reference or editing language is refused. Not natively qualified.");

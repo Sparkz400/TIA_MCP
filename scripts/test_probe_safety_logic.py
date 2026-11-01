@@ -78,5 +78,21 @@ class ClassifyTests(unittest.TestCase):
             p.input_start(rows + [{"path": "/m/items/x", "addresses": [{"ioType": "Input", "startAddress": 8}]}], "/m")
 
 
+
+class SimulationCompileTests(unittest.TestCase):
+    receipt = {"errorCount": 0, "targetIdentityPolicy": "device-path-v1",
+               "targets": [{"targetPath": "/projects/P/devices/ScratchStation"}, {"targetPath": "/projects/P/devices/TiaMcpFStation"}]}
+
+    def test_every_device_compiled(self):
+        self.assertEqual(["/projects/P/devices/ScratchStation", "/projects/P/devices/TiaMcpFStation"],
+                         p.simulation_compiled(self.receipt, ["/projects/P/devices/ScratchStation", "/projects/P/devices/TiaMcpFStation"]))
+
+    def test_a_plc_compile_or_an_error_fails(self):
+        for receipt in ({**self.receipt, "targets": self.receipt["targets"][1:]}, {**self.receipt, "errorCount": 1},
+                        {"errorCount": 0, "targets": [{"target": "/projects/P/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"}]}):
+            with self.assertRaises(AssertionError):
+                p.simulation_compiled(receipt, ["/projects/P/devices/ScratchStation", "/projects/P/devices/TiaMcpFStation"])
+
+
 if __name__ == "__main__":
     unittest.main()

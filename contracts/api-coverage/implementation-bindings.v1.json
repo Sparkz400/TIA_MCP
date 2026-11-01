@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "dc1081b4a738be96b5e2e412086660f8d5794accc56cadbabf5897ae97544961",
-      "bytes": 1443674
+      "sha256": "9212d92fde652d44b28cfdbb030f608b38d9187343eba6a0b83c6dde767c485d",
+      "bytes": 1444084
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2322,8 +2322,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/CompileOnlyRules.cs",
-      "sha256": "6064ccaa6f3ccff4b8087be0d30deb117f8a445680e422a7a43339ec40b3fc3f",
-      "bytes": 1583
+      "sha256": "6f12f0cc185d4efa5d3d737c84fbb5f149a8ee37f0c42561800ef7054cf47731",
+      "bytes": 2467
     },
     {
       "path": "src/TiaMcp.Openness.V21/ContractDocument.cs",
@@ -2487,8 +2487,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Capabilities.cs",
-      "sha256": "ec7f2cb437842e31d309fd4f7a57164017826246c30cffef9bad7034c25a33c4",
-      "bytes": 58866
+      "sha256": "4558241f7a22c88e4e3baead9adfd13c51c878361cd4ba4be88fb2ff21993e6a",
+      "bytes": 59011
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CapturedStorage.cs",
@@ -2507,8 +2507,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Changes.cs",
-      "sha256": "de2dae0fec03f243ac266123b9f8592e613f337baaf203a2d72ec4973c0dff3d",
-      "bytes": 123231
+      "sha256": "f234be8fd031232f417de87b1ccddd8eab444744e4326e031795af62707295f8",
+      "bytes": 122699
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.CompileChanges.cs",

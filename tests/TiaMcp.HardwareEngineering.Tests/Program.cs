@@ -355,4 +355,10 @@ if (chain.Count != 2 || (string)chain[0]["text"] != "Import failed." || ((string
 count++; Console.WriteLine("PASS native failure chain keeps Siemens message data, bounded");
 count += RuntimeRouteChecks.Run();
 count += FParameterAllowlistChecks.Run();
+// A project-wide setting compiles every device: one PLC's compile left the other PLC inconsistent and its fingerprint unavailable (sl2).
+foreach (var kind in new[] { "project_simulation_enable", "safety_import_xml", "safety_fparameter_set", "hardware_plug", "connection_create", "certificate_create", "opcua_server_settings_set" })
+    if (!CompileOnlyRules.CompilesEveryDevice(kind)) throw new Exception("Device-compiled kind compiles one PLC: " + kind); else count++;
+foreach (var kind in new[] { "tag_create", "source_upsert", "to_create", "project_languages_set", "plc_compile" })
+    if (CompileOnlyRules.CompilesEveryDevice(kind)) throw new Exception("PLC-compiled kind compiles every device: " + kind); else count++;
+Console.WriteLine("PASS project_simulation_enable and the hardware/safety kinds compile every device");
 Console.WriteLine($"{count} hardware preservation checks passed.");
