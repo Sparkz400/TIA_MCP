@@ -7,9 +7,9 @@ library, peer and existing FBD FC callers, mapped tags) and its independent orac
 Each eligible plan is applied once; a failed or uncertain apply is never replayed or
 restored automatically. A failed step is retained as failed, never converted to success.
 
---candidates qualifies the shapes that have a builder but no native evidence yet (LAD and FB callers, an earlier
-placement, reuse of the installed FB and a multi-instance with it). Only a --component-qualification Host admits them,
-in its own owned scratch; each case is independent and stops only itself.
+--candidates runs the candidate cases (LAD and FB callers, an earlier placement, reuse of the installed FB and a
+multi-instance with it; each a verified shape since 1 November) on a --component-qualification Host, which also admits
+shapes without native evidence, in its own owned scratch; each case is independent and stops only itself.
 """
 from __future__ import annotations
 import argparse
@@ -35,8 +35,9 @@ FLAG = "--enable-library-integrate-apply"
 CANDIDATE_FLAG = "--component-qualification"
 COMBINED_PATH_OVERHEAD = len("/changes/c/01234567/change-lib-" + "0" * 32 + "/before")
 REFUSED = "PlcIntegrationNotQualified"
-# FB callers are verified since 31 October, multi-instances are not: the refusal cases prepare an FB caller with a multi-instance.
-FB_REFUSAL = "Only new global instance DBs are verified; multi-instances stay plan-only."
+# FB callers are verified since 31 October and a multi-instance of the reused FB since 1 November; a multi-instance after a fresh
+# import is not, so the refusal cases prepare an FB caller with a multi-instance of the FB they import.
+FB_REFUSAL = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only."
 HOST_FB = "TiaMcpComponentHost"
 # The Host FB moves off FB2, the number the component FB is imported with: the captured instance profile is bound to it
 # (31 October), and prepare now refuses an occupied number (ComponentBlockNumberOccupied).
@@ -68,8 +69,7 @@ CANDIDATES = {
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
 # multiInstance installs through the captured component multi-instance template v21.fw41.component-gate.multi-instance.v1
-# (route-capture-component-storage-packet.v1.json), which is qualificationOnly: only this run's --component-qualification Host
-# selects it, in its own scratch. Its former pre-dispatch refusal is no longer an accepted outcome.
+# (route-capture-component-storage-packet.v1.json); it passed natively on 1 November, so its preview names no candidate feature.
 
 
 def failed_candidates(outcomes):
@@ -373,8 +373,7 @@ class IntegrateApplyRun(ComponentRun):
         baseline = snapshot(self.call, out / "before")
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
-        features = ["reusedComponent", "fbCaller", "multiInstance"] if multi else []
-        applied, record = self.apply_combined(case, prepared, baseline, features)
+        applied, record = self.apply_combined(case, prepared, baseline, [])
         after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
         self.call("library_close", {"libraryId": opened["libraryId"]})
         # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.

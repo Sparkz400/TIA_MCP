@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6ef1d63259056a428148cc4dfb5a094ae2e67777b8ee8fb1a7fc8ed2c9ed8dc3",
-      "bytes": 1541647
+      "sha256": "4f43ec88fbe570cb0cfa97f58cce95c77309df469d8ae4863ebcaf1320fe58c5",
+      "bytes": 1544505
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2702,8 +2702,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryChanges.cs",
-      "sha256": "0946bdae91b31167caee2497dc5a9f604018f0d0308de37231ec663e8e844395",
-      "bytes": 127516
+      "sha256": "34a593214d261adf27af5fd61d1c96576e80115873076aa42d5595df04b08819",
+      "bytes": 127651
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.LibraryHmi.cs",
@@ -2787,8 +2787,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs",
-      "sha256": "9245350fc802d82dcb91015d0fc3e2f13a6ad00c7460633c06c6ab7993be1608",
-      "bytes": 28206
+      "sha256": "fe7289835c8b190a8368daa48dc9453dd787e7695f3e84437b92d38ecfd9de79",
+      "bytes": 28263
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.ProjectModel.TypedPreview.cs",
@@ -3062,8 +3062,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcComponentQualificationGate.cs",
-      "sha256": "c023a361fa5d54211cdebd203bafc0d8997f6ee1f482d940d68d5f4d3969b11f",
-      "bytes": 15183
+      "sha256": "ff57c55fdf729272596c06ecde36b103f8e28b7e0ffc69922849989c69c5e596",
+      "bytes": 15639
     },
     {
       "path": "src/TiaMcp.Openness.V21/PlcHmiIntegrationPlanner.cs",
@@ -92706,7 +92706,7 @@
               "name": "PreparePlcCombinedApply",
               "line": 214,
               "endLine": 235,
-              "sha256": "2168a47470f027f53096d494adf4d6518c80eb5785c1b25e1bcba41858b02b70"
+              "sha256": "9fb8025e8ce575875d6b5ca81e0cfb96004db30d28821c7485db927634d21b0c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -92883,7 +92883,7 @@
               "name": "PreparePlcCombinedApply",
               "line": 214,
               "endLine": 235,
-              "sha256": "2168a47470f027f53096d494adf4d6518c80eb5785c1b25e1bcba41858b02b70"
+              "sha256": "9fb8025e8ce575875d6b5ca81e0cfb96004db30d28821c7485db927634d21b0c"
             },
             {
               "path": "src/TiaMcp.Openness.V21/OpennessSession.PlcHmiIntegration.cs",
@@ -103346,6 +103346,13 @@
           "artifacts": [
             "evidence/local.library_integrate.combined_apply.regression.20261031.json"
           ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.multi.20261101",
+          "profileSha256": "0fc1e499644eb858c28bcd6019c6e030324ef2f1b97cfb8e0ca636746880f081",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.multi.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -112072,6 +112079,13 @@
           "profileSha256": "dbd084fd179cebf290db1a33535ac3fb58572d1b3f98927b5e6c38b59f938c53",
           "artifacts": [
             "evidence/local.typed.component-storage-capture.20261101.json"
+          ]
+        },
+        {
+          "id": "local.library_integrate.candidate_shapes.multi.20261101",
+          "profileSha256": "0fc1e499644eb858c28bcd6019c6e030324ef2f1b97cfb8e0ca636746880f081",
+          "artifacts": [
+            "evidence/local.library_integrate.candidate_shapes.multi.20261101.json"
           ]
         }
       ],
@@ -127518,6 +127532,11 @@
       "sha256": "90c46e1cba75cb9806b021e87ade9470975c0b0110cf9753a2f3bb3b6cde95e4"
     },
     {
+      "path": "evidence/local.library_integrate.candidate_shapes.multi.20261101.json",
+      "state": "observed",
+      "sha256": "eb72b0c161721e83ab9cf46ab3a052f79e43bb0ad752eadddd05f89159774e18"
+    },
+    {
       "path": "evidence/local.library_integrate.candidate_shapes.rerun.20261031.json",
       "state": "observed",
       "sha256": "5451b5f1e33757b4a837aa5a94ce55052e3348c3587a52549e2e5ca527474e71"
@@ -128386,6 +128405,10 @@
     {
       "id": "local.library_intake.20261024",
       "profileSha256": "8f0505617ec4fa48992b0cd1ab70b118e88c71dc346c36516d916d83fc97286f"
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.multi.20261101",
+      "profileSha256": "0fc1e499644eb858c28bcd6019c6e030324ef2f1b97cfb8e0ca636746880f081"
     },
     {
       "id": "local.library_integrate.candidate_shapes.rerun.20261031",

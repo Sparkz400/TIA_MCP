@@ -217,7 +217,10 @@ tests.Add(("Generic builder rejects this nested callee without an identical capt
         .Descendants(ns + "Member").Single().SetAttributeValue("Name", "Other"));
     Reject(() => TypedGraphicalInstanceTemplate.Create("NewInstance", 123, fb, otherNesting), "GraphicalInstanceTemplateUnavailable");
 }));
-tests.Add(("No typed catalog template uses the private sc01 storage; component-gate templates are qualification-only", () => {
+// Only a component-gate template whose shape is verified (the multi-instance, local.library_integrate.candidate_shapes.multi.20261101)
+// may be deployed without qualificationOnly; any other stays qualification-only or absent.
+string[] verifiedComponentTemplates = { "v21.fw41.component-gate.multi-instance.v1" };
+tests.Add(("No typed catalog template uses the private sc01 storage; unverified component-gate templates are qualification-only", () => {
     DirectoryInfo? root = new(AppContext.BaseDirectory);
     while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
     Require(root != null, "Typed catalog not found");
@@ -232,8 +235,9 @@ tests.Add(("No typed catalog template uses the private sc01 storage; component-g
             Require(!new[] { "path", "referenceCalleePath" }.Any(k => (entry.Value<string>(k) ?? "").Contains("component04-")) &&
                 !new[] { "sha256", "referenceCalleeSha256" }.Any(k => privateHashes.Contains(entry.Value<string>(k) ?? "")),
                 "Template " + entry.Value<string>("id") + " references the private sc01 storage");
-            Require(!(entry.Value<string>("id") ?? "").Contains("component-gate") || JToken.DeepEquals(entry["qualificationOnly"], new JValue(true)),
-                "Component-gate template " + entry.Value<string>("id") + " is not qualification-only");
+            string id = entry.Value<string>("id") ?? "";
+            Require(!id.Contains("component-gate") || (verifiedComponentTemplates.Contains(id) ? entry["qualificationOnly"] == null : JToken.DeepEquals(entry["qualificationOnly"], new JValue(true))),
+                "Component-gate template " + id + " is neither verified nor qualification-only");
         }
 }));
 tests.Add(("Changed dependency after prepare is rejected by repeated contract evaluation", () => {

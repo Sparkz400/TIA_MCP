@@ -118,6 +118,11 @@ internal static class BroadenedPlanTests
         {
             test("combined apply admits the verified " + name + " in production", () => { Equal(null, Refusal(shape())); Equal("", Features(shape())); });
         }
+        // Passed natively on 1 November (local.library_integrate.candidate_shapes.multi.20261101): the exact combination of a
+        // multi-instance of the reused FB in an existing FBD FB caller. A multi-instance after a fresh import stays a candidate.
+        test("combined apply admits the verified reused-FB multi-instance in production", () => { Equal(null, Refusal(ReusedMulti())); Equal("", Features(ReusedMulti())); });
+        test("the reused-FB multi-instance is exactly the verified combination", () => Equal("fbCaller+multiInstance+reusedComponent",
+            PlcComponentQualificationGate.ShapeKey(PlcComponentQualificationGate.UnverifiedFeatures(ReusedMulti().Build(), ReusedMulti().Payload, ReusedMulti().Caller, new string[0]))));
         // Candidate shapes: each has a builder but no native evidence, so only a qualification Host's owned scratch admits it.
         foreach (var (name, shape, features) in new (string, Func<Fixture>, string)[] {
             ("multi-instance", Multi, "fbCaller,multiInstance"), ("LAD FB caller", ladFb, "ladCaller,fbCaller"), ("LAD FC with an earlier placement", ladEarlier, "ladCaller,earlierPlacement") })
@@ -142,7 +147,7 @@ internal static class BroadenedPlanTests
         });
         test("verified shapes have no candidate features", () => { Equal("", Features(new Fixture())); var f = new Fixture(); f.Standalone("FBD"); Equal("", Features(f)); Equal("", Features(Titled(Unit1, 2))); });
         test("candidate refusals name the first unverified feature, else the unverified combination", () => {
-            Equal("Only new global instance DBs are verified; multi-instances stay plan-only.", Refusal(Multi()));
+            Equal("A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only.", Refusal(Multi()));
             Equal("The combination fbCaller+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladFb()));
             Equal("The combination earlierPlacement+ladCaller of separately verified features has no native evidence; it stays plan-only.", Refusal(ladEarlier()));
         });
@@ -253,6 +258,7 @@ internal static class BroadenedPlanTests
         return f;
     }
     private static Fixture ReusedRoot() { var f = new Fixture(); Add(f, "Motor", "/plc/blocks/Motor", "FB"); Prove(f, 0); return f; }
+    private static Fixture ReusedMulti() { var f = Multi(); Add(f, "Motor", "/plc/blocks/Motor", "FB"); Prove(f, 0); return f; }
     private static void InstanceDb(Fixture f, JArray users) { Add(f, "Motor_1", "/plc/blocks/Motor_1", "DB"); f.Inventory["objects"].Last["number"] = 7; f.Inventory["objects"].Last["instanceOfName"] = "Motor"; f.Inventory["objects"].Last["users"] = users; }
     private static Fixture DbMember()
     {

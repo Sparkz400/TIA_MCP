@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.88",
-    "catalogSha256": "6ef1d63259056a428148cc4dfb5a094ae2e67777b8ee8fb1a7fc8ed2c9ed8dc3",
+    "catalogSha256": "4f43ec88fbe570cb0cfa97f58cce95c77309df469d8ae4863ebcaf1320fe58c5",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -8340,7 +8340,8 @@
       "evidenceIds": [
         "local.library_integrate.combined_apply.rerun.20261028",
         "local.library_integrate.candidate_shapes.rerun.20261031",
-        "local.library_integrate.combined_apply.regression.20261031"
+        "local.library_integrate.combined_apply.regression.20261031",
+        "local.library_integrate.candidate_shapes.multi.20261101"
       ],
       "cells": [
         {
@@ -8349,7 +8350,8 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8358,7 +8360,8 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8367,7 +8370,8 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8376,7 +8380,8 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8385,7 +8390,8 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8394,7 +8400,8 @@
           "evidenceIds": [
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
-            "local.library_integrate.combined_apply.regression.20261031"
+            "local.library_integrate.combined_apply.regression.20261031",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         }
       ]
@@ -8418,7 +8425,8 @@
         "local.library_integrate.combined_apply.rerun.20261028",
         "local.library_integrate.candidate_shapes.rerun.20261031",
         "local.library_integrate.combined_apply.regression.20261031",
-        "local.typed.component-storage-capture.20261101"
+        "local.typed.component-storage-capture.20261101",
+        "local.library_integrate.candidate_shapes.multi.20261101"
       ],
       "cells": [
         {
@@ -8428,7 +8436,8 @@
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
-            "local.typed.component-storage-capture.20261101"
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8438,7 +8447,8 @@
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
-            "local.typed.component-storage-capture.20261101"
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8448,7 +8458,8 @@
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
-            "local.typed.component-storage-capture.20261101"
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8458,7 +8469,8 @@
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
-            "local.typed.component-storage-capture.20261101"
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8468,7 +8480,8 @@
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
-            "local.typed.component-storage-capture.20261101"
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         },
         {
@@ -8478,7 +8491,8 @@
             "local.library_integrate.combined_apply.rerun.20261028",
             "local.library_integrate.candidate_shapes.rerun.20261031",
             "local.library_integrate.combined_apply.regression.20261031",
-            "local.typed.component-storage-capture.20261101"
+            "local.typed.component-storage-capture.20261101",
+            "local.library_integrate.candidate_shapes.multi.20261101"
           ]
         }
       ]
@@ -26609,6 +26623,21 @@
         {
           "path": "evidence/local.library_intake.20261024.json",
           "sha256": "90c46e1cba75cb9806b021e87ade9470975c0b0110cf9753a2f3bb3b6cde95e4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.library_integrate.candidate_shapes.multi.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "9febd4dfe1c38ccdbb04612c9703a22ef61a7ead",
+      "retained": [
+        {
+          "path": "evidence/local.library_integrate.candidate_shapes.multi.20261101.json",
+          "sha256": "eb72b0c161721e83ab9cf46ab3a052f79e43bb0ad752eadddd05f89159774e18"
         }
       ],
       "notRetained": []

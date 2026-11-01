@@ -24,7 +24,7 @@ GLOBAL_STORAGE = {"timer": ("Tgp_GlobalTimer", "IEC_TIMER"), "counter": ("Tgp_Gl
 CROSS_SCOPE_CALLEE = "TiaMcp_UnitA.TgpUnit_NumericFC"
 # The PLC component FB's storage (route-capture-component-storage-packet.v1.json), by route-folded block name: its UDT static
 # maps only onto a reference with that identical member, so these bind the captured component FB, not Tgp_TemplateFB_<language>.
-# Both are emitted qualificationOnly; the unit instance template is emitted only into --stage-output candidates.
+# The unit instance template is emitted only into --stage-output candidates, qualificationOnly; the multi-instance one is verified.
 COMPONENT_TEMPLATES = {"Tgp_ComponentHost_FBD": ("multi", "TiaMcpComponentGate", "Gate"),
                        "Tgp_ComponentGate_DB": ("global", "Tgp_ComponentGate", None)}
 
@@ -319,9 +319,9 @@ def extract(reports, route="standard", *, stage_output=None):
                 "tiaVersion": "V21", "cpuFamily": cpu, "route": route, **({"memberName": member} if member else {"blockType": "InstanceDB"}),
                 "path": target.relative_to(template_root).as_posix(), "sha256": source_hash,
                 "referenceCalleePath": reference_path.relative_to(template_root).as_posix(), "referenceCalleeSha256": reference_hash,
-                # Only a --component-qualification worker in its own scratch selects it; the change that adds its shape to
-                # PlcComponentQualificationGate.VerifiedShapes after the qualification run removes this flag.
-                "qualificationOnly": True})
+                # The multi-instance template's shape is verified (local.library_integrate.candidate_shapes.multi.20261101); the unit
+                # one stays qualificationOnly, so only a --component-qualification worker in its own scratch would select it.
+                **({} if member else {"qualificationOnly": True})})
     return {"schemaVersion": 1, "profileVersion": "tia-v21-flgnet-v5-1",
         "nativeFormat": {"tia": "V21 Update 2", "step7ApiFileVersion": "2100.0.121.1", "networkNamespace": NET,
                          "interfaceNamespace": INTERFACE, "instructionVersions": ["1.0"],

@@ -11624,8 +11624,7 @@
       "path": "native/Tgp_ComponentHost_FBD.xml",
       "sha256": "6b877fc9fb4eebac77578d5138fbafbc50280d87bc9cea39b4aa713beb00e9f3",
       "referenceCalleePath": "native/TiaMcpComponentGate.xml",
-      "referenceCalleeSha256": "c2979a1e21265b8984d6df1cb7c961516408c5b949f90a66d4957f751dd10284",
-      "qualificationOnly": true
+      "referenceCalleeSha256": "c2979a1e21265b8984d6df1cb7c961516408c5b949f90a66d4957f751dd10284"
     }
   ]
 }

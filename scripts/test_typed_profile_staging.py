@@ -305,8 +305,9 @@ class CandidateTests(unittest.TestCase):
         self.write_report()
         result, _ = extractor.extract_catalog([self.report_path], stage_output=self.stage)
         [multi] = result["multiInstanceTemplates"]
-        self.assertEqual(("v21.fw41.component-gate.multi-instance.v1", "standard", "Gate", "native/Tgp_ComponentHost_FBD.xml", "native/TiaMcpComponentGate.xml", True),
-                         (multi["id"], multi["route"], multi["memberName"], multi["path"], multi["referenceCalleePath"], multi["qualificationOnly"]))
+        # Verified on 1 November (local.library_integrate.candidate_shapes.multi.20261101): no qualificationOnly flag.
+        self.assertEqual(("v21.fw41.component-gate.multi-instance.v1", "standard", "Gate", "native/Tgp_ComponentHost_FBD.xml", "native/TiaMcpComponentGate.xml", None),
+                         (multi["id"], multi["route"], multi["memberName"], multi["path"], multi["referenceCalleePath"], multi.get("qualificationOnly")))
         self.assertEqual([], result["globalInstanceTemplates"])
         self.assertEqual({"native/TiaMcpComponentGate.xml", "native/Tgp_ComponentHost_FBD.xml"},
                          {pathlib.Path(source["path"]).relative_to("artifacts/candidates").as_posix() for source in result["sources"]})

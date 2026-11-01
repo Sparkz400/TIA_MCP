@@ -48,7 +48,9 @@ namespace TiaMcp.Openness.V21
         // scratch (candidates=true).
         // Passed natively on 31 October (local.library_integrate.candidate_shapes.rerun.20261031): a new or existing LAD FC caller, an
         // existing FBD FB caller, an existing FBD FC after an earlier network, and reuse of the installed FB with a new FBD FC caller.
-        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "ladCaller", "reusedComponent" };
+        // Passed natively on 1 November (local.library_integrate.candidate_shapes.multi.20261101): a multi-instance of the reused
+        // installed FB in an existing FBD FB caller, through the captured template local.typed.component-storage-capture.20261101.
+        internal static readonly string[] VerifiedShapes = { "earlierPlacement", "fbCaller", "fbCaller+multiInstance+reusedComponent", "ladCaller", "reusedComponent" };
         internal static string CombinedApplyRefusal(JObject preview, XDocument callerExport, bool candidates = false)
         {
             var payload = preview?["payload"] as JObject; var plan = preview?["integrationPlan"] as JObject; var caller = plan?["caller"] as JObject;
@@ -80,9 +82,9 @@ namespace TiaMcp.Openness.V21
             var caller = (JObject)plan["caller"]; string kind = caller.Value<string>("kind"), language = caller.Value<string>("language");
             var features = new JObject();
             if (language == "LAD") features["ladCaller"] = "A LAD caller is verified only as a new or existing FC on its own; a LAD " + kind + " caller with further features stays plan-only.";
-            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB; a " + language + " FB caller with further features stays plan-only.";
-            if (plan["multiInstance"] != null) features["multiInstance"] = "Only new global instance DBs are verified; multi-instances stay plan-only.";
-            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB; reuse with further features stays plan-only.";
+            if (kind == "FB") features["fbCaller"] = "An existing FB caller is verified only on its own with a new global instance DB, or with a multi-instance of the reused FB; a " + language + " FB caller with further features stays plan-only.";
+            if (plan["multiInstance"] != null) features["multiInstance"] = "A multi-instance is verified only for the reused installed FB in an existing FBD FB caller; other multi-instances stay plan-only.";
+            if (plan["fb"]?.Value<bool?>("reused") == true) features["reusedComponent"] = "Reuse of the installed FB is verified only with a new FBD FC caller and a new global instance DB, or as a multi-instance in an existing FBD FB caller; reuse with further features stays plan-only.";
             if (!PlcLibraryIntegrationPlanner.CreatesStandaloneCaller(payload) &&
                 (string)callerExport?.Descendants("SW.Blocks.CompileUnit").LastOrDefault()?.Attribute("ID") != payload["integration"]["caller"].Value<string>("insertAfterNetworkId"))
                 features["earlierPlacement"] = "An earlier placement is verified only in an existing FBD FC on its own; an earlier placement with further features stays plan-only.";
