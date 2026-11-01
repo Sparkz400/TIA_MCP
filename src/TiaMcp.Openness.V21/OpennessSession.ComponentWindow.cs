@@ -52,7 +52,8 @@ namespace TiaMcp.Openness.V21
             PlcComponentQualificationGate.RequireEnabled(_componentQualificationEnabled); EnsureAttached();
             var manifest = args["manifest"] as JObject ?? throw new BridgeException("MutationScopeIncomplete", "Exact complete manifest required.");
             string hash = ChangeText(args, "manifestSha256", 64);
-            if (SharedMutationHash(manifest) != hash || manifest.Value<string>("adapterSha256") != ChangeFileHash(Assembly.GetExecutingAssembly().Location))
+            // A window reserved before RFC 8785 is bound to the manifest hash the earlier form gave it.
+            if (!CanonicalJson.Matches(hash, manifest) || manifest.Value<string>("adapterSha256") != ChangeFileHash(Assembly.GetExecutingAssembly().Location))
                 throw new BridgeException("MutationScopeIncomplete", "Manifest/adapter identity differs.");
             var reservation = ComponentWindowReadReservation(args, manifest, hash);
             if (_componentWindowManifest != null && _componentWindowManifestHash != hash) throw new BridgeException("ResourceBusy", "Worker already belongs to another component window.");
@@ -209,10 +210,11 @@ namespace TiaMcp.Openness.V21
         private string ComponentWindowVerifySource()
         {
             string path = _componentWindowManifest.Value<string>("sourceSnapshotPath");
-            string hash = _componentWindowManifest.Value<bool>("sourceSnapshotIsDirectory") ? LibraryDirectoryHash(path) : ChangeFileHash(path);
-            string original = _componentWindowManifest.Value<string>("originalSourcePath");
-            string originalHash = _componentWindowManifest.Value<bool>("originalSourceIsDirectory") ? LibraryDirectoryHash(original) : ChangeFileHash(original);
-            if (hash != _componentWindowManifest.Value<string>("sourceSnapshotSha256") || originalHash != hash) throw new BridgeException("PackageChanged", "The original pinned component source or retained snapshot changed."); return hash;
+            string pinned = _componentWindowManifest.Value<string>("sourceSnapshotSha256");
+            var hashes = SourceHashes(path, _componentWindowManifest.Value<bool>("sourceSnapshotIsDirectory"));
+            var originals = SourceHashes(_componentWindowManifest.Value<string>("originalSourcePath"), _componentWindowManifest.Value<bool>("originalSourceIsDirectory"));
+            int form = Array.IndexOf(hashes, pinned); // a window reserved before RFC 8785 pins the earlier directory form
+            if (form < 0 || originals[Math.Min(form, originals.Length - 1)] != pinned) throw new BridgeException("PackageChanged", "The original pinned component source or retained snapshot changed."); return pinned;
         }
         private JObject ComponentWindowCapture(string phase, string expectedPath)
         {

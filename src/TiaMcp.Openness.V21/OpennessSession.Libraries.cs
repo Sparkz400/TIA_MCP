@@ -418,7 +418,10 @@ namespace TiaMcp.Openness.V21
             foreach (var child in value.Elements) { FlattenLibraryComparison(child, output, budget, depth + 1); if (budget.Truncated) break; }
         }
 
-        private static string LibraryDirectoryHash(string directory)
+        private static string LibraryDirectoryHash(string directory) => LibraryDirectoryHashes(directory)[0];
+        // A file has one hash; a directory has its RFC 8785 hash and, second, the form workers before it stored.
+        private static string[] SourceHashes(string path, bool directory) => directory ? LibraryDirectoryHashes(path) : new[] { ChangeFileHash(path) };
+        private static string[] LibraryDirectoryHashes(string directory)
         {
             var manifest = new JArray(); long bytes = 0; var stack = new Stack<string>(); stack.Push(Path.GetFullPath(directory));
             while (stack.Count != 0)
@@ -434,7 +437,8 @@ namespace TiaMcp.Openness.V21
                     manifest.Add(new JObject { ["path"] = path.Substring(directory.TrimEnd('\\', '/').Length + 1).Replace('\\', '/'), ["sha256"] = ChangeFileHash(path) });
                 }
             }
-            return SharedMutationHash(new JArray(manifest.OrderBy(x => x.Value<string>("path"), StringComparer.Ordinal))); // the Host recomputes it for component windows
+            var sorted = new JArray(manifest.OrderBy(x => x.Value<string>("path"), StringComparer.Ordinal));
+            return new[] { SharedMutationHash(sorted), CanonicalJson.LegacySha256(sorted) }; // the Host recomputes the first for component windows
         }
 
         // A read-only source must still yield a writable owned working copy; the snapshot keeps its attributes.

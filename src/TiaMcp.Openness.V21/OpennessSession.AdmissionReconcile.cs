@@ -176,12 +176,21 @@ namespace TiaMcp.Openness.V21
             JObject archiveRow = check.Row("readCheckpoint"), destination = check.Row("createNewDestination");
             if (archiveRow == null || destination == null) return;
             string archive = archiveRow.Value<string>("path");
-            bool unchanged = File.Exists(archive) && SharedMutationHash(new JObject { ["archiveSha256"] = ChangeFileHash(archive),
-                ["retrievalDestination"] = destination.Value<string>("path") }) == observationSha256;
+            bool unchanged = File.Exists(archive) && CanonicalJson.Matches(observationSha256, new JObject { ["archiveSha256"] = ChangeFileHash(archive),
+                ["retrievalDestination"] = destination.Value<string>("path") });
             if (unchanged) check.Prove(archiveRow, "unchanged", "The archive hash recomputes the admitted observation exactly.");
             else check.Hold(archiveRow, "The archive is missing or no longer has its admitted hash.");
             check.Destination(destination, () => unchanged ? check.ArchiveFingerprint(destination, archive) : null,
                 "The destination is the retrieved archive (fresh fingerprints are equal).");
+        }
+
+        // Index of the source hash form (0 RFC 8785, 1 the earlier worker's) that recomputes the admitted observation, or -1.
+        // An admission observed before 1 November 2026 binds the earlier form, and so does the receipt that worker wrote.
+        private static int AdmittedForm(string observationSha256, string[] hashes, Func<string, JObject> observation)
+        {
+            if (hashes == null) return -1;
+            if (SharedMutationHash(observation(hashes[0])) == observationSha256) return 0;
+            return CanonicalJson.LegacySha256(observation(hashes[hashes.Length - 1])) == observationSha256 ? hashes.Length - 1 : -1;
         }
 
         private void AdmissionReconcileCopy(AdmissionReconcileCheck check)
@@ -206,8 +215,10 @@ namespace TiaMcp.Openness.V21
             JObject source = check.Row("readUpgradeSource"), destination = check.Row("createNewDestination");
             if (source == null || destination == null) return;
             string path = source.Value<string>("path"), root = destination.Value<string>("path");
-            string hash = File.Exists(path) ? ChangeFileHash(path) : Directory.Exists(path) ? LibraryDirectoryHash(path) : null;
-            if (hash != null && SharedMutationHash(new JObject { ["sourceSha256"] = hash, ["upgradeDestination"] = root }) == observationSha256)
+            var hashes = File.Exists(path) || Directory.Exists(path) ? SourceHashes(path, !File.Exists(path)) : null;
+            int form = AdmittedForm(observationSha256, hashes, h => new JObject { ["sourceSha256"] = h, ["upgradeDestination"] = root });
+            string hash = hashes?[Math.Max(form, 0)];
+            if (form >= 0)
                 check.Prove(source, "unchanged", "The upgrade source hash recomputes the admitted observation exactly.");
             else check.Hold(source, "The upgrade source is missing or changed.");
             string receiptPath = Path.Combine(root, "upgrade-receipt.json");
@@ -231,7 +242,9 @@ namespace TiaMcp.Openness.V21
             if (projectRow != null)
             {
                 // The handle lived only in the interrupted worker; nothing was written.
-                var opened = check.OpenProject(projectRow, projectRow.Value<string>("path"), project => SharedMutationHash(new JObject { ["project"] = ProjectInfo(project) }));
+                // An admission observed before RFC 8785 binds the earlier form of the same fingerprint.
+                var opened = check.OpenProject(projectRow, projectRow.Value<string>("path"), project =>
+                { var info = new JObject { ["project"] = ProjectInfo(project) }; return CanonicalJson.Matches(observationSha256, info) ? observationSha256 : SharedMutationHash(info); });
                 if (opened != null && opened.Value<string>("outcomeFingerprint") == observationSha256)
                     check.Prove(projectRow, "unchanged", "The project opens fresh with its admitted identity; the library handle existed only in the interrupted worker.");
                 else if (opened != null) check.Hold(projectRow, "The project identity differs from the admitted observation.");
@@ -241,8 +254,10 @@ namespace TiaMcp.Openness.V21
             if (source == null || destination == null) return;
             string path = source.Value<string>("path"), root = destination.Value<string>("path");
             bool archive = File.Exists(path);
-            string hash = archive ? ChangeFileHash(path) : Directory.Exists(path) ? LibraryDirectoryHash(path) : null;
-            bool unchanged = hash != null && SharedMutationHash(new JObject { ["sourceSha256"] = hash, ["workingCopyDestination"] = root }) == observationSha256;
+            var hashes = archive || Directory.Exists(path) ? SourceHashes(path, !archive) : null;
+            int form = AdmittedForm(observationSha256, hashes, h => new JObject { ["sourceSha256"] = h, ["workingCopyDestination"] = root });
+            string hash = hashes?[Math.Max(form, 0)];
+            bool unchanged = form >= 0;
             if (unchanged) check.Prove(source, "unchanged", "The library source hash recomputes the admitted observation exactly.");
             else check.Hold(source, "The library source is missing or changed.");
             string receiptPath = Path.Combine(root, "open-receipt.json");
@@ -252,7 +267,7 @@ namespace TiaMcp.Openness.V21
             string snapshot = Path.Combine(root, "source"), sourceHash = receipt?["library"]?.Value<string>("sourceSha256");
             string snapshotHash = !unchanged || sourceHash == null ? null : archive
                 ? (File.Exists(Path.Combine(snapshot, Path.GetFileName(path))) ? ChangeFileHash(Path.Combine(snapshot, Path.GetFileName(path))) : null)
-                : (Directory.Exists(snapshot) ? LibraryDirectoryHash(snapshot) : null);
+                : (Directory.Exists(snapshot) ? LibraryDirectoryHashes(snapshot)[form] : null);
             check.Evidence(destination, "receipt", new JObject { ["state"] = receipt?["state"], ["sourceSha256"] = sourceHash, ["snapshotSha256"] = snapshotHash });
             if (receipt?.Value<string>("state") == "opened" && snapshotHash != null && snapshotHash == sourceHash && sourceHash == hash)
                 check.Prove(destination, "verifiedApplied", "The open receipt completed and the managed snapshot equals the unchanged source; the library handle died with the worker.");

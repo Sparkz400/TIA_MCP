@@ -145,7 +145,7 @@ namespace TiaMcp.Openness.V21
                         string id = null;
                         try
                         {
-                            using (var jsonReader = new JsonTextReader(new StringReader(line)) { MaxDepth = 64, DateParseHandling = DateParseHandling.None })
+                            using (var jsonReader = new ExactNumberReader(line) { MaxDepth = 64, DateParseHandling = DateParseHandling.None })
                             {
                                 var request = JObject.Load(jsonReader, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
                                 if (jsonReader.Read()) throw new BridgeException("InvalidRequest", "Only one JSON object per request is accepted.");

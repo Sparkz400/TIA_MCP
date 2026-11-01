@@ -393,6 +393,64 @@ if (args.Length > 1)
         });
     }
 }
+// Writes records exactly as a build before RFC 8785 did: every canonical hash taken in the earlier form.
+T EarlierBuild<T>(Func<T> write)
+{
+    var form = typeof(CanonicalJson).GetField("legacy", BindingFlags.NonPublic | BindingFlags.Static)!;
+    form.SetValue(null, true);
+    try { return write(); } finally { form.SetValue(null, false); }
+}
+// A capture an earlier build wrote for a project whose path (non-ASCII, '+', an apostrophe) hashes differently in the two forms.
+(Fixture F, EngineeringObjectReference Identity, JsonObject Capture) EarlierCapture()
+{
+    var f = New();
+    var identity = f.Identity with { Object = f.Identity.Object with { ProjectPath = @"D:\Müller+Söhne's\TranslationHost.ap21" } };
+    var capture = EarlierBuild(() => f.Capture(profile: EarlierProfile(f), project: identity));
+    Check.True(Check.S(capture["metadata"]!, "projectSha256") != CanonicalJson.Sha256(TranslationJson.Node(identity)));
+    return (f, identity, capture);
+}
+// A profile id with '+' gives the profile a different hash in the two forms too.
+WorkbookProfile EarlierProfile(Fixture f) => f.Profile with { Id = "synthetic+bilingual.v1" };
+Test("a capture from before RFC 8785 pages to its end with the cursors it returns", () =>
+{
+    var (f, _, baseline) = EarlierCapture();
+    int rows = 0; TranslationInspectionCursor? cursor = null;
+    do
+    {
+        var page = Check.Ok(f.Tools.Inspect(Check.Ref(baseline), 2, cursor));
+        rows += page["rows"]!.AsArray().Count;
+        cursor = page["nextCursor"] is null ? null : TranslationJson.Parse<TranslationInspectionCursor>(page["nextCursor"]!.ToJsonString());
+    } while (cursor is not null);
+    Check.Equal(12, rows);
+});
+Test("a capture from before RFC 8785 reconciles as a baseline with an unchanged profile", () =>
+{
+    var (f, identity, baseline) = EarlierCapture();
+    var candidate = f.Candidate(f.Prepare(baseline, [f.Edit("K-002", "Reviewed")]));
+    var current = f.Capture(f.Changed([f.Edit("K-001", "Sentinelle", "fr-FR")]), EarlierProfile(f), identity with { Snapshot = identity.Snapshot with { ObservationId = "current-2" }, ContentSha256 = new string('c', 64) });
+    var reconciled = Check.Ok(f.Tools.Reconcile(Check.Ref(baseline), Check.Artifact(candidate, "candidate.xlsx"), Check.Ref(current)));
+    Check.Equal(0, reconciled["metadata"]!["conflicts"]!.GetValue<int>());
+});
+Test("a review, approval and candidate completed before RFC 8785 stay readable and replay", () =>
+{
+    var (f, _, baseline) = EarlierCapture();
+    var review = EarlierBuild(() => f.Prepare(baseline, [f.Edit("K-002", "Reviewed")]));
+    var approval = EarlierBuild(() => f.Approve(review));
+    var candidate = EarlierBuild(() => f.Candidate(review));
+    Check.Ok(f.Tools.ReviewPage(Check.Ref(review)));
+    Check.Ok(f.Tools.Reopen(Check.Ref(review)));
+    Check.Ok(f.Tools.Reopen(Check.Ref(candidate)));
+    Check.Equal(Check.S(approval, "recordSha256"), Check.S(f.Approve(review), "recordSha256"));
+    Check.Equal(Check.S(candidate, "recordSha256"), Check.S(f.Candidate(review), "recordSha256"));
+});
+Test("a review pending approval from before RFC 8785 is refused with CanonicalFormChanged and prepared again", () =>
+{
+    var (f, _, baseline) = EarlierCapture();
+    var pending = EarlierBuild(() => f.Prepare(baseline, [f.Edit("K-004", "Pending")]));
+    Check.Error(CanonicalJson.FormChanged, f.Tools.Approve(Check.Ref(pending), Check.Digest(pending), "reviewer", true));
+    var renewed = f.Prepare(baseline, [f.Edit("K-004", "Pending")]);
+    Check.Ok(f.Tools.Candidate(Check.Ref(renewed), Check.Digest(renewed), Check.S(f.Approve(renewed), "recordSha256")));
+});
 int failures = 0;
 foreach (var test in checks)
 {

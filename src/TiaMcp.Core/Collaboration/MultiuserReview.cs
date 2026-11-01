@@ -45,7 +45,7 @@ public static class MultiuserReview
             foreach (string identity in oldRows[section].Keys.Union(newRows[section].Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal))
             {
                 oldRows[section].TryGetValue(identity, out var old); newRows[section].TryGetValue(identity, out var next);
-                if (old is not null && next is not null && CanonicalJson.Serialize(old) == CanonicalJson.Serialize(next)) continue;
+                if (old is not null && next is not null && CanonicalJson.ExactlyEqual(old, next)) continue;
                 changes.Add(new JsonObject { ["section"] = section, ["identity"] = identity,
                     ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : "differentObservation",
                     ["before"] = old?.DeepClone(), ["after"] = next?.DeepClone() });

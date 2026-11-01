@@ -45,7 +45,7 @@ public static class SafetyEvidenceReview
             foreach (string identity in b[section].Keys.Union(a[section].Keys, StringComparer.Ordinal).Order(StringComparer.Ordinal))
             {
                 b[section].TryGetValue(identity, out var old); a[section].TryGetValue(identity, out var next);
-                if (old is not null && next is not null && CanonicalJson.Serialize(old) == CanonicalJson.Serialize(next)) continue;
+                if (old is not null && next is not null && CanonicalJson.ExactlyEqual(old, next)) continue;
                 changes.Add(new JsonObject { ["section"] = section, ["identity"] = identity,
                     ["status"] = old is null ? "onlyAfter" : next is null ? "onlyBefore" : "differentObservation",
                     ["before"] = old?.DeepClone(), ["after"] = next?.DeepClone(),
@@ -54,7 +54,7 @@ public static class SafetyEvidenceReview
             }
         var metadataBefore = before.DeepClone().AsObject(); var metadataAfter = after.DeepClone().AsObject();
         foreach (string section in b.Keys) { metadataBefore.Remove(section); metadataAfter.Remove(section); }
-        bool metadataChanged = CanonicalJson.Serialize(metadataBefore) != CanonicalJson.Serialize(metadataAfter);
+        bool metadataChanged = !CanonicalJson.ExactlyEqual(metadataBefore, metadataAfter);
         if (metadataChanged) changes.Add(new JsonObject { ["section"] = "otherReportedContent", ["identity"] = "observation",
             ["status"] = "differentObservation", ["before"] = metadataBefore, ["after"] = metadataAfter });
         return new JsonObject { ["schemaVersion"] = "safety-evidence-review.v1", ["reviewId"] = reviewId, ["plcPath"] = plcPath,
