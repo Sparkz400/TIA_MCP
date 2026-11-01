@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.107",
+  "catalogVersion": "0.4.108",
   "targetTiaVersions": [
     21
   ],
@@ -3566,6 +3566,26 @@
         "One packaged single-rule style fixture (CodeBlock (FB,FC,OB)) per Run in a worker-created scratch CPU 1511-1 PN V4.1 under the English UI; other rules, rule sets, scopes, CPUs and UI languages stay unqualified. Production admission stays closed: testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified. testsuite_style_plan_prepare, testsuite_style_job_prepare and testsuite_style_job_mark_interrupted were not called; qualification_testsuite_prepare builds the review and job through the same TestSuiteStyleJobs core.",
         "Scope and license rest on operator observations: V21 Update 3 has no rule-set scope read route. For clean/prepare the screenshot showed neither the object selector nor the enabled state; the operator confirmed both in chat. Later screenshots show the rule table (CodeBlock (FB,FC,OB), Enabled). Screenshots pasted as WebP were re-encoded to PNG with unchanged pixels for the validator (PNG/JPEG only); the originals are kept beside each challenge folder as <challenge>-<purpose>-original.webp. The violating/reconcile-recovered screenshot has no title bar; its open project path (violating/h/recovered) was confirmed from the TIA process's window title (read-only, no Openness attach). Later screenshots include the title bar.",
         "Interruption is injected worker response loss at beforeRun, afterRun and afterRestore; the worker and TIA stay alive. No worker, Portal or Host process loss was exercised for style jobs."
+      ]
+    },
+    {
+      "id": "local.testsuite.job-prepare.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "4ced3b90aaacd3986efcebc333223d90cb2f4830",
+        "passedScope": "scripts/qualify_testsuite_application.py cases jobPass and jobFail on a frozen Debug build of 4ced3b90 (artifacts/tj1, git archive, TestSuiteQualification=true, Host --testsuite-qualification; reports artifacts/q/tj/tq_68318815 and tq_56f8e66f, 42 steps), each with one owned Portal, owned scratch CPU 1511-1 PN V4.1 and one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (download, generated-state save, credential provisioning, power on, RUN). After qualification_testsuite_prepare imported and scoped the TS-Q02 fixture, testsuite_application_plan_prepare reviewed the case again (externally managed, profile v21.owned-plcsim.application.qualification-v1) and retained a review byte-identical to the qualification review; testsuite_style_job_prepare queued it as a separate job (a wrong reviewed hash refused with ReviewMismatch, the repeated key returned the same job and operation, the key with a two-run review refused with IdempotencyConflict, status prepared at revision 0). qualification_testsuite_execute dispatched that job: one TestCaseExecutor.Run(TestCase) with observation, checkpoint archive, compile, preservation, fresh reopen and cleanup. jobPass: succeeded, classification passed. jobFail: assertionFailure, recoveryRequired, qualification_testsuite_recover into a new folder and qualification_testsuite_reconcile verifiedRestored. The qualification job prepared alongside stayed prepared and was never dispatched."
+      },
+      "artifacts": [
+        "evidence/local.testsuite.job-prepare.20261101.json",
+        "docs/verification/testsuite-job-prepare-20261101.md"
+      ],
+      "limitations": [
+        "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus, in the TS-Q02 qualification mode. Style reviews queued by testsuite_style_job_prepare have no production consumer (V21 boundary), system reviews have no qualification mode, and production admission stays closed.",
+        "The result profile matches the exact TS-Q02 fixture tree TIA V21 Update 3 wrote under its English UI; other trees fail closed. The simulator ticket expires 15 minutes after sim_create."
       ]
     },
     {
@@ -16036,14 +16056,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style, TS-05 application and TS-06 system reviews. Production execution and recovery stay disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026): no native run has dispatched a job this tool prepared. It also queues application reviews (testsuite_application_plan_prepare), whose execution is qualified in the TS-Q02 mode, so it does not follow the style V21 boundary. The TS-Q02 pass case called it natively (local.testsuite.application.20261030), but that job was refused at the production gate and never ran; TS-Q01 (local.testsuite.style-q01.20261101) prepares its jobs inside qualification_testsuite_prepare. Verifying it needs a native run that calls it on a qualification review and dispatches that job through qualification_testsuite_execute; TS-Q02 needs no operator."
+          "Native (1 November 2026, local.testsuite.job-prepare.20261101), TS-Q02 qualification mode only: a job this tool queued from a testsuite_application_plan_prepare review (byte-identical to the qualification review) was dispatched through qualification_testsuite_execute; the passing case succeeded, the failing case was recovered and reconciled verifiedRestored. A wrong reviewed hash (ReviewMismatch) and the key bound to another review (IdempotencyConflict) refused; the repeated key returned the same job at revision 0. Style reviews it queues have no production consumer (V21 boundary), and system reviews have no qualification mode."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.job-prepare.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",

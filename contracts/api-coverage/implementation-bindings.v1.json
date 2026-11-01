@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "9602af3879c9cca17a6f29cdec7775c1d129f0a9beded3adb959417db7aa9b93",
-      "bytes": 1641374
+      "sha256": "cd4c160a16e7a368a72998771c7a7ea24cf193c2e4b14fbb2a1fca50291cc2da",
+      "bytes": 1643903
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -126579,7 +126579,16 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.job-prepare.20261101",
+          "profileSha256": "304e9f10c2301cd35aaafc14a036abe3f8bcc340322cce4510e3e563c63df600",
+          "artifacts": [
+            "evidence/local.testsuite.job-prepare.20261101.json",
+            "docs/verification/testsuite-job-prepare-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -130574,6 +130583,11 @@
       "sha256": "660dcb066bf79657004b3377444db85813facb755e4a587c88a034bd90d55329"
     },
     {
+      "path": "docs/verification/testsuite-job-prepare-20261101.md",
+      "state": "observed",
+      "sha256": "3c94393f95d9a8f4b787d74dd8b54e5a08c3a0ead6d9d68a4f299ae128fa5e36"
+    },
+    {
       "path": "docs/verification/testsuite-style-q01-20261101.md",
       "state": "observed",
       "sha256": "e55080015b9388106ebf3368c406f7578a8705c5c52d441ba835f00c9121d4e2"
@@ -131397,6 +131411,11 @@
       "path": "evidence/local.testsuite.definitions.20261028.json",
       "state": "observed",
       "sha256": "b622b4e86dbc77c04ded72744d4d9d152c3a10bf974fbd1e9e3ce8cc4d530773"
+    },
+    {
+      "path": "evidence/local.testsuite.job-prepare.20261101.json",
+      "state": "observed",
+      "sha256": "b9c6b87f98f39408c9124f8cad47d0a49a28de64f2b29386298e03c4e7580123"
     },
     {
       "path": "evidence/local.testsuite.scope-probe.20261028.json",
@@ -132320,6 +132339,10 @@
     {
       "id": "local.testsuite.definitions.20261028",
       "profileSha256": "ce8867a7a2a01b02cbeb62de5bddbe3e8e70d5e72b971412be0023b66d81d20e"
+    },
+    {
+      "id": "local.testsuite.job-prepare.20261101",
+      "profileSha256": "304e9f10c2301cd35aaafc14a036abe3f8bcc340322cce4510e3e563c63df600"
     },
     {
       "id": "local.testsuite.scope-probe.20261028",
