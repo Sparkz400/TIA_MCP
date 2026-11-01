@@ -3587,6 +3587,26 @@
       ]
     },
     {
+      "id": "local.testsuite.job-prepare.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "4ced3b90aaacd3986efcebc333223d90cb2f4830",
+        "passedScope": "scripts/qualify_testsuite_application.py cases jobPass and jobFail on a frozen Debug build of 4ced3b90 (artifacts/tj1, git archive, TestSuiteQualification=true, Host --testsuite-qualification; reports artifacts/q/tj/tq_68318815 and tq_56f8e66f, 42 steps), each with one owned Portal, owned scratch CPU 1511-1 PN V4.1 and one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (download, generated-state save, credential provisioning, power on, RUN). After qualification_testsuite_prepare imported and scoped the TS-Q02 fixture, testsuite_application_plan_prepare reviewed the case again (externally managed, profile v21.owned-plcsim.application.qualification-v1) and retained a review byte-identical to the qualification review; testsuite_style_job_prepare queued it as a separate job (a wrong reviewed hash refused with ReviewMismatch, the repeated key returned the same job and operation, the key with a two-run review refused with IdempotencyConflict, status prepared at revision 0). qualification_testsuite_execute dispatched that job: one TestCaseExecutor.Run(TestCase) with observation, checkpoint archive, compile, preservation, fresh reopen and cleanup. jobPass: succeeded, classification passed. jobFail: assertionFailure, recoveryRequired, qualification_testsuite_recover into a new folder and qualification_testsuite_reconcile verifiedRestored. The qualification job prepared alongside stayed prepared and was never dispatched."
+      },
+      "artifacts": [
+        "evidence/local.testsuite.job-prepare.20261101.json",
+        "docs/verification/testsuite-job-prepare-20261101.md"
+      ],
+      "limitations": [
+        "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus, in the TS-Q02 qualification mode. Style reviews queued by testsuite_style_job_prepare have no production consumer (V21 boundary), system reviews have no qualification mode, and production admission stays closed.",
+        "The result profile matches the exact TS-Q02 fixture tree TIA V21 Update 3 wrote under its English UI; other trees fail closed. The simulator ticket expires 15 minutes after sim_create."
+      ]
+    },
+    {
       "id": "local.online.upload.tls-hardening.20261030",
       "status": "passed",
       "profile": {
@@ -16054,14 +16074,16 @@
       "implementation": {
         "status": "implemented",
         "limitations": [
-          "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
+          "Style, TS-05 application and TS-06 system reviews. Production execution and recovery stay disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026): no native run has dispatched a job this tool prepared. It also queues application reviews (testsuite_application_plan_prepare), whose execution is qualified in the TS-Q02 mode, so it does not follow the style V21 boundary. The TS-Q02 pass case called it natively (local.testsuite.application.20261030), but that job was refused at the production gate and never ran; TS-Q01 (local.testsuite.style-q01.20261101) prepares its jobs inside qualification_testsuite_prepare. Verifying it needs a native run that calls it on a qualification review and dispatches that job through qualification_testsuite_execute; TS-Q02 needs no operator."
+          "Native (1 November 2026, local.testsuite.job-prepare.20261101), TS-Q02 qualification mode only: a job this tool queued from a testsuite_application_plan_prepare review (byte-identical to the qualification review) was dispatched through qualification_testsuite_execute; the passing case succeeded, the failing case was recovered and reconciled verifiedRestored. A wrong reviewed hash (ReviewMismatch) and the key bound to another review (IdempotencyConflict) refused; the repeated key returned the same job at revision 0. Style reviews it queues have no production consumer (V21 boundary), and system reviews have no qualification mode."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.job-prepare.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -20504,10 +20526,10 @@
           "Compiled against the V21 PublicAPI only; not natively qualified.",
           "Reviews run through the testsuite_style_job_* lifecycle. Native execution and recovery stay disabled behind the same code-owned profile gate as style jobs.",
           "One native Run returns one TestResults tree. It is retained losslessly for every reviewed case, but only a single-definition run owns it; lists and groups stay inconclusive per case. Warning and Information states, including inconclusive runtime outcomes, never pass.",
-          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance and that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified).",
+          "The owning worker verifies the sim_create downloadTicket (15-minute expiry), the registered owned instance, that serverAddress is one of its ControllerIP addresses, routed by Windows through the PLCSIM Virtual Ethernet Adapter, and that the instance was created for TCP/IP, before SetScope and Run. Physical or unowned endpoints and a route through another network card are refused (RuntimeTargetNotOwnedPlcsim; an undetermined route RuntimeTargetRouteUnverified), and so is a Softbus instance (PlcsimEndpointUnreachable): it keeps its configured ControllerIP, and the PLCSIM adapter can still hold that subnet with nothing listening (observed 1 November 2026).",
           "StandardSIMATIC interface only, anonymous OPC UA only. UserDefined and SiOME interfaces need SetScope(String, ServerInterfaces, DirectoryInfo) with a hash-pinned interface folder and are not offered. No credential or security-policy argument exists in the V21 API.",
           "SetScope persists the address on every reviewed case after the checkpoint. Preservation and effective scope remain unverified.",
-          "Native blocker (28 October 2026, V21 Update 3): application and system test execution (TestCaseExecutor.Run, SystemTestCaseExecutor.Run) has no qualification mode, and the production profile gate refuses it on Host and worker, so AC-native, AC-recovery, AC-runtime and AC-simulator-lifecycle have no native run. The definitions themselves are qualified (local.testsuite.definitions.20261028). Qualifying execution needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance on Softbus."
+          "Native blocker (1 November 2026, docs/verification/testsuite-system-blocker-20261101.md): system execution has no qualification mode, and the production profile gate and the TS-Q01/TS-Q02 qualification admission refuse system reviews before any native call. A TS-Q03 mode in the TS-Q02 shape is designed but not built, since it cannot run on this PC: OPC UA reaches a PLCSIM Advanced instance only in PLCSIM's TCP/IP mode, an operator setting (this PC is on Softbus); SystemTestCaseExecutor.Run and SetScope take no credential, so the scratch CPU's UMAC-protected OPC UA server would need guest access (the UMAC anonymous user holding OPCUAServerAccess), which is not settable through V21 Openness, so an operator-made seed is needed; and whether Test Suite trusts the CPU's server certificate without a UI prompt is unobserved. The definitions themselves are qualified (local.testsuite.definitions.20261028)."
         ]
       },
       "qualification": {
