@@ -49,6 +49,11 @@ rack lists the same two items, and `hmi_inspect` finds no HMI device. Together w
 25 October refusal (`CanPlugNew` false in every slot), V21 Openness neither creates nor
 exposes WinCC RT Professional.
 
+Retained locally (main checkout, ignored `artifacts/`): the owned copy made by `project_copy`
+(`artifacts/rtp2/copies/r_c5c17770/Scratch/Scratch.ap21`; the operator's original was opened
+without saving), the `device_inventory` view (`artifacts/rtp3/rtp-inventory.json`) and the
+`hardware_inspect` reads of the PC station (`artifacts/rtp4`), all on build `10763a35`.
+
 This is a recorded V21 boundary, not a missing prerequisite: the X07 ledger entry no longer
 asks for an RT Professional target, and no release-matrix row is added. Catalog texts say
 "not exposed by V21 Openness". If a later Openness version exposes the runtime, the profile
