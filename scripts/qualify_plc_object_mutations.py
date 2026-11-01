@@ -6,6 +6,11 @@ native snapshot (every block, type and tag-table XML, every tag/constant row and
 previous one in exactly the intended keys. A fresh Portal then reopens the saved project, which must show the identical
 state. Phase B applies one more change per kind from that state and restores its checkpoint; the recovered copy must
 equal the pre-change state. Typed refusals must leave the PLC software unchanged.
+
+Since the 31 October audit every preview reports the project's unsaved state (isModified), block_rename and block_delete
+refuse compile=false at apply, and once the final partial failure leaves its change recovery_required, change_prepare
+refuses another change on the project (RecoveryRequired, naming it) and a change prepared before the failure is refused
+before its checkpoint.
 """
 from __future__ import annotations
 
@@ -50,6 +55,8 @@ LIMITATIONS = [
     "Not covered here: " + ", ".join(sorted(EXCLUDED)) + ".",
     "Engineering only; runtime behavior is not observed.",
     "A change whose compile fails leaves an inconsistent user block; change_restore then refuses (FingerprintUnavailable) by design and the retained checkpoint is the recovery input.",
+    "The apply-side unresolved-change guard is reached only when a change prepared before the failure still matches its "
+    "fingerprint; the failed apply changed the project, so that change may be refused StaleRevision first (both refuse before the checkpoint).",
 ]
 
 DATA = '''DATA_BLOCK "X11Data"
@@ -207,6 +214,7 @@ class Run:
                     "targetGroupPath": target_group(kind, self.plc, payload), **(preview or {})}
         require(prepared["state"] == "prepared" and shown["payload"] == payload and matches(expected, shown),
                 "Preview of %s differs: %s" % (label, {key: shown.get(key) for key in expected}))
+        require(isinstance(shown.get("isModified"), bool), "Preview of %s does not report isModified" % label)
         return prepared
 
     def finish(self, label, kind, prepared, added=(), removed=(), changed=(), rows=None, xml=None, restore=False):
@@ -400,13 +408,18 @@ def edit_blocks(run, gate):
                changed=[run.blk("X11Edit")], rows={run.blk("X11Edit"): {"number": 77}})
     run.refuse("block_rename", "an existing block name", {"blockName": "X11Edit", "newName": "TiaMcp_IsEnabled"}, "ObjectExists")
     run.refuse("block_rename", "a missing block", {"blockName": "X11Missing", "newName": "X11Other"}, "BlockNotFound")
-    run.mutate("rename X11Edit", "block_rename", {"blockName": "X11Edit", "newName": "X11Edited"},
-               {"effects": [{"action": "block_rename", "existingBlock": run.info("X11Edit")}, {"renameTo": "X11Edited"}]},
+    # The delete and rename kinds need compile=true since the 31 October audit; the refusal comes before the checkpoint.
+    renamed = run.prepare("rename X11Edit", "block_rename", {"blockName": "X11Edit", "newName": "X11Edited"},
+                          {"effects": [{"action": "block_rename", "existingBlock": run.info("X11Edit")}, {"renameTo": "X11Edited"}]})
+    run.refuse_apply("block_rename", "compile=false", renamed, "InvalidRequest", compile=False, save=False)
+    run.finish("rename X11Edit", "block_rename", renamed,
                added=[run.blk("X11Edited")], removed=[run.blk("X11Edit")], rows={run.blk("X11Edited"): {"name": "X11Edited", "number": 77}},
                xml={run.blk("X11Edited"): "<HeaderAuthor>X11Auth</HeaderAuthor>"})
     run.refuse("block_delete", "FB TiaMcp_EnableGate, used by its instance DB and Main", {"blockName": "TiaMcp_EnableGate", **POLICY}, "DependencyExists")
-    run.mutate("delete X11Drop", "block_delete", {"blockName": "X11Drop", **POLICY},
-               {"effects": [{"action": "block_delete", "existingBlock": run.info("X11Drop")}], "dependencies": NO_REFERENCES}, removed=[run.blk("X11Drop")])
+    dropped = run.prepare("delete X11Drop", "block_delete", {"blockName": "X11Drop", **POLICY},
+                          {"effects": [{"action": "block_delete", "existingBlock": run.info("X11Drop")}], "dependencies": NO_REFERENCES})
+    run.refuse_apply("block_delete", "compile=false", dropped, "InvalidRequest", compile=False, save=False)
+    run.finish("delete X11Drop", "block_delete", dropped, removed=[run.blk("X11Drop")])
     # Instance DBs of the scratch's own FB, which no later step renames or deletes.
     run.refuse("instance_db_create", "an existing block name", {"name": "X11Data", "instanceOfName": "TiaMcp_EnableGate"}, "ObjectExists")
     run.refuse("instance_db_create", "a missing FB", {"name": "X11GateDB", "instanceOfName": "X11Missing"}, "BlockNotFound")
@@ -511,6 +524,9 @@ def recover_each_kind(run):
                added=[run.blk("X11GateAgainDB")], rows={run.blk("X11GateAgainDB"): {"kind": "InstanceDB"}}, restore=True)
     run.mutate("compile the PLC again", "plc_compile", {}, {"effects": [{"action": "compile", "plcPath": run.plc}]}, restore=True)
 
+    # Prepared before the partial failure below, so its apply meets the unresolved change.
+    late = run.prepare("create X11Late before the failure", "group_create", {"groupKind": "blocks", "groupPath": run.plc + "/blocks", "name": "X11Late"},
+                       {"effects": [{"action": "group_create", "groupKind": "blocks", "groupPath": run.plc + "/blocks", "name": "X11Late"}]})
     # A partial failure: X11Ref beyond the CPU's bit memory; the outcome is recorded and recovered, never replayed.
     label = "readdress X11Ref beyond the bit memory"
     prepared = run.prepare(label, "tag_set", {**t, "memberName": "X11Ref", "attributes": {"LogicalAddress": "%M20000.0"}},
@@ -531,6 +547,7 @@ def recover_each_kind(run):
     if not h.report["nativeBound"]["isError"]:
         run.restore(label, "tag_set", prepared)
         return
+    unresolved_guard(run, prepared, late)
     # A failed compile leaves an inconsistent user block, which the recovery guard deliberately cannot fingerprint;
     # change_restore then refuses rather than accept a weaker guard. The checkpoint stays retained (checked above).
     def refused():
@@ -538,6 +555,35 @@ def recover_each_kind(run):
         require(error.get("code") == "FingerprintUnavailable", "Expected the inconsistent-block recovery refusal: %s" % error)
         return error
     h.report["nativeBound"]["restoreRefusal"] = h.stage("restore " + label + " is refused on the inconsistent block", refused)
+
+
+def unresolved_guard(run, failed, late):
+    """With failed recovery_required: a new preparation and the apply of a change prepared before it refuse before any checkpoint."""
+    h = run.h
+
+    def prepare_refused():
+        before = run.state()
+        error = h.call_error("change_prepare", {"kind": "group_create", "payload": {"groupKind": "blocks", "groupPath": run.plc + "/blocks", "name": "X11Later"},
+                                                "plcPath": run.plc})
+        require(error.get("code") == "RecoveryRequired" and failed["changeId"] in (error.get("message") or ""),
+                "Expected RecoveryRequired naming %s: %s" % (failed["changeId"], error))
+        require(run.state() == before, "The refused preparation changed the PLC software")
+        return {"code": error["code"], "message": error.get("message"), "details": error.get("details")}
+    h.report["unresolvedGuard"] = {"prepare": h.stage("refuse change_prepare while the failed change is recovery_required", prepare_refused)}
+
+    def apply_refused():
+        before = run.state()
+        error = h.call_error("change_apply", h.apply_args(late))
+        # The failed apply changed the project, so the earlier preview's fingerprint check may refuse first.
+        require(error.get("code") in ("RecoveryRequired", "StaleRevision"), "Expected RecoveryRequired or StaleRevision: %s" % error)
+        status = h.tool("change_status", {"changeId": late["changeId"]})
+        archives = [str(p) for p in h.directory.glob("**/change-%s/before.zap21" % late["changeId"])]
+        require(status["state"] == "prepared" and not status["stages"] and not status["recoveryArchive"] and not archives and run.state() == before,
+                "The refused apply left its prepared state, wrote a checkpoint or changed the PLC software")
+        failed_status = h.tool("change_status", {"changeId": failed["changeId"]})
+        require(failed_status["state"] == "recovery_required", "The failed change left recovery_required: %s" % failed_status["state"])
+        return {"code": error["code"], "message": error.get("message"), "state": status["state"]}
+    h.report["unresolvedGuard"]["apply"] = h.stage("refuse change_apply of a change prepared before the failure, before its checkpoint", apply_refused)
 
 
 def body(h):
