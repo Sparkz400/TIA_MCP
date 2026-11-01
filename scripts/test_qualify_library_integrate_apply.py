@@ -241,6 +241,23 @@ class Candidates(unittest.TestCase):
         for path in ("callers/TiaMcpComponentCaller.lad.s7dcl", "callers/TiaMcpComponentHost.s7dcl"):
             self.assertTrue((subject.FIXTURES / path).is_file(), path)
 
+    def test_combinations_name_exactly_their_gate_features(self):
+        # PlcComponentQualificationGate.Features: LAD language, an FB caller, a multi-instance, a reused FB, an earlier network.
+        verified = {"earlierPlacement", "fbCaller", "fbCaller+multiInstance+reusedComponent", "ladCaller", "reusedComponent"}
+        keys = set()
+        for name, (reuse, caller, features) in subject.COMBINATIONS.items():
+            with self.subTest(name=name):
+                derived = sorted(feature for feature, present in (("ladCaller", caller["language"] == "LAD"), ("fbCaller", caller["kind"] == "FB"),
+                                 ("multiInstance", caller.get("multi")), ("reusedComponent", reuse), ("earlierPlacement", caller.get("networks") == 2)) if present)
+                self.assertEqual(features, [] if "+".join(derived) in verified else derived)
+                self.assertTrue(not caller.get("multi") or reuse and caller["kind"] == "FB", "A multi-instance needs a reused FB in an FB caller")
+                self.assertTrue(not caller.get("new") or caller["kind"] == "FC" and caller.get("networks", 1) == 1)
+                self.assertTrue((subject.FIXTURES / subject.CALLER_SOURCES[caller["kind"], caller["language"]]).is_file())
+                keys.add("+".join(derived))
+        self.assertFalse(set(subject.COMBINATIONS) & set(subject.CANDIDATES))
+        # Every unverified combination of the five features that a plan can have runs once at least.
+        self.assertEqual(14, len(keys - verified))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -4,8 +4,10 @@ namespace TiaMcp.Core.EngineeringJobs;
 
 /// <summary>
 /// Releases a failed credential-provisioning admission only on fresh native evidence:
-/// the project matches its pre-provision archive, the card manifest matches the original
-/// and any discovery observer project is empty. Every other outcome keeps the reservation.
+/// the project matches its pre-provision archive and was not saved after it, the card manifest
+/// matches the original, the rest of the storage matches its pre-attempt inventory, the write-ahead
+/// stream never armed the credential, and any discovery observer project is absent or empty.
+/// Every other outcome keeps the reservation.
 /// </summary>
 public sealed record SimulationProvisionReconciliation(string AdmissionId, string ScopeSha256, int ProvisioningProcessId,
     string StorageKey, string ProjectKey, string ProjectPath, string? ObserverKey, string? ObserverPath, string ReportPath)
@@ -62,19 +64,24 @@ public sealed record SimulationProvisionReconciliation(string AdmissionId, strin
         if (!Is("archiveHashMatches")) reasons.Add("The pre-provision project archive is missing or changed.");
         if (!Is("cardManifestMatches")) reasons.Add("The memory card manifest differs from the original.");
         if (!Is("projectFingerprintMatches")) reasons.Add("The project differs from its pre-provision archive.");
-        if (ObserverPath is not null && !Is("observerProjectEmpty")) reasons.Add("The discovery observer project is missing or not empty.");
+        if (!Is("projectSavedBeforeArchive")) reasons.Add("The project was saved after its pre-provision archive was written; an equal fingerprint does not prove nothing was persisted.");
+        if (!Is("storageMatchesBaseline")) reasons.Add("The simulator storage differs from its pre-attempt inventory beyond this attempt's own files.");
+        if (!Is("credentialNeverArmed")) reasons.Add("The write-ahead stream does not prove the credential was never submitted; the runtime protection store may hold it.");
+        if (ObserverPath is not null && !Is("observerProjectEmpty") && !Is("observerProjectAbsent")) reasons.Add("The discovery observer project is not empty.");
         return reasons;
     }
 
-    public IReadOnlyList<ResourceReconciliation> Dispositions(Func<string, string, EngineeringArtifactReference> evidence)
+    public IReadOnlyList<ResourceReconciliation> Dispositions(JsonObject verification, Func<string, string, EngineeringArtifactReference> evidence)
     {
         var rows = new List<ResourceReconciliation>
         {
-            new(ProjectKey, "unchanged", null, evidence("project", "Fresh session fingerprint equals the retrieved pre-provision archive.")),
-            new(StorageKey, "verifiedApplied", null, evidence("storage", "Memory card manifest equals the original generated card; provisioning attempt files are retained."))
+            new(ProjectKey, "unchanged", null, evidence("project", "Fresh session fingerprint (engineering and project library) equals the retrieved pre-provision archive, and the project was last saved before that archive was written.")),
+            new(StorageKey, "verifiedApplied", null, evidence("storage", "Memory card manifest equals the original generated card; every other pre-attempt entry is unchanged by metadata, the only new entries are this attempt's files and PLCSIM's runtime files (contents not read), and the write-ahead stream never opened or armed the credential."))
         };
         if (ObserverKey is not null)
-            rows.Add(new(ObserverKey, "verifiedApplied", null, evidence("observer", "Discovery observer project exists, opens and contains no device.")));
+            rows.Add(verification["observerProjectEmpty"]?.GetValueKind() == System.Text.Json.JsonValueKind.True
+                ? new(ObserverKey, "verifiedApplied", null, evidence("observer", "Discovery observer project exists, opens and contains no device."))
+                : new(ObserverKey, "unchanged", null, evidence("observer", "Discovery observer destination was never created.")));
         return rows;
     }
 }
