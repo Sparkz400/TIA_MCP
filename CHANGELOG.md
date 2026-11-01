@@ -176,6 +176,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
       a store over 10,000 records shrinks instead of refusing every admission. Hosts older than this
       change refuse new admissions and operations in an artifact root whose component-window store
       has an `.archive` folder.
+  - Follow-ups, fixed on 1 November (offline):
+    - A Test Suite fresh reopen keeps scratch status only for the project that held it; a
+      watch-owned project no longer gains it.
+    - Admission reconcile of a combined apply's step workspace no longer holds on the temporary
+      file a crashed journal write leaves; it lists it in the evidence and never reads it.
+    - The text-list Host-loss sweep now fails when a run leaves a temporary file behind.
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the
