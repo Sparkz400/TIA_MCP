@@ -282,13 +282,34 @@ class FakeClient:
         return self.view(change)
 
     def view(self, change):
-        compiled = {"errorCount": self.host.errors, "warningCount": 0}
+        rows = [{"depth": 0, "state": "Error", "description": "Password %d" % i, "path": ""} for i in range(self.host.errors)]
+        rows.append({"depth": 0, "state": "Error" if self.host.errors else "Success", "description": "Compiling finished (errors: %d; warnings: 0)" % self.host.errors, "path": ""})
+        compiled = {"errorCount": self.host.errors, "warningCount": 0, "targets": [{"target": "HmiDevice_A", "messages": rows, "messagesTruncated": False}]}
         return {"changeId": change["id"], "previewHash": "h" + change["id"], "state": change["state"], "stages": change["stages"], "journalPath": str(change["journal"]),
                 "compile": compiled if change["state"] == "applied" else None,
                 "hmiEvidence": {"baselineCompile": compiled, "baselineCompileChangedCapture": False}}
 
     def write(self, change):
         change["journal"].write_text(json.dumps({"state": change["state"], "stages": change["stages"]}), encoding="utf-8")
+
+
+class CompileProblemTests(unittest.TestCase):
+    def test_the_rows_decide_not_the_summary_counts(self):
+        # Route run hr4: the first compile after a retrieve lists both password errors at depth 0 yet ends "errors: 0".
+        first = {"targets": [{"messagesTruncated": False, "messages": [
+            {"depth": 0, "state": "Error", "description": "The entered password confirmation does not match the password. "},
+            {"depth": 0, "state": "Error", "description": "The entered password does not comply with the password security concept"},
+            {"depth": 0, "state": "Success", "description": "Compiling finished (errors: 0; warnings: 0)"}]}]}
+        later = {"targets": [{"messagesTruncated": False, "messages": [
+            {"depth": 0, "state": "Error", "description": ""}, {"depth": 1, "state": "Error", "description": ""},
+            {"depth": 3, "state": "Error", "description": "The entered password confirmation does not match the password. "},
+            {"depth": 3, "state": "Error", "description": "The entered password does not comply with the password security concept"},
+            {"depth": 0, "state": "Error", "description": "Compiling finished (errors: 2; warnings: 0)"}]}]}
+        self.assertEqual(route.problems(first), route.problems(later))
+        added = json.loads(json.dumps(later))
+        added["targets"][0]["messages"].insert(2, {"depth": 3, "state": "Warning", "description": "New warning"})
+        self.assertNotEqual(route.problems(first), route.problems(added))
+        self.assertIsNone(route.problems({"targets": [{"messagesTruncated": True, "messages": []}]}))
 
 
 class GateRouteRunTests(unittest.TestCase):

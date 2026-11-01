@@ -367,8 +367,14 @@ def summary(value):
             "baselineCompileChangedCapture": evidence.get("baselineCompileChangedCapture"), "recoveredProject": value.get("recoveredProject")}
 
 
-def counts(compilation):
-    return (compilation or {}).get("errorCount"), (compilation or {}).get("warningCount")
+def problems(compilation):
+    """Sorted error and warning rows with text, summary rows left out; None without a message tree. The counts are no oracle: the
+    first compile after a retrieve lists the seeded fixture's two password errors yet ends "errors: 0" (route run hr4)."""
+    targets = (compilation or {}).get("targets")
+    if not targets or any(t.get("messagesTruncated") is not False for t in targets):
+        return None
+    return sorted((m["state"], m["description"]) for t in targets for m in t.get("messages") or []
+                  if m.get("state") in ("Error", "Warning") and m.get("description") and not m["description"].startswith("Compiling finished"))
 
 
 def run(args, connect):
@@ -430,8 +436,8 @@ def run(args, connect):
             evidence = result.get("hmiEvidence") or {}
             gate(result.get("state") == "applied" and result.get("stages") == APPLIED_STAGES, "Applied with every stage: " + label,
                  {"state": result.get("state"), "stages": result.get("stages"), "failure": result.get("failure")})
-            baseline, compiled = counts(evidence.get("baselineCompile")), counts(result.get("compile"))
-            gate(compiled == baseline and (fixture["mode"] == "seeded" or compiled == (0, 0)),
+            baseline, compiled = problems(evidence.get("baselineCompile")), problems(result.get("compile"))
+            gate(compiled is not None and compiled == baseline and (fixture["mode"] == "seeded" or compiled == []),
                  "Compiler errors and warnings as the baseline compile found them%s: %s" % ("" if fixture["mode"] == "seeded" else " (none)", label), {"baseline": baseline, "after": compiled})
             # Same key: the recorded outcome without a second write; another key: RecoveryRequired before admission.
             again = decoded(client.raw_tool("change_apply", apply_arguments(prepared, key)))
