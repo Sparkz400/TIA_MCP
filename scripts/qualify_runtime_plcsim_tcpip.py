@@ -1021,6 +1021,7 @@ def inventory(r):
     def export():
         der = pinned(r.args.cpu_ip, r.report["pins"]["web"]["sha256"], "Api.Browse")[0]
         path.write_bytes(der)
+        # Not a trust decision (the SHA-256 pin above is): Windows names a certificate-store entry by its SHA-1 thumbprint.
         r.thumbprint = hashlib.sha1(der).hexdigest().upper()
         return {"path": str(path), "sha1": r.thumbprint, "sha256": hashlib.sha256(der).hexdigest()}
     r.stage("export the pinned web server certificate", export)

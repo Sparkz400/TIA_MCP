@@ -116,6 +116,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Changed
 
+- From 1.0 on, `scripts/release_matrix.py --release-gate` also refuses while any release obligation in
+  the ledger is not accepted, so a set `releaseReady` flag cannot bypass the per-obligation acceptance.
 - `serverInfo.version` reports the product version; the catalog version moved to
   `capabilities.experimental["tiaMcp/featureCatalog"].version`.
 - Bundles from `scripts/Package.ps1` carry the product version in their name and `manifest.json`.
