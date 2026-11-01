@@ -73,6 +73,9 @@ qualified, so `_execute_next`, `_recover` and `_reconcile` refuse with `TestSuit
 worker. No native run, result, interruption or recovery exists for `AC-native` and `AC-recovery`. Qualifying the
 TS-Q01 style profile needs complete effective scope, and the installed V21 Update 3 PublicAPI still exposes
 `RuleSet.SetScope` and `CopyScope` but no scope getter.
+*Update 1 November:* the TS-Q01 desk session ran all six cases ([TS-Q01 record](testsuite-style-q01-20261101.md));
+it verifies `_status`, `_results` and `_stop_request`. The other six rows stay open: the run prepares and dispatches
+through the qualification tools, and production still has no qualified profile.
 
 **TS-Q01 qualification tools** (`qualification_testsuite_prepare`, `_execute`, `_recover`, `_reconcile`): the
 qualification build (`--testsuite-qualification`, [`qualify_testsuite_native.py`](../../scripts/qualify_testsuite_native.py))
@@ -80,6 +83,8 @@ substitutes an operator observation for the missing getter. At each prepare, reo
 writes a challenge and waits up to 12 minutes for a screenshot of the expanded scope tree in the TIA rule-set editor
 and, at prepare, an Automation License Manager key check. That needs a person at this PC's desktop. It was not run:
 driving the user's live desktop from an agent session was ruled out.
+*Update 1 November:* run with the operator at the desk; all six cases passed (`local.testsuite.style-q01.20261101`,
+[TS-Q01 record](testsuite-style-q01-20261101.md)).
 
 **Application and system execution** (`testsuite_application_plan_prepare`, `testsuite_system_plan_prepare`):
 `TestCaseExecutor.Run` and `SystemTestCaseExecutor.Run` have no qualification mode, and the production gate refuses
@@ -91,10 +96,13 @@ needs a TS-Q02 qualification mode with an owned PLCSIM Advanced instance.
 **Interruption.** Native interruption of Test Suite style jobs (the open interruption TODO item) needs a dispatched
 style job, so it is blocked with the style lifecycle. The two import kinds are target-dependent `change_apply` kinds
 and are covered by that route's qualification ([interruption coverage](interruption-coverage-20261027.md)).
+*Update 1 November:* TS-Q01 passed worker response loss before and after the Run and after the restore, with
+reconciliation and no replay; worker, Portal and Host process loss for style jobs is still not covered
+([TS-Q01 record](testsuite-style-q01-20261101.md)).
 
 ## Next step
 
-A user-assisted TS-Q01 run on this PC, from a `TestSuiteQualification=true` build:
+*Done on 1 November ([TS-Q01 record](testsuite-style-q01-20261101.md)).* A user-assisted TS-Q01 run on this PC, from a `TestSuiteQualification=true` build:
 `python -B scripts/qualify_testsuite_native.py --host <host> --worker <worker> --root <new dir> --case clean`
 (then `violating`, `stop`, `beforeRun`, `afterRun`, `afterRestore`). For each challenge, the operator expands the
 scope tree of the shown rule set, takes the screenshots, runs the ALM check and writes `observation.json` next to

@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "e9553ee7d25a123386ef3bd7376fbf903fea3ef3ab42b0ff61267f4221da189b",
-      "bytes": 1599056
+      "sha256": "c35e6aff5dc9d3d651762452e9b6ba571d48e45eab4b1d45677ec8da3aae5229",
+      "bytes": 1602698
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -118545,6 +118545,14 @@
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
           ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -118623,6 +118631,14 @@
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
           ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -118664,6 +118680,14 @@
           "artifacts": [
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
+          ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
           ]
         }
       ],
@@ -118758,6 +118782,14 @@
           "artifacts": [
             "evidence/local.testsuite.application.20261030.json",
             "docs/verification/testsuite-application-20261030.md"
+          ]
+        },
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
           ]
         }
       ],
@@ -126252,7 +126284,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126289,7 +126330,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126312,7 +126362,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -130111,6 +130170,11 @@
       "sha256": "660dcb066bf79657004b3377444db85813facb755e4a587c88a034bd90d55329"
     },
     {
+      "path": "docs/verification/testsuite-style-q01-20261101.md",
+      "state": "observed",
+      "sha256": "8c331902c7b72178b936ba5442a76c1c805ad429ff4544becf1557800d210f90"
+    },
+    {
       "path": "evidence/local.access.qualify.20261029.json",
       "state": "observed",
       "sha256": "a7d7c0e33554445937f602f1a8f9fa4070a38cbd58114514bfb541de2d4d9601"
@@ -130884,6 +130948,11 @@
       "path": "evidence/local.testsuite.scope-probe.20261028.json",
       "state": "observed",
       "sha256": "67b9ac17c1a2193567a14aa6d29d8db2155e881293f013723ab438b38d29fc14"
+    },
+    {
+      "path": "evidence/local.testsuite.style-q01.20261101.json",
+      "state": "observed",
+      "sha256": "424a86424ece9926c16e9a8fb3a2d5aa854dd49e6716573dffc49bfedf47c01f"
     },
     {
       "path": "evidence/local.translation.native.20261028.json",
@@ -131761,6 +131830,10 @@
     {
       "id": "local.testsuite.scope-probe.20261028",
       "profileSha256": "fc96bbe5ab2bd3e9a1be79c0cef2f04526fee906ed79e604c48a28f19dcc02b4"
+    },
+    {
+      "id": "local.testsuite.style-q01.20261101",
+      "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9"
     },
     {
       "id": "local.translation.native.20261028",

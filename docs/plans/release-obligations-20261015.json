@@ -18,7 +18,7 @@
       "docs/history/status-log.md",
       "docs/TODO.md"
     ],
-    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md). On 1 November 2026 X07, X08, B03 and B04 were refreshed against catalog 0.4.92: the HMI gate kinds passed natively, and WinCC RT Professional became a recorded V21 boundary (no matrix row)."
+    "note": "Each currentResult starts with counts derived from the release matrix; obligations changed since 27 October add a dated note, and their implementation/qualification labels were rewritten. remainingWork and nextAction were rewritten for every obligation except F01, F02, L06, D15, X05, X09, X12, X13, C01, C04 (and D17's nextAction), which keep the 15 October audit text. counts, dependencies and the historical sections keep the 15 October audit. The 27 October values of the refreshed fields are in commit 53d4be7, the 15 October values in commit 9c0b021. On 29 October 2026 D02, D04, D06 and X04 were refreshed against catalog 0.4.70, C03, D12 and D16 against 0.4.72 and D09 against 0.4.76; later that day F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 were refreshed against 0.4.76, B03's current text was corrected, dispositions was added for the eight maintainer-decided blocked rows, and completionCriteria and completionRules were amended (docs/plans/release-acceptance.md). On 1 November 2026 X07, X08, B03 and B04 were refreshed against catalog 0.4.92: the HMI gate kinds passed natively, and WinCC RT Professional became a recorded V21 boundary (no matrix row). Later on 1 November D06 was refreshed against catalog 0.4.95: TS-Q01 passed natively (local.testsuite.style-q01.20261101)."
   },
   "release": "1.0",
   "releaseReady": false,
@@ -831,11 +831,11 @@
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
       "implementation": "partial_definitions_imports_native_execution_gated",
-      "qualification": "native_inventories_imports_scope_probe_verified_execution_blocked",
+      "qualification": "native_definitions_application_runs_and_ts_q01_style_qualification_verified_production_style_execution_closed",
       "releaseAccepted": false,
-      "currentResult": "29 October 2026 (catalog 0.4.70): 23 release-matrix rows (2 shipped, 6 limited, 15 unqualified); 37 cells bound and 97 open. TS-Q01 ran natively in two operator sessions: the scope and license observations were accepted and the style rule ran (clean 0/3, violating 3/3). The checkpoint manifest, TIA's English result texts and typed qualification errors were fixed (d4ee5e8, 1c272fc).",
-      "remainingWork": "The 15 style-job, TS-Q01 and application/system plan rows (97 cells): V21 Update 3 has no rule-set scope read route, and application/system execution has no qualification mode.",
-      "nextAction": "One more operator session of the six TS-Q01 cases on the fixed build (artifacts/tq7); then style-job execution and its interruption.",
+      "currentResult": "1 November 2026 (catalog 0.4.95): 23 release-matrix rows (9 shipped, 7 limited, 7 unqualified); 83 cells bound and 51 open. TS-Q01 passed natively in the qualification build with operator scope and license observations (local.testsuite.style-q01.20261101): clean passed, violating assertionFailure, stop between two runs, and lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay; it verifies testsuite_style_job_status, _results and _stop_request. Application execution passed in the TS-Q02 qualification mode (local.testsuite.application.20261030).",
+      "remainingWork": "51 cells: testsuite_style_plan_prepare and testsuite_style_job_prepare (not called natively; the qualification run prepares through qualification_testsuite_prepare); testsuite_style_job_execute_next, _recover and _reconcile (production refuses with TestSuiteProfileUnqualified: no production profile is qualified, and V21 Update 3 has no rule-set scope read route); testsuite_style_job_mark_interrupted and worker, Portal and Host process loss for style jobs (TS-Q01 injected response loss only); system execution (testsuite_system_plan_prepare) has no qualification mode.",
+      "nextAction": "Decide whether an operator-observed production style profile is admissible; add process-kill cases and direct calls of the plan and job prepare tools to the TS-Q01 runner for a desk session; build a qualification mode for system execution.",
       "ownerRole": "Test Suite",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -852,7 +852,8 @@
         "docs/verification/testsuite-worker-integration-20261016.md",
         "docs/verification/testsuite-result-review-20261016.md",
         "docs/plans/expansion-plans/native-test-suite.md",
-        "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs"
+        "src/TiaMcp.Core/TestSuite/TestSuiteStyleJobs.cs",
+        "docs/verification/testsuite-style-q01-20261101.md"
       ],
       "packages": [
         "AC-17"

@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.94`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.95`.
 
 ### Added
 
@@ -33,7 +33,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   injection (OB40, OB82, OB83, OB86), memory reset and storage archives, DB snapshots,
   `plc_online_compare` and `plc_station_upload`, runtime OPC UA and Web API against PLCSIM over
   TCP/IP, and read-only live monitoring of watch and force tables (`watch_table_monitor`).
-- **Test Suite:** application test runs on an owned PLCSIM instance (TS-Q02 qualification mode).
+- **Test Suite:** application test runs on an owned PLCSIM instance (TS-Q02 qualification mode), and
+  style-rule runs with operator scope and license observations (TS-Q01 qualification mode).
 - **Online device identification:** `device_online_browse` and `device_identify` are qualified on an
   owned PLCSIM instance over TCP/IP: they equal pinned `Modules.Browse` and I&M0 reads of the CPU, its
   PROFINET interface and both ports. The operator trusts the instance's web certificate for the run, and

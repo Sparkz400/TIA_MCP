@@ -5,10 +5,10 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.94`: 481 features, 457 verified, 24 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 129 shipped, 328 limited, 15 unqualified, 7 unavailable on V21, 2 deferred |
-| Matrix cells | 2,084 bound, **93 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92` |
+| Feature catalog | `0.4.95`: 481 features, 460 verified, 21 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 132 shipped, 328 limited, 12 unqualified, 7 unavailable on V21, 2 deferred |
+| Matrix cells | 2,105 bound, **72 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, D06 against `0.4.95` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -18,8 +18,8 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 [TODO](TODO.md) lists the open work; [open matrix rows by owner](TODO.md#open-matrix-rows-by-owner)
 names every row with an open cell.
 
-- **External prerequisites:** an operator at the desktop for the last Test Suite session
-  (TS-Q01); the VMware guest, a V20 library input, other HMI targets, a physical PLC (B05), optional products and licenses such
+- **External prerequisites:** an operator at the desktop for every further Test Suite style
+  run (V21 has no scope read route); the VMware guest, a V20 library input, other HMI targets, a physical PLC (B05), optional products and licenses such
   as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
   UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).
@@ -68,7 +68,8 @@ conditions, external Git delivery with two-sided conflicts, the Unified text-lis
 restricted translation profile, four more combined-apply shapes, technology version and F-parameter
 profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
-recorded V21 boundaries. Later on 1 November: the `project_upgrade` interruption cases passed natively
+recorded V21 boundaries. Later on 1 November: the six TS-Q01 Test Suite style cases passed natively with the operator at the desk, which verifies three
+style-job tools (catalog 0.4.95); the `project_upgrade` interruption cases passed natively
 (16/16) and combined apply gained a multi-instance shape. In a desk session the Explorer roundtrip passed
 in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an
 operator-installed I-device GSD in the hardware runner (catalog 0.4.89). On

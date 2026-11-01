@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.92",
+  "catalogVersion": "0.4.95",
   "targetTiaVersions": [
     21
   ],
@@ -3489,6 +3489,27 @@
         "One single-step application test case per Run, externally managed, on one owned PLCSIM Advanced V8 instance on Softbus; system-managed mode, case lists, sets (.ttst), whole-group runs and system tests stay unqualified. Production admission stays closed.",
         "The result profile matches the exact fixture tree TIA V21 Update 3 wrote under its English UI; other UI languages or trees fail closed (inconclusive or executionError).",
         "License: this session's TestCase.SaveToFile (documented to throw LicenseNotFoundException) is the pre-run observation; the returned Run is the execution acceptance. The simulator ticket expires 15 minutes after sim_create."
+      ]
+    },
+    {
+      "id": "local.testsuite.style-q01.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1",
+        "sourceCommit": "0ed68e8515e6f4ccae2a47fafcf09fdcdb18c5b5",
+        "passedScope": "scripts/qualify_testsuite_native.py --case <case> on a frozen Debug build of da5485d9 (artifacts/tq9, git archive, TestSuiteQualification=true, Host --testsuite-qualification), 1 November 2026 16:43-17:08 UTC, six cases with one owned TIA Portal V21 Update 3 (English UI, Test Suite Advanced V21) and one worker-created scratch CPU 1511-1 PN V4.1 each. qualification_testsuite_prepare imports the packaged single-rule style fixture (TiaMcp_Q01_Clean or TiaMcp_Q01_Violating, CodeBlock (FB,FC,OB), enabled), sets its scope on the program blocks, compiles, saves and prepares a durable style job; qualification_testsuite_execute runs one RuleSetExecutor.Run with checkpoint archive, compile, preservation, fresh reopen and cleanup. Scope and license are operator observations: at every ui-* challenge the operator at the desk supplied screenshots of the native style-guide scope editor and, at prepare, of the Automation License Manager key check (Test Suite Advanced 21.0, 1 OK, 0 defective), accepted by StyleUiEvidence.Validate. clean: succeeded, classification passed. violating: assertionFailure, recoveryRequired, qualification_testsuite_recover into a new folder and qualification_testsuite_reconcile verifiedRestored. stop: two reviewed runs; testsuite_style_job_stop_request after the first leaves [succeeded, stopped]. beforeRun and afterRun: injected worker response loss before and after the Run; testsuite_style_job_status reports outcomeUnknown and no result, nothing is replayed, recover and reconcile verifiedRestored. afterRestore (root ar): violating fixture with the restore reply lost; the operation stays outcomeUnknown and reconcile verifiedRestored. Every case: Host exit 0, worker exit verified, preexisting TIA processes unchanged. Not part of this record: root afterRestore, refused by the worker at tia_create_scratch with ProjectPathTooLong (its 12-character folder name put the planned scratch path over the native limit) before any native change; Host, worker and TIA exited cleanly."
+      },
+      "artifacts": [
+        "evidence/local.testsuite.style-q01.20261101.json",
+        "docs/verification/testsuite-style-q01-20261101.md"
+      ],
+      "limitations": [
+        "One packaged single-rule style fixture (CodeBlock (FB,FC,OB)) per Run in a worker-created scratch CPU 1511-1 PN V4.1 under the English UI; other rules, rule sets, scopes, CPUs and UI languages stay unqualified. Production admission stays closed: testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified. testsuite_style_plan_prepare, testsuite_style_job_prepare and testsuite_style_job_mark_interrupted were not called; qualification_testsuite_prepare builds the review and job through the same TestSuiteStyleJobs core.",
+        "Scope and license rest on operator observations: V21 Update 3 has no rule-set scope read route. For clean/prepare the screenshot showed neither the object selector nor the enabled state; the operator confirmed both in chat. Later screenshots show the rule table (CodeBlock (FB,FC,OB), Enabled). Screenshots pasted as WebP were re-encoded to PNG with unchanged pixels for the validator (PNG/JPEG only); the originals are kept beside each challenge folder as <challenge>-<purpose>-original.webp. The violating/reconcile-recovered screenshot has no title bar; its open project path (violating/h/recovered) was confirmed from the TIA process's window title (read-only, no Openness attach). Later screenshots include the title bar.",
+        "Interruption is injected worker response loss at beforeRun, afterRun and afterRestore; the worker and TIA stay alive. No worker, Portal or Host process loss was exercised for style jobs."
       ]
     },
     {
@@ -15722,7 +15743,7 @@
         "limitations": [
           "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). The run builds its review inside qualification_testsuite_prepare through the same TestSuiteStyleJobs.Review; this tool was not called natively. Closing it needs a native run that calls it on a captured fixture."
         ]
       },
       "qualification": {
@@ -15815,7 +15836,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). The run prepares its job inside qualification_testsuite_prepare through the same TestSuiteStyleJobs.Prepare; this tool was not called natively. Closing it needs a native run that calls it with a qualification review."
         ]
       },
       "qualification": {
@@ -15862,12 +15883,14 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). After the injected loss of the Run reply (beforeRun, afterRun) and of the restore reply (afterRestore) it reported the operation outcomeUnknown with no result, then the recovery intent and reconciliation states. Production admission stays closed: no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified on Host and worker."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15909,12 +15932,14 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). After the first of two reviewed runs succeeded, the request left the operations [succeeded, stopped]; the second run was never dispatched. Production admission stays closed: no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified on Host and worker."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -15956,7 +15981,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). This production tool was not called natively: the run dispatched through qualification_testsuite_execute, which shares TestSuiteStyleJobs.ExecuteNext but admits only the exact UI-observed qualification profile. This entry still refuses with TestSuiteProfileUnqualified before any native call; a production profile needs a repeatable scope observation that V21 Update 3 does not offer, or a maintainer decision to admit an operator-observed profile."
         ]
       },
       "qualification": {
@@ -16003,12 +16028,14 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). It revalidated the retained raw bytes and rederived passed (clean, stop) and assertionFailure (violating, afterRestore); after a lost Run reply it returned the operation with no result or raw artifact. Production admission stays closed: no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified on Host and worker."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",
@@ -16050,7 +16077,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). The injected response losses set outcomeUnknown themselves and left no in-flight intent for this tool, which needs a worker, Portal or Host process loss during a dispatch or restore; none has run for style jobs."
         ]
       },
       "qualification": {
@@ -16097,7 +16124,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). This production tool was not called natively: the run dispatched through qualification_testsuite_recover, which shares TestSuiteStyleJobs.Recover but admits only the exact UI-observed qualification profile. This entry still refuses with TestSuiteProfileUnqualified before any native call; a production profile needs a repeatable scope observation that V21 Update 3 does not offer, or a maintainer decision to admit an operator-observed profile."
         ]
       },
       "qualification": {
@@ -16144,7 +16171,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (28 October 2026, V21 Update 3): no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified on Host and worker and no native run, result, interruption or recovery exists for AC-native and AC-recovery. Qualifying the TS-Q01 style profile needs complete effective scope: V21 Update 3 has no scope read route (the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor; local.testsuite.scope-probe.20261028), so the qualification build (--testsuite-qualification, scripts/qualify_testsuite_native.py) needs a human operator at each prepare, reopen and reconcile observation: a screenshot of the expanded scope tree in the TIA rule-set editor and an Automation License Manager key check. That operator run has not been performed. Test Suite Advanced V21 is installed and its service observed (local.testsuite.definitions.20261028)."
+          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). This production tool was not called natively: the run dispatched through qualification_testsuite_reconcile, which shares TestSuiteStyleJobs.Reconcile but admits only the exact UI-observed qualification profile. This entry still refuses with TestSuiteProfileUnqualified before any native call; a production profile needs a repeatable scope observation that V21 Update 3 does not offer, or a maintainer decision to admit an operator-observed profile."
         ]
       },
       "qualification": {
@@ -16840,13 +16867,14 @@
           "Qualification build only: prepare an owned fixture and retain an exact durable review. Style fixtures (clean, violating) wait for independently reviewed current scope/license evidence. Application fixtures (applicationPass, applicationFail) need simulatorTicket, the downloadTicket of an owned sim_create instance loaded and in RUN; the worker imports both cases externally managed on that instance and reads their scope back natively. No executor invocation.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
           "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
-          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
+          "TS-Q01 (1 November 2026, local.testsuite.style-q01.20261101): style fixtures (clean, violating) with operator observations of the native scope editor at every challenge and an Automation License Manager key check at prepare, because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). clean passed; violating assertionFailure, recovered into a new folder and reconciled verifiedRestored; stop between two runs; lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.testsuite.application.20261030"
+          "local.testsuite.application.20261030",
+          "local.testsuite.style-q01.20261101"
         ]
       },
       "availability": {
@@ -16886,13 +16914,14 @@
           "Qualification build only: one durable style or application dispatch with native checkpoint, raw retention, preservation and independently observed reopened scope.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
           "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
-          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
+          "TS-Q01 (1 November 2026, local.testsuite.style-q01.20261101): style fixtures (clean, violating) with operator observations of the native scope editor at every challenge and an Automation License Manager key check at prepare, because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). clean passed; violating assertionFailure, recovered into a new folder and reconciled verifiedRestored; stop between two runs; lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.testsuite.application.20261030"
+          "local.testsuite.application.20261030",
+          "local.testsuite.style-q01.20261101"
         ]
       },
       "availability": {
@@ -16932,13 +16961,14 @@
           "Qualification build only: restore the retained checkpoint once into an exact absent destination. Requires separate reconciliation.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
           "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
-          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
+          "TS-Q01 (1 November 2026, local.testsuite.style-q01.20261101): style fixtures (clean, violating) with operator observations of the native scope editor at every challenge and an Automation License Manager key check at prepare, because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). clean passed; violating assertionFailure, recovered into a new folder and reconciled verifiedRestored; stop between two runs; lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.testsuite.application.20261030"
+          "local.testsuite.application.20261030",
+          "local.testsuite.style-q01.20261101"
         ]
       },
       "availability": {
@@ -16978,13 +17008,14 @@
           "Qualification build only: independently reopen the original and each admitted recovery destination and compare complete fixture preservation; style fixtures also read the scope editor again.",
           "Requires Dedicated TestSuiteQualification build and --testsuite-qualification. No production profile is enabled by this declaration.",
           "TS-Q02 (30 October 2026, local.testsuite.application.20261030): application fixtures (applicationPass, applicationFail) need the simulatorTicket of an owned sim_create instance in RUN; the worker imports both cases externally managed on that instance, reads scope back natively (GetScope plus the case export) and needs no operator. Passing and deliberately failing cases, checkpoint recovery and reconciliation, a lost Run reply and refusals for foreign, tampered and released targets passed natively.",
-          "Style fixtures (TS-Q01) still need the operator desk session: V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028), so prepare, reopen and reconcile wait for a screenshot of the expanded scope tree and an Automation License Manager key check; that session has not run."
+          "TS-Q01 (1 November 2026, local.testsuite.style-q01.20261101): style fixtures (clean, violating) with operator observations of the native scope editor at every challenge and an Automation License Manager key check at prepare, because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). clean passed; violating assertionFailure, recovered into a new folder and reconciled verifiedRestored; stop between two runs; lost Run (beforeRun, afterRun) and restore (afterRestore) replies stayed outcomeUnknown and reconciled verifiedRestored without replay."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.testsuite.application.20261030"
+          "local.testsuite.application.20261030",
+          "local.testsuite.style-q01.20261101"
         ]
       },
       "availability": {

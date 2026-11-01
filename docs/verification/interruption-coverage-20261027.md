@@ -124,6 +124,11 @@ and Host loss during the import, each reconciled from a fresh Host without repla
 import, compile, save, reopen and restore replies and a pre-dispatch interruption were run
 on the same workflow in qualification mode (`local.translation.native.20261028`,
 `local.translation.qualification.20261028`, [record](translation-native-20261028.md)).
+On 1 November D06 ran the style jobs' TS-Q01 cases: worker response loss before and after the
+native Run and after the checkpoint restore, injected inside a live worker, each reconciled
+`verifiedRestored` without replay (`local.testsuite.style-q01.20261101`,
+[record](testsuite-style-q01-20261101.md)). Worker, Portal and Host process loss for style jobs
+has not run.
 
 ## Limits
 
