@@ -53,6 +53,8 @@ to the instrumented browser suite.
 
 ## Still open
 
+Closed on 1 November 2026: VS Code 1.144.0 passed the full roundtrip ([record](explorer-desktop-20261101.md)).
+
 The [full desktop/native checklist](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual)
 still requires the production engineering Host, fresh capture, independent
 `block_read`, successful exact selection roundtrip, and refusal after native

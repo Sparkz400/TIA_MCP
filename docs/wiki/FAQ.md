@@ -40,10 +40,11 @@ records the reviewed packages and exclusions; they are not bundled with TIA MCP 
 
 ## Has the Explorer been tested in a desktop MCP Apps host?
 
-VS Code rendered the Explorer and exercised retained-snapshot search, selection,
-relationships and stale-selection refusal. Fresh production Host/native
-acceptance remains open. See the
-[desktop evidence and limits](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/explorer-desktop-20261025.md).
+Yes. On 1 November 2026 VS Code 1.144.0 passed the full roundtrip with the production Host
+and a fresh native capture: an exact selection answered by `project_model_details`, refusal
+after `tia_detach`, and the artifact fallback for a client without MCP Apps. SSH/VM transport
+is still open. See the
+[desktop record and limits](https://github.com/Sparkz400/TIA_MCP/blob/main/docs/verification/explorer-desktop-20261101.md).
 
 ## Where do I ask something that is not answered here?
 
