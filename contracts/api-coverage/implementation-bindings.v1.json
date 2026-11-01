@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "9602af3879c9cca17a6f29cdec7775c1d129f0a9beded3adb959417db7aa9b93",
-      "bytes": 1641374
+      "sha256": "1225da943aa375e0ee1f6dc531fa3e9b84074bd697bd7c85b0d461daaa4b3e15",
+      "bytes": 1643575
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -104855,6 +104855,13 @@
           "artifacts": [
             "evidence/local.hmi.classic-import.interruption.20261101.json"
           ]
+        },
+        {
+          "id": "local.hmi.lifecycle.20261101",
+          "profileSha256": "b3d0de458685aaedaf6071aced8826cbe0c816180921df62bdf85d3bff609e63",
+          "artifacts": [
+            "evidence/local.hmi.lifecycle.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -105059,6 +105066,13 @@
           "profileSha256": "46823522d6fe53cfd89a95f82dec5b4df82415c62066bcf0c9a9a8ec233ef307",
           "artifacts": [
             "evidence/local.hmi.external-tag.interruption.20261101.json"
+          ]
+        },
+        {
+          "id": "local.hmi.lifecycle.20261101",
+          "profileSha256": "b3d0de458685aaedaf6071aced8826cbe0c816180921df62bdf85d3bff609e63",
+          "artifacts": [
+            "evidence/local.hmi.lifecycle.20261101.json"
           ]
         }
       ],
@@ -130804,6 +130818,11 @@
       "sha256": "09ed6e0116606e3bb6324b3dd4c4d9d0ca97c683915e385d15fefd51c7b5f326"
     },
     {
+      "path": "evidence/local.hmi.lifecycle.20261101.json",
+      "state": "observed",
+      "sha256": "89d941806dcc37777430b7242c78574b4b27aa5094ac7f07d187b691ed17e3a5"
+    },
+    {
       "path": "evidence/local.hmi.text-list-import.20261029.json",
       "state": "observed",
       "sha256": "7c7042792dab344a28bf1ebc1f31d4393545d39c9d96d1043e4f3a9dac2e2e9e"
@@ -131844,6 +131863,10 @@
     {
       "id": "local.hmi.external-tag.route.20261101",
       "profileSha256": "5a71361109877613273bd72870dec96bceb7c3a46bcf9e0d215bffd4b8741c71"
+    },
+    {
+      "id": "local.hmi.lifecycle.20261101",
+      "profileSha256": "b3d0de458685aaedaf6071aced8826cbe0c816180921df62bdf85d3bff609e63"
     },
     {
       "id": "local.hmi.text-list-import.20261029",
