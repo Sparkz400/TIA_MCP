@@ -1972,8 +1972,8 @@
     },
     {
       "path": "src/TiaMcp.Host/OpcUaSubscriptionTools.cs",
-      "sha256": "bbc6381f8a226ccedabe6ee2c80d575466e7652d0bcee326d300672518b0c42d",
-      "bytes": 5610
+      "sha256": "c3cb98f481c396d628fbb871cc69f77132e70bb5aa9b297395eb5906a08c1877",
+      "bytes": 5711
     },
     {
       "path": "src/TiaMcp.Host/OpcUaTools.cs",
@@ -2277,8 +2277,8 @@
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionContracts.cs",
-      "sha256": "cc65afb84d97f85ea9ceea713d36ad9fe8701a5f625fa5b119b488d6ec92b022",
-      "bytes": 12804
+      "sha256": "09f3198f51dc08893950e7cadcfa6d4642fc0585e6fbef3be2792896f86e9642",
+      "bytes": 12803
     },
     {
       "path": "src/TiaMcp.OpcUa.Runtime/OpcUaSubscriptionStore.cs",
