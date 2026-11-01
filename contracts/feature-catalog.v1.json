@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.95",
+  "catalogVersion": "0.4.97",
   "targetTiaVersions": [
     21
   ],
@@ -15735,7 +15735,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API."
+          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API.",
+          "V21 Update 3 has no public member that reads a style rule set's effective scope: the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor (local.testsuite.scope-probe.20261028)."
         ]
       },
       "implementation": {
@@ -15743,17 +15744,19 @@
         "limitations": [
           "Style only. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). The run builds its review inside qualification_testsuite_prepare through the same TestSuiteStyleJobs.Review; this tool was not called natively. Closing it needs a native run that calls it on a captured fixture."
+          "V21 boundary (maintainer decision, 1 November 2026, docs/plans/release-obligations-20261015.json dispositions): V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed. This tool retains style reviews whose only production consumer is testsuite_style_job_execute_next, which refuses with TestSuiteProfileUnqualified, so it follows the boundary. The TS-Q01 qualification mode, with the operator observing the scope editor at every challenge, passed natively (local.testsuite.style-q01.20261101); no operator-based production profile is offered. The qualification mode builds its review inside qualification_testsuite_prepare."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed (local.testsuite.scope-probe.20261028). Only the operator-observed TS-Q01 qualification mode ran (local.testsuite.style-q01.20261101)."
         ]
       },
       "prerequisites": [
@@ -15836,7 +15839,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). The run prepares its job inside qualification_testsuite_prepare through the same TestSuiteStyleJobs.Prepare; this tool was not called natively. Closing it needs a native run that calls it with a qualification review."
+          "Native blocker (1 November 2026): no native run has dispatched a job this tool prepared. It also queues application reviews (testsuite_application_plan_prepare), whose execution is qualified in the TS-Q02 mode, so it does not follow the style V21 boundary. The TS-Q02 pass case called it natively (local.testsuite.application.20261030), but that job was refused at the production gate and never ran; TS-Q01 (local.testsuite.style-q01.20261101) prepares its jobs inside qualification_testsuite_prepare. Verifying it needs a native run that calls it on a qualification review and dispatches that job through qualification_testsuite_execute; TS-Q02 needs no operator."
         ]
       },
       "qualification": {
@@ -15846,7 +15849,7 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "Offline retained workflow is available. Production style execution is a V21 boundary; native runs go through the TS-Q01 and TS-Q02 qualification modes."
         ]
       },
       "prerequisites": [
@@ -15883,7 +15886,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). After the injected loss of the Run reply (beforeRun, afterRun) and of the restore reply (afterRestore) it reported the operation outcomeUnknown with no result, then the recovery intent and reconciliation states. Production admission stays closed: no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified on Host and worker."
+          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). After the injected loss of the Run reply (beforeRun, afterRun) and of the restore reply (afterRestore) it reported the operation outcomeUnknown with no result, then the recovery intent and reconciliation states. Production style execution is a V21 boundary (maintainer decision, 1 November 2026): testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified, because V21 Update 3 cannot re-check a style rule's scope at execution time."
         ]
       },
       "qualification": {
@@ -15895,7 +15898,7 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "Offline retained workflow is available. Production style execution is a V21 boundary; native runs go through the TS-Q01 and TS-Q02 qualification modes."
         ]
       },
       "prerequisites": [
@@ -15932,7 +15935,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). After the first of two reviewed runs succeeded, the request left the operations [succeeded, stopped]; the second run was never dispatched. Production admission stays closed: no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified on Host and worker."
+          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). After the first of two reviewed runs succeeded, the request left the operations [succeeded, stopped]; the second run was never dispatched. Production style execution is a V21 boundary (maintainer decision, 1 November 2026): testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified, because V21 Update 3 cannot re-check a style rule's scope at execution time."
         ]
       },
       "qualification": {
@@ -15944,7 +15947,7 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "Offline retained workflow is available. Production style execution is a V21 boundary; native runs go through the TS-Q01 and TS-Q02 qualification modes."
         ]
       },
       "prerequisites": [
@@ -15973,7 +15976,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API."
+          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API.",
+          "V21 Update 3 has no public member that reads a style rule set's effective scope: the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor (local.testsuite.scope-probe.20261028)."
         ]
       },
       "implementation": {
@@ -15981,17 +15985,19 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). This production tool was not called natively: the run dispatched through qualification_testsuite_execute, which shares TestSuiteStyleJobs.ExecuteNext but admits only the exact UI-observed qualification profile. This entry still refuses with TestSuiteProfileUnqualified before any native call; a production profile needs a repeatable scope observation that V21 Update 3 does not offer, or a maintainer decision to admit an operator-observed profile."
+          "V21 boundary (maintainer decision, 1 November 2026, docs/plans/release-obligations-20261015.json dispositions): V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed; this tool refuses with TestSuiteProfileUnqualified before any native call. The TS-Q01 qualification mode, with the operator observing the scope editor at every challenge, passed natively (local.testsuite.style-q01.20261101); no operator-based production profile is offered. qualification_testsuite_execute shares TestSuiteStyleJobs.ExecuteNext. Application reviews carried by this tool run only in the TS-Q02 qualification mode (local.testsuite.application.20261030); their production admission stays closed."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed (local.testsuite.scope-probe.20261028). Only the operator-observed TS-Q01 qualification mode ran (local.testsuite.style-q01.20261101)."
         ]
       },
       "prerequisites": [
@@ -16028,7 +16034,7 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). It revalidated the retained raw bytes and rederived passed (clean, stop) and assertionFailure (violating, afterRestore); after a lost Run reply it returned the operation with no result or raw artifact. Production admission stays closed: no production Test Suite profile is qualified, so testsuite_style_job_execute_next, _recover and _reconcile still refuse with TestSuiteProfileUnqualified on Host and worker."
+          "TS-Q01 passed natively in the qualification build on 1 November 2026 (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). It revalidated the retained raw bytes and rederived passed (clean, stop) and assertionFailure (violating, afterRestore); after a lost Run reply it returned the operation with no result or raw artifact. Production style execution is a V21 boundary (maintainer decision, 1 November 2026): testsuite_style_job_execute_next, _recover and _reconcile refuse with TestSuiteProfileUnqualified, because V21 Update 3 cannot re-check a style rule's scope at execution time."
         ]
       },
       "qualification": {
@@ -16040,7 +16046,7 @@
       "availability": {
         "status": "conditional",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "Offline retained workflow is available. Production style execution is a V21 boundary; native runs go through the TS-Q01 and TS-Q02 qualification modes."
         ]
       },
       "prerequisites": [
@@ -16069,7 +16075,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API."
+          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API.",
+          "V21 Update 3 has no public member that reads a style rule set's effective scope: the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor (local.testsuite.scope-probe.20261028)."
         ]
       },
       "implementation": {
@@ -16077,17 +16084,19 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). The injected response losses set outcomeUnknown themselves and left no in-flight intent for this tool, which needs a worker, Portal or Host process loss during a dispatch or restore; none has run for style jobs."
+          "V21 boundary (maintainer decision, 1 November 2026, docs/plans/release-obligations-20261015.json dispositions): V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed. This tool only marks an in-flight checkpoint, dispatch or recovery intent unknown, and production never creates one because testsuite_style_job_execute_next and _recover refuse with TestSuiteProfileUnqualified, so it follows the boundary. The TS-Q01 qualification mode, with the operator observing the scope editor at every challenge, passed natively (local.testsuite.style-q01.20261101); no operator-based production profile is offered."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed (local.testsuite.scope-probe.20261028). Only the operator-observed TS-Q01 qualification mode ran (local.testsuite.style-q01.20261101)."
         ]
       },
       "prerequisites": [
@@ -16116,7 +16125,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API."
+          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API.",
+          "V21 Update 3 has no public member that reads a style rule set's effective scope: the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor (local.testsuite.scope-probe.20261028)."
         ]
       },
       "implementation": {
@@ -16124,17 +16134,19 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). This production tool was not called natively: the run dispatched through qualification_testsuite_recover, which shares TestSuiteStyleJobs.Recover but admits only the exact UI-observed qualification profile. This entry still refuses with TestSuiteProfileUnqualified before any native call; a production profile needs a repeatable scope observation that V21 Update 3 does not offer, or a maintainer decision to admit an operator-observed profile."
+          "V21 boundary (maintainer decision, 1 November 2026, docs/plans/release-obligations-20261015.json dispositions): V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed; this tool refuses with TestSuiteProfileUnqualified before any native call. The TS-Q01 qualification mode, with the operator observing the scope editor at every challenge, passed natively (local.testsuite.style-q01.20261101); no operator-based production profile is offered. qualification_testsuite_recover shares TestSuiteStyleJobs.Recover. Application reviews carried by this tool run only in the TS-Q02 qualification mode (local.testsuite.application.20261030); their production admission stays closed."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed (local.testsuite.scope-probe.20261028). Only the operator-observed TS-Q01 qualification mode ran (local.testsuite.style-q01.20261101)."
         ]
       },
       "prerequisites": [
@@ -16163,7 +16175,8 @@
       "api": {
         "status": "available",
         "reasons": [
-          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API."
+          "Local durable Host workflow; optional V21 RuleSet.SaveToFile and RuleSetExecutor.Run public boundary compiles against installed API.",
+          "V21 Update 3 has no public member that reads a style rule set's effective scope: the live rule set offers only Name, CopyScope, Delete, SaveToFile, SetScope and ShowInEditor (local.testsuite.scope-probe.20261028)."
         ]
       },
       "implementation": {
@@ -16171,17 +16184,19 @@
         "limitations": [
           "Style and TS-05 application reviews; no system tests. Native execution and recovery profiles remain disabled; no product/license, effective-scope or native qualification is inferred from managed tests.",
           "One explicit dispatch per operation, shared exact project ownership, immutable definitions, raw result retention and no automatic replay.",
-          "Native blocker (1 November 2026, V21 Update 3): TS-Q01 passed natively in the qualification build (local.testsuite.style-q01.20261101): clean, violating, stop between runs, and lost Run and restore replies with recovery into a new folder and reconciliation without replay. Scope and license rest on operator observations because V21 Update 3 has no rule-set scope read route (local.testsuite.scope-probe.20261028). This production tool was not called natively: the run dispatched through qualification_testsuite_reconcile, which shares TestSuiteStyleJobs.Reconcile but admits only the exact UI-observed qualification profile. This entry still refuses with TestSuiteProfileUnqualified before any native call; a production profile needs a repeatable scope observation that V21 Update 3 does not offer, or a maintainer decision to admit an operator-observed profile."
+          "V21 boundary (maintainer decision, 1 November 2026, docs/plans/release-obligations-20261015.json dispositions): V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed; this tool refuses with TestSuiteProfileUnqualified before any native call. The TS-Q01 qualification mode, with the operator observing the scope editor at every challenge, passed natively (local.testsuite.style-q01.20261101); no operator-based production profile is offered. qualification_testsuite_reconcile shares TestSuiteStyleJobs.Reconcile. Application reviews carried by this tool run only in the TS-Q02 qualification mode (local.testsuite.application.20261030); their production admission stays closed."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.testsuite.style-q01.20261101"
+        ]
       },
       "availability": {
-        "status": "conditional",
+        "status": "unsupported",
         "reasons": [
-          "Offline retained workflow is available. Native actions require accepted TS-Q01 profile and independent current observations."
+          "V21 Update 3 offers no API to re-check a style rule's scope at execution time, so a production style run cannot prove the scope it executed (local.testsuite.scope-probe.20261028). Only the operator-observed TS-Q01 qualification mode ran (local.testsuite.style-q01.20261101)."
         ]
       },
       "prerequisites": [

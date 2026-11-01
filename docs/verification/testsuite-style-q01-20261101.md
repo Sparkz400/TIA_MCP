@@ -3,8 +3,8 @@
 D06 style execution is held by a missing scope read route: V21 Update 3 has no rule-set scope getter
 ([28 October record](testsuite-native-20261028.md)), so the TS-Q01 qualification build waits at every scope
 observation for an operator at the desk. This record covers the six TS-Q01 cases that ran with that operator on
-1 November 2026, 16:43–17:08 UTC. Production admission is unchanged: `testsuite_style_job_execute_next`, `_recover`
-and `_reconcile` still refuse with `TestSuiteProfileUnqualified`.
+1 November 2026, 16:43–17:08 UTC. Production style execution is a V21 boundary (see [below](#v21-boundary)):
+`testsuite_style_job_execute_next`, `_recover` and `_reconcile` refuse with `TestSuiteProfileUnqualified`.
 
 Everything ran in owned TIA Portal V21 Update 3 instances (English UI) with Test Suite Advanced V21, in one
 worker-created scratch CPU 1511-1 PN V4.1 per case. No user project, PLC or PLCSIM instance was touched.
@@ -69,16 +69,37 @@ What the screenshots show and what was confirmed otherwise:
 - **Verified:** `testsuite_style_job_status`, `testsuite_style_job_results` and `testsuite_style_job_stop_request`
   (21 cells), which the runner called natively. The four `qualification_testsuite_*` tools now also cite this record
   for the style fixtures.
-- **Still open:** `testsuite_style_plan_prepare` and `testsuite_style_job_prepare`: the run builds its review and job
-  inside `qualification_testsuite_prepare` through the same `TestSuiteStyleJobs` core, and neither production tool was
-  called. `testsuite_style_job_execute_next`, `_recover` and `_reconcile`: production refuses before any native call,
-  because no production profile is qualified; the qualification tools share their core but admit only the exact
-  UI-observed qualification profile. A production profile needs a repeatable scope observation that V21 Update 3 does
-  not offer, or a maintainer decision to admit an operator-observed one. `testsuite_style_job_mark_interrupted` needs
-  a process loss that leaves an in-flight intent.
+- **V21 boundary** (`unavailable_target`, [below](#v21-boundary)): `testsuite_style_job_execute_next`, `_recover`,
+  `_reconcile`, `testsuite_style_plan_prepare` and `testsuite_style_job_mark_interrupted` (35 cells, blocked).
+- **Still open:** `testsuite_style_job_prepare`. It also queues application reviews, whose execution is qualified in
+  the TS-Q02 mode, so it does not follow the style boundary. The TS-Q02 pass case called it natively, but that job was
+  refused at the production gate and never ran, and TS-Q01 prepares its jobs inside `qualification_testsuite_prepare`.
+  A native run that calls it on a qualification review and dispatches that job through `qualification_testsuite_execute`
+  verifies it; TS-Q02 needs no operator.
+
+## V21 boundary
+
+Decided by the maintainer on 1 November 2026: production style execution is a V21 boundary, and no operator-based
+production profile is offered. V21 Update 3 offers no API to re-check a style rule's scope at execution time (the live
+rule set has only `Name`, `CopyScope`, `Delete`, `SaveToFile`, `SetScope` and `ShowInEditor`;
+`local.testsuite.scope-probe.20261028`), so a production run cannot prove the scope it executed. The qualification mode
+above, with the operator observing the scope editor at every challenge, is the only route that ran.
+
+| Row | Why it is blocked |
+| --- | --- |
+| `testsuite_style_job_execute_next` | refuses with `TestSuiteProfileUnqualified`; the run cannot prove its scope |
+| `testsuite_style_job_recover` | a production style operation never reaches a recoverable state |
+| `testsuite_style_job_reconcile` | reconciliation would need the same scope re-check |
+| `testsuite_style_plan_prepare` | its style reviews have no production consumer but `_execute_next` |
+| `testsuite_style_job_mark_interrupted` | it acts only on in-flight intents, which production never creates |
+
+The ledger's `dispositions` record each row (`docs/plans/release-obligations-20261015.json`); the rows do not count
+toward 1.0 and are not a pass. Application reviews carried by `_execute_next`, `_recover` and `_reconcile` run only in
+the TS-Q02 qualification mode ([record](testsuite-application-20261030.md)); their production admission stays closed.
+If a later V21 update adds a scope read route, the rows reopen.
 
 ## Limits
 
 One packaged single-rule fixture (`CodeBlock (FB,FC,OB)`) per Run, in a worker-created scratch CPU 1511-1 PN V4.1
 under the English UI. Scope and license rest on the operator's observations. Only response loss was injected:
-worker, Portal and Host process loss for style jobs is not covered. Production admission stays closed.
+worker, Portal and Host process loss for style jobs is not covered. Production style execution is a V21 boundary.

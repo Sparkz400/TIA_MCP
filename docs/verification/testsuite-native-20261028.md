@@ -74,8 +74,9 @@ worker. No native run, result, interruption or recovery exists for `AC-native` a
 TS-Q01 style profile needs complete effective scope, and the installed V21 Update 3 PublicAPI still exposes
 `RuleSet.SetScope` and `CopyScope` but no scope getter.
 *Update 1 November:* the TS-Q01 desk session ran all six cases ([TS-Q01 record](testsuite-style-q01-20261101.md));
-it verifies `_status`, `_results` and `_stop_request`. The other six rows stay open: the run prepares and dispatches
-through the qualification tools, and production still has no qualified profile.
+it verifies `_status`, `_results` and `_stop_request`. Production style execution became a V21 boundary the same day:
+`_execute_next`, `_recover`, `_reconcile`, `testsuite_style_plan_prepare` and `_mark_interrupted` are blocked, and
+`_job_prepare` stays open.
 
 **TS-Q01 qualification tools** (`qualification_testsuite_prepare`, `_execute`, `_recover`, `_reconcile`): the
 qualification build (`--testsuite-qualification`, [`qualify_testsuite_native.py`](../../scripts/qualify_testsuite_native.py))

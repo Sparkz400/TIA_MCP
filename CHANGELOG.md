@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.95`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.97`.
 
 ### Added
 
@@ -223,15 +223,16 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 455 of 481 catalog features are verified; 99 release-matrix cells are open and 6 deferred
+- 460 of 481 catalog features are verified; 37 release-matrix cells are open and 6 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
 - V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
   through Openness, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
   file, a safety program cannot be loaded into PLCSIM (the offline memory-card download is
-  refused; the online route needs a card from the PLC), and V21 Openness neither creates nor
-  exposes WinCC RT Professional.
+  refused; the online route needs a card from the PLC), V21 Openness neither creates nor
+  exposes WinCC RT Professional, and V21 Update 3 cannot re-check a Test Suite style rule's scope at
+  execution time, so production style execution is unavailable (only the TS-Q01 qualification mode runs).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built

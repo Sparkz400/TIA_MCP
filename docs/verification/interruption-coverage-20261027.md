@@ -128,7 +128,8 @@ On 1 November D06 ran the style jobs' TS-Q01 cases: worker response loss before 
 native Run and after the checkpoint restore, injected inside a live worker, each reconciled
 `verifiedRestored` without replay (`local.testsuite.style-q01.20261101`,
 [record](testsuite-style-q01-20261101.md)). Worker, Portal and Host process loss for style jobs
-has not run.
+has not run, and it is not required: the same day production style execution became a V21 boundary
+(`unavailable_target`), so style jobs are no longer an advertised recoverable mutation.
 
 ## Limits
 

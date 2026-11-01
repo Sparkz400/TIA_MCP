@@ -5,10 +5,10 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.95`: 481 features, 460 verified, 21 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 132 shipped, 328 limited, 12 unqualified, 7 unavailable on V21, 2 deferred |
-| Matrix cells | 2,105 bound, **72 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, D06 against `0.4.95` |
+| Feature catalog | `0.4.97`: 481 features, 460 verified, 21 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 132 shipped, 328 limited, 7 unqualified, 12 unavailable on V21, 2 deferred |
+| Matrix cells | 2,105 bound, **37 open**, 72 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, D06 against `0.4.97` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -18,8 +18,7 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 [TODO](TODO.md) lists the open work; [open matrix rows by owner](TODO.md#open-matrix-rows-by-owner)
 names every row with an open cell.
 
-- **External prerequisites:** an operator at the desktop for every further Test Suite style
-  run (V21 has no scope read route); the VMware guest, a V20 library input, other HMI targets, a physical PLC (B05), optional products and licenses such
+- **External prerequisites:** the VMware guest, a V20 library input, other HMI targets, a physical PLC (B05), optional products and licenses such
   as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
   UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).
@@ -31,11 +30,14 @@ names every row with an open cell.
   Since 31 October also: the PLC's OPC UA server has no `HistoryRead`, no public member moves a
   PLC block, Openness cannot install a GSD file, and a safety program cannot be loaded into PLCSIM (the offline
   memory-card download is refused, the online route needs a card from the PLC). Since 1 November: V21 Openness neither creates nor
-  exposes WinCC RT Professional ([record](verification/hmi-rt-professional-20261025.md#v21-boundary--1-november-2026)).
-- **Rows blocked by decision:** seven `unavailable_target` rows (37 cells:
+  exposes WinCC RT Professional ([record](verification/hmi-rt-professional-20261025.md#v21-boundary--1-november-2026)), and
+  V21 Update 3 cannot re-check a Test Suite style rule's scope at execution time, so production style execution is
+  unavailable ([record](verification/testsuite-style-q01-20261101.md#v21-boundary)).
+- **Rows blocked by decision:** twelve `unavailable_target` rows (72 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`,
-  the two OPC UA reference-namespace kinds, `block.move` and `safety.logic_changes`) are blocked and do not count toward 1.0 (decision
-  of 29 October, the last two on 1 November; each row's disposition is in the ledger). The three block-protection kinds
+  the two OPC UA reference-namespace kinds, `block.move`, `safety.logic_changes` and the five Test Suite style execution
+  rows) are blocked and do not count toward 1.0 (decision
+  of 29 October, the last seven on 1 November; each row's disposition is in the ledger). The three block-protection kinds
   left the blocked set: their credential route was built and verified on 30 October.
 - **Deferred rows:** two `not_implemented` rows (6 cells) are not open cells but stay 1.0
   work ([TODO](TODO.md#deferred-rows)).
@@ -69,7 +71,7 @@ restricted translation profile, four more combined-apply shapes, technology vers
 profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
 recorded V21 boundaries. Later on 1 November: the six TS-Q01 Test Suite style cases passed natively with the operator at the desk, which verifies three
-style-job tools (catalog 0.4.95); the `project_upgrade` interruption cases passed natively
+style-job tools, and production style execution became a V21 boundary (catalog 0.4.97); the `project_upgrade` interruption cases passed natively
 (16/16) and combined apply gained a multi-instance shape. In a desk session the Explorer roundtrip passed
 in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an
 operator-installed I-device GSD in the hardware runner (catalog 0.4.89). On

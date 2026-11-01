@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "c35e6aff5dc9d3d651762452e9b6ba571d48e45eab4b1d45677ec8da3aae5229",
-      "bytes": 1602698
+      "sha256": "ebfb20ffad90cf5f67487b7e07165057950f15f91f934a1fa8925a4698795e4b",
+      "bytes": 1605001
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -126106,7 +126106,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126128,7 +126137,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126235,7 +126253,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126262,7 +126289,16 @@
       ],
       "schemaBindings": [],
       "schemaReview": "unresolved",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings.",
@@ -126497,7 +126533,16 @@
         }
       ],
       "schemaReview": "partial",
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        {
+          "id": "local.testsuite.style-q01.20261101",
+          "profileSha256": "965373ddce6f7f194dc551ebe916ee90a6991270d6565762802d4c07503dced9",
+          "artifacts": [
+            "evidence/local.testsuite.style-q01.20261101.json",
+            "docs/verification/testsuite-style-q01-20261101.md"
+          ]
+        }
+      ],
       "reviewState": "partial",
       "gaps": [
         "Transitive receiver/overload resolution is not proven; unknown source/schema changes invalidate all feature bindings."
@@ -130172,7 +130217,7 @@
     {
       "path": "docs/verification/testsuite-style-q01-20261101.md",
       "state": "observed",
-      "sha256": "8c331902c7b72178b936ba5442a76c1c805ad429ff4544becf1557800d210f90"
+      "sha256": "e55080015b9388106ebf3368c406f7578a8705c5c52d441ba835f00c9121d4e2"
     },
     {
       "path": "evidence/local.access.qualify.20261029.json",
