@@ -210,8 +210,12 @@ tests.Add(("Document provenance is required absent rather than normalized away",
     var altered = ArtifactOf(Mutate(fb, d => d.Root!.AddFirst(new XElement("DocumentInfo", "provenance"))));
     Reject(() => Build(profile with { ReferenceCallee = altered }, boundFb with { Document = altered }));
 }));
-tests.Add(("Existing scalar builder still rejects this nested callee", () => {
-    Reject(() => TypedGraphicalInstanceTemplate.Create("NewInstance", 123, fb, db), "GraphicalInstanceTemplateUnavailable");
+// The generic builder takes a nested member only from an identical captured prototype; the sc01 storage itself stays out of
+// the ordinary typed catalog (TiaMcp.Tests checks every deployed standard-route template rejects the component FB).
+tests.Add(("Generic builder rejects this nested callee without an identical captured prototype", () => {
+    var otherNesting = Mutate(db, d => d.Descendants(ns + "Member").Single(m => (string?)m.Attribute("Name") == "State")
+        .Descendants(ns + "Member").Single().SetAttributeValue("Name", "Other"));
+    Reject(() => TypedGraphicalInstanceTemplate.Create("NewInstance", 123, fb, otherNesting), "GraphicalInstanceTemplateUnavailable");
 }));
 tests.Add(("Changed dependency after prepare is rejected by repeated contract evaluation", () => {
     Build();

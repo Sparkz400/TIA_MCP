@@ -1,5 +1,4 @@
 """Offline checks of the combined-apply runner's pure oracles; nothing starts TIA or the Host."""
-import copy
 import hashlib
 from pathlib import Path
 import tempfile
@@ -172,24 +171,12 @@ class Candidates(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "exactly one network"):
             subject.two_network_fc(xml, "Thrice", 78)
 
-    def test_multi_instance_boundary_needs_a_listed_code_and_nothing_dispatched(self):
-        boundary = {"failure": {"code": "InstanceCreationProfileUnavailable", "failedStep": "prepare_graphical_typed_edit"},
-                    "combinedApply": {"libraryStepDispatched": False, "typedStepDispatched": False}}
-        self.assertTrue(subject.multi_boundary_journal(boundary))
-        for label, change in (("other code", lambda j: j["failure"].update(code="CompileFailed")),
-                              ("other step", lambda j: j["failure"].update(failedStep="apply_graphical_typed_edit")),
-                              ("typed dispatched", lambda j: j["combinedApply"].update(typedStepDispatched=True)),
-                              ("library dispatched", lambda j: j["combinedApply"].update(libraryStepDispatched=True)),
-                              ("flag unknown", lambda j: j["combinedApply"].pop("typedStepDispatched")),
-                              ("no failure", lambda j: j.pop("failure"))):
-            journal = copy.deepcopy(boundary); change(journal)
-            with self.subTest(label=label):
-                self.assertFalse(subject.multi_boundary_journal(journal))
-
-    def test_candidate_aggregation_accepts_installs_and_only_the_multi_instance_boundary(self):
-        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstance": "boundary"}))
-        self.assertEqual({"reuse": "boundary", "fbCaller": "failed: x"},
-                         subject.failed_candidates({"reuse": "boundary", "fbCaller": "failed: x", "multiInstance": "installed"}))
+    def test_candidate_aggregation_accepts_installs_only(self):
+        # The captured component multi-instance template removed the former multiInstance boundary outcome.
+        self.assertFalse(hasattr(subject, "multi_boundary_journal"))
+        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstance": "installed"}))
+        self.assertEqual({"multiInstance": "boundary", "fbCaller": "failed: x"},
+                         subject.failed_candidates({"multiInstance": "boundary", "fbCaller": "failed: x", "reuse": "installed"}))
 
     def test_runner_path_check_matches_the_worker_layout(self):
         # PlcComponentQualificationGate.CombinedApplyArchivePathLength: 121 characters for a 51-character root.

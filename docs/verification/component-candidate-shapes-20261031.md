@@ -88,6 +88,31 @@ their summaries (`evidence/local.library_integrate.candidate_shapes.20261031.jso
   V21 imports a `NAMESPACE` SCL source into the unit but resolves unqualified names in it against the root namespace, so
   the OB-rooted caller failed. The runner now qualifies every namespaced reference.
 
+## Component storage capture — 1 November 2026 (authored, not run)
+
+The boundary above is a missing profile, not a V21 refusal. Changes, offline only:
+
+- `TypedGraphicalMultiInstanceTemplate.MapDeclaration` and `TypedGraphicalInstanceTemplate.Create` accept a structured
+  (UDT) member when a captured reference member or prototype is identical to it, nested declaration included; the
+  captured storage is copied as before. Any other structured member keeps its earlier refusal, and start or default
+  values stay refused (`TiaMcp.Tests`, "Typed structured members map only onto an identical captured member").
+- [`route-capture-component-storage-packet.v1.json`](../../fixtures/typed-graphical/route-capture-component-storage-packet.v1.json)
+  holds two `capture_typed_routes_owned.py` runs, which now admit `.udt` sources through `type_source_upsert`:
+  - standard route: the component UDT and FB from `fixtures/libraries/component-qualification`, then the FBD FB
+    `Tgp_ComponentHost_FBD` declaring the multi-instance `Gate : "TiaMcpComponentGate"`. Extraction yields
+    `v21.fw41.component-gate.multi-instance.v1`, the profile the `multiInstance` shape needs;
+  - softwareUnit route (`TiaMcp_UnitA`): the same interface as `TgpUnit_ComponentGate` with its instance DB. Extraction
+    yields `v21.fw41.softwareUnit.component-gate.global-instance.v1`.
+- `extract_typed_graphical_profiles.py` binds both to the captured component FB (`COMPONENT_TEMPLATES`) and skips
+  captured types.
+- `qualify_library_integrate_apply.py --candidates` no longer accepts a `multiInstance` boundary.
+
+Still plan-only: a multi-instance in a caller FB that has an instance DB (no captured dependent-DB effect for a structured
+member), and software-unit destinations. The unit capture removes only the storage cause; component readback still covers
+the standard scope only, unit tags stay a V21 boundary, a library instance keeps an empty namespace unless one is set
+explicitly while the unit-route template needs the FB in the unit's namespace, and another unit's FB still gets no new
+storage (`InstanceCreationRouteUnsupported`).
+
 ## Clean rerun — 31 October 2026
 
 Frozen Debug builds of the worker, Host and `LibraryUnitSeeder` under `artifacts/` (no subst drive), one owned TIA

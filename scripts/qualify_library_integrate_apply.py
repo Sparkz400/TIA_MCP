@@ -67,22 +67,13 @@ CANDIDATES = {
     "earlierPlacement": ({"callerMode": "existing", "callerSource": None, "twoNetworks": True, "insertNetworkIndex": 0}, []),
 }
 REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComponentGate_2", "Gate"
-# The typed route's multi-instance profiles do not cover an FB with a structured (UDT) static; a refusal before any
-# dispatch is then recorded as that boundary, never as a pass.
-MULTI_BOUNDARY = ("InstanceCreationProfileUnavailable", "GraphicalInstanceTemplateUnavailable")
-
-
-def multi_boundary_journal(journal):
-    """The recorded multi-instance boundary only: a listed storage-profile refusal at typed preparation with nothing dispatched."""
-    failure, summary = journal.get("failure") or {}, journal.get("combinedApply") or {}
-    return (failure.get("code") in MULTI_BOUNDARY and failure.get("failedStep") == "prepare_graphical_typed_edit"
-            and summary.get("libraryStepDispatched") is False and summary.get("typedStepDispatched") is False)
+# multiInstance installs through the captured component multi-instance template v21.fw41.component-gate.multi-instance.v1
+# (route-capture-component-storage-packet.v1.json); its former pre-dispatch refusal is no longer an accepted outcome.
 
 
 def failed_candidates(outcomes):
-    """Every candidate case that did not install; only multiInstance may instead end at its recorded boundary."""
-    return {name: outcome for name, outcome in outcomes.items()
-            if not (outcome == "installed" or name == "multiInstance" and outcome == "boundary")}
+    """Every candidate case that did not install."""
+    return {name: outcome for name, outcome in outcomes.items() if outcome != "installed"}
 
 
 def two_network_fc(peer_xml, name, number):
@@ -382,11 +373,7 @@ class IntegrateApplyRun(ComponentRun):
         caller, caller_recipe, network = self.select_caller(baseline, plc)
         prepared, plan = self.prepare(scratch, opened["libraryId"], released, plc, baseline, caller, caller_recipe)
         features = ["reusedComponent", "fbCaller", "multiInstance"] if multi else []
-        try:
-            applied, record = self.apply_combined(case, prepared, baseline, features)
-        except NativeToolError as error:
-            if multi and self.multi_boundary(case, out, baseline, error): return
-            raise
+        applied, record = self.apply_combined(case, prepared, baseline, features)
         after = self.verify_installed(case, out, plan, baseline, plc, caller, network, released, record)
         self.call("library_close", {"libraryId": opened["libraryId"]})
         # The typed step's own pre-mutation archive is the recovery anchor: it holds the first installation.
@@ -394,18 +381,6 @@ class IntegrateApplyRun(ComponentRun):
                 and case["initialCheckpoint"].get("changeId") == applied["journal"]["combinedApply"]["typedChangeId"],
                 "The reuse checkpoint is not the typed step's own archive.")
         self.finish(case, out, prepared, plc, case["initialCheckpoint"], baseline, after, sorted(version_key(n, pin) for n, pin in released.items()))
-
-    def multi_boundary(self, case, out, baseline, error):
-        """True when the typed route's storage profiles refused the multi-instance before any dispatch: the recorded boundary,
-        with the project unchanged. Any other failure stays a failure."""
-        journal = (case.get("failureStatus") or {}).get("journal") or {}
-        case["boundary"] = {"error": str(error), "failure": journal.get("failure"), "combinedApply": journal.get("combinedApply")}; self.persist()
-        if not multi_boundary_journal(journal):
-            return False
-        assert_snapshot(baseline, snapshot(self.call, out / "after-refusal"))
-        case.update(outcome="boundary", projectUnchanged=True); self.persist()
-        self.session.close()
-        return True
 
     def restore(self, case, prepared, checkpoint, baseline, out, restored_versions=()):
         self.session.close()
@@ -499,7 +474,7 @@ class IntegrateApplyRun(ComponentRun):
         for name, operation in cases:
             try:
                 self.step("candidate:" + name, operation)
-                self.report["candidateCases"][name] = self.report["cases"][name].get("outcome", "installed")
+                self.report["candidateCases"][name] = "installed"
             except Exception as error:
                 self.report["candidateCases"][name] = "failed: " + str(error)
                 try: self.session.close()

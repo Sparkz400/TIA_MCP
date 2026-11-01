@@ -158,10 +158,14 @@ namespace TiaMcp.Openness.V21
                     Fail("The captured callee/storage declaration pair is incomplete or ambiguous.", code);
                 var mapped = source.Elements().Select(member =>
                 {
-                    if (member.Name.LocalName != "Member" || member.Descendants().Any(e => e.Name.LocalName == "Member" || e.Name.LocalName == "StartValue" || e.Name.LocalName == "DefaultValue"))
+                    bool structured = member.Descendants().Any(e => e.Name.LocalName == "Member");
+                    if (member.Name.LocalName != "Member" || member.Descendants().Any(e => e.Name.LocalName == "StartValue" || e.Name.LocalName == "DefaultValue"))
                         Fail("Structured or custom-start FB declarations require another profile.", code);
+                    // SameDefaults compares the whole member, so a structured (UDT) member maps only onto a captured reference
+                    // member with the identical nested declaration, whose captured storage is then copied.
                     var matches = referenceMembers.Where(p => (string)p.Attribute("Datatype") == (string)member.Attribute("Datatype") && SameDefaults(p, member)).ToArray();
-                    if (matches.Length == 0) Fail("No captured matching FB defaults for " + name + "/" + (string)member.Attribute("Datatype") + ".", code);
+                    if (matches.Length == 0) Fail(structured ? "Structured or custom-start FB declarations require another profile."
+                        : "No captured matching FB defaults for " + name + "/" + (string)member.Attribute("Datatype") + ".", code);
                     var templates = matches.Select(m => storedMembers.Single(p => (string)p.Attribute("Name") == (string)m.Attribute("Name"))).ToArray();
                     if (templates.Skip(1).Any(p => !SameDefaults(templates[0], p))) Fail("Captured storage defaults are ambiguous.", code);
                     var copy = new XElement(templates[0]); copy.SetAttributeValue("Name", (string)member.Attribute("Name")); return copy;

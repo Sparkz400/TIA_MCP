@@ -761,6 +761,58 @@ internal static class TypedGraphicalTests
         await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalInstanceTemplate.Create("NewInstance", 456, callee, template));
     }
 
+    // The component FB's UDT static (route-capture-component-storage-packet.v1.json): a structured member maps only onto a
+    // captured reference member with the identical nested declaration; any other nesting or a start value stays refused.
+    internal static async Task StructuredMembersMapOnlyOntoIdenticalCapturedMembers()
+    {
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json"))) root = root.Parent;
+        if (root == null) throw new InvalidOperationException("Missing typed native template corpus.");
+        string native = Path.Combine(root.FullName, "fixtures", "typed-graphical", "native");
+        var callee = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(native, "component04-callee.xml")));
+        var db = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(native, "component04-instance.xml")));
+        XElement Member(XContainer document, string name) => document.Descendants().Single(e => e.Name.LocalName == "Member" && e.Attribute("Name")?.Value == name);
+        XDocument Changed(Action<XDocument> change) { var copy = new XDocument(callee); change(copy); return copy; }
+        var otherNesting = Changed(d => Member(Member(d, "State"), "Active").SetAttributeValue("Name", "Other"));
+        var startValue = Changed(d => Member(Member(d, "State"), "Active").Add(new XElement(Member(d, "State").Name.Namespace + "StartValue", "true")));
+
+        // Global: the DB natively captured beside this FB is the prototype of its UDT static.
+        var created = TypedGraphicalInstanceTemplate.Create("FreshGate", 7, callee, db);
+        var expected = new XDocument(db); var attributes = expected.Root!.Element("SW.Blocks.InstanceDB")!.Element("AttributeList")!;
+        attributes.Element("Name")!.Value = "FreshGate"; attributes.Element("Number")!.Value = "7"; attributes.Element("AutoNumber")!.Value = "false";
+        EngineeringSources.RequireNativePreservation(expected, created);
+        await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalInstanceTemplate.Create("FreshGate", 7, otherNesting, db));
+        await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalInstanceTemplate.Create("FreshGate", 7, startValue, db));
+        // The private sc01 storage stays out of the ordinary catalog: no deployed standard-route template covers the component FB.
+        var catalog = JObject.Parse(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", "profiles.v1.json")));
+        foreach (var entry in catalog["globalInstanceTemplates"]!.Where(t => t.Value<string>("route") == "standard"))
+        {
+            var template = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(root.FullName, "fixtures", "typed-graphical", entry.Value<string>("path")!)));
+            await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalInstanceTemplate.Create("FreshGate", 7, callee, template));
+        }
+
+        // Multi: a synthetic captured declaration in the compact embedded shape of Tgp_FB_multi_LAD's Child (test data only).
+        var observed = EngineeringSources.ReadXml(File.ReadAllText(Path.Combine(native, "Tgp_FB_multi_LAD.xml")));
+        var captured = new XElement(Member(observed, "Child")); XNamespace ns = captured.Name.Namespace;
+        captured.SetAttributeValue("Name", "Gate"); captured.SetAttributeValue("Datatype", "\"TiaMcpComponentGate\"");
+        XElement Compact(string name, string type, params XElement[] nested) => new(ns + "Member", new XAttribute("Name", name), new XAttribute("Datatype", type), nested);
+        captured.Elements(ns + "Sections").Single().ReplaceNodes(
+            new XElement(ns + "Section", new XAttribute("Name", "Input"), Compact("Enable", "Bool")),
+            new XElement(ns + "Section", new XAttribute("Name", "Output"), Compact("Active", "Bool")),
+            new XElement(ns + "Section", new XAttribute("Name", "InOut")),
+            new XElement(ns + "Section", new XAttribute("Name", "Static"), Compact("State", "\"TiaMcpComponentState\"",
+                new XElement(ns + "Sections", new XElement(ns + "Section", new XAttribute("Name", "None"), Compact("Active", "Bool"))))));
+        var declaration = TypedGraphicalMultiInstanceTemplate.Create("Gate2", "\"TiaMcpComponentGate\"", callee, callee, captured);
+        var embedded = new XElement(captured); embedded.SetAttributeValue("Name", "Gate2");
+        EngineeringSources.RequireNativePreservation(new XDocument(new XElement("Document", embedded)), new XDocument(new XElement("Document", declaration)));
+        await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalMultiInstanceTemplate.Create("Gate2", "\"TiaMcpComponentGate\"", otherNesting, callee, captured));
+        await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalMultiInstanceTemplate.Create("Gate2", "\"TiaMcpComponentGate\"", startValue, callee, captured));
+        // A scalar-only reference (the generic templates) never covers the UDT static.
+        var scalar = new XDocument(observed); Member(scalar, "Child").Remove();
+        var child = new XElement(Member(observed, "Child")); child.SetAttributeValue("Datatype", "\"" + scalar.Root!.Element("SW.Blocks.FB")!.Element("AttributeList")!.Element("Name")!.Value + "\"");
+        await Error("GraphicalInstanceTemplateUnavailable", () => TypedGraphicalMultiInstanceTemplate.Create("Gate2", "\"TiaMcpComponentGate\"", callee, scalar, child));
+    }
+
     internal static Task CapturedCreationAndInstanceDefaultsRemainComplete()
     {
         DirectoryInfo? root = new(AppContext.BaseDirectory);

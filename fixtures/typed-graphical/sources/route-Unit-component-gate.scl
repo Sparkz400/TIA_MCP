@@ -1,0 +1,26 @@
+NAMESPACE TiaMcp_UnitA
+FUNCTION_BLOCK "TgpUnit_ComponentGate"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+VAR_INPUT
+    Enable : Bool;
+END_VAR
+VAR_OUTPUT
+    Active : Bool;
+END_VAR
+VAR
+    State : "TiaMcp_UnitA.TiaMcpComponentState";
+END_VAR
+BEGIN
+    #State.Active := #Enable;
+    #Active := #State.Active;
+END_FUNCTION_BLOCK
+
+DATA_BLOCK "TgpUnit_ComponentGate_DB"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+"TiaMcp_UnitA.TgpUnit_ComponentGate"
+BEGIN
+END_DATA_BLOCK
+
+END_NAMESPACE

@@ -48,14 +48,17 @@ namespace TiaMcp.Openness.V21
                 var to = targetSections.Elements().Single(s => (string)s.Attribute("Name") == sectionName);
                 var prototypes = to.Elements().ToArray();
                 var members = from.Elements().ToArray();
-                if (members.Any(member => member.Name.LocalName != "Member" || member.Descendants().Any(e => e.Name.LocalName == "Member" || e.Name.LocalName == "StartValue" || e.Name.LocalName == "DefaultValue")))
-                    Fail("Structured declarations and custom start values need their own independently observed storage profile.");
+                const string structuredRefusal = "Structured declarations and custom start values need their own independently observed storage profile.";
+                if (members.Any(member => member.Name.LocalName != "Member" || member.Descendants().Any(e => e.Name.LocalName == "StartValue" || e.Name.LocalName == "DefaultValue")))
+                    Fail(structuredRefusal);
                 foreach (var member in members)
                 {
                     string type = (string)member.Attribute("Datatype");
                     var matching = prototypes.Where(p => p.Name == member.Name && (string)p.Attribute("Datatype") == type).ToArray();
+                    // The whole member is compared, so a structured (UDT) member needs a captured prototype with the identical nested storage.
                     if (matching.Length == 0 || !matching.Any(p => SameMemberDefaults(p, member)))
-                        Fail("No observed matching native instance declaration defaults for " + sectionName + "/" + type + ".");
+                        Fail(member.Descendants().Any(e => e.Name.LocalName == "Member") ? structuredRefusal
+                            : "No observed matching native instance declaration defaults for " + sectionName + "/" + type + ".");
                 }
                 to.ReplaceNodes(members.Select(member => new XElement(member)));
             }

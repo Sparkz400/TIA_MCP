@@ -296,6 +296,31 @@ class CandidateTests(unittest.TestCase):
         self.unchanged()
         self.assertFalse((self.root / "escape.xml").exists())
 
+    def test_component_storage_captures_bind_the_captured_component_fb(self):
+        fb = '<Document><SW.Blocks.FB ID="0"><AttributeList><Name>%s</Name></AttributeList></SW.Blocks.FB></Document>'
+        db = '<Document><SW.Blocks.InstanceDB ID="0"><AttributeList><Name>%s</Name></AttributeList></SW.Blocks.InstanceDB></Document>'
+        self.capture({"TiaMcpComponentGate": fb % "TiaMcpComponentGate", "Tgp_ComponentHost_FBD": fb % "Tgp_ComponentHost_FBD"})
+        # The captured UDT is the FB's dependency, not a template: it has no block read and is skipped.
+        self.report["fixtures"][0]["exports"].append({"name": "TiaMcpComponentState", "kind": "type"})
+        self.write_report()
+        result, _ = extractor.extract_catalog([self.report_path], stage_output=self.stage)
+        [multi] = result["multiInstanceTemplates"]
+        self.assertEqual(("v21.fw41.component-gate.multi-instance.v1", "standard", "Gate", "native/Tgp_ComponentHost_FBD.xml", "native/TiaMcpComponentGate.xml"),
+                         (multi["id"], multi["route"], multi["memberName"], multi["path"], multi["referenceCalleePath"]))
+        self.assertEqual([], result["globalInstanceTemplates"])
+        self.assertEqual({"native/TiaMcpComponentGate.xml", "native/Tgp_ComponentHost_FBD.xml"},
+                         {pathlib.Path(source["path"]).relative_to("artifacts/candidates").as_posix() for source in result["sources"]})
+        # The software-unit capture folds TgpUnit_ to Tgp_ and yields the unit route's global instance template.
+        self.capture({"TgpUnit_ComponentGate": fb % "TgpUnit_ComponentGate", "TgpUnit_ComponentGate_DB": db % "TgpUnit_ComponentGate_DB"})
+        self.report["fixtures"][0]["route"] = "softwareUnit"
+        self.write_report()
+        result, _ = extractor.extract_catalog([], [self.report_path], stage_output=self.root / "artifacts/unit-candidates")
+        [unit] = result["globalInstanceTemplates"]
+        self.assertEqual(("v21.fw41.softwareUnit.component-gate.global-instance.v1", "InstanceDB", "native/TgpUnit_ComponentGate_DB.xml", "native/TgpUnit_ComponentGate.xml"),
+                         (unit["id"], unit["blockType"], unit["path"], unit["referenceCalleePath"]))
+        self.assertEqual([], result["multiInstanceTemplates"])
+        self.unchanged()
+
 
 if __name__ == "__main__":
     unittest.main()
