@@ -39,7 +39,7 @@ def fixtures():
                         break
         if login:
             calls.append("Api.Login")
-            if action in {"verify", "verifyAgain"} and "Api.GetSessionInfo" in config.get("optional", OPTIONAL):
+            if action in {"verify", "verifyAgain", "verifyCancelled"} and "Api.GetSessionInfo" in config.get("optional", OPTIONAL):
                 calls.extend(["Api.GetSessionInfo"] * (2 if action == "verifyAgain" else 1))
             calls.append("Api.Logout")
         cases.append({"name": name, "server": server or {}, "request": {"action": action, "user": user, "mode": mode},
@@ -106,6 +106,8 @@ def fixtures():
             {"timestamp": "2027-01-01T00:00:00Z", "warning": 1}}, "RuntimeProfileInvalid"),
     ]:
         add(name, {"sessionInfo": [info]}, action="verify", login=True, unusable=True, error=error)
+    # A caller's cancellation of the verification (a stopped capture) leaves the session usable; nothing is sent for it (run rgn2).
+    add("cancelled-verification-keeps-the-session", action="verifyCancelled", login=True, profile={"sessionInfoObserved": True})
     add("expiration-retained-as-public-metadata", {"sessionInfo": [{"username": "reader", "authentication_mode": "local",
         "password_expiration": {"timestamp": "2027-01-01T00:00:00Z", "warning": True}}]},
         action="verify", login=True, profile={"passwordExpiresUtc": "2027-01-01T00:00:00+00:00", "passwordExpirationWarning": True})

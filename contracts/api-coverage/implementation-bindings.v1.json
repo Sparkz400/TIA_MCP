@@ -1412,8 +1412,8 @@
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
-      "sha256": "51dbe758d5a0582ff2b8fa6941180ba00b8c4eee9889bc280883079b5313d583",
-      "bytes": 21591
+      "sha256": "71e9d611479cd0317ebd6bc43117aacb61d5d0ff5e3b6bef3fcbef4d2688589a",
+      "bytes": 21820
     },
     {
       "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeProtocol.cs",
@@ -10564,8 +10564,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -11727,8 +11727,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -17900,8 +17900,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "BrowseAsync",
-          "line": 232,
-          "endLine": 236,
+          "line": 234,
+          "endLine": 238,
           "sha256": "5adcd38b3b541ef2d6d5d7282ae1b830b8f10e078a04955049f61f8aa1038976"
         },
         {
@@ -24015,15 +24015,15 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Query",
-          "line": 216,
-          "endLine": 224,
+          "line": 218,
+          "endLine": 226,
           "sha256": "96a63ff742d2ce257545e0dc6e45495aa18f0c6f7588f46f117b503df10f3ab2"
         },
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -29905,8 +29905,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -34292,8 +34292,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
@@ -42010,8 +42010,8 @@
         {
           "path": "src/TiaMcp.Core/PhysicalRuntime/WebRuntimeClient.cs",
           "name": "Result",
-          "line": 341,
-          "endLine": 346,
+          "line": 343,
+          "endLine": 348,
           "sha256": "4804852a6aa8788deb96e2f2e3a590ea1e4d7c5f872e39afa7a71dd014668b47"
         },
         {
