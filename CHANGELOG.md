@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.105`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.107`.
 
 ### Added
 
@@ -237,9 +237,20 @@ Changes since the repository went public on 23 October 2026, up to feature catal
       symbol whose area in PLCSIM's tag list is the output area, as `sim_area_write` refuses outputs
       (`InvalidRequest`, the whole request, before anything is written); inputs, markers, data blocks,
       timers and counters stay writable. Rechecked natively for `sim_write`, `sim_write_signals` and
-      `sim_test` (`local.sim.output-refusal.20261101`); `diagnostic_plcsim_write` has no native run.
+      `sim_test` (`local.sim.output-refusal.20261101`), and for `diagnostic_plcsim_write` and the
+      member of a structured output tag (`local.sim.output-refusal-2.20261101`).
     - A component-window step whose request had emoji, certain control characters or a number such
-      as `1e3` was refused: the Host and the worker hashed it differently. Both now use RFC 8785.
+      as `1e3` was refused: the Host and the worker hashed it differently. Both now use RFC 8785
+      (rechecked natively, `local.component.canonical-hash.20261101`).
+- Open audit items, 1 November ([record](docs/verification/audit-rechecks-20261101.md#second-round-the-open-items)):
+  - `software_unit_create_from` brings a unit's tag tables from a master copy unread and had no F-I/O
+    rule; like `library_instantiate` of a tag-table master copy it now refuses with `SafetyBoundary`
+    while the PLC owns, or may own, any F-I/O range (`local.safety.fio-routes-2.20261101`).
+  - `library_instantiate` of a tag-table master copy reported applied when TIA had created a tag whose
+    name the PLC already used under a new name (`McProbe(1)`). Its readback now checks the created
+    tags' names and fails such a change with `MutationVerificationFailed`, so the checkpoint recovers
+    it; `software_unit_create_from`, where TIA renamed a copy's unit tag the same way, refuses such
+    tags with the renamed blocks and types (`local.library.tag-collision.20261101`).
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the
@@ -258,7 +269,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     `ExactClient` runners accept the `tools/list` prefetch without params again (broken since
     `28d50f91`); `qualify_plcsim_signals.py` takes the discovery baseline before `sim_create`; card-move
     rows carry their UTC time; the retained-tree runners give the FileStorage helper its 360 s exit
-    deadline.
+    deadline; the runners' store scanners and watch verifiers accept the Host's RFC 8785 journal
+    hashes beside the earlier form (they refused every record a Host since PR 184 writes).
 
 ### Known limitations
 
@@ -275,7 +287,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   execution time, so production style execution is unavailable (only the TS-Q01 qualification mode runs).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
-- `library_instantiate` of a tag-table master copy: TIA renames a tag whose name the PLC already
-  uses (`McProbe(1)`), and the change reports applied, since its readback checks only the table.
+- `library_instantiate` and `software_unit_create_from` recognize a master-copy tag TIA renamed by
+  its `<name>(<n>)` form beside an existing `<name>`, so a tag that is itself named that way fails
+  the change too.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built
   on a TIA V21 workstation. Bundle manifests are hash lists, not publisher signatures.

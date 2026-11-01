@@ -215,7 +215,11 @@ left to PLCSIM, which resolves names through that same list (`DoesNotExist`, or 
 (`local.sim.output-refusal.20261101`): `sim_write` of an output tag, quoted and unquoted, a `sim_write_signals`
 batch with one output tag among a marker and a DB member, and a `sim_test` step writing an output tag were
 refused and wrote nothing, `sim_test` saved no report, and a marker, a DB member and an input still wrote.
-`diagnostic_plcsim_write` shares the check but has no native run.
+A second run (`local.sim.output-refusal-2.20261101`) refused the member `"SigOutStruct".A` of a PLC tag of a
+PLC data type at `%Q24.0` (PLCSIM lists the tag as a Struct in the area `Output`, with its members) through
+`sim_write` and `sim_write_signals`, and `diagnostic_plcsim_write` of a case's output tag, alone or beside a
+marker, while an input and a marker tag of the case still wrote. The Host reports a refused
+`diagnostic_plcsim_write` with the code only.
 
 ## Online compare and station upload
 

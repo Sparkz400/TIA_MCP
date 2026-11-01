@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.105",
+  "catalogVersion": "0.4.107",
   "targetTiaVersions": [
     21
   ],
@@ -4026,6 +4026,79 @@
         "The profile rerun re-created only the accepted cells natively; the recorded refusals were refused by the embedded profile at prepare, not by V21's Create.",
         "Engineering only: nothing downloaded, no axis moves, encoders and axes stay unconnected."
       ]
+    },
+    {
+      "id": "local.safety.fio-routes-2.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5044285e4b7426f3de67aa0659e28de6a94a04f1",
+        "passedScope": "scripts/qualify_fio_tag_routes.py on a frozen Debug build of 5044285e (artifacts/oi1, git archive), 75/75 steps (run fr_af86ff5b), in one owned scratch with the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0 on its IO system (the first F-DI's inputs start at byte 0). Repeats every route of local.safety.fio-routes.20261101 (tag_create, tag_set, tag_table_import_xml, vci_synchronize WorkspaceToProject and library_instantiate refused at prepare with SafetyBoundary naming %I0.0 or the master copy and an F-DI; the bit-memory routes applied with checkpoint, compile and save). New (1 November audit fixes): vci_conflict_resolve take=remote of FioTags, mapped in SimaticML: its package was committed (vci_prepare, vci_commit) and pushed (vci_push) to the Host's --git-remote, a local bare repository; another engineer moved FioProbe from %M41.0 to %I0.0 in a plain Git clone and pushed; tag_set moved FioProbe to %M42.0 in the project; after vci_fetch, three vci_package_capture records (baseline, native, remote) and a vci_package_compare divergentChange row, and the checkout of the fetched package into the workspace, change_prepare refused with SafetyBoundary naming %I0.0 and the first F-DI. software_unit_create_from of a master copy (library_create_master_copy, kind softwareUnit) of the standard PLC's empty unit FioUnit refused into the F-PLC with SafetyBoundary naming the master copy and an F-DI; after FioUnit was deleted on the standard PLC it applied there with checkpoint, compile and save and FioUnit read back as a software scope. After each refusal every tag table and tag of both PLCs (software_inspect) was unchanged."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-routes-2.20261101.json"
+      ],
+      "limitations": [
+        "One owned scratch: a standard CPU 1511-1 PN V4.1 and a CPU 1511F-1 PN with two ET 200SP F-DI 8x24VDC HF; addresses in the first F-DI's input range only. F-output ranges, ET 200MP and other F-modules are not exercised.",
+        "vci_conflict_resolve ran take=remote only, against a local bare Git remote; take=merged and block or SCL imports with absolute operands are not exercised. V21 offered only SimaticML as a tag table's VCI format.",
+        "software_unit_create_from copied an empty unit (its generated default tag table only) within the project library; unit master copies holding tags and other libraries are not exercised.",
+        "The F-CPU's generated scratch user holds Full access including fail-safe (owned scratch only); no safety login, password or download."
+      ]
+    },
+    {
+      "id": "local.library.tag-collision.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5044285e4b7426f3de67aa0659e28de6a94a04f1",
+        "passedScope": "scripts/qualify_master_copy_tag_collision.py on a frozen Debug build of 5044285e (artifacts/oi1, git archive), 41/41 steps (run tc_531cbab9), in two owned scratch CPU 1511-1 PN V4.1 projects. Master-copy tag readback (1 November audit fix). Scratch 1: the table McTags with the Bool tags McProbe (%M60.0) and McSpare (%M61.0) became a master copy in the project library (library_create_master_copy, kind tagTable). Without a collision (both tags and McTags deleted first) library_instantiate (destinationComposition tagTables) applied with checkpoint, compile and save, and McTags read back with McProbe and McSpare under their own names. With a collision (McTags renamed to McTagsOld, so both tags stayed in the PLC root) TIA created the master copy's tags as McProbe(1) and McSpare(1): change_apply failed with MutationVerificationFailed (details renamedTags McProbe(1), McSpare(1), tagTable McTags) and change_status showed recovery_required with that failure; in a fresh empty owned Portal change_restore retrieved the project checkpoint to a new location (restored_to_new_locations), whose tag tables equalled those before the apply (McTagsOld with both tags, no McTags). Scratch 2: the unit CollUnit whose default tag table held the Bool tag UnitTag (%M70.0) became a master copy (kind softwareUnit); software_unit_create_from with onNameConflict=rename into the same PLC as CollUnit2: TIA created the copy's tag as UnitTag(1) beside CollUnit's UnitTag, and change_apply failed after the compile with MutationVerificationFailed naming UnitTag(1); change_restore in the applying Portal restored the checkpoint and the tag tables equalled those before the apply."
+      },
+      "artifacts": [
+        "evidence/local.library.tag-collision.20261101.json"
+      ],
+      "limitations": [
+        "Owned scratch CPU 1511-1 PN V4.1 projects; master copies in the project library only, Bool tags at bit-memory addresses. The tag-table collision is within the PLC root scope; the unit copy is within its own PLC with onNameConflict=rename (MasterCopyMode.Rename).",
+        "TIA's rename is recognized by its <name>(<n>) pattern against the names before the create, conservatively: a master-copy tag that is itself named <existing>(<n>) also fails the readback. User constants share the check but are not exercised.",
+        "Whether software_unit_create_from with MasterCopyMode.ThrowIfExists also renames a tag that exists in another unit or the PLC root is not exercised."
+      ]
+    },
+    {
+      "id": "local.sim.output-refusal-2.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "5044285e4b7426f3de67aa0659e28de6a94a04f1",
+        "passedScope": "Two runs on a frozen Debug build of 5044285e (artifacts/oi1, git archive), each on one fresh owned PLCSIM Advanced V8 CPU 1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1, released afterwards. Members of a structured output tag (1 November audit fix): scripts/qualify_plcsim_signals.py, 95/95 steps (run ps_95b2f7f7), repeats every check of local.sim.output-refusal.20261101 and adds SigOutStruct, a PLC tag of the PLC data type SigOutUdt (members A and B, Int) at %Q24.0 imported with tag_table_import_xml, whose members the program writes every scan; PLCSIM's tag list reports SigOutStruct (Struct), SigOutStruct.A and SigOutStruct.B all in the area Output. sim_write of \"SigOutStruct\".A, and a sim_write_signals batch of SigMarker and \"SigOutStruct\".A, refused with InvalidRequest, details.symbol \"SigOutStruct\".A and details.area Output; QB24..27 read the same before and after and SigMarker stayed 4321. diagnostic_plcsim_write: scripts/qualify_plcsim_diagnostics.py, 60/60 steps (run ps_6b3362fe), runs the checks of local.plcsim_diagnostics.20261028 (Enable of one FB instance) and adds a second diagnostic_plan case over the PLC tags DiagIn (%I30.0), DiagMarker (%M30.0) and DiagOut (%Q30.0; the program copies DiagIn to it), all resolved as captured Bool declarations; PLCSIM reports their areas Input, Marker and Output. diagnostic_plcsim_write of DiagOut, and of DiagMarker with DiagOut, refused with InvalidRequest and every value read the same afterwards; a write of DiagIn and DiagMarker together returned written with two dispatches and matching readbacks, DiagOut followed DiagIn, and a second write reset both."
+      },
+      "artifacts": [
+        "evidence/local.sim.output-refusal-2.20261101.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance per run on Softbus; output tags without a configured I/O module. Array elements of an output tag are not exercised (the fixture's structured output tag is a PLC data type).",
+        "The program writes the output tags every scan, so unchanged reads after a refusal show the refusal and the scan agree; a write that slipped through would be overwritten at the next scan. The Host reports diagnostic_plcsim_write refusals with its generic message, so only the code InvalidRequest is checked there.",
+        "Engineering scratch and simulation only; no physical PLC."
+      ]
+    },
+    {
+      "id": "local.component.canonical-hash.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "d57defa5b499bfe94396d6079d4af603de5403ad",
+        "passedScope": "scripts/qualify_plc_component.py --canonical-hash-probe on a frozen Debug build of d57defa5 (artifacts/oi3, git archive; main with PR 184's RFC 8785 hashing, PR 186's exact decimal parsing of request floats and the runner scanners' RFC 8785 fix), passed: fresh owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 projects; the author scratch released and published the fixture's FB/UDT closure, the consumer scratch installed it through the Host's qualification_component_window (--component-qualification) in six children (start, applyLibrary, verifyImport, prepareGraphical, applyGraphical, verifyInstallation), with complete unrelated-content preservation, a fresh reopen, retrieval of the first import checkpoint to a new location with baseline equality and recovered reopen, and window completion (released, lifecycleEvidenceComplete). Each of the three advance requests (verifyImport, prepareGraphical, verifyInstallation) carried the non-ASCII key prüfName名前, non-ASCII text with an astral emoji (sent as \\u escapes) and the number literals 1e3 and 2.2250738585072012e-308 written raw on the wire. The Host compares its RFC 8785 requestSha256 with the worker's before each dispatch and refuses a mismatch, so every child dispatching shows the two agreed; after the run a separate Python RFC 8785 recomputation of the verifyImport request (1e3 as 1000, the other as 2.2250738585072014e-308) reproduced the Host's recorded requestSha256 5d077eef."
+      },
+      "artifacts": [
+        "evidence/local.component.canonical-hash.20261101.json"
+      ],
+      "limitations": [
+        "One component window in owned scratch projects; the worker ignores the probe fields beyond hashing them, so the run shows Host/worker hash agreement, not the use of such values by a step.",
+        "Numbers and text only in the advance requests; manifests and other worker-hashed values carried ASCII paths, and the earlier-form acceptance of PR 186 (records written before RFC 8785) is not exercised by this fresh store.",
+        "Qualification-only route (--component-qualification); production combined library_integrate apply stays disabled."
+      ]
     }
   ],
   "features": [
@@ -6515,14 +6588,15 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written; the member \"SigOutStruct\".A of a PLC tag of a PLC data type at %Q24.0, which PLCSIM lists as a Struct in the area Output with its members, refused the same way (local.sim.output-refusal-2.20261101)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.runtime.frozen.20261024",
-          "local.sim.output-refusal.20261101"
+          "local.sim.output-refusal.20261101",
+          "local.sim.output-refusal-2.20261101"
         ]
       },
       "availability": {
@@ -11681,7 +11755,7 @@
           "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029), for a UDT root reused as the namespaced FB's dependency and for a master copy of an FC (instanceNamespace.masterCopies); a later PLC-wide library_update_project keeps every namespaced path (local.library_units.namespace.rerun.20261031). A dependency created alongside a namespaced root keeps its type namespace: a UDT created with a namespaced FB stays in the root namespace and compiles (local.library_units.namespace.dependency.20261101); a dependency with its own type namespace and nested dependency chains are not exercised.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
-          "A tag-table master copy (destinationComposition tagTables) refuses at prepare with SafetyBoundary while the PLC owns, or may own, any F-I/O address range: V21 exposes only a master copy's content names, so the addresses it brings cannot be checked before the create, and a tag on an F-I/O address would become a safety tag; nothing is written. Import such a table with tag_table_import_xml, which checks every address (1 November 2026; rechecked natively in local.safety.fio-routes.20261101, where the master copy still instantiated on a standard CPU without F-I/O). TIA renames a master-copy tag whose name an existing tag of the PLC already uses (McProbe became McProbe(1) in that recheck's first run, fr_eeb8be6f), and the change still reports applied, because its readback checks only the created table.",
+          "A tag-table master copy (destinationComposition tagTables) refuses at prepare with SafetyBoundary while the PLC owns, or may own, any F-I/O address range: V21 exposes only a master copy's content names, so the addresses it brings cannot be checked before the create, and a tag on an F-I/O address would become a safety tag; nothing is written. Import such a table with tag_table_import_xml, which checks every address (1 November 2026; rechecked natively in local.safety.fio-routes.20261101, where the master copy still instantiated on a standard CPU without F-I/O). TIA creates a master-copy tag whose name the software scope already uses as <name>(<n>), which nothing references (McProbe became McProbe(1) in that recheck's first run, fr_eeb8be6f); the readback compares the created tags and user constants with the scope's tag and constant names before the create and fails such a change with MutationVerificationFailed (details renamedTags), so the checkpoint recovers it; natively a colliding McProbe and McSpare failed as McProbe(1) and McSpare(1) and change_restore retrieved the pre-change tag tables, and the same master copy without a collision applied with both names (local.library.tag-collision.20261101). A master-copy tag that is itself named <existing>(<n>) also fails, conservatively.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
@@ -11709,7 +11783,9 @@
           "local.library_units.namespace.20261029",
           "local.library_units.namespace.rerun.20261031",
           "local.library_units.namespace.dependency.20261101",
-          "local.safety.fio-routes.20261101"
+          "local.safety.fio-routes.20261101",
+          "local.safety.fio-routes-2.20261101",
+          "local.library.tag-collision.20261101"
         ]
       },
       "availability": {
@@ -15417,7 +15493,8 @@
         "limitations": [
           "Qualified for a fresh FB/UDT component: complete FC/DB/call/bindings install, preservation, save/reopen, first-checkpoint recovery and PLCSIM runtime with a separate OB1 call; and installation into an existing FBD FC caller with the exact following-ID shift, preservation, save/reopen and first-checkpoint recovery. LAD/FB/OB callers and production combined library_integrate apply remain unqualified.",
           "Requires --component-qualification. Retains durable ownership across begin/status/recovery/completion; restart cannot resume installation. Unavailable on normal Hosts.",
-          "Qualification-only tool registration does not enable a production mutation profile."
+          "Qualification-only tool registration does not enable a production mutation profile.",
+          "Host and worker hash each child request in RFC 8785 and the Host refuses a dispatch whose hashes differ; natively (local.component.canonical-hash.20261101, with PR 186's exact decimal parsing) every child of a complete window dispatched with advance requests holding a non-ASCII key and text and the literals 1e3 and 2.2250738585072012e-308."
         ]
       },
       "qualification": {
@@ -15425,7 +15502,8 @@
         "evidenceIds": [
           "local.plc_component.install.rerun.20261028",
           "local.plc_component.runtime.rerun.20261028",
-          "local.plc_component.existing_caller.rerun.20261028"
+          "local.plc_component.existing_caller.rerun.20261028",
+          "local.component.canonical-hash.20261101"
         ]
       },
       "availability": {
@@ -24563,13 +24641,14 @@
           "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
           "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
           "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028) with one FB instance's Bool Enable: a wrong expected value returns preconditionMismatch without dispatching; a write and its restoring write each read back and the program reacts; refusals without acknowledgeWrite, for a signal outside the case, a datatype differing from the declaration and while a capture holds the instance.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); sim_write, sim_write_signals and sim_test share the check and were rechecked natively (local.sim.output-refusal.20261101), this tool was not."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal-2.20261101): a write of a case's output tag DiagOut, alone and beside the marker DiagMarker, refused with every value unchanged, and a write of the input DiagIn and DiagMarker of the same case wrote and read back. The Host reports this refusal with its generic message and the code only."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_diagnostics.20261028"
+          "local.plcsim_diagnostics.20261028",
+          "local.sim.output-refusal-2.20261101"
         ]
       },
       "availability": {
@@ -26689,14 +26768,15 @@
           "1-64 distinct symbols of the sim_read_signals types; every value is validated before the call. A failed item fails the call with PartialSimulationWrite and each item's result; items not reported failed may have been written.",
           "Assignments, not forces; the program scan may overwrite them.",
           "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written; so did a batch of a marker and the member \"SigOutStruct\".A of a structured output tag (local.sim.output-refusal-2.20261101)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.plcsim_signals.20261030",
-          "local.sim.output-refusal.20261101"
+          "local.sim.output-refusal.20261101",
+          "local.sim.output-refusal-2.20261101"
         ]
       },
       "availability": {
@@ -26925,15 +27005,18 @@
         "status": "partial",
         "limitations": [
           "libraryId and masterCopyPath select one master copy of a registered project or global library; it must describe exactly one PlcUnit. The new unit is renamed to name; collisions refuse.",
-          "MasterCopyMode.ThrowIfExists unless the template's unit name already exists in the PLC: then onNameConflict=refuse (default) refuses at prepare and onNameConflict=rename uses MasterCopyMode.Rename. A unit master copy describes only the unit, and MasterCopyMode.Rename also renames members whose names exist in the PLC: the createdUnitMembers readback lists the blocks, types and tag tables and every <existing name>_<n> rename; a renamed block or type fails the apply after the compile (checkpoint recovery), a renamed tag table is reported. A master copy whose name or creation date changed refuses with StaleRevision.",
+          "MasterCopyMode.ThrowIfExists unless the template's unit name already exists in the PLC: then onNameConflict=refuse (default) refuses at prepare and onNameConflict=rename uses MasterCopyMode.Rename. A unit master copy describes only the unit, and MasterCopyMode.Rename also renames members whose names exist in the PLC: the createdUnitMembers readback lists the blocks, types and tag tables and every <existing name>_<n> rename; a renamed block or type fails the apply after the compile (checkpoint recovery), a renamed tag table is reported. A tag or user constant of the copy created as <name>(<n>) beside an existing <name> in any scope of the PLC fails the same way, in either mode (natively, UnitTag became UnitTag(1) beside the template unit's UnitTag with onNameConflict=rename and the change failed and restored, local.library.tag-collision.20261101). A master copy whose name or creation date changed refuses with StaleRevision.",
           "V21 has no unit copy or move API: PlcUnit exposes only Delete(); PlcUnitComposition only Create(String), CreateFrom(MasterCopy), CreateFrom(MasterCopy, MasterCopyMode) and Find(String); PlcUnitSystemGroup holds Units and SafetyUnits without user groups, so a unit has no other parent in its PLC (PublicAPI V21 Siemens.Engineering.Step7). A copy is library_create_master_copy of the unit (object kind softwareUnit) followed by change.software_unit_create_from; it creates new objects and is not identity-preserving. A move between PLCs would be such a copy plus a delete and is not offered.",
-          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.lifecycle.20261030): an empty unit with namespace preset Ns.T and a SoftwareUnit relation copied through library_create_master_copy (kind softwareUnit) and software_unit_create_from with onNameConflict=rename (the copy keeps the preset and the outgoing relation), and an unreferenced unit renamed, each applied, persisted across a fresh Portal reopen and restored from its checkpoint; referenced units, names in use, the current name, a block master copy, an unknown policy and the template-name conflict refused typed. The ContentDescriptions of a unit master copy list only the unit. In the same PLC MasterCopyMode.Rename also renames members (UnitFb became UnitFb_1 (FB3), Default tag table_3 became _4): the createdUnitMembers readback lists them, a renamed block or type fails the apply after the compile (MutationVerificationFailed) and restores from the checkpoint."
+          "Natively qualified on one owned scratch CPU 1511-1 PN V4.1 without safety units (local.software_units.lifecycle.20261030): an empty unit with namespace preset Ns.T and a SoftwareUnit relation copied through library_create_master_copy (kind softwareUnit) and software_unit_create_from with onNameConflict=rename (the copy keeps the preset and the outgoing relation), and an unreferenced unit renamed, each applied, persisted across a fresh Portal reopen and restored from its checkpoint; referenced units, names in use, the current name, a block master copy, an unknown policy and the template-name conflict refused typed. The ContentDescriptions of a unit master copy list only the unit. In the same PLC MasterCopyMode.Rename also renames members (UnitFb became UnitFb_1 (FB3), Default tag table_3 became _4): the createdUnitMembers readback lists them, a renamed block or type fails the apply after the compile (MutationVerificationFailed) and restores from the checkpoint.",
+          "The unit's tag tables come along unread (V21 exposes only the master copy's content names), so the master copy refuses at prepare and again at apply with SafetyBoundary while the PLC owns, or may own, any F-I/O address range, as library_instantiate refuses a tag-table master copy; nothing is written (1 November 2026; natively refused into a CPU 1511F-1 PN with ET 200SP F-DI and applied on a standard CPU in local.safety.fio-routes-2.20261101)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.software_units.lifecycle.20261030"
+          "local.software_units.lifecycle.20261030",
+          "local.safety.fio-routes-2.20261101",
+          "local.library.tag-collision.20261101"
         ]
       },
       "availability": {
@@ -27079,7 +27162,7 @@
           "Natively qualified (local.vci_git.20261031): take=remote, take=native and take=merged each resolved a native two-sided conflict (VciConflict both ways) of one SCL FC against a commit fetched from a local bare remote, with reopen and checkpoint restore. Payload: workspacePath, objectPath, comparisonRef (a vci_package_compare record with baseline, project = native side, workspace = remote side), packageId and take native, remote or merged; take=merged also needs mergedRecordRef (a preview, committed or fetched revision holding every package file).",
           "The Host binds the payload: it refuses rows other than divergentChange (VciResolutionUnsupported), a workspacePath other than the comparison's workspace lineage or an objectPath other than the reviewed package object (VciResolutionMismatch), a native side without object.contentSha256 and sides with different file layouts, and hands the worker the exact remote package hashes and, for remote or merged, the exact bytes (at most 16 files, 4 MiB). Callers never supply hashes or bytes.",
           "The workspace package must be exactly the reviewed remote side (VciResolutionStale otherwise) and the mapping must report WorkspaceFileChanged (VciResolutionNotNeeded otherwise). ProjectObjectChanged may also be set: that is the native two-sided conflict vci_synchronize refuses as VciConflict. At prepare the worker exports the live object and its hash must equal the native side's object.contentSha256 (the vci_workspace_inspect contentSha256), so an object edited after the comparison is never overwritten or exported unreviewed (VciResolutionStale); the preview reports the live hash.",
-          "take=native synchronizes ProjectToWorkspace and overwrites the remote package files (backed up first; the remote side stays in its Git revision). take=remote and take=merged write the bound bytes into the package, then synchronize WorkspaceToProject with compile=true and the guards of direct mutations (for a tag table, the bound bytes also pass the tag_table_import_xml F-I/O rule at prepare, SafetyBoundary otherwise; 1 November 2026, not exercised natively); the project's own unsynchronized changes to the object are overwritten, with the project checkpoint as the way back.",
+          "take=native synchronizes ProjectToWorkspace and overwrites the remote package files (backed up first; the remote side stays in its Git revision). take=remote and take=merged write the bound bytes into the package, then synchronize WorkspaceToProject with compile=true and the guards of direct mutations (for a tag table, the bound bytes also pass the tag_table_import_xml F-I/O rule at prepare, SafetyBoundary otherwise; 1 November 2026, rechecked natively for take=remote of an F-DI input address in local.safety.fio-routes-2.20261101); the project's own unsynchronized changes to the object are overwritten, with the project checkpoint as the way back.",
           "The mapping must read back CompareState Equal and, for remote or merged, the package must equal the written bytes; only the package and .vci configuration may change. A change applies once (RecoveryRequired from the shared mutation admission under another idempotency key; the same key returns the recorded outcome without running again); an interrupted apply is held for manual reconciliation.",
           "Package paths in the comparison are paths below the workspace root, so the revisions mirror the root, and the mapping evidence's workspaceId is the vci_workspace_inspect workspace path. V21 has no project-neutral VCI export: the native side of the plan is the base package files with the object's changed contentSha256.",
           "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
@@ -27089,7 +27172,8 @@
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.vci_git.20261031"
+          "local.vci_git.20261031",
+          "local.safety.fio-routes-2.20261101"
         ]
       },
       "availability": {
