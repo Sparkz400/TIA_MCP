@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
+using TiaMcp.Core.Engineering;
 
 namespace TiaMcp.Core.VersionControl;
 
@@ -127,7 +128,7 @@ public sealed partial class VciWorkspaceStore
         var parent = Committed(parentRevisionRef);
         var reader = Runner();
         var before = await reader.InspectAsync(parent.Repository, token);
-        Require(before.Sha256 == parent.SnapshotSha256, "PreviewStale", "Parent repository differs from its retained committed revision.");
+        Require(before.Matches(parent.SnapshotSha256), "PreviewStale", "Parent repository differs from its retained committed revision.");
         var branches = await reader.BranchesAsync(parent.Repository, token);
         CopyTree(parent.Repository, repository, token);
         Require((await reader.InspectAsync(parent.Repository, token)).Sha256 == before.Sha256,
@@ -151,6 +152,8 @@ public sealed partial class VciWorkspaceStore
         Require(runner.ExecutableSha256 == preview.Value.ExecutableSha256, "PreviewStale", "Configured Git executable changed since review.");
         var plan = await runner.PrepareCommitAsync(preview.Repository, preview.Value.SnapshotSha256,
             preview.Value.Changes, preview.Value.Author, preview.Value.Message, token);
+        // A preview made before RFC 8785 binds the legacy plan hash; committing it would journal a different intent.
+        Require(plan.Sha256 == reviewedPlanSha256 || plan.LegacySha256 != reviewedPlanSha256, CanonicalJson.FormChanged, "This commit preview was made before RFC 8785 canonical hashing (1 November 2026); preview it again.");
         Require(plan.Sha256 == reviewedPlanSha256, "PreviewStale", "Reconstructed plan differs from the retained review.");
         var binding = GitOperationBinding.Commit(plan, runner.ControlDirectory, runner.ExecutableSha256);
         WriteNew(intent, new { previewRef, binding });
@@ -224,11 +227,11 @@ public sealed partial class VciWorkspaceStore
         using var gate = Lock();
         Require(count is > 0 and <= 50, "VciInputLimit", "History accepts 1..50 commits.");
         var revision = Committed(revisionRef); var runner = Runner();
-        Require((await runner.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
+        Require((await runner.InspectAsync(revision.Repository, token)).Matches(revision.SnapshotSha256),
             "PreviewStale", "Revision repository changed.");
         var history = await runner.HistoryAsync(revision.Repository, count, token);
         Require(history.StartsWith(revision.Commit + "\0", StringComparison.Ordinal) &&
-            (await runner.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
+            (await runner.InspectAsync(revision.Repository, token)).Matches(revision.SnapshotSha256),
             "PreviewStale", "History no longer belongs to the selected immutable revision.");
         Require(Encoding.UTF8.GetByteCount(history) <= 65536, "VciOutputLimit", "History exceeds 64 KiB; request fewer commits.");
         return new { revisionRef, nativeQualified = false, maximumCommits = count, history,
@@ -243,13 +246,13 @@ public sealed partial class VciWorkspaceStore
         Require(offset == 0 || expectedInventorySha256 is not null, "VciInputLimit", "Subsequent pages require the first page's inventorySha256.");
         if (expectedInventorySha256 is not null) VciGuard.Hash(expectedInventorySha256);
         var revision = Committed(revisionRef); var reader = Runner();
-        Require((await reader.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
+        Require((await reader.InspectAsync(revision.Repository, token)).Matches(revision.SnapshotSha256),
             "PreviewStale", "Revision repository changed.");
         var branches = await reader.BranchesAsync(revision.Repository, token);
         string hash = GitWorkspaceSnapshot.Digest(branches);
         Require((expectedInventorySha256 is null || expectedInventorySha256 == hash) &&
             hash == GitWorkspaceSnapshot.Digest(await reader.BranchesAsync(revision.Repository, token)) &&
-            (await reader.InspectAsync(revision.Repository, token)).Sha256 == revision.SnapshotSha256,
+            (await reader.InspectAsync(revision.Repository, token)).Matches(revision.SnapshotSha256),
             "PreviewStale", "Branch inventory changed; restart from the first page.");
         Require(offset <= branches.Count, "VciInputLimit", "Branch offset exceeds the current inventory.");
         var rows = branches.Skip(offset).Take(count).ToArray();
@@ -267,7 +270,7 @@ public sealed partial class VciWorkspaceStore
         WriteNew(Path.Combine(entry.Path, "intent.json"), new { kind = "export", revisionRef });
         var journal = new Journal(Path.Combine(entry.Path, "export-journal")); var runner = Runner(journal);
         var before = await runner.InspectAsync(revision.Repository, token);
-        Require(before.Sha256 == revision.SnapshotSha256, "PreviewStale", "Revision repository changed.");
+        Require(before.Matches(revision.SnapshotSha256), "PreviewStale", "Revision repository changed.");
         string destination = Path.Combine(entry.Path, "files");
         journal.Bind(GitOperationBinding.Materialize(before, runner.ControlDirectory, runner.ExecutableSha256, revision.Commit, destination));
         var result = await runner.MaterializeAsync(revision.Repository, revision.Commit, destination, token);
@@ -542,7 +545,7 @@ public sealed partial class VciWorkspaceStore
             {
                 var bytes = ReadBytes(path); var row = JsonSerializer.Deserialize<Callback>(bytes, BridgeProtocol.Json);
                 Require(row is not null && row.Sequence == ++count && Path.GetFileName(path) == count.ToString("D4") + ".json" &&
-                    row.PreviousSha256 == priorHash && row.Record.BindingSha256 == intent.Sha256 && row.Record.Operation == operation &&
+                    row.PreviousSha256 == priorHash && GitWorkspaceSnapshot.Matches(row.Record.BindingSha256, intent) && row.Record.Operation == operation &&
                     row.Record.RepositoryRoot == repository && (previousRecord is null || row.Record.OperationId == previousRecord.OperationId) &&
                     Allowed(operation, previousRecord?.Phase, row.Record.Phase), "VciIntegrityFailure", "Callback sequence or hash chain changed.");
                 priorHash = GitSafety.Hash(bytes); previousRecord = row.Record;

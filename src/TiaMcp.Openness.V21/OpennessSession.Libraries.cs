@@ -434,7 +434,7 @@ namespace TiaMcp.Openness.V21
                     manifest.Add(new JObject { ["path"] = path.Substring(directory.TrimEnd('\\', '/').Length + 1).Replace('\\', '/'), ["sha256"] = ChangeFileHash(path) });
                 }
             }
-            return ChangeHash(new JArray(manifest.OrderBy(x => x.Value<string>("path"), StringComparer.Ordinal)).ToString(Formatting.None));
+            return SharedMutationHash(new JArray(manifest.OrderBy(x => x.Value<string>("path"), StringComparer.Ordinal))); // the Host recomputes it for component windows
         }
 
         // A read-only source must still yield a writable owned working copy; the snapshot keeps its attributes.

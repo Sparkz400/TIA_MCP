@@ -1,6 +1,5 @@
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TiaMcp.Core.Engineering;
@@ -66,7 +65,7 @@ public sealed class TestSuiteDefinitionBundle
             // Check projected storage before creating all base64 strings or the complete JSON tree.
             encodedSize += Encoding.UTF8.GetByteCount(CanonicalJson.Serialize(JsonSerializer.SerializeToNode(item.Manifest, BridgeProtocol.Json)!)) + 64;
             string base64 = Convert.ToBase64String(item.Capture.OriginalBytes);
-            foreach (char c in base64) encodedSize += JavaScriptEncoder.Default.WillEncode(c) ? 6 : 1;
+            encodedSize += base64.Length; // RFC 8785 escapes no base64 character
             if (encodedSize > MaxBundleBytes) throw Limit("Definition bundle exceeds the 64 MiB encoded limit.");
             ordered[i] = item.Capture;
             entries[i] = new(item.Manifest, base64);

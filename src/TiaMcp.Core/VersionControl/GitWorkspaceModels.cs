@@ -46,15 +46,20 @@ public sealed class GitWorkspaceSnapshot
     public string Status { get; }
     public IReadOnlyList<GitFileEvidence> Files { get; }
     public string Sha256 { get; }
+    // The same state as builds before RFC 8785 hashed it; reviews and revisions they retained carry this value.
+    public string LegacySha256 { get; }
     internal GitWorkspaceSnapshot(string root, string reference, string? commit, string? tree, string index,
         string configuration, string status, IEnumerable<GitFileEvidence> files)
     {
         RepositoryRoot = root; HeadReference = reference; HeadCommit = commit; HeadTree = tree;
         IndexSha256 = index; ConfigurationSha256 = configuration; Status = status;
         Files = Array.AsReadOnly(files.OrderBy(x => x.RelativePath, StringComparer.Ordinal).ToArray());
-        Sha256 = Digest(new { root, reference, commit, tree, index, configuration, status, files = Files });
+        var state = JsonSerializer.SerializeToNode(new { root, reference, commit, tree, index, configuration, status, files = Files }, BridgeProtocol.Json)!;
+        Sha256 = CanonicalJson.Sha256(state); LegacySha256 = CanonicalJson.LegacySha256(state);
     }
+    public bool Matches(string? stored) => stored is not null && (stored == Sha256 || stored == LegacySha256);
     internal static string Digest(object value) => CanonicalJson.Sha256(JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
+    internal static bool Matches(string? stored, object value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
 }
 
 /// <summary>Created only by the runner. Review evidence and private copied bytes cannot be edited by callers.</summary>
@@ -65,14 +70,16 @@ public sealed class GitCommitPlan
     public GitAuthor Author { get; }
     public string Message { get; }
     public string Sha256 { get; }
+    public string LegacySha256 { get; }
     internal IReadOnlyDictionary<string, byte[]> Payloads { get; }
     internal GitCommitPlan(GitWorkspaceSnapshot before, GitFileChange[] changes, GitAuthor author,
         string message, Dictionary<string, byte[]> payloads)
     {
         Before = before; Changes = Array.AsReadOnly(changes); Author = author; Message = message;
         Payloads = new ReadOnlyDictionary<string, byte[]>(payloads);
-        Sha256 = GitWorkspaceSnapshot.Digest(new { before = before.Sha256, changes, author, message,
-            payloads = payloads.OrderBy(x => x.Key, StringComparer.Ordinal).Select(x => new { path = x.Key, sha256 = GitSafety.Hash(x.Value) }) });
+        var files = payloads.OrderBy(x => x.Key, StringComparer.Ordinal).Select(x => new { path = x.Key, sha256 = GitSafety.Hash(x.Value) }).ToArray();
+        Sha256 = GitWorkspaceSnapshot.Digest(new { before = before.Sha256, changes, author, message, payloads = files });
+        LegacySha256 = CanonicalJson.LegacySha256(JsonSerializer.SerializeToNode(new { before = before.LegacySha256, changes, author, message, payloads = files }, BridgeProtocol.Json)!);
     }
 }
 

@@ -50,7 +50,7 @@ public sealed class EngineeringOperationStore
         if (prior is null && File.Exists(Marker(idempotencyKey))) prior = ReadLocked(PackageStorage.Load<string>(Marker(idempotencyKey)));
         if (prior is not null)
         {
-            if (prior.PlanSha256 != hash || prior.IdempotencyKey != idempotencyKey) Fail("IdempotencyConflict", "The key belongs to a different immutable plan.");
+            if (!Matches(prior.PlanSha256, plan) || prior.IdempotencyKey != idempotencyKey) Fail("IdempotencyConflict", "The key belongs to a different immutable plan.");
             return prior;
         }
         string id = Guid.NewGuid().ToString("N");
@@ -432,7 +432,7 @@ public sealed class EngineeringOperationStore
             var record = i == files.Length - 1 ? last : PackageStorage.Load<EngineeringOperationRecord>(files[i]);
             ValidatePlan(record.Plan, live);
             if (Path.GetFileName(files[i]) != i.ToString("D6") + ".json" || record.Id != id || record.Revision != i ||
-                record.PlanSha256 != Hash(record.Plan) || record.PreviousSha256 != (previous is null ? null : Hash(previous)) ||
+                !Matches(record.PlanSha256, record.Plan) || (previous is null ? record.PreviousSha256 is not null : !Matches(record.PreviousSha256, previous)) ||
                 previous is not null && (record.PlanSha256 != previous.PlanSha256 || record.IdempotencyKey != previous.IdempotencyKey))
                 Fail("JournalInvalid", "The operation revision chain or immutable plan is invalid.");
             ValidateTransition(previous, record, live);
@@ -540,6 +540,8 @@ public sealed class EngineeringOperationStore
         r.RecoveryDestinations.Select(d => EngineeringResourceKey.ForPath(r.Plan.Resources.Single(x => x.ResourceKey == d.ResourceKey).Kind, d.RecoveryLocation)));
     private static T Freeze<T>(T value) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, BridgeProtocol.Json), BridgeProtocol.Json)!;
     private static string Hash<T>(T value) => CanonicalJson.Sha256(JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
+    // Revisions written before RFC 8785 keep verifying against the hash form they were written with.
+    private static bool Matches<T>(string? stored, T value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
     private static void State(EngineeringOperationRecord record, string required)
     { if (record.State != required) Fail("RecoveryRequired", "Expected " + required + "; durable state " + record.State + " cannot be replayed."); }
     private static void Text(string text)

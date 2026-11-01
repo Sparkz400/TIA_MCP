@@ -286,7 +286,10 @@ public sealed partial class TranslationWorkflowStore
         { return new JsonObject { ["recordRef"] = Reference(kind, id), ["state"] = "incomplete", ["nativeImportAllowed"] = false }; }
     }
 
-    private (TranslationWorkbook Workbook, TranslationProposalBatch Batch, JsonObject Report) VerifiedReview(TranslationRecord review)
+    // An approval binds the review hash, so a review prepared before RFC 8785 is prepared again.
+    private (TranslationWorkbook Workbook, TranslationProposalBatch Batch, JsonObject Report) VerifiedReview(TranslationRecord review) =>
+        CanonicalJson.Current(() => VerifiedReviewExact(review), "This translation review was prepared before RFC 8785 canonical hashing (1 November 2026); prepare a new review from its capture.");
+    private (TranslationWorkbook Workbook, TranslationProposalBatch Batch, JsonObject Report) VerifiedReviewExact(TranslationRecord review)
     {
         var capture = RequireKind(retained.Load(Text(review.Metadata, "captureRef")), "capture");
         var workbook = OpenCapture(capture);
@@ -298,7 +301,9 @@ public sealed partial class TranslationWorkflowStore
         return (workbook, batch, report);
     }
 
-    private TranslationWorkbook OpenCapture(TranslationRecord record)
+    // A capture is a native observation; one retained before RFC 8785 verifies in the form it was written with.
+    private TranslationWorkbook OpenCapture(TranslationRecord record) => CanonicalJson.Compatible(() => OpenCaptureExact(record));
+    private TranslationWorkbook OpenCaptureExact(TranslationRecord record)
     {
         var profile = Parse<WorkbookProfile>(Encoding.UTF8.GetString(retained.Read(record, "profile.json")));
         var project = Parse<EngineeringObjectReference>(Encoding.UTF8.GetString(retained.Read(record, "project.json")));

@@ -147,7 +147,9 @@ public sealed class CompositeEngineeringWorkflowStore
         byte[] request = Read(PathFor(id, "request.json"), CompositeEngineeringReview.InputLimit), report = Read(PathFor(id, "report.json"), CompositeEngineeringReview.ReportLimit);
         foreach (var (artifact, bytes) in new[] { (receipt.Artifacts[0], request), (receipt.Artifacts[1], report) })
             Require(bytes.Length == artifact.Bytes && Hash(bytes) == artifact.Sha256, "CompositeIntegrityFailure", "Retained artifact differs from its receipt.");
-        Require(Evaluate(request).AsSpan().SequenceEqual(report), "CompositeIntegrityFailure", "Report differs from independently reopened inputs.");
+        // A review saved before RFC 8785 re-derives its selector keys in the form it was written with.
+        CanonicalJson.Compatible(() =>
+        { Require(Evaluate(request).AsSpan().SequenceEqual(report), "CompositeIntegrityFailure", "Report differs from independently reopened inputs."); return true; });
         return new(reference, receipt, receiptData, request, report);
     }
 

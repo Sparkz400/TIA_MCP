@@ -64,7 +64,9 @@ public sealed class TestSuiteStyleJobs
         return Retain(new TestSuiteStyleReview(1, executionProfile, runs.ToArray()) { Application = application });
     }
 
-    public TestSuiteStyleReview ReadReview(EngineeringArtifactReference review)
+    // A review retained before RFC 8785 re-derives with the form it was written with.
+    public TestSuiteStyleReview ReadReview(EngineeringArtifactReference review) => CanonicalJson.Compatible(() => ReadReviewExact(review));
+    private TestSuiteStyleReview ReadReviewExact(EngineeringArtifactReference review)
     {
         var value = Read<TestSuiteStyleReview>(review);
         if (value.SchemaVersion != 1 || value.Runs is null || value.Runs.Length is < 1 or > 32 ||
@@ -120,7 +122,7 @@ public sealed class TestSuiteStyleJobs
         var job = ReadJob(id);
         var review = ReadReview(job.Review);
         var operations = job.OperationIds.Select(store.Read).ToArray();
-        if (operations.Length != review.Runs.Length || operations.Where((op, i) => op.PlanSha256 != Hash(review.Runs[i].Operation) ||
+        if (operations.Length != review.Runs.Length || operations.Where((op, i) => !Matches(op.PlanSha256, review.Runs[i].Operation) ||
             op.IdempotencyKey != "testsuite:" + id + ":" + i).Any())
             throw new BridgeException("InvalidTestSuiteJob", "Job membership differs from its immutable operations.");
         bool stop = Stopped(id);
@@ -281,17 +283,18 @@ public sealed class TestSuiteStyleJobs
         var raw = context.Operation.Evidence.SingleOrDefault(e => e.Gate == "dispatch.rawResults");
         TestSuiteStyleRetainedResult? result = null;
         if (raw is not null) VerifyArtifact(raw.Artifact);
-        if (entry is not null)
+        if (entry is not null) result = CanonicalJson.Compatible(() =>
         {
-            result = Read<TestSuiteStyleRetainedResult>(entry.Artifact);
-            if (raw?.Artifact != result.Raw) throw new BridgeException("TestSuiteArtifactMismatch", "Report must bind the original retained response.");
-            var normalized = TestSuiteResultNormalizer.Normalize(context.Run, TestSuiteApplicationRun.Captures(context.Run, Parse<NativeTestResult[]>(ReadBytes(result.Raw))));
-            var scope = Read<TestSuiteScopeCoverageReport>(result.Scope);
+            var retained = Read<TestSuiteStyleRetainedResult>(entry.Artifact);
+            if (raw?.Artifact != retained.Raw) throw new BridgeException("TestSuiteArtifactMismatch", "Report must bind the original retained response.");
+            var normalized = TestSuiteResultNormalizer.Normalize(context.Run, TestSuiteApplicationRun.Captures(context.Run, Parse<NativeTestResult[]>(ReadBytes(retained.Raw))));
+            var scope = Read<TestSuiteScopeCoverageReport>(retained.Scope);
             var assessment = TestSuiteScopeCoverage.Assess(context.Run, normalized, scope);
-            if (Hash(normalized) != result.Results.Sha256 || Hash(assessment) != result.Assessment.Sha256 || result.Classification != Classify(normalized, scope, assessment))
+            if (Hash(normalized) != retained.Results.Sha256 || Hash(assessment) != retained.Assessment.Sha256 || retained.Classification != Classify(normalized, scope, assessment))
                 throw new BridgeException("TestSuiteArtifactMismatch", "Recomputed reports disagree with retained raw results and scope.");
-            VerifyArtifact(result.Results); VerifyArtifact(result.Assessment);
-        }
+            VerifyArtifact(retained.Results); VerifyArtifact(retained.Assessment);
+            return retained;
+        });
         return new { operation = context.Operation, result, raw = raw?.Artifact, nativeQualification = false };
     }
 
@@ -375,7 +378,7 @@ public sealed class TestSuiteStyleJobs
         if (revision is not null && op.Revision != revision) throw new BridgeException("RevisionConflict", "Reread the operation revision.");
         var review = ReadReview(status.Job.Review);
         var run = review.Runs[Array.IndexOf(status.Job.OperationIds, operationId)].Run;
-        return new(root, run, TestSuiteDefinitionBundle.Restore(run, ReadBytes(op.Plan.Inputs[1])), op, review.ExecutionProfile) { Application = review.Application };
+        return new(root, run, CanonicalJson.Compatible(() => TestSuiteDefinitionBundle.Restore(run, ReadBytes(op.Plan.Inputs[1]))), op, review.ExecutionProfile) { Application = review.Application };
     }
     private sealed record StopRecord(string JobId, string ReviewSha256);
     private bool Stopped(string id)
@@ -407,5 +410,6 @@ public sealed class TestSuiteStyleJobs
         results.Results.Any(r => r.Outcome == "assertionFailed") ? "assertionFailure" :
         assessment.RequiredCoveragePassed ? "passed" : "incompleteEvidence";
     private static string Hash<T>(T value) => TestSuiteStyleOperation.CanonicalHash(value);
+    private static bool Matches<T>(string stored, T value) => CanonicalJson.Matches(stored, JsonSerializer.SerializeToNode(value, BridgeProtocol.Json)!);
     private static string BytesHash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 }

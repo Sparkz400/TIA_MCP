@@ -291,7 +291,9 @@ public sealed class TranslationImportWorkflow
     private EngineeringOperationPlan Plan(TranslationImportBinding b, EngineeringArtifactReference binding) => new("translation.import", b.Baseline.Target,
         [new(EngineeringResourceKey.ForPath("project", b.Baseline.Target.ProjectFilePath), "project", "translationImportAndCheckpoint", "projectArchiveToNewLocation")],
         [binding, b.Candidate, b.Baseline.Workbook, b.Baseline.Receipt], Probes.ToArray(), Gates.ToArray());
-    private TranslationImportContext Context(string id, int? revision)
+    // An admitted import keeps verifying (and recovering) in the form its review was written with.
+    private TranslationImportContext Context(string id, int? revision) => CanonicalJson.Compatible(() => ContextExact(id, revision));
+    private TranslationImportContext ContextExact(string id, int? revision)
     {
         var op = store.Read(id);
         Require(op.Plan.Operation == "translation.import" && op.Plan.Inputs.Count == 4, "InvalidTranslationOperation", "Not a translation import operation.");

@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 // Offline: no TiaPortal constructor, start, attach, discover or native method.
@@ -8,14 +10,15 @@ internal static class Program
 {
     private static int Main()
     {
-        string api = @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+        // The same override the builds take from MSBuild's TiaApiDirectory property.
+        string api = Environment.GetEnvironmentVariable("TiaApiDirectory") ?? @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
         AppDomain.CurrentDomain.AssemblyResolve += (_, e) => {
             string path = Path.Combine(api, new AssemblyName(e.Name).Name + ".dll");
             return File.Exists(path) ? Assembly.LoadFrom(path) : null;
         };
+        int passed = CanonicalVectors(Assembly.Load("TiaMcp.Openness.V21"));
         var type = Assembly.Load("TiaMcp.Openness.V21").GetType("TiaMcp.Openness.V21.OpennessSession", true);
         var execute = type.GetMethod("Execute", BindingFlags.Instance | BindingFlags.NonPublic);
-        int passed = 0;
         void Reject(bool enabled, string operation, JObject arguments, string expected)
         {
             var session = Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { api, enabled }, null);
@@ -77,5 +80,46 @@ internal static class Program
         StorageBoundary(false, true, "StaleDeclaration");
         Console.WriteLine(passed + " offline production-routing boundary checks passed; no native session started.");
         return 0;
+    }
+
+    // The worker's component manifest and request hashes must equal the Host's byte for byte (shared RFC 8785 vectors).
+    private static int CanonicalVectors(Assembly worker)
+    {
+        var canonical = worker.GetType("TiaMcp.Openness.V21.CanonicalJson", true);
+        var serialize = canonical.GetMethod("Serialize", BindingFlags.Static | BindingFlags.NonPublic);
+        var sha256 = canonical.GetMethod("Sha256", BindingFlags.Static | BindingFlags.NonPublic);
+        var directory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, "fixtures", "canonical-json", "vectors.v1.json"))) directory = directory.Parent;
+        JObject vectors;
+        using (var file = new JsonTextReader(new StringReader(File.ReadAllText(Path.Combine(directory.FullName, "fixtures", "canonical-json", "vectors.v1.json")))) { DateParseHandling = DateParseHandling.None })
+            vectors = JObject.Load(file);
+        int passed = 0;
+        foreach (JObject vector in vectors["cases"])
+        {
+            string name = (string)vector["name"];
+            JToken input;
+            if (vector["utf16"] is JArray units)
+            {
+                string text = new string(units.Select(u => (char)(int)u).ToArray());
+                input = (string)vector["as"] == "key" ? new JObject { [text] = 1 } : (JToken)new JValue(text);
+            }
+            else // Read as the worker reads requests (Program.cs), with a deeper bound so the depth cases reach the canonical limit.
+                using (var reader = new JsonTextReader(new StringReader((string)vector["input"])) { MaxDepth = 256, DateParseHandling = DateParseHandling.None })
+                    input = JToken.ReadFrom(reader);
+            try
+            {
+                string text = (string)serialize.Invoke(null, new object[] { input }), digest = (string)sha256.Invoke(null, new object[] { input });
+                if (vector["refusal"] != null) throw new Exception("Expected " + vector["refusal"] + " for vector: " + name);
+                if (text != (string)vector["canonical"] || digest != (string)vector["sha256"]) throw new Exception("Worker canonical JSON differs from the shared vector: " + name);
+            }
+            catch (TargetInvocationException error)
+            {
+                string code = (string)error.InnerException.GetType().GetProperty("Code", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetValue(error.InnerException);
+                if (code == null || code != (string)vector["refusal"]) throw new Exception("Unexpected refusal for vector: " + name, error.InnerException);
+            }
+            passed++;
+        }
+        Console.WriteLine("PASS worker RFC 8785 canonical JSON: " + passed + " shared vectors");
+        return passed;
     }
 }

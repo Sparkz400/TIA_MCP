@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using TiaMcp.Core.Engineering;
 using TiaMcp.Core.EngineeringJobs;
 
 namespace TiaMcp.Core.PhysicalRuntime;
@@ -69,7 +70,9 @@ public sealed class RuntimeCaptureStore : IDisposable
     }
     public bool Exists(string id) => Directory.Exists(PathFor(id));
     public RuntimeCapturePlan Plan(string id) => Decode<RuntimeCapturePlan>(Read(PathFor(id,"plan.json"),PlanBytes));
-    private static void ValidatePlan(RuntimeCapturePlan plan)
+    // A plan retained before RFC 8785 re-derives its selection metadata hashes in the form it was written with.
+    private static void ValidatePlan(RuntimeCapturePlan plan) => CanonicalJson.Compatible(() => { ValidatePlanExact(plan); return true; });
+    private static void ValidatePlanExact(RuntimeCapturePlan plan)
     {
         Id(plan.CaptureId); Id(plan.HostId); Validate(plan.Request);
         if (plan.UaContext is not null) { OpcUaCaptureContracts.ValidatePlan(plan); return; }

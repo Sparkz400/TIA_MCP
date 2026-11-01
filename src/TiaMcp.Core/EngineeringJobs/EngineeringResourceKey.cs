@@ -55,10 +55,11 @@ public static class EngineeringResourceKey
         if (identity is null) throw new BridgeException("InvalidResourceKey", "External identity is required.");
         Exact(identity.Provider); Exact(identity.Authority); Exact(identity.OwnerId);
         if ((identity.ResourceKind is null) != (identity.ResourceId is null)) throw new BridgeException("InvalidResourceKey", "External resource kind and identity must both be present or both null for owner scope.");
-        string owner = "external:" + CanonicalJson.Sha256(JsonSerializer.SerializeToNode(new { identity.Provider, identity.Authority, identity.OwnerId }, BridgeProtocol.Json)!);
+        // A key is an identity that stored records lock and compare, so it keeps the pre-RFC 8785 form; it never reaches the worker.
+        string owner = "external:" + CanonicalJson.LegacySha256(JsonSerializer.SerializeToNode(new { identity.Provider, identity.Authority, identity.OwnerId }, BridgeProtocol.Json)!);
         if (identity.ResourceKind is null) return owner;
         Exact(identity.ResourceKind); Exact(identity.ResourceId!);
-        return owner + ":" + CanonicalJson.Sha256(JsonSerializer.SerializeToNode(new { identity.ResourceKind, identity.ResourceId }, BridgeProtocol.Json)!);
+        return owner + ":" + CanonicalJson.LegacySha256(JsonSerializer.SerializeToNode(new { identity.ResourceKind, identity.ResourceId }, BridgeProtocol.Json)!);
     }
     private static void Exact(string value)
     {
