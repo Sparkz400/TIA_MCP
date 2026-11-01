@@ -7,7 +7,6 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Globalization;
-using Newtonsoft.Json.Linq;
 
 namespace TiaMcp.Model
 {
@@ -20,19 +19,6 @@ namespace TiaMcp.Model
         internal const string UnifiedTypedReadbackNote = "Unified typed readback compares the public V21 object model (screens, items, dynamizations, event handlers with hashed script code, parts, translations, tags, alarms, logs, audit, runtime settings, groups, lists, script modules) per node. V21 has no Screen.Export, so payloads without a public getter remain uncompared; this readback is not natively qualified.";
         // The coverage note every Classic capture records once per target; hmi_classic_import accepts exactly it (HmiEngineeringRules.StandingNotes).
         internal const string ClassicExportNote = "All exposed Classic screen/template/popup/slide-in/global/overview, tag-table, connection, cycle, script and text/graphic-list exports are captured. The installed HmiTarget has no public alarm composition; embedded/resource dependency closure and export stability still need exact-profile native qualification.";
-
-        /// <summary>A capture whose only gaps are the given standing notes of one family: no native capture failure, every target of
-        /// that family, every note one of them (no typed read error, no other note) and a valid observed-artifacts hash, which then
-        /// serves as its content hash.</summary>
-        internal static bool StandingNotesOnly(JObject manifest, string family, params string[] notes)
-        {
-            if (manifest == null || manifest["nativeFailure"]?.Type is JTokenType type && type != JTokenType.Null || manifest.Value<string>("family") != family) return false;
-            var missing = manifest["missingCoverage"] as JArray; var targets = manifest["targets"] as JArray;
-            string observed = manifest.Value<string>("observedArtifactsHash");
-            return missing != null && targets != null && targets.Count > 0 && targets.All(t => t.Value<string>("family") == family)
-                && missing.All(n => n.Type == JTokenType.String && notes.Contains((string)n, StringComparer.Ordinal))
-                && observed != null && observed.Length == 64 && observed.All(Uri.IsHexDigit);
-        }
 
         internal static string Hash(string value)
         {

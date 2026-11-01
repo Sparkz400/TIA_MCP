@@ -297,9 +297,22 @@ namespace TiaMcp.Model
             : kind == "hmi_external_tag_create" || kind == "hmi_text_list_import" ? new[] { HmiPreservationRules.UnifiedTagTableExportNote, HmiPreservationRules.UnifiedTypedReadbackNote }
             : null;
 
-        /// <summary>Whether the capture shows only the kind's standing notes, every HMI of the kind's family (HmiPreservationRules.StandingNotesOnly).</summary>
+        /// <summary>Whether the capture shows only the kind's standing notes, every HMI of the kind's family (StandingNotesOnly).</summary>
         internal static bool ScopeAccepted(string kind, JObject manifest)
-            => StandingNotes(kind) is string[] notes && HmiPreservationRules.StandingNotesOnly(manifest, kind == "hmi_classic_import" ? "classic" : "unified", notes);
+            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, kind == "hmi_classic_import" ? "classic" : "unified", notes);
+
+        /// <summary>A capture whose only gaps are the given standing notes of one family: no native capture failure, every target of
+        /// that family, every note one of them (no typed read error, no other note) and a valid observed-artifacts hash, which then
+        /// serves as its content hash. (Here, not in HmiPreservationRules: TiaMcp.Core links that file without Newtonsoft.Json.)</summary>
+        internal static bool StandingNotesOnly(JObject manifest, string family, params string[] notes)
+        {
+            if (manifest == null || manifest["nativeFailure"]?.Type is JTokenType type && type != JTokenType.Null || manifest.Value<string>("family") != family) return false;
+            var missing = manifest["missingCoverage"] as JArray; var targets = manifest["targets"] as JArray;
+            string observed = manifest.Value<string>("observedArtifactsHash");
+            return missing != null && targets != null && targets.Count > 0 && targets.All(t => t.Value<string>("family") == family)
+                && missing.All(n => n.Type == JTokenType.String && notes.Contains((string)n, StringComparer.Ordinal))
+                && observed != null && observed.Length == 64 && observed.All(Uri.IsHexDigit);
+        }
 
         internal static JArray RequiredGates(string operation)
         {
