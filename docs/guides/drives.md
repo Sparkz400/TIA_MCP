@@ -7,11 +7,10 @@ starts and every other tool works; these routes return `UnsupportedCapability`.
 `target_capabilities` on a drive hardware item reports whether the
 `DriveObjectContainer` service is present.
 
-`drive_observe` is natively qualified, and `drive_parameter_set` and
-`drive_telegram_set` (the main telegram number change) passed natively, on one
-SINAMICS G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14) in an owned scratch,
-offline values only ([record](../verification/drives-index-20261101.md)); the
-two change kinds wait on a rerun that also checks `change_status`. The
+`drive_observe`, `drive_parameter_set` and `drive_telegram_set` (the main
+telegram number change) are natively qualified on one SINAMICS G120C PN
+(6SL3210-1KE21-3AF1, firmware 4.7.14) in an owned scratch, offline values only
+([record](../verification/drives-index-20261101.md)). The
 [Startdrive plan](../plans/expansion-plans/startdrive.md) lists the remaining
 work (telegram size and PKW edits, TO connection, DRIVE-CLiQ, online access,
 download, activation, security, safety).

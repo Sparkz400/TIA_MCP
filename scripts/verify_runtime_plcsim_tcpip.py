@@ -5,7 +5,8 @@ certificate pin taken after the last compile, every Host and worker with its exi
 stores with the attempts the runner opened (nothing reconnects or logs in on its own). Recovery modes add their
 boundaries: an interrupted acquisition is never resumed, a lost write is never replayed and only an explicit read
 decides it. ua-services adds the server-method call counted by the PLCSIM API, its refusals, the HistoryRead boundary
-and the ConditionRefresh snapshots around a PLCSIM-raised alarm.
+and the ConditionRefresh snapshots around a PLCSIM-raised alarm. device-inventory compares every device_online_browse and
+device_identify result field by field with the pinned Modules.Browse and I&M0 reads retained beside it.
 """
 import argparse
 import datetime
@@ -14,9 +15,9 @@ import json
 from pathlib import Path
 
 SIEMENS_NS = "http://www.siemens.com/simatic-s7-opcua"
-MODES = ("normal", "host-loss-capture", "server-restart", "ua-write-loss", "web-write-loss", "ua-services")
+MODES = ("normal", "host-loss-capture", "server-restart", "ua-write-loss", "web-write-loss", "ua-services", "device-inventory")
 POINTS = {"ua-write-loss": "ua.write.afterSend", "web-write-loss": "web.write.afterSend"}
-HOSTS = {"normal": 1, "server-restart": 1, "host-loss-capture": 3, "ua-write-loss": 3, "web-write-loss": 3, "ua-services": 1}
+HOSTS = {"normal": 1, "server-restart": 1, "host-loss-capture": 3, "ua-write-loss": 3, "web-write-loss": 3, "ua-services": 1, "device-inventory": 2}
 MARKER = "runtime-interruption-marker.json"
 COMPILES = ("apply ", "simulation_download", "save the generated state")
 PIN_STEP = "certificate_inspect after the last compile"
@@ -53,6 +54,12 @@ TOOLS = ("runtime_plcsim_bind",
          "runtime_web_write", "runtime_web_operating_mode", "runtime_web_status", "runtime_web_disconnect",
          "runtime_capture_start", "runtime_capture_status", "runtime_capture_stop", "runtime_capture_page", "runtime_capture_export",
          "runtime_capture_analyze")
+TRUST, IN_ROOT = "the coordinator's trust command", "the web certificate is in Cert:\\CurrentUser\\Root"
+BROWSE, IDENTIFY = "device_online_browse beside the pinned Modules.Browse", "device_identify beside the pinned I&M0 reads"
+INVENTORY_TOOLS = ("device_inventory", "device_online_browse", "device_identify")
+ACTUAL = ("mlfb", "serialNumber", "hardwareRevision", "firmware")
+# SiemensWebIdentity's row state for a JSON-RPC error code of Modules.ReadIdentificationMaintenance; any other code is readError.
+IM_FAILURES = {2: "permissionDenied", -32601: "unsupported", 1100: "identityMismatch", 1102: "unreachable", 1103: "unsupported"}
 
 
 def name(base, channel):
@@ -81,6 +88,66 @@ def utc(text):
 
 def same(left, right):
     return left is not None and isinstance(left, bool) == isinstance(right, bool) and left == right
+
+
+def answered(pinned):
+    """The JSON-RPC result of one retained pinned call, or None when it failed (HTTP status or JSON-RPC error)."""
+    response = pinned.get("response")
+    return response["result"] if pinned.get("httpStatus") == 200 and isinstance(response, dict) and "result" in response else None
+
+
+def browse_issues(row):
+    """One device_online_browse call against the pinned Modules.Browse of the same subtree: both fail, or both list the same
+    hardware IDs with the same value in every node field."""
+    label = "Modules.Browse of " + ("the top level" if row["hardwareId"] is None else "hwid %s" % row["hardwareId"])
+    tool, pinned = row["tool"], answered(row["pinned"])
+    if tool["isError"] or pinned is None:
+        return [] if tool["isError"] and pinned is None else ["%s: the tool %s, the pinned call %s" % (
+            label, "failed" if tool["isError"] else "answered", "failed" if pinned is None else "answered")]
+    ours, theirs = tool["structuredContent"]["result"]["nodes"], pinned.get("nodes") or []
+    if sorted(str(n.get("hwid")) for n in ours) != sorted(str(n.get("hwid")) for n in theirs):
+        return ["%s: the tool lists hardware IDs %s, the pinned call %s" % (label, [n.get("hwid") for n in ours], [n.get("hwid") for n in theirs])]
+    by_id = {n.get("hwid"): n for n in theirs}
+    return ["%s: hwid %s field %s is %r, the pinned call reads %r" % (label, node.get("hwid"), key, node.get(key), by_id[node.get("hwid")].get(key))
+            for node in ours for key in sorted(set(node) | set(by_id[node.get("hwid")])) if node.get(key) != by_id[node.get("hwid")].get(key)]
+
+
+def im0(data):
+    """The actual fields SiemensWebIdentity derives from one I&M0 data object: trimmed texts, unsigned numbers, type+major.minor.patch."""
+    def text(value):
+        return value.strip() if isinstance(value, str) and value.strip() else None
+
+    def number(value):
+        return str(value) if isinstance(value, int) and not isinstance(value, bool) and 0 <= value < 1 << 32 else None
+    revision = data.get("software_revision") if isinstance(data.get("software_revision"), dict) else {}
+    parts = [number(revision.get(key)) for key in ("major", "minor", "patch")]
+    firmware = revision["type"] + ".".join(parts) if isinstance(revision.get("type"), str) and None not in parts else None
+    return {"mlfb": text(data.get("order_number")), "serialNumber": text(data.get("serial_number")),
+            "hardwareRevision": number(data.get("hardware_revision")), "firmware": text(firmware)}
+
+
+def identify_issues(identified):
+    """Every device_identify row against the pinned I&M0 read of its hardware ID, field by field, and the CPU row answered I&M0."""
+    rows = {row.get("rowId"): row for row in identified["tool"].get("selectedRows", [])}
+    issues = [] if len(identified["bindings"]) == len(identified["pinned"]) else ["Not every binding has a pinned I&M0 read"]
+    for binding, pinned in zip(identified["bindings"], identified["pinned"]):
+        row = rows.get(binding["rowId"]) or {}
+        online, actual, label = row.get("online") or {}, row.get("actual") or {}, "%s (hwid %s)" % (row.get("name", binding["rowId"]), binding["hardwareId"])
+        result = answered(pinned)
+        if isinstance(result, dict) and isinstance(result.get("data"), dict):
+            expected = im0(result["data"])
+            status = "read" if None not in expected.values() else "partial"
+        else:
+            error = (pinned.get("response") or {}).get("error") if isinstance(pinned.get("response"), dict) else None
+            expected = dict.fromkeys(ACTUAL)
+            status = "permissionDenied" if pinned.get("httpStatus") in (401, 403) else IM_FAILURES.get((error or {}).get("code") if isinstance(error, dict) else None, "readError")
+        if online.get("status") != status or online.get("hardwareId") != binding["hardwareId"]:
+            issues.append("%s: the tool row is %s at hwid %s, the pinned read expects %s" % (label, online.get("status"), online.get("hardwareId"), status))
+        issues += ["%s: %s is %r, I&M0 reads %r" % (label, key, (actual.get(key) or {}).get("value"), value)
+                   for key, value in expected.items() if (actual.get(key) or {}).get("value") != value]
+    if ((rows.get(identified["controllerRowId"]) or {}).get("online") or {}).get("status") not in ("read", "partial"):
+        issues.append("The CPU row did not answer I&M0")
+    return issues
 
 
 def verify(root):
@@ -116,7 +183,7 @@ def verify(root):
             need(plcsim.get("quality") == "good" and same(value, plcsim.get("value")),
                  "%s: the %s read %r differs from the PLCSIM API read %r" % (row["label"], row["channel"], value, plcsim.get("value")))
             compared.add(row["channel"])
-        for channel in {"ua-write-loss": ("ua",), "web-write-loss": ("web",), "ua-services": ("ua",)}.get(mode, ("ua", "web")):
+        for channel in {"ua-write-loss": ("ua",), "web-write-loss": ("web",), "ua-services": ("ua",), "device-inventory": ()}.get(mode, ("ua", "web")):
             need(channel in compared, "No %s value is compared with the PLCSIM API" % channel)
 
         # Pins come from certificate_inspect after the last compile and every connected session uses them.
@@ -239,6 +306,15 @@ def verify(root):
                 raised = active(snapshots[1]) - active(snapshots[0])
                 need(raised == set(alarm.get("conditionIds", [])) and len(raised) == 1, "The raised condition is not one new active retained condition")
                 need(not raised & active(snapshots[2]), "The condition is still active after the trigger fell")
+        elif mode == "device-inventory":
+            passed = {c["name"] for c in report.get("toolCalls", []) if not c["isError"]}
+            for tool in INVENTORY_TOOLS:
+                need(tool in passed, "No successful call of " + tool)
+            need(result(TRUST) == "trusted" and result(IN_ROOT) is True, "The certificate was not trusted in Cert:\\CurrentUser\\Root before the tools ran")
+            browsed = result(BROWSE) or []
+            if need(browsed and not browsed[0]["tool"]["isError"], "The top-level device_online_browse did not answer"):
+                issues.extend(issue for row in browsed for issue in browse_issues(row))
+            issues.extend(identify_issues(result(IDENTIFY)))
     except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError) as error:
         issues.append("%s: %s" % (type(error).__name__, error))
     return {"completed": not issues, "kind": "runtime-plcsim-tcpip", "nativeInvoked": False, "issues": issues}

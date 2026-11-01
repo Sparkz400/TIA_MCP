@@ -1,0 +1,74 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.classic-import.route.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T13:38:24+00:00",
+  "source": {
+    "commit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_hmi_gate_route.py --profile classic-comfort on the desk-configured TP700 Comfort pair (configured.zap21, retrieved into an owned project) with a Host started --hmi-change-qualification classic-comfort: refusals before any write (hmi_engineering with the same payload, wrong operation or family, non-canonical color, template/popup/global-element import, other name or root type, DTD or two roots, unbound prepare, compile=false/save=false, a stale preview); applies of BackColor on both HMIs' Overview_A, a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, unchanged compiler problems (none), the target's independent export carrying exactly the intended delta and every other export unchanged, same-key replay and other-key RecoveryRequired; checkpoint restore; fresh reopen on a production Host (equal reads, kind refused with admission null). 63/63 checks.",
+  "limitations": [
+    "One profile (TP700 Comfort, V21 Update 3) on a desk-configured fixture; screens and tag tables only; other Classic object types, profiles and runtime behaviour are not qualified.",
+    "The XML import readback ignores DocumentInfo, export-local IDs and formatting; every other export is compared after Created-only normalization."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4f7f16a4cf11913e5c75a238874c3c83b9580620ddfdcc7aacaeed7ba52ff9e9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "74dc93ae7feafc654ab45cc54ca61c4a9612770a19900d202d398028c0f450ae"
+    }
+  ],
+  "runs": [
+    {
+      "report": "report.json",
+      "sha256": "0cd270dba3d1e64da92746838dc7dd26ddcd8c760e028c218610e70dc653eec8",
+      "bytes": 120356,
+      "completed": true,
+      "steps": [
+        "tia_start",
+        "project_retrieve fixture",
+        "change_prepare stale probe",
+        "change_prepare BackColor of HMI_RT_1 Overview_A",
+        "change_apply BackColor of HMI_RT_1 Overview_A",
+        "change_prepare BackColor of HMI_RT_2 Overview_A",
+        "change_apply BackColor of HMI_RT_2 Overview_A",
+        "change_prepare no-op import of HMI_RT_1 Overview_B",
+        "change_apply no-op import of HMI_RT_1 Overview_B",
+        "change_prepare GridColor import of HMI_RT_1 Overview_B",
+        "change_apply GridColor import of HMI_RT_1 Overview_B",
+        "change_prepare no-op import of HMI_RT_1 Overview_A",
+        "change_apply no-op import of HMI_RT_1 Overview_A",
+        "change_prepare QualificationTags import with one added internal tag",
+        "change_apply QualificationTags import with one added internal tag",
+        "change_restore QualificationTags import with one added internal tag",
+        "fresh tia_start",
+        "project_open saved original"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply",
+        "change_prepare"
+      ]
+    }
+  ]
+}

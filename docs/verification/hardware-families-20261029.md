@@ -75,7 +75,7 @@ PLCSIM. They need, together:
 
 - a reachable S7-1500 V4.1 or later (or a PLCSIM Advanced instance in TCP/IP mode) with the web server on, loaded
   with the project whose `device_inventory` snapshot is used; the endpoint IP must be an interface under that CPU;
-- `Api.Browse` advertising `Modules.Browse` and `Modules.ReadIdentificationMaintenance` (not yet observed on PLCSIM);
+- `Api.Browse` advertising `Modules.Browse` and `Modules.ReadIdentificationMaintenance` (observed on PLCSIM on 1 November);
 - a web server certificate that chains to a root trusted by Windows for the Host's user: this route keeps default TLS
   validation and has no pin, unlike `runtime_web_*`. Trusting the certificate is a security setting for the operator;
 - `read_diagnostics` for the session user, and with web authentication a token from an externally established
@@ -85,10 +85,17 @@ PLCSIM. They need, together:
 The runtime real-server TCP/IP window provides the first item. A pinned route like `runtime_web_*` would remove the
 trust-store step, but it is a security change and not made here.
 
+**1 November 2026: passed on PLCSIM** (`local.device_inventory.online.20261101`,
+[record](device-inventory-online-20261101.md)). PLCSIM advertises both methods and refuses `Modules.Browse` without
+a session. With the operator trusting that instance's certificate and an `Api.Login` token in a
+`TIA_INVENTORY_<target>` record, both tools equal pinned `Modules.Browse` and I&M0 reads of the CPU, its
+PROFINET interface and both ports. The run fixed the tools' request body, which PLCSIM answered with HTTP 500.
+Physical CPUs and modules with their own I&M0 stay open.
+
 ## Still open
 
 - ET 200SP on a second controller (its generated server-module contract is captured for the scratch CPU only),
   shared devices and I-devices under a higher-level controller.
 - Address-changing replacements and `acceptLoss`; rings with media redundancy.
 - HMI, drive and GSD devices; S7-1200 G2 (`6ES7 214-1AH50`) and other CPU lines.
-- The X10 online rows above; physical runtime.
+- The X10 online rows above on physical hardware (PLCSIM passed on 1 November); physical runtime.

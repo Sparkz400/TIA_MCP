@@ -27,6 +27,19 @@ namespace TiaMcp.Model
         private static readonly Dictionary<string, long> IntegerProperties = new Dictionary<string, long>(StringComparer.Ordinal)
             { ["RaisedStateTagBitNumber"] = 63, ["Priority"] = byte.MaxValue, ["Settings.LogMaxSize"] = uint.MaxValue };
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
+        // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (those
+        // whose native qualification passed: local.hmi.classic-import.*.20261101, local.hmi.external-tag.*.20261101) and the profiles a
+        // qualification Host may admit in a project its own worker retrieved or created.
+        private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
+            new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
+        {
+            ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort" }, new[] { "classic-comfort" }),
+            ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
+        };
+        // The profiles --hmi-change-qualification may name; each kind admits only its own.
+        internal static readonly string[] QualificationProfiles = Kinds.Values.SelectMany(k => k.QualificationProfiles).Distinct().ToArray();
+        // hmi_classic_import imports only these whole objects; templates, popups, slide-ins, global elements and the rest stay closed.
+        internal static readonly string[] ClassicImportTypes = { "Siemens.Engineering.Hmi.Screen.Screen", "Siemens.Engineering.Hmi.Tag.TagTable" };
 
         internal static void RequireRequest(JObject payload)
         {
@@ -234,12 +247,72 @@ namespace TiaMcp.Model
                     : classicScalar
                         ? "Classic screen export is documented. Exact BackColor property readback, full export/dependency coverage, unrelated-content preservation, compile, save/reopen and recovered-project equality have not passed for this exact device/runtime profile."
                         : "Classic has no typed screen-item or primitive tag Create route in the inspected V21 assembly; a family-specific preserving XML creation/binding adapter and its dependency closure remain required.";
+            var carrier = Kinds.FirstOrDefault(k => k.Value.Family == family && k.Value.Operations.Contains(operation, StringComparer.Ordinal));
+            if (carrier.Key != null) reason += " Change kind " + carrier.Key + " admits this operation only on " + string.Join(" or ", carrier.Value.QualificationProfiles)
+                + (operation == "classic_xml_import" ? " and only for a screen or tag table" : "") + ", under its own qualification gate; hmi_engineering never does.";
             return new JObject { ["family"] = family, ["targetProfile"] = profile ?? "unknown", ["operation"] = operation,
                 ["apiAvailability"] = body ? "available" : family == "unified" ? "unavailable" : "partial",
                 ["bridgeImplementation"] = body ? "guarded_body" : "unavailable",
                 ["nativeQualification"] = "unverified", ["available"] = false, ["reasonCode"] = "HmiPreservationUnavailable", ["reason"] = reason,
                 ["requiredGates"] = RequiredGates(operation),
                 ["engineeringVerified"] = false, ["preservationVerified"] = false, ["persistenceVerified"] = false, ["recoveryVerified"] = false, ["runtimeVerified"] = false };
+        }
+
+        /// <summary>The gate of an admitted kind: the operation's hmi_engineering gate, opened only within the kind's family, operations
+        /// and (classic_xml_import) native types, on a production profile or on qualificationProfile, which the worker passes only for
+        /// a project it retrieved or created itself.</summary>
+        internal static JObject KindGate(string kind, string family, string profile, string operation, string nativeType, string qualificationProfile = null)
+        {
+            if (!Kinds.TryGetValue(kind ?? "", out var admitted)) throw new ArgumentException("Unknown HMI change kind.");
+            var gate = Gate(family, profile, operation);
+            bool scope = family == admitted.Family && admitted.Operations.Contains(operation, StringComparer.Ordinal)
+                && (operation != "classic_xml_import" || ClassicImportTypes.Contains(nativeType, StringComparer.Ordinal));
+            bool production = scope && admitted.Profiles.Contains(profile, StringComparer.Ordinal);
+            bool qualification = !production && scope && profile != null && profile == qualificationProfile && admitted.QualificationProfiles.Contains(profile, StringComparer.Ordinal);
+            bool available = production || qualification;
+            gate["available"] = available;
+            gate["admission"] = production ? "production" : qualification ? "qualification" : null;
+            gate["nativeQualification"] = production ? "verified" : "unverified";
+            gate["reasonCode"] = available ? null : "HmiPreservationUnavailable";
+            gate["reason"] = production ? "Opened for change kind " + kind + " on a natively qualified profile (1 November 2026); every other HMI write stays behind the closed preservation gate."
+                : qualification ? "Qualification-only admission of profile " + profile + " for change kind " + kind + " in a project this worker retrieved; production admits " + string.Join(" or ", admitted.Profiles) + "."
+                : !scope ? "Change kind " + kind + " admits only " + string.Join(" and ", admitted.Operations) + " on " + admitted.Family + " HMIs"
+                    + (admitted.Operations.Contains("classic_xml_import") ? " (classic_xml_import of a screen or tag table only)" : "") + "; this request stays behind the closed preservation gate."
+                : "Change kind " + kind + " passed native qualification on " + string.Join(" and ", admitted.Profiles) + " only (this target's profile is " + (profile ?? "unknown") + "); other profiles stay behind the closed preservation gate.";
+            return gate;
+        }
+
+        /// <summary>An admitted kind fixes the family and operations of the hmi_engineering payload; hmi_engineering itself takes every operation.</summary>
+        internal static void RequireKind(string kind, JObject payload)
+        {
+            if (!Kinds.TryGetValue(kind ?? "", out var admitted)) return;
+            if (payload?["target"]?.Value<string>("family") != admitted.Family || !admitted.Operations.Contains(payload.Value<string>("operation"), StringComparer.Ordinal))
+                throw new ArgumentException(kind + " takes the hmi_engineering payload of " + string.Join(" or ", admitted.Operations) + " on a " + admitted.Family + " HMI.");
+        }
+
+        internal static bool IsAdmittedKind(string kind) => kind != null && Kinds.ContainsKey(kind);
+
+        /// <summary>The coverage notes a kind accepts in place of a complete capture; null when it requires a complete one (hmi_engineering).</summary>
+        internal static string[] StandingNotes(string kind)
+            => kind == "hmi_classic_import" ? new[] { HmiPreservationRules.ClassicExportNote }
+            : kind == "hmi_external_tag_create" || kind == "hmi_text_list_import" ? new[] { HmiPreservationRules.UnifiedTagTableExportNote, HmiPreservationRules.UnifiedTypedReadbackNote }
+            : null;
+
+        /// <summary>Whether the capture shows only the kind's standing notes, every HMI of the kind's family (StandingNotesOnly).</summary>
+        internal static bool ScopeAccepted(string kind, JObject manifest)
+            => StandingNotes(kind) is string[] notes && StandingNotesOnly(manifest, kind == "hmi_classic_import" ? "classic" : "unified", notes);
+
+        /// <summary>A capture whose only gaps are the given standing notes of one family: no native capture failure, every target of
+        /// that family, every note one of them (no typed read error, no other note) and a valid observed-artifacts hash, which then
+        /// serves as its content hash. (Here, not in HmiPreservationRules: TiaMcp.Core links that file without Newtonsoft.Json.)</summary>
+        internal static bool StandingNotesOnly(JObject manifest, string family, params string[] notes)
+        {
+            if (manifest == null || manifest["nativeFailure"]?.Type is JTokenType type && type != JTokenType.Null || manifest.Value<string>("family") != family) return false;
+            var missing = manifest["missingCoverage"] as JArray; var targets = manifest["targets"] as JArray;
+            string observed = manifest.Value<string>("observedArtifactsHash");
+            return missing != null && targets != null && targets.Count > 0 && targets.All(t => t.Value<string>("family") == family)
+                && missing.All(n => n.Type == JTokenType.String && notes.Contains((string)n, StringComparer.Ordinal))
+                && observed != null && observed.Length == 64 && observed.All(Uri.IsHexDigit);
         }
 
         internal static JArray RequiredGates(string operation)

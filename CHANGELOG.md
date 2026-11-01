@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.92`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.95`.
 
 ### Added
 
@@ -35,6 +35,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `plc_online_compare` and `plc_station_upload`, runtime OPC UA and Web API against PLCSIM over
   TCP/IP, and read-only live monitoring of watch and force tables (`watch_table_monitor`).
 - **Test Suite:** application test runs on an owned PLCSIM instance (TS-Q02 qualification mode).
+- **Online device identification:** `device_online_browse` and `device_identify` are qualified on an
+  owned PLCSIM instance over TCP/IP: they equal pinned `Modules.Browse` and I&M0 reads of the CPU, its
+  PROFINET interface and both ports. The operator trusts the instance's web certificate for the run, and
+  the session token comes from an `Api.Login` passed as a `TIA_INVENTORY_<target>` record
+  (`local.device_inventory.online.20261101`).
 - **HMI:** Unified text-list authoring and generation whose candidates import exactly through V21;
   Unified and Classic HMI read and authoring routes.
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
@@ -62,6 +67,15 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   would change, also for older records; apply checkpoints, compiles, imports and requires the
   candidate lists to read back exactly and the other lists, the rest of the HMI and the compiler
   errors and warnings to stay unchanged before it saves (`local.hmi.text-list-import.route.20261031`).
+- **HMI writes past the preservation gate:** change kinds `hmi_classic_import` (Classic
+  `classic_xml_import` of a screen or tag table, and the screen `BackColor`) on TP700 Comfort and
+  `hmi_external_tag_create` (PLC-backed Unified tags: root tags and scalar global DB members) on
+  Unified Comfort and Unified PC take the `hmi_engineering` payload of their operation. They accept
+  their family's standing capture notes, compile after the checkpoint and require the compiler
+  problems unchanged, and passed route and interruption runs (`local.hmi.classic-import.route.20261101`,
+  `local.hmi.classic-import.interruption.20261101`, `local.hmi.external-tag.route.20261101`,
+  `local.hmi.external-tag.interruption.20261101`); `--hmi-change-qualification <profile>` runs them
+  on a qualification Host.
 - **VCI remote delivery:** `vci_push` publishes a committed or fetched revision to the one remote set
   by `--git-remote`, with compare-and-swap and no forced update; `vci_fetch` fast-forwards a revision
   to the remote branch after validating its tree; change kind `vci_conflict_resolve` resolves a
@@ -202,6 +216,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     change `recovery_required`; it is refused before any claim.
   - `network_io_assign` accepts the start address the assigned PLC gives a range that had none (an
     I-device GSD's transfer areas); it refused the assignment with `MutationVerificationFailed`.
+  - `device_online_browse` and `device_identify` send a sized HTTP/1.1 body with plain
+    `application/json`, as the runtime Web API client does; PLCSIM answered their chunked
+    `application/json; charset=utf-8` request with HTTP 500.
   - Runner and diagnostics fixes: the Explorer desktop gate reads the MCP 2026-07-28
     `server/discover` handshake and accepts `ModelInvalidated` after `tia_detach`; the GSD slice puts the
     device on the subnet without an address (its GSD sets `IpProtocolSelection` `OtherPath`);
@@ -214,13 +231,14 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 454 of 479 catalog features are verified; 96 release-matrix cells are open and 6 deferred
+- 460 of 481 catalog features are verified; 78 release-matrix cells are open and 6 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
 - V21 boundaries: no public API forces a value, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
-  file, and a safety program cannot be loaded into PLCSIM (the offline memory-card download is
-  refused; the online route needs a card from the PLC).
+  file, a safety program cannot be loaded into PLCSIM (the offline memory-card download is
+  refused; the online route needs a card from the PLC), and V21 Openness neither creates nor
+  exposes WinCC RT Professional.
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
 - Release assets are the offline bundle only; the engineering bundle with native workers is built

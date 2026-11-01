@@ -70,7 +70,7 @@ def probe_plc_hmi_recipe(client, profile, inspections, proofs):
     codes = {b["code"] for b in plan["blockers"]}
     _require(plan["status"] == "planned_only" and plan["applySupported"] is False
              and {"HmiMemberMappingUnqualified", "HmiScreenItemCreationUnavailable", "HmiPreservationGateClosed"} <= codes
-             and [s["kind"] for s in plan["steps"]] == ["library_instantiate", "graphical_typed_edit", "hmi_engineering"]
+             and [s["kind"] for s in plan["steps"]] == ["library_instantiate", "graphical_typed_edit", "hmi_external_tag_create"]
              and plan["hmi"]["tags"][0]["plcSymbol"] == "MotorDrive_1.status.speed"
              and plan["hmi"]["target"]["connection"]["plcPath"] == plc_b, "Combined install plan differs from the native fixture")
     refused, applied = _call(client, "change_apply", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"], "idempotencyKey": "plchmi-probe-install",

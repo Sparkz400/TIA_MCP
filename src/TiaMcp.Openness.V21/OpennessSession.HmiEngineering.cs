@@ -16,11 +16,25 @@ namespace TiaMcp.Openness.V21
 {
     internal sealed partial class OpennessSession
     {
+        // --hmi-change-qualification <profile>: admits that profile for hmi_classic_import/hmi_external_tag_create only in a project this worker created or retrieved.
+        internal string HmiChangeQualificationProfile { get; set; }
+
+        private static bool IsHmiChangeKind(string kind) => kind == "hmi_engineering" || kind == "hmi_text_list_import" || HmiEngineeringRules.IsAdmittedKind(kind);
+
+        // hmi_engineering is closed for every operation; an admitted kind opens only its own operations and Classic import types.
+        private JObject HmiEngineeringGate(EngineeringChange change, Project project, string family, string profile, HmiNativeEntry entry)
+        {
+            string operation = change.Payload.Value<string>("operation");
+            return HmiEngineeringRules.IsAdmittedKind(change.Kind)
+                ? HmiEngineeringRules.KindGate(change.Kind, family, profile, operation, entry.Native?.GetType().FullName, OwnedQualificationProfile(HmiChangeQualificationProfile, project))
+                : HmiEngineeringRules.Gate(family, profile, operation);
+        }
+
         // All entry points are called by the existing change lifecycle. Optional
         // Siemens HMI types occur only inside family methods, never session fields.
         private JObject PrepareHmiEngineeringMutation(EngineeringChange change, Project project)
         {
-            try { HmiEngineeringRules.RequireRequest(change.Payload); }
+            try { HmiEngineeringRules.RequireRequest(change.Payload); HmiEngineeringRules.RequireKind(change.Kind, change.Payload); }
             catch (ArgumentException ex) { throw new BridgeException("InvalidRequest", ex.Message); }
             var identity = (JObject)change.Payload["target"];
             HmiValidateIdentity(project, identity);
@@ -28,7 +42,7 @@ namespace TiaMcp.Openness.V21
             var entry = HmiEngineeringObject(project, identity);
             var target = ResolveHmiTarget(project, identity);
             string operation = change.Payload.Value<string>("operation");
-            var gate = HmiEngineeringRules.Gate(target.Family, discovered.Profile, operation);
+            var gate = HmiEngineeringGate(change, project, target.Family, discovered.Profile, entry);
             gate["catalogIdentifier"] = discovered.CatalogIdentifier;
             gate["runtimeVersion"] = discovered.RuntimeVersion;
             gate["nativeAssembly"] = target.Software.GetType().Assembly.FullName;
@@ -43,12 +57,14 @@ namespace TiaMcp.Openness.V21
             var effect = target.Family == "classic" ? PrepareClassicEngineeringBody(change, target.Software, native) : PrepareUnifiedEngineeringBody(change, project, native);
             change.HmiEvidence["proposedEffect"] = effect;
             RequireHmiEngineeringGate(gate, change.HmiEvidence);
-            RequireHmiCompleteScope(change.HmiBeforeManifest);
+            RequireHmiScope(change, change.HmiBeforeManifest);
             if (change.HmiBeforeManifest.Value<string>("contentHash") != change.Payload.Value<string>("expectedContentHash"))
                 throw new BridgeException("StaleRevision", "HMI native content changed since inspection; prepare from a fresh complete content capture.", change.HmiEvidence);
             return new JObject { ["effects"] = new JArray(effect), ["warnings"] = new JArray("Native compile does not qualify HMI runtime behavior."),
                 ["hmiEvidence"] = change.HmiEvidence.DeepClone(), ["compileRequired"] = true, ["saveRequired"] = true,
-                ["preservationPolicy"] = "hmi-family-specific-exact-v1; no PLC normalization; Classic export-time DocumentInfo.Created only" };
+                ["preservationPolicy"] = operation == "classic_xml_import"
+                    ? "hmi-family-specific-exact-v1; the target's readback ignores DocumentInfo, export-local IDs (HmiPreservationRules) and formatting; every other export Classic export-time DocumentInfo.Created only"
+                    : "hmi-family-specific-exact-v1; no PLC normalization; Classic export-time DocumentInfo.Created only" };
         }
 
         private static void RequireHmiEngineeringGate(JObject gate, JObject evidence)
@@ -98,11 +114,11 @@ namespace TiaMcp.Openness.V21
             var hashes = artifacts.Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             manifest["observedArtifactsHash"] = hashes.Count == 0 ? null : HmiPreservationRules.ScopeHash(target.Family, hashes, true);
             if (missing.Count == 0) manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
-            // hmi_text_list_import accepts exactly the two standing Unified notes; its content hash is then the observed-artifacts hash.
-            else if (change.Kind == "hmi_text_list_import" && HmiTextListImportRules.ScopeAccepted(manifest))
+            // A kind with standing notes (text list, admitted kinds) accepts exactly those; its content hash is then the observed-artifacts hash.
+            else if (HmiEngineeringRules.ScopeAccepted(change.Kind, manifest))
             {
                 manifest["contentHash"] = manifest["observedArtifactsHash"].DeepClone();
-                manifest["scopeAcceptance"] = "hmi_text_list_import: only the standing Unified tag-table export and typed-readback notes";
+                manifest["scopeAcceptance"] = change.Kind + (target.Family == "classic" ? ": only the standing Classic export note" : ": only the standing Unified tag-table export and typed-readback notes");
             }
             string path = Path.Combine(directory, "manifest.json");
             File.WriteAllText(path, manifest.ToString(Formatting.Indented));
@@ -137,7 +153,7 @@ namespace TiaMcp.Openness.V21
                 CaptureHmiArtifact(directory, target.Path + "/screenGlobalElements", artifacts, f => hmi.ScreenGlobalElements.Export(f, ExportOptions.WithDefaults));
             if (hmi.ScreenOverview != null)
                 CaptureHmiArtifact(directory, target.Path + "/screenOverview", artifacts, f => hmi.ScreenOverview.Export(f, ExportOptions.WithDefaults));
-            missing.Add("All exposed Classic screen/template/popup/slide-in/global/overview, tag-table, connection, cycle, script and text/graphic-list exports are captured. The installed HmiTarget has no public alarm composition; embedded/resource dependency closure and export stability still need exact-profile native qualification.");
+            missing.Add(HmiPreservationRules.ClassicExportNote);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -177,7 +193,11 @@ namespace TiaMcp.Openness.V21
                 Directory.CreateDirectory(exported);
                 table.Tags.Export(new DirectoryInfo(exported));
                 foreach (string path in Directory.GetFiles(exported, "*", SearchOption.AllDirectories))
-                    AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + path.Substring(exported.Length + 1).Replace('\\', '/'), path, artifacts);
+                {
+                    string relative = path.Substring(exported.Length + 1).Replace('\\', '/');
+                    if (HmiPreservationRules.IsExportHelperFile(relative)) continue;
+                    AddHmiArtifact(target.Path + "/tagTables/" + Segment(table.Name) + "/export/" + relative, path, artifacts);
+                }
             }
             missing.Add(HmiPreservationRules.UnifiedTagTableExportNote);
             // The complete paired text-list export; it re-exports byte-identically (local.hmi.text-list-import.20261029).
@@ -230,12 +250,12 @@ namespace TiaMcp.Openness.V21
             artifacts.Add(identity, artifact);
         }
 
-        // The capture requirement of the change's kind: complete for hmi_engineering, standing Unified notes only for hmi_text_list_import.
+        // The capture requirement of the change's kind: complete for hmi_engineering, only its standing notes (HmiEngineeringRules.StandingNotes) otherwise.
         private static void RequireHmiScope(EngineeringChange change, JObject manifest)
         {
-            if (change.Kind != "hmi_text_list_import") { RequireHmiCompleteScope(manifest); return; }
-            if (!HmiTextListImportRules.ScopeAccepted(manifest) || manifest.Value<string>("contentHash") != manifest.Value<string>("observedArtifactsHash"))
-                throw new BridgeException("HmiPreservationUnavailable", "The Unified capture has coverage gaps beyond its two standing notes (typed read errors, a capture failure or a Classic HMI); no text-list import is authorized.", manifest);
+            if (HmiEngineeringRules.StandingNotes(change.Kind) == null) { RequireHmiCompleteScope(manifest); return; }
+            if (!HmiEngineeringRules.ScopeAccepted(change.Kind, manifest) || manifest.Value<string>("contentHash") != manifest.Value<string>("observedArtifactsHash"))
+                throw new BridgeException("HmiPreservationUnavailable", "The capture has coverage gaps beyond the standing notes of " + change.Kind + " (typed read errors, a capture failure or an HMI of the other family); no " + change.Kind + " change is authorized.", manifest);
         }
 
         private static void RequireHmiCompleteScope(JObject manifest)
@@ -260,7 +280,7 @@ namespace TiaMcp.Openness.V21
             string observed = owners[0].Element("AttributeList")?.Element("BackColor")?.Value;
             var expected = HmiPreservationRules.PatchClassicScalar(document, "Hmi.Screen.Screen", (string)owners[0].Attribute("ID"), "BackColor", observed, value);
             change.InputPath = Path.Combine(change.Directory, "hmi-classic-expected.xml");
-            File.WriteAllText(change.InputPath, expected.ToString(System.Xml.Linq.SaveOptions.DisableFormatting));
+            HmiPreservationRules.WriteXml(expected, change.InputPath);
             change.InputHash = ChangeFileHash(change.InputPath);
             change.Backups.Add(new JObject { ["role"] = "hmi-classic-before", ["artifact"] = ChangeArtifact(before) });
             return new JObject { ["objectPath"] = change.Payload["target"]["objectPath"].DeepClone(), ["property"] = "BackColor", ["before"] = observed, ["after"] = value };
@@ -432,9 +452,23 @@ namespace TiaMcp.Openness.V21
             // Recompute the gate on the server at apply; never trust the serialized
             // preview, a client qualification flag, or a persisted availability bit.
             var target = HmiResolveNativeTarget(project, (JObject)change.Payload["target"]);
-            RequireHmiEngineeringGate(HmiEngineeringRules.Gate(target.Family, target.Profile, change.Payload.Value<string>("operation")), change.HmiEvidence);
-            RequireHmiCompleteScope(change.HmiBeforeManifest);
             var entry = HmiEngineeringObject(project, (JObject)change.Payload["target"]);
+            RequireHmiEngineeringGate(HmiEngineeringGate(change, project, target.Family, target.Profile, entry), change.HmiEvidence);
+            RequireHmiScope(change, change.HmiBeforeManifest);
+            if (HmiEngineeringRules.IsAdmittedKind(change.Kind))
+            {
+                // As the text list: the compile before the write is the reference for unchanged compiler problems,
+                // and preservation compares with the compiled state, so compiler effects are never attributed to the write.
+                change.HmiEvidence["baselineCompile"] = CompileHmiEngineeringChange(change, project);
+                var compiled = CaptureHmiEngineeringScope(change, project, "pre-import");
+                RequireHmiScope(change, compiled);
+                change.HmiEvidence["preImport"] = compiled;
+                change.HmiEvidence["baselineCompileChangedCapture"] = compiled.Value<string>("contentHash") != change.HmiBeforeManifest.Value<string>("contentHash");
+                change.Stages.Add("hmi_baseline_compiled");
+                WriteChangeJournal(change);
+                change.Stages.Add("hmi_native_write_started");
+                WriteChangeJournal(change);
+            }
             if (target.Family == "classic") ApplyClassicEngineeringBody(change, target.Software, (IEngineeringObject)entry.Native);
             else ApplyUnifiedEngineeringBody(change, project, (IEngineeringObject)entry.Native);
             change.Stages.Add("hmi_precise_readback_verified");
@@ -861,9 +895,11 @@ namespace TiaMcp.Openness.V21
         private JObject CompileHmiEngineeringChange(EngineeringChange change, Project project)
         {
             var selected = ResolveHmiTarget(project, (JObject)change.Payload["target"]);
-            var compiler = ((IEngineeringServiceProvider)selected.Software).GetService<ICompilable>() ?? throw new BridgeException("HmiCompileUnavailable", "The selected HMI profile has no native compiler service.");
-            var result = compiler.Compile();
-            return new JObject { ["errorCount"] = result.ErrorCount, ["warningCount"] = result.WarningCount, ["targets"] = new JArray(ChangeCompilation(result, selected.Path)), ["runtimeVerified"] = false };
+            // Unified HmiSoftware is no IEngineeringServiceProvider; LibraryHmiCompiler compiles its owning device, Classic the HmiTarget.
+            var scope = HmiTargetView(selected);
+            var result = LibraryHmiCompiler(selected).Compile();
+            return new JObject { ["errorCount"] = result.ErrorCount, ["warningCount"] = result.WarningCount, ["targets"] = new JArray(ChangeCompilation(result, scope.Value<string>("compileScope"))),
+                ["compileScope"] = scope["compileScopeKind"].DeepClone(), ["runtimeVerified"] = false };
         }
 
         private string HmiEngineeringFingerprint(EngineeringChange change, Project project)
@@ -876,8 +912,8 @@ namespace TiaMcp.Openness.V21
         private void VerifyHmiEngineeringPreservation(EngineeringChange change, Project project)
         {
             var after = CaptureHmiEngineeringScope(change, project, "after");
-            // A text-list import is compared with its compiled pre-import capture; recovery still compares with the checkpoint's.
-            var reference = change.Kind == "hmi_text_list_import" ? (JObject)change.HmiEvidence["preImport"] : change.HmiBeforeManifest;
+            // A text-list import or an admitted kind is compared with its compiled pre-import capture; recovery still compares with the checkpoint's.
+            var reference = change.HmiEvidence["preImport"] as JObject ?? change.HmiBeforeManifest;
             RequireHmiScope(change, after); RequireHmiScope(change, reference);
             var beforeHashes = ((JObject)reference["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);
             var afterHashes = ((JObject)after["artifacts"]).Properties().ToDictionary(p => p.Name, p => p.Value.Value<string>("contentSha256") ?? p.Value.Value<string>("sha256"), StringComparer.Ordinal);

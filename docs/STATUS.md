@@ -5,10 +5,10 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.92`: 479 features, 454 verified, 25 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 129 shipped, 325 limited, 16 unqualified, 7 unavailable on V21, 2 deferred |
-| Matrix cells | 2,067 bound, **96 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`, and D10 against `0.4.92` |
+| Feature catalog | `0.4.95`: 481 features, 460 verified, 21 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 129 shipped, 331 limited, 12 unqualified, 7 unavailable on V21, 2 deferred |
+| Matrix cells | 2,099 bound, **78 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, and D10 against `0.4.95` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -19,8 +19,7 @@ unresolved feasibility stay release blockers ([release ledger](plans/release-obl
 names every row with an open cell.
 
 - **External prerequisites:** an operator at the desktop for the last Test Suite session
-  (TS-Q01); the VMware guest, a V20 library input, RT
-  Professional and other HMI targets, a physical PLC (B05), optional products and licenses such
+  (TS-Q01); the VMware guest, a V20 library input, other HMI targets, a physical PLC (B05), optional products and licenses such
   as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
   UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).
@@ -31,7 +30,8 @@ names every row with an open cell.
   CPU protection level is refused while UMAC runtime access is enabled (its password now has a route).
   Since 31 October also: the PLC's OPC UA server has no `HistoryRead`, no public member moves a
   PLC block, Openness cannot install a GSD file, and a safety program cannot be loaded into PLCSIM (the offline
-  memory-card download is refused, the online route needs a card from the PLC).
+  memory-card download is refused, the online route needs a card from the PLC). Since 1 November: V21 Openness neither creates nor
+  exposes WinCC RT Professional ([record](verification/hmi-rt-professional-20261025.md#v21-boundary--1-november-2026)).
 - **Rows blocked by decision:** seven `unavailable_target` rows (37 cells:
   `change.call_connection_set`, `change.project_attributes_set`, `change.hmi_engineering`,
   the two OPC UA reference-namespace kinds, `block.move` and `safety.logic_changes`) are blocked and do not count toward 1.0 (decision
@@ -61,16 +61,17 @@ record is cited by a feature; records no feature cites any more are in the retir
 ## Recent changes
 
 Dated notes, newest first, are in the [status log](history/status-log.md). From 31 October to
-[1 November](history/status-log.md#1-november-2026): project upgrade, OPC UA method calls and
+[1 November](history/status-log.md#1-november-2026): the Classic screen/tag-table import and BackColor (TP700 Comfort) and PLC-backed
+Unified tags (Unified Comfort, Unified PC) passed the HMI preservation gate natively and are admitted in production, and WinCC RT
+Professional became a recorded V21 boundary (catalog 0.4.92). Before that: project upgrade, OPC UA method calls and
 conditions, external Git delivery with two-sided conflicts, the Unified text-list import, a
 restricted translation profile, four more combined-apply shapes, technology version and F-parameter
 profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
 recorded V21 boundaries. Later on 1 November: the `project_upgrade` interruption cases passed natively
 (16/16) and combined apply gained a multi-instance shape. Drive objects whose number Startdrive cannot read
-are addressed by container index, and the three D10 drive rows passed natively on a G120C PN; `drive_observe` is
-verified, the two change kinds wait on a rerun that checks `change_status` (catalog 0.4.92; the drive object number
-left the recorded boundaries). In a desk session the Explorer roundtrip passed
+are addressed by container index, and the three D10 drive rows are verified on a G120C PN (catalog 0.4.95; the
+drive object number left the recorded boundaries). In a desk session the Explorer roundtrip passed
 in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an
 operator-installed I-device GSD in the hardware runner (catalog 0.4.89). On
 [31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed

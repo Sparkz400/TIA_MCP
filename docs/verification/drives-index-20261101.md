@@ -7,10 +7,12 @@ G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14), not connected to the CPU's IO sy
 | --- | --- | --- |
 | `artifacts/dvn` | `f8dd1e64` (dvx) | parameter set passed; every telegram prepare refused (defect, fixed below) |
 | `artifacts/dvo` | `027212a2` (dvy) | 26/26 steps, no boundary: `local.drives.index.20261101` |
+| `artifacts/dv3` | `bfa633fe` (dv2) | 28/28 steps, Host exit 0, owned TIA exited: `local.drives.index-status.20261101` |
 
-Catalog 0.4.92 verifies `drive_observe` with this record. `drive_parameter_set` and `drive_telegram_set` also bind
-`change_status`, which the run did not call, so `scripts/test_contracts.py` keeps them unverified; the runner now
-checks `change_status` after each apply, and a rerun closes their 12 cells.
+The second run did not call `change_status`, which `drive_parameter_set` and `drive_telegram_set` bind, so
+`scripts/test_contracts.py` kept them unverified. The third run adds a `change_status` check after each apply (both
+report the applied stages) and the owned TIA's exit after detach and Host close (279 ms). Catalog 0.4.95 verifies
+all three rows with both records; the 15 D10 cells are bound.
 
 ## Finding
 
@@ -31,7 +33,7 @@ parameters up to the item budget and its telegrams. The block was the design's r
   part of the change fingerprint, so apply refuses with `StaleRevision` when it changed.
 - The rules are in `src/TiaMcp.Openness.V21/DriveObjectRules.cs`, checked by `tests/TiaMcp.HardwareEngineering.Tests`.
 
-## Results (`local.drives.index.20261101`)
+## Results (`local.drives.index.20261101`, `local.drives.index-status.20261101`)
 
 - **Observe:** the one drive object as `driveObjectIndex` 0 (`DO@0`) with the number warning; parameters paged and
   filtered by number; `MainTelegram` 1 (4/4 input/output bytes, no address ranges off the IO system).
@@ -53,8 +55,9 @@ parameters up to the item budget and its telegrams. The block was the design's r
 - **Owned TIA left running (second run):** after the last restore the Harness detached (`tia_detach` returned), but
   the worker's exit was not verified within the Host's 120 s and the Openness-started TIA kept running until it was
   closed by hand. `qualify_drives.py` now captures the owned TIA process after `tia_start`, and the Harness requires
-  that it exits after detach and Host close; otherwise the run fails with the wait evidence (`tiaProcessExit`). The
-  cause of the lingering TIA is not known; the runner cannot close it (no kill route by design).
+  that it exits after detach and Host close; otherwise the run fails with the wait evidence (`tiaProcessExit`). In the
+  third run the Host exited with 0 and the owned TIA 279 ms after; why it lingered in the second run is not known,
+  and the runner cannot close it (no kill route by design).
 
 ## Not covered
 

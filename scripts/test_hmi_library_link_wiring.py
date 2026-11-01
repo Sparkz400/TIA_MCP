@@ -1,4 +1,5 @@
 """Source-only caller boundaries; native caller compilation remains a separate gate."""
+import re
 import unittest
 from pathlib import Path
 
@@ -49,6 +50,28 @@ class HmiLibraryLinkWiringTests(unittest.TestCase):
             body = source[start:end]
             self.assertEqual(1, body.count('HmiLibraryLink.RequireNoLink(screen);'))
             self.assertLess(body.index('HmiLibraryLink.RequireNoLink(screen);'), body.index(io))
+
+    def test_admitted_kinds_use_the_qualification_profile_only_for_an_owned_project(self):
+        source = (NATIVE / 'OpennessSession.HmiEngineering.cs').read_text(encoding='utf-8')
+        start = source.index('private JObject HmiEngineeringGate(')
+        helper = source[start:source.index('private JObject PrepareHmiEngineeringMutation(', start)]
+        self.assertIn('HmiEngineeringRules.KindGate(change.Kind, family, profile, operation, entry.Native?.GetType().FullName, OwnedQualificationProfile(HmiChangeQualificationProfile, project))', helper)
+        # The property is declared once and read only through the ownership predicate; prepare and apply both use the helper.
+        self.assertEqual(2, source.count('HmiChangeQualificationProfile'))
+        self.assertEqual(2, source.count('HmiEngineeringGate(change, project, '))
+        owned = (NATIVE / 'OpennessSession.HmiTextListImport.cs').read_text(encoding='utf-8')
+        self.assertIn('private string OwnedQualificationProfile(string profile, Project project) => profile != null && _ownsPortal &&\n'
+                      '            (WatchOwnsScratch(project) || _retrievedProjectPaths.Contains(project.Path.FullName)) ? profile : null;', owned)
+        self.assertIn('HmiChangeQualificationProfile = hmiChangeQualification', (NATIVE / 'Program.cs').read_text(encoding='utf-8'))
+
+    def test_library_handoff_keeps_the_closed_hmi_engineering_gate(self):
+        source = (NATIVE / 'OpennessSession.HmiEngineering.cs').read_text(encoding='utf-8')
+        start = source.index('private void RequireHmiLibraryHandoff(')
+        body = source[start:]
+        self.assertIn('var gate = HmiEngineeringRules.Gate(target.Family, observedTarget.Profile, operation);', body)
+        self.assertNotIn('KindGate', body)
+        self.assertIsNone(re.search(r'(?<!Require)HmiEngineeringGate\(', body))
+        self.assertNotIn('QualificationProfile', body)
 
     def test_shared_helper_has_no_optional_hmi_module_types(self):
         source = (NATIVE / 'HmiLibraryLink.cs').read_text(encoding='utf-8')
