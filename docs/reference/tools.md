@@ -102,7 +102,7 @@ option registers or admits the tool only on a qualification Host.
 
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
-| `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | unqualified | reviews |  |  |
+| `drive_observe` | Read offline SINAMICS drive objects, parameters and telegrams | limited | reviews |  |  |
 
 ## engineering
 

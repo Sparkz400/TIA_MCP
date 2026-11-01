@@ -4,9 +4,9 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.97",
-    "catalogSha256": "ebfb20ffad90cf5f67487b7e07165057950f15f91f934a1fa8925a4698795e4b",
+    "catalogSha256": "4522ce01ab3a932e42c21c5ff4c4b1e9d1eaa4baf591746781b205c1f53042f0",
     "ledger": "docs/plans/release-obligations-20261015.json",
-    "ledgerSha256": "bfd74ca08fdf7a56d596788669f97a9cc24432914d0a19e3d0d9feedda112338"
+    "ledgerSha256": "f9ac274c146bd9c7a0aef45f6ef8290825a795c0e430ac8847ac6ae61db32a41"
   },
   "targetTiaVersions": [
     21
@@ -15,25 +15,21 @@
     "features": 481,
     "support": {
       "deferred": 2,
-      "limited": 328,
+      "limited": 331,
       "shipped": 132,
       "unavailable_target": 12,
-      "unqualified": 7
+      "unqualified": 4
     },
     "cells": {
       "blocked": 72,
-      "bound": 2105,
+      "bound": 2120,
       "deferred": 6,
-      "open": 37
+      "open": 22
     },
     "openCellsByOwner": {
       "D06": {
         "role": "Test Suite",
         "open": 16
-      },
-      "D10": {
-        "role": "Drives",
-        "open": 15
       },
       "D16": {
         "role": "Physical runtime",
@@ -24323,41 +24319,62 @@
         "change_restore"
       ],
       "changeKind": "drive_parameter_set",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.drives.index.20261101",
+        "local.drives.index-status.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         }
       ]
     },
@@ -24371,41 +24388,62 @@
         "change_restore"
       ],
       "changeKind": "drive_telegram_set",
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.drives.index.20261101",
+        "local.drives.index-status.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-preserve",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-preview",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-native",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-recovery",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         }
       ]
     },
@@ -24416,26 +24454,38 @@
         "drive_observe"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "D10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.drives.index.20261101",
+        "local.drives.index-status.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.drives.index.20261101",
+            "local.drives.index-status.20261101"
+          ]
         }
       ]
     },
@@ -26114,6 +26164,36 @@
         {
           "path": "evidence/local.device_inventory.online.20261101.json",
           "sha256": "c78df72164b0b37f319cffb33ca1080eae2762838a325846b1e5fc0cf1123a9e"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.drives.index-status.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "bfa633fe181790666f1d85efd03fa4e692125b86",
+      "retained": [
+        {
+          "path": "evidence/local.drives.index-status.20261101.json",
+          "sha256": "c4ffc8df75cfcc4f76fa36e8644072b3248ed54f362f0b6cc6dfcd9ceb391c6d"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.drives.index.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "027212a289cb08fe49c2cfe8cab65f07b0642e82",
+      "retained": [
+        {
+          "path": "evidence/local.drives.index.20261101.json",
+          "sha256": "0246d3f9b1988f12c54c34885b148fa431d4bfb609be15ca32f97f73e5fcd60a"
         }
       ],
       "notRetained": []

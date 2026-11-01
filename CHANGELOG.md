@@ -22,7 +22,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   schemas for 85 tools ([MCP surface](docs/reference/mcp-surface.md)).
 - **Engineering changes** through the prepare/apply/restore workflow: hardware families and CPU
   parameters, device and project compile, tag tables, software units (rename and create from a unit
-  master copy), motion connections, PLC documents, project copy
+  master copy), motion connections, SINAMICS drive parameters and telegrams (by container index when
+  Startdrive cannot read the drive object number), PLC documents, project copy
   and compare, connections, alarms, GRAPH, CAx import and export, OPC UA server interfaces and role
   mappings, web server and certificates, safety F-parameters and F-block import, block protection
   and the CPU protection level through a credential route, watch and force tables, library maintenance and combined PLC library
@@ -149,11 +150,19 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   from this PLC; V21 has no block move API. The release matrix counts an unavailable API with an
   unsupported or blocked target as `unavailable_target`.
 - `SimulationTargetMismatch` tells an owned instance with no successful card that it has none.
+- `drive_observe` no longer drops a drive object whose `DriveObjectNumber` Startdrive cannot read (a
+  G120C PN V4.7): such a drive's objects are addressed by their container position
+  (`driveObjectIndex`, `driveId` `DO@<index>`) with a warning. `drive_parameter_set` and
+  `drive_telegram_set` take exactly one of `driveObjectNumber` or `driveObjectIndex`, refuse the
+  other with `DriveObjectHandleMismatch`, and add the drive object's identity to the change fingerprint.
 - The Unified HMI preservation capture also covers the complete text-list export, and OPC UA sessions
   also check that namespace 0 is the OPC UA namespace.
 
 ### Fixed
 
+- `drive_telegram_set` refused every prepare with `ExpectedValueMismatch`: telegram rows carried a
+  string-typed null that never equals the null of the echoed `expectedTelegrams`; they now carry real
+  JSON nulls (`local.drives.index.20261101`).
 - Defects found in native runs across text-list import (V21 silently altered some content; those
   inputs are now refused), DB snapshots, OPC UA role mappings, TCP/IP provisioning, the Add-In
   sandbox, project translations and the read tools; each is recorded in the status log.
@@ -223,10 +232,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 460 of 481 catalog features are verified; 37 release-matrix cells are open and 6 deferred
+- 463 of 481 catalog features are verified; 22 release-matrix cells are open and 6 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
-- V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
-  through Openness, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
+- V21 boundaries: no public API forces a value, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
   file, a safety program cannot be loaded into PLCSIM (the offline memory-card download is
