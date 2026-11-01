@@ -26,9 +26,16 @@ concurrent UA and web acquisitions share, and retired at the end.
   refused for a standard server method, a wrong argument count and a missing acknowledgement; the method's own Bad result
   is returned. runtime_ua_conditions with ConditionRefresh observes the alarm after a PLCSIM write raises it and after it
   falls. runtime_ua_history_probe records the server's HistoryRead boundary.
+--mode device-inventory: device_online_browse and device_identify, which keep Windows TLS validation without a pin. The runner
+  writes the instance's web certificate to web-server.cer in the run directory, prints TRUST_READY <path> <sha1> with the
+  operator's import and removal commands, and waits up to 30 minutes for trust-command.json beside it ({"command": "trusted"} or
+  {"command": "abort"}); it only reads Cert:\\CurrentUser\\Root. When the web server refuses Modules.Browse without a session, the
+  runtime user logs in over the pinned connection and a TIA_INVENTORY_PLCSIM record of that token is in the next Host's
+  environment only. That Host reopens the saved scratch for its device_inventory snapshot, browses and identifies; every result is
+  compared field by field with pinned Modules.Browse and I&M0 reads of the same hardware IDs.
 
-PLCSIM's network mode, adapters and IP addresses are operator settings and are never changed. verify_runtime_plcsim_tcpip
-checks the retained run; verification.json is written only when it passes.
+PLCSIM's network mode, adapters and IP addresses are operator settings and are never changed, nor are certificate stores.
+verify_runtime_plcsim_tcpip checks the retained run; verification.json is written only when it passes.
 """
 from __future__ import annotations
 
@@ -36,9 +43,13 @@ import argparse
 import ctypes
 from ctypes import wintypes
 import hashlib
+import http.client
 import json
+import os
 from pathlib import Path
+import ssl
 import subprocess
+import threading
 import time
 import traceback
 import uuid
@@ -191,6 +202,11 @@ LIMITATIONS = [
     "Scalar DInt, Int and Bool tags only; arrays and structures are not exercised. ua-services adds one user-program server method with "
     "Int/Bool arguments and one Program_Alarm with TIA's default text and class; Acknowledge, AddComment and history access are not product routes.",
 ]
+INVENTORY_LIMITATION = ("Web API module configuration and I&M0 of one PLCSIM CPU 1511 only, through the operator's temporary CurrentUser\\Root trust "
+                        "of that instance's self-signed web certificate; physical CPUs, distributed I/O and other families are not covered.")
+SESSION = "TIA_INVENTORY_PLCSIM"  # sessionEnvironmentVariable of the device_* tools; the record lives in the inventory Host's environment only.
+TRUST_WAIT = 1800
+REMOVE = "Remove-Item Cert:\\CurrentUser\\Root\\%s"
 
 
 def unprotect(path):
@@ -222,10 +238,12 @@ class Runner(Harness):
 
     def __init__(self, args):
         args.artifacts, args.runner = args.root, __file__
-        super().__init__(args, "rs_", "Runtime UA, web and capture tools on an owned PLCSIM Advanced V8 CPU in TCP/IP mode (%s)" % args.mode, LIMITATIONS, [])
+        super().__init__(args, "rs_", "Runtime UA, web and capture tools on an owned PLCSIM Advanced V8 CPU in TCP/IP mode (%s)" % args.mode,
+                         LIMITATIONS + ([INVENTORY_LIMITATION] if args.mode == "device-inventory" else []), [])
         self.report["simWorker"] = {"path": str(args.sim_worker.resolve()), "sha256": hashlib.sha256(args.sim_worker.read_bytes()).hexdigest()}
         self.report.update(mode=args.mode, cpuIp=args.cpu_ip, hosts=[], comparisons=[], pins={}, attempts={"ua": [], "web": []})
         self.calls, self.credentials, self.password, self.selections, self.watched = [], [], None, {}, []
+        self.token = self.thumbprint = None  # device-inventory: the borrowed Web API token (memory only) and the certificate the operator trusts
         # One vault for both channels: concurrent UA and web users must take turns on it (runs rs_abde1bb3 and rs_db5b4b21
         # failed while the vault refused a concurrent user at once).
         self.vault = uuid.uuid4().hex
@@ -315,12 +333,12 @@ class Runner(Harness):
             rows.append({"credential": label, "exitCode": done.returncode})
 
     def leaked(self):
-        """Retained text files that contain the runtime user's password; none may."""
-        if not self.password:
+        """Retained text files that contain the runtime user's password or the borrowed Web API token; none may."""
+        secrets = [s.encode("utf-8") for s in (self.password, self.token) if s]
+        if not secrets:
             return []
-        secret = self.password.encode("utf-8")
         return [str(p) for p in self.directory.rglob("*") if p.is_file() and p.suffix.lower() in (".json", ".jsonl", ".csv", ".md", ".html", ".txt", ".log")
-                and p.stat().st_size < 64 << 20 and secret in p.read_bytes()]
+                and p.stat().st_size < 64 << 20 and any(s in p.read_bytes() for s in secrets)]
 
     def run(self, body):
         failure = None
@@ -897,6 +915,195 @@ def services(r):
     require(r.stage("runtime_ua_disconnect", lambda: t("runtime_ua_disconnect", {"attemptId": ua}))["state"] == "closed", "The UA session did not close")
 
 
+def pinned(ip, pin, method, params=None, token=None):
+    """One Web API JSON-RPC call that only the pinned web certificate may answer: (DER, HTTP status, parsed response or None).
+    The route beside the device_* tools; neither the request (an Api.Login password) nor the token is retained."""
+    context = ssl.create_default_context()
+    context.check_hostname, context.verify_mode = False, ssl.CERT_NONE  # The pin decides, before anything is sent.
+    connection = http.client.HTTPSConnection(ip, 443, timeout=15, context=context)
+    try:
+        connection.connect()
+        der = connection.sock.getpeercert(binary_form=True)
+        require(hashlib.sha256(der).hexdigest() == pin.lower(), "The web server certificate is not the pinned one")
+        body = {"jsonrpc": "2.0", "id": 1, "method": method, **({} if params is None else {"params": params})}
+        connection.request("POST", "/api/jsonrpc", json.dumps(body), {"Content-Type": "application/json", **({"X-Auth-Token": token} if token else {})})
+        response = connection.getresponse()
+        status, text = response.status, response.read()
+    finally:
+        connection.close()
+    try:
+        return der, status, json.loads(text)
+    except ValueError:
+        return der, status, None
+
+
+def pinned_call(r, method, params=None):
+    _, status, response = pinned(r.args.cpu_ip, r.report["pins"]["web"]["sha256"], method, params, r.token)
+    return {"httpStatus": status, "response": response}
+
+
+def await_trust(path, timeout=TRUST_WAIT, poll=5):
+    """The coordinator's {"command": "trusted"} or {"command": "abort"} in path; an absent, partly written or other file waits."""
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            command = json.loads(path.read_text(encoding="utf-8")).get("command")
+        except (OSError, ValueError, AttributeError):
+            command = None
+        if command in ("trusted", "abort"):
+            return command
+        require(time.monotonic() < deadline, "No trust command in %s within %d minutes" % (path, timeout // 60))
+        time.sleep(poll)
+
+
+def in_root(thumbprint):
+    """Read-only: whether Cert:\\CurrentUser\\Root holds the thumbprint. The runner never imports or removes a certificate."""
+    done = subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", "Test-Path -LiteralPath 'Cert:\\CurrentUser\\Root\\%s'" % thumbprint],
+                          capture_output=True, text=True, timeout=60)
+    return done.returncode == 0 and done.stdout.strip() == "True"
+
+
+def keep_alive(r, stop, alive):
+    """Api.GetPermissions every 30 seconds until stop: the borrowed session must not idle out while TIA reopens the scratch."""
+    while not stop.wait(30):
+        try:
+            alive["answered" if oracle.answered(pinned_call(r, "Api.GetPermissions")) is not None else "failed"] += 1
+        except Exception:  # Counted only: a session that expires anyway fails the tools with their own codes.
+            alive["failed"] += 1
+
+
+def snapshot(r):
+    """Every row of one device_inventory capture; device_identify needs a snapshot of the Host that calls it."""
+    page = r.tool("device_inventory", {"pageSize": 200, "maxVisited": 50000})
+    coverage, rows = page["snapshot"]["coverage"], list(page["rows"])
+    require(coverage["scopeComplete"] is True and coverage["truncated"] is False, "device_inventory is incomplete: %s" % coverage)
+    while page.get("nextCursor"):
+        page = r.tool("device_inventory", {"snapshotId": page["snapshot"]["snapshotId"], "cursor": page["nextCursor"], "pageSize": 200})
+        rows += page["rows"]
+    return {"snapshotId": page["snapshot"]["snapshotId"], "rows": rows}
+
+
+def flatten(nodes):
+    """Browsed nodes with their nested children: PLCSIM answers Modules.Browse with the station node and its CPU under children."""
+    for node in nodes:
+        yield node
+        yield from flatten(node.get("children") or [])
+
+
+def bind_rows(rows, nodes):
+    """The CPU row bound to the one cpu node of its name (PLCSIM gives the station the CPU's name too), then every other row whose name
+    is unique in the snapshot and among the other browsed modules and submodules, bound to that node (at most 32)."""
+    def unique(names):
+        return {n for n in names if names.count(n) == 1}
+    names = unique([row["name"] for row in rows])
+    cpus = [row for row in rows if row["kind"] == "cpu"]
+    cpu_nodes = [node for node in nodes if cpus and node.get("subtype") == "cpu" and node.get("name") == cpus[0]["name"]]
+    require(len(cpus) == 1 and cpus[0]["name"] in names and len(cpu_nodes) == 1,
+            "Expected one CPU row named like one online cpu node: %s, %s" % ([row["name"] for row in cpus], sorted({n.get("name") for n in nodes if n.get("subtype") == "cpu"})))
+    cpu, cpu_node = cpus[0], cpu_nodes[0]
+    others = [node for node in nodes if node is not cpu_node and node.get("type") != "device"]
+    online = unique([node.get("name") for node in others])
+    online = {node["name"]: node for node in others if node.get("name") in online}
+    bindings = [{"rowId": cpu["rowId"], "hardwareId": cpu_node["hwid"]}] + [{"rowId": row["rowId"], "hardwareId": online[row["name"]]["hwid"]}
+                for row in rows if row is not cpu and row["name"] in names and row["name"] in online]
+    return cpu["rowId"], cpu_node["hwid"], bindings[:32]
+
+
+def agree(issues):
+    require(not issues, "; ".join(issues))
+    return issues
+
+
+def inventory(r):
+    """device_online_browse and device_identify through Windows trust of this instance's web certificate, each beside pinned reads."""
+    endpoint, path, command = "https://" + r.args.cpu_ip, r.directory / "web-server.cer", r.directory / "trust-command.json"
+
+    def export():
+        der = pinned(r.args.cpu_ip, r.report["pins"]["web"]["sha256"], "Api.Browse")[0]
+        path.write_bytes(der)
+        r.thumbprint = hashlib.sha1(der).hexdigest().upper()
+        return {"path": str(path), "sha1": r.thumbprint, "sha256": hashlib.sha256(der).hexdigest()}
+    r.stage("export the pinned web server certificate", export)
+    r.close_host()  # The inventory Host starts after the trust and the login, so that its environment can hold the session record.
+    print("TRUST_READY %s %s" % (path, r.thumbprint), flush=True)
+    print("  import:  Import-Certificate -FilePath \"%s\" -CertStoreLocation Cert:\\CurrentUser\\Root" % path, flush=True)
+    print("  removal: " + REMOVE % r.thumbprint, flush=True)
+    print('  then write {"command": "trusted"} or {"command": "abort"} to %s within 30 minutes' % command, flush=True)
+    require(r.stage(oracle.TRUST, lambda: await_trust(command)) == "trusted", "The coordinator aborted the run")
+
+    def trusted():
+        require(in_root(r.thumbprint), "Cert:\\CurrentUser\\Root does not hold " + r.thumbprint)
+        return True
+    r.stage(oracle.IN_ROOT, trusted)
+
+    def probe():
+        answer = pinned_call(r, "Modules.Browse", {"mode": "children"})
+        error = answer["response"].get("error") if isinstance(answer["response"], dict) else None
+        required = answer["httpStatus"] in (401, 403) or isinstance(error, dict) and error.get("code") == 2
+        require(required or oracle.answered(answer) is not None, "Modules.Browse without a session answered %s" % answer)
+        return {**answer, "sessionRequired": required}
+    if r.stage("Modules.Browse without a session", probe)["sessionRequired"]:
+        def login():
+            answer = pinned_call(r, "Api.Login", {"user": r.username, "password": r.password, "mode": "local"})
+            result = oracle.answered(answer)
+            require(isinstance(result, dict) and isinstance(result.get("token"), str) and result["token"],
+                    "Api.Login was refused (HTTP %s)" % answer["httpStatus"])
+            r.token = result["token"]
+            return {"httpStatus": answer["httpStatus"], "resultKeys": sorted(result), "runtimeTimeout": result.get("runtime_timeout")}
+        r.stage("Api.Login of the runtime user over the pinned connection", login)
+        r.stage("Api.GetPermissions of that session", lambda: pinned_call(r, "Api.GetPermissions"))
+    session = {"sessionEnvironmentVariable": SESSION} if r.token else {}
+    stop, alive = threading.Event(), r.report.setdefault("sessionKeepAlive", {"answered": 0, "failed": 0})
+    if r.token:
+        threading.Thread(target=keep_alive, args=(r, stop, alive), daemon=True).start()
+        os.environ[SESSION] = json.dumps({"endpoint": endpoint, "token": r.token})
+    try:
+        try:
+            r.start_host("inventory")
+        finally:
+            os.environ.pop(SESSION, None)  # Only the inventory Host, and the workers it starts, inherit the record.
+        r.owned_portal("inventory")
+        r.stage("reopen the saved scratch project", lambda: r.reopen_project(r.scratch["project"]["path"]))
+        captured = r.stage("device_inventory of the reopened scratch", lambda: snapshot(r))
+        r.stage("tia_detach after the snapshot", lambda: r.tool("tia_detach"))
+
+        def browse():
+            """From the top level down, each node's children once (at most 32 calls), each beside the same pinned Modules.Browse."""
+            rows, queue, seen = [], [None], set()
+            while queue and len(rows) < 32:
+                hwid = queue.pop(0)
+                subtree = {} if hwid is None else {"hardwareId": hwid}
+                tool = r.client.request("tools/call", {"name": "device_online_browse", "arguments": {"endpoint": endpoint, **session, **subtree}})
+                rows.append({"hardwareId": hwid, "tool": {"isError": bool(tool.get("isError")), "structuredContent": tool.get("structuredContent")},
+                             "pinned": pinned_call(r, "Modules.Browse", {"mode": "children", **({} if hwid is None else {"hwid": hwid})})})
+                for node in [] if tool.get("isError") else flatten(tool["structuredContent"]["result"]["nodes"]):
+                    if isinstance(node.get("hwid"), int) and node["hwid"] not in seen:
+                        seen.add(node["hwid"])
+                        queue.append(node["hwid"])
+            require(not rows[0]["tool"]["isError"], "device_online_browse failed: %s" % rows[0]["tool"]["structuredContent"])
+            return rows
+        browsed = r.stage(oracle.BROWSE, browse)
+        r.stage("device_online_browse equals the pinned Modules.Browse", lambda: agree([i for row in browsed for i in oracle.browse_issues(row)]))
+
+        def identify():
+            nodes = {n["hwid"]: n for row in browsed if not row["tool"]["isError"] for n in flatten(row["tool"]["structuredContent"]["result"]["nodes"])
+                     if isinstance(n.get("hwid"), int)}
+            row_id, hwid, bindings = bind_rows(captured["rows"], list(nodes.values()))
+            tool = r.tool("device_identify", {"snapshotId": captured["snapshotId"], "endpoint": endpoint, "controllerRowId": row_id,
+                                              "controllerHardwareId": hwid, "bindings": bindings, **session})
+            return {"controllerRowId": row_id, "controllerHardwareId": hwid, "bindings": bindings, "tool": tool,
+                    "pinned": [pinned_call(r, "Modules.ReadIdentificationMaintenance", {"hwid": b["hardwareId"], "number": 0, "type": "actual"}) for b in bindings]}
+        identified = r.stage(oracle.IDENTIFY, identify)
+        r.stage("device_identify equals the pinned I&M0 reads", lambda: agree(oracle.identify_issues(identified)))
+    finally:
+        stop.set()
+        if r.token:
+            try:
+                r.stage("Api.Logout of the borrowed session", lambda: pinned_call(r, "Api.Logout"))
+            except Exception as error:  # Keep the original failure; the logout failure is retained beside it.
+                r.report["logoutFailure"] = str(error)
+
+
 def release(r):
     """Stop, switch off and release the owned instance from the current Host (a new one adopts it when none is open)."""
     if getattr(r, "instance", None) is None:
@@ -915,21 +1122,26 @@ def release(r):
 
 
 MODES = {"normal": normal, "host-loss-capture": host_loss_capture, "server-restart": server_restart,
-         "ua-write-loss": lambda r: write_loss(r, "ua"), "web-write-loss": lambda r: write_loss(r, "web"), "ua-services": services}
+         "ua-write-loss": lambda r: write_loss(r, "ua"), "web-write-loss": lambda r: write_loss(r, "web"), "ua-services": services,
+         "device-inventory": inventory}
 
 
 def body(r):
     r.instance = None
     try:
-        setup(r)
-        MODES[r.args.mode](r)
-    except BaseException:
         try:
-            release(r)
-        except Exception as error:  # Keep the original failure; the release failure is retained beside it.
-            r.report["releaseFailure"] = str(error)
-        raise
-    release(r)
+            setup(r)
+            MODES[r.args.mode](r)
+        except BaseException:
+            try:
+                release(r)
+            except Exception as error:  # Keep the original failure; the release failure is retained beside it.
+                r.report["releaseFailure"] = str(error)
+            raise
+        release(r)
+    finally:
+        if r.thumbprint:  # device-inventory: the operator's trust outlives the instance until it is removed by hand.
+            print("Remove the trusted web certificate: " + REMOVE % r.thumbprint, flush=True)
 
 
 if __name__ == "__main__":

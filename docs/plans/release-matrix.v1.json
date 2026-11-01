@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.92",
-    "catalogSha256": "16d5fd553e02a27395ad530833fdae8779270514d14402f27cd963f944c2d1dc",
+    "catalogSha256": "e9553ee7d25a123386ef3bd7376fbf903fea3ef3ab42b0ff61267f4221da189b",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "46737ea7e7ac38dc63c0f4e775924db19fffde58bddc165b6f6773af3a0ce3ed"
   },
@@ -15,16 +15,16 @@
     "features": 481,
     "support": {
       "deferred": 2,
-      "limited": 326,
+      "limited": 328,
       "shipped": 129,
       "unavailable_target": 7,
-      "unqualified": 17
+      "unqualified": 15
     },
     "cells": {
       "blocked": 37,
-      "bound": 2078,
+      "bound": 2084,
       "deferred": 6,
-      "open": 99
+      "open": 93
     },
     "openCellsByOwner": {
       "D06": {
@@ -46,10 +46,6 @@
       "L06": {
         "role": "Coordinator and release",
         "open": 3
-      },
-      "X10": {
-        "role": "Hardware and remote IO",
-        "open": 6
       }
     }
   },
@@ -14675,26 +14671,34 @@
         "device_online_browse"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.device_inventory.online.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.device_inventory.online.20261101"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.device_inventory.online.20261101"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.device_inventory.online.20261101"
+          ]
         }
       ]
     },
@@ -14705,26 +14709,34 @@
         "device_identify"
       ],
       "changeKind": null,
-      "support": "unqualified",
+      "support": "limited",
       "owners": [
         "X10"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.device_inventory.online.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.device_inventory.online.20261101"
+          ]
         },
         {
           "gate": "AC-completeness",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.device_inventory.online.20261101"
+          ]
         },
         {
           "gate": "AC-evidence",
-          "status": "open",
-          "evidenceIds": []
+          "status": "bound",
+          "evidenceIds": [
+            "local.device_inventory.online.20261101"
+          ]
         }
       ]
     },
@@ -26007,6 +26019,23 @@
         {
           "path": "evidence/local.cpu_memory_bytes.rerun.20261028.json",
           "sha256": "e412155f02aefd9f7fd8086c5b4c053433a043c38fe9f27080a5a580ded19dd9"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.device_inventory.online.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "cpu": "CPU 1511-1 PN 6ES7 511-1AL03-0AB0",
+        "firmware": "V4.1"
+      },
+      "sourceCommit": "a6f763700833f5e298aa520f81bc8358bbeb1377",
+      "retained": [
+        {
+          "path": "evidence/local.device_inventory.online.20261101.json",
+          "sha256": "c78df72164b0b37f319cffb33ca1080eae2762838a325846b1e5fc0cf1123a9e"
         }
       ],
       "notRetained": []

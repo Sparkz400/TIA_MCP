@@ -134,6 +134,37 @@ def services():
     return report
 
 
+CPU_NODE = {"hwid": 49, "name": "ScratchPLC", "type": "module", "subtype": "cpu"}
+IM0 = {"order_number": "6ES7 511-1AL03-0AB0 ", "serial_number": "S V-L0X12345", "hardware_revision": 3, "software_revision": {"type": "V", "major": 4, "minor": 1, "patch": 0}}
+
+
+def pinned(result=None, code=None, status=200):
+    return {"httpStatus": status, "response": {"jsonrpc": "2.0", "id": 1, **({"result": result} if code is None else {"error": {"code": code}})}}
+
+
+def browsed(hwid, nodes):
+    return {"hardwareId": hwid, "tool": {"isError": False, "structuredContent": {"result": {"nodes": copy.deepcopy(nodes)}}}, "pinned": pinned({"nodes": nodes})}
+
+
+def identified():
+    """The CPU answers I&M0; its interface answers 1103, which SiemensWebIdentity reports as unsupported."""
+    cpu = {"rowId": "r1", "name": "ScratchPLC", "online": {"status": "read", "hardwareId": 49}, "actual": {
+        "mlfb": {"value": "6ES7 511-1AL03-0AB0"}, "serialNumber": {"value": "S V-L0X12345"}, "hardwareRevision": {"value": "3"}, "firmware": {"value": "V4.1.0"}}}
+    interface = {"rowId": "r2", "name": "PROFINET interface_1", "online": {"status": "unsupported", "hardwareId": 64}, "actual": {k: {"value": None} for k in oracle.ACTUAL}}
+    return {"controllerRowId": "r1", "controllerHardwareId": 49, "bindings": [{"rowId": "r1", "hardwareId": 49}, {"rowId": "r2", "hardwareId": 64}],
+            "tool": {"selectedRows": [cpu, interface]}, "pinned": [pinned({"data": copy.deepcopy(IM0)}), pinned(code=1103)]}
+
+
+def device_inventory():
+    report = normal()
+    report.update(mode="device-inventory", hosts=[host("setup", pid=1), host("inventory", pid=2)], comparisons=[], attempts={"ua": [], "web": []},
+                  toolCalls=[{"name": name, "isError": False} for name in oracle.INVENTORY_TOOLS])
+    report["steps"] = report["steps"][:4] + [step(oracle.TRUST, "trusted"), step(oracle.IN_ROOT, True), step(oracle.BROWSE, [
+        browsed(None, [CPU_NODE]), browsed(49, [{"hwid": 64, "name": "PROFINET interface_1", "subtype": "interface"}]), browsed(64, [])]),
+        step(oracle.IDENTIFY, identified())]
+    return report
+
+
 class Oracle(unittest.TestCase):
     def issues(self, report, marker=None, stored=None):
         with tempfile.TemporaryDirectory() as root:
@@ -252,6 +283,32 @@ class Oracle(unittest.TestCase):
         self.assertTrue(any("method set" in issue for issue in self.issues(report)))
         report = services(); named(report, oracle.CONDITIONS[0])["result"]["refresh"]["endObserved"] = False
         self.assertTrue(any("ConditionRefresh boundaries" in issue for issue in self.issues(report)))
+
+    def test_device_inventory_compares_every_field_with_the_pinned_reads(self):
+        self.assertEqual(self.issues(device_inventory()), [])
+        for change, text in ((lambda r: named(r, oracle.IDENTIFY)["result"]["pinned"][0]["response"]["result"]["data"].update(serial_number="S V-OTHER"), "serialNumber"),
+                             (lambda r: named(r, oracle.IDENTIFY)["result"]["pinned"][0]["response"]["result"]["data"]["software_revision"].update(patch=1), "firmware"),
+                             (lambda r: named(r, oracle.IDENTIFY)["result"]["pinned"].__setitem__(1, pinned({"data": IM0})), "expects read"),
+                             (lambda r: named(r, oracle.IDENTIFY)["result"]["tool"]["selectedRows"][0]["online"].update(hardwareId=50), "at hwid 50"),
+                             (lambda r: named(r, oracle.BROWSE)["result"][1]["pinned"]["response"]["result"]["nodes"][0].update(name="Port_1"), "field name"),
+                             (lambda r: named(r, oracle.BROWSE)["result"][0]["pinned"]["response"]["result"]["nodes"][0].update(hwid=50), "hardware IDs"),
+                             (lambda r: named(r, oracle.BROWSE)["result"][2].update(pinned=pinned(code=1100)), "the pinned call failed"),
+                             (lambda r: named(r, oracle.TRUST).update(result="abort"), "trusted"),
+                             (lambda r: r["hosts"].pop(), "Expected 2 Hosts")):
+            report = device_inventory()
+            change(report)
+            self.assertTrue(any(text in issue for issue in self.issues(report)), text)
+
+    def test_device_inventory_failures_agree_and_the_cpu_must_answer(self):
+        row = browsed(64, [])
+        row.update(tool={"isError": True, "structuredContent": {"error": {"code": "IdentityMismatch"}}}, pinned=pinned(code=1100))
+        self.assertEqual(oracle.browse_issues(row), [])
+        denied = identified()
+        denied["pinned"][0] = pinned(code=2)
+        denied["tool"]["selectedRows"][0].update(online={"status": "permissionDenied", "hardwareId": 49}, actual={k: {"value": None} for k in oracle.ACTUAL})
+        self.assertEqual(oracle.identify_issues(denied), ["The CPU row did not answer I&M0"])
+        denied["pinned"][0] = pinned(status=401)
+        self.assertEqual(oracle.identify_issues(denied), ["The CPU row did not answer I&M0"])
 
     def test_a_failed_run_is_never_complete(self):
         report = normal(); report["completed"] = False

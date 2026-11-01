@@ -430,6 +430,9 @@ sealed class FakeHandler : HttpMessageHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         if (request.RequestUri!.Scheme != "https" || request.Method != HttpMethod.Post || !request.Headers.Contains("X-Auth-Token")) throw new Exception("Request contract");
+        // PLCSIM's web server refuses a chunked or charset-qualified body with HTTP 500 (X10 run x10q).
+        if (request.Content!.Headers.ContentLength is null || request.Content.Headers.ContentType?.ToString() != "application/json" ||
+            request.Version != HttpVersion.Version11 || request.VersionPolicy != HttpVersionPolicy.RequestVersionExact) throw new Exception("Body contract");
         using var document = JsonDocument.Parse(await request.Content!.ReadAsStringAsync(cancellationToken)); var body = document.RootElement;
         string method = body.GetProperty("method").GetString()!; Methods.Add(method);
         if (TransportFailure) throw new IOException("SECRET transport diagnostics");

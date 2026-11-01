@@ -6,11 +6,14 @@ oracle before an operator TCP/IP window, not native behavior.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest import mock
+import uuid
 
 import library_native_harness
 
@@ -21,6 +24,18 @@ URI = "urn:SIMATIC:ScratchPLC"
 CERTS = {"plc": {"sha256": "1" * 64, "subjectCommonName": "PLC-1", "subjectAlternativeNames": []},
          "web": {"sha256": "2" * 64, "subjectCommonName": "PLC-1/Webserver-3", "subjectAlternativeNames": [{"type": "IP", "value": "192.168.0.1"}]},
          "ua": {"sha256": "3" * 64, "subjectCommonName": "PLC-1/OPCUA", "subjectAlternativeNames": [{"type": "Uri", "value": URI}]}}
+DER = b"fake web server certificate"
+# device-inventory: the fake CPU's Modules.Browse children per hwid (None: the top level) and its I&M0; the interface answers 1103.
+# As PLCSIM answers (X10 run x10r): the station carries the CPU's name and nests the CPU under children, at the top and for its hwid.
+STATION = [{"hwid": 32, "name": "ScratchPLC", "type": "device", "subtype": "central_device",
+            "children": [{"hwid": 49, "name": "ScratchPLC", "type": "module", "subtype": "cpu", "has_children": True}]}]
+NODES = {None: STATION, 32: STATION,
+         49: [{"hwid": 64, "name": "PROFINET interface_1", "type": "submodule", "subtype": "interface"}], 64: []}
+IM0 = {49: {"order_number": "6ES7 511-1AL03-0AB0 ", "serial_number": "S V-L0X12345", "hardware_revision": 3,
+            "software_revision": {"type": "V", "major": 4, "minor": 1, "patch": 0}}}
+ACTUAL = {49: {"mlfb": "6ES7 511-1AL03-0AB0", "serialNumber": "S V-L0X12345", "hardwareRevision": "3", "firmware": "V4.1.0"}}  # SiemensWebIdentity's row
+ROWS = [{"rowId": "r0", "name": "ScratchStation", "kind": "device"}, {"rowId": "r1", "name": "ScratchPLC", "kind": "cpu"},
+        {"rowId": "r2", "name": "PROFINET interface_1", "kind": "builtIn"}, {"rowId": "r3", "name": "Port_1", "kind": "builtIn"}]
 
 
 class Fail(Exception):
@@ -36,6 +51,42 @@ class Plc:
         self.root, self.state, self.started, self.clock = root, "Off", 0, 0
         self.memory = {"Marker": 4711, "Cycles": 0, "UaValue": 0, "MethodCalls": 0, "AlarmTrigger": False, "Enable": False, "Active": False}
         self.inspections, self.sessions, self.captures, self.host, self.stale = 0, {}, {}, None, False
+        self.token, self.logged_out = None, False
+
+    def web(self, method, params, token):
+        """The fake CPU's Web API: Modules.* need the logged-in session."""
+        if method == "Api.Login":
+            assert params["password"] == "fake-password" and self.token is None
+            self.token = "tok-" + uuid.uuid4().hex
+            return {"result": {"token": self.token, "runtime_timeout": "PT120S"}}
+        if method.startswith("Modules.") and (token is None or token != self.token):
+            return {"error": {"code": 2}}
+        if method == "Modules.Browse":
+            return {"result": {"nodes": NODES[params.get("hwid")]}}
+        if method == "Modules.ReadIdentificationMaintenance":
+            return {"result": {"data": IM0[params["hwid"]]}} if params["hwid"] in IM0 else {"error": {"code": 1103}}
+        self.logged_out = self.logged_out or method == "Api.Logout"
+        return {"result": True if method == "Api.Logout" else [{"name": "read_diagnostics"}]}
+
+    def pinned(self, ip, pin, method, params=None, token=None):
+        assert pin == CERTS["web"]["sha256"]
+        return DER, 200, {"jsonrpc": "2.0", "id": 1, **self.web(method, params or {}, token)}
+
+    def inventory_tool(self, host, tool, a):
+        """device_* answer only with the token record the Host had in its environment at its start."""
+        record = json.loads(host.session or "null")
+        if a.get("sessionEnvironmentVariable") != runner.SESSION or not record or (record["endpoint"], record["token"]) != (a["endpoint"], self.token):
+            raise Fail("PermissionDenied")
+        if tool == "device_online_browse":
+            return {"provider": "siemensWebApiIm0", "endpoint": a["endpoint"], "source": "onlineControllerConfiguration", "result": {"nodes": NODES[a.get("hardwareId")]}}
+        rows = []
+        for binding in a["bindings"]:
+            row, hwid = next(dict(r) for r in ROWS if r["rowId"] == binding["rowId"]), binding["hardwareId"]
+            read = hwid in ACTUAL
+            row.update(online={"status": "read" if read else "unsupported", "hardwareId": hwid},
+                       actual={k: {"value": ACTUAL[hwid][k] if read else None, "state": "available" if read else "unsupported"} for k in oracle.ACTUAL})
+            rows.append(row)
+        return {"snapshot": {"snapshotId": "s2"}, "selectedRows": rows, "onlineScopeComplete": False}
 
     def cert(self, channel, argument):
         return argument["certificateSha256" if channel == "ua" else "peerCertificateSha256"]
@@ -165,6 +216,7 @@ class Host:
         Host.count += 1
         self.plc, self.pid, self.exit_code, self.tool_calls, self.errors = plc, 1000 + Host.count, None, [], []
         self.point = arguments[arguments.index("--runtime-qualification") + 1] if "--runtime-qualification" in arguments else None
+        self.session = os.environ.get(runner.SESSION)  # A process reads its environment as it was at its start.
         plc.host = self.pid
         self.process = self
 
@@ -207,6 +259,11 @@ class Host:
         p = self.plc
         if tool.startswith(("runtime_ua_subscription_", "runtime_ua_capture_", "runtime_capture_")) and tool != "runtime_capture_analyze":
             return p.acquisition(tool, a)
+        if tool in ("device_online_browse", "device_identify"):
+            return p.inventory_tool(self, tool, a)
+        if tool == "device_inventory":  # Two pages: the runner must follow the cursor.
+            return {"snapshot": {"snapshotId": "s1", "coverage": {"scopeComplete": True, "truncated": False}},
+                    "rows": ROWS[2:] if a.get("cursor") else ROWS[:2], "nextCursor": None if a.get("cursor") else "c1"}
         if tool == "certificate_inspect":
             p.inspections += 1
             return {"devices": [{"certificates": [CERTS["plc"]] + ([CERTS["web"], CERTS["ua"]] if p.inspections > 1 else [])}]}
@@ -273,6 +330,7 @@ class Host:
         return {
             "tia_discover": {"processes": []}, "tia_session_status": {"ownsPortalProcess": True, "projects": []},
             "tia_create_scratch": {"completed": True, "compile": {"errorCount": 0}, "selectedCpu": {"typeIdentifier": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1"},
+                                   "project": {"path": "C:/scratch/TiaMcpScratch.ap21"},
                                    "scratchSecurity": {"cpus": [{"credentialMetadataPath": "secret.json", "runtimeUser": {"supported": True, "credentialMetadataPath": str(p.user)}}]}},
             "project_inventory": {"plcs": [{"path": "/projects/P/devices/ScratchStation/items/ScratchPLC/plc/ScratchPLC"}]},
             "change_prepare": {"changeId": "c", "previewHash": "h", "state": "prepared", "preview": {}}, "change_apply": {"state": "applied"},
@@ -332,15 +390,17 @@ class TagRefresh(unittest.TestCase):
 
 
 class Modes(unittest.TestCase):
-    def run_mode(self, mode):
+    def run_mode(self, mode, inspect=None):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root)
             plc = Plc(None)
             plc.user = root / "user.json"
             plc.user.write_text(json.dumps({"username": "TiaMcpTest_1", "protectedPath": "x.dpapi"}), encoding="utf-8")
             originals = {k: getattr(runner, k) for k in ("Client", "unprotect", "save_generated_scratch_project", "verify_download",
-                                                          "verify_memory_card", "verify_credential_provisioning", "verify_owned_instance")}
+                                                          "verify_memory_card", "verify_credential_provisioning", "verify_owned_instance", "pinned", "in_root")}
             runner.Client = lambda executable, timeout, arguments: Host(plc, arguments)
+            runner.pinned = plc.pinned
+            runner.in_root = lambda thumbprint: thumbprint == hashlib.sha1(DER).hexdigest().upper()
             runner.unprotect = lambda path: "fake-password"
             runner.save_generated_scratch_project = lambda tool, download: {"applied": {"state": "applied"}}
             runner.verify_download = lambda download, instance: None
@@ -353,9 +413,12 @@ class Modes(unittest.TestCase):
                 with mock.patch.object(library_native_harness, "require", lambda condition, message: None):  # Long temp paths; no scratch is made.
                     fake = Fake(args)
                 plc.root = fake.directory
+                (fake.directory / "trust-command.json").write_text('{"command": "trusted"}', encoding="utf-8")  # The coordinator, already done.
                 sleep = runner.time.sleep
                 with mock.patch.object(runner.time, "sleep", lambda seconds: sleep(min(seconds, 0.05))):
                     fake.run(runner.body)
+                if inspect:
+                    inspect(fake, plc)
                 return json.loads((fake.directory / "verification.json").read_text(encoding="utf-8"))
             finally:
                 for k, v in originals.items():
@@ -367,6 +430,57 @@ class Modes(unittest.TestCase):
                 verification = self.run_mode(mode)
                 self.assertTrue(verification["completed"] and verification["oracle"]["issues"] == [], verification["oracle"])
                 self.assertEqual(len(verification["hosts"]), oracle.HOSTS[mode])
+
+    def test_device_inventory_never_retains_the_token(self):
+        def inspect(fake, plc):
+            self.assertTrue(plc.token and plc.logged_out, "No session was borrowed and closed")
+            self.assertNotIn(runner.SESSION, os.environ)
+            self.assertFalse([p for p in fake.directory.rglob("*") if p.is_file() and plc.token.encode() in p.read_bytes()])
+            report = json.loads((fake.directory / "qualification.json").read_text(encoding="utf-8"))
+            self.assertEqual((report["secretLeaks"], [h["label"] for h in report["hosts"]]), ([], ["setup", "inventory"]))
+            identified = next(s for s in report["steps"] if s["name"] == oracle.IDENTIFY)["result"]
+            # Port_1 is in the snapshot but not online; the station row has no online node.
+            self.assertEqual([(b["rowId"], b["hardwareId"]) for b in identified["bindings"]], [("r1", 49), ("r2", 64)])
+            self.assertEqual((fake.directory / "web-server.cer").read_bytes(), DER)
+        self.run_mode("device-inventory", inspect)
+
+
+class Inventory(unittest.TestCase):
+    """The coordinator wait, the read-only store check and the token leak check of device-inventory."""
+
+    def test_the_wait_skips_absent_partial_and_unknown_commands(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "trust-command.json"
+            states = iter(['{"comm', '{"command": "later"}', '{"command": "abort"}'])
+            with mock.patch.object(runner.time, "sleep", lambda seconds: path.write_text(next(states), encoding="utf-8")):
+                self.assertEqual(runner.await_trust(path, timeout=60, poll=1), "abort")
+            path.write_text('{"command": "trusted"}', encoding="utf-8")
+            self.assertEqual(runner.await_trust(path, timeout=0), "trusted")
+
+    def test_the_wait_ends_at_its_timeout(self):
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaisesRegex(AssertionError, "No trust command"):
+                runner.await_trust(Path(root) / "trust-command.json", timeout=0)
+
+    def test_the_store_check_only_tests_the_path(self):
+        commands = []
+        for code, output, expected in ((0, "True\r\n", True), (0, "False\r\n", False), (1, "", False)):
+            def run(command, **_):
+                commands.append(command)
+                return SimpleNamespace(returncode=code, stdout=output)
+            with mock.patch.object(runner.subprocess, "run", run):
+                self.assertEqual(runner.in_root("AB12"), expected)
+        for command in commands:
+            self.assertEqual(command[-1], "Test-Path -LiteralPath 'Cert:\\CurrentUser\\Root\\AB12'")
+            self.assertFalse(any(word in " ".join(command) for word in ("Import", "Remove", "Set-", "New-")))
+
+    def test_a_retained_token_is_a_leak(self):
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root)
+            (root / "steps.json").write_text('{"token": "tok-secret"}', encoding="utf-8")
+            (root / "clean.json").write_text("{}", encoding="utf-8")
+            stub = SimpleNamespace(directory=root, password=None, token="tok-secret")
+            self.assertEqual(runner.Runner.leaked(stub), [str(root / "steps.json")])
 
 
 if __name__ == "__main__":
