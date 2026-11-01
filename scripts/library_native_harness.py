@@ -10,6 +10,8 @@ import time
 import traceback
 import uuid
 
+from block_test_process import OwnedTiaProcessWatcher
+from run_block_tests import wait_owned_tia_exit
 from smoke_mcp import Client
 
 
@@ -34,7 +36,7 @@ class Harness:
                 "Choose a shorter --artifacts path (for example artifacts/lq)")
         self.directory.mkdir(parents=True, exist_ok=False)
         self.args = args
-        self.client = None
+        self.client = self.watcher = None
         self.report = {"schemaVersion": 1, "profile": profile, "completed": False, "runtimeVerified": False,
                        "steps": [], "mutations": [], "limitations": limitations}
         for name, path in (("host", args.host), ("worker", args.worker), ("runner", Path(args.runner))):
@@ -79,8 +81,21 @@ class Harness:
                 self.client.close()
                 self.report["hostExitCode"] = self.client.process.returncode
                 self.report["hostLogs"] = self.client.errors
+            if self.watcher is not None:
+                try:
+                    wait_owned_tia_exit(self.watcher, True, self.report)
+                except Exception as error:
+                    self.report["tiaExitFailure"] = str(error)
+                    if self.report["completed"]:
+                        self.report.update(completed=False, failure="The owned TIA process did not exit after detach and Host close: " + str(error))
             self.persist()
             print("Report: " + str(self.directory / "qualification.json"), flush=True)
+        require(self.report["completed"], self.report.get("failure", "The run did not complete"))
+
+    def watch_owned_tia(self):
+        """Capture the owned TIA process right after tia_start; run() then requires that it exits after detach and Host close."""
+        self.watcher = OwnedTiaProcessWatcher(self.tool("tia_session_status")["processId"])
+        self.report["tiaProcessHandle"] = dict(self.watcher.evidence)
 
     def tool(self, name, arguments=None):
         return self.client.tool(name, arguments)

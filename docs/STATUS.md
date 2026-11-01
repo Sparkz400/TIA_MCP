@@ -5,10 +5,10 @@ simulators you own (see the [README](../README.md)). On `main`, 1 November 2026:
 
 | | |
 | --- | --- |
-| Feature catalog | `0.4.94`: 481 features, 457 verified, 24 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
-| Release matrix rows | 129 shipped, 328 limited, 15 unqualified, 7 unavailable on V21, 2 deferred |
-| Matrix cells | 2,084 bound, **93 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
-| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92` |
+| Feature catalog | `0.4.95`: 481 features, 460 verified, 21 unverified; 325 MCP tools ([catalog](../contracts/feature-catalog.v1.json)) |
+| Release matrix rows | 129 shipped, 331 limited, 12 unqualified, 7 unavailable on V21, 2 deferred |
+| Matrix cells | 2,099 bound, **78 open**, 37 blocked, 6 deferred ([matrix](plans/release-matrix.v1.json)) |
+| Release obligations | 0 of 44 accepted ([ledger](plans/release-obligations-20261015.md), [how acceptance works](plans/release-acceptance.md)); refreshed on 28 October against catalog `0.4.68`, D02, D04, D06 and X04 on 29 October against `0.4.70`, C03, D12 and D16 against `0.4.72`, and D09, F00, L01, L03, D02, X01, X04, X07, X08, X10 and X11 against `0.4.76`; X07, X08, B03 and B04 on 1 November against `0.4.92`, and D10 against `0.4.95` |
 
 Release scope: every feasible capability ships before 1.0; missing prerequisites and
 unresolved feasibility stay release blockers ([release ledger](plans/release-obligations-20261015.md)).
@@ -23,7 +23,7 @@ names every row with an open cell.
   as SiVArc, STEP 7 CFC, SINAMICS DCC, Test Suite execution prerequisites and the licensed AX
   trace package (B04), a native trace route (B06), nonproduction Project Server, Teamcenter and
   UMC endpoints (B10), and installations and SDKs of other TIA versions (B11).
-- **Recorded V21 boundaries:** no public API forces a value (only the TIA Portal UI does), Startdrive cannot read a drive object number added through Openness, the
+- **Recorded V21 boundaries:** no public API forces a value (only the TIA Portal UI does), the
   station upload's TLS challenges offer no certificate (trusted unauthenticated for owned PLCSIM only), an OPC UA reference-namespace import crashes TIA,
   force-table rows can only be authored in the
   TIA editor, and the
@@ -69,7 +69,9 @@ restricted translation profile, four more combined-apply shapes, technology vers
 profiles and the shared-device/MRP hardware topology were added and natively qualified (catalog
 0.4.88); HistoryRead, block move, GSD installation and loading a safety program into PLCSIM are
 recorded V21 boundaries. Later on 1 November: the `project_upgrade` interruption cases passed natively
-(16/16) and combined apply gained a multi-instance shape. In a desk session the Explorer roundtrip passed
+(16/16) and combined apply gained a multi-instance shape. Drive objects whose number Startdrive cannot read
+are addressed by container index, and the three D10 drive rows are verified on a G120C PN (catalog 0.4.95; the
+drive object number left the recorded boundaries). In a desk session the Explorer roundtrip passed
 in VS Code 1.144.0, change.hmi_compile on desk-configured Classic and Unified fixtures and an
 operator-installed I-device GSD in the hardware runner (catalog 0.4.89). On
 [31 October](history/status-log.md#31-october-2026): the 20 findings of a code audit were fixed

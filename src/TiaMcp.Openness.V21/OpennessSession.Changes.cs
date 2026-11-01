@@ -89,6 +89,7 @@ namespace TiaMcp.Openness.V21
                 if (IsPlcAlarmKind(change.Kind)) change.Preview["fingerprintScope"] += " PLC alarm imports additionally hash a fresh native export of their artifact type for every PLC/software-unit owner, or the project; XLSX document properties are excluded and a nondeterministic export fails closed as StaleRevision.";
                 if (change.Kind == "opcua_server_settings_set") change.Preview["fingerprintScope"] += " OPC UA server settings additionally cover every device item's pinned OPC UA server attribute values (server, port, automatic certificate acceptance, purchased license, alarms and conditions).";
                 if (change.Kind == "webserver_page_set") change.Preview["fingerprintScope"] += " Web page settings additionally cover every web-capable CPU's WebserverActivate value, system web page flag and web application names, types and default flags.";
+                if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set") change.Preview["fingerprintScope"] += " Drive kinds additionally cover the selected drive object's identity (hardware path, driveId, drive object count of its container, order number, firmware and parameter count) and the listed parameter values or the drive object's telegram rows.";
                 if (change.Kind == "umac_role_set") change.Preview["fingerprintScope"] += " UMAC role changes additionally cover all custom and system roles with engineering and device function rights, and the role assignments and activation state of project, anonymous and UMC principals.";
                 change.Preview["fingerprintCoverage"] = change.FingerprintCoverage?.DeepClone();
                 change.Preview["targetScopePath"] = change.ScopePath;
@@ -829,12 +830,12 @@ namespace TiaMcp.Openness.V21
                     break;
                 case "drive_parameter_set":
                     preview["parameterChanges"] = Startdrive(() => DriveParameterSet(change, project, false));
-                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(), ["action"] = change.Kind });
+                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), [DriveObjectRules.Handle(payload)] = payload[DriveObjectRules.Handle(payload)].DeepClone(), ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("Startdrive may recalculate dependent parameters; readback covers only the listed parameters. Compare drive_observe snapshots with drive_profile_review. Offline project only: no online write, download or RAM-to-ROM.");
                     break;
                 case "drive_telegram_set":
                     preview["telegramChange"] = Startdrive(() => DriveTelegramSet(change, project, false));
-                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), ["driveObjectNumber"] = payload["driveObjectNumber"].DeepClone(),
+                    effects.Add(new JObject { ["hardwarePath"] = payload["hardwarePath"].DeepClone(), [DriveObjectRules.Handle(payload)] = payload[DriveObjectRules.Handle(payload)].DeepClone(),
                         ["operation"] = payload["operation"].DeepClone(), ["telegramType"] = payload["telegramType"].DeepClone(), ["action"] = change.Kind });
                     ((JArray)preview["warnings"]).Add("The telegram change moves PLC-side I/O addresses. Apply reads back every telegram row of the drive object and reports the address shift; a collateral telegram change or an address overlap fails after the write and requires checkpoint recovery. Technology-object connections, PLC tags and program references to the telegram are not rebound; the mandatory device compile validates the configuration. Offline project only: no download.");
                     break;
@@ -1411,6 +1412,7 @@ namespace TiaMcp.Openness.V21
                 snapshot["technologyConnections"] = TechnologyConnections(entry.Item, connectionBudget, new JArray(), entry.Path, out _, new TechnologyReferenceReader(plc.Project, plc.Path));
                 if (connectionBudget.Truncated) throw new BridgeException("TraversalLimit", "Cannot establish a complete technology connection fingerprint within the scan bound.");
             }
+            if (change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set") snapshot["driveObject"] = Startdrive(() => DriveObjectFingerprint(change, project));
             if (change.Kind == "drive_parameter_set") snapshot["driveParameters"] = Startdrive(() => DriveParameterFingerprint(change, project));
             if (change.Kind == "drive_telegram_set") snapshot["driveTelegrams"] = Startdrive(() => DriveTelegramFingerprint(change, project));
             if (change.Kind.StartsWith("to_", StringComparison.Ordinal))
