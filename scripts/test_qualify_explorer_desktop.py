@@ -70,6 +70,16 @@ class DesktopRoundtripTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "negotiated"):
             q.review(records)
 
+    def test_stateless_discover_negotiates_through_meta(self):
+        records = roundtrip()
+        records[0]["message"].update(method="server/discover", params={"_meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28", "io.modelcontextprotocol/clientInfo": {"name": "copilot-cli", "version": "1"},
+            "io.modelcontextprotocol/clientCapabilities": {"extensions": {"io.modelcontextprotocol/ui": {"mimeTypes": [q.MIME]}}}}})
+        self.assertEqual("copilot-cli", q.review(records)["clientInfo"]["name"])
+        records[0]["message"]["params"]["_meta"]["io.modelcontextprotocol/clientCapabilities"] = {}
+        with self.assertRaisesRegex(AssertionError, "negotiated"):
+            q.review(records)
+
     def test_server_requests_and_other_sessions_are_ignored(self):
         records = copy.deepcopy(roundtrip())
         records.insert(4, {"session": 1, "dir": "s2c", "message": {"jsonrpc": "2.0", "id": 99, "method": "roots/list"}})

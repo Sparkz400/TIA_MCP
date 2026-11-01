@@ -101,6 +101,16 @@ def model_call(row, action):
     return None
 
 
+def handshake(row):
+    """(capabilities, clientInfo) of an initialize (2025-11-25), or of a server/discover (2026-07-28 sends both in _meta)."""
+    if row["method"] == "initialize":
+        return row["params"].get("capabilities") or {}, row["params"].get("clientInfo")
+    meta = row["params"].get("_meta") or {}
+    if row["method"] == "server/discover":
+        return meta.get("io.modelcontextprotocol/clientCapabilities") or {}, meta.get("io.modelcontextprotocol/clientInfo")
+    return {}, None
+
+
 def failed(row):
     return row.get("error") is not None or (row.get("result") or {}).get("isError") is True
 
@@ -108,8 +118,7 @@ def failed(row):
 def review(records):
     """Every transcript gate of the desktop roundtrip; raises on the first unmet gate."""
     rows = exchanges(records)
-    starts = [r for r in rows if r["method"] == "initialize"]
-    negotiated = [r for r in starts if MIME in ((r["params"].get("capabilities") or {}).get("extensions") or {}).get("io.modelcontextprotocol/ui", {}).get("mimeTypes", [])]
+    negotiated = [r for r in rows if MIME in (handshake(r)[0].get("extensions") or {}).get("io.modelcontextprotocol/ui", {}).get("mimeTypes", [])]
     require(negotiated, "No session negotiated MCP Apps (io.modelcontextprotocol/ui with %s)" % MIME)
     session = negotiated[-1]["session"]
     rows = [r for r in rows if r["session"] == session]
@@ -134,7 +143,7 @@ def review(records):
     require(reused and failed(reused[0]), "The reference was not reused after tia_detach, or it was accepted")
     code = (body(reused[0]["result"]).get("error") or {}).get("code") if reused[0].get("result") else None
     require(code in STALE, "The reused reference was refused with %s, not one of %s" % (code, sorted(STALE)))
-    return {"session": session, "clientInfo": negotiated[-1]["params"].get("clientInfo"), "reference": reference,
+    return {"session": session, "clientInfo": handshake(negotiated[-1])[1], "reference": reference,
             "verification": body(sent["result"]), "details": body(details[0]["result"]), "staleCode": code,
             "order": {"capture": captures[0]["index"], "sent": sent["index"], "details": details[0]["index"], "detach": detach[0]["index"], "reused": reused[0]["index"]}}
 
