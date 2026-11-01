@@ -20,6 +20,10 @@ three profiles passed (1 November 2026) the gate admits them in production, also
 3. change_restore of the last change: the recovered copy equals the state before it.
 4. Fresh reopen of the saved original on a production Host: hmi_inspect equals the last applied state, and the gate admits the
    kind with admission production (the profiles are production since 1 November 2026; the qualifying runs saw admission null).
+Compiler scope: the baseline and the apply compile name exactly the target HMI's own scope (Classic the HmiTarget, Unified its
+owning device). Normal lifecycle: each Host closes by EOF without a kill and exits 0, every worker exit is verified with code 0,
+and the owned TIA process exits (a handle captured right after tia_start). Lock release: after that exit a new TIA process opens
+the saved original read-write at the first attempt.
 Interruption at each durable boundary is qualify_interruption.py with the ci-*/et-* scenarios.
 """
 import argparse
@@ -31,6 +35,7 @@ import types
 import uuid
 import xml.etree.ElementTree as ET
 
+from block_test_process import OwnedTiaProcessWatcher, ProcessExitNotVerified
 from qualify_engineering_gaps import differences, hmi_snapshot, prepared_archive, retrieve_fits
 from qualify_hmi import inspect_all
 from qualify_reliability import ReliabilityClient, decoded, require
@@ -380,12 +385,39 @@ def problems(compilation):
                   if m.get("state") in ("Error", "Warning") and m.get("description") and not m["description"].startswith("Compiling finished"))
 
 
-def run(args, connect):
-    """One profile; connect(store, hostArguments, toolCalls) returns an MCP client (ReliabilityClient on a real run)."""
+def compile_scope(device, family):
+    """The scope kind and path a compile of this HMI must name (OpennessSession.LibraryHmi.cs HmiTargetView): Classic compiles its
+    HmiTarget, Unified its owning device (HmiSoftware has no compiler service), so another HMI or a PLC never is in scope."""
+    return ("hmiSoftware", device["hmiPath"]) if family == "classic" else ("owningDeviceHardwareAndSoftware", device["hmiPath"].split("/items/", 1)[0])
+
+
+def scoped(compilation, scope):
+    return bool(compilation) and compilation.get("compileScope") == scope[0] and [t.get("target") for t in compilation.get("targets") or []] == [scope[1]]
+
+
+def ended(client, watcher):
+    """One Host lifetime's end. Normal lifecycle: closed by EOF without a kill, exit 0, stderr at EOF, every bridgeWorkerExit
+    verified with code 0 and no forced termination, and the owned TIA process exited (handle captured after tia_start)."""
+    receipt = client.receipt_close()
+    receipt.pop("toolCalls", None)
+    try:
+        receipt["tiaProcess"] = watcher.wait_for_exit(180000) if watcher else None
+    except ProcessExitNotVerified as error:
+        receipt["tiaProcess"] = error.evidence
+    workers = receipt.get("workerExits") or []
+    receipt["normalLifecycle"] = (receipt.get("hostExitCode") == 0 and receipt.get("forcedHostStop") is False and receipt.get("stderrEofObserved") is True
+                                  and bool(workers) and all(w.get("processExitVerified") is True and w.get("exitCode") == 0 and w.get("forcedTermination") is False for w in workers)
+                                  and (receipt["tiaProcess"] or {}).get("processExitVerified") is True)
+    return receipt
+
+
+def run(args, connect, watch=lambda pid: None):
+    """One profile; connect(store, hostArguments, toolCalls) returns an MCP client (ReliabilityClient on a real run), watch(pid) a
+    process-exit watcher of the owned TIA (OwnedTiaProcessWatcher)."""
     profile = args.profile
     family, kind = PROFILES[profile]
     report = {"schemaVersion": 1, "completed": False, "nativeExecuted": True, "runtimeVerified": False, "kind": kind, "profile": profile,
-              "checks": [], "failures": [], "steps": [], "replays": [], "toolCalls": []}
+              "checks": [], "failures": [], "steps": [], "replays": [], "lifetimes": [], "toolCalls": []}
 
     def gate(value, label, detail=None):
         (report["checks"] if value else report["failures"]).append(label if value or detail is None else label + ": " + json.dumps(detail, ensure_ascii=False, default=str)[:1500])
@@ -401,10 +433,11 @@ def run(args, connect):
     require(retrieve_fits(store), "Choose a shorter --base: project_retrieve refuses a destination over 80 characters")
     fixture_of, refusals_of, cases_of = (classic_fixture, classic_refusals, classic_cases) if family == "classic" else (unified_fixture, unified_refusals, unified_cases)
     client = connect(store, ["--hmi-change-qualification", profile], report["toolCalls"])
-    project, history = None, []
+    project, history, watcher = None, [], None
     try:
         client.initialize()
-        step("tia_start", client.tool("tia_start"))
+        first_pid = step("tia_start", client.tool("tia_start"))["processId"]
+        watcher = watch(first_pid)
         project = step("project_retrieve fixture", client.tool("project_retrieve", {"archivePath": fixture["path"], "expectedSha256": fixture["sha256"]}))["project"]["path"]
         hmis = devices(client, family)
         gate(all(d.get("profile") == profile for d in hmis.values()), "Both fixture HMIs have the native profile " + profile, {n: d.get("profile") for n, d in hmis.items()})
@@ -439,6 +472,11 @@ def run(args, connect):
             evidence = result.get("hmiEvidence") or {}
             gate(result.get("state") == "applied" and result.get("stages") == APPLIED_STAGES, "Applied with every stage: " + label,
                  {"state": result.get("state"), "stages": result.get("stages"), "failure": result.get("failure")})
+            scope = compile_scope(device, family)
+            gate(scoped(evidence.get("baselineCompile"), scope) and scoped(result.get("compile"), scope),
+                 "Compiler scope: the baseline and the apply compile exactly %s %s: %s" % (scope[0], scope[1].rsplit("/", 1)[-1], label),
+                 {"expected": scope, **{name: [c.get("compileScope")] + [t.get("target") for t in c.get("targets") or []]
+                                        for name, c in (("baseline", evidence.get("baselineCompile") or {}), ("after", result.get("compile") or {}))}})
             baseline, compiled = problems(evidence.get("baselineCompile")), problems(result.get("compile"))
             gate(compiled is not None and compiled == baseline and (fixture["mode"] == "seeded" or compiled == []),
                  "Compiler errors and warnings as the baseline compile found them%s: %s" % ("" if fixture["mode"] == "seeded" else " (none)", label), {"baseline": baseline, "after": compiled})
@@ -478,17 +516,27 @@ def run(args, connect):
     except Exception as error:
         gate(False, "Route run completed", repr(error))
     finally:
-        client.close()
+        first = ended(client, watcher)
+        report["lifetimes"].append({"host": "qualification", **first})
         report["hostExitCode"] = client.process.returncode
+    gate(first["normalLifecycle"], "Normal lifecycle of the qualification Host: EOF close, Host and worker exit 0, owned TIA process exited", first)
 
     # 4. Fresh reopen of the saved original on a production Host (no qualification profile).
     if project is None or not history:
         return report
-    fresh = connect(store, [], report["toolCalls"])
+    fresh, watcher = connect(store, [], report["toolCalls"]), None
     try:
         fresh.initialize()
-        step("fresh tia_start", fresh.tool("tia_start"))
-        step("project_open saved original", fresh.tool("project_open", {"path": project}))
+        second_pid = step("fresh tia_start", fresh.tool("tia_start"))["processId"]
+        watcher = watch(second_pid)
+        # Lock release: the first TIA process has exited; a new one must open the saved original at once, not read-only.
+        opened = decoded(fresh.raw_tool("project_open", {"path": project}))
+        step("project_open saved original", opened)
+        gate(second_pid != first_pid and (first.get("tiaProcess") or {}).get("processExitVerified") is True and "error" not in opened
+             and opened.get("opened") is True and opened.get("readOnly") is False,
+             "Independent lock release: after the first TIA process exited, a new TIA process opens the saved original read-write at the first attempt",
+             {"firstPid": first_pid, "secondPid": second_pid, "open": opened})
+        require("error" not in opened, "project_open of the saved original failed: " + json.dumps(opened.get("error"), default=str)[:600])
         hmis = devices(fresh, family)
         changed = unintended(history[-1][3], snapshots(fresh, hmis, project), family)
         gate(not changed, "Fresh reopen: hmi_inspect equals the last applied state", changed)
@@ -503,8 +551,10 @@ def run(args, connect):
     except Exception as error:
         gate(False, "Fresh reopen completed", repr(error))
     finally:
-        fresh.close()
+        second = ended(fresh, watcher)
+        report["lifetimes"].append({"host": "production", **second})
         report["freshHostExitCode"] = fresh.process.returncode
+    gate(second["normalLifecycle"], "Normal lifecycle of the production Host: EOF close, Host and worker exit 0, owned TIA process exited", second)
     report["completed"] = not report["failures"]
     return report
 
@@ -523,7 +573,7 @@ def main(argv=None):
     require(len(str(args.base)) <= 50, "TIA refuses long project paths; choose a shorter base")
     args.base.mkdir(parents=True)
     host, worker = args.host.resolve(strict=True), args.worker.resolve(strict=True)
-    report = run(args, lambda store, extra, calls: ReliabilityClient(host, worker, store, timeout=900, record=calls, extra=extra))
+    report = run(args, lambda store, extra, calls: ReliabilityClient(host, worker, store, timeout=900, record=calls, extra=extra), OwnedTiaProcessWatcher)
     report.update(hostSha256=digest(host.read_bytes()), workerSha256=digest(worker.read_bytes()))
     (args.base / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"profile": args.profile, "completed": report["completed"], "checks": len(report["checks"]), "failures": report["failures"]}, ensure_ascii=False))

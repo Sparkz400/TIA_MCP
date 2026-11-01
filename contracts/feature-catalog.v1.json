@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.109",
+  "catalogVersion": "0.4.110",
   "targetTiaVersions": [
     21
   ],
@@ -790,6 +790,24 @@
       ],
       "limitations": [
         "A root PLC tag on one HMI only; two profiles."
+      ]
+    },
+    {
+      "id": "local.hmi.lifecycle.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "device": "TP700 Comfort (desk-configured pair), MTP700 Unified Comfort (desk-configured pair) and WinCC Unified PC RT 21.0.1.0 (seeded baseline)",
+        "sourceCommit": "2431ccf9b07986242b38a1e53e84e2cba78f9b89",
+        "passedScope": "Build hbf1 = 2431ccf9. scripts/qualify_hmi_gate_route.py with its compiler-scope, normal-lifecycle and lock-release gates on classic-comfort (hmi_classic_import, 72/72), unified-comfort and unified-pc (hmi_external_tag_create, 49/49 each): every apply's baseline and after compile name exactly the target HMI's scope (Classic HmiTarget, Unified owning device); each Host lifetime closes by EOF with Host exit 0, a verified worker exit 0 and the owned TIA process exited; after that exit a new TIA process opened the saved original read-write at the first attempt."
+      },
+      "artifacts": [
+        "evidence/local.hmi.lifecycle.20261101.json"
+      ],
+      "limitations": [
+        "Three profiles and their fixtures only; WinCC RT Advanced and KTP700 Basic PN are not covered.",
+        "Lock release is an immediate read-write reopen by another TIA process, not an inspection of TIA's lock files; complete content preservation stays a V21 boundary (no Classic alarm composition, no Unified Screen.Export)."
       ]
     },
     {
@@ -27301,14 +27319,16 @@
           "Apply requires compile=true and save=true. After the checkpoint it compiles the HmiTarget and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) imports with ImportOptions.Override through the owning composition and re-exports the re-found object: BackColor must read back as the prepared patched document apart from DocumentInfo/Created, an XML import as the supplied document apart from DocumentInfo, export-local object IDs and formatting. Every other export of the compiled capture must stay identical with the same artifact set, only the target's own export may differ, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
           "Gate: this kind only, for these two operations; production admits classic-comfort, the profile whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Classic. Every other profile, operation and Classic object type stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Native, 1 November (build 10763a35): the route passed on the desk-configured TP700 Comfort pair (local.hmi.classic-import.route.20261101, 63/63 checks): every refusal before any write; BackColor on both HMIs' Overview_A (identity separation), a no-op and a GridColor import of Overview_B, a no-op import of the start screen and a QualificationTags import adding one internal tag, each with every stage, no compiler problems, the target's independent re-export carrying exactly the intended delta, every other export unchanged, same-key replay and another key refused RecoveryRequired; a stale preview refused; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay (local.hmi.classic-import.interruption.20261101, 8/8).",
-          "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered."
+          "Qualified on one desk-configured TP700 Comfort fixture (start screen set in the editor). Import(Override) of the start screen kept it natively, but the start-screen setting has no public getter, so the compile rule is its only guard. Other Classic devices, object types, customer projects, runtime and visual behavior are not covered.",
+          "Lifecycle, 1 November (build 2431ccf9): on the same TP700 Comfort pair both compiles of every apply named only the target HmiTarget, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 72/72)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hmi.classic-import.route.20261101",
-          "local.hmi.classic-import.interruption.20261101"
+          "local.hmi.classic-import.interruption.20261101",
+          "local.hmi.lifecycle.20261101"
         ]
       },
       "availability": {
@@ -27355,14 +27375,16 @@
           "Apply requires compile=true and save=true. After the checkpoint it compiles the owning HMI device and captures the compiled state (stage hmi_baseline_compiled), then (stage hmi_native_write_started) creates the tag, sets Connection then PlcTag and requires the natively derived name, type, symbolic access, connection, PLC tag and PLC name. Outside the target table's export files and the created tag's own typed subtree (<table>/tags/<name>) the compiled capture must stay identical, and the HMI's compiler errors and warnings must be unchanged by the write, compared with the compile after the checkpoint by state, text and path (CompileProblemsUnchanged, the hmi_text_list_import rule; Information rows are ignored); then the project is saved. change_restore retrieves the checkpoint into a new directory and requires the pre-change content hash.",
           "Gate: this kind only, for this operation; production admits unified-comfort and unified-pc, the profiles whose native qualification passed (1 November 2026), in any owned project whose HMIs are all Unified. Every other profile and operation stays behind the closed preservation gate, and hmi_engineering stays closed for every operation. Interrupted applies are a target kind for reconciliation: worker loss before the save releases the unchanged project, a lost save or a Host loss holds the admission for review; nothing is replayed.",
           "Arrays, strings, whole UDT/struct values, quoted or indexed member paths, software-unit declarations, non-integrated connections and Classic external tags are not mapped. On both fixtures the create left the table and connection nodes unchanged and added no compiler problem; the rules still refuse either. PLC communication, runtime and visual behavior are not verified.",
-          "Native, 1 November (build 10763a35): the route passed on the desk-configured MTP700 Unified Comfort pair and on the seeded WinCC Unified PC RT baseline with its two encrypted-transfer password errors (local.hmi.external-tag.route.20261101, 43/43 checks each): every refusal before any write; a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and another key refused RecoveryRequired; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.external-tag.interruption.20261101, 8/8 each). Qualified on these two fixtures only; other devices and customer projects are not covered."
+          "Native, 1 November (build 10763a35): the route passed on the desk-configured MTP700 Unified Comfort pair and on the seeded WinCC Unified PC RT baseline with its two encrypted-transfer password errors (local.hmi.external-tag.route.20261101, 43/43 checks each): every refusal before any write; a root PLC tag and a global DB member on HMI_RT_1 and a root tag on HMI_RT_2 from its own PLC, each with the created tag read back, tags and typed model unchanged outside the new tag, compiler problem rows unchanged, same-key replay and another key refused RecoveryRequired; checkpoint restore and a fresh reopen. Worker loss at the checkpoint, during the baseline compile, the native write and the compile and after the save, and Host loss at the checkpoint, the write and the save, reconciled without replay on both profiles (local.hmi.external-tag.interruption.20261101, 8/8 each). Qualified on these two fixtures only; other devices and customer projects are not covered.",
+          "Lifecycle, 1 November (build 2431ccf9): on both profiles both compiles of every apply named only the target HMI's owning device, both Host lifetimes ended normally (Host and worker exit 0, owned TIA process exited) and a new TIA process then reopened the saved project read-write at once (local.hmi.lifecycle.20261101, 49/49 each)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
           "local.hmi.external-tag.route.20261101",
-          "local.hmi.external-tag.interruption.20261101"
+          "local.hmi.external-tag.interruption.20261101",
+          "local.hmi.lifecycle.20261101"
         ]
       },
       "availability": {

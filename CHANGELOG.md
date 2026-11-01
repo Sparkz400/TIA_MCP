@@ -13,6 +13,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Added
 
+- **HMI lifecycle gates:** the HMI gate route checks that every compile names only the target HMI's own scope, that each Host
+  lifetime ends normally (Host, worker and owned TIA exits verified) and that a new TIA process then opens the saved project
+  read-write at once; passed on TP700 Comfort, MTP700 Unified Comfort and WinCC Unified PC RT
+  ([record](docs/verification/hmi-lifecycle-20261101.md)).
 - **Versioning and releases:** product version `0.9.0` for every assembly, the npm metadata,
   `serverInfo.version` and release bundles; a tag-triggered workflow drafts a GitHub release with
   the verified offline bundle ([releasing](docs/guides/releasing.md)).
