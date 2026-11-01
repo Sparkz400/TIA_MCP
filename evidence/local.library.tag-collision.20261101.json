@@ -1,0 +1,102 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library.tag-collision.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T21:13:34+00:00",
+  "source": {
+    "commit": "5044285e4b7426f3de67aa0659e28de6a94a04f1",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_master_copy_tag_collision.py on a frozen Debug build of 5044285e (artifacts/oi1, git archive), 41/41 steps (run tc_531cbab9), in two owned scratch CPU 1511-1 PN V4.1 projects. Master-copy tag readback (1 November audit fix). Scratch 1: the table McTags with the Bool tags McProbe (%M60.0) and McSpare (%M61.0) became a master copy in the project library (library_create_master_copy, kind tagTable). Without a collision (both tags and McTags deleted first) library_instantiate (destinationComposition tagTables) applied with checkpoint, compile and save, and McTags read back with McProbe and McSpare under their own names. With a collision (McTags renamed to McTagsOld, so both tags stayed in the PLC root) TIA created the master copy's tags as McProbe(1) and McSpare(1): change_apply failed with MutationVerificationFailed (details renamedTags McProbe(1), McSpare(1), tagTable McTags) and change_status showed recovery_required with that failure; in a fresh empty owned Portal change_restore retrieved the project checkpoint to a new location (restored_to_new_locations), whose tag tables equalled those before the apply (McTagsOld with both tags, no McTags). Scratch 2: the unit CollUnit whose default tag table held the Bool tag UnitTag (%M70.0) became a master copy (kind softwareUnit); software_unit_create_from with onNameConflict=rename into the same PLC as CollUnit2: TIA created the copy's tag as UnitTag(1) beside CollUnit's UnitTag, and change_apply failed after the compile with MutationVerificationFailed naming UnitTag(1); change_restore in the applying Portal restored the checkpoint and the tag tables equalled those before the apply.",
+  "limitations": [
+    "Owned scratch CPU 1511-1 PN V4.1 projects; master copies in the project library only, Bool tags at bit-memory addresses. The tag-table collision is within the PLC root scope; the unit copy is within its own PLC with onNameConflict=rename (MasterCopyMode.Rename).",
+    "TIA's rename is recognized by its <name>(<n>) pattern against the names before the create, conservatively: a master-copy tag that is itself named <existing>(<n>) also fails the readback. User constants share the check but are not exercised.",
+    "Whether software_unit_create_from with MasterCopyMode.ThrowIfExists also renames a tag that exists in another unit or the PLC root is not exercised."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "838c66fb619fac130e164ff6b0e2e9c7145ce535b95409ab1e18936cdba68504"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "5e95c99f8df94d3867f7e1e8f8d6903d31af87b0296df8d22b76ce8f7eee9b81"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "b02f6f2e4c0e64d6fb4a667e8b0e7158c435ff79f0b71e5492bd9341087e939c",
+      "bytes": 315557,
+      "completed": true,
+      "steps": [
+        "start owned TIA tag collision",
+        "create owned scratch tag collision",
+        "prepare tag_table_create",
+        "apply tag_table_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare library_create_master_copy",
+        "apply library_create_master_copy",
+        "prepare tag_delete",
+        "apply tag_delete",
+        "prepare tag_delete",
+        "apply tag_delete",
+        "prepare tag_table_delete",
+        "apply tag_table_delete",
+        "prepare library_instantiate",
+        "apply library_instantiate",
+        "without a collision, McTags reads back with both tags under their own names",
+        "prepare tag_table_rename",
+        "apply tag_table_rename",
+        "tag tables before the colliding instantiation",
+        "prepare library_instantiate of McTags beside McTagsOld",
+        "change_apply fails with MutationVerificationFailed naming McProbe(1), McSpare(1)",
+        "change_status shows recovery_required with the renamed tags",
+        "close the failed session",
+        "start owned TIA recovery",
+        "change_restore retrieves the checkpoint to a new location",
+        "the recovered project holds McTagsOld with both tags and no McTags",
+        "close the recovery session",
+        "start owned TIA unit tag copy",
+        "create owned scratch unit tag copy",
+        "prepare software_unit_create",
+        "apply software_unit_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare library_create_master_copy",
+        "apply library_create_master_copy",
+        "tag tables before the unit copy",
+        "prepare software_unit_create_from of CollUnit as CollUnit2",
+        "software_unit_create_from with UnitTag in the template unit: applied unrenamed, or refused and restored"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}

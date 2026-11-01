@@ -67,6 +67,20 @@ def dotnet_canonical(value):
 def canonical_sha(value): return sha(dotnet_canonical(value).encode("utf-8"))
 
 
+def rfc8785(value):
+    """RFC 8785 (JCS) for the same contract: UTF-16 key order, only quote, backslash and control characters escaped."""
+    if isinstance(value, str): return json.dumps(value, ensure_ascii=False)
+    if isinstance(value, dict): return "{" + ",".join(rfc8785(k) + ":" + rfc8785(value[k]) for k in sorted(value, key=lambda s: s.encode("utf-16-be"))) + "}"
+    if isinstance(value, list): return "[" + ",".join(rfc8785(v) for v in value) + "]"
+    need(value is None or isinstance(value, (int, bool)), "Unsupported numeric journal representation.")
+    return json.dumps(value)
+
+
+def canonical_matches(stored, value):
+    """A Host hash in RFC 8785 (Hosts since 1 November 2026) or in the earlier form it keeps verifying (hashes stored before RFC 8785)."""
+    return stored in (sha(rfc8785(value).encode("utf-8")), canonical_sha(value))
+
+
 def xml(data):
     need(0 < len(data) <= 16 * 1024 * 1024, "XML size bound.")
     need(b"<!DOCTYPE" not in data.upper() and b"<!ENTITY" not in data.upper() and b"\x00" not in data, "DTD/entities and non-UTF8 workflow XML are refused.")
@@ -266,8 +280,8 @@ def journal_check(root, operation_id):
     records = [load(path) for path in paths]
     for index, record in enumerate(records):
         need(record["id"] == operation_id and record["revision"] == index and paths[index].stem == f"{index:06}", "Journal revision/id gap.")
-        need(record["planSha256"] == canonical_sha(record["plan"]), "Plan digest mismatch.")
-        need(record["previousSha256"] == (canonical_sha(records[index-1]) if index else None), "Journal hash chain changed.")
+        need(canonical_matches(record["planSha256"], record["plan"]), "Plan digest mismatch.")
+        need(canonical_matches(record["previousSha256"], records[index-1]) if index else record["previousSha256"] is None, "Journal hash chain changed.")
         need(record["plan"] == records[0]["plan"], "Journal immutable plan changed.")
         for item in record["plan"]["inputs"] + record["checkpoints"] + [e["artifact"] for e in record["evidence"]]: artifact(root, item)
     dispatches = 0

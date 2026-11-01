@@ -46,6 +46,7 @@ MAIN = '''ORGANIZATION_BLOCK "Main"
 VERSION : 0.1
 BEGIN
     "DiagGate_DB"();
+    "DiagOut" := "DiagIn";
 END_ORGANIZATION_BLOCK
 
 '''
@@ -56,6 +57,10 @@ HYPOTHESES = [
      "prediction": {"when": [{"signalId": "enable", "op": "eq", "value": False}], "expect": [{"signalId": "active", "op": "eq", "value": False}]}},
 ]
 UNITS = {"enable": "1", "active": "1"}
+# PLC tags of a second case: an input, a marker and an output the program copies the input to.
+TAG_SIGNALS = (("DiagIn", "%I30.0", "input"), ("DiagMarker", "%M30.0", "marker"), ("DiagOut", "%Q30.0", "output"))
+TAG_HYPOTHESES = [{"id": "copies", "statement": "DiagOut is true whenever DiagIn is true.",
+                   "prediction": {"when": [{"signalId": "diagin", "op": "eq", "value": True}], "expect": [{"signalId": "diagout", "op": "eq", "value": True}]}}]
 CRITERIA = {
     "simulation_provision_scratch_credential": {
         "AC-identity": "A malformed download ticket refuses as InvalidSimulationTicket before any native call and leaves the project state unchanged.",
@@ -63,7 +68,8 @@ CRITERIA = {
         "AC-simulator-lifecycle": "Fresh owned OFF instance, download, generated-state save, provisioning with the original card restored, power-on, RUN, stop, power-off and owned release.",
         "AC-evidence": "This report."},
     "diagnostic_plcsim_write": {
-        "AC-identity": "Writes without acknowledgeWrite, of a signal outside the case, with a datatype that differs from the declaration, and while a capture holds the instance are refused; nothing is written.",
+        "AC-identity": "Writes without acknowledgeWrite, of a signal outside the case, with a datatype that differs from the declaration, while a capture holds the instance, "
+                       "and of an output tag (alone or beside a marker) are refused; nothing is written. An input and a marker tag of a case write and read back.",
         "AC-preview": "A wrong expected value returns preconditionMismatch with the values read and dispatches nothing; sim_read confirms the unchanged value.",
         "AC-recovery": "The reverse write restores Enable after its own precondition read; sim_read and the PLC's response (Active) confirm both writes.",
         "AC-evidence": "This report."},
@@ -223,6 +229,49 @@ class Lab:
         return self.h.stage("sim_read shows Enable and Active %s" % enable, check)
 
 
+def tag_writes(h, lab, case):
+    """diagnostic_plcsim_write refuses an output tag of a case, alone or beside a marker, before any write; an input and a marker write."""
+    tags = h.tool("sim_tags", {"instanceId": lab.instance["id"], "filter": "Diag", "maxItems": 2000})["tags"]
+    signals = {}
+    for name, _, _ in TAG_SIGNALS:
+        found = [t["symbol"] for t in tags if t["symbol"].replace('"', "") == name]
+        require(len(found) == 1, "PLCSIM tag %s is missing or ambiguous: %s" % (name, [t["symbol"] for t in tags]))
+        signals[name] = {"id": name.lower(), "symbol": found[0], "type": "bool", "datatype": "Bool"}
+    h.report["tagSignals"] = {name: {k: t.get(k) for k in ("symbol", "area", "offset", "bit")} for t in tags for name in signals if t["symbol"] == signals[name]["symbol"]}
+    rows = list(signals.values())
+    def write(label, values):
+        return {"caseId": case, "instanceId": lab.instance["id"], "instanceName": lab.instance["name"], "creationId": lab.creation, "acknowledgeWrite": True,
+                "writes": [{"signalId": signals[n]["id"], "symbol": signals[n]["symbol"], "type": "bool", "datatype": "Bool", "expected": e, "value": v, "reason": label}
+                           for n, e, v in values]}
+    def refused(label, names):
+        def check():
+            before = lab.read(rows)
+            error = h.call_error("diagnostic_plcsim_write", write(label, [(n, before[signals[n]["symbol"]], not before[signals[n]["symbol"]]) for n in names]))
+            require(error.get("code") == "InvalidRequest", "Expected InvalidRequest, observed %s: %s" % (error.get("code"), error.get("message")))
+            after = lab.read(rows)
+            require(after == before, "The refused write changed values: %s -> %s" % (before, after))
+            return {"code": error["code"], "values": after}
+        return h.stage("refuse diagnostic_plcsim_write: " + label, check)
+    refused("the output tag DiagOut", ["DiagOut"])
+    refused("a batch with the marker DiagMarker and the output tag DiagOut", ["DiagMarker", "DiagOut"])
+    def written(label, value):
+        def run():
+            result = h.tool("diagnostic_plcsim_write", write(label, [("DiagIn", not value, value), ("DiagMarker", not value, value)]))
+            require(result["state"] == "written" and result["dispatched"] == 2 and all(i["readbackMatches"] is True for i in result["items"]) and result["physicalPlc"] is False,
+                    "Write %s returned %s" % (label, {k: result.get(k) for k in ("state", "dispatched", "items")}))
+            deadline = time.monotonic() + 5
+            while True:
+                values = lab.read(rows)
+                if all(values[s["symbol"]] is value for s in rows) or time.monotonic() > deadline:
+                    break
+                time.sleep(0.2)
+            require(all(values[s["symbol"]] is value for s in rows), "DiagIn, DiagMarker and the program's DiagOut do not all read %s: %s" % (value, values))
+            return {"state": result["state"], "dispatched": result["dispatched"], "values": values}
+        h.report["writes"][label] = h.stage("diagnostic_plcsim_write " + label, run)
+    written("set the input DiagIn and the marker DiagMarker", True)
+    written("reset DiagIn and DiagMarker", False)
+
+
 def fixture(h, plc, kind, payload):
     prepared = h.stage("prepare " + kind, lambda: h.tool("change_prepare", {"kind": kind, "payload": payload, "plcPath": plc}))
     return h.apply_prepared(kind, prepared)
@@ -237,6 +286,11 @@ def body(h):
     h.apply("project_simulation_enable", {"enabled": True})
     fixture(h, run.plc, "source_upsert", {"language": "SCL", "source": FB, "expectedBlockNames": ["DiagGate"]})
     fixture(h, run.plc, "instance_db_create", {"name": "DiagGate_DB", "instanceOfName": "DiagGate"})
+    tables = h.tool("software_inspect", {"plcPath": run.plc, "maxItems": 2000})["tagTables"]
+    default = [t for t in tables if any(c.get("kind") == "system" for c in t.get("constants", []))]
+    require(len(default) == 1, "Expected one default tag table: %s" % [t["name"] for t in tables])
+    for name, address, _ in TAG_SIGNALS:
+        fixture(h, run.plc, "tag_create", {"tagTablePath": default[0]["path"], "name": name, "dataTypeName": "Bool", "logicalAddress": address})
     fixture(h, run.plc, "source_upsert", {"language": "SCL", "source": MAIN, "expectedBlockNames": ["Main"]})
 
     lab.review = h.stage("save project review", lambda: h.tool("project_snapshot_capture", {"request": {"maxBlocks": 25}}))["reviewId"]
@@ -250,6 +304,13 @@ def body(h):
     require([(s["id"], s["resolution"], s["datatype"]) for s in resolved] == [("enable", "capturedDeclaration", "Bool"), ("active", "capturedDeclaration", "Bool")],
             "Case signals did not resolve to captured Bool declarations: %s" % [(s["id"], s["resolution"], s["datatype"], s.get("unavailableReason")) for s in resolved])
     lab.case = case["id"]
+    tag_signals = [{"id": name.lower(), "role": role, "reason": "The PLC tag %s at %s." % (name, address), "hypothesisIds": ["copies"],
+                    "storagePath": default[0]["path"] + "/tags/" + name, "memberPath": [name]} for name, address, role in TAG_SIGNALS]
+    tag_case = h.stage("diagnostic_plan of the PLC tags DiagIn, DiagMarker and DiagOut", lambda: h.tool("diagnostic_plan", {"request": {
+        "reviewId": lab.review, "report": "DiagOut should follow DiagIn.", "blockPath": fb, "instance": {"dbPath": db, "memberPath": []},
+        "signals": tag_signals, "hypotheses": TAG_HYPOTHESES}}))
+    require([(s["id"], s["resolution"], s["datatype"]) for s in tag_case["plan"]["signals"]] == [(n.lower(), "capturedDeclaration", "Bool") for n, _, _ in TAG_SIGNALS],
+            "Tag signals did not resolve to captured Bool declarations: %s" % [(s["id"], s["resolution"], s.get("unavailableReason")) for s in tag_case["plan"]["signals"]])
     lab.experiment = h.stage("diagnostic_experiment_plan", lambda: h.tool("diagnostic_experiment_plan", {"planId": lab.case, "request": {
         "reason": "Observe Enable and Active before and after a PLCSIM write of Enable.",
         "watch": {"tableName": "DiagGate experiment", "tiaVersion": 21},
@@ -339,6 +400,7 @@ def body(h):
             h.stage("stop the holding capture", lambda: h.tool("runtime_capture_stop", {"captureId": capture_id})["state"])
         lab.written("restore Enable", lab.write("Restore Enable to its initial value.", enable, True, False), "written")
         lab.settled(False)
+        tag_writes(h, lab, tag_case["id"])
         stopped = h.stage("stop", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "stop", "timeoutMs": 30000}))
         require(stopped["instance"]["operatingState"] == "Stop", "The instance did not stop")
         off = h.stage("power off", lambda: h.tool("sim_state", {"instanceId": lab.instance["id"], "action": "powerOff", "timeoutMs": 60000}))

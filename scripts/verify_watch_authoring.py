@@ -111,7 +111,7 @@ def reviewed_candidate(root, check_sources=True):
     before = review['before']
     need(record['state'] == 'prepared' and record['revision'] == 0 and record['previousSha256'] is None
          and record['plan']['operation'] == 'watchAuthoring', 'Initial authoring operation required')
-    need(base.canonical_sha(record['plan']) == record['planSha256'], 'Plan digest mismatch')
+    need(base.canonical_matches(record['planSha256'], record['plan']), 'Plan digest mismatch')
     need(record['plan']['target'] == before['observation'], 'Plan target mismatch')
     need(load(artifact(root, outer['reviewArtifact'])) == review, 'Retained review mismatch')
     for entry in record['plan']['inputs']:

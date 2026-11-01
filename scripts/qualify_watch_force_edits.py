@@ -265,7 +265,7 @@ class Run(owned.Run):
         plan_, before, edit = record['plan'], proposal['before'], proposal['edit']
         require(record['state'] == 'prepared' and record['revision'] == 0 and record['previousSha256'] is None
                 and plan_['operation'] == 'watchDocumentEdit', 'Initial document-edit operation required')
-        require(base.canonical_sha(plan_) == record['planSha256'] and plan_['target'] == before['observation'], 'Plan digest or target differs')
+        require(base.canonical_matches(record['planSha256'], plan_) and plan_['target'] == before['observation'], 'Plan digest or target differs')
         require(base.load(base.artifact(self.root, outer['reviewArtifact'])) == proposal, 'Retained review differs')
         identity_ = lambda item: (base.artifact(self.root, item).resolve(), item['sha256'])
         require([identity_(i) for i in plan_['inputs']] == [identity_(outer['reviewArtifact']), identity_(proposal['input'])], 'Plan inputs differ')

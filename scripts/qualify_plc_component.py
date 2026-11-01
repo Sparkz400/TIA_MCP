@@ -31,6 +31,25 @@ FIXTURES = ROOT / "fixtures/libraries/component-qualification"
 # The unrelated peer FC always comes from the fixture's own FBD caller source, whatever caller a case selects.
 FIXTURE_CALLER = json.loads((FIXTURES / "manifest.json").read_text(encoding="utf-8"))["caller"]
 KIND = "library_component_qualification"
+# --canonical-hash-probe adds these to every advance request. The worker hashes the request and ignores it otherwise, so the step passes
+# only if the Host's and the worker's RFC 8785 hashes agree on a non-ASCII name and text (sent \u-escaped) and on the number literals
+# 1e3 and 2.2250738585072012e-308. json.dumps cannot spell those, so they travel as "<raw>...</raw>" strings that RawNumbers writes
+# as the literal number on the wire.
+HASH_PROBE = {"reviewNote": "Pr\u00fcfung \u00c4\u00d6\u00dc \u00df \u8a66\u9a13 \U0001f600", "pr\u00fcfName\u540d\u524d": "\u00c9tape \u2116 1",
+              "reviewWeight": "<raw>1e3</raw>", "reviewTiny": "<raw>2.2250738585072012e-308</raw>"}
+RAW_NUMBER = re.compile(r'"<raw>(-?[0-9][0-9.eE+-]*)</raw>"')
+
+
+class RawNumbers:
+    """smoke_mcp's json, writing every "<raw>number</raw>" string as that number literal."""
+    def __getattr__(self, name):
+        return getattr(json, name)
+
+    @staticmethod
+    def dumps(value, **options):
+        return RAW_NUMBER.sub(r"\1", json.dumps(value, **options))
+
+
 EXTRA_TOOLS = ("library_open", "library_close", "library_list", "library_query", "qualification_component_window")
 
 
@@ -55,8 +74,8 @@ def step_request(prepared):
             "checkpointSave": True, "compile": True, "save": True}
 
 
-def drive_component(call, initial, review, retain):
-    """Every mutation has its own reviewed, persisted exact preview. Never retry."""
+def drive_component(call, initial, review, retain, extra=None):
+    """Every mutation has its own reviewed, persisted exact preview. Never retry. extra joins every advance payload."""
     value = initial
     identity = value["changeId"]
     require(value.get("state") == "library_prepared", "Unexpected initial component state; never replay or recover automatically.")
@@ -77,7 +96,7 @@ def drive_component(call, initial, review, retain):
             expected = "library_applied" if state == "library_prepared" else "graphical_applied"
         elif state in {"library_applied", "import_verified", "graphical_applied"}:
             value = call("change_prepare", {"kind": KIND, "payload": {"schemaVersion": 1,
-                "action": "advance", "changeId": identity}})
+                "action": "advance", "changeId": identity, **(extra or {})}})
             expected = {"library_applied": "import_verified", "import_verified": "graphical_prepared",
                         "graphical_applied": "installation_verified"}[state]
         else:
@@ -705,8 +724,16 @@ class ComponentRun:
             exact = review_step(value, payload["selection"], self.manifest, lambda artifact: artifact_bytes(self.call, artifact), expected_number)
             self.retain("step_reviewed", exact)
 
-        installed = drive_component(self.call, initial, review, self.retain)
+        probe = HASH_PROBE if getattr(self.args, "canonical_hash_probe", False) else None
+        installed = drive_component(self.call, initial, review, self.retain, probe)
         self.report["installed"] = installed; self.persist()
+        if probe:
+            # Each child's requestSha256 is the Host's hash, which it compared with the worker's before the dispatch.
+            children = self.lifetime.control("status").get("children") or []
+            self.report["canonicalHashProbe"] = {"advanceFields": probe, "children": [{k: c.get(k) for k in ("step", "state", "requestSha256")} for c in children]}
+            require([c["step"] for c in children[1:6]] == ["applyLibrary", "verifyImport", "prepareGraphical", "applyGraphical", "verifyInstallation"]
+                    and all(c.get("requestSha256") for c in children), "The component window lacks a child step: %s" % children)
+            self.persist()
         after = snapshot(self.call, self.output / "after-install")
         added = installed_objects(after, self.manifest, plc, existing)
         verify_preserved_installation(baseline, after, caller, added)
@@ -868,8 +895,12 @@ def main():
     source_mode.add_argument("--reuse-source-report", type=Path, help="Reuse only native04's exact committed archive in a new consumer; never author/reopen/resume the old attempt.")
     parser.add_argument("--reuse-source-report-sha256", help="Required exact reviewed SHA256 of --reuse-source-report.")
     parser.add_argument("--known-store-root", type=Path, action="append", default=[], help="Additional known retained engineering store; locked in canonical order for the component window.")
+    parser.add_argument("--canonical-hash-probe", action="store_true", help="Add a non-ASCII name and text and the literals 1e3 and 2.2250738585072012e-308 to every advance request (RFC 8785 Host/worker hash agreement).")
     args = parser.parse_args()
     require(5 <= args.timeout <= 900, "Timeout must be 5..900 seconds.")
+    if args.canonical_hash_probe:
+        import smoke_mcp
+        smoke_mcp.json = RawNumbers()
     require(not args.recover_from_report or not args.reuse_source_report_sha256, "Source-reuse hash cannot accompany checkpoint-only recovery.")
     run = ComponentRun(args)
     if args.recover_from_report: run.run_recovery(args.recover_from_report)

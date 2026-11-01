@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TiaMcp.Openness.V21
 {
@@ -25,6 +26,15 @@ namespace TiaMcp.Openness.V21
                     return members != 0 ? "TagTableNotEmpty" : null;
                 default: return "UnsupportedChange";
             }
+        }
+
+        // TIA creates a master-copy tag whose name the software scope already uses as "<name>(<n>)" and reports success (native,
+        // 1 November 2026, run fr_eeb8be6f: McProbe -> McProbe(1)). The created tag and constant names that are such a rename, sorted.
+        internal static string[] RenamedOnCollision(IEnumerable<string> namesBefore, IEnumerable<string> createdNames)
+        {
+            var before = new HashSet<string>(namesBefore, StringComparer.OrdinalIgnoreCase);
+            return createdNames.Where(name => !before.Contains(name) && Regex.Match(name, @"^(.+)\([0-9]+\)$") is var match && match.Success && before.Contains(match.Groups[1].Value))
+                .OrderBy(name => name, StringComparer.Ordinal).ToArray();
         }
     }
 }

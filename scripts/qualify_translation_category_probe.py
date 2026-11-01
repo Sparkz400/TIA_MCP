@@ -23,7 +23,7 @@ import psutil
 import native_dispatch_guard
 from smoke_mcp import Client
 import verify_watch_expansion as watch_oracle
-from verify_watch_workflow import canonical_sha, load
+from verify_watch_workflow import canonical_matches, canonical_sha, load
 from verify_translation_populated_category_probe import MAIN_BLOCK_LABELS, decode, main_prefix, populated_control
 
 REPO = Path(__file__).resolve().parents[1]
@@ -139,10 +139,10 @@ def scan_store(root, keys, checkpoint_read=None):
                 require(file.name == f"{index:0{width}d}.json" and file.stat().st_size <= 8 * 1024 * 1024, "Noncontiguous/oversized journal")
                 record = load(file)
                 require(record["id"] == directory.name and record["revision"] == index and
-                        record.get("previousSha256") == (None if previous is None else canonical_sha(previous)), "Journal hash chain differs")
+                        (record.get("previousSha256") is None if previous is None else canonical_matches(record.get("previousSha256"), previous)), "Journal hash chain differs")
                 if folder_name == "engineering-operations":
                     require(record["state"] == "prepared" if previous is None else record["state"] in OPERATION_TRANSITIONS.get(previous["state"], set()), "Invalid operation state transition")
-                    require(canonical_sha(record["plan"]) == record["planSha256"], "Operation plan digest differs")
+                    require(canonical_matches(record["planSha256"], record["plan"]), "Operation plan digest differs")
                     if previous is not None and previous["state"] == record["state"] == "dispatchIntent":
                         before, after = previous.get("evidence", []), record.get("evidence", [])
                         require(len(after) == len(before) + 1 and after[:-1] == before and

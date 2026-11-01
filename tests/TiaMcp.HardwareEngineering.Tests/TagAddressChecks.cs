@@ -40,10 +40,21 @@ internal static class TagAddressChecks
         Check(Incoming(Package("%I6.0"), Package("%Q4.0")).All(a => TagAddressRules.FIoOverlap(a, ranges) == null), "a VCI package on non-F I/O addresses passes");
         Check(Incoming(Package("%Q0.0"), Package("%I2.1")).Select(a => TagAddressRules.FIoOverlap(a, ranges)).First(path => path != null) == "/fdi", "a VCI package with an F-I/O address refuses");
 
-        // library_instantiate cannot read a tag-table master copy's addresses, so any F-I/O range refuses it.
+        // library_instantiate (a tag-table master copy) and software_unit_create_from (a unit master copy, whose tag tables come along)
+        // cannot read the copy's addresses, so any F-I/O range refuses them.
         Check(TagAddressRules.AnyFIo(ranges) == "/fdi", "a tag-table master copy refuses while the PLC owns an F-I/O range");
         Check(TagAddressRules.AnyFIo(Array.Empty<(string, int, int, string)>()) == null && TagAddressRules.AnyFIo(new[] { ("Input", 0, 0, "/empty") }) == null,
               "a tag-table master copy passes on a PLC without F-I/O ranges");
+
+        // A master copy's tag that TIA renamed on a name collision fails library_instantiate's and software_unit_create_from's readback.
+        var scope = new[] { "McProbe", "Motor", "Pump(1)", "Valve" };
+        Check(TagTableLifecycleRules.RenamedOnCollision(scope, new[] { "McProbe(1)", "Other" }).SequenceEqual(new[] { "McProbe(1)" }),
+              "a created McProbe(1) beside an existing McProbe is a rename");
+        Check(TagTableLifecycleRules.RenamedOnCollision(scope, new[] { "mcprobe(12)", "Valve(2)" }).SequenceEqual(new[] { "Valve(2)", "mcprobe(12)" }), "the base name compares case-insensitively");
+        Check(TagTableLifecycleRules.RenamedOnCollision(scope, new[] { "Other(1)", "Motor_1", "Motor(x)", "(1)", "Pump" }).Length == 0,
+              "a suffix without an existing base name, an underscore suffix and a non-numeric suffix are no rename");
+        Check(TagTableLifecycleRules.RenamedOnCollision(scope, new[] { "Pump(1)" }).Length == 0 && TagTableLifecycleRules.RenamedOnCollision(Array.Empty<string>(), new[] { "McProbe(1)" }).Length == 0,
+              "a name the scope already held, or an empty scope, is no rename");
         return count;
     }
 }

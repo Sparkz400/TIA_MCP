@@ -203,7 +203,7 @@ def frozen_sources(root, admission, before):
 def reviewed_candidate(root, check_sources=True):
     root = Path(root).resolve(); outer = load(root / "review.json"); record, review = outer["operation"], outer["review"]
     need(record["state"] == "prepared" and record["revision"] == 0 and record["previousSha256"] is None, "Exact initial prepared operation required.")
-    need(base.canonical_sha(record["plan"]) == record["planSha256"], "Reviewed plan digest mismatch.")
+    need(base.canonical_matches(record["planSha256"], record["plan"]), "Reviewed plan digest mismatch.")
     need(record["plan"]["target"] == review["before"]["observation"], "Prepared target differs from reviewed native observation.")
     need(len(record["plan"]["inputs"]) == 2, "Review and candidate inputs must be exact.")
     need(outer["reviewArtifact"] == record["plan"]["inputs"][0] and review["input"] == record["plan"]["inputs"][1], "Input reference aliases conflict.")
@@ -225,8 +225,8 @@ def journal(root, operation_id):
     need(paths, "Durable operation records missing."); records = [load(p) for p in paths]
     for index, record in enumerate(records):
         need(paths[index].stem == f"{index:06}" and record["revision"] == index and record["id"] == operation_id, "Journal revision/identity gap.")
-        need(record["planSha256"] == base.canonical_sha(record["plan"]) and record["plan"] == records[0]["plan"], "Immutable journal plan changed.")
-        need(record["previousSha256"] == (base.canonical_sha(records[index - 1]) if index else None), "Journal hash chain changed.")
+        need(base.canonical_matches(record["planSha256"], record["plan"]) and record["plan"] == records[0]["plan"], "Immutable journal plan changed.")
+        need(base.canonical_matches(record["previousSha256"], records[index - 1]) if index else record["previousSha256"] is None, "Journal hash chain changed.")
         need(len({e["gate"] for e in record["evidence"]}) == len(record["evidence"]), "Duplicate durable evidence gates.")
         for item in record["plan"]["inputs"] + record["checkpoints"] + [e["artifact"] for e in record["evidence"]] + [r["evidence"] for r in record["reconciliation"]] + [r["evidence"] for r in record.get("recoveryResolutions", [])]: artifact(root, item)
     transitions = [r["state"] for i, r in enumerate(records) if i == 0 or r["state"] != records[i - 1]["state"]]
