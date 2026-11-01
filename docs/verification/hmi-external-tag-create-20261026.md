@@ -3,7 +3,9 @@
 **Status:** implemented. The prepare-only native probe passed on Unified Comfort
 ([`local.hmi.external-tag-prepare.20261026`](../../evidence/local.hmi.external-tag-prepare.20261026.json)).
 Apply is not qualified. Production apply stays unavailable behind the Unified
-preservation gate.
+preservation gate. Since 1 November 2026 the operation also has its own change kind,
+`hmi_external_tag_create`, admitted only on a qualification Host; see
+[HMI engineering](../guides/hmi-engineering.md).
 
 ## What was added
 
