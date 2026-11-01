@@ -169,6 +169,7 @@ namespace TiaMcp.Openness.V21
                     var refusal = VciResolutionRules.Refusal(take, direction, details.HasFlag(IndividualObjectCompareDetails.WorkspaceFileChanged), live,
                         plan.Value<string>("projectObjectContentSha256"), current, reviewed, result, p => VciInPackage(p, directory, fileName));
                     if (refusal != null) throw new BridgeException(refusal[0], refusal[1], new JObject { ["mapping"] = row, ["packageFiles"] = JObject.FromObject(current), ["projectObjectContentSha256"] = live });
+                    if (direction == "WorkspaceToProject") VciRejectFIoAddresses(change, target.Target, result.Values.Select(file => file.Content));
                     bool projectChanged = details.HasFlag(IndividualObjectCompareDetails.ProjectObjectChanged);
                     packages.Add(new JObject { ["directory"] = directory, ["fileName"] = fileName });
                     effect["action"] = "resolveConflict"; effect["take"] = take; effect["direction"] = direction; effect["object"] = target.Identity.DeepClone();
@@ -206,6 +207,8 @@ namespace TiaMcp.Openness.V21
                         if (details.HasFlag(IndividualObjectCompareDetails.ProjectObjectChanged) && details.HasFlag(IndividualObjectCompareDetails.WorkspaceFileChanged))
                             throw new BridgeException("VciConflict", "Both the project object and its workspace files changed; synchronizing either way discards one side. Resolve the conflict first.", new JObject { ["mapping"] = row });
                         if (toProject && status.CompareState == CompareState.WorkspaceFileMissing) throw new BridgeException("VciPackageMissing", "The workspace files of this mapping are missing.");
+                        if (toProject) VciRejectFIoAddresses(change, mapping.EngineeringObject, files.Where(f => VciInPackage(f.Value<string>("path"), row.Value<string>("directory"), row.Value<string>("fileName")))
+                            .Select(f => File.ReadAllBytes(Path.Combine(root, f.Value<string>("path").Replace('/', '\\')))));
                         if (details.HasFlag(toProject ? IndividualObjectCompareDetails.ProjectObjectChanged : IndividualObjectCompareDetails.WorkspaceFileChanged)) overwritten++;
                         if (!toProject) packages.Add(new JObject { ["directory"] = row["directory"], ["fileName"] = row["fileName"] });
                     }
@@ -389,6 +392,14 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("UnsupportedObjectKind", "VCI changes select one exact block, PLC data type, tag table or technology object by objectPath.");
             if (ObjectIdentity.IsGeneratedPath(target.Identity.Value<string>("objectPath"))) throw new BridgeException("GeneratedObject", "Generated system-group objects are excluded.");
             return target;
+        }
+
+        // A project-ward import of a tag-table package keeps tag_table_import_xml's F-I/O rule over every tag of its documents.
+        private void VciRejectFIoAddresses(EngineeringChange change, IEngineeringObject target, IEnumerable<byte[]> packageFiles)
+        {
+            if (target is Siemens.Engineering.SW.Tags.PlcTagTable)
+                RejectFIoAddresses(SelectPlc(change.Selector), packageFiles.SelectMany(bytes =>
+                    { using (var reader = new StreamReader(new MemoryStream(bytes), true)) return TagAddressRules.TagTableAddresses(EngineeringSources.ReadXml(reader.ReadToEnd())); }).ToArray());
         }
 
         // Project-ward sync rewrites the object, so it keeps the guards of the direct mutation kinds.

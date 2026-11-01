@@ -481,6 +481,7 @@ namespace TiaMcp.Openness.V21
                     var tables = TagTables(scope.Tags, scope.Path, tableBudget).Select(x => x.Item.Name).ToList();
                     if (tableBudget.Truncated) throw new BridgeException("DependencyUnresolved", "Target tag-table inventory exceeded its completeness budget.");
                     if (tables.Contains(descriptions[0].ContentName, StringComparer.OrdinalIgnoreCase)) throw new BridgeException("LibraryConflict", "A tag table with the master-copy name already exists.");
+                    RejectFIoMasterCopy(plc, master.Name);
                 }
                 else if (names.Contains(descriptions[0].ContentName)) throw new BridgeException("LibraryConflict", "Master-copy destination name already exists.");
             }

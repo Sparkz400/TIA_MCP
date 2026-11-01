@@ -31,6 +31,19 @@ internal static class TagAddressChecks
         var addresses = TagAddressRules.TagTableAddresses(table);
         Check(addresses.SequenceEqual(new[] { "%M200.0", "%I1.0" }), "a tag-table document yields every tag's address and no constant");
         Check(addresses.Select(a => TagAddressRules.FIoOverlap(a, ranges)).Where(path => path != null).SequenceEqual(new[] { "/fdi" }), "the imported F-DI address is the one that overlaps");
+
+        // vci_synchronize WorkspaceToProject reads every document of a tag-table package (VCI writes the table's SimaticML export).
+        string Package(string address) => "<Document><Engineering version=\"V21\" /><SW.Tags.PlcTagTable ID=\"0\"><AttributeList><Name>Vci</Name></AttributeList><ObjectList>" +
+            "<SW.Tags.PlcTag ID=\"1\" CompositionName=\"Tags\"><AttributeList><DataTypeName>Bool</DataTypeName><LogicalAddress>" + address + "</LogicalAddress><Name>T</Name></AttributeList></SW.Tags.PlcTag>" +
+            "</ObjectList></SW.Tags.PlcTagTable></Document>";
+        string[] Incoming(params string[] documents) => documents.SelectMany(xml => TagAddressRules.TagTableAddresses(System.Xml.Linq.XDocument.Parse(xml))).ToArray();
+        Check(Incoming(Package("%I6.0"), Package("%Q4.0")).All(a => TagAddressRules.FIoOverlap(a, ranges) == null), "a VCI package on non-F I/O addresses passes");
+        Check(Incoming(Package("%Q0.0"), Package("%I2.1")).Select(a => TagAddressRules.FIoOverlap(a, ranges)).First(path => path != null) == "/fdi", "a VCI package with an F-I/O address refuses");
+
+        // library_instantiate cannot read a tag-table master copy's addresses, so any F-I/O range refuses it.
+        Check(TagAddressRules.AnyFIo(ranges) == "/fdi", "a tag-table master copy refuses while the PLC owns an F-I/O range");
+        Check(TagAddressRules.AnyFIo(Array.Empty<(string, int, int, string)>()) == null && TagAddressRules.AnyFIo(new[] { ("Input", 0, 0, "/empty") }) == null,
+              "a tag-table master copy passes on a PLC without F-I/O ranges");
         return count;
     }
 }

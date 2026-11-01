@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.101`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.103`.
 
 ### Added
 
@@ -138,7 +138,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   F-parameters join configured-hardware preservation.
 - `tag_create`, `tag_set` (`LogicalAddress`) and `tag_table_import_xml` refuse an absolute input or
   output address in an F-I/O range at prepare with `SafetyBoundary` and write nothing; before, a tag
-  created there became a safety tag and was refused only after the create.
+  created there became a safety tag and was refused only after the create. `vci_synchronize`
+  WorkspaceToProject and a project-ward `vci_conflict_resolve` of a tag table apply the same rule to
+  the incoming package, and `library_instantiate` refuses a tag-table master copy while the PLC owns
+  any F-I/O range (V21 cannot read a master copy's addresses before the create); before, these
+  ended in checkpoint recovery.
 - Combined `library_integrate` apply refuses before any claim when a block number the import would
   take is already used (`ComponentBlockNumberOccupied`) or a step checkpoint or recovery path would
   exceed TIA's 143 characters (`ComponentPathTooLong`); its steps run in a short workspace
@@ -146,7 +150,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   the preview records.
 - `to_create` checks the CPU, type and version against the technology version profiles: a recorded
   refusal refuses with its native text (`TechnologyVersionRefused`), and an unprofiled pair needs
-  `unprofiledAcknowledged` (`TechnologyVersionUnprofiled` otherwise).
+  `unprofiledAcknowledged` (`TechnologyVersionUnprofiled` otherwise). `change_apply` refuses a PLC's
+  first motion object with `compile=false` (`CompileRequired`, nothing written): its generated
+  MC_Servo and MC_Interpolator stay inconsistent without a compile, and the change failed after the
+  create with `FingerprintUnavailable` and could not be restored in place.
 - `safety.logic_changes` and `block.move` are closed as `unavailable_target`: V21's offline
   `DownloadProvider` refuses the PLCSIM card and the online route refuses at prepare without a card
   from this PLC; V21 has no block move API. The release matrix counts an unavailable API with an

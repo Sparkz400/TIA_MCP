@@ -7,8 +7,9 @@ using System.Xml.Linq;
 
 namespace TiaMcp.Openness.V21
 {
-    // A PLC tag on an F-I/O address becomes a safety tag in TIA. tag_create, tag_set and tag_table_import_xml decide this before
-    // writing anything by comparing each requested absolute address with the F-I/O address ranges of the selected PLC.
+    // A PLC tag on an F-I/O address becomes a safety tag in TIA. tag_create, tag_set, tag_table_import_xml and project-ward VCI
+    // imports of a tag table decide this before writing anything by comparing each requested absolute address with the F-I/O
+    // address ranges of the selected PLC; library_instantiate of a tag-table master copy, whose addresses it cannot read, by any range.
     internal static class TagAddressRules
     {
         // International (I/Q) and German (E/A) mnemonics; bit, byte, word, double word and long word accesses.
@@ -31,6 +32,11 @@ namespace TiaMcp.Openness.V21
         /// <summary>Every PLC tag's LogicalAddress in a SimaticML tag-table document (user constants have none).</summary>
         internal static string[] TagTableAddresses(XDocument document) =>
             document.Descendants("SW.Tags.PlcTag").Select(tag => tag.Element("AttributeList")?.Element("LogicalAddress")?.Value).Where(address => address != null).ToArray();
+
+        /// <summary>The first F-I/O with a non-empty range, or null. V21 exposes only a master copy's content names, so the addresses a
+        /// tag-table master copy brings are unknown before library_instantiate creates it; any such range refuses it.</summary>
+        internal static string AnyFIo(IEnumerable<(string IoType, int StartByte, int LengthBits, string Path)> fIoRanges) =>
+            fIoRanges.FirstOrDefault(range => range.LengthBits > 0).Path;
 
         /// <summary>The first F-I/O range (ioType, start byte, length in bits, path) the address overlaps, or null.</summary>
         internal static string FIoOverlap(string logicalAddress, IEnumerable<(string IoType, int StartByte, int LengthBits, string Path)> fIoRanges)

@@ -145,6 +145,10 @@ namespace TiaMcp.Openness.V21
                 throw new BridgeException("InvalidRequest", "The online download compiles the PLC itself before downloading; use compile=false and save=false so the applied PLCSIM route is never saved.");
             if (!compile && change.Kind == "to_create" && change.Payload["parameters"] != null)
                 throw new BridgeException("InvalidRequest", "Technology creation with initial parameters requires compile=true.");
+            if (!compile && change.Kind == "to_create" && change.Preview.Value<bool?>("firstMotionObject") == true)
+                throw new BridgeException("CompileRequired", "The PLC's first motion technology object adds the know-how protected MC_Servo and MC_Interpolator OBs, which stay inconsistent without a compile, " +
+                    "so the change could be neither fingerprinted nor restored in place. Apply it with compile=true; an unconnected real axis or encoder does not compile, so create a compilable one first " +
+                    "(on an S7-1500, a TO_PositioningAxis with parameters {\"VirtualAxis.Mode\": 1}). Nothing was written.", new JObject { ["typeIdentifier"] = change.Payload["typeIdentifier"].DeepClone() });
             if (!compile && (change.Kind == "vci_synchronize" || change.Kind == "vci_conflict_resolve") && change.Payload.Value<string>("direction") == "WorkspaceToProject")
                 throw new BridgeException("InvalidRequest", "Project-ward VCI synchronization changes PLC software and requires compile=true.");
             // network_configure kept its optional compile when it joined the hardware rules; remote-I/O fixtures defer it.
@@ -770,6 +774,13 @@ namespace TiaMcp.Openness.V21
                     preview["technologyProfile"] = AdmitTechnologyVersion(plc, payload);
                     if (preview["technologyProfile"].Value<string>("outcome") == "unprofiled")
                         ((JArray)preview["warnings"]).Add("No recorded technology version profile covers this CPU/type/version; unprofiledAcknowledged lets Siemens validate it at creation, and a native refusal requires checkpoint recovery.");
+                    // FindTechnologyEntry above traversed the same tree completely, so the type list is complete.
+                    if (TechnologyVersionProfileRules.FirstMotionObject(payload.Value<string>("typeIdentifier"),
+                            TechnologyObjects(plc.Software.TechnologicalObjectGroup, plc.Path + "/technology", new ScanBudget(50000)).Select(entry => entry.Item.OfSystemLibElement).ToArray()))
+                    {
+                        preview["firstMotionObject"] = true;
+                        ((JArray)preview["warnings"]).Add("This is the PLC's first motion technology object; it adds the know-how protected MC_Servo and MC_Interpolator OBs, so change_apply requires compile=true (CompileRequired otherwise).");
+                    }
                     if (payload["parameters"] != null)
                     {
                         var initial = ChangeObject(payload, "parameters");
