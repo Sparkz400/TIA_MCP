@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.91",
+  "catalogVersion": "0.4.92",
   "targetTiaVersions": [
     21
   ],
@@ -3303,6 +3303,25 @@
         "One DI 16x24VDC HF V1.0 central module, channels 0 and 1, rising edge only; falling edges, priorities, other modules and remote or shared-device modules are not exercised.",
         "OB40 runs on PLCSIM's ProcessEvent for the configured event; a rising edge written to the input tag through sim_write does not raise it.",
         "One owned PLCSIM Advanced V8 instance on Softbus; simulated runtime, not physical I/O."
+      ]
+    },
+    {
+      "id": "local.drives.index.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "027212a289cb08fe49c2cfe8cab65f07b0642e82",
+        "passedScope": "scripts/qualify_drives.py --run-native with Debug builds of 027212a2 (frozen at artifacts/dvy, --artifacts artifacts/dvo), 26/26 steps: an owned scratch CPU 1511-1 PN V4.1 with an added SINAMICS G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14), whose DriveObject.DriveObjectNumber Startdrive cannot read. drive_observe addresses its one drive object by container index (driveObjectIndex 0, driveId DO@0) with the native error as a warning and reads parameters and telegrams. drive_parameter_set (p1082[0], 1500 to 12.5) prepares by the index handle, refuses a stale expected value, an unknown parameter, the number handle (DriveObjectHandleMismatch) and p0971 (SafetyBoundary); drive_telegram_set (main telegram 1 to 20) prepares by the index handle and refuses a safety telegram and stale expected telegrams. Each applies with checkpoint and device compile (the PLC station compiled, the drive listed as not compiled) and save, reads back through drive_observe and restores from its checkpoint."
+      },
+      "artifacts": [
+        "evidence/local.drives.index.20261101.json"
+      ],
+      "limitations": [
+        "One G120C PN on an owned scratch, not connected to the CPU's IO system; offline engineering values only (no online values, upload, download or RAM-to-ROM).",
+        "The drive's telegrams carry no address ranges off the IO system, so the telegram address-shift report and overlap check ran on empty ranges.",
+        "The drive object identity is the hardware path, the container's object count, order number, firmware and parameter count; BICO sources on index-addressed drives stay unresolved.",
+        "The wrong-handle refusal ran on drive_parameter_set; drive_telegram_set resolves the drive object through the same code."
       ]
     },
     {
@@ -9157,7 +9176,7 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "Backlog for the remaining Startdrive adapters (drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation, scalar parameter writes and telegram number/insert/erase edits are tracked as drive_observe, change.drive_parameter_set and change.drive_telegram_set."
+          "Backlog for the remaining Startdrive adapters (drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection, DRIVE-CLiQ, online access, download/upload, activation, security, safety). Offline observation, scalar parameter writes and telegram number/insert/erase edits are tracked as drive_observe, change.drive_parameter_set and change.drive_telegram_set, which passed natively on a G120C PN whose objects are addressed by container index (local.drives.index.20261101). Online access, download/upload, activation, security and safety need a physical drive (B05)."
         ]
       },
       "qualification": {
@@ -25541,12 +25560,12 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Passed natively on one SINAMICS G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14) in an owned scratch CPU 1511-1 PN V4.1 (local.drives.index.20261101): p1082[0] (System.Single, 1500 to 12.5) prepared by driveObjectIndex, applied with checkpoint, device compile (the PLC station compiled, the drive listed under notCompiled) and save, read back through drive_observe and restored from its checkpoint; a stale expected value (ExpectedValueMismatch), an unknown name (ParameterNotFound), the number handle (DriveObjectHandleMismatch) and p0971 (SafetyBoundary) refused. Offline engineering values only. Not exercised natively: several parameters per change, non-floating-point values, numbered drive objects and drives with several drive objects. The record does not exercise change_status, which this kind binds, so it stays unverified until a rerun of qualify_drives.py, which now checks change_status after each apply.",
           "One exact hardwarePath and exactly one drive object handle as drive_observe reports it: driveObjectNumber, or driveObjectIndex on a drive where a drive object number cannot be read (the other handle refuses with DriveObjectHandleMismatch). Prepare and apply resolve the object again; its identity (hardware path, drive object count of the container, order number, firmware, parameter count) is part of the change fingerprint, so apply refuses with StaleRevision when it changed; 1..200 exact parameter names, each with the expected current value exactly as drive_observe reports it. Prepare and apply refuse any difference before the first write; the requested values are also part of the change fingerprint.",
           "Scalar values only, converted to the current native CLR type; BICO interconnections, unavailable values, Safety Integrated parameters (p9300..p10999) and commissioning/reset/save/motor-identification parameters (p0009, p0010, p0970-p0972, p0976, p0977, p1900, p1910, p1960, p3900) are refused.",
           "Openness exposes no per-parameter write access: a read-only or rejected value fails at the native setter after earlier writes and requires checkpoint recovery. Startdrive may recalculate dependent parameters; readback covers only the listed parameters, so compare drive_observe snapshots with drive_profile_review.",
           "compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled. No online write, download or RAM-to-ROM.",
-          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): a SINAMICS G120C PN exposes no device-level ICompilable; the device compile now compiles every other device and lists the drive under notCompiled, so device-compiled changes run in a project that holds a drive. Startdrive cannot read DriveObject.DriveObjectNumber of the G120C PN (6SL3210-1KE21-3AF1 V4.7.14), before or after compile and save and whether or not it was commissioned in the Startdrive UI (\"Drive object number could not be retrieved\"), so this kind refused at preparation with EngineeringError. A probe worker on 1 November 2026 that skipped the number read the drive object's parameters and telegrams, so the kind now addresses it by driveObjectIndex; not natively qualified yet."
+          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): a SINAMICS G120C PN exposes no device-level ICompilable; the device compile now compiles every other device and lists the drive under notCompiled, so device-compiled changes run in a project that holds a drive. Startdrive cannot read DriveObject.DriveObjectNumber of the G120C PN (6SL3210-1KE21-3AF1 V4.7.14), before or after compile and save and whether or not it was commissioned in the Startdrive UI (\"Drive object number could not be retrieved\"), so this kind refused at preparation with EngineeringError; since 1 November 2026 it addresses such a drive object by driveObjectIndex."
         ]
       },
       "qualification": {
@@ -25594,13 +25613,13 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Passed natively on one SINAMICS G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14) in an owned scratch CPU 1511-1 PN V4.1 (local.drives.index.20261101): the MainTelegram number changed from 1 to 20 by driveObjectIndex, with checkpoint, device compile (the drive listed under notCompiled) and save; the readback reported the new number and sizes (4/4 to 12/4 input/output bytes), and the checkpoint restore brought back the exact rows. A safety telegram (SafetyBoundary) and stale expectedTelegrams (ExpectedValueMismatch) refused. The drive is not on an IO system, so its telegrams carried no address ranges: the address-shift report and overlap check ran on empty ranges. Supplementary and additional telegram insert/erase and numbered drive objects are not exercised. Offline engineering values only. The record does not exercise change_status, which this kind binds, so it stays unverified until a rerun of qualify_drives.py, which now checks change_status after each apply.",
           "One exact hardwarePath and exactly one drive object handle as drive_observe reports it: driveObjectNumber, or driveObjectIndex on a drive where a drive object number cannot be read (the other handle refuses with DriveObjectHandleMismatch). Prepare and apply resolve the object again; its identity (hardware path, drive object count of the container, order number, firmware, parameter count) is part of the change fingerprint, so apply refuses with StaleRevision when it changed; expectedTelegrams must equal the drive object's complete telegram rows exactly as drive_observe reports them (at most 128 telegrams with 16 addresses each). Prepare and apply refuse any difference before the write; the rows are also part of the change fingerprint.",
           "Operations: change the TelegramNumber of the only MainTelegram or SupplementaryTelegram; insert a SupplementaryTelegram (telegramNumber) or an AdditionalTelegram (inputSize/outputSize in native Telegram.GetSize units, read back through GetSize) when none of that type exists; erase the only SupplementaryTelegram or AdditionalTelegram. Startdrive's CanChangeTelegram/CanInsert* must agree; Openness has no erase check. Safety telegrams are refused as a safety boundary; torque/edge telegrams, main-telegram insert/erase, ChangeSize and PKW are not supported.",
           "Startdrive assigns addresses only during the write, so the preview shows the current rows and the request. Apply reads back every telegram row, reports the address shift, and fails after the write (checkpoint recovery) on a collateral telegram type/number change or an I/O overlap. Overlaps that already exist refuse at prepare.",
           "Overlap check: same-IoType byte ranges against every configured project address; ranges sharing an address controller, or with unresolved controllers, conflict. Matching a telegram range to its own device-item range uses native object equality or equal parent/type/start/length, which is unqualified.",
           "Technology-object connections, PLC tags and program references to the telegram are not rebound or checked beyond the mandatory device compile (compile=true compiles every project device that has a compiler service; the drive itself is listed under notCompiled). No online write, download or RAM-to-ROM.",
-          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): a SINAMICS G120C PN exposes no device-level ICompilable; the device compile now compiles every other device and lists the drive under notCompiled, so device-compiled changes run in a project that holds a drive. Startdrive cannot read DriveObject.DriveObjectNumber of the G120C PN (6SL3210-1KE21-3AF1 V4.7.14), before or after compile and save and whether or not it was commissioned in the Startdrive UI (\"Drive object number could not be retrieved\"), so this kind refused at preparation with EngineeringError. A probe worker on 1 November 2026 that skipped the number read the drive object's parameters and telegrams, so the kind now addresses it by driveObjectIndex; not natively qualified yet."
+          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): a SINAMICS G120C PN exposes no device-level ICompilable; the device compile now compiles every other device and lists the drive under notCompiled, so device-compiled changes run in a project that holds a drive. Startdrive cannot read DriveObject.DriveObjectNumber of the G120C PN (6SL3210-1KE21-3AF1 V4.7.14), before or after compile and save and whether or not it was commissioned in the Startdrive UI (\"Drive object number could not be retrieved\"), so this kind refused at preparation with EngineeringError; since 1 November 2026 it addresses such a drive object by driveObjectIndex."
         ]
       },
       "qualification": {
@@ -25645,19 +25664,21 @@
       "implementation": {
         "status": "partial",
         "limitations": [
-          "Compiled against the V21 PublicAPI only; not natively qualified.",
+          "Natively qualified on one SINAMICS G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14) added to an owned scratch CPU 1511-1 PN V4.1 (local.drives.index.20261101): its one drive object is reported by driveObjectIndex 0 (DO@0) with the unreadable number as a warning, and its parameters (paged up to the item budget and filtered by number) and main telegram read back before and after the drive_parameter_set and drive_telegram_set changes and their checkpoint restores. Offline engineering values only. Not exercised natively: drives with readable numbers or several drive objects, motor/encoder configuration entries, BICO references and telegram address ranges (the drive is not on an IO system).",
           "Siemens.Engineering.Startdrive is optional: drive code is JIT-isolated, so a missing assembly or DriveObjectContainer service reports UnsupportedCapability without affecting worker start or other tools.",
           "Each drive object returns a drive-profile-review-request.v2 snapshot (identity, offline valueDomain, parameters, telegrams). driveId is the local handle DO<driveObjectNumber>, or DO@<driveObjectIndex> on a drive where any drive object number cannot be read: every object of that drive then reports driveObjectNumber null and driveObjectIndex (its zero-based position in DriveObjects), with a warning naming the native error; family and parameter set are null with a reason, order number/firmware come from the hosting hardware item's attributes.",
           "Parameter access is always unknown: Openness exposes no per-parameter write access and the CLR Value setter exists on every parameter. Bits sub-compositions and ReadParameters are not expanded; BICO sources resolve to DO<n> plus the exact parameter name or stay unresolved with a reason (also when the source's drive object number cannot be read).",
           "Telegram addresses use the repository's hardware Address convention (start byte, length in bits); PLC ownership, PKW and hardware identifiers are not resolved.",
           "maxItems bounds all rows; parameters page per drive object with parameterOffset/nextParameterOffset and a 50,000-parameter scan bound. Motor/encoder configuration is read only for caller-supplied dataset/encoder numbers because their index ranges are undocumented; side-effect freedom of GetCurrent*Configuration is not natively verified.",
           "No online values, upload, download, RAM-to-ROM, activation, safety or motion.",
-          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): on a SINAMICS G120C PN newly added to an owned scratch, Startdrive Openness cannot read DriveObject.DriveObjectNumber (\"could not be retrieved\"), neither before nor after a project_compile with save, and on 1 November 2026 also not on a drive commissioned in the Startdrive UI; drive_observe then dropped the drive object. A probe worker that skipped the number read the one drive object on both (1,998 parameters up to the item budget, MainTelegram 1), so drive_observe now reports it by driveObjectIndex with a warning (scopeComplete false); not natively qualified yet."
+          "Native observations (28 and 30 October 2026, local.drives.probe.20261030): on a SINAMICS G120C PN newly added to an owned scratch, Startdrive Openness cannot read DriveObject.DriveObjectNumber (\"could not be retrieved\"), neither before nor after a project_compile with save, and on 1 November 2026 also not on a drive commissioned in the Startdrive UI; drive_observe then dropped the drive object. A probe worker that skipped the number read the one drive object on both (1,998 parameters up to the item budget, MainTelegram 1), so drive_observe now reports it by driveObjectIndex with a warning (scopeComplete false)."
         ]
       },
       "qualification": {
-        "status": "unverified",
-        "evidenceIds": []
+        "status": "verified",
+        "evidenceIds": [
+          "local.drives.index.20261101"
+        ]
       },
       "availability": {
         "status": "conditional",

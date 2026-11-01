@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.91`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.92`.
 
 ### Added
 
@@ -22,7 +22,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   schemas for 85 tools ([MCP surface](docs/reference/mcp-surface.md)).
 - **Engineering changes** through the prepare/apply/restore workflow: hardware families and CPU
   parameters, device and project compile, tag tables, software units (rename and create from a unit
-  master copy), motion connections, PLC documents, project copy
+  master copy), motion connections, SINAMICS drive parameters and telegrams (by container index when
+  Startdrive cannot read the drive object number), PLC documents, project copy
   and compare, connections, alarms, GRAPH, CAx import and export, OPC UA server interfaces and role
   mappings, web server and certificates, safety F-parameters and F-block import, block protection
   and the CPU protection level through a credential route, watch and force tables, library maintenance and combined PLC library
@@ -144,6 +145,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- `drive_telegram_set` refused every prepare with `ExpectedValueMismatch`: telegram rows carried a
+  string-typed null that never equals the null of the echoed `expectedTelegrams`; they now carry real
+  JSON nulls (`local.drives.index.20261101`).
 - Defects found in native runs across text-list import (V21 silently altered some content; those
   inputs are now refused), DB snapshots, OPC UA role mappings, TCP/IP provisioning, the Add-In
   sandbox, project translations and the read tools; each is recorded in the status log.
@@ -210,10 +214,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 - Pre-1.0. Use it only with offline projects, copies, scratch projects and simulators you own,
   never with production PLCs or plants.
-- 451 of 479 catalog features are verified; 108 release-matrix cells are open and 6 deferred
+- 454 of 479 catalog features are verified; 96 release-matrix cells are open and 6 deferred
   ([STATUS](docs/STATUS.md), [TODO](docs/TODO.md)).
-- V21 boundaries: no public API forces a value, Startdrive cannot read the number of a drive added
-  through Openness (its drive objects are addressed by position), an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
+- V21 boundaries: no public API forces a value, an OPC UA reference-namespace import crashes TIA, V21 refuses the CPU protection
   level while UMAC runtime access is enabled (its password has a credential route), the PLC's OPC UA
   server has no `HistoryRead`, no public member moves a PLC block, Openness cannot install a GSD
   file, and a safety program cannot be loaded into PLCSIM (the offline memory-card download is

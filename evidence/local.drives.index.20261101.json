@@ -1,0 +1,86 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.drives.index.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T16:36:56+00:00",
+  "source": {
+    "commit": "027212a289cb08fe49c2cfe8cab65f07b0642e82",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_drives.py --run-native with Debug builds of 027212a2 (frozen at artifacts/dvy, --artifacts artifacts/dvo), 26/26 steps: an owned scratch CPU 1511-1 PN V4.1 with an added SINAMICS G120C PN (6SL3210-1KE21-3AF1, firmware 4.7.14), whose DriveObject.DriveObjectNumber Startdrive cannot read. drive_observe addresses its one drive object by container index (driveObjectIndex 0, driveId DO@0) with the native error as a warning and reads parameters and telegrams. drive_parameter_set (p1082[0], 1500 to 12.5) prepares by the index handle, refuses a stale expected value, an unknown parameter, the number handle (DriveObjectHandleMismatch) and p0971 (SafetyBoundary); drive_telegram_set (main telegram 1 to 20) prepares by the index handle and refuses a safety telegram and stale expected telegrams. Each applies with checkpoint and device compile (the PLC station compiled, the drive listed as not compiled) and save, reads back through drive_observe and restores from its checkpoint.",
+  "limitations": [
+    "One G120C PN on an owned scratch, not connected to the CPU's IO system; offline engineering values only (no online values, upload, download or RAM-to-ROM).",
+    "The drive's telegrams carry no address ranges off the IO system, so the telegram address-shift report and overlap check ran on empty ranges.",
+    "The drive object identity is the hardware path, the container's object count, order number, firmware and parameter count; BICO sources on index-addressed drives stay unresolved.",
+    "The wrong-handle refusal ran on drive_parameter_set; drive_telegram_set resolves the drive object through the same code."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "9ce6d6dd8356a3cd0c24a840abe5a76d17f9436158f5f608187f8cefbe627f38"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "35184c70db5fced9cabab8f785a65b6b4b48347eb1baf1528db8aa4adf34df68"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "672c33f0d01cd623f6b5f5ec028b02a955b0eaf055a8b0d934129a807f282eb8",
+      "bytes": 6379525,
+      "completed": true,
+      "steps": [
+        "start owned TIA drives",
+        "create owned scratch drives",
+        "prepare hardware_add",
+        "apply hardware_add without compile or save",
+        "drive_observe of the new unsaved drive",
+        "prepare project_compile",
+        "apply project_compile",
+        "project_compile lists the drive as not compiled",
+        "drive_observe after compile and save",
+        "list the drive objects",
+        "read p1120/p1082",
+        "refuse a stale expected value",
+        "refuse an unknown parameter",
+        "refuse the other drive object handle",
+        "refuse the save parameter p971",
+        "apply drive_parameter_set",
+        "drive_parameter_set compile lists the drive as not compiled",
+        "read back the parameter",
+        "restore the parameter change from its checkpoint",
+        "read the telegrams",
+        "refuse a safety telegram",
+        "refuse stale expected telegrams",
+        "apply drive_telegram_set",
+        "drive_telegram_set compile lists the drive as not compiled",
+        "read back the main telegram",
+        "restore the telegram change from its checkpoint"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "drive_observe",
+        "hardware_catalog_search",
+        "project_inventory",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare"
+      ]
+    }
+  ]
+}
