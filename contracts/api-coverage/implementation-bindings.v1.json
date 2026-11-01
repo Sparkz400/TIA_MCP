@@ -2382,8 +2382,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/DriveObjectRules.cs",
-      "sha256": "93cff3c0d39585a1425056d77bdd2d44547c1e0260301177f064ea006cfa9f1a",
-      "bytes": 4180
+      "sha256": "2757d58c2a1b4b878fdb482a1e0a1f7ac2a8c0792192b65a590a18d1f54ebb84",
+      "bytes": 4564
     },
     {
       "path": "src/TiaMcp.Openness.V21/EngineeringFingerprintRules.cs",
@@ -2617,8 +2617,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Drives.cs",
-      "sha256": "ead0610009f8098d7da355ed5a5d55123890a4b38a7bd4922192717828aabb0a",
-      "bytes": 37538
+      "sha256": "b001cfc4eb5c84c53da5c7ba51a6468f7a0b7c614fec154c2f63b1d593f268be",
+      "bytes": 37584
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.Engineering.cs",

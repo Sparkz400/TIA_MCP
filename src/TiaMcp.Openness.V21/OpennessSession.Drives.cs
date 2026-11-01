@@ -232,14 +232,14 @@ namespace TiaMcp.Openness.V21
                 string io = address.IoType.ToString(), addressId = io;
                 for (int n = 2; !addressIds.Add(addressId); n++) addressId = io + "#" + n;
                 string direction = io == "Input" || io == "Output" ? io : null;
-                addresses.Add(new JObject { ["id"] = addressId, ["plcPath"] = null, ["direction"] = direction, ["context"] = "Telegram.Addresses",
+                addresses.Add(new JObject { ["id"] = addressId, ["plcPath"] = null, ["direction"] = DriveObjectRules.Text(direction), ["context"] = "Telegram.Addresses",
                     ["startAddress"] = address.StartAddress < 0 ? null : (int?)address.StartAddress, ["addressUnit"] = "byte",
                     ["length"] = address.Length < 0 ? null : (int?)address.Length, ["lengthUnit"] = "bit",
                     ["unknownReason"] = "PLC ownership is not resolved by drive_observe" + (direction == null ? "; IoType " + io + " is neither Input nor Output" : "") + "." });
             }
             return new JObject { ["id"] = id, ["type"] = type, ["number"] = telegram.TelegramNumber,
                 ["inputBytes"] = telegram.GetSizeInBytes(AddressIoType.Input), ["outputBytes"] = telegram.GetSizeInBytes(AddressIoType.Output),
-                ["addressesComplete"] = complete, ["addresses"] = addresses, ["unknownReason"] = complete ? null : "More than 16 addresses; capture is truncated." };
+                ["addressesComplete"] = complete, ["addresses"] = addresses, ["unknownReason"] = DriveObjectRules.Text(complete ? null : "More than 16 addresses; capture is truncated.") };
         }
 
         // Dataset/encoder indices are caller-supplied: their ranges are not documented, so none are guessed.

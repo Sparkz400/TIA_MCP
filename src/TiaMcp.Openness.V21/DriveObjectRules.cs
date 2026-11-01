@@ -16,6 +16,10 @@ namespace TiaMcp.Openness.V21
 
         internal static string DriveId(bool byIndex, int? number, int index) => byIndex ? "DO@" + index : "DO" + number;
 
+        /// <summary>A JSON null for a null string. Newtonsoft turns a string-typed null into a String JValue, which prints as null but never
+        /// DeepEquals the null of an echoed expectedTelegrams, so drive_telegram_set could not prepare (drive run dvn).</summary>
+        internal static JToken Text(string value) => value == null ? JValue.CreateNull() : new JValue(value);
+
         /// <summary>The one handle a change payload names, driveObjectNumber or driveObjectIndex, after checking its value.</summary>
         internal static string Handle(JObject payload)
         {

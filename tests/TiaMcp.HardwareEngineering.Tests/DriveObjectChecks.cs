@@ -23,6 +23,10 @@ internal static class DriveObjectChecks
         Check(DriveObjectRules.DriveId(false, 3, 0) == "DO3" && DriveObjectRules.DriveId(true, null, 0) == "DO@0" && DriveObjectRules.DriveId(true, 1, 1) == "DO@1",
             "driveId is DO<number> or DO@<index>, never mixed on one drive");
 
+        // An echoed telegram row must equal the worker's own: a string-typed null would not (drive run dvn).
+        var row = new JObject { ["unknownReason"] = DriveObjectRules.Text(null), ["direction"] = DriveObjectRules.Text("Input") };
+        Check(JToken.DeepEquals(row, JToken.Parse(row.ToString())) && !JToken.DeepEquals(new JObject { ["unknownReason"] = (string)null }, JToken.Parse("{\"unknownReason\":null}")),
+            "telegram rows carry real JSON nulls, so an echoed expectedTelegrams matches");
         Check(DriveObjectRules.Handle(Number(1)) == "driveObjectNumber" && DriveObjectRules.Handle(Index(0)) == "driveObjectIndex", "a payload names its one handle");
         Refuse(() => DriveObjectRules.Handle(new JObject { ["driveObjectNumber"] = 1, ["driveObjectIndex"] = 0 }), "InvalidRequest", "both handles refused", "exactly one");
         Refuse(() => DriveObjectRules.Handle(new JObject { ["hardwarePath"] = "/d" }), "InvalidRequest", "no handle refused", "exactly one");
