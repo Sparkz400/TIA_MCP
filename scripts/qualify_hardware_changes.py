@@ -591,11 +591,13 @@ def gsd_device(run, rows=None, restore=False):
     path, controller = prefix + interface, run.path("HwPeer", "items", "HwPeerCpu", "items", "PROFINET%20interface_1")
     payload = {"hardwarePath": path, "connectorIndex": 0, "controllerHardwarePath": controller, "controllerIndex": 0}
     generated = lambda applied, state: [key for key in state if key.startswith(constant(run, MP, head + "~"))]
+    # Unlike the ET 200MP head, the GSD's ports keep their state on assignment (discovery hg4).
+    items = lambda applied, state: [key for key in head_items(run, device, head)(applied, state) if "/items/Port%20" not in key]
     def assign(restored):
         return run.apply("assign %s to HwPeerCpu%s" % (device, ", restored" if restored else ""), "network_io_assign", payload,
                          {"effects": [{"hardwarePath": path, "connectorIndex": 0, "beforeIoSystem": None, "afterIoSystem": IO_SYSTEM, "disconnect": False, "sharedDevice": False}]},
                          shown={**payload, "addressControllerOwnerPath": run.path("HwPeer", "items", "HwPeerCpu")},
-                         changed=lambda applied, state: head_items(run, device, head)(applied, state) + ["hw:" + controller], added=generated, restore=restored, boundary=True)
+                         changed=lambda applied, state: items(applied, state) + ["hw:" + controller], added=generated, restore=restored, boundary=True)
     if restore:
         run.b0 = run.current
         assign(True)
