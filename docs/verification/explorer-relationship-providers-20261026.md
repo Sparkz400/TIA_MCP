@@ -171,5 +171,5 @@ python scripts/qualify_project_explorer_relationships.py --release-file artifact
   These have offline oracle tests only.
 - Broader network topologies: several subnets, shared devices, redundancy and couplers.
 - Populated watch tables and external sources against an independent oracle.
-- Fresh desktop/native transport acceptance ([checklist](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual-open)).
+- Fresh desktop/native transport acceptance ([checklist](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual)).
 - Alarm text lists and libraries remain outside the tree; physical topology stays unsupported.

@@ -78,4 +78,4 @@ explicitly.
 - Whole-project relationship completeness is never claimed.
 - The timings come from one machine and are not a contention-independent guarantee.
 - Desktop MCP Apps host acceptance stays open and needs a host product; see the
-  [manual procedure](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual-open).
+  [manual procedure](../guides/project-explorer.md#desktop-mcp-apps-host-acceptance-manual).

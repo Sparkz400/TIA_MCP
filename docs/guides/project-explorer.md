@@ -28,13 +28,13 @@ The artifact manifest contains a host-owned path, byte length and SHA-256. Use `
 
 Clients advertising the MCP Apps extension and `text/html;profile=mcp-app` receive `ui://tia-project-explorer/view.html`. The resource has no network domains and the browser negotiates host capabilities before calling tools. Clients without negotiated support retain structured results and HTML export. Protocol tests verify both cases; that is separate from qualification of a particular desktop product. The implementation follows the [MCP Apps specification](https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx).
 
-### Desktop MCP Apps host acceptance (manual, open)
+### Desktop MCP Apps host acceptance (manual)
 
-VS Code 1.140.0 has passed [desktop rendering and retained-snapshot interaction checks](../verification/explorer-desktop-20261025.md), including resize negotiation and historical-selection refusal. Full production Host/native acceptance remains open. Register the engineering Host as a stdio server in that product, then record each step with its product name and version:
+VS Code 1.144.0 passed the full roundtrip with the production Host and a native capture on 1 November 2026 ([record](../verification/explorer-desktop-20261101.md)); VS Code 1.140.0 had passed [desktop rendering and retained-snapshot interaction checks](../verification/explorer-desktop-20261025.md) on 25 October. To qualify another product, register the engineering Host as a stdio server in it, then record each step with its product name and version:
 
 1. **Negotiated resource loading.** `tools/list` exposes `_meta.ui.resourceUri` only after the product advertises MCP Apps; the product loads `ui://tia-project-explorer/view.html` with no network requests (check the product's developer console).
 2. **Exact selection roundtrip.** After `project_model_capture`, select a block in the embedded tree, send the selection, and confirm the agent's next `project_model_details` call carries all six reference fields unchanged and matches an independent `block_read`.
-3. **Stale and disconnected states.** Run `tia_detach`, then reuse the selection: the view shows the stale/disconnected state and the call returns `SessionMismatch`, `StaleSelection` or `SnapshotInvalidated`, never another object.
+3. **Stale and disconnected states.** Run `tia_detach`, then reuse the selection: the view shows the stale/disconnected state and the call returns `SessionMismatch`, `StaleSelection`, `SnapshotInvalidated` or `ModelInvalidated`, never another object.
 4. **Artifact fallback.** In the same product with MCP Apps disabled (or in a product without it), the same capture returns structured results and `project_model_export` HTML that opens offline.
 
 Keep screenshots and the product's MCP log with the record. Browser protocol fixtures (`browser-native.mjs`) do not substitute for this check.
