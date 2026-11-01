@@ -4,7 +4,7 @@
   "frozenFrom": {
     "catalog": "contracts/feature-catalog.v1.json",
     "catalogVersion": "0.4.86",
-    "catalogSha256": "1468027294963fb286ea891a44472b0b1910d72db06acfbb267e5080310514b1",
+    "catalogSha256": "834c5c42ebb42a1ee29faea8b276f3af0013d2ed5aa07cc2566672c97ad6c273",
     "ledger": "docs/plans/release-obligations-20261015.json",
     "ledgerSha256": "37f5b0a2328ebef78a6f1f623adb1bc055fb7fc8ff2a83ed110dba71a6618b24"
   },
@@ -5354,7 +5354,9 @@
       "owners": [
         "D14"
       ],
-      "evidenceIds": [],
+      "evidenceIds": [
+        "local.safety.logic_plcsim_boundary.20261101"
+      ],
       "cells": [
         {
           "gate": "AC-identity",
@@ -26425,6 +26427,21 @@
         {
           "path": "evidence/local.safety.fparameter_discovery.20261031.json",
           "sha256": "dd03f7e1737913324de27efc412aed7058d73b29bf252a53d607ac598ef4d3b4"
+        }
+      ],
+      "notRetained": []
+    },
+    {
+      "id": "local.safety.logic_plcsim_boundary.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21
+      },
+      "sourceCommit": "a7740570057b1f4f36ec839dd6b6a463ff63cedb",
+      "retained": [
+        {
+          "path": "evidence/local.safety.logic_plcsim_boundary.20261101.json",
+          "sha256": "159d5f0d948c435aa454b094a30caeae8a57de72c19cebc9fa3c5f64f50d47e0"
         }
       ],
       "notRetained": []

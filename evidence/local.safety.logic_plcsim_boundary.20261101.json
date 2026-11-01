@@ -1,0 +1,91 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.safety.logic_plcsim_boundary.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T02:27:44+00:00",
+  "source": {
+    "commit": "a7740570057b1f4f36ec839dd6b6a463ff63cedb",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/probe_safety_logic.py on a frozen Debug build of a7740570 (artifacts/w2bs5, git archive), 25/25 steps, PLCSIM Advanced V8 on Softbus. Owned scratch with the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF (input start byte 0). project_simulation_enable without plcPath compiled all three devices with zero errors; safety_inspect showed no safety password and no login. safety_import_xml re-imported Main_Safety_RTG1 changed to two F-FBD networks (SafeOut %M100.0 := F-DI channel 0 by absolute address %I0.0, SafeAlive %M100.1 := TRUE) with checkpoint, device compile including the safety program (zero errors) and save; the F-runtime group kept FOB_RTG1/Main_Safety_RTG1. sim_create created an owned PLCSIM instance of ECPUType CPU1511F (license OK). simulation_download compiled the F-PLC (safety program consistent, zero errors), presented no download configuration callback, and then V21's offline DownloadProvider refused: EngineeringTargetInvocationException 'Error when calling method Download of type Siemens.Engineering.Download.DownloadProvider. An error has occured during download: Load safety program to device'. No memory card was written; the owned instance was released (unregistered). This is the boundary of the offline memory-card route for an F-CPU: the changed F-logic compiles but cannot be loaded into PLCSIM this way, so F-logic behavior and F-I/O injection were not reached.",
+  "limitations": [
+    "Only the offline DownloadProvider memory-card route (simulation_download) was tried; the online PLCSIM download route (simulation_download_online) is untested for an F-CPU.",
+    "No safety acceptance, login or password; the scratch user's fail-safe access exists in the owned scratch only."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "0d4fe7aa0f85fb231cee6075b97f868ff5fac5023db92f46a04319822c05fde9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "d77d3f79ab057df872630d5d15ccf5b29fc48d94b235964e2242b026b1bd3a23"
+    },
+    {
+      "name": "net48",
+      "files": 4,
+      "sha256": "9dfae76c4b895ee259b8f40ed70d8d3d23056308f20fa65453bdf0a67fe9087d"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "0383ef7ef6c465399e5d7cc72793b2d83d6c22daa36596f651c13b9797cf6d00",
+      "bytes": 821459,
+      "completed": true,
+      "steps": [
+        "start owned TIA safety logic",
+        "create owned scratch safety logic",
+        "prepare hardware_add",
+        "apply hardware_add",
+        "prepare hardware_add",
+        "apply hardware_add without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_configure",
+        "apply network_configure without compile",
+        "prepare network_io_assign",
+        "apply network_io_assign",
+        "prepare hardware_move",
+        "apply hardware_move",
+        "apply hardware_plug",
+        "apply hardware_plug",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "safety_inspect of the F-PLC",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "safety_import_xml of the changed F-logic",
+        "sim_release"
+      ],
+      "toolsPassed": [
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_catalog_search",
+        "hardware_inspect",
+        "project_inventory",
+        "safety_inspect",
+        "sim_create",
+        "sim_release",
+        "software_inspect",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "simulation_download"
+      ]
+    }
+  ]
+}

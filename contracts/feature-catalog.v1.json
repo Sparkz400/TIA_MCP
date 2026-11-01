@@ -3283,6 +3283,23 @@
         "Covers project_simulation_enable in a project with two PLCs (enable only) and the restore of a natively refused safety import; no F-logic behavior, PLCSIM download or F-I/O injection.",
         "The scratch user's fail-safe access exists in the owned scratch only; no safety login, password, acceptance or download."
       ]
+    },
+    {
+      "id": "local.safety.logic_plcsim_boundary.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "a7740570057b1f4f36ec839dd6b6a463ff63cedb",
+        "passedScope": "scripts/probe_safety_logic.py on a frozen Debug build of a7740570 (artifacts/w2bs5, git archive), 25/25 steps, PLCSIM Advanced V8 on Softbus. Owned scratch with the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF (input start byte 0). project_simulation_enable without plcPath compiled all three devices with zero errors; safety_inspect showed no safety password and no login. safety_import_xml re-imported Main_Safety_RTG1 changed to two F-FBD networks (SafeOut %M100.0 := F-DI channel 0 by absolute address %I0.0, SafeAlive %M100.1 := TRUE) with checkpoint, device compile including the safety program (zero errors) and save; the F-runtime group kept FOB_RTG1/Main_Safety_RTG1. sim_create created an owned PLCSIM instance of ECPUType CPU1511F (license OK). simulation_download compiled the F-PLC (safety program consistent, zero errors), presented no download configuration callback, and then V21's offline DownloadProvider refused: EngineeringTargetInvocationException 'Error when calling method Download of type Siemens.Engineering.Download.DownloadProvider. An error has occured during download: Load safety program to device'. No memory card was written; the owned instance was released (unregistered). This is the boundary of the offline memory-card route for an F-CPU: the changed F-logic compiles but cannot be loaded into PLCSIM this way, so F-logic behavior and F-I/O injection were not reached."
+      },
+      "artifacts": [
+        "evidence/local.safety.logic_plcsim_boundary.20261101.json"
+      ],
+      "limitations": [
+        "Only the offline DownloadProvider memory-card route (simulation_download) was tried; the online PLCSIM download route (simulation_download_online) is untested for an F-CPU.",
+        "No safety acceptance, login or password; the scratch user's fail-safe access exists in the owned scratch only."
+      ]
     }
   ],
   "features": [
@@ -8431,17 +8448,20 @@
       "implementation": {
         "status": "not_implemented",
         "limitations": [
-          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py probes changed F-logic of an F-CPU 1511F-1 PN in PLCSIM Advanced V8 (import, device compile, simulation_download, RUN, F-DI input through sim_area_write, the F-logic's outputs read back) and records a V8 or V21 refusal as the boundary. Its native runs of 1 November 2026 did not reach PLCSIM: a generic tag on the F-DI's input address becomes a safety tag that tag_create refuses (SafetyBoundary), and V21 refused the probe's absolute-address F-FBD access ('The element Address has an invalid scope GlobalVariable', local.project_simulation.multi_plc.20261101). Behavior, F-CPU simulation and F-I/O injection remain unqualified."
+          "No product operation beyond change.safety_import_xml. scripts/probe_safety_logic.py (1 November 2026, local.safety.logic_plcsim_boundary.20261101): a changed Main_Safety_RTG1 (F-DI channel to bit memory, constant TRUE to bit memory) imported, compiled with the safety program and saved on a CPU 1511F-1 PN, and PLCSIM V8 created an owned CPU1511F instance, but V21's offline DownloadProvider refused to write its memory card: 'An error has occured during download: Load safety program to device'. F-CPU RUN, F-logic behavior and F-I/O injection were not reached.",
+          "Boundary of the memory-card route for F-CPUs (docs/verification/safety-logic-plcsim-20261101.md); the online PLCSIM download route (change.simulation_download_online) is untested for an F-CPU."
         ]
       },
       "qualification": {
         "status": "unverified",
-        "evidenceIds": []
+        "evidenceIds": [
+          "local.safety.logic_plcsim_boundary.20261101"
+        ]
       },
       "availability": {
         "status": "unsupported",
         "reasons": [
-          "No implemented adapter."
+          "V21's offline DownloadProvider cannot load a safety program into a PLCSIM virtual memory card (local.safety.logic_plcsim_boundary.20261101); no other route is implemented."
         ]
       },
       "prerequisites": [
