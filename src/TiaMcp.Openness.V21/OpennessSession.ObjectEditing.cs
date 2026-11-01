@@ -153,6 +153,10 @@ namespace TiaMcp.Openness.V21
             bool constant = change.Kind == "constant_create";
             string name = ChangeText(change.Payload, "name", 128), type = ChangeText(change.Payload, "dataTypeName", 256), detail = ChangeText(change.Payload, constant ? "value" : "logicalAddress", 1024);
             RejectTagNameCollision(change, plc, name, null);
+            // A tag on an F-I/O address becomes a safety tag; refuse before creating anything (sl3 created it, then refused).
+            if (!constant && TagAddressRules.Io(detail) != null && TagAddressRules.FIoOverlap(detail, FIoAddressRanges(plc)) is string fIo)
+                throw new BridgeException("SafetyBoundary", "The address " + detail + " lies in the address range of the F-I/O " + fIo +
+                    "; a tag there becomes a safety tag, which generic tag creation excludes. Nothing was created.", new JObject { ["logicalAddress"] = detail, ["fIoPath"] = fIo });
             if (!apply) return;
             if (constant)
             {

@@ -30,7 +30,7 @@ namespace TiaMcp.Openness.V21
             foreach (var entry in DeviceItems(plc.Project, lookup))
             {
                 bool fIo;
-                try { fIo = entry.Item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress"); }
+                try { fIo = IsFIo(entry.Item); }
                 catch (Exception) { warnings.Add(new JObject { ["path"] = entry.Path, ["message"] = "Native attribute metadata could not be captured." }); continue; }
                 if (!fIo) continue;
                 var source = FailsafeValue(entry.Item, "Failsafe_FSourceAddress");
@@ -110,6 +110,25 @@ namespace TiaMcp.Openness.V21
             : (change.Payload["parameters"] as JArray ?? new JArray()).OfType<JObject>().Select(row => row["name"]?.Type == JTokenType.String ? row.Value<string>("name") : null)
                 .Where(name => !FParameterAllowlistRules.Denied(name)).ToArray();
 
+        // An F-I/O exposes Failsafe_FDestinationAddress, as safety_validation_inspect and safety_fparameter_set select them.
+        private static bool IsFIo(DeviceItem item) => item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress");
+
+        // Address ranges of every F-I/O subtree whose addresses the PLC owns or may own (no or an unresolved controller counts),
+        // for tag_create. Metadata that cannot be read leaves an item out; the created tag's IsSafety readback stays the backstop.
+        private static List<(string IoType, int StartByte, int LengthBits, string Path)> FIoAddressRanges(PlcSelection plc)
+        {
+            var budget = new ScanBudget(50000);
+            var hardware = DeviceItems(plc.Project, budget).ToArray();
+            if (budget.Truncated) throw new BridgeException("TraversalLimit", "F-I/O lookup is incomplete; a tag on an I/O address cannot be checked against F-I/O address ranges.");
+            var ranges = new List<(string IoType, int StartByte, int LengthBits, string Path)>();
+            foreach (var fIo in hardware.Where(entry => { try { return IsFIo(entry.Item); } catch (Exception) { return false; } }))
+                foreach (var item in hardware.Where(entry => entry.Path == fIo.Path || entry.Path.StartsWith(fIo.Path + "/", StringComparison.Ordinal)))
+                    foreach (var address in item.Item.Addresses)
+                        if (!address.AddressControllers.Any() || address.AddressControllers.Any(controller => ControllerMatchesSelectedPlc(controller, plc.Software) != false))
+                            ranges.Add((address.IoType.ToString(), address.StartAddress, address.Length, fIo.Path));
+            return ranges;
+        }
+
         // The catalog type of an F-I/O: its own, else its direct parent module's (an ET 200SP F-I/O item has none). Never a rack's.
         private static string FIoModuleTypeIdentifier(DeviceItem item) =>
             FParameterAllowlistRules.ModuleKey(item.TypeIdentifier, (item.Parent as DeviceItem)?.TypeIdentifier)
@@ -136,7 +155,7 @@ namespace TiaMcp.Openness.V21
             var hardware = DeviceItems(project, budget).ToArray();
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "F-I/O lookup is incomplete.");
             // Every F-I/O not provably on another F-source; an unreadable F-source counts, so the collision check stays conservative.
-            var fIo = hardware.Where(entry => entry.Item.GetAttributeInfos().Any(info => info.Name == "Failsafe_FDestinationAddress")).Where(entry =>
+            var fIo = hardware.Where(entry => IsFIo(entry.Item)).Where(entry =>
                 { var source = FailsafeValue(entry.Item, "Failsafe_FSourceAddress"); return source?.Type != JTokenType.Integer || JToken.DeepEquals(source, central); }).ToArray();
             var targets = new List<(HardwareEntry Entry, string Name, object Value)>();
             var result = new JArray();

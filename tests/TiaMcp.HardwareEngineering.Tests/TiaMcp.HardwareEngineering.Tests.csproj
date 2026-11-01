@@ -10,6 +10,7 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/CompileOnlyRules.cs" Link="CompileOnlyRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/SimulationOnlineDownloadRules.cs" Link="SimulationOnlineDownloadRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/ContractDocument.cs" Link="ContractDocument.cs" />
+    <Compile Include="../../src/TiaMcp.Openness.V21/TagAddressRules.cs" Link="TagAddressRules.cs" />
     <Compile Include="../../src/TiaMcp.Openness.V21/FParameterAllowlistRules.cs" Link="FParameterAllowlistRules.cs" />
     <None Include="../../contracts/safety-fparameter-allowlist.v1.json" Link="safety-fparameter-allowlist.v1.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../../tests/TiaMcp.PlcLibraryIntegration.Tests/BridgeException.cs" Link="BridgeException.cs" />

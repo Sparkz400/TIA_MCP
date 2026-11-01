@@ -9321,7 +9321,7 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
-          "Safety units are rejected; a created tag that native TIA reports as IsSafety fails verification and requires checkpoint recovery.",
+          "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
           "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
         ]
       },
