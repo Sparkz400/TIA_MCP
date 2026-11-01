@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 from pathlib import Path
 import time
 
@@ -307,18 +308,23 @@ def stable(value):
     return value
 
 
-def hmi_snapshot(h, hmi):
-    """Every hmi_inspect section of one target: coverage status and stable rows keyed by exact object path."""
+def hmi_snapshot(h, hmi, project):
+    """Every hmi_inspect section of one target in the exact project: coverage status and stable rows keyed by object path.
+    Every page and row must name that project, so a snapshot cannot silently come from another open copy."""
     target = {"family": hmi["family"], "hmiPath": hmi["hmiPath"]}
     snapshot = {}
     def collect(label, request):
         page = inspect_all(h.client, {**request, "target": target})
         status = page["lastPage"]["coverage"]["status"]
         require(status != "truncated", "hmi_inspect %s is truncated" % label)
+        require(all(Path(p or "") == Path(project) for p in [page["lastPage"].get("projectPath"), *(r["identity"]["projectPath"] for r in page["items"])]),
+                "hmi_inspect %s did not read %s" % (label, project))
         snapshot[label] = {"coverage": status, "rows": {row["identity"]["objectPath"]: stable(row) for row in page["items"]}}
         return page["items"]
     for section in SECTIONS + (("model",) if hmi["family"] == "unified" else ()):
         rows = collect(section, {"section": section})
+        # An empty or unavailable capture would compare equal to itself.
+        require(rows or section not in ("screens", "model"), "hmi_inspect %s of %s is empty" % (section, hmi["hmiPath"]))
         if section == "screens":
             for screen in rows:
                 collect("items " + screen["identity"]["objectPath"], {"section": "items", "screenPath": screen["identity"]["objectPath"]})
@@ -341,8 +347,8 @@ def differences(before, after):
     return found
 
 
-def unchanged(h, targets, before):
-    found = {t["hmiPath"]: differences(before[t["hmiPath"]], hmi_snapshot(h, t)) for t in targets}
+def unchanged(h, targets, before, project):
+    found = {t["hmiPath"]: differences(before[t["hmiPath"]], hmi_snapshot(h, t, project)) for t in targets}
     require(not any(found.values()), "hmi_inspect differs: %s" % {path: rows[:20] for path, rows in found.items() if rows})
     return counts(before)
 
@@ -364,16 +370,32 @@ def retrieve_fits(directory):
     return len(str(Path(directory) / "recovery" / ("r_" + "0" * 12))) <= 80
 
 
+def prepared_archive(archive):
+    """The configured archive's SHA-256 as its completed preparation (<output>/result.json) recorded it; the file must match."""
+    archive = Path(archive).resolve(strict=True)
+    result_path = archive.parent.parent / "result.json"
+    result = json.loads(result_path.read_text(encoding="utf-8-sig"))
+    native = result.get("nativeResult") or {}
+    recorded = native.get("archive") or {}
+    require(archive.name == "configured.zap21" and result.get("completed") is True and native.get("completed") is True
+            and native.get("savedConfiguredArchiveCaptured") is True and Path(recorded.get("path") or "") == archive,
+            "The archive is not the configured archive of a completed prepare_hmi_fixture_ui.py run: %s" % result_path)
+    sha = hashlib.sha256(archive.read_bytes()).hexdigest()
+    require(sha == recorded.get("sha256"), "The configured archive differs from the SHA-256 its preparation recorded")
+    return {"path": str(archive), "sha256": sha, "profile": native.get("profile"),
+            "preparation": {"path": str(result_path), "sha256": hashlib.sha256(result_path.read_bytes()).hexdigest()}}
+
+
 def fixture_body(archive):
     def body(h):
         require(retrieve_fits(h.directory), "Choose a shorter --artifacts path (for example artifacts/hc)")
-        expected = hashlib.sha256(archive.read_bytes()).hexdigest()
+        fixture = prepared_archive(archive)
         h.owned_portal("hmi fixture")
-        retrieved = h.stage("retrieve the configured HMI fixture", lambda: h.tool("project_retrieve", {"archivePath": str(archive), "expectedSha256": expected}))
+        retrieved = h.stage("retrieve the configured HMI fixture", lambda: h.tool("project_retrieve", {"archivePath": fixture["path"], "expectedSha256": fixture["sha256"]}))
         project_path = retrieved["project"]["path"]
         targets = h.stage("discover HMI targets", lambda: h.tool("library_query", {"request": {"action": "hmi_targets"}})["targets"])
         require(targets and len({t["family"] for t in targets}) == 1, "Expected the fixture's HMI targets of one family: %s" % targets)
-        h.report["fixture"] = {"archive": {"path": str(archive), "sha256": expected}, "projectPath": project_path, "targets": targets}
+        h.report["fixture"] = {"archive": fixture, "projectPath": project_path, "targets": targets}
         first = {"family": targets[0]["family"], "hmiPath": targets[0]["hmiPath"]}
         h.refuse("refuse hmi_compile with an extra payload field", "hmi_compile", {"target": first, "x": 1}, "InvalidRequest")
         def no_flag():
@@ -384,19 +406,23 @@ def fixture_body(archive):
         h.stage("refuse hmi_compile without compile=true", no_flag)
         before = {}
         def capture():
-            before.update({t["hmiPath"]: hmi_snapshot(h, t) for t in targets})
+            before.update({t["hmiPath"]: hmi_snapshot(h, t, project_path) for t in targets})
             return counts(before)
         h.stage("capture hmi_inspect of every target", capture)
         for hmi in targets:
             compile_clean(h, hmi)
-        h.stage("hmi_inspect unchanged by the compiles", lambda: unchanged(h, targets, before))
+        h.stage("hmi_inspect unchanged by the compiles", lambda: unchanged(h, targets, before, project_path))
         h.stage("close the compiled session", lambda: h.tool("tia_detach"))
         h.stage("start a fresh Host", h.connect)
         h.owned_portal("reopen")
         h.stage("reopen the saved fixture", lambda: h.reopen_project(project_path))
-        h.stage("reopened hmi_inspect equals the compiled fixture", lambda: unchanged(h, targets, before))
+        h.stage("reopened hmi_inspect equals the compiled fixture", lambda: unchanged(h, targets, before, project_path))
         last = [compile_clean(h, hmi) for hmi in targets][-1]
-        restore(h, last, "hmi_compile", lambda: unchanged(h, targets, before))
+        recovered = restore(h, last, "hmi_compile", lambda: None)["recoveredProject"]["path"]
+        # change_restore leaves the recovered copy open (project_open refuses a non-empty instance); every inspected
+        # page and row must name that copy, not the saved original.
+        require(Path(recovered) != Path(project_path), "change_restore did not report a new project copy")
+        h.stage("recovered copy hmi_inspect equals the compiled fixture", lambda: unchanged(h, targets, before, recovered))
     return body
 
 

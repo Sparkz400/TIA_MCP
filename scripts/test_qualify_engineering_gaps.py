@@ -60,27 +60,80 @@ class HmiEqualityTests(unittest.TestCase):
         self.assertEqual(gaps.differences(before, snapshot([row(path, Left="10")], "unavailable")), ["screens"])
         self.assertEqual(gaps.differences(before, {}), ["screens"])
 
-    def test_snapshot_pages_every_section_and_each_screens_items(self):
-        requests = []
+    @staticmethod
+    def inspector(requests, project="D:/a/s1.ap21", filled=("screens", "model"), status="complete"):
         def tool(name, arguments):
             request = arguments["request"]
             requests.append((request["section"], request.get("screenPath")))
-            items = [row("/projects/P/hmi/screens/A")] if request["section"] == "screens" else []
-            return {"coverage": {"status": "complete"}, "items": items, "metadataRevision": "0" * 64, "nextOffset": None}
-        h = SimpleNamespace(client=SimpleNamespace(tool=tool))
-        classic = gaps.hmi_snapshot(h, {"family": "classic", "hmiPath": "/projects/P/hmi"})
+            items = [row("/projects/P/hmi/" + request["section"] + "/A")] if request["section"] in filled else []
+            return {"projectPath": project, "coverage": {"status": status}, "items": items, "metadataRevision": "0" * 64, "nextOffset": None}
+        return SimpleNamespace(client=SimpleNamespace(tool=tool))
+
+    def test_snapshot_pages_every_section_and_each_screens_items(self):
+        requests = []
+        h = self.inspector(requests)
+        classic = gaps.hmi_snapshot(h, {"family": "classic", "hmiPath": "/projects/P/hmi"}, "D:/a/s1.ap21")
         self.assertEqual(list(classic), [*gaps.SECTIONS[:3], "items /projects/P/hmi/screens/A", *gaps.SECTIONS[3:]])
         self.assertNotIn("projectPath", classic["screens"]["rows"]["/projects/P/hmi/screens/A"]["identity"])
         requests.clear()
-        unified = gaps.hmi_snapshot(h, {"family": "unified", "hmiPath": "/projects/P/hmi"})
+        unified = gaps.hmi_snapshot(h, {"family": "unified", "hmiPath": "/projects/P/hmi"}, "D:/A/S1.ap21")
         self.assertEqual(requests[-1], ("model", None))
         self.assertIn("model", unified)
 
+    def test_snapshot_must_read_the_named_project(self):
+        h = self.inspector([])
+        with self.assertRaisesRegex(AssertionError, "did not read"):
+            gaps.hmi_snapshot(h, {"family": "classic", "hmiPath": "/projects/P/hmi"}, "D:/a/recovered.ap21")
+        with self.assertRaisesRegex(AssertionError, "did not read"):
+            gaps.hmi_snapshot(self.inspector([], project=None), {"family": "classic", "hmiPath": "/projects/P/hmi"}, "D:/a/s1.ap21")
+
+    def test_empty_screens_or_model_refuse(self):
+        with self.assertRaisesRegex(AssertionError, "screens of /projects/P/hmi is empty"):
+            gaps.hmi_snapshot(self.inspector([], filled=()), {"family": "classic", "hmiPath": "/projects/P/hmi"}, "D:/a/s1.ap21")
+        with self.assertRaisesRegex(AssertionError, "model of /projects/P/hmi is empty"):
+            gaps.hmi_snapshot(self.inspector([], filled=("screens",)), {"family": "unified", "hmiPath": "/projects/P/hmi"}, "D:/a/s1.ap21")
+        classic = gaps.hmi_snapshot(self.inspector([], filled=("screens",)), {"family": "classic", "hmiPath": "/projects/P/hmi"}, "D:/a/s1.ap21")
+        self.assertNotIn("model", classic)
+
     def test_truncated_inspection_refuses(self):
-        h = SimpleNamespace(client=SimpleNamespace(tool=lambda name, arguments: {
-            "coverage": {"status": "truncated"}, "items": [], "nextOffset": None}))
         with self.assertRaisesRegex(AssertionError, "truncated"):
-            gaps.hmi_snapshot(h, {"family": "classic", "hmiPath": "/projects/P/hmi"})
+            gaps.hmi_snapshot(self.inspector([], status="truncated"), {"family": "classic", "hmiPath": "/projects/P/hmi"}, "D:/a/s1.ap21")
+
+
+class PreparedArchiveTests(unittest.TestCase):
+    def setUp(self):
+        folder = tempfile.TemporaryDirectory()
+        self.addCleanup(folder.cleanup)
+        self.root = Path(folder.name).resolve()
+        (self.root / "native").mkdir()
+        self.archive = self.root / "native" / "configured.zap21"
+        self.archive.write_bytes(b"configured archive")
+        sha = gaps.hashlib.sha256(b"configured archive").hexdigest()
+        self.result = {"completed": True, "nativeResult": {"completed": True, "savedConfiguredArchiveCaptured": True,
+                       "profile": "classic-comfort", "archive": {"path": str(self.archive).upper(), "sha256": sha}}}
+
+    def check(self):
+        (self.root / "result.json").write_text(gaps.json.dumps(self.result), encoding="utf-8")
+        return gaps.prepared_archive(self.archive)
+
+    def test_recorded_archive_is_pinned(self):
+        fixture = self.check()
+        self.assertEqual(fixture["profile"], "classic-comfort")
+        self.assertEqual(fixture["sha256"], self.result["nativeResult"]["archive"]["sha256"])
+
+    def test_changed_archive_refuses(self):
+        self.archive.write_bytes(b"edited after preparation")
+        with self.assertRaisesRegex(AssertionError, "differs from the SHA-256"):
+            self.check()
+
+    def test_incomplete_or_foreign_preparation_refuses(self):
+        for change in (lambda r: r.update(completed=False), lambda r: r["nativeResult"].update(savedConfiguredArchiveCaptured=False),
+                       lambda r: r["nativeResult"]["archive"].update(path=str(self.root / "other.zap21"))):
+            original = copy.deepcopy(self.result)
+            change(self.result)
+            with self.subTest(self.result), self.assertRaisesRegex(AssertionError, "not the configured archive"):
+                self.check()
+            self.result = original
 
 
 class PathAndHostTests(unittest.TestCase):

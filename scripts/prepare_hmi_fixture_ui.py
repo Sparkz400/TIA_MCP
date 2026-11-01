@@ -329,6 +329,7 @@ def run(args):
         with StoreExclusiveWindow([root, *args.known_store], profile['projectPath'], root / 'window',
                 mode='isolatedQualificationMutation', resources=resources,
                 effects='Prerequisite-only UI repair in a new archive copy; no online/runtime operation', isolation=isolation):
+            # checkpointRetrievalGatePassed is backed by prerequisites(): the source profile's archiveRetrievalVerified.
             admission = dict(ownedFixture=True, sequentialNativeAdmission=True, checkpointRetrievalGatePassed=True,
                 automaticReplay=False, runtimeAllowed=False, helperSha256=reference(args.helper)['sha256'],
                 archive=profile['archive'], sourceReport=reference(args.source_report), review=review,

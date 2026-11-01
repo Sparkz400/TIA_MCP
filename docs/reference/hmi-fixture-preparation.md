@@ -79,6 +79,8 @@ Neither test suite establishes successful native fixture configuration.
 
 `scripts/qualify_engineering_gaps.py --hmi-fixture <configured.zap21>` qualifies
 the production `hmi_compile` change kind on a completed preparation's archive.
+The archive must be `<output>/native/configured.zap21` of a completed preparation
+and match the SHA-256 its `<output>/result.json` recorded.
 In an owned TIA it retrieves the archive with `project_retrieve`, checks the
 refusals (an extra payload field, `compile=false`, a missing target) and the
 preview scope, then compiles every HMI target through `change_prepare` and
@@ -88,6 +90,8 @@ complete diagnostic tree, and `change_status` reads it back. `hmi_inspect`
 by the compiles. After `tia_detach` a fresh Host reopens the saved project, finds
 the same `hmi_inspect` content and compiles every target again; the last compile
 is restored from its checkpoint and the recovered copy compared once more.
+Every inspected page and row must name the project of that step (retrieved,
+reopened, recovered), and empty screens or an empty Unified model refuse.
 Session-bound identity fields and Classic export hashes are not compared.
 
 ```powershell
