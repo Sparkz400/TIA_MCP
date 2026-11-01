@@ -97,13 +97,20 @@ public sealed class EngineeringMutationAdmissionStore
     {
         string root = PackageStorage.Under(artifacts, "engineering-admissions");
         if (!Directory.Exists(root)) yield break;
-        var folders = Directory.GetDirectories(root);
-        if (folders.Length > 10000) throw new BridgeException("OperationStoreLimit", "Too many retained mutation admissions.");
+        var folders = Directory.GetDirectories(root); int kept = 0;
         foreach (string folder in folders)
         {
             string name = Path.GetFileName(folder);
             if (name.StartsWith(".preparing-", StringComparison.Ordinal) && name.Length == 43 && name[11..].All(char.IsAsciiHexDigit) || name == ".archive") continue;
-            yield return ReadUnderLock(artifacts, name, scan: true);
+            var record = ReadUnderLock(artifacts, name, scan: true);
+            // Past the bound a scan also archives a finished admission left in place, so a store that grew beyond the limit shrinks.
+            if (folders.Length > EngineeringOperationStore.ArchiveAbove && record.State is "returned" or "reconciled")
+            {
+                EngineeringOperationStore.Archive(folder, PackageStorage.Under(root, ".archive/" + name));
+                if (!Directory.Exists(folder)) continue;
+            }
+            if (++kept > 10000) throw new BridgeException("OperationStoreLimit", "Too many retained mutation admissions.");
+            yield return record;
         }
     }
 
@@ -206,6 +213,6 @@ public sealed class EngineeringMutationAdmissionStore
         string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { JsonSerializer.Serialize(stream, record, BridgeProtocol.Json); stream.Flush(true); }
-        File.Move(temporary, path, false);
+        PackageStorage.MoveDurably(temporary, path);
     }
 }

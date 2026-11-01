@@ -134,6 +134,16 @@ internal static class SimulationRuntimeControlTests
         return Task.CompletedTask;
     }
 
+    internal static Task EventTimesAreUtc()
+    {
+        // The native shape: an Unspecified V8 event time already holds UTC and only gains its zone; a Local one is converted.
+        Check.Equal("2026-10-30T07:36:19.8760000Z", SimulationRuntimeControl.EventTimeUtc(new DateTime(2026, 10, 30, 7, 36, 19, 876, DateTimeKind.Unspecified)));
+        var local = new DateTime(2026, 10, 30, 8, 36, 19, 876, DateTimeKind.Local);
+        Check.Equal(local.ToUniversalTime().ToString("O"), SimulationRuntimeControl.EventTimeUtc(local));
+        Check.Equal(true, SimulationRuntimeControl.EventTimeUtc(local).EndsWith("Z", StringComparison.Ordinal));
+        return Task.CompletedTask;
+    }
+
     // Every new runtime write sits behind the owned-instance check; the source is read like the network-mode guard.
     internal static Task WritesRequireAnOwnedInstance()
     {

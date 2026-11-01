@@ -232,6 +232,20 @@ try
             Check((await store.Read(id, [FixtureServer.Node("bool")])).Items[0].Outcome == "value", "The session reads again once the vault is free");
             Check((await store.Disconnect(id)).State == "closed", "Busy-vault fixture closes");
         }
+        {
+            // A logged-in session's requests run outside the vault: a slow read holds the vault only for the credential check.
+            long held = 0;
+            await using var store = new OpcUaRuntimeSessionStore(Path.Combine(output, "vault-released"), (_, consume) => {
+                var inside = Stopwatch.StartNew(); var bytes = JsonSerializer.SerializeToUtf8Bytes("fixture-only-secret");
+                try { consume(bytes); } finally { CryptographicOperations.ZeroMemory(bytes); held = Math.Max(held, inside.ElapsedMilliseconds); } });
+            string id = Id();
+            Check((await store.Connect(id, User(server.Selection))).State == "connected", "Vault-release fixture connects");
+            held = 0; server.ReadDelayMs = 800; var clock = Stopwatch.StartNew();
+            try { Check((await store.Read(id, [FixtureServer.Node("bool")])).Items[0].Outcome == "value", "A slow read on a username session completes"); }
+            finally { server.ReadDelayMs = 0; }
+            Check(clock.ElapsedMilliseconds >= 700 && held < 300, "The vault is not held while the read waits on the server (" + held + " ms)");
+            Check((await store.Disconnect(id)).State == "closed", "Vault-release fixture closes");
+        }
         await using (var store = Store("browse-cancel"))
         {
             string id = Id(); await store.Connect(id, server.Selection); server.NextDelayMs = 1500;

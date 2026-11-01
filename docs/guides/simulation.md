@@ -188,7 +188,8 @@ otherwise), and are refused before any runtime call when a value or bound is inv
   call, and a display summary (`hasDisplay`, `dataLength`, SHA-256; `includeDisplayData` adds the bytes
   as base64, up to 4 MiB). With `windowMs` it subscribes to `OnOperatingStateChanged` and `OnLedChanged`
   for that window only, and returns every reported change with the runtime's event time, up to
-  `maxEvents` (the window then ends early and `truncated` is true). The subscription ends before the
+  `maxEvents` (the window then ends early and `truncated` is true). `eventTime` is UTC on the instance's
+  virtual clock (V8 reports it without a time zone; natively it matched the Host's UTC receipt time). The subscription ends before the
   call returns; nothing keeps running. V8 has no getter for LEDs, so `ledModes` holds the last mode of
   each LED reported in the window. The bridge runs one call at a time, so the window sees changes made by
   the program (for example `STP`, a cycle-time error), the PLCSIM control panel, TIA Portal or other API

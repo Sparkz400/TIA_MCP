@@ -46,6 +46,11 @@ namespace TiaMcp.Simulation
             return time;
         }
 
+        /// <summary>V8 reports event times as DateTimeKind.Unspecified holding the instance's virtual UTC clock (natively an event at
+        /// 07:36:19.876 arrived at 07:36:19.936Z on a CET host, 30 October), so they are stamped UTC; a Local time is converted.</summary>
+        public static string EventTimeUtc(DateTime time) =>
+            (time.Kind == DateTimeKind.Local ? time.ToUniversalTime() : DateTime.SpecifyKind(time, DateTimeKind.Utc)).ToString("O", CultureInfo.InvariantCulture);
+
         /// <summary>Normalized event with the V8 enum codes; every field is checked before the first runtime call.</summary>
         public static JObject Event(JToken input)
         {

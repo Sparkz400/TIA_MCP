@@ -184,9 +184,9 @@ namespace TiaMcp.Simulator.V8
                 lock (gate) { if (open && events.Count < maximum) { events.Add(item); Monitor.PulseAll(gate); } }
             }
             Delegate_II_EREC_DT_EOS_EOS state = (sender, code, time, previous, current) => Add(new JObject { ["kind"] = "operatingState",
-                ["previous"] = previous.ToString(), ["current"] = current.ToString(), ["eventTime"] = time.ToString("O"), ["errorCode"] = code.ToString() });
+                ["previous"] = previous.ToString(), ["current"] = current.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
             Delegate_II_EREC_DT_ELT_ELM led = (sender, code, time, type, mode) => Add(new JObject { ["kind"] = "led",
-                ["led"] = type.ToString(), ["mode"] = mode.ToString(), ["eventTime"] = time.ToString("O"), ["errorCode"] = code.ToString() });
+                ["led"] = type.ToString(), ["mode"] = mode.ToString(), ["eventTime"] = SimulationRuntimeControl.EventTimeUtc(time), ["errorCode"] = code.ToString() });
             var clock = Stopwatch.StartNew();
             if (window > 0)
             {

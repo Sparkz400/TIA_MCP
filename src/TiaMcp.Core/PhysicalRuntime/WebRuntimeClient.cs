@@ -115,33 +115,56 @@ public sealed class WebRuntimeClient : IDisposable
             throw Error("RuntimeAuthenticationModeUnsupported");
     }
 
+    /// <summary>A JSON string of valid Unicode up to 32 KiB, checked without a managed string: a string copy of a secret cannot be cleared.</summary>
+    public static void ValidatePassword(ReadOnlySpan<byte> passwordJson)
+    {
+        if (passwordJson.Length > 32 * 1024) throw Error("RuntimeCredentialFormatInvalid");
+        // On the stack the GC cannot move the unescaped copy and leave an uncleared one behind.
+        Span<byte> unescaped = stackalloc byte[passwordJson.Length];
+        try
+        {
+            var reader = new Utf8JsonReader(passwordJson);
+            if (!reader.Read() || reader.TokenType != JsonTokenType.String) throw Error("RuntimeCredentialFormatInvalid");
+            // CopyString unescapes and refuses invalid UTF-8 and lone surrogates; trailing text fails the next Read.
+            reader.CopyString(unescaped);
+            if (reader.Read()) throw Error("RuntimeCredentialFormatInvalid");
+        }
+        catch (Exception error) when (error is JsonException or InvalidOperationException) { throw Error("RuntimeCredentialFormatInvalid"); }
+        finally { CryptographicOperations.ZeroMemory(unescaped); }
+    }
+
     public async Task LoginAsync(string id, string user, string mode, ReadOnlyMemory<byte> passwordJson, CancellationToken cancellationToken)
     {
         if (loginAttempted || token is not null) throw Error("RuntimeLoginAlreadyAttempted");
-        ValidateLoginMode(user, mode);
-        using var password = JsonDocument.Parse(passwordJson, new JsonDocumentOptions { MaxDepth = 1 });
-        if (password.RootElement.ValueKind != JsonValueKind.String) throw Error("RuntimeCredentialFormatInvalid");
-        _ = new UTF8Encoding(false, true).GetByteCount(password.RootElement.GetString()!);
-        var body = Request("Api.Login", id, new { user, mode, password = password.RootElement });
-        loginAttempted = true;
-        await Exchange(body, bytes =>
+        ValidateLoginMode(user, mode); ValidatePassword(passwordJson.Span);
+        // One request buffer, cleared below: SerializeToElement would keep an uncleared copy of the password.
+        byte[] request;
+        using (var password = JsonDocument.Parse(passwordJson))
+            request = JsonSerializer.SerializeToUtf8Bytes(new { jsonrpc = "2.0", id, method = "Api.Login", @params = new { user, mode, password = password.RootElement } });
+        try
         {
-            using var response = WebRuntimeProtocol.Response(bytes, id);
-            LoginRejected = response.RootElement.TryGetProperty("error", out _);
-            var result = Result(response);
-            if (result.ValueKind != JsonValueKind.Object || !result.TryGetProperty("token", out var value) || value.ValueKind != JsonValueKind.String)
-                throw Error("RuntimeLoginResponseInvalid");
-            string supplied = value.GetString()!;
-            if (supplied.Length is < 1 or > 8192 || supplied.Any(c => c < 33 || c > 126)) throw Error("RuntimeLoginResponseInvalid");
-            token = supplied;
-            ApplyPolicy(result);
-            if (result.TryGetProperty("has_no_permissions",out var denied))
+            using var body = JsonDocument.Parse(request);
+            loginAttempted = true;
+            await Exchange(body.RootElement, bytes =>
             {
-                if (denied.ValueKind is not (JsonValueKind.True or JsonValueKind.False)) throw Error("RuntimeProfileInvalid");
-                Profile = Profile with { HasNoPermissions = denied.GetBoolean() };
-            }
-            return true;
-        }, cancellationToken);
+                using var response = WebRuntimeProtocol.Response(bytes, id);
+                LoginRejected = response.RootElement.TryGetProperty("error", out _);
+                var result = Result(response);
+                if (result.ValueKind != JsonValueKind.Object || !result.TryGetProperty("token", out var value) || value.ValueKind != JsonValueKind.String)
+                    throw Error("RuntimeLoginResponseInvalid");
+                string supplied = value.GetString()!;
+                if (supplied.Length is < 1 or > 8192 || supplied.Any(c => c < 33 || c > 126)) throw Error("RuntimeLoginResponseInvalid");
+                token = supplied;
+                ApplyPolicy(result);
+                if (result.TryGetProperty("has_no_permissions",out var denied))
+                {
+                    if (denied.ValueKind is not (JsonValueKind.True or JsonValueKind.False)) throw Error("RuntimeProfileInvalid");
+                    Profile = Profile with { HasNoPermissions = denied.GetBoolean() };
+                }
+                return true;
+            }, cancellationToken);
+        }
+        finally { CryptographicOperations.ZeroMemory(request); }
     }
 
     public async Task VerifySessionAsync(string user, string mode, CancellationToken cancellationToken)

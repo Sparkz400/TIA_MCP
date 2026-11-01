@@ -216,24 +216,13 @@ public sealed class OpcUaRuntimeSessionStore : IAsyncDisposable
             bool vaultBusy = false;
             try
             {
+                // Only the credential's state is checked under the vault lock; the request runs after it is released, so a slow
+                // server (or a capture poll) cannot hold other vault users (block protection) past their bounded wait.
                 if (entry.Status.Selection.Authentication == "username")
                 {
-                    T? value = default;
-                    BridgeException? failure = null;
-                    bool consumed = false;
-                    try
-                    {
-                        credentialConsumer(entry.Status.Selection, _ => {
-                            consumed = true;
-                            try { value = action(entry.Client, deadline.Token).GetAwaiter().GetResult(); }
-                            catch (Exception e) { failure = e is UaContinuationCleanupFailure cleanup
-                                ? new UaContinuationCleanupFailure(cleanup.OperationErrorCode) : Error(Code(e)); }
-                        });
-                    }
+                    try { credentialConsumer(entry.Status.Selection, _ => { }); }
                     // The vault stayed busy past its bounded wait before anything was sent: the session stays as it is.
-                    catch (BridgeException busy) when (!consumed && busy.Code == "CredentialStoreBusy") { vaultBusy = true; throw Error("UaCredentialStoreBusy"); }
-                    if (failure is not null) throw failure;
-                    return value!;
+                    catch (BridgeException busy) when (busy.Code == "CredentialStoreBusy") { vaultBusy = true; throw Error("UaCredentialStoreBusy"); }
                 }
                 return await action(entry.Client, deadline.Token);
             }
