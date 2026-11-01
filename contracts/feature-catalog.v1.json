@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.104",
+  "catalogVersion": "0.4.105",
   "targetTiaVersions": [
     21
   ],
@@ -3972,6 +3972,60 @@
       "limitations": [
         "One FB/UDT pair in one software unit of one S7-1500; a dependency with its own namespace and nested dependency chains are not exercised."
       ]
+    },
+    {
+      "id": "local.sim.output-refusal.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "0f4ef12549fbb82e934c801539fd76a817e61916",
+        "passedScope": "scripts/qualify_plcsim_signals.py on a frozen Debug build of 0f4ef125 (artifacts/an1, git archive), 85/85 steps, on one owned PLCSIM Advanced V8 CPU 1511 instance on Softbus of an owned scratch CPU 1511-1 PN V4.1 whose program copies IB20 to QB20 and IW22 + 1 to QW22. Symbolic output writes (1 November audit fix): sim_write of the output tag SigOutWord (%QW22), quoted and unquoted, and a sim_write_signals batch of SigMarker (%MW30), \"SigDb\".VInt and SigOutByte (%QB20) were refused with InvalidRequest naming the output symbol (details.symbol, area Output), and single sim_read calls before and after showed every value unchanged; a sim_test step writing SigOutByte was refused the same way and saved no report under simulation-tests; one sim_write of SigMarker, \"SigDb\".VInt and the input SigInByte (%IB20) then read back. The run also repeated the signals, areas, observation, foreign-instance and released-instance checks of local.plcsim_signals.20261030."
+      },
+      "artifacts": [
+        "evidence/local.sim.output-refusal.20261101.json"
+      ],
+      "limitations": [
+        "One owned PLCSIM Advanced V8 CPU 1511 instance on Softbus; output tags at %QB20 and %QW22 without a configured I/O module. Output elements or members of a structured output tag, and diagnostic_plcsim_write, which shares the check, are not exercised natively.",
+        "The program writes both output tags every scan, so the unchanged reads after a refusal show the refusal and the scan agree; a write that slipped through would be overwritten at the next scan.",
+        "Engineering scratch and simulation only; no physical PLC."
+      ]
+    },
+    {
+      "id": "local.safety.fio-routes.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a0dea8787aae7636587f017afff5791c9e67f9b",
+        "passedScope": "scripts/qualify_fio_tag_routes.py on a frozen Debug build of 4a0dea87 (artifacts/an2, git archive), 48/48 steps, in one owned scratch with the standard CPU 1511-1 PN V4.1 and an added CPU 1511F-1 PN 6ES7 511-1FL03-0AB0/V4.1 (configureScratchSecurity, failsafeRuntimeAccess; owned scratch only) plus an ET 200SP station with two F-DI 8x24VDC HF 6ES7 136-6BA01-0CA0/V2.0 on its IO system (the first F-DI's inputs start at byte 0). F-I/O tag addresses (1 November audit fix): change_prepare refused with SafetyBoundary, naming %I0.0 and the first F-DI's F-I/O, tag_create of a new tag at %I0.0 in the F-PLC's table FioTags, tag_set of FioProbe's LogicalAddress from %M40.0 to %I0.0, tag_table_import_xml of a new table with one tag at %I0.0, and vci_synchronize WorkspaceToProject of FioTags, mapped by export in SimaticML (the only VCI format V21 offered for the tag table) to a workspace outside the project and the artifact store, after its package file was edited from %M40.0 to %I0.0; library_instantiate of a master copy of the standard PLC's McTags into the F-PLC refused with SafetyBoundary naming the master copy and an F-DI. After each refusal every tag table and tag of both PLCs (software_inspect) was unchanged. The bit-memory routes applied with checkpoint, compile and save and read back: the FioTags package edited to %M41.0 synchronized project-ward, McTags with McProbe at %M60.0 imported into the standard PLC, and its master copy instantiated into the standard PLC after McProbe and McTags were deleted there."
+      },
+      "artifacts": [
+        "evidence/local.safety.fio-routes.20261101.json"
+      ],
+      "limitations": [
+        "One owned scratch: a standard CPU 1511-1 PN V4.1 and a CPU 1511F-1 PN with two ET 200SP F-DI 8x24VDC HF; addresses in the first F-DI's input range only. F-output ranges, ET 200MP and other F-modules are not exercised.",
+        "The project-ward vci_conflict_resolve route and block or SCL imports with absolute operands are not exercised; V21 offered only SimaticML as a tag table's VCI format.",
+        "The F-CPU's generated scratch user holds Full access including fail-safe (owned scratch only); no safety login, password or download."
+      ]
+    },
+    {
+      "id": "local.technology.first-motion.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "4a0dea8787aae7636587f017afff5791c9e67f9b",
+        "passedScope": "Two runs on a frozen Debug build of 0f4ef125 (artifacts/an1, git archive). First motion object (1 November audit fix), scripts/qualify_first_motion.py, 12/12 steps, in an owned scratch CPU 1511-1 PN 6ES7 511-1AL03-0AB0/V4.1 with no technology object: to_create of TO_PositioningAxis 10.0 previewed firstMotionObject with its warning; change_apply with compile=false refused with CompileRequired, and the change stayed prepared with no stage and no before.zap21, no admission stayed open, and technology_read and the program inventory equalled the baseline; the axis with parameters {\"VirtualAxis.Mode\": 1} then applied with checkpoint, compile (0 errors) and save; TO_ExternalEncoder 10.0 previewed without firstMotionObject, applied with compile=false and save=false, and change_restore retrieved its checkpoint into a new directory whose project holds the axis only. Profile rerun, scripts/probe_technology_versions.py, 50/50 steps, motion cells now compiled: the 45 cells of local.technology.version_profiles.20261031 on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7 gave the same result, 21 accepted with the same type and version and the 24 recorded refusals refused at prepare by the embedded profile (TechnologyVersionRefused); the 10 accepted motion creates applied with compile, 9 of them failed that compile as unconnected (CompileFailed after the create, TO_CommandTable 8.0 compiled), and all 21 accepted cells were restored in place by change_restore, none by discarding the Portal."
+      },
+      "artifacts": [
+        "evidence/local.technology.first-motion.20261101.json"
+      ],
+      "limitations": [
+        "One owned scratch CPU 1511-1 PN V4.1 for the refusal; the rule's other motion families and CPUs are checked offline only.",
+        "The profile rerun re-created only the accepted cells natively; the recorded refusals were refused by the embedded profile at prepare, not by V21's Create.",
+        "Engineering only: nothing downloaded, no axis moves, encoders and axes stay unconnected."
+      ]
     }
   ],
   "features": [
@@ -6461,13 +6515,14 @@
         "status": "implemented",
         "limitations": [
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): an output tag, quoted and unquoted, refused with nothing written, and a marker, a DB member and an input still written."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.runtime.frozen.20261024"
+          "local.runtime.frozen.20261024",
+          "local.sim.output-refusal.20261101"
         ]
       },
       "availability": {
@@ -6506,7 +6561,7 @@
           "Qualified by one stimulus scenario on an owned PLCSIM Advanced V8 CPU1511 scratch in RUN, in two runs; broader runtime behavior rests on the separate runtime corpus.",
           "Bounded public-API coverage; see target_capabilities and operation documentation.",
           "Steps with writes and virtualTime=true need an instance this worker created or adopted (OwnedInstanceRequired). virtualTime=true runs the scenario in TimespanSynchronized_C with StartProcessing spans and virtual-time samples, then restores the previous mode. Natively (local.plcsim_gaps.20261029) a 5 s TON scenario passed twice in 13 and 14 spans of 5.90 s virtual time; at scale factor 1 it takes wall-clock time, so the speed-up comes from sim_time scaleFactor.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a step writing an output tag refused the scenario before any write, and no report was saved."
         ]
       },
       "qualification": {
@@ -6514,7 +6569,8 @@
         "evidenceIds": [
           "local.sim.provision.20261024",
           "local.sim.state.rerun.20261028",
-          "local.plcsim_gaps.20261029"
+          "local.plcsim_gaps.20261029",
+          "local.sim.output-refusal.20261101"
         ]
       },
       "availability": {
@@ -7173,13 +7229,14 @@
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Only explicit supported objects and scopes; native protection and typed validation still apply.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026)."
+          "Every imported tag whose LogicalAddress is an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses the whole import at prepare and again before the native import with SafetyBoundary (TIA would make it a safety tag); nothing is imported (1 November 2026; rechecked natively in local.safety.fio-routes.20261101)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-routes.20261101"
         ]
       },
       "availability": {
@@ -8131,7 +8188,7 @@
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
           "The 17 October connection-service repair reports four independently probed services, explicit observed/not-exposed/failed/unvisited states, bounded sensor/field reads, exact technology-owner observation paths and field completeness. Null service observations are not capability or physical-absence proof. Native object projections remain incomplete identities; current source and changed qualification consumers have synthetic/offline evidence only. SDK and native endpoint/preservation qualification remain open; historical evidence IDs are retained.",
           "Selected technology connection references require bounded project-provider roundtrips and verified-owner channel selectors. Synthetic offline checks do not qualify native SDK, channel ownership or persistence (17 October 2026).",
-          "The first motion object of a PLC (TO_PositioningAxis, TO_SpeedAxis, TO_SynchronousAxis, TO_ExternalEncoder, TO_MeasuringInput, TO_OutputCam, TO_Cam or TO_CommandTable while the PLC holds none of them) adds the know-how protected MC_Servo and MC_Interpolator OBs, which stay inconsistent without compile, so such a change could be neither fingerprinted nor restored in place (FingerprintUnavailable, local.technology.version_profiles.20261031). The preview flags firstMotionObject, and change_apply with compile=false refuses it with CompileRequired before the checkpoint; nothing is written (1 November 2026; the refusal is not exercised natively). A later motion object may be applied without compile (local.technology.motion_connections.20261030)."
+          "The first motion object of a PLC (TO_PositioningAxis, TO_SpeedAxis, TO_SynchronousAxis, TO_ExternalEncoder, TO_MeasuringInput, TO_OutputCam, TO_Cam or TO_CommandTable while the PLC holds none of them) adds the know-how protected MC_Servo and MC_Interpolator OBs, which stay inconsistent without compile, so such a change could be neither fingerprinted nor restored in place (FingerprintUnavailable, local.technology.version_profiles.20261031). The preview flags firstMotionObject, and change_apply with compile=false refuses it with CompileRequired before the checkpoint; nothing is written (1 November 2026; rechecked natively in local.technology.first-motion.20261101: the preview flag, the refusal with no checkpoint, a compiled virtual axis, and a TO_ExternalEncoder after it applied without compile and restored from its checkpoint). A later motion object may be applied without compile (local.technology.motion_connections.20261030)."
         ]
       },
       "qualification": {
@@ -8139,7 +8196,8 @@
         "evidenceIds": [
           "local.engineering.interruption-matrix.20261027",
           "local.technology_changes.20261028",
-          "local.technology.version_profiles.20261031"
+          "local.technology.version_profiles.20261031",
+          "local.technology.first-motion.20261101"
         ]
       },
       "availability": {
@@ -9159,13 +9217,14 @@
           "contracts/technology-version-profiles.v1.json records accepted and refused cells per CPU type identifier, technology type and version; the worker embeds it and change.to_create admits, refuses with the recorded native refusal, or refuses an unprofiled pair unless unprofiledAcknowledged is set.",
           "31 October 2026 (local.technology.version_profiles.20261031): scripts/probe_technology_versions.py captured 45 cells on CPU 1511-1 PN V4.1, CPU 1511C-1 PN V2.6 and CPU 1214C DC/DC/DC V4.7 (21 accepted, 24 refused with V21's native text), each create in its own checkpoint and returned to the baseline; scripts/technology_version_profiles.py merged them into the contract. Versions were tried newest first until one was accepted, so older versions a CPU may also accept stay unprofiled. The gate's admit path ran natively for the recorded cells; its TechnologyVersionRefused and TechnologyVersionUnprofiled refusals are covered offline only.",
           "A cell covers creation at the PLC root only, not compile, connections, parameters, children (to_child_create) or behavior.",
-          "An uncompiled first motion object leaves the generated, know-how protected motion OBs (MC_Servo) inconsistent, so the engineering fingerprint and change_restore refuse (FingerprintUnavailable) until the PLC compiles; the probe recovered those creates by closing the owned Portal unsaved (the two CPU 1214C motion cells restored in place). change_apply now refuses a first motion object without compile (CompileRequired) on every CPU, so the probe compiles its motion cells; the shipped cells predate that."
+          "An uncompiled first motion object leaves the generated, know-how protected motion OBs (MC_Servo) inconsistent, so the engineering fingerprint and change_restore refuse (FingerprintUnavailable) until the PLC compiles; the probe recovered those creates by closing the owned Portal unsaved (the two CPU 1214C motion cells restored in place). change_apply now refuses a first motion object without compile (CompileRequired) on every CPU, so the probe compiles its motion cells. Its rerun on 1 November (local.technology.first-motion.20261101) gave the same 45 cells: 21 accepted again, the 24 recorded refusals refused at prepare by the profile, and all 21 accepted cells restored in place by change_restore; 9 of the 10 accepted motion creates failed their compile as unconnected (CompileFailed after the create)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.technology.version_profiles.20261031"
+          "local.technology.version_profiles.20261031",
+          "local.technology.first-motion.20261101"
         ]
       },
       "availability": {
@@ -9888,13 +9947,14 @@
           "Changed scalar-write guards require unique access metadata, known scalar types, complete batch preflight, fresh per-setter checks and exact typed readback. Null values require one explicit SupportedTypes entry. Linked-production synthetic tests do not qualify the real SDK or native preservation/recovery; historical evidence references are retained.",
           "A preceding write that changes another requested attribute type causes refusal before that later setter; split dependent edits into separately reviewed changes. Earlier setters can already have taken effect.",
           "The 17 October shared inspection-value repair bounds recursive display, excludes sensitive attribute getters, rejects duplicate metadata identities and distinguishes incomplete values/projections. It also changes software-unit relation display in the shared engineering fingerprint; that fingerprint remains incomplete metadata evidence. Linked synthetic-routine tests do not compile the native worker or qualify this source. Retained historical evidence is unchanged; repeat SDK/native qualification.",
-          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026)."
+          "A LogicalAddress change to an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native write with SafetyBoundary (TIA would make the tag a safety tag); nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-routes.20261101"
         ]
       },
       "availability": {
@@ -10101,14 +10161,15 @@
         "limitations": [
           "Natively qualified on one owned scratch CPU 1511-1 PN (V21) at PLC-root scope (local.plc_object_mutations.20261028); software units, namespaces, safety and know-how protected objects are not qualified.",
           "Exact existing table selector plus explicit name, dataTypeName and logicalAddress; names colliding case-insensitively with any tag, user constant or system constant in the selected software scope are rejected at prepare and apply.",
-          "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
+          "Safety units are rejected. An absolute input or output address (%I/%Q or %E/%A, bit to long word) inside the address range of an F-I/O the PLC owns, or may own, refuses at prepare and again before the native create with SafetyBoundary, because TIA makes such a tag a safety tag; nothing is created (1 November 2026; native run sl3 had created it first; the prepare refusal rechecked natively on an F-CPU with ET 200SP F-DI in local.safety.fio-routes.20261101). A created tag that TIA still reports as IsSafety fails verification and requires checkpoint recovery.",
           "Readback is exact: dataTypeName and logicalAddress must use the native normalized spelling (for example %M0.0)."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plc_object_mutations.rerun.20261028"
+          "local.plc_object_mutations.rerun.20261028",
+          "local.safety.fio-routes.20261101"
         ]
       },
       "availability": {
@@ -11620,7 +11681,7 @@
           "Qualified destinations: single- and multi-PLC projects (local.library_scopes.20261025), one software unit without relations (local.library_units.20261025) and a provider unit called from a related consumer unit (local.library_unit_relations.20261027); units and relations are created by a fixture tool, not an MCP route. A library type is allowed once per PLC, related units included; TIA does not apply a unit's namespace preset to library instances; an explicit namespace in a software unit is qualified for one FB root (local.library_units.namespace.20261029), for a UDT root reused as the namespaced FB's dependency and for a master copy of an FC (instanceNamespace.masterCopies); a later PLC-wide library_update_project keeps every namespaced path (local.library_units.namespace.rerun.20261031). A dependency created alongside a namespaced root keeps its type namespace: a UDT created with a namespaced FB stays in the root namespace and compiles (local.library_units.namespace.dependency.20261101); a dependency with its own type namespace and nested dependency chains are not exercised.",
           "Compiled against the installed Siemens V21 public API; each operation requires native fixture qualification on the target engineering profile.",
           "Exact GUID versions and explicit destinations are required. Unsupported and incomplete targets fail with structured errors. Know-how protected FB types and master copies are qualified (local.library_protected.20261027); V21 Openness cannot protect PLC data types or export protected versions as documents.",
-          "A tag-table master copy (destinationComposition tagTables) refuses at prepare with SafetyBoundary while the PLC owns, or may own, any F-I/O address range: V21 exposes only a master copy's content names, so the addresses it brings cannot be checked before the create, and a tag on an F-I/O address would become a safety tag; nothing is written. Import such a table with tag_table_import_xml, which checks every address (1 November 2026; not exercised natively).",
+          "A tag-table master copy (destinationComposition tagTables) refuses at prepare with SafetyBoundary while the PLC owns, or may own, any F-I/O address range: V21 exposes only a master copy's content names, so the addresses it brings cannot be checked before the create, and a tag on an F-I/O address would become a safety tag; nothing is written. Import such a table with tag_table_import_xml, which checks every address (1 November 2026; rechecked natively in local.safety.fio-routes.20261101, where the master copy still instantiated on a standard CPU without F-I/O). TIA renames a master-copy tag whose name an existing tag of the PLC already uses (McProbe became McProbe(1) in that recheck's first run, fr_eeb8be6f), and the change still reports applied, because its readback checks only the created table.",
           "Prepared library journals are durable and non-replayable after a worker restart; checkpoint retrieval recovers to new locations. Save/reopen, preservation and runtime claims require independent evidence.",
           "PLC update applies the selected source default to the entire selected PLC; V21 has no instance, block-group or software-unit update scope. Explicit forceDefault=true assigns a source default below the project default or below the source's highest release (forced downgrade, per-PLC version assignment) and makes it the project default; qualified for one root FB downgrade with an unchanged UDT dependency across two PLCs (local.library_scopes.forced.20261029). Forced dependency defaults are refused; automatic old-version deletion is not exposed.",
           "Native evidence covers the recorded V21 standard PLC fixtures, including versioned FB/UDT types; HMI types and arbitrary existing projects remain unqualified.",
@@ -11647,7 +11708,8 @@
           "local.library_scopes.rerun.20261029",
           "local.library_units.namespace.20261029",
           "local.library_units.namespace.rerun.20261031",
-          "local.library_units.namespace.dependency.20261101"
+          "local.library_units.namespace.dependency.20261101",
+          "local.safety.fio-routes.20261101"
         ]
       },
       "availability": {
@@ -19705,7 +19767,7 @@
           "Natively qualified (local.vci_mappings.20261028): one mapping synchronized ProjectToWorkspace after an in-place project edit and WorkspaceToProject after a workspace-file edit, each reading back Equal; a project-ward synchronization of every mapping refused; reopen and checkpoint restore.",
           "Payload: workspacePath, direction (ProjectToWorkspace or WorkspaceToProject), and either objectPath or allMappedObjects=true (1..200 mappings, ProjectToWorkspace only). Mappings with both ProjectObjectChanged and WorkspaceFileChanged are refused as VciConflict; WorkspaceToProject refuses WorkspaceFileMissing.",
           "Each synchronized mapping must read back CompareState Equal. A whole-workspace sync is a journaled sequence of per-mapping calls, not a transaction.",
-          "ProjectToWorkspace overwrites the previewed package files (backed up first); every other workspace file must stay byte-identical. WorkspaceToProject keeps the workspace files byte-identical, applies the guards of direct mutations (safety-unit, F-block, know-how protected objects refused) and requires compile=true. For a tag table it also applies the tag_table_import_xml rule at prepare: a tag in the package documents on an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses with SafetyBoundary; nothing is written (1 November 2026; not exercised natively).",
+          "ProjectToWorkspace overwrites the previewed package files (backed up first); every other workspace file must stay byte-identical. WorkspaceToProject keeps the workspace files byte-identical, applies the guards of direct mutations (safety-unit, F-block, know-how protected objects refused) and requires compile=true. For a tag table it also applies the tag_table_import_xml rule at prepare: a tag in the package documents on an absolute input or output address inside the address range of an F-I/O the PLC owns, or may own, refuses with SafetyBoundary; nothing is written (1 November 2026; rechecked natively in local.safety.fio-routes.20261101 on a SimaticML package, the only VCI format V21 offers a tag table).",
           "Workspace and group paths are the exact paths vci_workspace_inspect returns; objects are one exact block, PLC data type, tag table or technology object by objectPath (generated system-group objects refused).",
           "Workspace roots overlapping the project directory or the Host artifact store, drive/share roots and any symbolic link or junction (root, parents or entries) are refused. The root inventory is bounded to 20000 entries and 1 GiB and hashed at prepare; apply refuses with StaleRevision before the checkpoint if it changed, and afterwards only the previewed packages and .vci configuration may differ (MutationVerificationFailed otherwise).",
           "The engineering fingerprint additionally covers workspace groups, roots, languages, library policy and mappings; workspace files are outside it, so an interrupted apply is held for manual reconciliation. The project checkpoint never restores workspace files; files this change may overwrite or remove are copied into the change directory first."
@@ -19715,7 +19777,8 @@
         "status": "verified",
         "evidenceIds": [
           "local.vci_mappings.20261028",
-          "local.vci_git.20261031"
+          "local.vci_git.20261031",
+          "local.safety.fio-routes.20261101"
         ]
       },
       "availability": {
@@ -24500,7 +24563,7 @@
           "Refuses unless the simulator worker observes the exact instance this Host created or adopted (instance ID, name, owned storage and the supplied creationId receipt) on Softbus; physical PLCs and unowned instances are never written. Requires acknowledgeWrite, 1..16 distinct signals of an exact retained diagnostic case whose captured declarations are re-resolved against the saved review, and a declared datatype that equals the declaration and fits the typed PLCSIM access.",
           "Every expected value must equal the current typed read (Real compared at float precision) or nothing is written (preconditionMismatch). Each write is sent once in order and read back once; the sequence stops at the first failure or readback mismatch, and the scan may overwrite assignments. Refused while a runtime capture holds the instance. No forcing, batch atomicity, durable intent journal, automatic retry or running-program identity proof.",
           "Natively qualified on an owned PLCSIM Advanced V8 CPU 1511 instance on Softbus (local.plcsim_diagnostics.20261028) with one FB instance's Bool Enable: a wrong expected value returns preconditionMismatch without dispatching; a write and its restoring write each read back and the program reacts; refusals without acknowledgeWrite, for a signal outside the case, a datatype differing from the declaration and while a capture holds the instance.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); sim_write, sim_write_signals and sim_test share the check and were rechecked natively (local.sim.output-refusal.20261101), this tool was not."
         ]
       },
       "qualification": {
@@ -26626,13 +26689,14 @@
           "1-64 distinct symbols of the sim_read_signals types; every value is validated before the call. A failed item fails the call with PartialSimulationWrite and each item's result; items not reported failed may have been written.",
           "Assignments, not forces; the program scan may overwrite them.",
           "Natively one call wrote all eleven primitive types (SInt..ULInt at their range limits, Real 1.5, LReal -2.25e300), read back by single sim_read calls. A batch with an unknown symbol threw SignalConfigurationError (PartialSimulationWrite, valid items Unknown) and its valid item was written.",
-          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline only (1 November 2026); the native recheck is open."
+          "A symbol whose area in the instance's PLCSIM tag list is Output, itself or as an element or member of an entry there, is refused with InvalidRequest (the code sim_area_write refuses the output area with) before anything is written; one such symbol refuses the whole request. The reported area decides, never the name: inputs, markers, data blocks, timers and counters stay writable, and a symbol missing from the tag list is left to PLCSIM. Checked offline on 1 November 2026 and rechecked natively (local.sim.output-refusal.20261101): a batch of a marker, a DB member and an output tag refused whole, nothing written."
         ]
       },
       "qualification": {
         "status": "verified",
         "evidenceIds": [
-          "local.plcsim_signals.20261030"
+          "local.plcsim_signals.20261030",
+          "local.sim.output-refusal.20261101"
         ]
       },
       "availability": {
