@@ -565,7 +565,7 @@ Disposition("differing project without outcome holds", false, 5, false, null, "d
 Disposition("differing unsaved project holds", false, -1, false, null, "differs from its checkpoint");
 try { AdmissionReconcileRules.ApplyProject(true, DateTime.SpecifyKind(archived.AddSeconds(-1), DateTimeKind.Local), archived, false, out _); throw new Exception("Local save time accepted"); }
 catch (ArgumentException) { count++; Console.WriteLine("PASS non-UTC save time refused"); }
-foreach (var kind in new[] { "hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
+foreach (var kind in new[] { "hmi_engineering", "hmi_text_list_import", "hmi_classic_import", "hmi_external_tag_create", "hmi_screen_create", "hardware_attributes", "tag_set", "constant_set", "to_create", "to_parameters", "to_delete" })
     if (AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Target kind treated as recomputable: " + kind); else count++;
 foreach (var kind in new[] { "source_upsert", "hardware_plug", "network_configure", "tag_delete", "constant_delete", "plc_compile", "project_simulation_enable" })
     if (!AdmissionReconcileRules.OutcomeRecomputable(kind)) throw new Exception("Covered kind treated as target-dependent: " + kind); else count++;
