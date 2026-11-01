@@ -187,6 +187,41 @@ class Candidates(unittest.TestCase):
             (root / "engineering-admissions" / "note.json").write_text("{}", encoding="utf-8")
             self.assertEqual(["a0", "a1"], subject.admission_records(root))
 
+    def test_refusal_and_default_host_cases_start_from_the_base_manifest(self):
+        # ir1 (1 November): refusals() left multiInstance set, so default_host's standalone FC plan became a multi-instance plan.
+        class Staged(Exception): pass
+        for method in ("refusals", "default_host"):
+            with tempfile.TemporaryDirectory() as directory, self.subTest(method=method):
+                run = object.__new__(subject.IntegrateApplyRun)
+                run.base = {"callerMode": "existing", "root": "Gate"}
+                run.manifest = {**run.base, "multiInstance": subject.MULTI_NAME}
+                run.output, run.report, run.persist = Path(directory), {"cases": {}}, lambda: None
+                run.session = type("Session", (), {"client_factory": None})()
+                seen = []
+                def stage(archive, released): seen.append(dict(run.manifest)); raise Staged()
+                run.stage_consumer = stage
+                with self.assertRaises(Staged):
+                    getattr(run, method)("archive", {})
+                self.assertEqual([{"callerMode": "createStandaloneFc", "root": "Gate"}], seen)
+
+    def test_refused_apply_requires_the_pre_admission_refusal_and_no_admission_record(self):
+        prepared = {"changeId": "lib-" + "a" * 32, "previewHash": "b" * 64}
+        def run_with(message, admit=False):
+            directory = tempfile.mkdtemp()
+            run = object.__new__(subject.IntegrateApplyRun)
+            run.output = Path(directory)
+            def call(tool, arguments=None):
+                if tool == "change_apply":
+                    if admit: (run.output / "engineering-admissions" / "x1").mkdir(parents=True)
+                    raise NativeToolError(tool, {"error": {"code": subject.REFUSED, "message": message}})
+                return {"state": "prepared", "journal": {}}
+            run.call = call
+            return run.refused_apply(prepared)
+        self.assertEqual(subject.REFUSED, run_with(subject.BEFORE_ADMISSION + "OB insertion is refused.")["code"])
+        for message, admit in (("Combined apply refused: OB insertion is refused.", False), (subject.BEFORE_ADMISSION + "x", True)):
+            with self.subTest(message=message, admit=admit), self.assertRaises(RuntimeError):
+                run_with(message, admit)
+
     def test_host_instance_db_source_is_one_db_of_the_host_fb(self):
         source = subject.HOST_DB_SOURCE
         self.assertEqual(['DATA_BLOCK "TiaMcpComponentHost_DB"', '"TiaMcpComponentHost"'], [line for line in source.splitlines() if '"' in line])

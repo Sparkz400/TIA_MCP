@@ -75,6 +75,8 @@ REUSE_CALLER, REUSE_INSTANCE, MULTI_NAME = "TiaMcpComponentCaller2", "TiaMcpComp
 HOST_DB = HOST_FB + "_DB"
 HOST_DB_SOURCE = 'DATA_BLOCK "%s"\n{ S7_Optimized_Access := \'TRUE\' }\nVERSION : 0.1\n"%s"\nBEGIN\nEND_DATA_BLOCK\n' % (HOST_DB, HOST_FB)
 DEPENDENTS_REFUSED = "DependencyProfileUnavailable"
+# The worker's message for a combined apply refused while it resolves the shared-mutation scope (OpennessSession.SharedMutationAdmission).
+BEFORE_ADMISSION = "Combined apply refused before admission: "
 REFUSED_CASES = {"multiInstanceDependents"}
 
 
@@ -272,13 +274,17 @@ class IntegrateApplyRun(ComponentRun):
         return prepared, self.review_plan(prepared, payload, caller, caller_recipe["mode"] == "existing")
 
     def refused_apply(self, prepared, code=REFUSED):
-        """One change_apply that must be refused before any claim; the plan stays prepared."""
+        """One change_apply that must be refused before admission (since dc805b70 the worker refuses while resolving the
+        shared-mutation scope, so the Host writes no admission record) and before any claim; the plan stays prepared."""
+        admissions = admission_records(self.output)
         try:
             result = self.call("change_apply", step_request(prepared))
         except NativeToolError as error:
             detail = refusal(error, code)
         else:
             raise RuntimeError("change_apply installed a plan that must be refused: " + str(result.get("state")))
+        require((detail.get("message") or "").startswith(BEFORE_ADMISSION), "The apply was not refused before admission: " + str(detail.get("message")))
+        require(admission_records(self.output) == admissions, "The refused apply wrote an admission record.")
         status = self.call("change_status", {"changeId": prepared["changeId"]})
         require(status.get("state") == "prepared" and not (status.get("journal") or {}).get("idempotencyKeyHash"),
                 "A refused apply changed the plan's durable state.")
@@ -405,9 +411,7 @@ class IntegrateApplyRun(ComponentRun):
         block = case["combinedApply"] = require_combined_preview(prepared["preview"], refusal="The multi-instance caller ")
         require(block.get("refusalCode") == DEPENDENTS_REFUSED and host_db in (block.get("refusalDetails") or {}).get("dependents", []),
                 "The preview does not refuse the caller's instance DB as a dependent: " + str(block.get("refusalDetails")))
-        admissions = case["admissionsBefore"] = admission_records(self.output)
         case["refusal"] = self.refused_apply(prepared, DEPENDENTS_REFUSED)
-        require(admission_records(self.output) == admissions, "The refused apply wrote an admission record.")
         assert_snapshot(baseline, snapshot(self.call, out / "after-refusal"))
         case.update(outcome="refused", admissionWritten=False, projectUnchanged=True); self.persist()
         self.call("library_close", {"libraryId": opened["libraryId"]})
@@ -452,7 +456,7 @@ class IntegrateApplyRun(ComponentRun):
 
     def refusals(self, archive, released):
         """Flag on: an FBD OB caller and an existing FBD FB caller with a multi-instance are refused at apply with no project change."""
-        self.manifest["callerMode"] = "createStandaloneFc"
+        self.use({"callerMode": "createStandaloneFc"})  # each case starts from the base manifest, no multiInstance left over
         case, out = self.case("refusals", True), self.output / "refusals"
         scratch, opened, plc = self.stage_consumer(archive, released)
         exports = [artifact_bytes(self.call, self.call("block_read", {"blockPath": plc + "/blocks/" + name})["artifact"]).decode("utf-8-sig")
@@ -478,7 +482,7 @@ class IntegrateApplyRun(ComponentRun):
         """Host without the former flag: combined apply is the default, so the standalone FBD plan previews eligible (the
         install steps already applied it; it is not applied again) and an FB caller plan with an unverified multi-instance is
         refused with no change."""
-        self.manifest["callerMode"] = "createStandaloneFc"
+        self.use({"callerMode": "createStandaloneFc"})  # each case starts from the base manifest, no multiInstance left over
         self.session.client_factory = host_client(False)
         case, out = self.case("defaultHost", False), self.output / "defaultHost"
         scratch, opened, plc = self.stage_consumer(archive, released)
