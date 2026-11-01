@@ -354,6 +354,146 @@ class HardwareChangeTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             q.linked(state, local, partner, False)
 
+    def slice_run(self, stubs, coverage=None, report=None):
+        """refusal_slice with stubbed steps: the recorded calls (name, string args, restore) and the final gate."""
+        calls, run = [], q.Run.__new__(q.Run)
+        run.base, run.current, run.coverage = "/projects/P/devices/", {"view": {}}, coverage if coverage is not None else {}
+        run.h = type("H", (), {"report": dict(report or {}), "args": None})()
+        run.expect = lambda ok, label, message, detail=None: calls.append(("expect", bool(ok)))
+        def record(name, result=None):
+            return lambda *args, **kwargs: calls.append((name, *[a for a in args[1:] if isinstance(a, str)], kwargs.get("restore", False))) or result
+        defaults = {"add_cpu": record("add_cpu"), "network": record("network"), "plug": record("plug"), "address_change": record("address_change"),
+                    "sp_station": record("sp_station", q.SP), "sp_modules": record("sp_modules", ("old", "new")), "channel_gate": record("channel_gate"),
+                    "gsd_entries": lambda run: [{"typeIdentifier": "GSD:X/DAP/DAP1"}], "gsd_device": lambda run, rows=None, restore=False: run.h.report.update(gsdDevice={}),
+                    "versionless_gate": record("versionless_gate"), "profiles": lambda run, only=None: calls.append(("profiles", sorted(only))),
+                    "shared_device": record("shared", True), "shared_refusal": record("shared_refusal"), "shared_access": record("access", True),
+                    "shared_disconnect": record("disconnect", True), "link_refusals": record("link_refusals"), "second_project": record("second_project")}
+        stubs = {**defaults, **stubs}
+        saved = {name: getattr(q, name) for name in stubs}
+        try:
+            for name, stub in stubs.items():
+                setattr(q, name, stub)
+            q.refusal_slice(run)
+        finally:
+            for name, original in saved.items():
+                setattr(q, name, original)
+        return calls
+
+    def test_refusal_slice_moves_an_address_then_shares_refuses_and_opens_a_second_project(self):
+        complete = {kind: {need: ["x", "y"]} for kind, need in (("network_mrp_set", "refused"), ("hardware_shared_device_access", "refused"), ("hardware_channel_attributes", "refused"),
+                                                               ("hardware_attributes", "refused"), ("network_io_assign", "restored"), ("hardware_replace", "restored"))}
+        complete["hardware_shared_device_access"]["applied"] = ["SpDi4 outside"]
+        opened = []
+        second = lambda run, module, first: run.h.report.update(secondProject={}) or opened.append((module, first[0]))
+        calls = self.slice_run({"second_project": second}, complete)
+        names = [call[0] for call in calls]
+        # HwDi and HwDi2 come first, so the address change moves HwDi's start before the scratch CPU takes SpDi3.
+        self.assertEqual(["add_cpu", "network", "plug", "plug", "address_change", "sp_station", "sp_modules", "plug", "plug", "plug", "channel_gate", "versionless_gate",
+                          "profiles", "shared", "shared_refusal", "access", "disconnect", "link_refusals", "expect"], names)
+        self.assertEqual(("profiles", ["GSD:X/DAP/DAP1"]), calls[names.index("profiles")])
+        self.assertEqual([("old", "/projects/P/devices/")], opened)
+        self.assertEqual(("expect", True), calls[-1])
+        # Without the shared device no second project opens and the gate fails; without the GSD device its gates are skipped.
+        calls = self.slice_run({"shared_device": lambda run, restore=False: False, "gsd_device": lambda run, rows=None, restore=False: None,
+                                "second_project": second}, {})
+        self.assertFalse({"versionless_gate", "shared_refusal", "disconnect"} & {call[0] for call in calls})
+        self.assertEqual(1, len(opened))
+        self.assertEqual(("expect", False), calls[-1])
+
+    def test_sp_station_assigns_to_its_own_plc_and_creates_the_io_system(self):
+        run, calls = q.Run.__new__(q.Run), []
+        run.base = "/projects/P/devices/"
+        head, interface = run.hw("HwSp", "items", "HwSpHead"), run.hw("HwSp", "items", *q.SP.interface)
+        run.current = {"view": {interface: {"name": "PROFINET interface", "network": {"nodes": [{"name": "X1"}]}}, head: {"attributes": {"Author": "a"}},
+                                "hw:/projects/P/devices/HwSp/items/Rack_0": {"positionNumber": 0, "classification": "None"}}}
+        run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: calls.append((label, kind, payload, preview, shown, plc, expected))
+        q.sp_station(run, q.SP2, q.OTHER_IO)
+        label, kind, payload, preview, shown, plc, expected = calls[2]
+        owner = run.path("ScratchStation", "items", "ScratchPLC")
+        self.assertEqual(("assign HwSp to ScratchPLC", "network_io_assign"), (label, kind))
+        self.assertEqual((owner + "/items/PROFINET%20interface_1", q.OTHER_IO), (payload["controllerHardwarePath"], payload["createIoSystemName"]))
+        self.assertEqual((owner, q.scratch_plc(run), q.OTHER_IO), (shown["addressControllerOwnerPath"], plc, preview["effects"][0]["afterIoSystem"]))
+        own = [q.constant(run, q.SP2, "Local~" + q.OTHER_IO), q.constant(run, q.SP2, "HwSpHead~HwSpHead")]
+        state = dict.fromkeys(own + [q.constant(run, q.SP, "HwSpHead~HwSpHead")], 1)
+        self.assertEqual(sorted(own), sorted(expected["added"](None, state)))  # The scratch CPU's constants, not HwPeerCpu's.
+        calls.clear()
+        q.sp_station(run)
+        self.assertNotIn("createIoSystemName", calls[2][2])
+        self.assertEqual(q.IO_SYSTEM, calls[2][3]["effects"][0]["afterIoSystem"])
+
+    def test_link_refusals_refuse_both_ways_around_the_ring_roles(self):
+        run, calls = q.Run.__new__(q.Run), []
+        run.base, run.h = "/projects/P/devices/", type("H", (), {"report": {}, "args": None})()
+        texts = {"a ring role on a port linked to a non-ring port": "A/P2 would be a ring port while linked to B/P2, which is not a ring port; ...",
+                 "NotInRing on a port linked to a ring port": "B/P2 would leave the ring while linked to A/P2, a ring port; ..."}
+        run.refuse = lambda kind, label, payload, code: calls.append(("refuse", payload["role"], code)) or {"message": texts[label]}
+        run.expect = lambda ok, label, message, detail=None: calls.append(("expect", bool(ok)))
+        saved = q.link, q.mrp
+        try:
+            q.link = lambda run_, kind, number, restore=False, pair=None, label=None: calls.append((kind, number))
+            q.mrp = lambda run_, interface, role, domain=None, create=False, restore=False: calls.append(("mrp", role, domain, create)) or True
+            q.link_refusals(run)
+        finally:
+            q.link, q.mrp = saved
+        self.assertEqual([("hardware_port_connect", 2), ("refuse", "Manager", "NetworkPrerequisite"), ("expect", True), ("hardware_port_disconnect", 2),
+                          ("mrp", "Manager", q.RING, True), ("mrp", "Client", q.RING, False), ("hardware_port_connect", 2),
+                          ("refuse", "NotInRing", "NetworkPrerequisite"), ("expect", True)], calls)
+        calls.clear()
+        q.message(run, "x", {"message": "B/P2 would be a ring port"}, "would leave the ring")
+        self.assertEqual([("expect", False)], calls)
+
+    def test_shared_disconnect_names_the_shared_connector_and_both_owners(self):
+        run, calls = q.Run.__new__(q.Run), []
+        run.base, run.current = "/projects/P/devices/", {"view": {"k": 1}}
+        run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: calls.append((payload, preview, shown, plc, expected)) or {"changeId": "c"}
+        self.assertTrue(q.shared_disconnect(run))
+        payload, preview, shown, plc, expected = calls[0]
+        self.assertEqual({"hardwarePath": run.path("HwSp", "items", *q.SP.interface), "connectorIndex": 1, "disconnect": True, "sharedDevice": True}, payload)
+        self.assertEqual([run.path("HwPeer", "items", "HwPeerCpu")], shown["sharedAddressControllerOwnerPaths"])
+        self.assertEqual((q.scratch_plc(run), True, True), (plc, expected["restore"], expected["boundary"]))
+        self.assertIs(run.b0, run.current)
+
+    def test_second_project_stations_must_be_complementary(self):
+        def station(base, accesses, external):
+            prefix = "hw:" + base + "HwSp/items/"
+            view = {prefix + name: {"typeIdentifier": "T", "positionNumber": slot, "attributes": {"SharedDeviceAccessType": access}}
+                    for (name, slot), access in zip((("SpDi3", 1), ("SpDi", 2), ("SpDi4", 3)), accesses)}
+            view[prefix + "HwSpHead/items/PROFINET%20interface"] = {"attributes": {"NumberOfExternalIoControllers": external}}
+            return view
+        first = ("/projects/A/devices/", station("/projects/A/devices/", ("PLC", "PLC", "OutsideOfProject"), 1))
+        for accesses, external, ok in ((("OutsideOfProject", "OutsideOfProject", "PLC"), 2, True), (("OutsideOfProject", "PLC", "PLC"), 2, False),
+                                       (("OutsideOfProject", "OutsideOfProject", "PLC"), 1, False)):
+            run = q.Run.__new__(q.Run)
+            run.base, run.h = "/projects/B/devices/", type("H", (), {"report": {}, "stage": lambda self, name, operation: operation()})()
+            run.current = {"view": station(run.base, accesses, external)}
+            if ok:
+                q.complementary(run, first)
+                self.assertEqual([1, 2], run.h.report["secondProject"]["externalIoControllers"])
+            else:
+                with self.assertRaises(AssertionError):
+                    q.complementary(run, first)
+
+    def test_address_change_can_require_a_moved_start(self):
+        for moved, after, ok in ((True, 4, True), (True, 0, False), (False, 0, True)):
+            run, checks = q.Run.__new__(q.Run), []
+            run.base, run.h = "/projects/P/devices/", type("H", (), {"report": {}, "stage": lambda self, name, operation: operation(),
+                                                                     "tool": lambda self, name, arguments: {"entries": [{"typeIdentifier": "W", "articleNumber": "6ES7 521-1BL00", "typeName": "DI 32x24VDC HF"}]}})()
+            module = run.path("ScratchStation", "items", "HwDi")
+            run.current = {"view": {"hw:" + module: {"addresses": [{"ioType": "Input", "startAddress": 0, "length": 16}]}}}
+            tag = q.scratch_plc(run) + "/tags/Default%20tag%20table/tags/HwInput"
+            run.refuse = lambda *a, **k: {"details": {"referencedTags": [{"path": tag}]}}
+            run.expect = lambda ok_, *a, **k: None
+            run.apply = lambda label, kind, payload, preview=None, shown=None, plc=None, **expected: checks.append(expected.get("check"))
+            q.address_change(run, moved)
+            applied = {"readbacks": [{"role": "hardware-replace-inventory", "addressMap": [{"changed": True}],
+                                      "changedReferencedTags": [{"path": tag, "startAddress": 0, "rangeAfter": {"startAddress": after}}]}]}
+            if ok:
+                checks[-1](applied, {})
+                self.assertEqual({"before": 0, "after": after}, run.h.report["selected"]["addressStart"])
+            else:
+                with self.assertRaises(AssertionError):
+                    checks[-1](applied, {})
+
     def test_unit_scopes_keep_preset_and_relations(self):
         rows = u.scopes({"softwareScopes": [{"path": "/p/units/A", "name": "A", "kind": "softwareUnit", "namespacePreset": "N", "relations": [], "groups": ["g"], "identity": {}}]})
         self.assertEqual({"scope:/p/units/A": {"name": "A", "kind": "softwareUnit", "namespacePreset": "N", "relations": []}}, rows)

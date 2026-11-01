@@ -516,6 +516,11 @@ var gsdProfiles = new[] { new JObject { ["typeIdentifier"] = "GSD:F/D", ["firmwa
 HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", "V1.0");
 HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:Other/D", null);
 count += 2;
+// The catalog search names a versionless type's profiles by type alone: its entry's Version is the GSD file name, not a firmware.
+if (!HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:F/D") || HardwareEngineeringRules.HasProfiles(gsdProfiles, "GSD:Other/D")
+    || !HardwareEngineeringRules.HasProfiles(HardwareEngineeringRules.BundledProfileList, "OrderNumber:6ES7 131-6BF00-0BA0/V1.1"))
+    throw new Exception("Catalog profile links differ.");
+count++; Console.WriteLine("PASS catalog entries name their type's profiles, versionless ones without a firmware");
 foreach (var (label, firmware) in new[] { ("another firmware", "V2.0"), ("another firmware format", "1.0"), ("an unreadable firmware", (string)null) })
 {
     try { HardwareEngineeringRules.RequireVersionlessMatch(gsdProfiles, "GSD:F/D", firmware); throw new Exception("Versionless profile mismatch accepted: " + label); }

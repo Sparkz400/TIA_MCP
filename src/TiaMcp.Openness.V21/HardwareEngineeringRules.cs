@@ -618,6 +618,10 @@ namespace TiaMcp.Openness.V21
 
         internal static IEnumerable<JObject> BundledProfileList => BundledProfiles.Value.Values;
 
+        // Whether hardware_catalog_search names a profile of the entry's type. A versionless catalog entry's Version is no firmware (a GSD
+        // entry shows its file name), so only the type is matched; a write still selects the profile by the item's FirmwareVersion.
+        internal static bool HasProfiles(IEnumerable<JObject> profiles, string typeIdentifier) => profiles.Any(profile => profile.Value<string>("typeIdentifier") == typeIdentifier);
+
         // A write to a versionless (System:, GSD:) type that has profiles, but none for the item's firmware (unreadable, or in another
         // format than the profile recorded), fails closed instead of skipping the profile check.
         internal static void RequireVersionlessMatch(IEnumerable<JObject> profiles, string typeIdentifier, string firmwareVersion)
