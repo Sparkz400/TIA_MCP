@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "8466063e8140c079f9b76343d4d92572504c49840d3746a712c8fa65b3539eea",
-      "bytes": 1574251
+      "sha256": "ca27693772ba8efb064fa345b1d9ca96053b59f53ae988bf29d4078341f37d82",
+      "bytes": 1575765
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -103493,6 +103493,13 @@
           "artifacts": [
             "evidence/local.library_units.namespace.rerun.20261031.json"
           ]
+        },
+        {
+          "id": "local.library_units.namespace.dependency.20261101",
+          "profileSha256": "2be5288005d9d30639ff5791c1741e88c814380ae6fa6ebf0572339f92c8b1d2",
+          "artifacts": [
+            "evidence/local.library_units.namespace.dependency.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -104190,6 +104197,13 @@
           "profileSha256": "a424fc4700b6fbe1555ae308a9536a877cbf158eac0d4b846d0e1d6dbff54b43",
           "artifacts": [
             "evidence/local.library_units.namespace.rerun.20261031.json"
+          ]
+        },
+        {
+          "id": "local.library_units.namespace.dependency.20261101",
+          "profileSha256": "2be5288005d9d30639ff5791c1741e88c814380ae6fa6ebf0572339f92c8b1d2",
+          "artifacts": [
+            "evidence/local.library_units.namespace.dependency.20261101.json"
           ]
         }
       ],
@@ -128046,6 +128060,11 @@
       "sha256": "bd573e39b84a401821d52df2a033a864299401fe56a729153e0ff140dc2b48f4"
     },
     {
+      "path": "evidence/local.library_units.namespace.dependency.20261101.json",
+      "state": "observed",
+      "sha256": "2d951d552a16c68d9fbddd6358efe032809eeea29e4f05de94eb782801bb1131"
+    },
+    {
       "path": "evidence/local.library_units.namespace.rerun.20261031.json",
       "state": "observed",
       "sha256": "d105510b8b29305381480aed07ff34cdccb109ac06a6b40182e6349dea6c70b3"
@@ -128955,6 +128974,10 @@
     {
       "id": "local.library_units.namespace.20261029",
       "profileSha256": "2f1abac401b7884c189c1249daa2ae9fec63876438bc2b781834512de5c415bb"
+    },
+    {
+      "id": "local.library_units.namespace.dependency.20261101",
+      "profileSha256": "2be5288005d9d30639ff5791c1741e88c814380ae6fa6ebf0572339f92c8b1d2"
     },
     {
       "id": "local.library_units.namespace.rerun.20261031",

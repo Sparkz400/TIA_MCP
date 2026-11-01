@@ -65,7 +65,8 @@ un-namespaced UDT by its simple name, but resolves every unqualified name agains
 therefore qualifies each namespaced type and block. The runner stops at the stage "import the OB-rooted callers inside
 NAMESPACE TiaMcp_LibUnit" with V21's own message if the source is still refused.
 
-A dependency created alongside a namespaced root keeps its type namespace; that stays unexercised.
+A dependency created alongside a namespaced root keeps its type namespace; that stayed unexercised here and passed on
+1 November ([lane C](library-lane-c-20261024.md#software-units-and-namespaces--25-october-2026)).
 
 ## Native attempt — 31 October 2026
 
