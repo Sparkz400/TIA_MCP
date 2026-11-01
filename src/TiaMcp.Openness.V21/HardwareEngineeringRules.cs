@@ -11,7 +11,7 @@ namespace TiaMcp.Openness.V21
     {
         internal static bool Applies(string kind) => new[] { "hardware_plug", "hardware_move", "hardware_channel_attributes", "hardware_address_set", "network_io_assign", "hardware_cpu_memory_bytes", "hardware_cpu_parameters",
             "hardware_port_connect", "hardware_port_disconnect", "hardware_replace", "cax_import", "safety_fparameter_set", "network_configure",
-            "hardware_transfer_area_create", "hardware_transfer_area_delete" }.Contains(kind);
+            "hardware_transfer_area_create", "hardware_transfer_area_delete", "network_mrp_set", "hardware_shared_device_access" }.Contains(kind);
 
         // A channel's hardware interrupt links exactly one hardware interrupt OB of the module's own PLC. secondaryTypes holds
         // the OB event class of each block with the exact name, null for a block that is no OB.
@@ -25,6 +25,40 @@ namespace TiaMcp.Openness.V21
 
         // Port interconnections join the manifest only for kinds that change or can lose them.
         internal static bool CapturesPorts(string kind) => kind == "hardware_port_connect" || kind == "hardware_port_disconnect" || kind == "hardware_replace";
+
+        // MRP instances (domain, role, ring ports) join the manifest only for the kind that changes them.
+        internal static bool CapturesMrp(string kind) => kind == "network_mrp_set";
+
+        // The shared-device attributes join the manifest for the kinds that change them: a sharedDevice assignment (its sharedSubmodules'
+        // SharedDeviceAssignmentTarget) and hardware_shared_device_access. A plain assignment sets them on the whole station, unreviewed.
+        internal static bool CapturesSharedAccess(string kind, JObject payload) =>
+            kind == "hardware_shared_device_access" || kind == "network_io_assign" && payload?.Value<bool?>("sharedDevice") == true;
+
+        // V21 compiles a ring role only while each port link joins two ring ports or two other ports ("Ring port ... is connected to
+        // port ..., which is not a ring port", discovery hw3): one link per row, with whether each end is a ring port after the change.
+        internal static void RequireRingLinks(IEnumerable<(string Port, bool Ring, string Partner, bool PartnerRing)> links)
+        {
+            foreach (var link in links.Where(link => link.Ring != link.PartnerRing))
+                throw new BridgeException("NetworkPrerequisite", link.Port + (link.Ring ? " would be a ring port" : " would leave the ring") + " while linked to " + link.Partner +
+                    (link.PartnerRing ? ", a ring port" : ", which is not a ring port") + "; V21 fails such a link at the device compile. Disconnect it first (hardware_port_disconnect).");
+        }
+
+        // V21 SharedDeviceAccessType values a change may request (Unknown is the native unassigned state).
+        internal static readonly string[] SharedDeviceAccessTypes = { "PLC", "OutsideOfProject" };
+
+        // NumberOfExternalIoControllers a shared-access change may set. V21 states no maximum in its metadata; 32 is a conservative
+        // ceiling well above the IO controllers a shared device admits (2 to 4 for ET 200SP/MP heads), and native validation still applies.
+        internal const int MaxExternalIoControllers = 32;
+
+        internal static int RequireExternalIoControllers(JToken value)
+        {
+            if (value?.Type != JTokenType.Integer || !int.TryParse(value.ToString(), out int count) || count < 1 || count > MaxExternalIoControllers)
+                throw new BridgeException("InvalidRequest", "externalIoControllers must be an integer from 1 to " + MaxExternalIoControllers + ".");
+            return count;
+        }
+
+        // V21 MediaRedundancyRole names an MRP instance takes.
+        internal static readonly string[] MediaRedundancyRoles = { "NotInRing", "Manager", "Client", "ManagerAuto" };
 
         // Addresses and child items of one replaced subtree, read from a preservation manifest.
         internal static JObject ReplaceInventory(JArray rows, string path)
@@ -250,15 +284,26 @@ namespace TiaMcp.Openness.V21
             {
                 int connectorIndex = payload.Value<int>("connectorIndex");
                 string station = path.Substring(0, path.IndexOf("/items/", StringComparison.Ordinal));
+                bool disconnect = payload.Value<bool?>("disconnect") == true, shared = payload.Value<bool?>("sharedDevice") == true;
+                // A shared device keeps the selected interface's other connectors assigned to other controllers, whose PLCs may own station addresses.
+                var peers = new HashSet<string>((payload["sharedAddressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
+                if (shared == (peers.Count == 0)) Fail("A shared-device assignment, and only one, names the PLCs of the interface's other assigned connectors.");
+                var ownersBefore = new HashSet<string>(peers, StringComparer.Ordinal) { payload.Value<string>("addressControllerOwnerPath") };
+                var ownersAfter = disconnect ? peers : ownersBefore;
+                var sharedItems = (payload["sharedSubmodules"] as JArray ?? new JArray()).Select(item => item.Value<string>()).ToArray();
                 foreach (var planned in RemoteIoCompanionContract.ExpectedRows(payload)) expected.Add(planned.DeepClone());
+                int sharing = 0;
                 foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal)))
                     foreach (var peer in (row["network"]?["connectors"] as JArray ?? new JArray()).OfType<JObject>())
                         if ((row.Value<string>("path") != path || peer.Value<int>("index") != connectorIndex) && peer["system"]?.Value<string>("state") == "assigned")
-                            Fail("Another remote-station interface/connector is assigned; its address ownership must not be rewritten.");
+                        {
+                            if (!shared || row.Value<string>("path") != path) Fail("Another remote-station interface/connector is assigned; its address ownership must not be rewritten.");
+                            sharing++;
+                        }
+                if (shared && sharing == 0) Fail("A shared-device assignment needs another assigned connector of the selected interface.");
                 var observed = Target(after, path);
                 var connector = (JObject)selected["network"]["connectors"][connectorIndex];
                 var actual = (JObject)observed["network"]["connectors"][connectorIndex]["system"];
-                bool disconnect = payload.Value<bool?>("disconnect") == true;
                 if (disconnect)
                 {
                     if (actual.Value<string>("state") != "notAssigned") Fail("The selected connector remains assigned.");
@@ -278,22 +323,46 @@ namespace TiaMcp.Openness.V21
                     if (!JToken.DeepEquals(current, actual)) Fail("Connector does not reference the exact selected controller's I/O system.");
                 }
                 connector["system"] = actual.DeepClone();
-                // Native address ownership follows the assigned controller. It is
-                // the only allowed address change, and only on this remote station.
+                // Native address ownership follows the assigned controller. It is the only allowed address change, and only on this
+                // remote station; a sharedDevice connection moves only its sharedSubmodules subtrees to the selected PLC.
+                string selectedOwner = payload.Value<string>("addressControllerOwnerPath");
+                bool moving = shared && !disconnect;
+                if (moving && sharedItems.Length == 0) Fail("A sharedDevice connection names its sharedSubmodules.");
+                var moved = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal) &&
                     before.OfType<JObject>().Any(original => original.Value<string>("path") == row.Value<string>("path"))))
                 {
                     var actualRow = Target(after, row.Value<string>("path"));
-                    var addresses = (JArray)row["addresses"];
+                    var addresses = (JArray)row["addresses"]; var seen = actualRow["addresses"] as JArray;
+                    if (seen?.Count != addresses.Count) Fail("A remote-station item's address ranges changed in number.");
+                    string named = moving ? sharedItems.FirstOrDefault(item => InTree(row, item)) : null;
                     for (int i = 0; i < addresses.Count; i++)
                     {
                         var previousOwners = (JArray)addresses[i]["owners"];
-                        if (previousOwners.Count > 1 || previousOwners.Any(owner => owner.Value<string>() != payload.Value<string>("addressControllerOwnerPath"))) Fail("Prechange remote-station address ownership is shared, foreign or unresolved.");
-                        var owners = (JArray)actualRow["addresses"][i]["owners"];
-                        if (owners.Count > 1 || (owners.Count == 1 && (disconnect || owners[0].Value<string>() != payload.Value<string>("addressControllerOwnerPath")))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
+                        if (previousOwners.Count > 1 || previousOwners.Any(owner => !ownersBefore.Contains(owner.Value<string>()))) Fail("Prechange remote-station address ownership is shared, foreign or unresolved.");
+                        var owners = (JArray)seen[i]["owners"];
+                        if (moving)
+                        {
+                            // Rows outside the sharedSubmodules subtrees and diagnostic (zero-length) addresses stay exact.
+                            if (named == null || addresses[i].Value<long>("lengthBits") == 0) continue;
+                            if (owners.Count != 1 || owners[0].Value<string>() != selectedOwner || !JToken.DeepEquals(addresses[i]["ioType"], seen[i]["ioType"]) || !JToken.DeepEquals(addresses[i]["lengthBits"], seen[i]["lengthBits"]))
+                                Fail("A shared submodule's I/O address must end owned by exactly the selected PLC, with its I/O type and length.");
+                            if (!JToken.DeepEquals(previousOwners, owners)) moved.Add(named);
+                            // It takes a start address in that PLC's address space (discovery hw4).
+                            addresses[i] = seen[i].DeepClone();
+                            continue;
+                        }
+                        if (owners.Count > 1 || owners.Any(owner => !ownersAfter.Contains(owner.Value<string>()))) Fail("Address ownership became shared or differs from the selected PLC address controller.");
                         addresses[i]["owners"] = owners.DeepClone();
                     }
+                    // A named item takes the selected PLC as its assignment target; its subitems keep theirs or follow it.
+                    var was = row["attributes"]?["SharedDeviceAssignmentTarget"]; var becomes = actualRow["attributes"]?["SharedDeviceAssignmentTarget"];
+                    bool takes = named != null && was != null && becomes?.Type == JTokenType.String && becomes.Value<string>() == selectedOwner;
+                    if (takes) row["attributes"]["SharedDeviceAssignmentTarget"] = becomes.DeepClone();
+                    if (row.Value<string>("path") == named && (!takes || JToken.DeepEquals(was, becomes))) Fail("A sharedSubmodules item does not move its assignment target to the selected PLC: " + named);
                 }
+                foreach (string item in moving ? sharedItems : new string[0])
+                    if (!moved.Contains(item)) Fail("A sharedSubmodules item moves no I/O address to the selected PLC: " + item);
             }
             else if (kind == "network_configure")
             {
@@ -337,7 +406,7 @@ namespace TiaMcp.Openness.V21
                     Fail("The replaced item differs from its reviewed type identifier, or its name, slot or container changed.");
                 if (payload.Value<bool?>("acceptLoss") != true)
                 {
-                    var lost = ReplaceLosses(ReplaceInventory(before, path), ReplaceInventory(after, path));
+                    var lost = ReplaceLosses(ReplaceInventory(before, path), ReplaceInventory(after, path), payload.Value<bool?>("acceptAddressChange") == true);
                     if (lost.Count != 0) Fail("The replacement lost configured addresses or child items; restore the checkpoint, or prepare again with acceptLoss: true. Lost: " + lost.ToString(Newtonsoft.Json.Formatting.None));
                 }
                 // The new type may bring its own channels, attributes and children; everything outside the subtree stays exact.
@@ -356,22 +425,203 @@ namespace TiaMcp.Openness.V21
                     Fail("The selected interface's transfer areas differ from exactly one " + (create ? "created" : "deleted") + " area named " + name + ".");
                 selected["network"]["transferAreas"] = now.DeepClone();
             }
+            else if (kind == "network_mrp_set")
+            {
+                // Only the selected interface's one MRP instance may take the requested role and domain; its name and ring ports stay.
+                JObject Instance(JObject row) => (row["mrp"] as JArray)?.Count == 1 ? (JObject)row["mrp"][0] : throw new BridgeException("MutationVerificationFailed", "The selected interface has no single captured MRP instance.");
+                var old = Instance(selected); var now = Instance(Target(after, path));
+                if (now.Value<string>("role") != payload.Value<string>("role") || now.Value<string>("domain") != (payload.Value<string>("domainName") ?? old.Value<string>("domain")) ||
+                    now.Value<string>("name") != old.Value<string>("name") || !JToken.DeepEquals(now["ringPorts"], old["ringPorts"]))
+                    Fail("The selected interface's MRP instance differs from the requested role and domain, or its name or ring ports changed.");
+                selected["mrp"][0] = now.DeepClone();
+                // Only createDomain adds a domain name, to every interface row of the selected interface's subnet.
+                if (payload.Value<bool?>("createDomain") == true)
+                {
+                    string subnet = selected["mrpDomains"]?.Value<string>("subnet") ?? throw new BridgeException("MutationVerificationFailed", "The selected interface has no captured subnet MRP domains.");
+                    foreach (var row in expected.OfType<JObject>().Where(row => row["mrpDomains"]?.Value<string>("subnet") == subnet))
+                    {
+                        var names = row["mrpDomains"]["domains"].Values<string>().ToList();
+                        if (names.Contains(payload.Value<string>("domainName"))) Fail("The created MRP domain already existed.");
+                        row["mrpDomains"]["domains"] = new JArray(names.Concat(new[] { payload.Value<string>("domainName") }).OrderBy(name => name, StringComparer.Ordinal));
+                    }
+                }
+            }
+            else if (kind == "hardware_shared_device_access")
+            {
+                // The module takes the requested access; its subitems may follow it. Address ranges stay; each may lose or change its one
+                // owner among the PLCs whose I/O systems the station's connectors join.
+                string access = payload.Value<string>("accessType");
+                var controllers = new HashSet<string>((payload["addressControllerOwnerPaths"] as JArray ?? new JArray()).Select(owner => owner.Value<string>()), StringComparer.Ordinal);
+                if (Target(after, path)["attributes"]?.Value<string>("SharedDeviceAccessType") != access) Fail("The selected item does not read back the requested SharedDeviceAccessType.");
+                if (access == "PLC" && Target(after, path)["attributes"]?.Value<string>("SharedDeviceAssignmentTarget") != payload.Value<string>("assignmentTargetPath")) Fail("The selected item does not read back the requested assignment target.");
+                // A direct PLC-to-PLC move is not covered (its start addresses would move unreviewed); prepare refuses it as well.
+                if (access == "PLC" && selected["attributes"]?.Value<string>("SharedDeviceAccessType") == "PLC") Fail("A module moves between two PLCs of the station only through OutsideOfProject.");
+                // externalIoControllers sets the station interface's NumberOfExternalIoControllers in the same change.
+                if (payload["externalIoControllers"] != null)
+                {
+                    var attributes = Target(expected, payload.Value<string>("ioDeviceInterfacePath"))["attributes"] as JObject ?? throw new BridgeException("MutationVerificationFailed", "The IO-device interface has no captured attributes.");
+                    attributes["NumberOfExternalIoControllers"] = payload["externalIoControllers"].DeepClone();
+                }
+                foreach (var row in expected.OfType<JObject>().Where(row => InTree(row, path)))
+                {
+                    var now = Target(after, row.Value<string>("path"));
+                    string was = row["attributes"]?.Value<string>("SharedDeviceAccessType"), becomes = now["attributes"]?.Value<string>("SharedDeviceAccessType");
+                    if (becomes != was && becomes != access) Fail("A subitem took a SharedDeviceAccessType other than the requested one.");
+                    if (becomes != null) row["attributes"]["SharedDeviceAccessType"] = becomes;
+                    // The writable inputs V21 derives the access from may follow in the subtree, only to the values the requested access gives.
+                    foreach (string name in new[] { "SharedDeviceAccessConfigured", "SharedDeviceAssignmentTarget" })
+                    {
+                        JToken old = row["attributes"]?[name], value = now["attributes"]?[name];
+                        JToken wanted = name == "SharedDeviceAccessConfigured" ? new JValue(access == "PLC") : access == "PLC" ? new JValue(payload.Value<string>("assignmentTargetPath")) : JValue.CreateNull();
+                        if (old == null && value == null) continue;
+                        if (value == null || !JToken.DeepEquals(value, old) && !JToken.DeepEquals(value, wanted)) Fail("A subitem's " + name + " differs from both its value before and the one the requested access gives.");
+                        row["attributes"][name] = value.DeepClone();
+                    }
+                    var addresses = (JArray)row["addresses"]; var observed = now["addresses"] as JArray ?? new JArray();
+                    // OutsideOfProject releases the subtree's addresses from this project; PLC gives them back, owned by the target (discovery hw4).
+                    if (observed.Count != addresses.Count)
+                    {
+                        bool released = access == "OutsideOfProject" && observed.Count == 0;
+                        bool restored = access == "PLC" && addresses.Count == 0 && observed.All(address => (address["owners"] as JArray)?.Count == 1 && address["owners"][0].Value<string>() == payload.Value<string>("assignmentTargetPath"));
+                        if (!released && !restored) Fail("The selected subtree's address ranges changed.");
+                        row["addresses"] = observed.DeepClone();
+                        continue;
+                    }
+                    for (int i = 0; i < addresses.Count; i++)
+                    {
+                        var owners = observed[i]["owners"] as JArray ?? new JArray();
+                        if (!new[] { "ioType", "startAddress", "lengthBits" }.All(key => JToken.DeepEquals(addresses[i][key], observed[i][key])) || owners.Count > 1 || owners.Any(owner => !controllers.Contains(owner.Value<string>())))
+                            Fail("A subtree address range changed, or its owner is not one PLC of the station's I/O systems.");
+                        addresses[i]["owners"] = owners.DeepClone();
+                    }
+                }
+            }
             else Fail("Unknown hardware preservation policy.");
             JArray Sorted(JArray rows) => new JArray(rows.Cast<JObject>().OrderBy(row => row.Value<string>("path"), StringComparer.Ordinal));
             if (!JToken.DeepEquals(Sorted(expected), Sorted(after))) Fail("An unrelated configured hardware, channel, address or network field changed; restore the checkpoint before further edits.");
         }
 
-        // An address survives when the subtree still has its ioType and start with at least its length and the same owners.
-        private static JArray ReplaceLosses(JObject before, JObject after)
+        // An address survives when the subtree still has its ioType and start with at least its length and the same owners;
+        // with addressChange, when the address map pairs it with an address of the same item, ioType and owners.
+        private static JArray ReplaceLosses(JObject before, JObject after, bool addressChange)
         {
             var lost = new JArray();
-            foreach (var address in before["addresses"].OfType<JObject>())
-                if (!after["addresses"].OfType<JObject>().Any(row => row.Value<string>("ioType") == address.Value<string>("ioType") && row.Value<long>("startAddress") == address.Value<long>("startAddress") &&
-                    row.Value<long>("lengthBits") >= address.Value<long>("lengthBits") && JToken.DeepEquals(row["owners"], address["owners"])))
-                    lost.Add(new JObject { ["address"] = address.DeepClone() });
+            if (addressChange)
+                foreach (var row in ReplaceAddressMap(before, after).OfType<JObject>().Where(row => row["before"].Type != JTokenType.Null &&
+                    (row["after"].Type == JTokenType.Null || !JToken.DeepEquals(row["before"]["owners"], row["after"]["owners"]))))
+                    lost.Add(new JObject { ["address"] = row });
+            else
+                foreach (var address in before["addresses"].OfType<JObject>())
+                    if (!after["addresses"].OfType<JObject>().Any(row => row.Value<string>("ioType") == address.Value<string>("ioType") && row.Value<long>("startAddress") == address.Value<long>("startAddress") &&
+                        row.Value<long>("lengthBits") >= address.Value<long>("lengthBits") && JToken.DeepEquals(row["owners"], address["owners"])))
+                        lost.Add(new JObject { ["address"] = address.DeepClone() });
             var kept = new HashSet<string>(after["children"].Select(child => child.Value<string>()), StringComparer.Ordinal);
             foreach (var child in before["children"]) if (!kept.Contains(child.Value<string>())) lost.Add(new JObject { ["child"] = child.DeepClone() });
             return lost;
+        }
+
+        // Pairs each address of a replaced subtree (ReplaceInventory form) with the new type's address at the same item and ioType,
+        // in start order; an unpaired side is null. changed marks a moved, resized, added or removed range.
+        internal static JArray ReplaceAddressMap(JObject before, JObject after)
+        {
+            string Key(JToken address) => address.Value<string>("hardwarePath") + "\n" + address.Value<string>("ioType");
+            JToken Range(JToken address) => address == null ? JValue.CreateNull() : new JObject { ["startAddress"] = address["startAddress"].DeepClone(), ["lengthBits"] = address["lengthBits"].DeepClone(), ["owners"] = address["owners"].DeepClone() };
+            var map = new JArray();
+            foreach (string key in before["addresses"].Concat(after["addresses"]).Select(Key).Distinct().OrderBy(key => key, StringComparer.Ordinal))
+            {
+                var old = before["addresses"].Where(address => Key(address) == key).OrderBy(address => address.Value<long>("startAddress")).ToArray();
+                var now = after["addresses"].Where(address => Key(address) == key).OrderBy(address => address.Value<long>("startAddress")).ToArray();
+                for (int i = 0; i < Math.Max(old.Length, now.Length); i++)
+                {
+                    var was = i < old.Length ? old[i] : null; var becomes = i < now.Length ? now[i] : null;
+                    map.Add(new JObject { ["hardwarePath"] = (was ?? becomes)["hardwarePath"].DeepClone(), ["ioType"] = (was ?? becomes)["ioType"].DeepClone(), ["before"] = Range(was), ["after"] = Range(becomes),
+                        ["changed"] = was == null || becomes == null || was.Value<long>("startAddress") != becomes.Value<long>("startAddress") || was.Value<long>("lengthBits") != becomes.Value<long>("lengthBits") });
+                }
+            }
+            return map;
+        }
+
+        // The referenced tags (path, hardwarePath, ioType, startAddress of their range before) whose range the map shows moved, resized
+        // or removed, each with that range's new form (null when removed).
+        internal static JArray ChangedReferencedTags(JArray referenced, JArray map)
+        {
+            var changed = new JArray();
+            foreach (var tag in referenced.OfType<JObject>())
+            {
+                var row = map.OfType<JObject>().FirstOrDefault(entry => entry["before"].Type != JTokenType.Null && entry.Value<string>("hardwarePath") == tag.Value<string>("hardwarePath") &&
+                    entry.Value<string>("ioType") == tag.Value<string>("ioType") && entry["before"].Value<long>("startAddress") == tag.Value<long>("startAddress"));
+                if (row == null || !row.Value<bool>("changed")) continue;
+                var copy = (JObject)tag.DeepClone(); copy["rangeAfter"] = row["after"].DeepClone(); changed.Add(copy);
+            }
+            return changed;
+        }
+
+        // An address-changing replacement needs acknowledgedTags naming exactly the tag paths on the module's addresses.
+        internal static bool TagsAcknowledged(JArray referenced, JToken acknowledged)
+        {
+            if (acknowledged != null && !(acknowledged is JArray list && list.All(tag => tag.Type == JTokenType.String)))
+                throw new BridgeException("InvalidRequest", "acknowledgedTags must be an array of exact tag paths.");
+            var given = ((JArray)acknowledged ?? new JArray()).Values<string>().OrderBy(tag => tag, StringComparer.Ordinal);
+            return referenced.Select(tag => tag.Value<string>("path")).OrderBy(tag => tag, StringComparer.Ordinal).SequenceEqual(given, StringComparer.Ordinal);
+        }
+
+        // A module capability profile (contracts/hardware-catalog-profiles.v1.json) declares every item of the module's subtree with
+        // each attribute's native access mode. When the nearest profiled item at or above the written one has a profile, the write must
+        // be declared writable on the row at its relative path. channel: null for the item's own attributes, else {type, ioType, number}.
+        internal static void RequireProfileWritable(JObject profile, string relativePath, JObject channel, IEnumerable<string> names)
+        {
+            if (profile == null) return;
+            var item = (profile["items"] as JArray ?? new JArray()).OfType<JObject>().SingleOrDefault(row => row.Value<string>("relativePath") == relativePath);
+            var scope = channel == null ? item : (item?["channels"] as JArray ?? new JArray()).OfType<JObject>().SingleOrDefault(row => row.Value<string>("type") == channel.Value<string>("type") &&
+                row.Value<string>("ioType") == channel.Value<string>("ioType") && row.Value<int>("number") == channel.Value<int>("number"));
+            foreach (string name in names)
+            {
+                var declared = (scope?["attributes"] as JArray ?? new JArray()).OfType<JObject>().Where(row => row.Value<string>("name") == name).ToArray();
+                if (declared.Length != 1 || (declared[0].Value<string>("accessMode") ?? "").IndexOf("Write", StringComparison.Ordinal) < 0)
+                    throw new BridgeException("AttributeNotWritable", "The capability profile of " + profile.Value<string>("typeIdentifier") + " does not declare " + name + " writable on " +
+                        (relativePath == "" ? "the module" : relativePath) + (channel == null ? "" : ", this channel") + ".");
+            }
+        }
+
+        // A profile row's path below its module: item segments joined as in hardware paths, with {module} for a segment equal to the
+        // module's own name (TIA names a built-in submodule after its module), so a profile serves every instance name.
+        internal static string ProfilePath(IEnumerable<string> segments, string moduleSegment) =>
+            string.Join("/", segments.Select(segment => "items/" + (segment == moduleSegment ? "{module}" : segment)));
+
+        internal const string ProfileContract = "contracts/hardware-catalog-profiles.v1.json";
+        private static readonly Lazy<Dictionary<string, JObject>> BundledProfiles = new Lazy<Dictionary<string, JObject>>(() =>
+        {
+            using (var stream = typeof(HardwareEngineeringRules).Assembly.GetManifestResourceStream("TiaMcp.HardwareCatalogProfiles.v1.json") ?? throw new InvalidOperationException("The bundled hardware catalog profiles are missing."))
+            using (var reader = new System.IO.StreamReader(stream)) return ParseProfiles(reader.ReadToEnd());
+        });
+
+        // An OrderNumber: identifier names its firmware; System: and GSD: identifiers do not, so their profiles are told apart by
+        // firmwareVersion, which must equal the item's FirmwareVersion attribute.
+        internal static string ProfileKey(string typeIdentifier, string firmwareVersion) =>
+            typeIdentifier == null ? null : typeIdentifier.StartsWith("OrderNumber:", StringComparison.Ordinal) ? typeIdentifier : firmwareVersion == null ? null : typeIdentifier + "|" + firmwareVersion;
+
+        // Profiles by ProfileKey; a duplicate key or another schema version refuses the whole contract.
+        internal static Dictionary<string, JObject> ParseProfiles(string json)
+        {
+            var root = JObject.Parse(json);
+            if (root.Value<int?>("schemaVersion") != 1 || !(root["profiles"] is JArray profiles)) throw new InvalidOperationException("Hardware catalog profiles need schemaVersion 1 and a profiles array.");
+            return profiles.OfType<JObject>().ToDictionary(profile => ProfileKey(profile.Value<string>("typeIdentifier") ?? throw new InvalidOperationException("A hardware catalog profile has no typeIdentifier."),
+                profile.Value<string>("firmwareVersion")) ?? throw new InvalidOperationException("A versionless hardware catalog profile needs firmwareVersion."), StringComparer.Ordinal);
+        }
+
+        internal static JObject Profile(string typeIdentifier, string firmwareVersion) =>
+            ProfileKey(typeIdentifier, firmwareVersion) is string key && BundledProfiles.Value.TryGetValue(key, out var profile) ? profile : null;
+
+        internal static IEnumerable<JObject> BundledProfileList => BundledProfiles.Value.Values;
+
+        // A write to a versionless (System:, GSD:) type that has profiles, but none for the item's firmware (unreadable, or in another
+        // format than the profile recorded), fails closed instead of skipping the profile check.
+        internal static void RequireVersionlessMatch(IEnumerable<JObject> profiles, string typeIdentifier, string firmwareVersion)
+        {
+            var known = profiles.Where(profile => profile.Value<string>("typeIdentifier") == typeIdentifier).Select(profile => profile.Value<string>("firmwareVersion")).ToArray();
+            if (known.Length != 0 && !known.Contains(firmwareVersion, StringComparer.Ordinal))
+                throw new BridgeException("AttributeNotWritable", "The capability profiles of " + typeIdentifier + " cover firmware " + string.Join(", ", known) +
+                    "; the item's FirmwareVersion (" + (firmwareVersion ?? "unreadable") + ") matches none, so the write is refused.");
         }
 
         // Added, removed and changed configured rows by exact path, for review of a CAx import.

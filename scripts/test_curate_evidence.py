@@ -53,6 +53,13 @@ class CurateEvidenceTests(unittest.TestCase):
         self.assertEqual(["discovery", "tia_start"], summary["steps"])
         self.assertEqual((["tia_discover"], ["change_apply"]), (summary["toolsPassed"], summary["toolsRejected"]))
 
+    def test_discovery_pass_is_never_completed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory, "report.json")
+            for discovery, completed in ((True, False), (False, True)):
+                path.write_text(json.dumps({"completed": True, "discovery": discovery, "steps": []}), encoding="utf-8")
+                self.assertEqual(completed, run(path)["completed"])
+
     def test_run_reads_tool_outcomes_from_steps_without_tool_calls(self):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory, "report.json")

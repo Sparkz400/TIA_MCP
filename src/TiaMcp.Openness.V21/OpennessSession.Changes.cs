@@ -685,7 +685,7 @@ namespace TiaMcp.Openness.V21
                     break;
                 }
                 case "network_io_assign":
-                    PrepareIoAssignment(change, project, preview, out _);
+                    PrepareIoAssignment(change, project, preview, out _, out _);
                     break;
                 case "connection_create":
                 case "connection_delete":
@@ -702,6 +702,12 @@ namespace TiaMcp.Openness.V21
                 case "hardware_transfer_area_create":
                 case "hardware_transfer_area_delete":
                     PrepareTransferArea(change, project, preview);
+                    break;
+                case "network_mrp_set":
+                    PrepareMrp(change, project, preview, out _);
+                    break;
+                case "hardware_shared_device_access":
+                    PrepareSharedDeviceAccess(change, project, preview, out _, out _);
                     break;
                 case "cax_import":
                     PrepareCaxImport(change, project, preview);
@@ -721,6 +727,7 @@ namespace TiaMcp.Openness.V21
                 {
                     var item = ChangeHardware(project, payload);
                     change.AttributeTarget = item.Item;
+                    HardwareEngineeringRules.RequireProfileWritable(ItemProfile(item.Item, out string profilePath), profilePath, null, ChangeObject(payload, "attributes").Properties().Select(property => property.Name));
                     preview["attributeChanges"] = PrepareAttributes(item.Item, ChangeObject(payload, "attributes"), HardwareWriteAttributes);
                     effects.Add(new JObject { ["hardwarePath"] = item.Path });
                     break;
@@ -1081,6 +1088,12 @@ namespace TiaMcp.Openness.V21
                 case "hardware_transfer_area_delete":
                     ApplyTransferArea(change, project);
                     break;
+                case "network_mrp_set":
+                    ApplyMrp(change, project);
+                    break;
+                case "hardware_shared_device_access":
+                    ApplySharedDeviceAccess(change, project);
+                    break;
                 case "cax_import":
                     ApplyCaxImport(change, project);
                     break;
@@ -1196,7 +1209,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_engineering") return CompileHmiEngineeringChange(change, project);
             if (change.Kind == "hmi_text_list_import") return CompileHmiTextListTarget(project, (JObject)change.Payload["target"]);
             if (IsCompileOnlyKind(change.Kind) && change.Kind != "plc_compile") return CompileOnly(change, project);
-            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
+            if (change.Kind.StartsWith("hardware_", StringComparison.Ordinal) || change.Kind.StartsWith("connection_", StringComparison.Ordinal) || change.Kind == "cax_import" || change.Kind == "network_configure" || change.Kind == "network_io_assign" || change.Kind == "network_mrp_set" || change.Kind == "drive_parameter_set" || change.Kind == "drive_telegram_set" || change.Kind == "safety_fparameter_set" || change.Kind == "safety_import_xml" || PlcAlarmProjectKinds.Contains(change.Kind) || change.Kind.StartsWith("certificate_", StringComparison.Ordinal) || change.Kind == "webserver_page_set" || change.Kind == "umac_role_set" || change.Kind == "opcua_server_settings_set")
                 return CompileDeviceProject(project);
             var plc = SelectPlc(change.Selector);
             return PlcCompilation.Compile(plc.Software.GetService<ICompilable>(), plc.Path, stage => {
@@ -1360,7 +1373,7 @@ namespace TiaMcp.Openness.V21
             if (change.Kind == "hmi_engineering" || change.Kind == "hmi_text_list_import") snapshot["hmiContent"] = HmiEngineeringFingerprint(change, project);
             if (change.Kind == "project_languages_set") snapshot["languageSettings"] = ProjectLanguageView(project.LanguageSettings);
             if (change.Kind.StartsWith("connection_", StringComparison.Ordinal)) snapshot["connections"] = ConnectionFingerprint(project, change.Payload);
-            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind, FParameterNames(change));
+            if (HardwareEngineeringRules.Applies(change.Kind)) snapshot["configuredHardware"] = CaptureHardwareEngineering(project, change.Kind, change.Payload, FParameterNames(change));
             if (IsPlcAlarmKind(change.Kind)) snapshot["plcAlarmContent"] = PlcAlarmFingerprint(change.Kind, project);
             if (change.Kind.StartsWith("vci_", StringComparison.Ordinal)) snapshot["vci"] = VciFingerprint(project);
             if (change.Kind.StartsWith("certificate_", StringComparison.Ordinal)) snapshot["certificates"] = CertificateFingerprint(project, change.Payload);

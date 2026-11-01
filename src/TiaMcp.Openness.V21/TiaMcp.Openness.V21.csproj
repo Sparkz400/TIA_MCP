@@ -55,6 +55,8 @@
       <Private>false</Private>
     </Reference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <!-- Module capability profiles; hardware writes refuse attributes a profile does not declare writable. -->
+    <EmbeddedResource Include="../../contracts/hardware-catalog-profiles.v1.json" LogicalName="TiaMcp.HardwareCatalogProfiles.v1.json" />
     <Reference Include="Siemens.Engineering.Base">
       <HintPath>$(TiaApiDirectory)\Siemens.Engineering.Base.dll</HintPath>
       <Private>false</Private>

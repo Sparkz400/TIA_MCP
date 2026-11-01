@@ -51,10 +51,10 @@ option registers or admits the tool only on a qualification Host.
 
 | Tool | Feature | Support | Toolset | Host option | Also in |
 | --- | --- | --- | --- | --- | --- |
-| `change_apply` | Checkpoint, mutate, compile and journal a prepared change | shipped | core |  | 132 features |
-| `change_prepare` | Validate and preview an explicit offline mutation | shipped | core |  | 133 features |
-| `change_restore` | Restore a recorded checkpoint into a new project | shipped | core |  | 132 features |
-| `change_status` | Read in-memory or persisted change outcomes | shipped | core |  | 124 features |
+| `change_apply` | Checkpoint, mutate, compile and journal a prepared change | shipped | core |  | 135 features |
+| `change_prepare` | Validate and preview an explicit offline mutation | shipped | core |  | 136 features |
+| `change_restore` | Restore a recorded checkpoint into a new project | shipped | core |  | 135 features |
+| `change_status` | Read in-memory or persisted change outcomes | shipped | core |  | 127 features |
 
 ## connections
 
@@ -145,9 +145,9 @@ option registers or admits the tool only on a qualification Host.
 | `device_inventory` | Capture and page device/module inventory | shipped | runtime |  |  |
 | `device_inventory_export` | Export device inventory to CSV and Excel | shipped | runtime |  |  |
 | `device_online_browse` | Browse online controller module identifiers | unqualified | runtime |  |  |
-| `hardware_catalog_search` | Search installed catalog identifiers | shipped | core |  |  |
+| `hardware_catalog_search` | Search installed catalog identifiers | shipped | core |  | `hardware.catalog_profiles` |
 | `hardware_gsd_export` | Export an I-device GSD file | limited | core |  |  |
-| `hardware_inspect` | Read configured hardware attributes and addresses | limited | core |  |  |
+| `hardware_inspect` | Read configured hardware attributes and addresses | limited | core |  | `hardware.distributed_io` |
 
 ## hmi
 

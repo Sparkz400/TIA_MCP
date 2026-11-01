@@ -48,6 +48,192 @@ class HardwareChangeTests(unittest.TestCase):
         self.assertEqual("member:/projects/P/devices/HwPeer/items/HwPeerCpu/plc/HwPeerCpu/tags/Default%20tag%20table/systemConstants/HwMpHead~MpDi",
                          q.constant(run, q.MP, q.MP.prefix + "MpDi"))
 
+    def test_ring_link_closes_the_line_into_one_ring(self):
+        run = q.Run.__new__(q.Run)
+        run.base = "/projects/P/devices/"
+        # The CPU 1214C (one port) leaves the line; the IM 155-5's Port_2 then takes the scratch CPU's freed Port_1.
+        links = [q.family_ports(run)["HwMp"], tuple(q.ports(run, 2)), q.ring_ports(run)]
+        ends = [port for link in links for port in link]
+        self.assertEqual(len(ends), len(set(ends)), "a port is linked twice")
+        self.assertIn(q.family_ports(run)["Hw1200"][1], q.ring_ports(run))
+        devices = [tuple(port[len(run.base):].split("/")[0] for port in link) for link in links]
+        degree = {d: sum(link.count(d) for link in devices) for link in devices for d in link}
+        self.assertEqual({"ScratchStation": 2, "HwPeer": 2, "HwMp": 2}, degree)  # Three devices, three links, two each: one ring.
+        managers = [path for path in q.interfaces(run) if path.startswith(run.base + "ScratchStation/")]
+        self.assertEqual(1, len(managers))
+        self.assertEqual({d for link in devices for d in link}, {path[len(run.base):].split("/")[0] for path in q.interfaces(run)})
+
+    def ring(self, refused=()):
+        """ring() with mrp/link stubbed; refused names the (device, domain) role changes V21 refuses."""
+        run = q.Run.__new__(q.Run)
+        run.base, run.current, calls = "/projects/P/devices/", {"view": {}}, []
+        run.h = type("H", (), {"report": {}})()
+        def mrp(run_, interface, role, domain=None, create=False, restore=False):
+            calls.append(("mrp", interface.split("/")[4], role, domain, create, restore))
+            return (interface.split("/")[4], domain) not in refused
+        saved = q.mrp, q.link
+        q.mrp, q.link = mrp, lambda run_, kind, number, restore=False, pair=None, label=None: calls.append((kind, number, restore))
+        try:
+            closed = q.ring(run)
+        finally:
+            q.mrp, q.link = saved
+        return closed, calls, run.h.report
+
+    def test_boundary_steps_are_recorded_and_recovered_only_in_discovery(self):
+        for discover in (True, False):
+            run = q.Run.__new__(q.Run)
+            run.h = type("H", (), {"report": {}, "args": type("A", (), {"discover": discover})()})()
+            run.current, recovered = {"view": {"k": 1}}, []
+            def refused(*args, **kwargs):
+                raise RuntimeError("change_prepare: UnsupportedCapability")
+            def failed(*args, **kwargs):
+                raise RuntimeError("change_apply: CompileFailed")
+            run.recover = lambda label, prepared, before: recovered.append((label, before))
+            run.prepare = refused
+            if discover:
+                self.assertIsNone(run.apply("step", "network_mrp_set", {}, boundary=True))
+                self.assertEqual("prepare", run.h.report["boundaries"]["step"]["stage"])
+                run.prepare, run.finish = (lambda *a, **k: {"changeId": "c", "previewHash": "h"}), failed
+                self.assertIsNone(run.apply("apply step", "network_mrp_set", {}, boundary=True))
+                self.assertEqual(("apply", [("apply step", {"view": {"k": 1}})]), (run.h.report["boundaries"]["apply step"]["stage"], recovered))
+                with self.assertRaises(RuntimeError):  # A step not marked as a boundary fails even a discovery pass.
+                    run.apply("plain", "hardware_plug", {})
+            else:
+                with self.assertRaises(RuntimeError):
+                    run.apply("step", "network_mrp_set", {}, boundary=True)
+
+    def test_shared_device_reports_whether_it_applied(self):
+        run = q.Run.__new__(q.Run)
+        run.base, calls = "/projects/P/devices/", []
+        for result, expected in (({"changeId": "c"}, True), (None, False)):
+            run.apply = lambda *args, result=result, **kwargs: calls.append(kwargs["removed"]) or result
+            self.assertIs(expected, q.shared_device(run))
+        self.assertEqual([q.constant(run, q.SP, "HwSpHead~SpDi3")], calls[0])  # hw5: SpDi3's HwPeerCpu system constant goes.
+
+    def test_profile_gates_need_the_catalog_link_and_the_profile_refusal(self):
+        identifier = "OrderNumber:6ES7 131-6BF00-0BA0/V1.1"
+        for link, message, ok in ((q.PROFILE_LINK + identifier, "The capability profile of %s does not declare InformationText writable on the module." % identifier, True),
+                                  (None, "", False), (q.PROFILE_LINK + identifier, "The item declares no writable InformationText.", False)):
+            run = q.Run.__new__(q.Run)
+            run.base, filters, refused = "/projects/P/devices/", [], []
+            run.h = type("H", (), {"report": {}, "args": None, "stage": lambda self, name, operation: operation(),
+                                   "tool": lambda self, name, arguments: filters.append(arguments["filter"]) or {"entries": [{"typeIdentifier": identifier, "profile": link}, {"typeIdentifier": "x", "profile": None}]}})()
+            run.refuse = lambda kind, label, payload, code: refused.append((kind, payload, code)) or {"code": code, "message": message}
+            if ok:
+                q.profile_gates(run, identifier)
+                self.assertEqual(["6ES7 131-6BF00-0BA0"], filters)
+                self.assertEqual([("hardware_attributes", {"hardwarePath": "/projects/P/devices/HwSp/items/SpDi3", "attributes": {"InformationText": "HwText"}}, "AttributeNotWritable")], refused)
+            else:
+                with self.assertRaises(Exception):
+                    q.profile_gates(run, identifier)
+
+    def test_restore_slice_restores_each_topology_change_the_full_run_lacks(self):
+        calls, run = [], q.Run.__new__(q.Run)
+        run.base, run.current, run.coverage = "/projects/P/devices/", {"view": {}}, {}
+        run.h = type("H", (), {"report": {}, "args": None})()
+        run.expect = lambda ok, label, message, detail=None: calls.append(("expect", bool(ok)))
+        def record(name, result=None):
+            return lambda *args, **kwargs: calls.append((name, *[a for a in args[1:] if isinstance(a, str)], kwargs.get("restore", False))) or result
+        stubs = {"add_cpu": record("add_cpu"), "network": record("network"), "station": record("station"), "sp_station": record("sp_station", q.SP),
+                 "sp_modules": record("sp_modules", ("old", "new")), "plug": record("plug"), "profile_gates": record("profile_gates"),
+                 "shared_device": record("shared", True), "shared_access": record("access", True), "mrp": record("mrp", True)}
+        saved = {name: getattr(q, name) for name in stubs}
+        try:
+            for name, stub in stubs.items():
+                setattr(q, name, stub)
+            q.restore_slice(run)
+        finally:
+            for name, original in saved.items():
+                setattr(q, name, original)
+        manager, _, head = q.interfaces(run)
+        self.assertEqual([("shared", True), ("shared", False), ("access", "SpDi4", "OutsideOfProject", True), ("mrp", manager, "Manager", q.RING, True),
+                          ("mrp", manager, "Manager", q.RING, False), ("mrp", head, "Client", q.RING, True)], calls[calls.index(("profile_gates", "old", False)) + 1:-1])
+        self.assertEqual(("expect", False), calls[-1])  # The stubs mark no coverage, so the slice's coverage gate fails.
+
+    def test_ring_opens_the_line_sets_roles_then_relinks_and_closes(self):
+        closed, calls, _ = self.ring()
+        self.assertTrue(closed)
+        self.assertEqual([("hardware_port_disconnect", 1, False), ("hardware_port_disconnect", 2, False), ("hardware_port_disconnect", 2, False),
+                          ("mrp", "ScratchStation", "Manager", q.RING, True, False), ("mrp", "HwPeer", "Client", q.RING, False, True),
+                          ("mrp", "HwPeer", "Client", q.RING, False, False), ("mrp", "HwMp", "Client", q.RING, False, False),
+                          ("hardware_port_connect", 2, False), ("hardware_port_connect", 2, False),
+                          ("hardware_port_connect", 2, True), ("hardware_port_connect", 2, False)], calls)
+
+    def test_ring_falls_back_to_the_default_domain_and_relinks_without_roles(self):
+        closed, calls, _ = self.ring(refused={("ScratchStation", q.RING)})
+        self.assertTrue(closed)
+        self.assertEqual([("mrp", "ScratchStation", "Manager", None, False, False), ("mrp", "HwPeer", "Client", None, False, True)], [c for c in calls if c[0] == "mrp"][1:3])
+        closed, calls, report = self.ring(refused={("HwMp", q.RING)})
+        self.assertFalse(closed)  # The IM refused its role: the applied roles go back to NotInRing, the line is relinked, no ring.
+        self.assertEqual([("mrp", "ScratchStation", "NotInRing", None, False, False), ("mrp", "HwPeer", "NotInRing", None, False, False)],
+                         [c for c in calls if c[0] == "mrp" and c[2] == "NotInRing"])
+        self.assertEqual([("hardware_port_connect", 2, False)] * 2, [c for c in calls if c[0] == "hardware_port_connect"])
+        self.assertEqual("skipped", report["boundaries"]["ring"]["stage"])
+
+    def test_gsd_device_not_installed_is_recorded_not_failed(self):
+        class Fake:
+            def __init__(self):
+                self.report = {}
+            def stage(self, name, operation):
+                return operation()
+            def tool(self, name, arguments):
+                return {"entries": [{"typeIdentifier": "OrderNumber:6ES7 999/V1.0"}]}  # A catalog hit that is no GSD device.
+        run = q.Run.__new__(q.Run)
+        run.h = Fake()
+        run.apply = lambda *a, **k: self.fail("A missing GSD must not change the project")
+        q.gsd_device(run)
+        self.assertEqual({"gsdCatalog": [], "gsdNotInstalled": True}, run.h.report)
+
+    def test_installed_gsd_device_is_added_put_on_the_subnet_and_assigned(self):
+        class Fake:
+            def __init__(self):
+                self.report = {}
+            def stage(self, name, operation):
+                return operation()
+            def tool(self, name, arguments):
+                return {"entries": [{"typeIdentifier": "GSD:GSDML-V2.43-SIEMENS-TIAMCPIDEVICE.XML/D/DAP1", "typeName": "TiaMcpIDevice"}]}
+        run = q.Run.__new__(q.Run)
+        run.h, run.base, calls = Fake(), "/projects/P/devices/", []
+        interface = run.base + "HwGsd/items/HwGsdHead/items/PROFINET%20interface"
+        def apply(label, kind, payload, preview=None, shown=None, plc=None, **expected):
+            calls.append((kind, payload))
+            if kind == "hardware_add":  # The added device shows its head and interface in the next state.
+                run.current = {"view": {"hw:" + run.base + "HwGsd/items/HwGsdHead": {"network": None},
+                                        "hw:" + interface: {"network": {"ioConnectors": [{}], "nodes": [{"name": "X1"}]}}}}
+        run.apply, run.current = apply, {"view": {}}
+        q.gsd_device(run)
+        self.assertEqual(["hardware_add", "network_configure", "network_io_assign"], [kind for kind, _ in calls])
+        self.assertEqual(interface, calls[1][1]["hardwarePath"])
+        self.assertEqual({"hardwarePath": interface, "connectorIndex": 0, "controllerIndex": 0,
+                          "controllerHardwarePath": run.base + "HwPeer/items/HwPeerCpu/items/PROFINET%20interface_1"}, calls[2][1])
+        self.assertNotIn("gsdNotInstalled", run.h.report)
+        self.assertEqual(interface, run.h.report["gsdDevice"]["hardwarePath"])
+
+    def test_rack_is_the_one_root_item_beside_the_head(self):
+        run = q.Run.__new__(q.Run)
+        run.base = "/projects/P/devices/"
+        row = lambda slot, kind="None": {"positionNumber": slot, "classification": kind}
+        run.current = {"view": {"hw:/projects/P/devices/HwSp/items/Rail_0": row(0), "hw:/projects/P/devices/HwSp/items/HwSpHead": row(0),
+                                "hw:/projects/P/devices/HwSp/items/Rail_0/items/X": row(0), "hw:/projects/P/devices/HwSp/items/Srv": row(4)}}
+        self.assertEqual("Rail_0", q.rack(run, "HwSp", "HwSpHead"))
+        run.current["view"]["hw:/projects/P/devices/HwSp/items/Rail_1"] = row(0)
+        with self.assertRaises(AssertionError):
+            q.rack(run, "HwSp", "HwSpHead")
+
+    def test_discovery_records_instead_of_failing(self):
+        class Fake:
+            def __init__(self, discover):
+                self.args, self.report = type("Args", (), {"discover": discover})(), {"certificateIdentity": {}, "notQualified": {}}
+        for discover in (False, True):
+            run = q.Run(Fake(discover))
+            self.assertEqual(discover, run.h.report["discovery"])
+            if discover:
+                run.expect(False, "step", "differs", {"changed": {}})
+                self.assertEqual([{"message": "differs", "detail": {"changed": {}}}], run.h.report["discovered"]["step"])
+            else:
+                with self.assertRaises(AssertionError):
+                    run.expect(False, "step", "differs")
+
     def test_deferred_apply_skips_compile_and_save_only(self):
         class Fake:
             def __init__(self, stages, compile=None):

@@ -15,5 +15,6 @@
     <Compile Include="../../src/TiaMcp.Openness.V21/VciResolutionRules.cs" Link="VciResolutionRules.cs" />
     <Compile Include="../../tests/TiaMcp.PlcLibraryIntegration.Tests/BridgeException.cs" Link="BridgeException.cs" />
     <None Update="Fixtures/*.json" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="../../contracts/hardware-catalog-profiles.v1.json" LogicalName="TiaMcp.HardwareCatalogProfiles.v1.json" />
   </ItemGroup>
 </Project>
