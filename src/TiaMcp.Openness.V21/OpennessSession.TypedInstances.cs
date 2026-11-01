@@ -218,13 +218,15 @@ namespace TiaMcp.Openness.V21
             var matches = capture.Blocks.Where(b => b.Item is FB && QualifiedName(b.Item) == type.Trim('"') && (ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == capture.Change.ScopePath || ObjectIdentity.ScopePath(capture.Plc.Path, b.Path) == calleeScope)).ToArray();
             if (matches.Length != 1 || matches[0].Path != path) throw new BridgeException("AmbiguousInstanceType", "The native declaration cannot uniquely identify the selected FB across the complete PLC index.");
         }
-        private void CaptureTypedDependents(TypedResolutionCapture capture, XElement declaration, JObject preview)
+        // Every block an interface change of the caller reaches: the closure over instance, type-instance and use edges.
+        // The combined apply's pre-claim check uses the same closure (PlcCombinedApplyTargetRefusal).
+        private System.Collections.Generic.List<string> TypedDependentPaths(PlcSelection plc, string callerPath)
         {
-            if (!capture.Blocks.Any(b => b.Path == capture.CallerPath)) return;
-            var analysis = ReadNativeAnalysis(new JObject { ["projectName"] = capture.Plc.Project.Name, ["plcPath"] = capture.Plc.Path, ["maxItems"] = 2000 });
+            var analysis = ReadNativeAnalysis(new JObject { ["projectName"] = plc.Project.Name, ["plcPath"] = plc.Path, ["maxItems"] = 2000 });
             if (analysis.IndexTruncated || analysis.Budget.Truncated || analysis.Warnings.Count > 0)
                 throw new BridgeException("DependencyUnresolved", "Interface-changing typed edits require complete native dependent coverage.");
-            var affected = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal) { capture.CallerPath };
+            var affected = new System.Collections.Generic.HashSet<string>(StringComparer.Ordinal) { callerPath };
+            var order = new System.Collections.Generic.List<string>();
             bool grew;
             do
             {
@@ -233,10 +235,16 @@ namespace TiaMcp.Openness.V21
                 {
                     if (!new[] { ReferenceType.InstanceType, ReferenceType.TypeInstance, ReferenceType.Uses, ReferenceType.UsedBy }.Contains(edge.Relation)) continue;
                     var actor = edge.Actor?.BlockPath; var subject = edge.Subject?.BlockPath;
-                    if (subject != null && actor != null && affected.Contains(subject) && affected.Add(actor)) grew = true;
+                    if (subject != null && actor != null && affected.Contains(subject) && affected.Add(actor)) { order.Add(actor); grew = true; }
                 }
             } while (grew);
-            foreach (string path in affected.Where(p => p != capture.CallerPath))
+            return order;
+        }
+
+        private void CaptureTypedDependents(TypedResolutionCapture capture, XElement declaration, JObject preview)
+        {
+            if (!capture.Blocks.Any(b => b.Path == capture.CallerPath)) return;
+            foreach (string path in TypedDependentPaths(capture.Plc, capture.CallerPath))
             {
                 var block = capture.Blocks.SingleOrDefault(b => b.Path == path) ?? throw new BridgeException("DependencyUnresolved", "A dependent native block lacks exact identity.");
                 capture.Export(block);

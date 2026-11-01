@@ -202,6 +202,12 @@ namespace TiaMcp.Openness.V21
                         string key = ChangeText(args, "idempotencyKey", 128);
                         bool returnedApply = change.IdempotencyKey == key && change.State == "applied";
                         if (change.IdempotencyKey != null && !returnedApply) throw new BridgeException("OutcomeUnknown", "The earlier library attempt cannot be replayed with this key/state.");
+                        // A refused combined apply mutates nothing: refuse it with change_apply's own pre-claim decision before the Host
+                        // writes an admission record (e.g. DependencyProfileUnavailable for a multi-instance caller with dependents).
+                        if (change.Kind == "library_integrate" && !IsHmiLibraryTarget(change.Payload) && _libraryIntegrateApplyEnabled && change.IdempotencyKey == null
+                            && PlcCombinedApplyRefusal(change) is JObject combinedRefusal)
+                            throw new BridgeException(combinedRefusal.Value<string>("code"), "Combined apply refused before admission: " + combinedRefusal.Value<string>("message") +
+                                " No admission record, idempotency claim, checkpoint or native mutation was written or dispatched.", LibraryChangeView(change));
                         if (change.Project != null) { EnsureProjectOffline(change.Project); add("project", change.Project.Path.FullName, "checkpointCompileSave"); }
                         foreach (var library in new[] { change.Source, change.Destination }.Where(l => l != null).Distinct())
                         {

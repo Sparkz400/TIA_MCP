@@ -96,6 +96,17 @@ namespace TiaMcp.Openness.V21
             active?.Length == 1 && active[0] == "de-DE" && reference == "de-DE" && editing == "de-DE" ? null
                 : "Only de-DE-only projects are verified; this project has active languages " + string.Join(", ", active ?? new string[0]) +
                   " (reference " + reference + ", editing " + editing + ").";
+        // A multi-instance changes the caller FB's interface, so the typed step would also change each dependent the typed route
+        // finds (its instance DBs, embedding parents and their users). No captured dependent-DB effect covers the component's
+        // structured member, and the verified shape had no dependents, so such a plan is refused before admission and claim.
+        internal static JObject CombinedApplyDependentsRefusal(JObject plan, System.Collections.Generic.IEnumerable<string> dependents)
+        {
+            var paths = plan?["multiInstance"] == null ? new string[0] : dependents.OrderBy(p => p, StringComparer.Ordinal).ToArray();
+            if (paths.Length == 0) return null;
+            return new JObject { ["code"] = "DependencyProfileUnavailable", ["dependents"] = new JArray(paths),
+                ["message"] = "The multi-instance caller " + plan["caller"]?.Value<string>("blockPath") + " has dependents (" + string.Join(", ", paths.Take(3)) +
+                    (paths.Length > 3 ? " and " + (paths.Length - 3) + " more" : "") + "); its instance DBs and embedding parents would need a captured dependent-DB effect for the new member, and none covers it." };
+        }
         // The template route of the instance DB step, decided on the planned FB export instead of after its import.
         internal static string CombinedApplyInstanceRefusal(XDocument callee, string instanceName, System.Collections.Generic.IEnumerable<XDocument> templates)
         {

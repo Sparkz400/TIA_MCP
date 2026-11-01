@@ -121,6 +121,16 @@ internal static class BroadenedPlanTests
         // Passed natively on 1 November (local.library_integrate.candidate_shapes.multi.20261101): the exact combination of a
         // multi-instance of the reused FB in an existing FBD FB caller. A multi-instance after a fresh import stays a candidate.
         test("combined apply admits the verified reused-FB multi-instance in production", () => { Equal(null, Refusal(ReusedMulti())); Equal("", Features(ReusedMulti())); });
+        // A multi-instance caller with dependents (its instance DB, an embedding parent) is refused before admission and claim.
+        test("a multi-instance caller with dependents is refused with DependencyProfileUnavailable", () => {
+            var plan = ReusedMulti().Build();
+            Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new string[0]));
+            Equal(null, PlcComponentQualificationGate.CombinedApplyDependentsRefusal(ReusedRoot().Build(), new[] { "/plc/blocks/Main_DB" }));
+            var refused = PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, new[] { "/plc/blocks/Main_DB", "/plc/blocks/Cycle" });
+            Equal("DependencyProfileUnavailable", refused.Value<string>("code"));
+            Equal("/plc/blocks/Cycle,/plc/blocks/Main_DB", string.Join(",", refused["dependents"].Select(d => (string)d)));
+            Equal(true, refused.Value<string>("message").Contains("/plc/blocks/Main_DB") && refused.Value<string>("message").Contains(plan["caller"].Value<string>("blockPath")));
+        });
         test("the reused-FB multi-instance is exactly the verified combination", () => Equal("fbCaller+multiInstance+reusedComponent",
             PlcComponentQualificationGate.ShapeKey(PlcComponentQualificationGate.UnverifiedFeatures(ReusedMulti().Build(), ReusedMulti().Payload, ReusedMulti().Caller, new string[0]))));
         // Candidate shapes: each has a builder but no native evidence, so only a qualification Host's owned scratch admits it.

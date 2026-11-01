@@ -171,11 +171,26 @@ class Candidates(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "exactly one network"):
             subject.two_network_fc(xml, "Thrice", 78)
 
-    def test_candidate_aggregation_accepts_installs_only(self):
-        # The captured component multi-instance template removed the former multiInstance boundary outcome.
-        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstance": "installed"}))
-        self.assertEqual({"multiInstance": "boundary", "fbCaller": "failed: x"},
-                         subject.failed_candidates({"multiInstance": "boundary", "fbCaller": "failed: x", "reuse": "installed"}))
+    def test_candidate_aggregation_accepts_installs_and_the_dependents_refusal_only(self):
+        # The captured component multi-instance template removed the former multiInstance boundary outcome; only the
+        # dependents case must end refused, and an install there would be a failure too.
+        self.assertEqual({}, subject.failed_candidates({"ladStandalone": "installed", "multiInstance": "installed", "multiInstanceDependents": "refused"}))
+        self.assertEqual({"multiInstance": "boundary", "fbCaller": "failed: x", "multiInstanceDependents": "installed"},
+                         subject.failed_candidates({"multiInstance": "boundary", "fbCaller": "failed: x", "reuse": "installed", "multiInstanceDependents": "installed"}))
+        self.assertEqual({"reuse": "refused"}, subject.failed_candidates({"reuse": "refused"}))
+
+    def test_admission_records_count_open_and_archived_records(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.assertEqual([], subject.admission_records(root))
+            (root / "engineering-admissions" / "a1").mkdir(parents=True); (root / "engineering-admissions" / ".archive" / "a0").mkdir(parents=True)
+            (root / "engineering-admissions" / "note.json").write_text("{}", encoding="utf-8")
+            self.assertEqual(["a0", "a1"], subject.admission_records(root))
+
+    def test_host_instance_db_source_is_one_db_of_the_host_fb(self):
+        source = subject.HOST_DB_SOURCE
+        self.assertEqual(['DATA_BLOCK "TiaMcpComponentHost_DB"', '"TiaMcpComponentHost"'], [line for line in source.splitlines() if '"' in line])
+        self.assertIn("multiInstanceDependents", subject.REFUSED_CASES)
 
     def test_runner_path_check_matches_the_worker_layout(self):
         # PlcComponentQualificationGate.CombinedApplyArchivePathLength: 121 characters for a 51-character root.

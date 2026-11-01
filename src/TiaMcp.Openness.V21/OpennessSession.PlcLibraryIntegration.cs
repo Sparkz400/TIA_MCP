@@ -169,9 +169,12 @@ namespace TiaMcp.Openness.V21
             {
                 var scope = LibraryPlcScope(change, out var plc); string cpu = TypedCpuIdentifier(plc);
                 var plan = (JObject)change.Preview["integrationPlan"];
-                // With a reused FB the typed preparation runs before any mutation, so it decides storage itself. After an import it
+                // With a reused FB the typed preparation runs before any mutation, so it decides storage itself; only a multi-instance
+                // caller's dependents are refused here, before admission, because no captured effect covers them. After an import it
                 // would fail only once the import is saved; a multi-instance profile needs the installed FB export, unknown before it.
-                if (plan["fb"].Value<bool>("reused")) return null;
+                if (plan["fb"].Value<bool>("reused"))
+                    return plan["multiInstance"] == null ? null
+                        : PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan["caller"].Value<string>("blockPath")));
                 if (plan["multiInstance"] != null) return NotQualified("A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.");
                 // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
                 var captured = CapturedStorageContext(change, true);

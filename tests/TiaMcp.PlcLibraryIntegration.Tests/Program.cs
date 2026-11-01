@@ -157,6 +157,22 @@ Test("native apply gate is before idempotency claims and checkpoints", () => {
     foreach (string check in new[] { "CombinedApplyLanguageRefusal(", "CombinedApplyInstanceRefusal(", "CapturedStorageContext(change, true)", "CombinedApplyNumberRefusal(", "CombinedApplyPathRefusal(" })
         if (integration.IndexOf(check, end, StringComparison.Ordinal) < 0) throw new Exception("Target check missing: " + check);
 });
+// A refused combined apply (a multi-instance caller with dependents included) is refused while the worker resolves the
+// shared-mutation scope (mutation_begin), so the Host writes no admission record; the dependents are the typed route's own closure.
+Test("combined-apply refusals precede the admission record, and multi-instance dependents are refused", () => {
+    string admission = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.SharedMutationAdmission.cs")).Replace("\r\n", "\n");
+    int resolve = admission.IndexOf("private JObject SharedMutationResolve()", StringComparison.Ordinal);
+    int library = admission.IndexOf("if (!_libraryChanges.TryGetValue(id, out var change))", resolve, StringComparison.Ordinal);
+    int refusal = admission.IndexOf("_libraryIntegrateApplyEnabled && change.IdempotencyKey == null\n                            && PlcCombinedApplyRefusal(change) is JObject combinedRefusal)\n                            throw new BridgeException(combinedRefusal.Value<string>(\"code\")", library, StringComparison.Ordinal);
+    int project = admission.IndexOf("add(\"project\", change.Project.Path.FullName, \"checkpointCompileSave\")", library, StringComparison.Ordinal);
+    if (resolve < 0 || library < resolve || refusal < library || project < refusal) throw new Exception("The combined-apply refusal must run in the admission scope before its resources are returned.");
+    string integration = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.PlcLibraryIntegration.cs"));
+    if (integration.IndexOf("PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan[\"caller\"].Value<string>(\"blockPath\")))", StringComparison.Ordinal) < 0)
+        throw new Exception("The reused-FB multi-instance target check must refuse the caller's dependents.");
+    string typed = File.ReadAllText(Path.Combine(RepositoryFiles.Root(), "src/TiaMcp.Openness.V21/OpennessSession.TypedInstances.cs"));
+    if (typed.IndexOf("foreach (string path in TypedDependentPaths(capture.Plc, capture.CallerPath))", StringComparison.Ordinal) < 0)
+        throw new Exception("The typed step and the pre-claim check must share one dependent closure.");
+});
 // Candidate shapes stay out of production: only the exact shapes with passed native evidence are verified, and candidates
 // are admitted only on a --component-qualification worker in its own single owned scratch. Change these pins only together with native evidence.
 Test("candidate shapes run only on a qualification Host's owned scratch, and only natively passed shapes are verified", () => {
