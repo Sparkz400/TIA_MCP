@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "6b1c5e822dcbcae3f56ae3eb3321ada1d8b289c30ea0cb2eade4d6d88f6c5eb7",
-      "bytes": 1545922
+      "sha256": "779664bacba4bb025ece44a00b31d9c456b778399eb10d5d5973e6457fb25844",
+      "bytes": 1547299
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -122139,6 +122139,13 @@
           "artifacts": [
             "evidence/local.runtime.timers.20261029.json"
           ]
+        },
+        {
+          "id": "local.provision.card_move.20261101",
+          "profileSha256": "eba53af995e7dd637e8b6c85fccb4a319203bfce58be88fb5490d6295aa8d2f4",
+          "artifacts": [
+            "evidence/local.provision.card_move.20261101.json"
+          ]
         }
       ],
       "reviewState": "partial",
@@ -122202,6 +122209,13 @@
           "profileSha256": "8c10eedb3f02dedf224a913fb3b78d7aaa654026a85a5e38811fc80562b34e9b",
           "artifacts": [
             "evidence/local.plcsim_diagnostics.20261028.json"
+          ]
+        },
+        {
+          "id": "local.provision.card_move.20261101",
+          "profileSha256": "eba53af995e7dd637e8b6c85fccb4a319203bfce58be88fb5490d6295aa8d2f4",
+          "artifacts": [
+            "evidence/local.provision.card_move.20261101.json"
           ]
         }
       ],
@@ -127777,6 +127791,11 @@
       "sha256": "91086c812c8d2b528fb8fd8b242e594a9a6d10a2e30ad6fa0ef66a2038c1d11c"
     },
     {
+      "path": "evidence/local.provision.card_move.20261101.json",
+      "state": "observed",
+      "sha256": "2c1d37a978778c8a6464c9e948c64e0cb840badfccbe0c0c4cda35ed5e468c91"
+    },
+    {
       "path": "evidence/local.read_contracts.20261028.json",
       "state": "observed",
       "sha256": "3841523a6aaeb22f6c4ad144112317f97d982bcd3818e9b377bd2bf743fcb399"
@@ -128611,6 +128630,10 @@
     {
       "id": "local.project_upgrade.20261031",
       "profileSha256": "63596019b1b19bb2ec27d6928eafc40b76190fa271d605e08ddf4b66f40c0264"
+    },
+    {
+      "id": "local.provision.card_move.20261101",
+      "profileSha256": "eba53af995e7dd637e8b6c85fccb4a319203bfce58be88fb5490d6295aa8d2f4"
     },
     {
       "id": "local.read_contracts.20261028",
