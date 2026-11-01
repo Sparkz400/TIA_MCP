@@ -50,7 +50,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
 - **Explorer:** technology, software-unit, library and port providers. The desktop roundtrip passed in
   VS Code 1.144.0 through MCP Apps: an exact selection answered by `project_model_details`, refusal
-  after `tia_detach` and the artifact fallback (`local.explorer.desktop.20261101`).
+  after `tia_detach` and the artifact fallback (`local.explorer.desktop.20261101`). Warm/cold
+  timings, memory and payload sizes for the 1k/10k/50k trees and the 500-node graph; the cache
+  benchmark also records cold first queries, page bytes and peak resident set
+  ([record](docs/verification/explorer-performance-20261101.md)).
 - **HMI compile:** `change.hmi_compile` compiles fixtures an operator configured in the editor (start
   screen, Unified transfer password): TP700 Comfort and MTP700 Unified Comfort, two targets each, with
   zero errors and warnings, a fresh-Host reopen and checkpoint restore (`local.hmi.compile.20261101`).
