@@ -360,7 +360,8 @@ public sealed class ComponentQualificationWindowStore
         PackageStorage.EnsureNoLinks(path);
         using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
         { JsonSerializer.Serialize(stream, r, BridgeProtocol.Json); stream.Flush(true); }
-        PackageStorage.MoveDurably(temporary, path);
+        // Save's checked publication with its bounded retry of a held rename (0x5, 0x20, 0x21); the rename itself is write-through.
+        PackageStorage.PublishFile(temporary, path, (source, target) => PackageStorage.MoveDurably(source, target), Thread.Sleep);
     }
     [System.Diagnostics.CodeAnalysis.DoesNotReturn]
     private static void Fail(string code, string message) => throw new BridgeException(code, message);
