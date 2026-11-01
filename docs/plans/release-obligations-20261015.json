@@ -92,7 +92,7 @@
       "decidedBy": "maintainer",
       "date": "2026-10-29",
       "boundary": "V21 and repository gate",
-      "reason": "Behind the closed HMI preservation gate: V21 has no Screen.Export, so payloads without a public getter stay uncompared and no profile has passed every preservation, compile, persistence, recovery and visual gate.",
+      "reason": "Behind the closed HMI preservation gate: V21 has no Screen.Export, so payloads without a public getter stay uncompared and no profile has passed every preservation, compile, persistence, recovery and visual gate. Since 1 November Classic classic_xml_import and BackColor go through change.hmi_classic_import and Unified external_tag_create through change.hmi_external_tag_create, each with its own qualification gate; under hmi_engineering every operation stays refused.",
       "evidenceIds": []
     },
     {
