@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.87",
+  "catalogVersion": "0.4.88",
   "targetTiaVersions": [
     21
   ],
@@ -2088,6 +2088,23 @@
         "Candidate shapes ran on a --component-qualification Host in owned scratch; combinations of these features (for example LAD with an earlier placement) were not exercised.",
         "Reuse accepted version-comment-only differences: the source global library versions had an empty en-US comment, the installed versions their de-DE release comment; the component readback proved the installed content against the pinned source exports.",
         "Software units, OB insertion, reused instance DBs, partial dependency reuse and DB/UDT-tag member bindings stay plan-only. No runtime execution."
+      ]
+    },
+    {
+      "id": "local.typed.component-storage-capture.20261101",
+      "status": "passed",
+      "profile": {
+        "tiaVersion": 21,
+        "machine": "PCNico",
+        "sourceCommit": "68eca319a1fa7bfcbd6e33de1914dea4527f2495",
+        "passedScope": "scripts/capture_typed_routes_owned.py, both captures of route-capture-component-storage-packet.v1.json (frozen 68eca319, artifacts/csm and artifacts/csu), each in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline. Standard route: the component UDT TiaMcpComponentState (type_source_upsert) and FB TiaMcpComponentGate from the component-qualification fixture sources, then the FBD FB Tgp_ComponentHost_FBD declaring the multi-instance Gate : \"TiaMcpComponentGate\". softwareUnit route (TiaMcp_UnitA): the same UDT and interface in the unit namespace as TgpUnit_ComponentGate with its instance DB. Every source compiled clean and saved, added exactly its declared objects in the selected scope and namespace, and the saved state matched a fresh-process reopen. The captured Gate member embeds the UDT static State with its nested Active member; the SCL-authored FB interface equals the library-installed component04-callee interface, and the unit DB members equal the unit FB members."
+      },
+      "artifacts": [
+        "evidence/local.typed.component-storage-capture.20261101.json"
+      ],
+      "limitations": [
+        "Native reference capture only. The standard multi-instance template v21.fw41.component-gate.multi-instance.v1 is the source of the multiInstance combined-apply shape; the unit instance template v21.fw41.softwareUnit.component-gate.global-instance.v1 is staged only (artifacts/csus) and has no qualification case.",
+        "No dependent instance-DB effect of a structured multi-instance member was captured: a caller FB with its own instance DB stays refused."
       ]
     },
     {
@@ -11395,7 +11412,8 @@
         "evidenceIds": [
           "local.library_integrate.combined_apply.rerun.20261028",
           "local.library_integrate.candidate_shapes.rerun.20261031",
-          "local.library_integrate.combined_apply.regression.20261031"
+          "local.library_integrate.combined_apply.regression.20261031",
+          "local.typed.component-storage-capture.20261101"
         ]
       },
       "availability": {

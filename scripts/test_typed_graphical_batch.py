@@ -679,8 +679,14 @@ class RouteCapturePacketTests(unittest.TestCase):
     def test_component_storage_packet_parses_exactly_and_authors_every_template_block(self):
         root = pathlib.Path(__file__).resolve().parents[1]
         packet = json.loads((root / "fixtures/typed-graphical/route-capture-component-storage-packet.v1.json").read_bytes())
-        self.assertEqual("authored-not-executed", packet["status"])
-        self.assertFalse(packet["nativeReferenceQualification"] or packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        # Captured 1 November (local.typed.component-storage-capture.20261101); only the multi-instance template is deployed.
+        self.assertEqual("captured-builder-not-qualified", packet["status"])
+        self.assertTrue(packet["nativeReferenceQualification"])
+        self.assertFalse(packet["typedBuilderQualification"] or packet["runtimeQualification"])
+        self.assertEqual(["standardMultiInstance", "unitGlobalInstance"], [row["id"] for row in packet["captured"] if row["status"] == "passed"])
+        templates = json.loads((root / "fixtures/typed-graphical/profiles.v1.json").read_bytes())
+        deployed = {t["id"] for collection in ("globalInstanceTemplates", "multiInstanceTemplates") for t in templates[collection] if "component-gate" in t["id"]}
+        self.assertEqual({"v21.fw41.component-gate.multi-instance.v1"}, deployed)
         folded = set()
         for capture in packet["captures"]:
             self.assertEqual(capture["unit"], capture["command"][capture["command"].index("--unit") + 1])

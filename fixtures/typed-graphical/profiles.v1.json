@@ -3658,6 +3658,32 @@
       "nativeImportCompileVerified": true,
       "builderUsed": false,
       "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/TiaMcpComponentGate.xml",
+      "sha256": "c2979a1e21265b8984d6df1cb7c961516408c5b949f90a66d4957f751dd10284",
+      "authoredSourcePath": "fixtures/libraries/component-qualification/TiaMcpComponentGate.scl",
+      "authoredSourceSha256": "af1c54cc68d63fd70e591e64d59024b62a04e12f7db15101a17e42c6e75f3b7b",
+      "transportSourceSha256": "af1c54cc68d63fd70e591e64d59024b62a04e12f7db15101a17e42c6e75f3b7b",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/csm/capture.json",
+      "changeId": "46306bf62eba4f1096026290c665c4e4",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
+    },
+    {
+      "path": "fixtures/typed-graphical/native/Tgp_ComponentHost_FBD.xml",
+      "sha256": "6b877fc9fb4eebac77578d5138fbafbc50280d87bc9cea39b4aa713beb00e9f3",
+      "authoredSourcePath": "fixtures/typed-graphical/sources/component-host-fbd.s7dcl",
+      "authoredSourceSha256": "7dd4d76eb92d31ed88bcc53139816c3fd4bb381e25ebcc615faa7db39cf084f4",
+      "transportSourceSha256": "7dd4d76eb92d31ed88bcc53139816c3fd4bb381e25ebcc615faa7db39cf084f4",
+      "transportNormalization": "UTF-8 source text; CRLF/CR normalized to LF by Python text read; native request written with UTF-8 BOM",
+      "captureReport": "artifacts/csm/capture.json",
+      "changeId": "bc4d9cb79fb140a2a9f787f0fc8916e9",
+      "nativeImportCompileVerified": true,
+      "builderUsed": false,
+      "runtimeVerified": false
     }
   ],
   "profiles": [
@@ -11588,6 +11614,18 @@
       "sha256": "bcdb774db6952678768cf2e21926d9501f3599cb4d1b32cbd24a040046b95d7d",
       "referenceCalleePath": "native/routes-20261025/TgpNamespace_TemplateFB_LAD.xml",
       "referenceCalleeSha256": "db7d8a5c9b196ad39d5e76d3aa26725c8f4b47bb37901c007381af254f1effbf"
+    },
+    {
+      "id": "v21.fw41.component-gate.multi-instance.v1",
+      "tiaVersion": "V21",
+      "cpuFamily": "OrderNumber:6ES7 511-1AL03-0AB0/V4.1",
+      "route": "standard",
+      "memberName": "Gate",
+      "path": "native/Tgp_ComponentHost_FBD.xml",
+      "sha256": "6b877fc9fb4eebac77578d5138fbafbc50280d87bc9cea39b4aa713beb00e9f3",
+      "referenceCalleePath": "native/TiaMcpComponentGate.xml",
+      "referenceCalleeSha256": "c2979a1e21265b8984d6df1cb7c961516408c5b949f90a66d4957f751dd10284",
+      "qualificationOnly": true
     }
   ]
 }

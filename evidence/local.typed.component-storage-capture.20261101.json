@@ -1,0 +1,80 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.typed.component-storage-capture.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T04:08:53+00:00",
+  "source": {
+    "commit": "68eca319a1fa7bfcbd6e33de1914dea4527f2495",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/capture_typed_routes_owned.py, both captures of route-capture-component-storage-packet.v1.json, each in one owned TIA V21 project retrieved from the SHA-bound software-unit baseline (frozen 68eca319, artifacts/csm and artifacts/csu): standard route, the component UDT TiaMcpComponentState (type_source_upsert) and FB TiaMcpComponentGate from the component-qualification fixture sources, then the FBD FB Tgp_ComponentHost_FBD declaring the multi-instance Gate : \"TiaMcpComponentGate\"; softwareUnit route (TiaMcp_UnitA), the same UDT and interface in the unit namespace as TgpUnit_ComponentGate with its instance DB TgpUnit_ComponentGate_DB. Every source compiled clean and saved, added exactly its declared objects in the selected scope and namespace, and the saved state matched a fresh-process reopen. The captured Gate member embeds the UDT static State with its nested Active member; the SCL-authored FB interface equals the library-installed component04-callee interface, and the unit DB members equal the unit FB members.",
+  "limitations": [
+    "Native reference capture only. The standard multi-instance template v21.fw41.component-gate.multi-instance.v1 is deployed qualificationOnly until the combined-apply candidate run qualifies the multiInstance shape; the unit instance template v21.fw41.softwareUnit.component-gate.global-instance.v1 is staged only (artifacts/csus) and has no qualification case.",
+    "No dependent instance-DB effect of a structured multi-instance member was captured: a caller FB with its own instance DB stays refused."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "18a7772d3b1875f08faa1ffb435fd35d3cb784708c70db6c753402a401c212bf"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "eb4e06507f68c096f3efce9428ad4a2f66c387cc76b150dcd0a24f5100e7bd50"
+    }
+  ],
+  "runs": [
+    {
+      "report": "capture.json",
+      "sha256": "18b6abff79dac896c2f4d3b00e01795778d073ab6c827b0419dc634e2afbd8b6",
+      "bytes": 4493951,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    },
+    {
+      "report": "capture.json",
+      "sha256": "77942a2eece6a6654a8f4059fe945ea20f36c7c897a5b142e526451a1539d4f8",
+      "bytes": 3475995,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "hardware_inspect",
+        "project_open",
+        "project_retrieve",
+        "software_inspect",
+        "tag_table_read",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
