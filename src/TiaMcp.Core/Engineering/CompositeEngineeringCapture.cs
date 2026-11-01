@@ -41,7 +41,7 @@ public static class CompositeEngineeringCapture
         var driveCapture = Row("drives", "drive_observe", driveError);
         foreach (var drive in drives?["drives"]?.AsArray() ?? new JsonArray())
             foreach (var item in drive!["driveObjects"]!.AsArray())
-                Component("drives", driveCapture, (string)drive["hardwarePath"]! + "#DO" + item!["driveObjectNumber"], new JsonObject { ["schemaVersion"] = "drive-profile-review-request.v2",
+                Component("drives", driveCapture, (string)drive["hardwarePath"]! + "#" + (string?)item!["snapshot"]?["identity"]?["driveId"], new JsonObject { ["schemaVersion"] = "drive-profile-review-request.v2",
                     ["reviewId"] = reviewId, ["hardwarePath"] = drive["hardwarePath"]!.DeepClone(), ["afterKind"] = "observation", ["before"] = item["snapshot"]!.DeepClone(), ["after"] = item["snapshot"]!.DeepClone() },
                     upload => (string)new DriveProfileWorkflowStore(artifactsRoot).Review(reviewId, upload)["recordId"]!);
 

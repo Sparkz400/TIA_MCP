@@ -1,11 +1,14 @@
 """Probe the D10 drive kinds natively in one owned scratch CPU 1511-1 PN with an added SINAMICS G120C PN.
 
-The drive is added without compile or save, and drive_observe records what Startdrive reads from the new drive (on
-28 October 2026 it could not read DriveObject.DriveObjectNumber). A project_compile with save then compiles the PLC
-station and lists the drive under notCompiled (Startdrive drives expose no device compile service), and drive_observe
-runs again. When the drive objects read, drive_parameter_set and drive_telegram_set each apply with checkpoint, device
-compile (drive listed as not compiled) and save, are read back through drive_observe, refuse typed and are restored from
-their checkpoints. Whatever V21 refuses is recorded under boundaries with its exact error.
+The drive is added without compile or save, and drive_observe records what Startdrive reads from the new drive. A
+project_compile with save then compiles the PLC station and lists the drive under notCompiled (Startdrive drives expose
+no device compile service), and drive_observe runs again. Startdrive cannot read DriveObject.DriveObjectNumber of this
+drive (28 October and 1 November 2026), so drive_observe addresses its drive objects by driveObjectIndex; the runner uses
+whichever handle drive_observe reports. When the drive objects read, drive_parameter_set and drive_telegram_set each
+apply with checkpoint, device compile (drive listed as not compiled) and save, are confirmed by change_status, are
+read back through drive_observe,
+refuse typed (including the other handle) and are restored from their checkpoints. Whatever V21 refuses is recorded
+under boundaries with its exact error. The run passes only if the owned TIA process exits after detach and Host close.
 """
 from __future__ import annotations
 
@@ -49,6 +52,29 @@ def drive_receipt(applied):
     return {"targets": [t["targetPath"] for t in receipt["targets"]], "notCompiled": skipped}
 
 
+def applied_status(h, prepared, applied):
+    """change_status reports the applied change with the stages of its apply result."""
+    status = h.tool("change_status", {"changeId": prepared["changeId"]})
+    require(status["state"] == "applied" and status["stages"] == applied["stages"], "change_status differs from the apply result: %s" % status)
+    return {"state": status["state"], "stages": status["stages"]}
+
+
+def handle(drive_object):
+    """The one handle drive_observe reports: driveObjectIndex on a drive whose numbers cannot be read, else driveObjectNumber."""
+    key = "driveObjectIndex" if "driveObjectIndex" in drive_object else "driveObjectNumber"
+    return {key: drive_object[key]}
+
+
+def other_handle(ref):
+    """A request by the handle drive_observe does not report, which the change kinds refuse."""
+    return {"driveObjectNumber": 1} if "driveObjectIndex" in ref else {"driveObjectIndex": 0}
+
+
+def unexpected_warnings(warnings):
+    """Warnings other than an unreadable drive object number, which index handles answer."""
+    return [w for w in warnings if not str((w or {}).get("path", "")).endswith("/driveObjectNumber")]
+
+
 def scalar(rows):
     return next((p for p in rows if (p.get("value") or {}).get("kind") == "scalar" and "Single" in (p["value"].get("type") or "")), None)
 
@@ -67,6 +93,7 @@ def add_drive(h):
 
 def body(h):
     h.owned_scratch("drives")
+    h.watch_owned_tia()  # run() then requires the owned TIA to exit after detach (on 1 November it outlived the run)
     boundaries = h.report["boundaries"] = {}
     add_drive(h)
     h.report["unsavedObserve"] = h.stage("drive_observe of the new unsaved drive", lambda: observe(h))
@@ -84,25 +111,27 @@ def body(h):
                               ("drive_telegram_set", {"hardwarePath": path, "driveObjectNumber": 1, "operation": "change", "telegramType": "MainTelegram", "telegramNumber": 20, "expectedTelegrams": []})):
             boundaries[kind] = h.stage("record the %s answer without readable drive objects" % kind, lambda kind=kind, payload=payload: outcome(h, "change_prepare", {"kind": kind, "payload": payload})[0])
         return
-    require(observed["completeness"]["scopeComplete"] is True, "The drive listing is incomplete: %s" % observed["completeness"])
-    number = drive["driveObjects"][0]["driveObjectNumber"]
-    h.report["driveObject"] = {"hardwarePath": path, "driveObjectNumber": number}
-    parameters(h, path, number, boundaries)
-    telegrams(h, path, number, boundaries)
+    # The full listing above stops at the 2,000-item budget; a filtered one shows whether anything else was not read.
+    listing = h.stage("list the drive objects", lambda: observe(h, path, parameterNumbers=[922]))
+    require(not listing["completeness"]["truncated"] and not unexpected_warnings(listing["warnings"]), "The drive listing is incomplete: %s" % listing)
+    ref = handle(drive["driveObjects"][0])
+    h.report["driveObject"] = {"hardwarePath": path, **ref}
+    parameters(h, path, ref, boundaries)
+    telegrams(h, path, ref, boundaries)
 
 
-def parameter_rows(h, path, number, numbers):
-    objects = [o for o in observe(h, path, parameterNumbers=numbers)["drives"][0]["driveObjects"] if o["driveObjectNumber"] == number]
-    require(len(objects) == 1, "Drive object %s is not listed once" % number)
+def parameter_rows(h, path, ref, numbers):
+    objects = [o for o in observe(h, path, parameterNumbers=numbers)["drives"][0]["driveObjects"] if handle(o) == ref]
+    require(len(objects) == 1, "Drive object %s is not listed once" % ref)
     return objects[0]["snapshot"]["parameters"]
 
 
-def parameters(h, path, number, boundaries):
-    row = h.stage("read p1120/p1082", lambda: scalar(parameter_rows(h, path, number, [1120, 1082])))
+def parameters(h, path, ref, boundaries):
+    row = h.stage("read p1120/p1082", lambda: scalar(parameter_rows(h, path, ref, [1120, 1082])))
     require(row, "No scalar floating-point p1120/p1082 row")
     name, before = row["name"], row["value"]
     value = 12.5 if before["text"] != "12.5" else 13.5
-    payload = {"hardwarePath": path, "driveObjectNumber": number, "parameters": [{"name": name, "expected": before, "value": value}]}
+    payload = {"hardwarePath": path, **ref, "parameters": [{"name": name, "expected": before, "value": value}]}
     kind = "drive_parameter_set"
     error, prepared = outcome(h, "change_prepare", {"kind": kind, "payload": payload})
     if error:
@@ -110,34 +139,36 @@ def parameters(h, path, number, boundaries):
         return
     h.refuse("refuse a stale expected value", kind, {**payload, "parameters": [{"name": name, "expected": {**before, "text": "-1"}, "value": value}]}, "ExpectedValueMismatch")
     h.refuse("refuse an unknown parameter", kind, {**payload, "parameters": [{"name": "p99999", "expected": before, "value": value}]}, "ParameterNotFound")
-    protected = [p for p in parameter_rows(h, path, number, [971]) if p["number"] == 971]
+    h.refuse("refuse the other drive object handle", kind, {"hardwarePath": path, **other_handle(ref), "parameters": payload["parameters"]}, "DriveObjectHandleMismatch")
+    protected = [p for p in parameter_rows(h, path, ref, [971]) if p["number"] == 971]
     if protected:
         h.refuse("refuse the save parameter p971", kind, {**payload, "parameters": [{"name": protected[0]["name"], "expected": protected[0]["value"], "value": 1}]}, "SafetyBoundary")
     applied = h.apply_prepared(kind, prepared)
     h.report["parameterCompile"] = h.stage("drive_parameter_set compile lists the drive as not compiled", lambda: drive_receipt(applied))
-    after = h.stage("read back the parameter", lambda: next(p for p in parameter_rows(h, path, number, [row["number"]]) if p["name"] == name)["value"])
+    h.report["parameterStatus"] = h.stage("change_status reports the applied parameter change", lambda: applied_status(h, prepared, applied))
+    after = h.stage("read back the parameter", lambda: next(p for p in parameter_rows(h, path, ref, [row["number"]]) if p["name"] == name)["value"])
     require(after["text"] == str(value), "Parameter readback %s differs from %s" % (after, value))
     def restore():
         restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
         require(restored["state"] == "restored", "Parameter restore: %s" % restored["stages"])
-        back = next(p for p in parameter_rows(h, path, number, [row["number"]]) if p["name"] == name)["value"]
+        back = next(p for p in parameter_rows(h, path, ref, [row["number"]]) if p["name"] == name)["value"]
         require(back == before, "The restored parameter %s differs from %s" % (back, before))
         return {"stages": restored["stages"], "value": back}
     h.report["parameter"] = {"name": name, "before": before, "after": after, "restore": h.stage("restore the parameter change from its checkpoint", restore)}
 
 
-def telegram_rows(h, path, number):
-    objects = [o for o in observe(h, path, parameterNumbers=[922])["drives"][0]["driveObjects"] if o["driveObjectNumber"] == number]
-    require(len(objects) == 1 and objects[0]["snapshot"]["telegramsComplete"], "Telegrams of drive object %s are not listed completely" % number)
+def telegram_rows(h, path, ref):
+    objects = [o for o in observe(h, path, parameterNumbers=[922])["drives"][0]["driveObjects"] if handle(o) == ref]
+    require(len(objects) == 1 and objects[0]["snapshot"]["telegramsComplete"], "Telegrams of drive object %s are not listed completely" % ref)
     return objects[0]["snapshot"]["telegrams"]
 
 
-def telegrams(h, path, number, boundaries):
-    before = h.stage("read the telegrams", lambda: telegram_rows(h, path, number))
+def telegrams(h, path, ref, boundaries):
+    before = h.stage("read the telegrams", lambda: telegram_rows(h, path, ref))
     main = [t for t in before if t["type"] == "MainTelegram"]
     require(len(main) == 1, "Expected one main telegram: %s" % before)
     target = 20 if main[0]["number"] != 20 else 1
-    payload = {"hardwarePath": path, "driveObjectNumber": number, "operation": "change", "telegramType": "MainTelegram", "telegramNumber": target, "expectedTelegrams": before}
+    payload = {"hardwarePath": path, **ref, "operation": "change", "telegramType": "MainTelegram", "telegramNumber": target, "expectedTelegrams": before}
     kind = "drive_telegram_set"
     error, prepared = outcome(h, "change_prepare", {"kind": kind, "payload": payload})
     if error:
@@ -147,12 +178,13 @@ def telegrams(h, path, number, boundaries):
     h.refuse("refuse stale expected telegrams", kind, {**payload, "expectedTelegrams": []}, "ExpectedValueMismatch")
     applied = h.apply_prepared(kind, prepared)
     h.report["telegramCompile"] = h.stage("drive_telegram_set compile lists the drive as not compiled", lambda: drive_receipt(applied))
-    after = h.stage("read back the main telegram", lambda: telegram_rows(h, path, number))
+    h.report["telegramStatus"] = h.stage("change_status reports the applied telegram change", lambda: applied_status(h, prepared, applied))
+    after = h.stage("read back the main telegram", lambda: telegram_rows(h, path, ref))
     require([t["number"] for t in after if t["type"] == "MainTelegram"] == [target], "Main telegram readback: %s" % after)
     def restore():
         restored = h.tool("change_restore", {"changeId": prepared["changeId"], "previewHash": prepared["previewHash"]})
         require(restored["state"] == "restored", "Telegram restore: %s" % restored["stages"])
-        back = telegram_rows(h, path, number)
+        back = telegram_rows(h, path, ref)
         require(back == before, "The restored telegrams differ: %s" % back)
         return {"stages": restored["stages"]}
     h.report["telegram"] = {"before": main[0]["number"], "after": target, "readbacks": applied.get("readbacks"),

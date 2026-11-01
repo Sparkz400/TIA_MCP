@@ -67,11 +67,17 @@ namespace TiaMcp.Openness.V21
                 drives.Add(new JObject { ["hardwarePath"] = entry.Path, ["name"] = entry.Item.Name, ["typeIdentifier"] = entry.Item.TypeIdentifier, ["driveObjects"] = objects });
                 try
                 {
-                    foreach (var driveObject in container.DriveObjects)
+                    var all = container.DriveObjects.ToList();
+                    var errors = new Exception[all.Count];
+                    var handles = DriveObjectNumbers(all, errors);
+                    bool byIndex = DriveObjectRules.ByIndex(handles);
+                    for (int i = 0; i < all.Count; i++)
                     {
-                        if (!seen.Add(driveObject)) continue;
+                        if (!seen.Add(all[i])) continue;
                         if (!budget.Take()) break;
-                        objects.Add(ObserveDriveObject(driveObject, entry, numbers, offset, motors, encoders, budget, warnings));
+                        string driveId = DriveObjectRules.DriveId(byIndex, handles[i], i);
+                        if (errors[i] != null) warnings.Add(InspectionWarning(entry.Path + "#" + driveId + "/driveObjectNumber", errors[i]));
+                        objects.Add(ObserveDriveObject(all[i], entry, driveId, byIndex ? null : handles[i], byIndex ? i : (int?)null, numbers, offset, motors, encoders, budget, warnings));
                     }
                 }
                 catch (Exception exception) { warnings.Add(InspectionWarning(entry.Path, exception)); }
@@ -85,7 +91,7 @@ namespace TiaMcp.Openness.V21
             result["drives"] = drives;
             result["parameterOffset"] = offset;
             result["parameterNumbers"] = args["parameterNumbers"]?.DeepClone();
-            result["reviewFormat"] = "Each driveObjects[].snapshot is a drive-profile-review-request.v2 before/after snapshot for that drive's hardwarePath. driveId is the local handle DO<driveObjectNumber>.";
+            result["reviewFormat"] = "Each driveObjects[].snapshot is a drive-profile-review-request.v2 before/after snapshot for that drive's hardwarePath. driveId is the local handle DO<driveObjectNumber>; on a drive where any drive object number cannot be read, every object reports driveObjectNumber null and driveObjectIndex (its zero-based position in the drive's DriveObjects), and driveId is DO@<driveObjectIndex>.";
             result["warnings"] = warnings;
             result["completeness"] = InspectionCoverage(budget, warnings, "Offline Startdrive drive objects, DriveObject.Parameters values/units/limits, BICO source references, telegrams with directional byte sizes and Address ranges, and explicitly requested motor/encoder configuration entries.",
                 "Parameter access is reported unknown; Openness does not expose per-parameter write access", "Bits sub-compositions and ReadParameters are not expanded",
@@ -104,9 +110,20 @@ namespace TiaMcp.Openness.V21
             return values.Select(v => v.Value<int>()).Distinct().ToArray();
         }
 
-        private static JObject ObserveDriveObject(DriveObject driveObject, HardwareEntry entry, HashSet<int> numbers, int offset, int[] motors, int[] encoders, ScanBudget budget, JArray warnings)
+        // Every object's DriveObjectNumber in container order; null where Startdrive refuses it, with errors[i] the native error.
+        private static int?[] DriveObjectNumbers(IList<DriveObject> objects, Exception[] errors)
         {
-            int number = driveObject.DriveObjectNumber;
+            var numbers = new int?[objects.Count];
+            for (int i = 0; i < objects.Count; i++)
+            {
+                try { numbers[i] = objects[i].DriveObjectNumber; }
+                catch (EngineeringTargetInvocationException error) { errors[i] = error; }
+            }
+            return numbers;
+        }
+
+        private static JObject ObserveDriveObject(DriveObject driveObject, HardwareEntry entry, string driveId, int? number, int? index, HashSet<int> numbers, int offset, int[] motors, int[] encoders, ScanBudget budget, JArray warnings)
+        {
             var telegrams = new JArray(); var ids = new HashSet<string>(StringComparer.Ordinal); bool telegramsComplete = true;
             try
             {
@@ -114,10 +131,10 @@ namespace TiaMcp.Openness.V21
                 {
                     if (telegrams.Count == 128 || !budget.Take()) { telegramsComplete = false; break; }
                     try { telegrams.Add(DriveTelegram(telegram, ids)); }
-                    catch (Exception exception) { telegramsComplete = false; warnings.Add(InspectionWarning(entry.Path + "#DO" + number + "/telegrams", exception)); }
+                    catch (Exception exception) { telegramsComplete = false; warnings.Add(InspectionWarning(entry.Path + "#" + driveId + "/telegrams", exception)); }
                 }
             }
-            catch (Exception exception) { telegramsComplete = false; warnings.Add(InspectionWarning(entry.Path + "#DO" + number + "/telegrams", exception)); }
+            catch (Exception exception) { telegramsComplete = false; warnings.Add(InspectionWarning(entry.Path + "#" + driveId + "/telegrams", exception)); }
             var parameters = new JArray(); int matched = 0, visited = 0; int? next = null; bool scanTruncated = false;
             try
             {
@@ -130,23 +147,25 @@ namespace TiaMcp.Openness.V21
                     parameters.Add(DriveParameterRow(parameter));
                 }
             }
-            catch (Exception exception) { scanTruncated = true; warnings.Add(InspectionWarning(entry.Path + "#DO" + number + "/parameters", exception)); }
-            return new JObject
+            catch (Exception exception) { scanTruncated = true; warnings.Add(InspectionWarning(entry.Path + "#" + driveId + "/parameters", exception)); }
+            var row = new JObject
             {
                 ["driveObjectNumber"] = number,
-                ["snapshot"] = new JObject { ["identity"] = DriveIdentity(entry.Item, number), ["valueDomain"] = "offline",
+                ["snapshot"] = new JObject { ["identity"] = DriveIdentity(entry.Item, driveId), ["valueDomain"] = "offline",
                     ["parametersComplete"] = numbers == null && offset == 0 && next == null && !scanTruncated, ["parameters"] = parameters,
                     ["telegramsComplete"] = telegramsComplete, ["telegrams"] = telegrams },
                 ["parameterOffset"] = offset, ["nextParameterOffset"] = next, ["parameterScanVisited"] = visited, ["parameterScanTruncated"] = scanTruncated,
                 ["motorConfigurations"] = DriveConfigurations(driveObject, motors, true, budget),
                 ["encoderConfigurations"] = DriveConfigurations(driveObject, encoders, false, budget)
             };
+            if (index != null) row["driveObjectIndex"] = index;
+            return row;
         }
 
-        private static JObject DriveIdentity(DeviceItem item, int number)
+        private static JObject DriveIdentity(DeviceItem item, string driveId)
         {
             string order = DriveAttribute(item, "OrderNumber"), firmware = DriveAttribute(item, "FirmwareVersion");
-            return new JObject { ["driveId"] = "DO" + number, ["family"] = null, ["orderNumber"] = order, ["firmware"] = firmware, ["parameterSet"] = null,
+            return new JObject { ["driveId"] = driveId, ["family"] = null, ["orderNumber"] = order, ["firmware"] = firmware, ["parameterSet"] = null,
                 ["unknownReason"] = "Drive family and parameter set are not exposed by drive_observe" + (order == null || firmware == null ? "; the hosting hardware item did not expose OrderNumber/FirmwareVersion" : "") + "." };
         }
 
@@ -213,14 +232,14 @@ namespace TiaMcp.Openness.V21
                 string io = address.IoType.ToString(), addressId = io;
                 for (int n = 2; !addressIds.Add(addressId); n++) addressId = io + "#" + n;
                 string direction = io == "Input" || io == "Output" ? io : null;
-                addresses.Add(new JObject { ["id"] = addressId, ["plcPath"] = null, ["direction"] = direction, ["context"] = "Telegram.Addresses",
+                addresses.Add(new JObject { ["id"] = addressId, ["plcPath"] = null, ["direction"] = DriveObjectRules.Text(direction), ["context"] = "Telegram.Addresses",
                     ["startAddress"] = address.StartAddress < 0 ? null : (int?)address.StartAddress, ["addressUnit"] = "byte",
                     ["length"] = address.Length < 0 ? null : (int?)address.Length, ["lengthUnit"] = "bit",
                     ["unknownReason"] = "PLC ownership is not resolved by drive_observe" + (direction == null ? "; IoType " + io + " is neither Input nor Output" : "") + "." });
             }
             return new JObject { ["id"] = id, ["type"] = type, ["number"] = telegram.TelegramNumber,
                 ["inputBytes"] = telegram.GetSizeInBytes(AddressIoType.Input), ["outputBytes"] = telegram.GetSizeInBytes(AddressIoType.Output),
-                ["addressesComplete"] = complete, ["addresses"] = addresses, ["unknownReason"] = complete ? null : "More than 16 addresses; capture is truncated." };
+                ["addressesComplete"] = complete, ["addresses"] = addresses, ["unknownReason"] = DriveObjectRules.Text(complete ? null : "More than 16 addresses; capture is truncated.") };
         }
 
         // Dataset/encoder indices are caller-supplied: their ranges are not documented, so none are guessed.
@@ -272,21 +291,30 @@ namespace TiaMcp.Openness.V21
         private static bool DriveParameterProtected(int number)
             => number >= 9300 && number <= 10999 || Array.IndexOf(new[] { 9, 10, 970, 971, 972, 976, 977, 1900, 1910, 1960, 3900 }, number) >= 0;
 
-        private DriveObject ChangeDriveObject(Project project, JObject payload)
+        private DriveObject ChangeDriveObject(Project project, JObject payload) => ChangeDriveObject(project, payload, out _);
+
+        // Prepare, apply and the change fingerprint each re-resolve the object by the payload's handle; identity joins the
+        // fingerprint, so apply refuses StaleRevision when the object's identity changed since prepare.
+        private DriveObject ChangeDriveObject(Project project, JObject payload, out JObject identity)
         {
             var entry = ChangeHardware(project, payload);
-            if (payload["driveObjectNumber"]?.Type != JTokenType.Integer) throw new BridgeException("InvalidRequest", "driveObjectNumber must be the integer reported by drive_observe.");
-            long number = payload.Value<long>("driveObjectNumber");
+            DriveObjectRules.Handle(payload);
             var container = entry.Item.GetService<DriveObjectContainer>()
                 ?? throw new BridgeException("UnsupportedCapability", "The selected hardware item exposes no Startdrive DriveObjectContainer service.");
-            DriveObject found = null;
-            foreach (var driveObject in container.DriveObjects)
-            {
-                if (driveObject.DriveObjectNumber != number) continue;
-                if (found != null) throw new BridgeException("AmbiguousTarget", "More than one drive object has driveObjectNumber " + number + ".");
-                found = driveObject;
-            }
-            return found ?? throw new BridgeException("DriveObjectNotFound", "No drive object on the selected hardware item has driveObjectNumber " + number + ".");
+            var objects = container.DriveObjects.ToList();
+            var numbers = DriveObjectNumbers(objects, new Exception[objects.Count]);
+            int index = DriveObjectRules.Resolve(payload, numbers);
+            var driveObject = objects[index];
+            identity = DriveObjectRules.Identity(entry.Path, numbers, index, DriveAttribute(entry.Item, "OrderNumber"), DriveAttribute(entry.Item, "FirmwareVersion"),
+                DriveRead(() => driveObject.Parameters.Count));
+            return driveObject;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private JObject DriveObjectFingerprint(EngineeringChange change, Project project)
+        {
+            ChangeDriveObject(project, change.Payload, out var identity);
+            return identity;
         }
 
         // Prepare (write=false) returns the preview; apply (write=true) rechecks every expected value, writes, then reads back.
@@ -354,7 +382,8 @@ namespace TiaMcp.Openness.V21
         private JObject DriveTelegramSet(EngineeringChange change, Project project, bool write)
         {
             var payload = change.Payload;
-            var driveObject = ChangeDriveObject(project, payload);
+            var driveObject = ChangeDriveObject(project, payload, out var identity);
+            string driveId = identity.Value<string>("driveId");
             string operation = ChangeText(payload, "operation", 16), typeName = ChangeText(payload, "telegramType", 32);
             if (Array.IndexOf(new[] { "change", "insert", "erase" }, operation) < 0) throw new BridgeException("InvalidRequest", "operation must be change, insert or erase.");
             if (typeName == "SafetyTelegram") throw new BridgeException("SafetyBoundary", "Safety telegrams require a dedicated safety workflow.");
@@ -362,7 +391,7 @@ namespace TiaMcp.Openness.V21
             if (Array.IndexOf(allowed, typeName) < 0) throw new BridgeException("UnsupportedCapability", operation + " supports telegramType " + string.Join(" or ", allowed) + ".");
             var type = (TelegramType)Enum.Parse(typeof(TelegramType), typeName);
             bool sized = type == TelegramType.AdditionalTelegram;
-            var keys = new List<string> { "hardwarePath", "driveObjectNumber", "operation", "telegramType", "expectedTelegrams" };
+            var keys = new List<string> { "hardwarePath", DriveObjectRules.Handle(payload), "operation", "telegramType", "expectedTelegrams" };
             if (operation != "erase") keys.AddRange(sized ? new[] { "inputSize", "outputSize" } : new[] { "telegramNumber" });
             if (payload.Count != keys.Count || keys.Any(key => payload[key] == null)) throw new BridgeException("InvalidRequest", operation + " " + typeName + " needs exactly: " + string.Join(", ", keys) + ".");
             int number = keys.Contains("telegramNumber") ? DriveTelegramInteger(payload, "telegramNumber") : 0;
@@ -379,7 +408,7 @@ namespace TiaMcp.Openness.V21
                 : sized ? composition.CanInsertAdditionalTelegram(inputSize, outputSize) : composition.CanInsertSupplementaryTelegram(number));
             if (!possible) throw new BridgeException("TelegramChangeRefused", "Startdrive reports that this telegram " + operation + " is not possible on the drive object; nothing was written.");
             // Existing overlaps refuse before the checkpoint; the same check after the write then attributes any overlap to this change.
-            var conflicts = DriveAddressConflicts(project, driveObject);
+            var conflicts = DriveAddressConflicts(project, driveObject, driveId);
             if (conflicts.Count != 0) throw new BridgeException("AddressConflict", "The drive object's telegram addresses already overlap configured I/O; resolve that first. Nothing was written.", new JObject { ["conflicts"] = conflicts });
             if (!write) return new JObject { ["before"] = before, ["after"] = null,
                 ["afterReason"] = "Startdrive assigns telegram addresses during the write; apply reads back every telegram row of the drive object and reports the address shift." };
@@ -388,7 +417,7 @@ namespace TiaMcp.Openness.V21
             else if (sized) composition.InsertAdditionalTelegram(inputSize, outputSize);
             else composition.InsertSupplementaryTelegram(number);
             var after = DriveTelegramRows(driveObject);
-            conflicts = DriveAddressConflicts(project, driveObject);
+            conflicts = DriveAddressConflicts(project, driveObject, driveId);
             var readback = new JObject { ["before"] = before, ["after"] = after, ["addressShift"] = DriveAddressShift(before, after), ["conflicts"] = conflicts };
             change.Readbacks.Add(new JObject { ["role"] = "drive-telegram-readback", ["telegrams"] = readback });
             var found = composition.Where(telegram => telegram.Type == type).ToArray();
@@ -419,7 +448,7 @@ namespace TiaMcp.Openness.V21
 
         // Same-IoType byte overlaps between the drive object's telegram ranges and every configured range; ranges sharing a
         // controller, or with no resolved controller, conflict. Unassigned (negative) or empty ranges occupy no I/O bytes.
-        private JArray DriveAddressConflicts(Project project, DriveObject driveObject)
+        private JArray DriveAddressConflicts(Project project, DriveObject driveObject, string driveId)
         {
             var own = driveObject.Telegrams.SelectMany(telegram => telegram.Addresses).ToArray();
             var budget = new ScanBudget(50000);
@@ -427,7 +456,7 @@ namespace TiaMcp.Openness.V21
             foreach (var entry in DeviceItems(project, budget))
                 foreach (var address in entry.Item.Addresses) { if (!budget.Take()) break; others.Add(new KeyValuePair<string, Address>(entry.Path, address)); }
             if (budget.Truncated) throw new BridgeException("TraversalLimit", "Address collision lookup is incomplete.");
-            others.AddRange(own.Select(address => new KeyValuePair<string, Address>("DO" + driveObject.DriveObjectNumber + "/telegrams", address)));
+            others.AddRange(own.Select(address => new KeyValuePair<string, Address>(driveId + "/telegrams", address)));
             var conflicts = new JArray();
             foreach (var mine in own)
             {

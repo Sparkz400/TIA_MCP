@@ -87,7 +87,9 @@ nothing touched a user project, a PLC or PLCSIM.
   compiled the PLC station and listed the drive as not compiled. Before and after that compile and save, Startdrive
   answered `DriveObject.DriveObjectNumber` with "Drive object number could not be retrieved"
   (`EngineeringTargetInvocationException`). `drive_parameter_set` and `drive_telegram_set` therefore refuse at
-  preparation with `EngineeringError`.
+  preparation with `EngineeringError`. *Update 1 November:* the number is also unreadable on a drive commissioned
+  in Startdrive's UI, but a probe worker that skipped it read the one drive object's parameters and telegrams on both
+  drives. Drive objects without a readable number are now addressed by their container position (`driveObjectIndex`).
 - **Online routes cannot authenticate.** Against a downloaded, credential-provisioned owned PLCSIM Advanced instance,
   going online asks for authentication, because the scratch CPU must be access-protected to compile. The online
   routes (`plc_online_compare`, `plc_station_upload`, the DB-snapshot kinds) never log in by design and refuse with

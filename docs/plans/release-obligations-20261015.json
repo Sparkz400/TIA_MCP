@@ -1031,11 +1031,11 @@
       "releaseObligation": true,
       "feasibility": "operation_level_review_required",
       "implementation": "partial_native_drive_kinds_implemented",
-      "qualification": "native_blocked_no_drive_device_compile",
+      "qualification": "native_drive_kinds_passed_by_index",
       "releaseAccepted": false,
-      "currentResult": "28 October 2026 (catalog 0.4.68): 6 release-matrix rows (2 limited, 3 unqualified, 1 deferred); 10 cells bound and 15 open. drive_parameter_set, drive_telegram_set and drive_observe are implemented; Startdrive drives expose no device compile service and a new drive's objects cannot be read (28 October).",
-      "remainingWork": "drive_parameter_set, drive_telegram_set and drive_observe (15 cells): Startdrive drives expose no device compile service and a new drive's objects cannot be read.",
-      "nextAction": "Look for a Startdrive compile or save route that lets the drive kinds apply; otherwise record the V21 boundary.",
+      "currentResult": "28 October 2026 (catalog 0.4.68): 6 release-matrix rows (2 limited, 3 unqualified, 1 deferred); 10 cells bound and 15 open. drive_parameter_set, drive_telegram_set and drive_observe are implemented; Startdrive drives expose no device compile service and a new drive's objects cannot be read (28 October). 1 November (catalog 0.4.95): the device compile lists the drive as not compiled, drive objects without a readable number are addressed by container index, and the three rows passed natively on a G120C PN (local.drives.index.20261101). The first run did not call change_status; the rerun (local.drives.index-status.20261101) did, and all three rows are verified (15 cells bound).",
+      "remainingWork": "drives.engineering (deferred): drive creation, telegram size/PKW/torque/safety edits, TO/encoder connection and DRIVE-CLiQ; online access, download/upload, activation, security and safety need a physical drive (B05).",
+      "nextAction": "Review the remaining Startdrive adapters of drives.engineering; schedule the online gates with a physical drive (B05).",
       "ownerRole": "Drives",
       "currentOwner": "unconfirmed; role is a proposed coordination boundary, not a live assignment",
       "dependencies": [
@@ -1052,6 +1052,7 @@
         "docs/plans/expansion-plans/startdrive.md",
         "docs/verification/drive-profile-review-20261017.md",
         "docs/verification/drive-telegrams-20261018.md",
+        "docs/verification/drives-index-20261101.md",
         "src/TiaMcp.Core/Drives/DriveProfileReview.cs"
       ],
       "packages": [
