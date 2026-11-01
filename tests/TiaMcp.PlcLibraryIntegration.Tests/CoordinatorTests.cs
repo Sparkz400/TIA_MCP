@@ -379,6 +379,18 @@ internal static class CoordinatorTests
             var envelope = JObject.Parse(File.ReadAllText(journal)); envelope["record"]["state"] = "installation_verified"; File.WriteAllText(journal, envelope.ToString());
             Equal(null, Reconcile(out var tampered)); Equal(true, tampered.StartsWith("Coordinator journal", StringComparison.Ordinal));
         });
+        // A crash between a journal's temporary write and its rename leaves the temporary; the committed journal beside it still decides.
+        test("admission reconcile resolves a step workspace holding a crashed journal write's temporary", () => {
+            var s = new Scenario(create: false); string workspace = Path.Combine(s.Root, "changes", "c", "33333333"); StepWorkspace(s, workspace);
+            string coordinator = Directory.GetDirectories(workspace, "component-*").Single(), guid = Guid.NewGuid().ToString("N");
+            foreach (string temporary in new[] { Path.Combine(coordinator, "component-journal.json." + guid + ".tmp"),
+                Path.Combine(workspace, "change-lib-" + new string('a', 32), "journal.json." + guid + ".tmp"), Path.Combine(workspace, "change-" + new string('b', 32), "journal.json.new") })
+                File.WriteAllText(temporary, "{\"torn");
+            var evidence = new JObject();
+            Equal("verifiedApplied", PlcComponentCoordinator.ReconcileWorkspace(workspace, evidence, out _)); Equal(3, ((JArray)evidence["journalTemporaries"]).Count);
+            File.WriteAllText(Path.Combine(workspace, "change-lib-" + new string('a', 32), "before.zap21." + guid + ".tmp"), "other temporary");
+            Equal(null, PlcComponentCoordinator.ReconcileWorkspace(workspace, new JObject(), out var stray)); Equal(true, stray.Contains("is not one the combined apply writes"));
+        });
         // The walk never follows a reparse point and admits only what the combined apply writes there.
         test("admission reconcile holds a junctioned step workspace or subdirectory and stray content", () => {
             var s = new Scenario(create: false); string changes = Path.Combine(s.Root, "changes", "c");
