@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using TiaMcp.Model;
 
-// Change kinds hmi_classic_import and hmi_external_tag_create: admission, standing capture notes and the compile rule they share with the text list.
+// Change kinds hmi_classic_import and hmi_external_tag_create: production admission, standing capture notes and the compile rule they share with the text list.
 static class GateAdmissionTests
 {
     static readonly string[] AllProfiles = { "classic-comfort", "classic-rt-advanced", "classic-basic", "classic-rt-professional", "unified-comfort", "unified-pc" };
@@ -9,44 +9,47 @@ static class GateAdmissionTests
     const string Screen = "Siemens.Engineering.Hmi.Screen.Screen", TagTable = "Siemens.Engineering.Hmi.Tag.TagTable";
     static string Family(string profile) => profile.StartsWith("classic-", StringComparison.Ordinal) ? "classic" : "unified";
     static void Assert(bool value, string label) { if (!value) throw new Exception(label); }
+    // The natively qualified scope of each kind (1 November 2026): what production admits, with or without a qualification profile.
+    static bool Qualified(string kind, string profile, string operation, string type)
+        => kind == "hmi_classic_import" ? profile == "classic-comfort" && (operation == "scalar_property_set" || operation == "classic_xml_import" && (type == Screen || type == TagTable))
+            : profile is "unified-comfort" or "unified-pc" && operation == "external_tag_create";
     static bool Open(string kind, string profile, string operation, string type, string qualification)
     {
         var gate = HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type, qualification);
         bool open = gate.Value<bool>("available");
-        Assert(open == (gate.Value<string>("admission") == "qualification") && open == (gate.Value<string>("reasonCode") == null), "admission and reason code follow availability: " + gate);
-        Assert(gate.Value<string>("nativeQualification") == "unverified" && !gate.Value<bool>("runtimeVerified") && !string.IsNullOrWhiteSpace(gate.Value<string>("reason")), "never verified before curation: " + gate);
+        Assert(open == (gate.Value<string>("admission") == "production") && open == (gate.Value<string>("reasonCode") == null), "admission and reason code follow availability: " + gate);
+        Assert(gate.Value<string>("nativeQualification") == (open ? "verified" : "unverified") && !gate.Value<bool>("runtimeVerified") && !string.IsNullOrWhiteSpace(gate.Value<string>("reason")), "verified exactly when open: " + gate);
         return open;
     }
 
     internal static void Run(Action<string, Action> check)
     {
-        check("Admitted kinds stay closed on every profile without a qualification profile", () => {
+        check("Production admits exactly each kind's natively qualified profiles, operations and Classic import types", () => {
+            int opened = 0;
             foreach (string kind in Kinds)
                 foreach (string profile in AllProfiles)
                     foreach (string operation in HmiEngineeringRules.Operations)
                         foreach (string type in new[] { Screen, TagTable, null })
                         {
-                            Assert(!Open(kind, profile, operation, type, null), "closed: " + kind + " " + profile + " " + operation);
-                            Assert(HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type).Value<string>("reasonCode") == "HmiPreservationUnavailable", "reason code");
+                            bool open = Open(kind, profile, operation, type, null);
+                            Assert(open == Qualified(kind, profile, operation, type), "production: " + kind + " " + profile + " " + operation + " " + type);
+                            Assert(open || HmiEngineeringRules.KindGate(kind, Family(profile), profile, operation, type).Value<string>("reasonCode") == "HmiPreservationUnavailable", "reason code");
+                            opened += open ? 1 : 0;
                         }
-            Assert(!Open("hmi_external_tag_create", "unified-comfort", "external_tag_create", null, "classic-comfort") && !Open("hmi_classic_import", "classic-comfort", "scalar_property_set", Screen, "unified-pc"), "a foreign qualification profile");
+            Assert(opened == 3 + 2 + 2 * 3, "classic-comfort BackColor (three types), screen and tag-table import; external_tag_create on two profiles (three types each): " + opened);
             foreach (string kind in new[] { "hmi_engineering", "hmi_text_list_import", "invented", null })
                 Reject(() => HmiEngineeringRules.KindGate(kind, "classic", "classic-comfort", "classic_xml_import", Screen), "unknown kind " + kind);
         });
-        check("A qualification profile opens only its own kind, family and profile", () => {
-            Assert(Open("hmi_classic_import", "classic-comfort", "classic_xml_import", Screen, "classic-comfort"), "Classic screen import");
-            Assert(Open("hmi_classic_import", "classic-comfort", "classic_xml_import", TagTable, "classic-comfort"), "Classic tag-table import");
-            Assert(Open("hmi_classic_import", "classic-comfort", "scalar_property_set", Screen, "classic-comfort"), "Classic BackColor");
-            foreach (string profile in new[] { "unified-comfort", "unified-pc" })
-            {
-                Assert(Open("hmi_external_tag_create", profile, "external_tag_create", "Siemens.Engineering.HmiUnified.HmiTags.HmiTagTable", profile), "external tag on " + profile);
-                Assert(!Open("hmi_classic_import", profile, "classic_xml_import", Screen, profile), "the Classic kind on " + profile);
-            }
-            Assert(!Open("hmi_external_tag_create", "unified-comfort", "external_tag_create", null, "unified-pc"), "another Unified profile");
-            Assert(!Open("hmi_external_tag_create", "classic-comfort", "external_tag_create", null, "classic-comfort"), "the Unified kind on Classic");
+        check("A qualification profile changes no admission and opens nothing beyond the qualified scope", () => {
+            foreach (string kind in Kinds)
+                foreach (string profile in AllProfiles)
+                    foreach (string qualification in new[] { profile, "classic-comfort", "unified-pc" })
+                        foreach (string operation in HmiEngineeringRules.Operations)
+                            foreach (string type in new[] { Screen, TagTable, null })
+                                Assert(Open(kind, profile, operation, type, qualification) == Qualified(kind, profile, operation, type), "with qualification " + qualification + ": " + kind + " " + profile + " " + operation);
+            Assert(HmiEngineeringRules.KindGate("hmi_classic_import", "classic", "classic-comfort", "classic_xml_import", Screen, "classic-comfort").Value<string>("admission") == "production", "a qualification Host does not change a qualified profile's admission");
             foreach (string profile in new[] { "classic-rt-advanced", "classic-basic", "classic-rt-professional" })
-                Assert(!Open("hmi_classic_import", profile, "classic_xml_import", Screen, profile), "unqualified Classic profile " + profile);
-            Assert(!Open("hmi_classic_import", "classic-comfort", "classic_xml_import", Screen, null) && !Open("hmi_classic_import", "classic-comfort", "classic_xml_import", Screen, "classic-basic"), "no or another qualification profile");
+                Assert(HmiEngineeringRules.KindGate("hmi_classic_import", "classic", profile, "classic_xml_import", Screen, profile).Value<string>("reason").Contains("passed native qualification on classic-comfort only"), "unqualified Classic profile " + profile);
             Assert(HmiEngineeringRules.QualificationProfiles.OrderBy(p => p, StringComparer.Ordinal).SequenceEqual(new[] { "classic-comfort", "unified-comfort", "unified-pc" }), "flag profiles");
         });
         check("Classic import opens only for screens and tag tables", () => {

@@ -1,7 +1,8 @@
 """Native qualification of change kinds hmi_classic_import and hmi_external_tag_create, the HMI writes that pass the closed
 preservation gate (the text-list precedent, scripts/qualify_hmi_text_list_route.py).
 
-One profile per run, on a qualification Host (--hmi-change-qualification <profile>) in a copy its own worker retrieves:
+One profile per run, on a qualification Host (--hmi-change-qualification <profile>) in a copy its own worker retrieves. Since the
+three profiles passed (1 November 2026) the gate admits them in production, also on that Host (ADMISSION):
 - classic-comfort (hmi_classic_import) and unified-comfort (hmi_external_tag_create) retrieve the desk-configured fixture
   (--fixture <configured.zap21> of scripts/prepare_hmi_fixture_ui.py, checked by qualify_engineering_gaps.prepared_archive);
 - unified-pc has no configured fixture yet (ruling R4): --seeded-report names the HmiSeeder qualify report
@@ -17,8 +18,8 @@ One profile per run, on a qualification Host (--hmi-change-qualification <profil
    refused RecoveryRequired. compile=false or save=false is refused; a preview prepared before the first apply is refused
    StaleRevision and stays prepared.
 3. change_restore of the last change: the recovered copy equals the state before it.
-4. Fresh reopen of the saved original on a production Host: hmi_inspect equals the last applied state, and the kind is refused
-   with HmiPreservationUnavailable and admission null.
+4. Fresh reopen of the saved original on a production Host: hmi_inspect equals the last applied state, and the gate admits the
+   kind with admission production (the profiles are production since 1 November 2026; the qualifying runs saw admission null).
 Interruption at each durable boundary is qualify_interruption.py with the ci-*/et-* scenarios.
 """
 import argparse
@@ -42,6 +43,8 @@ APPLIED_STAGES = ["prechange_project_saved", "recovery_archive_created", "hmi_ba
                   "hmi_precise_readback_verified", "mutation_applied", "compile_finished", "hmi_unrelated_content_preserved", "changed_project_saved"]
 PLC_KEYS = ("projectPath", "plcPath", "scopePath", "objectPath", "kind", "name", "namespace")  # The worker's plcTag allowlist.
 BACKCOLOR, ALTERNATE, ADDED_TAG, EXTERNAL = "200, 210, 220", "210, 220, 230", "SharedValueAdded", "QualificationExternal"
+# The admission the gate reports for these profiles; the qualifying runs (local.hmi.*.route.20261101) saw "qualification".
+ADMISSION = "production"
 
 
 def digest(raw):
@@ -425,8 +428,8 @@ def run(args, connect):
                 gate(case["absent"] not in rows(client, device, "tags"), "Absent before the change: " + label)
             prepared = step("change_prepare " + label, prepare(client, kind, case["payload"]))
             admission = prepared["preview"]["hmiEvidence"]["gate"]
-            gate(admission.get("available") is True and admission.get("admission") == "qualification" and admission.get("targetProfile") == profile,
-                 "Gate admits this kind and profile by qualification only: " + label, admission)
+            gate(admission.get("available") is True and admission.get("admission") == ADMISSION and admission.get("targetProfile") == profile,
+                 "Gate admits this kind and profile (%s): %s" % (ADMISSION, label), admission)
             if index == 0:
                 for flags in ({"compile": False, "save": False}, {"compile": True, "save": False}):
                     refused = decoded(client.raw_tool("change_apply", apply_arguments(prepared, **flags))).get("error") or {}
@@ -491,10 +494,11 @@ def run(args, connect):
         gate(not changed, "Fresh reopen: hmi_inspect equals the last applied state", changed)
         fx = fixture_of(fresh, hmis)
         payload = scalar(fx["HMI_RT_1"]["Overview_B"], ALTERNATE) if family == "classic" else external(fx["HMI_RT_1"], "QualificationReopen", "root")
+        # Unbound, so the prepare stops at StaleRevision after the gate; its details carry the gate.
         error = refusal(fresh, kind, payload)
         admission = (error.get("details") or {}).get("gate") or {}
-        gate(error.get("code") == "HmiPreservationUnavailable" and admission.get("available") is False and admission.get("admission") is None,
-             "A production Host refuses the kind with admission null", {"code": error.get("code"), "gate": {k: admission.get(k) for k in ("available", "admission", "reasonCode")}})
+        gate(error.get("code") == "StaleRevision" and admission.get("available") is True and admission.get("admission") == "production",
+             "A production Host admits the kind with admission production", {"code": error.get("code"), "gate": {k: admission.get(k) for k in ("available", "admission", "reasonCode")}})
         fresh.tool("tia_detach")
     except Exception as error:
         gate(False, "Fresh reopen completed", repr(error))

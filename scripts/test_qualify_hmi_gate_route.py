@@ -252,8 +252,9 @@ class FakeClient:
 
     def prepare(self, kind, payload):
         host = self.host
-        code = host.check(kind, payload, self.admitted == host.profile)
-        gate = {"available": code is None, "admission": "qualification" if code is None else None, "targetProfile": host.profile, "reasonCode": code}
+        # The three profiles are production-admitted since 1 November; a qualification Host does not change that.
+        code = host.check(kind, payload, True)
+        gate = {"available": code is None, "admission": "production" if code is None else None, "targetProfile": host.profile, "reasonCode": code}
         if code:
             raise Refused(code, {"gate": gate})
         if payload["expectedContentHash"] != host.hash():
@@ -356,7 +357,7 @@ class GateRouteRunTests(unittest.TestCase):
         self.assertEqual(11, sum(c.startswith("Refused before any write") for c in report["checks"]))
         self.assertEqual(6, sum(c.startswith("Applied with every stage") for c in report["checks"]))
         self.assertEqual(6, len(report["replays"]))
-        self.assertIn("A production Host refuses the kind with admission null", report["checks"])
+        self.assertIn("A production Host admits the kind with admission production", report["checks"])
 
     def test_unified_routes_pass_on_configured_and_seeded_fixtures(self):
         for profile, errors in (("unified-comfort", 0), ("unified-pc", 2)):

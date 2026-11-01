@@ -27,13 +27,14 @@ namespace TiaMcp.Model
         private static readonly Dictionary<string, long> IntegerProperties = new Dictionary<string, long>(StringComparer.Ordinal)
             { ["RaisedStateTagBitNumber"] = 63, ["Priority"] = byte.MaxValue, ["Settings.LogMaxSize"] = uint.MaxValue };
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
-        // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (empty
-        // until native curation) and the profiles a qualification Host may admit in a project its own worker retrieved or created.
+        // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (those
+        // whose native qualification passed: local.hmi.classic-import.*.20261101, local.hmi.external-tag.*.20261101) and the profiles a
+        // qualification Host may admit in a project its own worker retrieved or created.
         private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
             new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
         {
-            ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new string[0], new[] { "classic-comfort" }),
-            ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new string[0], new[] { "unified-comfort", "unified-pc" })
+            ["hmi_classic_import"] = ("classic", new[] { "classic_xml_import", "scalar_property_set" }, new[] { "classic-comfort" }, new[] { "classic-comfort" }),
+            ["hmi_external_tag_create"] = ("unified", new[] { "external_tag_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
         };
         // The profiles --hmi-change-qualification may name; each kind admits only its own.
         internal static readonly string[] QualificationProfiles = Kinds.Values.SelectMany(k => k.QualificationProfiles).Distinct().ToArray();
@@ -273,12 +274,11 @@ namespace TiaMcp.Model
             gate["admission"] = production ? "production" : qualification ? "qualification" : null;
             gate["nativeQualification"] = production ? "verified" : "unverified";
             gate["reasonCode"] = available ? null : "HmiPreservationUnavailable";
-            gate["reason"] = production ? "Opened for change kind " + kind + " on a natively qualified profile; every other HMI write stays behind the closed preservation gate."
-                : qualification ? "Qualification-only admission of profile " + profile + " for change kind " + kind + " in a project this worker retrieved; no production profile is qualified yet."
+            gate["reason"] = production ? "Opened for change kind " + kind + " on a natively qualified profile (1 November 2026); every other HMI write stays behind the closed preservation gate."
+                : qualification ? "Qualification-only admission of profile " + profile + " for change kind " + kind + " in a project this worker retrieved; production admits " + string.Join(" or ", admitted.Profiles) + "."
                 : !scope ? "Change kind " + kind + " admits only " + string.Join(" and ", admitted.Operations) + " on " + admitted.Family + " HMIs"
                     + (admitted.Operations.Contains("classic_xml_import") ? " (classic_xml_import of a screen or tag table only)" : "") + "; this request stays behind the closed preservation gate."
-                : "No profile has passed native qualification of change kind " + kind + " (this target's profile is " + (profile ?? "unknown") + "); only a qualification Host admits "
-                    + string.Join(" or ", admitted.QualificationProfiles) + " in its own retrieved project.";
+                : "Change kind " + kind + " passed native qualification on " + string.Join(" and ", admitted.Profiles) + " only (this target's profile is " + (profile ?? "unknown") + "); other profiles stay behind the closed preservation gate.";
             return gate;
         }
 

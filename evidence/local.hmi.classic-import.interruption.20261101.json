@@ -1,0 +1,54 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.hmi.classic-import.interruption.20261101",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-01T13:38:25+00:00",
+  "source": {
+    "commit": "10763a35fede7841eb6ed1af8902bc3d5418d3fe",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_interruption.py ci-* on the desk-configured TP700 Comfort pair: worker loss at the checkpoint (held), during the baseline compile, the native write and the compile (released, project unchanged) and after the save (held, persisted); Host loss at the checkpoint, the write and the save (held, journal ends applied with every stage). Reconciliation without replay; 8/8 cases.",
+  "limitations": [
+    "BackColor on one screen only; one profile."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "4f7f16a4cf11913e5c75a238874c3c83b9580620ddfdcc7aacaeed7ba52ff9e9"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "74dc93ae7feafc654ab45cc54ca61c4a9612770a19900d202d398028c0f450ae"
+    }
+  ],
+  "runs": [
+    {
+      "report": "hi1-report.json",
+      "sha256": "f1be569e5c21538bfd1929468b1ef658dbe22d3dee56f533cba5c9d4d2f46830",
+      "bytes": 2617177,
+      "completed": true,
+      "steps": [],
+      "toolsPassed": [
+        "change_prepare",
+        "engineering_admission_reconcile",
+        "engineering_operation_status",
+        "hmi_inspect",
+        "project_open",
+        "project_retrieve",
+        "tia_detach",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_prepare",
+        "project_retrieve"
+      ]
+    }
+  ]
+}

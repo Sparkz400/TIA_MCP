@@ -316,7 +316,8 @@ The worker proves the connection's PLC owner natively and refuses a different PL
 (`HmiConnectionPlcMismatch`), existing tag or item names (`HmiNameConflict`), type
 differences (`OperandTypeMismatch`) and rectangles outside the screen
 (`HmiPlacementInvalid`). The plan keeps the two PLC steps and adds one
-`hmi_engineering` `external_tag_create` proposal per root-tag mapping. Its blockers
+`hmi_external_tag_create` proposal (operation `external_tag_create`) per root-tag mapping,
+a change kind production admits on Unified Comfort and Unified PC. Its blockers
 stay explicit: `HmiMemberMappingUnqualified` (no operation creates member-bound tags),
 `HmiScreenItemCreationUnavailable` and `HmiPreservationGateClosed`.
 
