@@ -116,16 +116,20 @@ namespace TiaMcp.Openness.V21
 
         /// <summary>
         /// The upgraded project an interrupted upgrade's receipt proves to reconciliation: only an "upgraded" receipt of the admitted
-        /// source (the archive, or the folder of the project file) that names the observed layout's .ap21 under root. Otherwise null:
-        /// a partial copy or an unfinished upgrade is held without being opened in TIA. A malformed receipt throws (the caller holds).
+        /// source (the archive, or the folder of the project file) with its current hash (sourceSha256, freshly recomputed) that names
+        /// the observed layout's .ap21 under root. An archive's layout name comes from the admitted archive's own marker, never from
+        /// the receipt. Otherwise null: a partial copy or an unfinished upgrade is held without being opened in TIA. A malformed
+        /// receipt or source throws (the caller holds).
         /// </summary>
-        internal static string ReceiptProject(JObject receipt, string root, string admittedSource, bool archive)
+        internal static string ReceiptProject(JObject receipt, string root, string admittedSource, bool archive, string sourceSha256)
         {
             var source = receipt?["source"] as JObject;
             string path = source?.Value<string>("path"), project = (receipt?["project"] as JObject)?.Value<string>("path");
-            if (receipt?.Value<string>("state") != "upgraded" || string.IsNullOrEmpty(path) || string.IsNullOrEmpty(project)) return null;
+            if (receipt?.Value<string>("state") != "upgraded" || string.IsNullOrEmpty(path) || string.IsNullOrEmpty(project) || string.IsNullOrEmpty(sourceSha256) ||
+                !string.Equals(source.Value<string>("sourceSha256"), sourceSha256, StringComparison.OrdinalIgnoreCase)) return null;
             if (!string.Equals(Path.GetFullPath(archive ? path : Path.GetDirectoryName(path)).TrimEnd('\\', '/'), Path.GetFullPath(admittedSource).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return null;
-            return InLayout(Plan(root, path, archive, source.Value<string>("projectName")), project) ? project : null;
+            string name = archive ? MarkerName(admittedSource, true, SourceVersion(admittedSource, sourceSha256, out _)) : null;
+            return InLayout(Plan(root, path, archive, name), project) ? project : null;
         }
 
         /// <summary>TIA's conversion log: its project success marker and message counts.</summary>

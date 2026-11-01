@@ -22,6 +22,7 @@ import json
 import msvcrt
 import os
 import pathlib
+import queue
 import subprocess
 import time
 import uuid
@@ -275,6 +276,17 @@ def wait_until(predicate, description, timeout, interval=0.02):
     raise TimeoutError(description)
 
 
+def host_stopped(client, request):
+    """Whether the Host exited at its qualification point; an answer to the request instead (an error before the point) fails now."""
+    while True:
+        try:
+            line = client.lines.get_nowait()
+        except queue.Empty:
+            return client.process.poll() is not None
+        if line and json.loads(line).get("id") == request:
+            raise RuntimeError("The request was answered instead of stopping at the Host point: " + line[:500])
+
+
 def read_json(path):
     """Read with full sharing: a plain open blocks the worker's File.Replace of its journal (seen natively)."""
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -360,7 +372,7 @@ class Scenario:
             return {"terminated": "worker", "workerPid": workers[0], "tiaPid": tia_pid, "tiaExitedWithWorker": tia_exited_alone}
         if mode == "point":
             # A --watch-qualification Host stops itself (exit 74) at its admitted point; its worker and owned TIA then end alone.
-            wait_until(lambda: client.process.poll() is not None, "The Host never stopped at its qualification point", 900, 0.5)
+            wait_until(lambda: host_stopped(client, request), "The Host never stopped at its qualification point", 900, 0.5)
             marker = read_json(self.root / "interruption-marker.json") or {}
             require(client.process.returncode == 74 and marker.get("automaticReplay") is False, "The Host did not stop at its qualification point")
         else:
@@ -507,6 +519,8 @@ class Scenario:
         rows = {r["effect"]: r["disposition"] for r in reconciled["dispositions"]}
         require(observed["state"] in states, f"The interruption left {observed['state']}, not the {point} boundary {sorted(states)}")
         require(rows == {"readUpgradeSource": "unchanged", "createNewDestination": expected["destination"]}, f"Unexpected dispositions {rows}")
+        destination_row = next(r for r in reconciled["dispositions"] if r["effect"] == "createNewDestination")
+        require(expected["released"] or "project" not in (destination_row["evidence"] or {}), "Reconciliation opened an unproven upgrade")
         require(fingerprint(copy) == before, "The upgrade source changed")
         require(len(admissions(self.root, "project_upgrade")) == 1, "Reconciliation or the held check dispatched another upgrade")
         require(upgrade_state(self.root) == observed["state"] and [str(p) for p in upgraded_projects(self.root)] == observed["projects"],

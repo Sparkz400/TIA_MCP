@@ -1,6 +1,7 @@
 """Offline checks of the change_apply interruption matrix in qualify_interruption.py."""
 import json
 import pathlib
+import queue
 import re
 import shutil
 import tempfile
@@ -157,6 +158,17 @@ class UpgradeInterruptionTests(unittest.TestCase):
         outcomes = {p: {q.upgrade_outcome(s)["destination"] for s in states} for p, (_, _, states) in q.UPGRADE_POINTS.items()}
         self.assertEqual({"int": {"unchanged", None}, "cpy": {None}, "upg": {None}, "prj": {None, "verifiedApplied"}, "hint": {"unchanged"},
                           "hcpy": {"verifiedApplied"}, "hupg": {"verifiedApplied"}, "hret": {"verifiedApplied"}}, outcomes)
+
+    def test_host_point_wait_fails_fast_on_an_answer(self):
+        class Client:
+            def __init__(self, lines, code):
+                self.lines, self.process = queue.Queue(), type("P", (), {"poll": lambda _: code})()
+                for line in lines:
+                    self.lines.put(line)
+        self.assertFalse(q.host_stopped(Client(['{"jsonrpc":"2.0","method":"notifications/message"}'], None), 7))
+        self.assertTrue(q.host_stopped(Client(['{"jsonrpc":"2.0","id":6,"result":{}}', None], 74), 7))
+        with self.assertRaises(RuntimeError):
+            q.host_stopped(Client(['{"jsonrpc":"2.0","id":7,"result":{"isError":true}}'], None), 7)
 
     def test_host_points_exist_and_examples_are_pinned(self):
         text = (ROOT / "src/TiaMcp.Host/HostOptions.cs").read_text(encoding="utf-8")

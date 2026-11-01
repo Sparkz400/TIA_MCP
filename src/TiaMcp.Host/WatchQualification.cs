@@ -35,13 +35,16 @@ internal sealed class WatchQualificationBridge(IBridgeClient inner, HostOptions 
 
     private static void Stop(string point, string marker, JsonElement? response)
     {
-        using (var file = new FileStream(marker, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
+        // An earlier marker in a reused artifacts root is never overwritten; the Host stops at its point either way.
+        try
         {
+            using var file = new FileStream(marker, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
             JsonSerializer.Serialize(file, new { point, hostProcessId = Environment.ProcessId,
                 hostStartedAtUtc = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
                 response, automaticReplay = false }, BridgeProtocol.Json);
             file.Flush(true);
         }
+        catch (IOException) { }
         Environment.Exit(74);
     }
 }

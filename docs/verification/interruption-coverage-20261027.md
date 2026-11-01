@@ -131,5 +131,9 @@ on the same workflow in qualification mode (`local.translation.native.20261028`,
   Host. Power loss, disk faults and remote transport are not exercised.
 - The save-time rule trusts the checkpoint archive's file write time; the archive's
   hash is verified, its timestamp is not.
+- `project_upgrade` reconciliation trusts its worker-written upgrade receipt once it is
+  bound to the recomputed source hash and the observed layout; a receipt edited inside the
+  owned artifacts tree after the interruption is trusted, the same residual as other
+  receipts and journals.
 - Fingerprints exclude generated payload bytes and unexposed vendor data; library
   revisions do not cover unexposed document content.

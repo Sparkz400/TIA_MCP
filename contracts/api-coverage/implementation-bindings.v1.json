@@ -2197,8 +2197,8 @@
     },
     {
       "path": "src/TiaMcp.Host/WatchQualification.cs",
-      "sha256": "ab2e7d003cf3f7726993f901016ba4101b75c151c39379e274144dd9c3728886",
-      "bytes": 4532
+      "sha256": "0103d4685300d0910ad99b51260567492bcd7a0dfaac2e1130418707d5f3e3e8",
+      "bytes": 4697
     },
     {
       "path": "src/TiaMcp.Host/WatchTableTools.cs",
@@ -2502,8 +2502,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.AdmissionReconcile.cs",
-      "sha256": "0bf3f9313a1fb6afb04c71f6891c8f9226e49c61c61e0755a216ae443fab6c31",
-      "bytes": 32159
+      "sha256": "2a894ad6becd1c662182975785268038c7de1b71c0bb2a0c6225f2cf3bccfe0a",
+      "bytes": 32627
     },
     {
       "path": "src/TiaMcp.Openness.V21/OpennessSession.AdmissionReconcileLibrary.cs",
@@ -3127,8 +3127,8 @@
     },
     {
       "path": "src/TiaMcp.Openness.V21/ProjectUpgradeRules.cs",
-      "sha256": "133980806719a02119084c4ebf9182f6d814e31f7baf9c69f7eca6f8b81f0943",
-      "bytes": 11386
+      "sha256": "96613f788597c27e75205da1fdb116ef47a67ee958006aa4c14ee2d89aa6e4b0",
+      "bytes": 11851
     },
     {
       "path": "src/TiaMcp.Openness.V21/RemoteIoCompanionContract.cs",
@@ -44467,8 +44467,8 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 52,
-          "endLine": 56,
+          "line": 55,
+          "endLine": 59,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -44579,8 +44579,8 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 52,
-          "endLine": 56,
+          "line": 55,
+          "endLine": 59,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -44594,8 +44594,8 @@
       "host": {
         "path": "src/TiaMcp.Host/WatchQualification.cs",
         "name": "Compete",
-        "line": 69,
-        "endLine": 86,
+        "line": 72,
+        "endLine": 89,
         "sha256": "3460574674ad7d833f8df6ca3e43eb8c251d3f48a4594092bebd273b62619c24"
       },
       "bridgeOperations": [],
@@ -44613,15 +44613,15 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Compete",
-          "line": 69,
-          "endLine": 86,
+          "line": 72,
+          "endLine": 89,
           "sha256": "3460574674ad7d833f8df6ca3e43eb8c251d3f48a4594092bebd273b62619c24"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 52,
-          "endLine": 56,
+          "line": 55,
+          "endLine": 59,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -44952,8 +44952,8 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 52,
-          "endLine": 56,
+          "line": 55,
+          "endLine": 59,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         },
         {
@@ -44988,8 +44988,8 @@
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Stop",
           "line": 36,
-          "endLine": 46,
-          "sha256": "1fdae693d0ed55a3b81e0e3aa46eb809319f4473e866db17e2742c4e59a74c05"
+          "endLine": 49,
+          "sha256": "9b33355801a2d6b6a35ab96be2bf79b9db2975ac40c4f00f62179315460b66fd"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -45003,8 +45003,8 @@
       "host": {
         "path": "src/TiaMcp.Host/WatchQualification.cs",
         "name": "Seed",
-        "line": 60,
-        "endLine": 65,
+        "line": 63,
+        "endLine": 68,
         "sha256": "178f12d49bdc64aead43b3da15430338d35e69122548d01f8b4506d66b90dce6"
       },
       "bridgeOperations": [
@@ -45019,15 +45019,15 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Seed",
-          "line": 60,
-          "endLine": 65,
+          "line": 63,
+          "endLine": 68,
           "sha256": "178f12d49bdc64aead43b3da15430338d35e69122548d01f8b4506d66b90dce6"
         },
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 52,
-          "endLine": 56,
+          "line": 55,
+          "endLine": 59,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -45094,8 +45094,8 @@
         {
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "RequireQualification",
-          "line": 52,
-          "endLine": 56,
+          "line": 55,
+          "endLine": 59,
           "sha256": "74f397c9815155af5cb6dd230a887073a62971102865c8829d837ca9f308fae5"
         }
       ],
@@ -47307,8 +47307,8 @@
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Stop",
           "line": 36,
-          "endLine": 46,
-          "sha256": "1fdae693d0ed55a3b81e0e3aa46eb809319f4473e866db17e2742c4e59a74c05"
+          "endLine": 49,
+          "sha256": "9b33355801a2d6b6a35ab96be2bf79b9db2975ac40c4f00f62179315460b66fd"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -52605,8 +52605,8 @@
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Stop",
           "line": 36,
-          "endLine": 46,
-          "sha256": "1fdae693d0ed55a3b81e0e3aa46eb809319f4473e866db17e2742c4e59a74c05"
+          "endLine": 49,
+          "sha256": "9b33355801a2d6b6a35ab96be2bf79b9db2975ac40c4f00f62179315460b66fd"
         }
       ],
       "reviewState": "static_entrypoint_bound",
@@ -57411,8 +57411,8 @@
           "path": "src/TiaMcp.Host/WatchQualification.cs",
           "name": "Stop",
           "line": 36,
-          "endLine": 46,
-          "sha256": "1fdae693d0ed55a3b81e0e3aa46eb809319f4473e866db17e2742c4e59a74c05"
+          "endLine": 49,
+          "sha256": "9b33355801a2d6b6a35ab96be2bf79b9db2975ac40c4f00f62179315460b66fd"
         }
       ],
       "reviewState": "static_entrypoint_bound",
