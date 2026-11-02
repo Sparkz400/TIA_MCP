@@ -20,7 +20,7 @@ Every refusal must come from change_prepare as SafetyBoundary naming the F-DI, a
 - library_instantiate of a master copy of McTags into the F-PLC; into the standard PLC, after its own McProbe and McTags
   were deleted, it applies and McTags reads back with McProbe. (Renaming the table instead left McProbe in the PLC, and
   TIA then created the master copy's tag as McProbe(1), run fr_eeb8be6f; qualify_master_copy_tag_collision.py covers it.)
-- software_unit_create_from of a master copy of the standard PLC's empty unit FioUnit into the F-PLC; into the standard PLC,
+- software_unit_create_from of a master copy of the standard PLC's tag-bearing unit FioUnit into the F-PLC; into the standard PLC,
   after FioUnit was deleted there, it applies.
 Last, a probe records whether a tag table mapped in each other VCI format still synchronizes project-ward after a
 bit-memory edit (the F-I/O rule reads the package as SimaticML).
@@ -269,12 +269,16 @@ def unit_routes(h, plc, standard, s):
     require(len(masters) == 1, "Expected one master copy %s: %s" % (UNIT, masters))
     payload = {"libraryId": library, "masterCopyPath": masters[0]["masterCopyPath"], "name": UNIT}
     refuse(h, "a unit master copy into the F-PLC", "software_unit_create_from", payload, {"plcPath": plc}, module=FDI[:-1])
+    change(h, "tag_delete", {"tagTablePath": unit_table, "memberName": "UnitMarker"}, s)
+    change(h, "tag_table_delete", {"tagTablePath": unit_table}, s)
     change(h, "software_unit_delete", {"unitPath": unit, "dependencyPolicy": "rejectReferenced"}, s)
     change(h, "software_unit_create_from", payload, s)
     def created():
         scopes = [x["path"] for x in h.tool("software_inspect", {"plcPath": standard, "maxItems": 2000}).get("softwareScopes", [])]
         require(unit in scopes, "%s is not a scope of the standard PLC: %s" % (unit, scopes))
-        return scopes
+        restored = tables(h).get(unit_table)
+        require(restored == [["UnitMarker", "Bool", "%M61.0", False]], "The copied unit's tag differs: %s" % restored)
+        return {"scopes": scopes, "restoredTags": restored}
     h.stage("the created %s is a scope of the standard PLC" % UNIT, created)
 
 

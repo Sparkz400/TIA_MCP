@@ -1,0 +1,88 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.plcsim.relative-path-refusal.20261102",
+  "outcome": "failed",
+  "recordedAtUtc": "2026-11-02T20:07:32+00:00",
+  "source": {
+    "commit": "e27ad29cb9ed07f97ef33b8fb1a64de1a596e937",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "Simulator test stopped at WorkerNotFound because its relative worker path was resolved from the frozen snapshot; no simulator created.",
+  "limitations": [
+    "Incomplete qualification run retained; fresh corrected runner required."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "b8f4eb71bbd58e99f3dea16905a93df8c05418553fe473ca697e94729ec0e8b7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b8b2a3ab59d1afdb7f37a6e6ebbd52c3525241b9026a22d84c7de20be02e6b62"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "52929abec81423e47cb2ad34fb203d57ace5b1764f9233172bb9f55f177c6304",
+      "bytes": 233577,
+      "completed": false,
+      "steps": [
+        "start owned TIA plcsim signals",
+        "create owned scratch plcsim signals",
+        "prepare project_simulation_enable",
+        "apply project_simulation_enable",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare tag_create",
+        "apply tag_create",
+        "prepare type_source_upsert",
+        "apply type_source_upsert",
+        "prepare tag_table_create",
+        "apply tag_table_create",
+        "prepare tag_table_import_xml",
+        "apply tag_table_import_xml",
+        "SigOutStruct reads back as a SigOutUdt output tag",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "prepare source_upsert",
+        "apply source_upsert",
+        "discovery baseline",
+        "sim_create"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "change_apply",
+        "change_prepare",
+        "project_inventory",
+        "simulation_discovery_baseline",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "sim_create"
+      ]
+    }
+  ]
+}

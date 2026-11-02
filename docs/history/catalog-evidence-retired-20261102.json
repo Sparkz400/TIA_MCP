@@ -14,6 +14,18 @@
     {
       "id": "local.plcsim.event-missing-type.20261102",
       "reason": "Second OB55 fixture discovery refused: SecondaryType is mandatory. Fingerprint unchanged and recovery retained; no runtime qualification."
+    },
+    {
+      "id": "local.component.ob-storage-refusal.20261102",
+      "reason": "Owned combined-OB candidate refused at the captured-storage caller-class boundary; recovery checkpoint and coordinator journal retained."
+    },
+    {
+      "id": "local.fio.unit-cleanup-refusal.20261102",
+      "reason": "F-I/O tag, Git remote/merged conflict, master-copy and unit-copy refusals passed; positive unit fixture stopped at UnitNotEmpty before explicit tag cleanup."
+    },
+    {
+      "id": "local.plcsim.relative-path-refusal.20261102",
+      "reason": "Simulator test stopped at WorkerNotFound because its relative worker path was resolved from the frozen snapshot; no simulator created."
     }
   ]
 }

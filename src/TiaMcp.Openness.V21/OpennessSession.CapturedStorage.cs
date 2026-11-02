@@ -132,15 +132,15 @@ namespace TiaMcp.Openness.V21
             bool eligible = standalone ? model.Value<string>("operation") == "createBlock" && model["creation"]?.Value<string>("blockType") == "FC" : model.Value<string>("operation") == "insertNetwork";
             // The instance DB is generated from the FB alone; the caller's language and block kind never enter it.
             if (!eligible || !(model.Value<string>("language") is "FBD" or "LAD"))
-                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new LAD/FBD FC or an existing LAD/FBD FC or FB caller is eligible for this stored profile.");
+                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new LAD/FBD FC or an existing LAD/FBD FC, FB or OB caller is eligible for this stored profile.");
             var scan = new ScanBudget(50000); var blocks = ScopeBlocks(scope, scan).ToArray(); var types = ScopeTypes(scope, scan).ToArray();
             if (scan.Truncated) throw new BridgeException("TraversalLimit", "Exact captured storage requires complete native scope inventory.");
             if (blocks.Count(b => string.Equals(b.Item.Name, TypedGraphicalCapturedStorageTemplate.FbName, StringComparison.OrdinalIgnoreCase)) != 1 ||
                 types.Count(t => string.Equals(t.Item.Name, TypedGraphicalCapturedStorageTemplate.TypeName, StringComparison.OrdinalIgnoreCase)) != 1)
                 throw new BridgeException("StaleDeclaration", "Captured FB/UDT names must be unambiguous across the complete standard scope.");
             var existingCaller = standalone ? null : blocks.SingleOrDefault(b => b.Path == PlcLibraryIntegrationPlanner.CallerPath(plan.Payload))?.Item;
-            if (!standalone && !(existingCaller is FC || existingCaller is FB))
-                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new LAD/FBD FC or an existing LAD/FBD FC or FB caller is eligible for this stored profile.");
+            if (!standalone && !(existingCaller is FC || existingCaller is FB || existingCaller is OB))
+                throw new BridgeException("CapturedStorageProfileUnavailable", "Only a new LAD/FBD FC or an existing LAD/FBD FC, FB or OB caller is eligible for this stored profile.");
             var paths = new Dictionary<IEngineeringObject, string>();
             foreach (var b in blocks) paths[b.Item] = b.Path;
             foreach (var t in types) paths[t.Item] = t.Path;
