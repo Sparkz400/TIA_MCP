@@ -287,8 +287,8 @@
     },
     {
       "path": "contracts/feature-catalog.v1.json",
-      "sha256": "0c702fc9c68e454422d0e6a84fd3af20ec6de8f4d083005264793803b317fe21",
-      "bytes": 1721111
+      "sha256": "6c99e61fe122155bda2dc88c34431cace0222edd1f089211143dacb64b46dc9e",
+      "bytes": 1721632
     },
     {
       "path": "contracts/fixture-manifest.schema.json",
@@ -2107,8 +2107,8 @@
     },
     {
       "path": "src/TiaMcp.Host/SimulatorTools.cs",
-      "sha256": "5c1e0cfd949bd2ff58cf3bf2d43dc190e06cc098a307bb2d312a98dfc614a4d8",
-      "bytes": 17427
+      "sha256": "2c84a0ff61df4d5317eb7fd812f20d55e28a9bd0b6486432db663ab9b54a30de",
+      "bytes": 17544
     },
     {
       "path": "src/TiaMcp.Host/SoftwareUnitTools.cs",
@@ -2177,8 +2177,8 @@
     },
     {
       "path": "src/TiaMcp.Host/ToolTitles.cs",
-      "sha256": "4ab79f4a06ff40d5ec45198de5b234426528b8df1bd8c5001da9aa91bdab7b3b",
-      "bytes": 21882
+      "sha256": "d319b65f948714b641c0af989f7a8284f20487e3173affaa63db2997b2336e3f",
+      "bytes": 21889
     },
     {
       "path": "src/TiaMcp.Host/TranslationNativeTools.cs",
@@ -3297,8 +3297,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationRuntimeControl.cs",
-      "sha256": "e9cc1236d8492409022d9174aed4c5e9b0355a7eb5eb6f46880496a366deee9c",
-      "bytes": 15023
+      "sha256": "af12dcd8b114cfd48496011b5af43c1b261dfb7db14acd1ac98afc5abfa14181",
+      "bytes": 15221
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulationTicket.cs",
@@ -3307,8 +3307,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorRuntimeControl.cs",
-      "sha256": "c5f207809a9b40601c95e3c54919359df5075dfe399c957374c25697c69c6275",
-      "bytes": 13888
+      "sha256": "9d9c3e68c1d66b2358c5b6981e795badb37b5c96dcab967e81da324c223c36b6",
+      "bytes": 14212
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSelfTests.cs",
@@ -3317,8 +3317,8 @@
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.Signals.cs",
-      "sha256": "af9243a82e18c451c715c9ab24aec01786820b5828ed0364436bce7a3ee0fddb",
-      "bytes": 14542
+      "sha256": "0cffc35d082c4eecec167e061fe47e5ed22d150518f79d566755345874572037",
+      "bytes": 16076
     },
     {
       "path": "src/TiaMcp.Simulator.V8/SimulatorSession.cs",
@@ -63621,8 +63621,8 @@
               "path": "src/TiaMcp.Simulator.V8/SimulatorSession.Signals.cs",
               "name": "Observe",
               "line": 172,
-              "endLine": 221,
-              "sha256": "86eff2b48dbf40c13a95715e9ef8ae5639db62c530c93bf4229b8ba2b03e8c1d"
+              "endLine": 234,
+              "sha256": "02e5d707bfdc2184451dd5776f0698d5033ce6f1ac0ba7021a442efce22b1127"
             }
           ],
           "reviewState": "static_dispatch_bound",

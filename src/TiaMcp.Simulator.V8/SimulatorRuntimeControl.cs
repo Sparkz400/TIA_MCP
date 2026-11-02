@@ -77,6 +77,10 @@ namespace TiaMcp.Simulator.V8
                     selected.Instance.RackOrStationFaultEvent(hardware, (ERackOrStationFaultType)plan.Value<int>("code")); sequenced = false; break;
                 case "statusEvent":
                     selected.Instance.StatusEvent(hardware, (ushort)plan.Value<int>("specifier")); sequenced = false; break;
+                case "updateEvent":
+                    selected.Instance.UpdateEvent(hardware, (ushort)plan.Value<int>("specifier")); sequenced = false; break;
+                case "profileEvent":
+                    selected.Instance.ProfileEvent(hardware, (ushort)plan.Value<int>("specifier")); sequenced = false; break;
                 case "diagnosticAlarm":
                 {
                     var items = ((JArray)plan["channels"]).Select(channel => new SDiagExtChannelDescription {

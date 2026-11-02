@@ -46,7 +46,7 @@ TAGS = {"SigInByte": ("USInt", "%IB20", "uint8"), "SigInWord": ("Int", "%IW22", 
         "SigBit": ("Bool", "%M34.5", "bool")}
 EXTRA = {"Text": "string", "Arm": "bool", "Scans": "int32"}
 UDT, STRUCT_TAG, STRUCT_TABLE = "SigOutUdt", "SigOutStruct", "SigStructTags"
-UDT_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      A : Int;\n      B : Int;\n   END_STRUCT;\n\nEND_TYPE\n\n' % UDT
+UDT_SOURCE = 'TYPE "%s"\nVERSION : 0.1\n   STRUCT\n      A : Int;\n      B : Int;\n      Values : Array[0..1] of Int;\n   END_STRUCT;\n\nEND_TYPE\n\n' % UDT
 DB_SOURCE = '''DATA_BLOCK "SigDb"
 { S7_Optimized_Access := 'TRUE' }
 VERSION : 0.1
@@ -490,6 +490,15 @@ def outputs(h, lab):
     h.stage("refuse sim_write_signals: a batch with the member %s" % member,
             member_refused("sim_write_signals", [{**lab.signal("SigMarker"), "value": 4322}, {"symbol": member, "type": "int16", "value": 777}]))
     h.stage("the refused batch left SigMarker at 4321", lambda: require(lab.single("SigMarker") == {"SigMarker": 4321}, "SigMarker changed") or 4321)
+    for index in (0, 1):
+        symbol = '\"%s\".Values[%d]' % (STRUCT_TAG, index)
+        for tool in ("sim_write", "sim_write_signals"):
+            before = lab.area("output", 24, 8)
+            error = h.call_error(tool, {"instanceId": instance, "writes": [{"symbol": symbol, "type": "int16", "value": 777}]})
+            require(error.get("code") == "InvalidRequest" and (error.get("details") or {}).get("area") == "Output",
+                    "Array element was not refused as an output: %s" % error)
+            require(lab.area("output", 24, 8) == before, "Refused array-element write changed output bytes")
+            h.stage("%s refuses output array element %s" % (tool, symbol), lambda: {"error": error, "outputBytes": before})
 
 
 def states(result):

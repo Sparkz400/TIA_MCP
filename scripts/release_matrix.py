@@ -13,9 +13,12 @@ owner of their feature-name prefix.
 """
 import argparse
 import collections
+import datetime
 import hashlib
 import json
 import pathlib
+import re
+import subprocess
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CATALOG = "contracts/feature-catalog.v1.json"
@@ -144,15 +147,77 @@ def disposition_errors(rows, dispositions):
             + [f"{f}: ledger disposition without a blocked row" for f in sorted(decided - blocked)])
 
 
-def release_gate_errors(version, ledger, matrix):
+def acceptance_errors(obligation, ledger, matrix, root):
+    """An approval flag must name the unchanged evidence and source the maintainer reviewed."""
+    record = obligation.get("acceptance")
+    prefix = obligation["id"] + ": "
+    if not isinstance(record, dict):
+        return [prefix + "acceptance record missing"]
+    try:
+        datetime.date.fromisoformat(record["date"])
+        if record.get("acceptedBy") != "maintainer":
+            raise ValueError("acceptedBy must be maintainer")
+        for key, length in (("commit", 40), ("matrixSha256", 64)):
+            if not isinstance(record.get(key), str) or not re.fullmatch("[0-9a-f]{%d}" % length, record[key]):
+                raise ValueError(key + " must be a complete lowercase hash")
+        for key in ("evidenceIds", "dispositions", "limitations"):
+            values = record[key]
+            if not isinstance(values, list) or any(not isinstance(v, str) or not v.strip() for v in values) or len(values) != len(set(values)):
+                raise ValueError(key + " must contain unique nonempty strings")
+        blockers = record["blockers"]
+        if not isinstance(blockers, dict) or set(blockers) != set(obligation.get("blockers", [])) or any(
+                not isinstance(v, str) or not v.strip() for v in blockers.values()):
+            raise ValueError("every listed blocker needs a disposition")
+        rows = [row for row in matrix["rows"] if obligation["id"] in row["owners"]]
+        required = {e for row in rows for e in row["evidenceIds"]}
+        known = {e["id"] for e in matrix["evidence"]} | {p.stem for p in (root / "evidence").glob("*.json")}
+        if not required <= set(record["evidenceIds"]) <= known:
+            raise ValueError("evidenceIds must cover every owned row and name current evidence")
+        blocked = {r["featureId"] for r in rows if r["support"] == "unavailable_target"}
+        if set(record["dispositions"]) != blocked:
+            raise ValueError("dispositions must name exactly the owned blocked rows")
+        decided = {d["featureId"] for d in ledger["dispositions"]}
+        if not blocked <= decided:
+            raise ValueError("blocked row has no ledger disposition")
+
+        def git(*args):
+            result = subprocess.run(["git", "-C", str(root), *args], capture_output=True, timeout=30)
+            if result.returncode:
+                raise ValueError("reviewed commit/matrix is unavailable or not an ancestor; fetch full history")
+            return result.stdout
+
+        git("merge-base", "--is-ancestor", record["commit"], "HEAD")
+        reviewed_bytes = git("show", record["commit"] + ":" + MATRIX)
+        if hashlib.sha256(reviewed_bytes).hexdigest() != record["matrixSha256"]:
+            raise ValueError("reviewed matrix hash does not match its commit")
+        reviewed = json.loads(reviewed_bytes)
+        if rows != [r for r in reviewed["rows"] if obligation["id"] in r["owners"]]:
+            raise ValueError("owned matrix rows changed after acceptance")
+        current_proofs = [e for e in matrix["evidence"] if e["id"] in record["evidenceIds"]]
+        if current_proofs != [e for e in reviewed["evidence"] if e["id"] in record["evidenceIds"]]:
+            raise ValueError("accepted evidence changed after acceptance")
+        # Ledger/matrix edits record the approvals; code, contracts and build inputs must already be frozen.
+        changed = git("diff", "--name-only", record["commit"], "--", "src", "tests", "scripts", "fixtures",
+                      "contracts", "evidence", "ui", "e2e", ".github", "Directory.Build.props", "global.json",
+                      "NuGet.Config", "TiaMcp.slnx", "package.json", "package-lock.json")
+        if changed.strip():
+            raise ValueError("release inputs changed after acceptance; review the frozen candidate again")
+    except (KeyError, TypeError, ValueError, OSError, subprocess.TimeoutExpired) as error:
+        return [prefix + "invalid acceptance: " + str(error)]
+    return []
+
+
+def release_gate_errors(version, ledger, matrix, root=ROOT):
     """From 1.0 on, a release needs a ready ledger, every release obligation accepted and no open or deferred cell."""
     if int(version.split(".")[0]) < 1:
         return []
     cells = matrix["summary"]["cells"]
     # releaseReady alone is one flag; each obligation's own acceptance must agree with it.
-    return ([] if ledger["releaseReady"] else ["ledger releaseReady is false"]) + [
+    return ([] if ledger["releaseReady"] is True else ["ledger releaseReady is false"]) + [
         f"{o['id']}: release obligation not accepted" for o in ledger["obligations"]
         if o["releaseObligation"] and o["releaseAccepted"] is not True] + [
+        error for o in ledger["obligations"] if o["releaseObligation"] and o["releaseAccepted"] is True
+        for error in acceptance_errors(o, ledger, matrix, root)] + [
         f"{cells.get(state, 0)} {state} cells" for state in ("open", "deferred") if cells.get(state, 0)]
 
 

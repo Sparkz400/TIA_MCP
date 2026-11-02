@@ -32,6 +32,9 @@ NON_RETAIN
       TimerDone : Bool;
       ProgramVersion : Int;
       Ob40 : DInt;
+      Ob55 : DInt;
+      Ob56 : DInt;
+      Ob57 : DInt;
       Ob82 : DInt;
       Ob83 : DInt;
       Ob86 : DInt;
@@ -62,6 +65,9 @@ END_ORGANIZATION_BLOCK
 '''
 # number -> block name, Openness SecondaryType, GapDb counter, informative S7-1500 start information.
 OBS = {
+    55: ("GapStatus", "StatusInterrupt", "Ob55", []),
+    56: ("GapUpdate", "UpdateInterrupt", "Ob56", []),
+    57: ("GapProfile", "ProfileInterrupt", "Ob57", []),
     40: ("GapHardwareInterrupt", "HardwareInterrupt", "Ob40", [("LADDR", "HW_IO"), ("USI", "Word"), ("IChannel", "USInt"), ("EventType", "Byte")]),
     82: ("GapDiagnosticError", "DiagnosticErrorInterrupt", "Ob82", [("IO_State", "Word"), ("LADDR", "HW_ANY"), ("Channel", "UInt"), ("MultiError", "Bool")]),
     83: ("GapPullOrPlug", "PullOrPlugOfModules", "Ob83", [("LADDR", "HW_IO"), ("Event_Class", "Byte"), ("Fault_ID", "Byte")]),
@@ -157,7 +163,7 @@ class Lab:
         return result["instance"]["operatingState"]
 
     def counters(self):
-        return self.read(Ob40="int32", Ob82="int32", Ob83="int32", Ob86="int32")
+        return self.read(**{n: "int32" for n in self.symbols if n.startswith("Ob")})
 
 
 def body(h):
@@ -180,6 +186,9 @@ def body(h):
         obs.append(86)
     else:
         boundaries["OB86"] = h.report.get("remoteStation")
+    if getattr(h.args, "event_extension", False):
+        require(station is not None, "The extended event fixture needs the distributed ET 200SP station")
+        obs.extend([55, 56, 57])
     h.report["boundaries"] = boundaries
     plant(h, plc, sorted(obs))
     lab.interrupt = configure_interrupt(h, plc, module)
@@ -205,11 +214,15 @@ def body(h):
         h.stage("resolve GapDb in PLCSIM", lambda: lab.resolve(["Start", "TimerDone", "ProgramVersion", "Ob40", "Ob82", "Ob83", "Ob86", "Year"]))
         require(h.stage("program version 1 runs", lambda: lab.read(ProgramVersion="int16"))["ProgramVersion"] == 1, "Version 1 is not running")
 
-        online_downloads(h, lab, plc, ticket, login, secret)
-        virtual_time(h, lab)
-        events(h, lab, ids, module, station, obs)
-        memory_reset(h, lab)
-        storage(h, lab)
+        if getattr(h.args, "event_extension", False):
+            lab.resolve(["Ob55", "Ob56", "Ob57"])
+            extended_events(h, lab, ids)
+        else:
+            online_downloads(h, lab, plc, ticket, login, secret)
+            virtual_time(h, lab)
+            events(h, lab, ids, module, station, obs)
+            memory_reset(h, lab)
+            storage(h, lab)
     finally:
         released = h.stage("sim_release", lambda: h.tool("sim_release", {"instanceId": lab.instance["id"], "deleteOwned": True}))
         require(released.get("unregistered") is True, "The owned instance was not released")
@@ -472,6 +485,38 @@ def events(h, lab, ids, module, station, obs):
     h.report["events"] = results
 
 
+def extended_events(h, lab, ids):
+    """A distributed interface/module must raise the matching OB once; central modules must refuse."""
+    results = []
+    for kind, counter in (("statusEvent", "Ob55"), ("updateEvent", "Ob56"), ("profileEvent", "Ob57")):
+        successes = []
+        for name, hardware in sorted(ids.items()):
+            if not name.startswith("GapHead"):
+                continue
+            before = lab.counters()
+            wire = h.client.request("tools/call", {"name": "sim_event", "arguments": {"instanceId": lab.instance["id"],
+                                   "event": {"type": kind, "hardwareId": hardware, "specifier": 1}}})
+            row = {"type": kind, "hardwareName": name, "hardwareId": hardware, "wire": wire, "before": before}
+            if not wire.get("isError"):
+                for _ in range(50):
+                    after = lab.counters()
+                    if after[counter] != before[counter]: break
+                    time.sleep(0.1)
+                require(after[counter] == before[counter] + 1 and all(after[k] == before[k] for k in before if k != counter),
+                        "%s on %s: counters %s -> %s" % (kind, name, before, after))
+                row["after"] = after
+                successes.append(row)
+            results.append(row)
+            h.report["extendedEvents"] = results
+            h.persist()
+        require(successes, "No distributed endpoint executed %s: %s" % (kind, results))
+        before = lab.counters()
+        error = h.call_error("sim_event", {"instanceId": lab.instance["id"], "event": {
+                            "type": kind, "hardwareId": ids["Local~GapDI"], "specifier": 1}})
+        require(lab.counters() == before, "Central-module refusal changed an interrupt counter")
+        h.stage("%s distributed execution and central-module refusal" % kind, lambda: {"accepted": successes, "centralRefusal": error})
+
+
 def memory_reset(h, lab):
     lab.write("Ob82", "int32", 5)
     def reset():
@@ -556,6 +601,7 @@ if __name__ == "__main__":
     parser.add_argument("--artifacts", type=Path, required=True)
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
+    parser.add_argument("--event-extension", action="store_true", help="Qualify distributed status/update/profile events instead of the existing runtime corpus")
     args = parser.parse_args()
     args.runner = __file__
     Harness(args, "pg_", "PLCSIM gaps on one owned PLCSIM Advanced V8 instance: online download, virtual time, events, memory reset and storage", LIMITATIONS, []).run(body)

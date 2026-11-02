@@ -74,6 +74,16 @@ The strict supplemental preservation audit (`artifacts/continuation-20261009/aud
 
 Checkpoint requested by the user on 8 October 2026. Both family adapters and their integration are saved. **Full H0–H5 acceptance is not complete, and every production HMI mutation remains unavailable.** The authoritative package, hashes and checks for this checkpoint are recorded in `artifacts/hmi-delivery-report.json`. Do not infer native qualification from a successful build or an implemented guarded body.
 
+## Historical checkpoint checklist
+
+The numbered checklist below preserves the October checkpoint and its exact acceptance criteria.
+Its old unchecked boxes are not the current work queue: bridge retrieval, lifecycle, scoped
+production writes and interruption have since passed as recorded above. Current remaining work
+is tracked by [TODO](../TODO.md#engineering-workstreams): faceplates and interface bindings,
+additional object families and connections, combined PLC/HMI apply, configured Advanced/Basic
+fixtures and family-specific visual/runtime acceptance. Keep complete-content SDK boundaries
+explicit; do not erase the original failed checkpoint evidence.
+
 ## 1. Qualify the final immutable package
 
 - [ ] Run the complete regression suite against the checkpoint snapshot, including project-model contracts. The previous b58 snapshot passed 27 of 28 suites; its environment-redaction test failed once and passed unchanged on a focused retry. Preserve that original failed run. The checkpoint only repeats focused HMI checks and packaging/startup checks.

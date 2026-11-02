@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "0.4.121",
+  "catalogVersion": "0.4.122",
   "targetTiaVersions": [
     21
   ],
@@ -7329,7 +7329,8 @@
           "OB82 (diagnosticAlarm), OB83 (pull and plug) on a central DI 16x24VDC HF and OB86 (station fault and return) on an ET 200SP IO device each raised only their own counter. Hardware IDs come from the PLC's system constants.",
           "OB40 is verified with a hardware interrupt configured through change.hardware_channel_attributes on DI 16x24VDC HF V1.0 channel 0 (local.plcsim_gaps.ob40.20261030): PLCSIM lists the configured process event and ProcessEvent on it raises OB40 once. A rising edge written to the input tag with sim_write does not raise OB40. statusEvent on the central module is answered NotSupportedByModule (OB55 serves distributed modules).",
           "Owned instances in RUN only; one event per call, validated completely before the runtime call. Without event it only lists the configured hardware-interrupt events.",
-          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values."
+          "hardwareInterrupt (OB40), pullOrPlug (OB83), rackOrStationFault (OB86, distributed devices only), diagnosticAlarm (OB82) and statusEvent (OB55). The runtime's acceptance and sequence number are reported; whether the OB ran is shown only by program values.",
+          "2 November local extension: updateEvent and profileEvent use the V8 UpdateEvent/ProfileEvent public routes with bounded hardwareId/specifier. New distributed OB55/56/57 qualification is pending; prior evidence remains scoped to the existing OB40/82/83/86 routes."
         ]
       },
       "qualification": {
@@ -27513,7 +27514,8 @@
           "Natively qualified on one owned PLCSIM Advanced V8 CPU1511 instance on Softbus of a scratch CPU 1511-1 PN V4.1 (local.plcsim_signals.20261030); other CPUs, firmware and TCP/IP instances are not qualified.",
           "A bounded window of 0-60000 ms and 1-256 events; the subscription ends with the call. Calls run one at a time, so a change made by another tool call (sim_state) never falls inside a window.",
           "V8 has no LED getter: LEDs are reported only as changes within the window. Display data is summarized (length, SHA-256) and returned as base64 only on request, up to 4 MiB; its format is not decoded.",
-          "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes."
+          "Natively the program's STP was observed as Run to Stop with STOP, RUN and ERROR LED changes, a separate API client's Run, Stop, Run as Stop-Startup-Run-Stop-Startup-Run matching the client's log and the polled state, and maxEvents 1 ended a 15 s window after 1.5 s; a CPU 1511 display summary reported 41026 bytes.",
+          "2 November local extension: bounded subscriptions also report softwareConfiguration, hardwareConfiguration and ipAddress changes. New-event native qualification is pending; prior state/LED evidence does not qualify these additions."
         ]
       },
       "qualification": {

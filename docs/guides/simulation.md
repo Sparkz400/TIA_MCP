@@ -150,7 +150,8 @@ selected instance. None of them touches the machine-wide network mode, adapters 
 - **Events.** `sim_event` without `event` lists the downloaded hardware-interrupt configuration
   (`GetConfiguredProcessEvents`). With `event` it injects one of `hardwareInterrupt` (`ProcessEvent`, OB40),
   `pullOrPlug` (`PullOrPlugEvent`, OB83), `rackOrStationFault` (`RackOrStationFaultEvent`, OB86; distributed
-  devices only), `diagnosticAlarm` (`AlarmNotification`, OB82) or `statusEvent` (`StatusEvent`, OB55) into an
+  devices only), `diagnosticAlarm` (`AlarmNotification`, OB82) or `statusEvent` (`StatusEvent`, OB55),
+  `updateEvent` (`UpdateEvent`, OB56) and `profileEvent` (`ProfileEvent`, OB57; distributed modules) into an
   instance in RUN. Hardware IDs come from the PLC's system constants. The runtime's acceptance and sequence
   number are reported; whether the OB ran is shown only by program values, for example an OB counter read
   with `sim_read`.
@@ -416,3 +417,8 @@ The pure self-test mode exits before resolving or initializing Siemens API assem
 Twenty-one checks passed under the ordinary Windows user token: integer precision, JSON unsigned-64 conversion, large real comparison, tolerances, NaN rejection, typed comparisons, complete/incomplete/oversized UTF-8 framing, storage path rejection (including drive-relative paths), DPAPI roundtrip, expiration, ownership mismatch and ciphertext tamper. Reports are retained in uniquely named `artifacts/simulator-selftest-*` directories. These checks do not start a simulated CPU and do not replace the live engineering/runtime integration test.
 
 Primary references: [Siemens V21 offline Windows-folder download](https://docs.tia.siemens.cloud/r/en-us/v21/tia-portal-openness-api-for-automation-of-engineering-workflows/tia-portal-openness-api/functions-for-accessing-the-data-of-a-plc-device/functions-for-downloading-data-to-plc-device/downloading-plc-to-a-windows-folder), [Siemens Test Suite virtual memory-card example](https://docs.tia.siemens.cloud/r/en-us/v20/tia-portal-test-suite/openness-support/functions-for-application-test/execution-of-test-cases), [V8 API manual](https://support.industry.siemens.com/cs/attachments/109997789/s7-plcsim_advanced_function_manual_API_en-US_en-US.pdf) (operating-state/license results), and the installed V8 manuals in `C:\Program Files (x86)\Siemens\Automation\PLCSIMADV\documents\en-US`.
+
+The bounded observation window also subscribes to V8 software-configuration, hardware-configuration
+and IP-address events. It retains the native timestamp and error code, the software change type,
+and the interface index/IP suite where applicable. New event-family qualification is tracked in the
+feature catalog separately from the existing operating-state and LED evidence.
