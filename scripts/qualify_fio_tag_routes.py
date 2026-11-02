@@ -154,10 +154,12 @@ def absolute_block_read(h, plc, standard, fio, scope, standard_scope):
 def absolute_xml(xml, fio):
     """Keep native namespace spelling: TIA can silently drop a reserialized StructuredText body."""
     byte, bit = map(int, fio.removeprefix("%I").split("."))
-    pattern = r'<Access\b(?=[^>]*Scope="(?:GlobalVariable|Address)")([^>]*)>.*?</Access>'
+    pattern = r'<Access\b(?=[^>]*Scope="(?:GlobalVariable|Address)")([^>]*)>(.*?)</Access>'
     def replace(match):
         attributes = re.sub(r'Scope="[^"]+"', 'Scope="Address"', match.group(1))
-        return '<Access%s><Address Area="Input" Type="Bool" BitOffset="%d" /></Access>' % (attributes, byte * 8 + bit)
+        uid = re.search(r'<(?:Symbol|Address)\b[^>]*\bUId="([^"]+)"', match.group(2))
+        require(uid is not None, "The native SCL operand must carry its own UId")
+        return '<Access%s><Address Area="Input" Type="Bool" BitOffset="%d" UId="%s" /></Access>' % (attributes, byte * 8 + bit, uid.group(1))
     updated, count = re.subn(pattern, replace, xml, flags=re.S)
     require(count == 1, "Expected one input read in the native standard source export")
     ET.fromstring(updated)
