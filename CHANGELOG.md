@@ -9,7 +9,7 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.113`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.114`.
 
 ### Added
 
@@ -242,6 +242,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     grants scratch rights; generated-source reads take exclusive access.
   - Change prepare and apply refuse while another change on the same project needs recovery;
     `block_delete`, `block_rename`, `to_delete` and `hardware_delete` need `compile`.
+  - Rechecked natively on 2 November ([record](docs/verification/audit-paths-20261102.md)): the
+    delete and rename compile rule for all four kinds, `change_prepare`'s `RecoveryRequired` after a
+    failed apply, generated-source reads with `projectModifiedBefore`/`After`, and translation reopen
+    keeping scratch status for the owned fixture and never granting it to an admitted project.
   - A missing or renamed old project path no longer blocks every change; store locks wait up to
     5 s; finished records archive past 1,000 (Hosts older than this change refuse new admissions
     on a store with an `.archive` folder); a clock step back no longer fails a dispatch.
@@ -286,6 +290,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
     tags' names and fails such a change with `MutationVerificationFailed`, so the checkpoint recovers
     it; `software_unit_create_from`, where TIA renamed a copy's unit tag the same way, refuses such
     tags with the renamed blocks and types (`local.library.tag-collision.20261101`).
+- The translation admission scripts compared the Host's RFC 8785 key and row hashes (PR 184) with
+  the earlier form: `qualify_translation_import.py --same-instance` stopped before its first case,
+  and `build_translation_admission.py` would have written proofs the Host loader refuses. They accept
+  either form; the restricted pipeline ran natively end to end again
+  (`local.translation.restricted.qualification.20261102`, `local.translation.restricted.native.20261102`).
 - Native runs of 31 October and 1 November ([status log](docs/history/status-log.md#1-november-2026)):
   - `project_simulation_enable` compiles every device: in a project with more than one PLC it
     refused with `AmbiguousTarget`, or with a `plcPath` left the other PLCs uncompiled so the
@@ -324,7 +333,12 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   takes no OPC UA credential, a guest-access seed made at the desk
   ([record](docs/verification/testsuite-system-blocker-20261101.md)).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
-  Comfort 15.0 panel); restricted translation profiles cover one PLC's block comments only.
+  Comfort 15.0 panel); V15.1 and V17–V20 sources and UMAC-protected or locked sources are not
+  exercised, since only V21 is installed here and V21 cannot create older projects. Restricted
+  translation profiles cover one PLC's block comments only, and the default-mode run that finalizes
+  such an entry imports its one admitted edit, so a final entry cannot import on its own scratch.
+- A local Git remote with more than 100,000 entries is refused (`GitLimitExceeded`) until it is
+  repacked.
 - `library_instantiate` and `software_unit_create_from` recognize a master-copy tag TIA renamed by
   its `<name>(<n>)` form beside an existing `<name>`, so a tag that is itself named that way fails
   the change too.

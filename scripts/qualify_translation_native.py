@@ -5,7 +5,13 @@ the Host and worker admits one project instance and one Main OB1 comment edit. T
 absent and a malformed profile before native dispatch, captures, reviews, approves and imports that
 edit once, refuses a forged plan, a stale revision, a replay and an existing recovery destination,
 recovers the checkpoint to a new directory, reconciles both copies read-only, and finally shows that
-the changed project no longer matches the admission.
+the changed project no longer matches the admission. Right after the import's fresh reopen a scratch-only
+preparation (hardware_add with configureScratchSecurity) is refused with ScratchIsolationRequired: the
+admitted project never gains scratch status (31 October audit).
+
+--finalized-capture checks the worker side of a finalized (unbound) restricted entry instead: the default
+packet that finalized it already imported its one admitted edit, so the capture must pass with the
+installed category scope and show that edit, and a prepare from it is refused for the changed baseline.
 """
 import argparse
 import base64
@@ -28,6 +34,9 @@ PRODUCTION = {'translation_native_capture', 'translation_native_prepare', 'trans
 SOURCE, ORIGINAL, REPLACEMENT = 'Prueftext Main {0}', 'Verification text Main {0}', 'Verified translation Main {0} — Ω'
 TIA_EXE = Path(r'D:\Arbeit\Siemens\Portal V21\Bin\Siemens.Automation.Portal.exe')
 CASES = ('worker:checkpointIntent', 'host:dispatchIntent', 'worker:dispatchIntent', 'host:checkpointIntent')
+# Only the worker's current scratch may configure generated CPU security (EnsureCurrentScratchProject); prepare writes nothing.
+SCRATCH_PROBE = {'kind': 'hardware_add', 'payload': {'typeIdentifier': 'OrderNumber:6ES7 511-1AL03-0AB0/V4.1', 'deviceName': 'TrScratchProbe',
+                                                     'itemName': 'TrScratchProbeCpu', 'configureScratchSecurity': True}}
 
 
 def owned_children(parent, image):
@@ -123,13 +132,13 @@ class Run:
         self.call('artifact_upload_chunk', {'uploadId': begun['uploadId'], 'offset': 0, 'data': base64.b64encode(data).decode()})
         return self.call('artifact_upload_commit', {'uploadId': begun['uploadId']})['artifactRef']
 
-    def main_row(self, capture_ref):
+    def main_row(self, capture_ref, target=ORIGINAL):
         rows, cursor = [], None
         while True:
             page = self.call('translation_inspect', {'captureRef': capture_ref, 'pageSize': 1000, **({'cursor': cursor} if cursor else {})})
             rows += page['rows']; cursor = page['nextCursor']
             if cursor is None: break
-        main = [r for r in rows if r['source'].get('text') == SOURCE and r['target'].get('text') == ORIGINAL]
+        main = [r for r in rows if r['source'].get('text') == SOURCE and r['target'].get('text') == target]
         require(len(main) == 1, 'Exactly one captured Main OB1 comment required')
         return main[0], len(rows)
 
@@ -168,6 +177,8 @@ class Run:
         require(self.call('translation_native_status', {'operationId': op['id']}) == op, 'Refused apply changed the operation')
         applied = self.call('translation_native_apply', request)
         require(applied['state'] == 'succeeded', 'Full native lifecycle failed')
+        # Not under refusals: build_translation_admission.py --finalize requires exactly the lifecycle refusal set there.
+        report['scratchNotGranted'] = self.call('change_prepare', SCRATCH_PROBE, 'ScratchIsolationRequired')
         report['refusals']['replay'] = self.call('translation_native_apply', {**request, 'revision': applied['revision']}, '')
         status = self.call('translation_native_status', {'operationId': op['id']})
         require(status == applied, 'Status differs from the applied operation')
@@ -257,6 +268,28 @@ class Run:
         self.save('exact-close-' + label, close)
         require(close['hostExitCode'] == 0 and close['closeInterrupted'] is None and close['tree']['completed'], 'Exact Host cleanup incomplete: ' + label)
 
+    def finalized_capture(self, report):
+        """The worker loads the unbound final entry: capture passes on its category scope; the spent baseline refuses a prepare."""
+        require('qualification' not in self.entry, 'A finalized entry has no deployment binding')
+        profile = {'profileId': self.args.profile_id}
+        self.call('translation_native_capture', {'profileId': 'not-installed-profile'}, 'TranslationImportProfileUnqualified')
+        self.call('project_open', {'path': self.entry['projectPath']})
+        capture = self.call('translation_native_capture', profile)
+        require(capture['nativeImportExecuted'] is False, 'Capture must not import')
+        main, total = self.main_row(capture['capture']['recordRef'], REPLACEMENT)
+        require(total == len(self.entry['profile']['key']['rows']), 'The capture left the installed category scope')
+        # The finalizing packet imported the admitted edit, so the reviewed reverse edit is a different plan than the admitted one.
+        proposals = json.dumps({'edits': [{'nativeKey': main['nativeKey'], 'culture': main['culture'], 'kind': 'set', 'value': ORIGINAL,
+                                           'expectedSourceSha256': main['sourceSha256'], 'expectedTargetSha256': main['targetSha256']}]}).encode()
+        review = self.call('translation_prepare', {'captureRef': capture['capture']['recordRef'], 'proposalsArtifactRef': self.upload('proposals.json', proposals)})
+        review_ref, review_sha = review['recordRef'], review['metadata']['reviewSha256']
+        approval = self.call('translation_approve', {'reviewRef': review_ref, 'exactReviewSha256': review_sha,
+                                                     'reviewer': 'User-authorized disposable-fixture coordinator', 'approveEveryChange': True})
+        candidate = self.call('translation_candidate', {'reviewRef': review_ref, 'exactReviewSha256': review_sha, 'approvalSha256': approval['recordSha256']})
+        refused = self.call('translation_native_prepare', {**profile, 'candidateRef': candidate['recordRef'], 'candidateReceiptSha256': candidate['recordSha256'],
+                                                           'idempotencyKey': 'finalized-' + self.root.name}, '')
+        report['finalizedCapture'] = {'rows': total, 'nativeKey': main['nativeKey'], 'mainTarget': REPLACEMENT, 'spentBaselinePrepare': refused}
+
     def execute(self):
         report = {'completed': False, 'qualificationMode': False, 'automaticReplay': False}
         try:
@@ -269,7 +302,8 @@ class Run:
             before = self.call('tia_discover')
             started = self.call('tia_start')
             require(started['ownsPortalProcess'] and not started['projects'], 'Fresh empty owned Portal required')
-            self.lifecycle(report)
+            if self.args.finalized_capture: self.finalized_capture(report)
+            else: self.lifecycle(report)
             self.call('tia_detach')
             after = self.call('tia_discover')
             report.update(portal_check(before, after, started['processId']))
@@ -296,9 +330,12 @@ def main():
     parser.add_argument('--profile-id', required=True)
     parser.add_argument('--interrupt', action='append', default=[], choices=CASES,
                         help='Before the clean lifecycle: lose the worker or Host at this journal state, then reconcile from a fresh Host')
+    parser.add_argument('--finalized-capture', action='store_true',
+                        help='Instead of the lifecycle: capture through a finalized restricted entry and refuse a prepare from its spent baseline')
     parser.add_argument('--execute', action='store_true')
     args = parser.parse_args()
     require(args.execute, 'Explicit coordinator execution required')
+    require(not (args.finalized_capture and args.interrupt), '--finalized-capture runs alone')
     result = Run(args).execute()
     print(json.dumps({'completed': result['completed'], 'root': str(args.root), 'failure': result.get('failure')}), flush=True)
     return 0 if result['completed'] else 1

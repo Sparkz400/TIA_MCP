@@ -34,6 +34,7 @@ instead of failing: a key-discovery pass that fixes the expectations, never evid
 search names a profile; a write the profile does not declare is refused) and a checkpoint restore of each topology change the
 full run applied without one (the shared-device assignment, OutsideOfProject, the createDomain manager, the IM 155-5 client).
 --slice gsd runs only the installed I-device GSD device and what it needs (see gsd_slice).
+--slice delete-rule plugs one DI module and checks that hardware_delete refuses compile=false (see delete_rule_slice).
 --slice refusals runs the native refusals and paths the full run lacks (see refusal_slice): the MRP port-link rule both ways, a
 PLC-to-PLC shared-device access, channel and versionless capability-profile refusals, the sharedDevice disconnect, an address change
 that moves the start address, and a second owned scratch whose CPU takes the module the first project set OutsideOfProject.
@@ -119,6 +120,12 @@ SLICE_LIMITATIONS = [
     "Capability profiles: the worker's bundled contract; one hardware_catalog_search entry naming its profile and one refused undeclared write (InformationText).",
     "Checkpoint restores of the shared-device assignment (SpDi3 to the scratch CPU), SpDi4 OutsideOfProject with one external IO controller, the MRP manager "
     "creating domain HwRing and the IM 155-5 PN ST joining it as client; the members' ports stay unlinked, so no ring is closed.",
+    "Engineering only; nothing is downloaded and no physical topology is observed.",
+]
+DELETE_SLICE_LIMITATIONS = [
+    "--slice delete-rule: one owned scratch CPU 1511-1 PN V4.1 with one DI 16x24VDC HF (6ES7 521-1BH00-0AB0) plugged at slot 2. hardware_delete of it "
+    "refuses compile=false (InvalidRequest, the delete and rename rule of the 31 October audit) before its checkpoint, then applies with compile and "
+    "save; no reopen and no restore.",
     "Engineering only; nothing is downloaded and no physical topology is observed.",
 ]
 GSD_SLICE_LIMITATIONS = [
@@ -884,6 +891,27 @@ def restore_slice(run):
     run.expect(not missing and run.coverage.get("hardware_attributes", {}).get("refused"), "coverage", "Slice kinds without a restore or the profile refusal: %s" % missing)
 
 
+def delete_rule_slice(run):
+    """--slice delete-rule: HwDi in the scratch rack; hardware_delete with compile=false is refused before the checkpoint, then applies compiled."""
+    plug(run, "HwDi", 2)
+    module = run.hw(SCRATCH.device, "items", "HwDi")
+    prepared = run.prepare("delete HwDi", "hardware_delete", {"hardwarePath": module[3:]},
+                           {"effects": [{"deleteHardwarePath": module[3:], "positionNumber": int(run.current["view"][module]["positionNumber"])}]})
+
+    def refused():
+        before = run.state()
+        error = run.h.call_error("change_apply", {**run.h.apply_args(prepared), "compile": False, "save": False})
+        require(error.get("code") == "InvalidRequest" and "compile=true" in (error.get("message") or ""),
+                "Expected the compile=true refusal, observed %s: %s" % (error.get("code"), error.get("message")))
+        status = run.h.tool("change_status", {"changeId": prepared["changeId"]})
+        require(status["state"] == "prepared" and not status["stages"] and not status["recoveryArchive"] and run.state() == before,
+                "The refused delete changed the change state or the project")
+        return {"error": error, "state": status["state"]}
+    run.h.stage("refuse apply hardware_delete: compile=false", refused)
+    run.mark("hardware_delete", "refused", "InvalidRequest")
+    run.finish("delete HwDi", "hardware_delete", prepared, removed=under(module[3:], constant(run, SCRATCH, SCRATCH.prefix + "HwDi"))(None, run.current["view"]))
+
+
 def gsd_slice(run):
     """--slice gsd: the GSD catalog search first; with an installed I-device GSD, only what gsd_device needs (the added CPU HwPeer on
     HwNet and its IO system HwPeerIo, which the ET 200MP assignment creates), then the GSD device added and put on HwNet without
@@ -1052,11 +1080,12 @@ def heading(args):
     """The report title and limitations of the full run or the selected slice."""
     title = {"restores": "X10 topology restores and capability-profile gates in one owned scratch CPU 1511-1 PN with ET 200MP and ET 200SP stations",
              "gsd": "X10 GSD device: the project's own I-device GSD as an IO device of an added CPU 1511-1 PN in one owned scratch",
+             "delete-rule": "X10 hardware_delete compile rule: one DI module in one owned scratch CPU 1511-1 PN",
              "refusals": "X10 hardware refusals and topology paths natively: MRP port links, PLC-to-PLC shared access, channel and versionless profiles, the sharedDevice "
                          "disconnect, a start-moving address change and a second project's controller, in two owned scratches",
              None: "X10 hardware changes in one owned scratch CPU 1511-1 PN with S7-1200, ET 200MP and ET 200SP families, a shared device and an MRP ring"}[args.slice]
     return title + (" (key discovery, not evidence)" if args.discover else ""), {"restores": SLICE_LIMITATIONS, "gsd": GSD_SLICE_LIMITATIONS, "refusals": REFUSAL_LIMITATIONS,
-                                                                                None: LIMITATIONS}[args.slice]
+                                                                                "delete-rule": DELETE_SLICE_LIMITATIONS, None: LIMITATIONS}[args.slice]
 
 
 def body(h):
@@ -1068,7 +1097,7 @@ def body(h):
     run.current = run.snap("baseline")
     sliced = getattr(getattr(h, "args", None), "slice", None)
     if sliced:
-        {"restores": restore_slice, "gsd": gsd_slice, "refusals": refusal_slice}[sliced](run)
+        {"restores": restore_slice, "gsd": gsd_slice, "refusals": refusal_slice, "delete-rule": delete_rule_slice}[sliced](run)
         return
     phase_a(run)
     reopen(run)
@@ -1086,9 +1115,9 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=900)
     parser.add_argument("--run-native", action="store_true")
     parser.add_argument("--discover", action="store_true", help="Record unexpected state differences, previews and refusals instead of failing (not evidence).")
-    parser.add_argument("--slice", choices=("restores", "gsd", "refusals"), help="restores: only the profile gates and the topology restores the full run lacks; "
+    parser.add_argument("--slice", choices=("restores", "gsd", "refusals", "delete-rule"), help="restores: only the profile gates and the topology restores the full run lacks; "
                         "gsd: only the installed I-device GSD device and what it needs; refusals: the native refusals and topology paths the full run lacks, "
-                        "with a second owned scratch.")
+                        "with a second owned scratch; delete-rule: hardware_delete's compile=false refusal on one DI module.")
     args = parser.parse_args()
     args.runner = __file__
     title, limitations = heading(args)

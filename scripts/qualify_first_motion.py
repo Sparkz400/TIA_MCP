@@ -6,7 +6,8 @@ prepared with no stage and no recovery archive, no admission stays open, and tec
 are unchanged. The same axis with parameters {"VirtualAxis.Mode": 1} then applies with checkpoint, compile and save. A
 following TO_ExternalEncoder 10.0 is no longer the first motion object: its preview has neither, it applies with
 compile=false and save=false, and change_restore into a new directory brings back the project with the axis and without
-the encoder.
+the encoder. In that recovered project to_delete of the axis must refuse compile=false (InvalidRequest, the delete and
+rename rule of the 31 October audit) before its checkpoint, with the axis kept.
 """
 from __future__ import annotations
 
@@ -23,6 +24,7 @@ LIMITATIONS = [
     "One owned scratch CPU 1511-1 PN V4.1: TO_PositioningAxis 10.0 (refused uncompiled, then created virtual with VirtualAxis.Mode 1) "
     "and TO_ExternalEncoder 10.0. The rule's other motion families and other CPUs are checked offline only.",
     "Engineering only: nothing is downloaded, no axis moves and the encoder stays unconnected.",
+    "to_delete's compile=false refusal is checked on the restored axis; the delete itself is not applied here.",
 ]
 
 
@@ -84,6 +86,19 @@ def body(h):
         require(state() == with_axis, "The restored project differs from the project with the axis only")
         return {k: result.get(k) for k in ("state", "stages", "recoveredProject")}
     h.report["restore"] = h.stage("change_restore of the encoder into a new directory", restored)
+    path = plc + "/technology/" + AXIS[0]
+    delete = h.stage("prepare to_delete of the axis", lambda: h.tool("change_prepare", {"kind": "to_delete", "payload": {"technologyPath": path}, "plcPath": plc}))
+
+    def delete_refused():
+        error = h.call_error("change_apply", {**h.apply_args(delete), "compile": False, "save": False})
+        require(error.get("code") == "InvalidRequest" and "compile=true" in (error.get("message") or ""),
+                "Expected the compile=true refusal, observed %s: %s" % (error.get("code"), error.get("message")))
+        status = h.tool("change_status", {"changeId": delete["changeId"]})
+        archives = [str(p) for p in h.directory.glob("**/change-%s/before.zap21" % delete["changeId"])]
+        require(status.get("state") == "prepared" and not status.get("stages") and not archives, "The refused delete left the prepared state or wrote a checkpoint")
+        require(state() == with_axis, "The refused delete changed the technology objects or the program")
+        return {"error": error, "status": {k: status.get(k) for k in ("state", "stages")}}
+    h.report["deleteRefusal"] = h.stage("refuse to_delete with compile=false before the checkpoint", delete_refused)
 
 
 if __name__ == "__main__":

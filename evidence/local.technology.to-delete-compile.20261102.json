@@ -1,0 +1,72 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.technology.to-delete-compile.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T01:27:09+00:00",
+  "source": {
+    "commit": "bc162ad24797efa34d3c82f87202b2b018c7c160",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_first_motion.py on a frozen Debug build of bc162ad2 (artifacts/ap1, git archive), 14/14 steps, in one owned scratch CPU 1511-1 PN V4.1: the first-motion steps of local.technology.first-motion.20261101 again (TO_PositioningAxis 10.0 refused compile=false with CompileRequired before the checkpoint, the virtual axis applied compiled, TO_ExternalEncoder 10.0 applied uncompiled and change_restore brought back the project with the axis only), then in that restored project change_apply of to_delete of the axis with compile=false refused with InvalidRequest (requires compile=true, the 31 October delete and rename rule): change_status stayed prepared with no stage, no before.zap21 was written and technology_read and the program inventory were unchanged.",
+  "limitations": [
+    "One owned scratch CPU 1511-1 PN V4.1; only the compile=false refusal of to_delete is new here, the delete itself is qualified by local.technology_changes.20261028.",
+    "Engineering only: nothing is downloaded, no axis moves and the encoder stays unconnected."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "3348872af8950c2fe44df538b6eca91a22816a9ee9bf19d62c0be707fbd4d4a7"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "b1e1adad419317c49f760522263417a7a34e7660e76f587412890b4d2483b010"
+    }
+  ],
+  "runs": [
+    {
+      "report": "qualification.json",
+      "sha256": "5bfe6d9ce90085eaeaa85d032ae93d87a0d21748c35ba2495c72eb98ea67fea3",
+      "bytes": 149284,
+      "completed": true,
+      "steps": [
+        "start owned TIA first motion",
+        "create owned scratch first motion",
+        "baseline: no technology object",
+        "prepare the first motion object TO_PositioningAxis 10.0",
+        "refuse change_apply compile=false: CompileRequired before the checkpoint",
+        "prepare the first motion object as a virtual axis",
+        "apply to_create",
+        "technology_read shows the compiled axis",
+        "prepare a later motion object TO_ExternalEncoder 10.0",
+        "apply TO_ExternalEncoder without compile",
+        "technology_read shows the axis and the encoder",
+        "change_restore of the encoder into a new directory",
+        "prepare to_delete of the axis",
+        "refuse to_delete with compile=false before the checkpoint"
+      ],
+      "toolsPassed": [
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "change_status",
+        "project_inventory",
+        "software_inspect",
+        "technology_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start"
+      ],
+      "toolsRejected": [
+        "change_apply"
+      ]
+    }
+  ]
+}
