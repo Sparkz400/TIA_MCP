@@ -324,10 +324,12 @@ namespace TiaMcp.Openness.V21
                 }
                 connector["system"] = actual.DeepClone();
                 // Native address ownership follows the assigned controller. It is the only allowed address change, and only on this
-                // remote station; a sharedDevice connection moves only its sharedSubmodules subtrees to the selected PLC.
-                string selectedOwner = payload.Value<string>("addressControllerOwnerPath");
-                bool moving = shared && !disconnect;
-                if (moving && sharedItems.Length == 0) Fail("A sharedDevice connection names its sharedSubmodules.");
+                // remote station; a sharedDevice connection moves only its sharedSubmodules subtrees to the selected PLC, and a sharedDevice
+                // disconnect moves the leaving PLC's (its sharedSubmodules) to the one remaining PLC.
+                bool moving = shared && (!disconnect || sharedItems.Length != 0);
+                if (shared && !disconnect && sharedItems.Length == 0) Fail("A sharedDevice connection names its sharedSubmodules.");
+                if (moving && disconnect && peers.Count != 1) Fail("A shared disconnect gives its sharedSubmodules to exactly one remaining PLC.");
+                string selectedOwner = moving && disconnect ? peers.Single() : payload.Value<string>("addressControllerOwnerPath");
                 var moved = new HashSet<string>(StringComparer.Ordinal);
                 foreach (var row in expected.OfType<JObject>().Where(row => row.Value<string>("path").StartsWith(station + "/items/", StringComparison.Ordinal) &&
                     before.OfType<JObject>().Any(original => original.Value<string>("path") == row.Value<string>("path"))))
@@ -617,6 +619,10 @@ namespace TiaMcp.Openness.V21
             ProfileKey(typeIdentifier, firmwareVersion) is string key && BundledProfiles.Value.TryGetValue(key, out var profile) ? profile : null;
 
         internal static IEnumerable<JObject> BundledProfileList => BundledProfiles.Value.Values;
+
+        // Whether hardware_catalog_search names a profile of the entry's type. A versionless catalog entry's Version is no firmware (a GSD
+        // entry shows its file name), so only the type is matched; a write still selects the profile by the item's FirmwareVersion.
+        internal static bool HasProfiles(IEnumerable<JObject> profiles, string typeIdentifier) => profiles.Any(profile => profile.Value<string>("typeIdentifier") == typeIdentifier);
 
         // A write to a versionless (System:, GSD:) type that has profiles, but none for the item's firmware (unreadable, or in another
         // format than the profile recorded), fails closed instead of skipping the profile check.

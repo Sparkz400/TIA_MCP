@@ -9,10 +9,14 @@ the feature catalog keeps its own data contract version. Dated detail and eviden
 
 ## [Unreleased]
 
-Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.107`.
+Changes since the repository went public on 23 October 2026, up to feature catalog `0.4.113`.
 
 ### Added
 
+- **HMI lifecycle gates:** the HMI gate route checks that every compile names only the target HMI's own scope, that each Host
+  lifetime ends normally (Host, worker and owned TIA exits verified) and that a new TIA process then opens the saved project
+  read-write at once; passed on TP700 Comfort, MTP700 Unified Comfort and WinCC Unified PC RT
+  ([record](docs/verification/hmi-lifecycle-20261101.md)).
 - **Versioning and releases:** product version `0.9.0` for every assembly, the npm metadata,
   `serverInfo.version` and release bundles; a tag-triggered workflow drafts a GitHub release with
   the verified offline bundle ([releasing](docs/guides/releasing.md)).
@@ -35,7 +39,8 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `plc_online_compare` and `plc_station_upload`, runtime OPC UA and Web API against PLCSIM over
   TCP/IP, and read-only live monitoring of watch and force tables (`watch_table_monitor`).
 - **Test Suite:** application test runs on an owned PLCSIM instance (TS-Q02 qualification mode), and
-  style-rule runs with operator scope and license observations (TS-Q01 qualification mode).
+  style-rule runs with operator scope and license observations (TS-Q01 qualification mode). A job
+  queued by `testsuite_style_job_prepare` from a public application review ran in TS-Q02.
 - **Online device identification:** `device_online_browse` and `device_identify` are qualified on an
   owned PLCSIM instance over TCP/IP: they equal pinned `Modules.Browse` and I&M0 reads of the CPU, its
   PROFINET interface and both ports. The operator trusts the instance's web certificate for the run, and
@@ -46,7 +51,10 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **Add-In companion:** a TIA Add-In that hands a project-tree selection to an enrolled Host.
 - **Explorer:** technology, software-unit, library and port providers. The desktop roundtrip passed in
   VS Code 1.144.0 through MCP Apps: an exact selection answered by `project_model_details`, refusal
-  after `tia_detach` and the artifact fallback (`local.explorer.desktop.20261101`).
+  after `tia_detach` and the artifact fallback (`local.explorer.desktop.20261101`). Warm/cold
+  timings, memory and payload sizes for the 1k/10k/50k trees and the 500-node graph; the cache
+  benchmark also records cold first queries, page bytes and peak resident set
+  ([record](docs/verification/explorer-performance-20261101.md)).
 - **HMI compile:** `change.hmi_compile` compiles fixtures an operator configured in the editor (start
   screen, Unified transfer password): TP700 Comfort and MTP700 Unified Comfort, two targets each, with
   zero errors and warnings, a fresh-Host reopen and checkpoint restore (`local.hmi.compile.20261101`).
@@ -90,9 +98,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   optional `externalIoControllers` count); `network_io_assign` takes `sharedDevice` with `sharedSubmodules`, and
   `hardware_replace` takes `acceptAddressChange` with `acknowledgedTags`
   (`local.hardware_changes.topology.20261101`, `local.hardware_changes.topology_restores.20261101`).
-- **Capability profiles:** 13 module capability profiles in
-  `contracts/hardware-catalog-profiles.v1.json`, linked from `hardware_catalog_search` and checked by
-  attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
+- **Capability profiles:** 13 module capability profiles and the operator-installed I-device GSD
+  head's versionless profile in `contracts/hardware-catalog-profiles.v1.json`, linked from
+  `hardware_catalog_search` and checked by attribute writes; technology version profiles in `contracts/technology-version-profiles.v1.json`
   (45 cells on three CPUs) that `to_create` admits or refuses by (`local.technology.version_profiles.20261031`).
 - **Restricted translation profile:** qualification captures accept `categoryIds`, and the Host
   keeps exactly the requested categories of V21's leaking category export by row identity; a
@@ -113,6 +121,11 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 - **GSD:** the I-device GSD export reran (`local.gsd_transfer_areas.20261101`). With the GSDML
   installed by an operator, the hardware runner's `--slice gsd` adds the device, puts it on the subnet and
   assigns it with compile and checkpoint restore (`local.hardware_changes.gsd.20261101`).
+- **Hardware refusals natively:** the hardware runner's `--slice refusals` runs the MRP port-link
+  refusal both ways, the PLC-to-PLC shared-access refusal, channel and versionless capability-profile
+  refusals, the `sharedDevice` disconnect, an address change that moves the start address and a
+  second owned scratch whose CPU takes the module the first project set `OutsideOfProject`
+  (`local.hardware_changes.refusals.20261102`, [record](docs/verification/hardware-refusals-20261102.md)).
 
 ### Changed
 
@@ -122,8 +135,20 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   `capabilities.experimental["tiaMcp/featureCatalog"].version`.
 - Bundles from `scripts/Package.ps1` carry the product version in their name and `manifest.json`.
 - Combined PLC library apply is on by default for the natively verified recipe shapes;
-  `--enable-library-integrate-apply` is still accepted and changes nothing.
+  `--enable-library-integrate-apply` is still accepted and changes nothing. Since 2 November these
+  are 23 shapes: every combination of LAD/FBD FC and FB callers, earlier placement, reuse and the
+  reused-FB multi-instance (`local.library_integrate.candidate_shapes.combinations.20261102`), and a
+  multi-instance caller FB with its own instance DB, which gains the member through the newly captured
+  component effect (`local.typed.component-effect-capture.20261102`,
+  `local.library_integrate.candidate_shapes.dependent_db.20261102`); an embedding parent is still
+  refused before admission with `DependencyProfileUnavailable`.
 - Production Hosts dispatch the qualified force-table document edits.
+- `simulation_provision_reconcile` also requires the project's save time before its pre-provision
+  archive (and compares the project library), the storage outside the card against its pre-attempt
+  inventory by metadata, and a write-ahead stream that never opened or armed the credential; an
+  observer that was never created is unchanged. All five retained provisioning admissions on this
+  PC were released (`local.sim.reconcile.release.20261102`); `reconcile_provision.py` tracks every
+  process exactly and proves the project lock released.
 - `plc_station_upload` can trust an owned PLCSIM instance's TLS (`trustOwnedSimulationCertificate`,
   off by default); `safety_import_xml` compiles every device; the device compile lists devices
   without a compile service as not compiled instead of refusing.
@@ -172,7 +197,7 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   [shared vectors](fixtures/canonical-json/vectors.v1.json) that both runtimes' tests reproduce byte for
   byte; integer literals beyond 2^53 keep their exact digits, and a lone surrogate is refused
   (`InvalidRequest`). Numbers now hash by value (`1.0` as `1`, `1e3` as `1000`), and both runtimes
-  read number literals with one exact conversion (the worker's .NET Framework parser misrounds some);
+  read number literals with one exact conversion (the worker's .NET Framework parser misrounds some and never sees them);
   review diffs still report `1` to `1.0`. Non-ASCII text and `+ < > & '` stay literal. **Upgrade:**
   journals, records, captures, completed reviews, approvals and candidates, Test Suite jobs, VCI
   manifests and revisions, capture plans and saved reviews written by earlier builds keep verifying in
@@ -185,6 +210,16 @@ Changes since the repository went public on 23 October 2026, up to feature catal
 
 ### Fixed
 
+- No `sharedDevice` disconnect could compile: V21 fails a submodule left assigned to the leaving
+  PLC. The disconnect now names that PLC's items in `sharedSubmodules`, and they go to the one
+  remaining PLC in the same change (`local.hardware_changes.refusals.20261102`).
+- `hardware_catalog_search` never named a versionless (`GSD:`, `System:`) profile, because it
+  compared the entry's catalog version, a GSD file name, with the profile's firmware; it now matches
+  the type.
+- A Test Suite system-test endpoint also needs a TCP/IP instance: a Softbus instance keeps its
+  configured controller address and the PLCSIM adapter can still route to it with nothing
+  listening, so it now refuses with `PlcsimEndpointUnreachable`. No build dispatches system tests
+  yet, so this is checked offline only.
 - `drive_telegram_set` refused every prepare with `ExpectedValueMismatch`: telegram rows carried a
   string-typed null that never equals the null of the echoed `expectedTelegrams`; they now carry real
   JSON nulls (`local.drives.index.20261101`).
@@ -294,6 +329,9 @@ Changes since the repository went public on 23 October 2026, up to feature catal
   refused; the online route needs a card from the PLC), V21 Openness neither creates nor
   exposes WinCC RT Professional, and V21 Update 3 cannot re-check a Test Suite style rule's scope at
   execution time, so production style execution is unavailable (only the TS-Q01 qualification mode runs).
+- Test Suite system tests have no qualification mode: they need PLCSIM's TCP/IP mode and, since V21
+  takes no OPC UA credential, a guest-access seed made at the desk
+  ([record](docs/verification/testsuite-system-blocker-20261101.md)).
 - `project_upgrade` cannot upgrade projects with device types V21 dropped (for example a TP700
   Comfort 15.0 panel); V15.1 and V17–V20 sources and UMAC-protected or locked sources are not
   exercised, since only V21 is installed here and V21 cannot create older projects. Restricted

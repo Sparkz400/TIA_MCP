@@ -136,16 +136,39 @@ namespace TiaMcp.Openness.V21
         private readonly bool _libraryIntegrateApplyEnabled;
 
         // Null when combined apply may run; otherwise the refusal's code (PlcIntegrationNotQualified unless a precise one applies) and message.
-        private JObject PlcCombinedApplyRefusal(LibraryChange change)
+        private JObject PlcCombinedApplyRefusal(LibraryChange change) => PlcCombinedApplyRefusal(change, out _);
+        private JObject PlcCombinedApplyRefusal(LibraryChange change, out bool dependentInstanceDb)
         {
+            dependentInstanceDb = false;
             var caller = change.Preview["integrationPlan"]?["callerArtifact"] as JObject; System.Xml.Linq.XDocument export;
             try { export = caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))); }
             catch (PlcComponentException error) { return NotQualified("The retained caller export is unusable: " + error.Message); }
-            string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change)) ??
+            string[] dependents = null, directInstanceDbs = null;
+            try { PlcCombinedApplyDependents(change, out dependents, out directInstanceDbs); }
+            catch (BridgeException error) { return NotQualified(error.Message); }
+            dependentInstanceDb = directInstanceDbs?.Length > 0;
+            string shape = PlcComponentQualificationGate.CombinedApplyRefusal(change.Preview, export, PlcComponentCandidatesAdmitted(change), dependentInstanceDb) ??
                 (change.Source == null || change.Source.Project != null || string.IsNullOrEmpty(change.Source.SourcePath) || change.Source.Writable
                     ? "Only the verified read-only global source with its retained snapshot is eligible." : null);
             return shape != null ? NotQualified(shape) :
-                PlcCombinedApplyTargetRefusal(change);
+                PlcCombinedApplyTargetRefusal(change, dependents, directInstanceDbs);
+        }
+
+        // A reused-FB multi-instance plan changes its caller FB's interface: every dependent of the typed route's closure, and the
+        // caller's direct instance DBs among them (the only ones a captured effect covers). Both stay null for any other plan.
+        private void PlcCombinedApplyDependents(LibraryChange change, out string[] dependents, out string[] directInstanceDbs)
+        {
+            dependents = directInstanceDbs = null;
+            var plan = change.Preview["integrationPlan"] as JObject;
+            if (plan?["fb"]?.Value<bool?>("reused") != true || plan["multiInstance"] == null) return;
+            LibraryPlcScope(change, out var plc);
+            string callerPath = plan["caller"].Value<string>("blockPath");
+            dependents = TypedDependentPaths(plc, callerPath).ToArray();
+            var budget = new ScanBudget(50000); var blocks = AllBlocks(plc, budget).ToArray();
+            if (budget.Truncated) throw new BridgeException("DependencyUnresolved", "The dependent check needs the complete PLC block inventory.");
+            var owner = blocks.Single(b => b.Path == callerPath).Item;
+            directInstanceDbs = dependents.Where(path => blocks.SingleOrDefault(b => b.Path == path)?.Item is InstanceDB db
+                && db.InstanceOfName == QualifiedName(owner) && db.Namespace == owner.Namespace).ToArray();
         }
         private static JObject NotQualified(string message) => message == null ? null : new JObject { ["code"] = PlcLibraryIntegrationPlanner.ApplyError, ["message"] = message };
 
@@ -154,7 +177,7 @@ namespace TiaMcp.Openness.V21
             _componentQualificationEnabled && _ownsPortal && _scratchProject != null && change.Project != null && change.Project.Equals(_scratchProject) && _portal.Projects.Count == 1;
 
         // Step 1 imports and saves before step 2 creates the instance DB; what step 2 needs from the target is decided here, before any claim.
-        private JObject PlcCombinedApplyTargetRefusal(LibraryChange change)
+        private JObject PlcCombinedApplyTargetRefusal(LibraryChange change, string[] dependents, string[] directInstanceDbs)
         {
             var languages = change.Project.LanguageSettings;
             string refusal = PlcComponentQualificationGate.CombinedApplyLanguageRefusal(languages.ActiveLanguages.Select(l => l.Culture.Name).ToArray(),
@@ -173,8 +196,7 @@ namespace TiaMcp.Openness.V21
                 // caller's dependents are refused here, before admission, because no captured effect covers them. After an import it
                 // would fail only once the import is saved; a multi-instance profile needs the installed FB export, unknown before it.
                 if (plan["fb"].Value<bool>("reused"))
-                    return plan["multiInstance"] == null ? null
-                        : PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, TypedDependentPaths(plc, plan["caller"].Value<string>("blockPath")));
+                    return plan["multiInstance"] == null ? null : PlcComponentQualificationGate.CombinedApplyDependentsRefusal(plan, dependents, directInstanceDbs);
                 if (plan["multiInstance"] != null) return NotQualified("A multi-instance profile for a newly imported FB can only be checked against its installed export, after the import is saved. Install the component first, then add the multi-instance as a reuse plan.");
                 // The same captured-storage decision step 2 makes; its content equality needs the installed export and stays there.
                 var captured = CapturedStorageContext(change, true);
@@ -217,17 +239,17 @@ namespace TiaMcp.Openness.V21
         private void PreparePlcCombinedApply(LibraryChange change)
         {
             if (!_libraryIntegrateApplyEnabled) return;
-            var refused = PlcCombinedApplyRefusal(change); string refusal = refused?.Value<string>("message");
+            var refused = PlcCombinedApplyRefusal(change, out bool dependentInstanceDb); string refusal = refused?.Value<string>("message");
             var caller = change.Preview["integrationPlan"]["callerArtifact"] as JObject;
             var unverified = refusal != null ? new JObject() : PlcComponentQualificationGate.UnverifiedFeatures((JObject)change.Preview["integrationPlan"], change.Payload,
-                caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))));
+                caller == null ? null : EngineeringSources.ReadXml(PlcComponentContentContract.Artifact(caller, caller.Value<string>("sha256"))), null, dependentInstanceDb);
             change.Preview["applySupported"] = refusal == null;
             change.Preview["combinedApply"] = new JObject { ["enabled"] = true, ["eligible"] = refusal == null, ["refusal"] = refusal, ["refusalCode"] = refused?["code"]?.DeepClone(), ["refusalDetails"] = refused?.DeepClone(),
                 ["sequence"] = "change_apply prepares, applies with compile and save, and reads back each step in order: library_instantiate (absent for a reused FB), then graphical_typed_edit. Not atomic.",
                 ["checkpoint"] = "The first step's complete-project archive, taken before the first mutation, is this change's single recovery checkpoint.",
                 ["candidateFeatures"] = unverified,
                 ["qualification"] = unverified.Count != 0 ? "Candidate shape without native evidence, admitted only on this qualification Host's owned scratch."
-                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101)." };
+                    : "Natively qualified for the verified shapes on owned de-DE-only scratch projects (local.library_integrate.combined_apply.rerun.20261028, local.library_integrate.candidate_shapes.rerun.20261031, local.library_integrate.combined_apply.regression.20261031, local.library_integrate.candidate_shapes.multi.20261101, local.library_integrate.combined_apply.regression.20261101, local.library_integrate.candidate_shapes.combinations.20261102, local.library_integrate.candidate_shapes.dependent_db.20261102)." };
             if (refusal != null) return;
             var coordinator = (JObject)change.Preview["integrationPlan"]["coordinator"];
             coordinator["publicEntryPointAvailable"] = true; coordinator["remainingBoundary"] = "Combined change_apply runs only the verified shapes; every other shape stays plan-only.";

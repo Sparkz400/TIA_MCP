@@ -1,0 +1,79 @@
+{
+  "schema": "tia-mcp.evidence-summary.v1",
+  "evidenceId": "local.library_integrate.candidate_shapes.combinations.20261102",
+  "outcome": "passed",
+  "recordedAtUtc": "2026-11-02T00:25:23+00:00",
+  "source": {
+    "commit": "b3787562c6ef834a7237daa7f2e9a460be45d6be",
+    "dirty": false
+  },
+  "environment": {
+    "machine": "PCNico",
+    "os": "Windows-11-10.0.26300-SP0",
+    "tiaVersion": 21
+  },
+  "scope": "scripts/qualify_library_integrate_apply.py --candidates with the 16 combination cases at b3787562 (frozen artifacts/pc1, --artifacts artifacts/q1) on a --component-qualification Host, each case in its own owned de-DE-only CPU 1511-1 PN V4.1 scratch: ladEarlier, fbEarlier, ladFb, ladFbEarlier (fresh import with a new global DB), reuseExisting, reuseLad, reuseLadExisting, reuseEarlier, reuseLadEarlier, reuseFb, reuseFbEarlier, reuseLadFb, reuseLadFbEarlier (reuse of the installed FB after a verified standalone install, new global DB), multiEarlier, multiLad, multiLadEarlier (multi-instance Gate of the reused FB in the existing FBD or LAD FB TiaMcpComponentHost). Two-network callers were re-imported over themselves from their own native export. Every case installed with candidateFeatures exactly its feature combination, one change_apply, the exact installed-object diff, the native caller insertion proof after the selected network (and the one new Static member for a multi-instance), the call oracle, the instance DB number, exact library versions, a fresh reopen, a 0-error compile and change_restore of its initial checkpoint (the typed step's own archive for a reused FB) into a new location equal to the baseline after retrieval and after reopen.",
+  "limitations": [
+    "Engineering only (runtimeVerified false); owned de-DE-only scratch projects on CPU 1511-1 PN V4.1, the captured component FB/UDT, standard PLC scope.",
+    "Callers without their own instance DB; a multi-instance caller with dependents is a separate feature (dependentInstanceDb)."
+  ],
+  "binaries": [
+    {
+      "name": "net10.0-windows",
+      "files": 26,
+      "sha256": "d0cb1b6204b22e709f86426667f9d6ac30e9cd5b8e0c849d84abe15a01655e10"
+    },
+    {
+      "name": "net48",
+      "files": 6,
+      "sha256": "62029b6287e7a98eaeebc3148f8ffac004e443fb1e63b79aef58ee6eb4544710"
+    }
+  ],
+  "runs": [
+    {
+      "report": "result.json",
+      "sha256": "f5e4cd5ace5ed171b8cfbcbc901290c5ae0596ab5e8e529f71b3a38f6223c3d1",
+      "bytes": 43632896,
+      "completed": true,
+      "steps": [
+        "author",
+        "candidate:ladEarlier",
+        "candidate:fbEarlier",
+        "candidate:ladFb",
+        "candidate:ladFbEarlier",
+        "candidate:reuseExisting",
+        "candidate:reuseLad",
+        "candidate:reuseLadExisting",
+        "candidate:reuseEarlier",
+        "candidate:reuseLadEarlier",
+        "candidate:reuseFb",
+        "candidate:reuseFbEarlier",
+        "candidate:reuseLadFb",
+        "candidate:reuseLadFbEarlier",
+        "candidate:multiEarlier",
+        "candidate:multiLad",
+        "candidate:multiLadEarlier"
+      ],
+      "toolsPassed": [
+        "artifact_read",
+        "block_read",
+        "change_apply",
+        "change_prepare",
+        "change_restore",
+        "library_close",
+        "library_list",
+        "library_open",
+        "library_query",
+        "project_open",
+        "software_inspect",
+        "tag_table_read",
+        "tia_create_scratch",
+        "tia_detach",
+        "tia_session_status",
+        "tia_start",
+        "type_read"
+      ],
+      "toolsRejected": []
+    }
+  ]
+}
