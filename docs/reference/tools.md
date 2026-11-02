@@ -444,7 +444,7 @@ option registers or admits the tool only on a qualification Host.
 | `testsuite_result_review` | Reopen and page retained supplied Test Suite findings | limited | testsuite |  |  |
 | `testsuite_style_job_execute_next` | Execute one style run through native qualification gates | unavailable_target | testsuite |  |  |
 | `testsuite_style_job_mark_interrupted` | Retain an interrupted style outcome as unknown | unavailable_target | testsuite |  |  |
-| `testsuite_style_job_prepare` | Prepare an immutable durable style queue | unqualified | testsuite |  |  |
+| `testsuite_style_job_prepare` | Prepare an immutable durable style queue | shipped | testsuite |  |  |
 | `testsuite_style_job_reconcile` | Gate independent style resource reconciliation | unavailable_target | testsuite |  |  |
 | `testsuite_style_job_recover` | Gate explicit style checkpoint recovery | unavailable_target | testsuite |  |  |
 | `testsuite_style_job_results` | Retrieve and revalidate retained style results | shipped | testsuite |  |  |

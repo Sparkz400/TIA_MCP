@@ -40,9 +40,11 @@ class Refused(Exception):
 class FakeHost:
     """One TIA with project copies by path. A connection is a Host; extra holds its qualification profile."""
 
-    def __init__(self, directory, family, profile, errors=0, leak=None, stale_readback=False):
+    def __init__(self, directory, family, profile, errors=0, leak=None, stale_readback=False, scope=None, receipt=None, read_only=False):
         self.directory, self.family, self.profile, self.errors = directory, family, profile, errors
         self.leak, self.stale_readback = leak, stale_readback
+        # scope(hmiPath) overrides the compiled target; receipt overrides a Host's close receipt; read_only the reopen.
+        self.scope, self.receipt, self.read_only = scope, receipt, read_only
         self.counter, self.changes, self.applies = itertools.count(1), {}, 0
         self.worlds, self.active = {}, None
         self.original = str(directory / "p" / "Fixture.ap21")
@@ -203,8 +205,10 @@ class FakeClient:
     def initialize(self):
         pass
 
-    def close(self):
-        pass
+    def receipt_close(self):
+        receipt = {"hostExitCode": 0, "forcedHostStop": False, "stderrEofObserved": True, "toolCalls": [],
+                   "workerExits": [{"processExitVerified": True, "exitCode": 0, "forcedTermination": False}]}
+        return {**receipt, **(self.host.receipt or {})}
 
     def tool(self, name, arguments=None):
         raw = self.raw_tool(name, arguments)
@@ -224,14 +228,14 @@ class FakeClient:
     def call(self, name, args):
         host = self.host
         if name == "tia_start":
-            return {"processId": 1}
+            return {"processId": next(host.counter)}
         if name == "project_retrieve":
             host.worlds[host.original] = host.seed()
             host.active = host.original
             return {"project": {"path": host.original}}
         if name == "project_open":
             host.active = args["path"]
-            return {"project": {"path": args["path"]}}
+            return {"project": {"path": args["path"]}, "opened": True, "readOnly": host.read_only}
         if name == "tia_detach":
             return {}
         if name == "hmi_inspect":
@@ -285,7 +289,10 @@ class FakeClient:
     def view(self, change):
         rows = [{"depth": 0, "state": "Error", "description": "Password %d" % i, "path": ""} for i in range(self.host.errors)]
         rows.append({"depth": 0, "state": "Error" if self.host.errors else "Success", "description": "Compiling finished (errors: %d; warnings: 0)" % self.host.errors, "path": ""})
-        compiled = {"errorCount": self.host.errors, "warningCount": 0, "targets": [{"target": "HmiDevice_A", "messages": rows, "messagesTruncated": False}]}
+        hmi = change["payload"]["target"]["hmiPath"]
+        kind, target = route.compile_scope({"hmiPath": hmi}, self.host.family)
+        compiled = {"errorCount": self.host.errors, "warningCount": 0, "compileScope": kind,
+                    "targets": [{"target": self.host.scope(hmi) if self.host.scope else target, "messages": rows, "messagesTruncated": False}]}
         return {"changeId": change["id"], "previewHash": "h" + change["id"], "state": change["state"], "stages": change["stages"], "journalPath": str(change["journal"]),
                 "compile": compiled if change["state"] == "applied" else None,
                 "hmiEvidence": {"baselineCompile": compiled, "baselineCompileChangedCapture": False}}
@@ -348,7 +355,7 @@ class GateRouteRunTests(unittest.TestCase):
         else:
             arguments.fixture = self.configured(profile)
         with mock.patch("builtins.print"):
-            return route.run(arguments, host.connect)
+            return route.run(arguments, host.connect, lambda pid: types.SimpleNamespace(wait_for_exit=lambda timeout: {"processId": pid, "processExitVerified": True}))
 
     def test_classic_route_passes_against_a_faithful_host(self):
         report = self.run_route("classic-comfort", "classic")
@@ -382,6 +389,22 @@ class GateRouteRunTests(unittest.TestCase):
     def run_route_fresh(self, profile, family, **fake):
         shutil.rmtree(self.root / "prep", ignore_errors=True)
         return self.run_route(profile, family, **fake)["failures"]
+
+    def test_lifecycle_lock_release_and_compile_scope_are_gated(self):
+        report = self.run_route("unified-comfort", "unified")
+        for label in ("Normal lifecycle of the qualification Host", "Normal lifecycle of the production Host", "Independent lock release",
+                      "Compiler scope: the baseline and the apply compile exactly owningDeviceHardwareAndSoftware HmiDevice_B: root tag on HMI_RT_2"):
+            self.assertTrue(any(c.startswith(label) for c in report["checks"]), label)
+        self.assertEqual(["qualification", "production"], [l["host"] for l in report["lifetimes"]])
+        cases = (({"receipt": {"forcedHostStop": True}}, "Normal lifecycle of the qualification Host"),
+                 ({"receipt": {"workerExits": []}}, "Normal lifecycle of the production Host"),
+                 ({"read_only": True}, "Independent lock release"),
+                 ({"scope": lambda hmi: hmi.replace("HmiDevice_A", "HmiDevice_B")}, "Compiler scope: the baseline and the apply compile exactly owningDeviceHardwareAndSoftware HmiDevice_A"))
+        for fake, label in cases:
+            with self.subTest(label=label):
+                shutil.rmtree(self.root / "prep", ignore_errors=True)
+                failures = self.run_route("unified-comfort", "unified", **fake)["failures"]
+                self.assertTrue(any(f.startswith(label) for f in failures), failures)
 
     def test_a_unified_table_row_change_is_outside_the_delta(self):
         def leak(world):

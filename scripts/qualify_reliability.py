@@ -87,8 +87,10 @@ class ReliabilityClient(Client):
             cwd=ROOT, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, encoding="utf-8", bufsize=1, env=environment,
         )
-        threading.Thread(target=self._read_output, daemon=True).start()
-        threading.Thread(target=self._read_errors, daemon=True).start()
+        self.output_reader = threading.Thread(target=self._read_output, daemon=True)
+        self.error_reader = threading.Thread(target=self._read_errors, daemon=True)
+        self.output_reader.start()
+        self.error_reader.start()
 
     def begin(self, method, params=None):
         self.sequence += 1
@@ -126,6 +128,11 @@ class ReliabilityClient(Client):
         # Popen holds the exact created-process handle. No name-based or tree kill.
         self.process.kill()
         self.process.wait(timeout=10)
+
+    def receipt_close(self):
+        """Close by EOF with the Host's own worker-exit budget and return its receipts (smoke_mcp.Client.close): host exit code,
+        forcedHostStop and every bridgeWorkerExit diagnostic."""
+        return Client.close(self)
 
     def close(self):
         if self.process.poll() is None:
