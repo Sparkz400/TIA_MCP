@@ -29,7 +29,7 @@ namespace TiaMcp.Model
         private static readonly string[] PrimitiveTypes = { "Bool", "Byte", "Word", "DWord", "LWord", "SInt", "USInt", "Int", "UInt", "DInt", "UDInt", "LInt", "ULInt", "Real", "LReal" };
         // Kinds that carry named operations past the closed gate (text-list precedent): family, operations, production profiles (those
         // whose native qualification passed: local.hmi.classic-import.*.20261101, local.hmi.external-tag.*.20261101) and the profiles a
-        // qualification Host may admit in a project its own worker retrieved or created. hmi_screen_create: local.hmi.screen-create.*.20261102.
+        // qualification Host may admit in a project its own worker retrieved or created. hmi_screen_create: local.hmi.screen-create.*.20261102; hmi_dynamization_create: local.hmi.dynamization.*.20261102.
         private static readonly Dictionary<string, (string Family, string[] Operations, string[] Profiles, string[] QualificationProfiles)> Kinds =
             new Dictionary<string, (string, string[], string[], string[])>(StringComparer.Ordinal)
         {
@@ -38,7 +38,7 @@ namespace TiaMcp.Model
             // Graphics: a new screen (size copied from an existing one) and allowlisted items within a screen's rectangle.
             ["hmi_screen_create"] = ("unified", new[] { "screen_create", "item_create" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" }),
             // Binding: one new tag dynamization of an item property (ProcessValue, or Visible/Enabled by a Bool tag); PLC-backed tags need the proven owner.
-            ["hmi_dynamization_create"] = ("unified", new[] { "dynamization_set" }, new string[0], new[] { "unified-comfort", "unified-pc" })
+            ["hmi_dynamization_create"] = ("unified", new[] { "dynamization_set" }, new[] { "unified-comfort", "unified-pc" }, new[] { "unified-comfort", "unified-pc" })
         };
         // The profiles --hmi-change-qualification may name; each kind admits only its own.
         internal static readonly string[] QualificationProfiles = Kinds.Values.SelectMany(k => k.QualificationProfiles).Distinct().ToArray();

@@ -472,7 +472,7 @@ class GateRouteRunTests(unittest.TestCase):
                 self.assertEqual(4, sum(c.startswith("Setup applied") for c in report["checks"]))
                 self.assertEqual(7, sum(c.startswith("Refused before any write") for c in report["checks"]))
                 self.assertEqual(3, sum(c.startswith("Independent readback") for c in report["checks"]))
-                self.assertIn("A production Host refuses the kind before its production admission", report["checks"])
+                self.assertIn("A production Host admits the kind with admission production", report["checks"])
 
     def test_a_binding_that_changes_another_item_field_fails(self):
         def leak(world):
